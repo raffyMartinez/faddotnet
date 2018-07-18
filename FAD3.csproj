@@ -1,0 +1,392 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+  <PropertyGroup>
+    <ProjectGuid>{244B71F0-A919-46E9-B27F-3352D54DCD78}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>FAD3</RootNamespace>
+    <AssemblyName>FAD3</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>c:\deploy\fad\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <UpdateUrl>http://localhost/fad2/</UpdateUrl>
+    <ApplicationRevision>1</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' == 'AnyCPU' ">
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <DebugSymbols>True</DebugSymbols>
+    <DebugType>Full</DebugType>
+    <Optimize>False</Optimize>
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <DebugSymbols>False</DebugSymbols>
+    <DebugType>None</DebugType>
+    <Optimize>True</Optimize>
+    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+    <DefineConstants>TRACE</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestCertificateThumbprint>48E8AC905F544D10B413D78B110A60BDC249F0C4</ManifestCertificateThumbprint>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestKeyFile>fad2_TemporaryKey.pfx</ManifestKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>true</GenerateManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>false</SignManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Fatcow-Farm-Fresh-Book-key.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AOI.cs" />
+    <Compile Include="ErrorLogger.cs" />
+    <Compile Include="extension.cs" />
+    <Compile Include="frmGearUsage.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form1.Designer.cs">
+      <DependentUpon>frmGearUsage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmRefNoRange.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmRefNoRange.Designer.cs">
+      <DependentUpon>frmRefNoRange.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmMap.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmMap.Designer.cs">
+      <DependentUpon>frmMap.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmAbout.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmAbout.Designer.cs">
+      <DependentUpon>frmAbout.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmAOI.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmAOI.Designer.cs">
+      <DependentUpon>frmAOI.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmCatch.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmCatch.Designer.cs">
+      <DependentUpon>frmCatch.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmEditLF.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmEditLF.Designer.cs">
+      <DependentUpon>frmEditLF.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmEffort.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmEffort.Designer.cs">
+      <DependentUpon>frmEffort.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmEnumerator.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmEnumerator.Designer.cs">
+      <DependentUpon>frmEnumerator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmFG.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmFG.Designer.cs">
+      <DependentUpon>frmFG.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmEditGMS.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmEditGMS.Designer.cs">
+      <DependentUpon>frmEditGMS.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmLandingSite.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmLandingSite.Designer.cs">
+      <DependentUpon>frmLandingSite.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmLenFreq.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmLenFreq.Designer.cs">
+      <DependentUpon>frmLenFreq.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmMain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmMain.Designer.cs">
+      <DependentUpon>frmMain.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmNewDB.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmNewDB.Designer.cs">
+      <DependentUpon>frmNewDB.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmSamplingDetail.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmSamplingDetail.Designer.cs">
+      <DependentUpon>frmSamplingDetail.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmVesselDimension.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmVesselDimension.Designer.cs">
+      <DependentUpon>frmVesselDimension.cs</DependentUpon>
+    </Compile>
+    <Compile Include="gear.cs" />
+    <Compile Include="global.cs" />
+    <Compile Include="LandingSite.cs" />
+    <Compile Include="mru.cs" />
+    <Compile Include="names.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="registrytools.cs" />
+    <Compile Include="Sampling.cs" />
+    <Compile Include="UIRow.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Form1.resx">
+      <DependentUpon>frmGearUsage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmMap.resx">
+      <DependentUpon>frmMap.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmAbout.resx">
+      <DependentUpon>frmAbout.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmAOI.resx">
+      <DependentUpon>frmAOI.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmCatch.resx">
+      <DependentUpon>frmCatch.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmEditLF.resx">
+      <DependentUpon>frmEditLF.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmEffort.resx">
+      <DependentUpon>frmEffort.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmEnumerator.resx">
+      <DependentUpon>frmEnumerator.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmFG.resx">
+      <DependentUpon>frmFG.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmEditGMS.resx">
+      <DependentUpon>frmEditGMS.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmLandingSite.resx">
+      <DependentUpon>frmLandingSite.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmLenFreq.resx">
+      <DependentUpon>frmLenFreq.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmMain.resx">
+      <DependentUpon>frmMain.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmNewDB.resx">
+      <DependentUpon>frmNewDB.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmRefNoRange.resx">
+      <DependentUpon>frmRefNoRange.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmSamplingDetail.resx">
+      <DependentUpon>frmSamplingDetail.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmVesselDimension.resx">
+      <DependentUpon>frmVesselDimension.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.0,Profile=Client">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4 Client Profile %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.4.5">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 4.5</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
+    <None Include="fad2_TemporaryKey.pfx" />
+    <None Include="Resources\VSO_NewFile_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\OpenFileFromProject_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Close_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\History_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Team_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\VSO_AddUser_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\InsertSnippet_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="resource raw\newLS.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="resource raw\newAOI.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ProcedureMissing_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Remove_16xSM.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Add_16xSM.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ExportFile_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ColumnChart_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Fatcow-Farm-Fresh-Book-key.ico" />
+    <Content Include="Icon1.ico" />
+    <None Include="Resources\layerAdd.bmp" />
+    <None Include="Resources\layer.bmp" />
+    <None Include="Resources\db.bmp" />
+    <None Include="Resources\im_exit.bmp" />
+    <None Include="Resources\MapTileLayer_16x_24.bmp" />
+    <None Include="Resources\im_table.bmp" />
+    <None Include="Resources\fish2.bmp" />
+    <None Include="Resources\imHook.bmp" />
+    <None Include="Resources\help-browser.bmp" />
+    <None Include="Resources\month.bmp" />
+    <None Include="Resources\landingSite.bmp" />
+    <None Include="Resources\aoi.bmp" />
+    <None Include="Resources\Impound.bmp" />
+    <None Include="Resources\traps.bmp" />
+    <None Include="Resources\Seines.bmp" />
+    <None Include="Resources\Others.bmp" />
+    <None Include="Resources\nets.bmp" />
+    <None Include="Resources\lines.bmp" />
+    <None Include="Resources\jigs.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="ADOX">
+      <Guid>{00000600-0000-0010-8000-00AA006D2EA4}</Guid>
+      <VersionMajor>2</VersionMajor>
+      <VersionMinor>8</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="AxMapWinGIS">
+      <Guid>{C368D713-CC5F-40ED-9F53-F84FE197B96A}</Guid>
+      <VersionMajor>4</VersionMajor>
+      <VersionMinor>9</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>aximp</WrapperTool>
+      <Isolated>False</Isolated>
+    </COMReference>
+    <COMReference Include="MapWinGIS">
+      <Guid>{C368D713-CC5F-40ED-9F53-F84FE197B96A}</Guid>
+      <VersionMajor>4</VersionMajor>
+      <VersionMinor>9</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="MetaphoneCOM">
+      <Guid>{845FE5AF-CC53-4C37-9464-EE20A866B9B0}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="stdole">
+      <Guid>{00020430-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>2</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
