@@ -85,9 +85,43 @@ namespace FAD3
             get { return _VesselTypeDict; }
         }
 
-        public static List<string> TargetAreaUsed_RefCode(string RefCode)
+        public static Dictionary<string, string> GearLocalName_TargetArea(string RefCode, string AOIGuid)
         {
-            var myList = new List<string>();
+            var myList = new Dictionary<string, string>();
+            var dt = new DataTable();
+            using (var conection = new OleDbConnection(_ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                   var query = "SELECT LocalNameGUID, LocalName FROM tblGearLocalNames INNER JOIN " +
+                        "(tblRefGearCodes_Usage INNER JOIN tblRefGearUsage_LocalName ON " +
+                        "tblRefGearCodes_Usage.RowNo = tblRefGearUsage_LocalName.GearUsageRow) " +
+                        "ON tblGearLocalNames.LocalNameGUID = tblRefGearUsage_LocalName.GearLocalName " +
+                        "WHERE tblRefGearCodes_Usage.RefGearCode= '" + RefCode +"' AND " + 
+                        "tblRefGearCodes_Usage.TargetAreaGUID= '{" + AOIGuid + "}'";
+
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(dt);
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        DataRow dr = dt.Rows[i];
+                        myList.Add(dr["LocalNameGUID"].ToString(), dr["LocalName"].ToString());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ErrorLogger.Log(ex);
+                }
+            }
+
+            return myList;
+
+        }
+
+        public static Dictionary<string, string> TargetAreaUsed_RefCode(string RefCode)
+        {
+            var myList = new Dictionary<string, string>();
             var dt = new DataTable();
             var query = "";
             using (var conection = new OleDbConnection(_ConnectionString))
@@ -95,7 +129,7 @@ namespace FAD3
                 try
                 {
                     conection.Open();
-                    query = "SELECT AOIName FROM tblRefGearCodes_Usage INNER JOIN tblAOI ON " +
+                    query = "SELECT AOIName, AOIGuid FROM tblRefGearCodes_Usage INNER JOIN tblAOI ON " +
                         "tblRefGearCodes_Usage.TargetAreaGUID = tblAOI.AOIGuid WHERE " +
                         "tblRefGearCodes_Usage.RefGearCode= '" + RefCode + "' order by AOIName";
 
@@ -104,9 +138,8 @@ namespace FAD3
                     for (int i = 0; i < dt.Rows.Count; i++)
                     {
                         DataRow dr = dt.Rows[i];
-                        myList.Add( dr["AOIName"].ToString());
+                        myList.Add(dr["AOIGuid"].ToString(), dr["AOIName"].ToString());
                     }
-
                 }
                 catch (Exception ex)
                 {

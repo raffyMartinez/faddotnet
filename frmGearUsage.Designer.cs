@@ -48,6 +48,7 @@
             this.listViewVariations.Size = new System.Drawing.Size(220, 283);
             this.listViewVariations.TabIndex = 0;
             this.listViewVariations.UseCompatibleStateImageBehavior = false;
+            this.listViewVariations.Click += new System.EventHandler(this.OnlistView_Click);
             // 
             // listViewCodes
             // 
@@ -56,6 +57,7 @@
             this.listViewCodes.Size = new System.Drawing.Size(220, 283);
             this.listViewCodes.TabIndex = 1;
             this.listViewCodes.UseCompatibleStateImageBehavior = false;
+            this.listViewCodes.Click += new System.EventHandler(this.OnlistView_Click);
             // 
             // listViewWhereUsed
             // 
@@ -64,6 +66,7 @@
             this.listViewWhereUsed.Size = new System.Drawing.Size(220, 283);
             this.listViewWhereUsed.TabIndex = 2;
             this.listViewWhereUsed.UseCompatibleStateImageBehavior = false;
+            this.listViewWhereUsed.Click += new System.EventHandler(this.OnlistView_Click);
             // 
             // listViewLocalNames
             // 
@@ -72,15 +75,18 @@
             this.listViewLocalNames.Size = new System.Drawing.Size(220, 283);
             this.listViewLocalNames.TabIndex = 3;
             this.listViewLocalNames.UseCompatibleStateImageBehavior = false;
+            this.listViewLocalNames.Click += new System.EventHandler(this.OnlistView_Click);
             // 
             // buttonOk
             // 
+            this.buttonOk.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.buttonOk.Location = new System.Drawing.Point(841, 377);
             this.buttonOk.Name = "buttonOk";
             this.buttonOk.Size = new System.Drawing.Size(65, 27);
             this.buttonOk.TabIndex = 4;
             this.buttonOk.Text = "Ok";
             this.buttonOk.UseVisualStyleBackColor = true;
+            this.buttonOk.Click += new System.EventHandler(this.OnButtonClick);
             // 
             // comboClass
             // 
@@ -140,6 +146,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.CancelButton = this.buttonOk;
             this.ClientSize = new System.Drawing.Size(918, 416);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.label4);

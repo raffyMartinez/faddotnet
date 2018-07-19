@@ -15,14 +15,16 @@ namespace FAD3
         string _GearVarName = "";
         string _GearVarGuid = "";
         string _GearRefCode = "";
-        string _AOIName = "";
+        string _TargetAreaName = "";
+        string _TargetAreaGuid = "";
 
         frmSamplingDetail _Parent;
 
-        public string AOIName
+        public  void TargetArea(string TargetAreaName, string TargetAreaGuid)
         {
-            get { return _AOIName; }
-            set { _AOIName = value; }
+            _TargetAreaName = TargetAreaName;
+            _TargetAreaGuid = TargetAreaGuid;
+
         }
 
         public string GearRefCode
@@ -57,6 +59,7 @@ namespace FAD3
         private void OnFormLoad(object sender, EventArgs e)
         {
 
+            var WidthPercent = .8D;
             ReadGearClass();
             if (_GearClassName.Length > 0)
             {
@@ -83,24 +86,54 @@ namespace FAD3
             }
 
             var lv = listViewVariations;
-            lv.Columns.Add("Variation");
+            ch = lv.Columns.Add("Variation");
             FillVariationsList();
             lv.Items[_GearVarGuid].Selected = true;
+            ch.Width = (int)(lv.Width * WidthPercent);
 
             lv = listViewCodes;
-            ch = lv.Columns.Add("Code");
-            ch = lv.Columns.Add("Sub-variation");
+            var ch1 = lv.Columns.Add("Code");
+            var ch2 = lv.Columns.Add("Sub-variation");
             FillRefCodeList();
+            ch1.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
+            ch2.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
             lv.Items[_GearRefCode].Selected = true;
 
             lv = listViewWhereUsed;
             ch = lv.Columns.Add("Target area of use");
             FillRefCodeUsage();
-            lv.Items[_AOIName].Selected = true;
+            lv.Items[_TargetAreaGuid].Selected = true;
+            ch.Width = (int)(lv.Width * WidthPercent);
 
             lv = listViewLocalNames;
             ch = lv.Columns.Add("Local name");
-           
+            FillLocalNames();
+            ch.Width = (int)(lv.Width * WidthPercent);
+
+            foreach (Control c in Controls)
+            {
+                if (c.GetType().ToString() == "System.Windows.Forms.ListView" && c.Name != "listViewLocalNames")
+                {
+                    var i = ((ListView)c).SelectedItems[0].Index;
+                    ((ListView)c).EnsureVisible(i);
+                }
+            }
+
+        }
+
+        private void FillLocalNames()
+        {
+            listViewLocalNames.Items.Clear();
+            var list = global.GearLocalName_TargetArea(_GearRefCode, _TargetAreaGuid);
+            foreach (var i in list)
+            {
+                var lvi = new ListViewItem
+                {
+                    Name = i.Key,
+                    Text = i.Value
+                };
+                listViewLocalNames.Items.Add(lvi);
+            }
 
         }
 
@@ -112,13 +145,13 @@ namespace FAD3
             {
                 var lvi = new ListViewItem
                 {
-                    Name = i,
-                    Text = i
+                    Name = i.Key,
+                    Text = i.Value
                 };
                 listViewWhereUsed.Items.Add(lvi);
             }
-            listViewWhereUsed.Columns[0].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
         }
+
         private void FillRefCodeList()
         {
             listViewCodes.Items.Clear();
@@ -133,8 +166,7 @@ namespace FAD3
                 listViewCodes.Items.Add(lvi);
                 lvi.SubItems.Add(kv.Value.ToString());
             }
-            listViewCodes.Columns[0].AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
-            listViewCodes.Columns[1].AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
+
         }
 
         private void FillVariationsList()
@@ -151,7 +183,6 @@ namespace FAD3
                 };
                 listViewVariations.Items.Add(lvi);
             }
-            listViewVariations.Columns[0].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
         }
 
         private void ReadGearClass()
@@ -169,12 +200,98 @@ namespace FAD3
         private void comboClass_Validated(object sender, EventArgs e)
         {
             var cbo = (ComboBox)sender;
+
+
             switch (cbo.Name)
             {
                 case "comboClass":
+
+                    listViewCodes.Items.Clear();
+                    listViewWhereUsed.Items.Clear();
+                    listViewLocalNames.Items.Clear();
+                    listViewVariations.Items.Clear();
+
                     FillVariationsList();
+                    if (listViewVariations.Items.Count > 0)
+                    { 
+                        if (listViewVariations.Items.ContainsKey(_GearVarGuid))
+                        {
+                            listViewVariations.Items[_GearVarGuid].Selected = true;
+                        }
+                        else
+                        {   
+                            listViewVariations.Items[0].Selected = true;
+                            _GearVarGuid = listViewVariations.Items[0].Name;
+                        }
+
+                        EventArgs ea = new EventArgs();
+                        OnlistView_Click(listViewVariations, ea);
+                    }
                      break;
             }
+        }
+
+        private void OnButtonClick(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void OnlistView_Click(object sender, EventArgs e)
+        {
+            var lv = (ListView)sender;
+            var lvi = lv.SelectedItems[0];
+            switch (lv.Name)
+            {
+                case "listViewCodes":
+                    _GearRefCode = lvi.Name;
+
+                    listViewWhereUsed.Items.Clear();
+                    listViewLocalNames.Items.Clear();
+
+                    FillRefCodeUsage();
+                    if (!listViewWhereUsed.Items.ContainsKey(_TargetAreaGuid))
+                    {
+                        listViewWhereUsed.Items[0].Selected = true;
+                        _TargetAreaGuid = listViewWhereUsed.Items[0].Name;
+                    }
+                    else
+                    {
+                        listViewWhereUsed.Items[_TargetAreaGuid].Selected = true;
+                    }
+                    FillLocalNames();
+                    break;
+                case "listViewLocalNames":
+                    break;
+                case "listViewVariations":
+                    _GearVarGuid = lvi.Name;
+
+                    listViewCodes.Items.Clear();
+                    listViewWhereUsed.Items.Clear();
+                    listViewLocalNames.Items.Clear();
+
+                    FillRefCodeList();
+                    if (listViewCodes.Items.Count > 0)
+                    {
+                        _GearRefCode = listViewCodes.Items[0].Name;
+                        listViewCodes.Items[_GearRefCode].Selected = true;
+                        FillRefCodeUsage();
+                        if (!listViewWhereUsed.Items.ContainsKey(_TargetAreaGuid))
+                        {
+                            listViewWhereUsed.Items[0].Selected = true;
+                            _TargetAreaGuid = listViewWhereUsed.Items[0].Name;
+                        }
+                        else
+                        {
+                            listViewWhereUsed.Items[_TargetAreaGuid].Selected = true;
+                        }
+                        FillLocalNames();
+                    }
+                    break;
+                case "listViewWhereUsed":
+                    _TargetAreaGuid = lvi.Name;
+                    FillLocalNames();
+                    break;
+            } 
         }
     }
 }

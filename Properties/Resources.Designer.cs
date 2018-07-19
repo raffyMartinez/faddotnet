@@ -203,6 +203,16 @@ namespace FAD3.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap internet_web_browser {
+            get {
+                object obj = ResourceManager.GetObject("internet_web_browser", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap jigs {
             get {
                 object obj = ResourceManager.GetObject("jigs", resourceCulture);

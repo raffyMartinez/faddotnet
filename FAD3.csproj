@@ -86,7 +86,7 @@
     <Compile Include="frmGearUsage.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
+    <Compile Include="frmGearUsage.Designer.cs">
       <DependentUpon>frmGearUsage.cs</DependentUpon>
     </Compile>
     <Compile Include="frmRefNoRange.cs">
@@ -202,7 +202,7 @@
     <Compile Include="UIRow.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Form1.resx">
+    <EmbeddedResource Include="frmGearUsage.resx">
       <DependentUpon>frmGearUsage.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmMap.resx">
@@ -322,6 +322,7 @@
   <ItemGroup>
     <Content Include="Fatcow-Farm-Fresh-Book-key.ico" />
     <Content Include="Icon1.ico" />
+    <Content Include="Resources\internet-web-browser.png" />
     <None Include="Resources\layerAdd.bmp" />
     <None Include="Resources\layer.bmp" />
     <None Include="Resources\db.bmp" />

@@ -227,7 +227,7 @@ namespace FAD3
                             ((ComboBox)ctl).DataSource = new BindingSource(_aoi.AOIs, null);
                             break;
                         case "LandingSite":
-                             ((ComboBox)ctl).DataSource = new BindingSource(_aoi.LandingSites, null);
+                            ((ComboBox)ctl).DataSource = new BindingSource(_aoi.LandingSites, null);
                             break;
                         case "GearClass":
                             ((ComboBox)ctl).DataSource = new BindingSource(global.GearClass, null);
@@ -377,7 +377,8 @@ namespace FAD3
                     _txtVesselDimension = (TextBox)ctl;
             }
 
-
+            //making the controls not visible speeds up form drawing
+            ctl.Visible = false;
 
             //setup the buttons
             try
@@ -405,11 +406,10 @@ namespace FAD3
                 }
             }
             _yPos += ControlHt + Spacing;
-
-
         }
 
-        private void frmSamplingDetail_Load(object sender, EventArgs e)
+        private void 
+            frmSamplingDetail_Load(object sender, EventArgs e)
         {
             this.Size = new Size(Width, _lv.Height);
             global.LoadFormSettings(this, true);
@@ -429,9 +429,65 @@ namespace FAD3
                 Text = "Sampling detail";
                 _GearClassName = _lv.Items["GearClass"].SubItems[1].Text;
             }
+            //SetupComboDataSource();
+            SetFieldsVisible();
+            CancelButton = buttonCancel;
         }
 
- 
+
+        private void SetFieldsVisible()
+        {
+            foreach (Control ctl in panelUI.Controls)
+            {
+                var tName = ctl.GetType().Name;
+               if (tName != "Button" && tName != "Label")
+                {
+                    ctl.Visible = true;
+                }
+            }
+        }
+
+        private void SetupComboDataSource()
+        {
+            foreach(Control ctl in panelUI.Controls)
+            {
+                if (ctl.GetType().Name == "ComboBox")
+                {
+                    switch (ctl.Tag.ToString())
+                    {
+                        case "Enumerator":
+                            ((ComboBox)ctl).DataSource = new BindingSource(_aoi.Enumerators, null);
+                            break;
+                        case "TargetArea":
+                            ((ComboBox)ctl).DataSource = new BindingSource(_aoi.AOIs, null);
+                            break;
+                        case "LandingSite":
+                            ((ComboBox)ctl).DataSource = new BindingSource(_aoi.LandingSites, null);
+                            break;
+                        case "GearClass":
+                            ((ComboBox)ctl).DataSource = new BindingSource(global.GearClass, null);
+                            break;
+                        case "FishingGear":
+                            if (!_isNew)
+                            {
+                                global.GearClassUsed = _lv.Items["GearClass"].Tag.ToString();
+                            }
+                            ((ComboBox)ctl).DataSource = new BindingSource(global.GearVariationsUsage(global.GearClassUsed, _AOIGuid), null);
+                            break;
+                        case "TypeOfVesselUsed":
+                            ((ComboBox)ctl).DataSource = new BindingSource(global.VesselTypeDict, null);
+                            break;
+                    }
+                    ((ComboBox)ctl).With(o =>
+                    {
+                        o.DisplayMember = "Value";
+                        o.ValueMember = "Key";
+                        o.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+                        o.AutoCompleteSource = AutoCompleteSource.ListItems;
+                    });
+                }
+            }
+        }
 
         private void AdustControlsPosition()
         {
@@ -478,8 +534,12 @@ namespace FAD3
                             {
                                 if (c.Text.Length > 0)
                                 {
-                                    int VesselUsed = int.Parse(((ComboBox)panelUI.Controls["comboTypeOfVesselUsed"]).SelectedValue.ToString());
-                                    key = VesselUsed.ToString();
+                                    var cbo = ((ComboBox)panelUI.Controls["comboTypeOfVesselUsed"]);
+                                    if (cbo.Items.Count > 0)
+                                    {
+                                        var v = int.Parse(cbo.SelectedValue.ToString());
+                                        key = v.ToString();
+                                    }
                                 }
                             }
                             EffortData.Add(c.Tag.ToString(), key);
@@ -524,9 +584,9 @@ namespace FAD3
                     {
                         GearClassName = _GearClassName,
                         GearRefCode = _GearRefCode,
-                        AOIName = _AOIName,
                         Parent_Form = this
                     };
+                    fgu.TargetArea(_AOIName, _AOIGuid);
                     fgu.GearVariation(_GearVarName, _GearVarGuid);
                     fgu.ShowDialog(this);
                     break;

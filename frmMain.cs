@@ -1142,6 +1142,7 @@ namespace FAD3
             {
                 this.panelSamplingButtons.Location = new Point(listView1.Width - panelSamplingButtons.Width-10, listView1.Top + 50);
             }
+            CancelButton = buttonOK.Visible ? buttonOK : null;
         }
 
         void ResetTheBackColor(Control c)
@@ -2078,14 +2079,12 @@ namespace FAD3
 
         private void frmMain_KeyUp(object sender, KeyEventArgs e)
         {
-            switch (e.KeyData)
-            {
-                case Keys.Escape:
-                    if (listView1.Tag.ToString() == "samplingDetail")
-                        BackToSamplingMonth();
-                    break;
-            }
+
         }
 
+        private void frmMain_Activated(object sender, EventArgs e)
+        {
+            CancelButton = buttonOK.Visible ? buttonOK : null;
+        }
     }
 }

@@ -41,11 +41,7 @@ namespace FAD3
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.treeView1 = new System.Windows.Forms.TreeView();
             this.contextTreeViewMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.addAOIToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.addLandingSiteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.addSamplingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.addEnumeratorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.panelSamplingButtons = new System.Windows.Forms.Panel();
             this.buttonMap = new System.Windows.Forms.Button();
@@ -54,23 +50,14 @@ namespace FAD3
             this.lblErrorFormOpen = new System.Windows.Forms.Label();
             this.listView1 = new System.Windows.Forms.ListView();
             this.contextListViewMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.addNewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-            this.lengthFreqToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.gMSToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.catchDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
-            this.exportXlsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lblTitle = new System.Windows.Forms.Label();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripFileNewMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripRecentlyOpened = new System.Windows.Forms.ToolStripMenuItem();
-            this.testToolStripRecentOpenedList = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.resetReferenceNumbersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.referenceNumberRangeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -96,6 +83,19 @@ namespace FAD3
             this.toolStripButton4 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton5 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton6 = new System.Windows.Forms.ToolStripButton();
+            this.addAOIToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.addLandingSiteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.addSamplingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.addEnumeratorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.addNewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.lengthFreqToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportXlsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripFileNewMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripRecentlyOpened = new System.Windows.Forms.ToolStripMenuItem();
+            this.testToolStripRecentOpenedList = new System.Windows.Forms.ToolStripMenuItem();
+            this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -161,39 +161,10 @@ namespace FAD3
             this.contextTreeViewMenuStrip.Size = new System.Drawing.Size(175, 98);
             this.contextTreeViewMenuStrip.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.contextMenuStrip1_ItemClicked);
             // 
-            // addAOIToolStripMenuItem
-            // 
-            this.addAOIToolStripMenuItem.Image = global::FAD3.Properties.Resources.newAOI;
-            this.addAOIToolStripMenuItem.Name = "addAOIToolStripMenuItem";
-            this.addAOIToolStripMenuItem.Size = new System.Drawing.Size(174, 22);
-            this.addAOIToolStripMenuItem.Text = "New AOI ...";
-            // 
-            // addLandingSiteToolStripMenuItem
-            // 
-            this.addLandingSiteToolStripMenuItem.Image = global::FAD3.Properties.Resources.newLS;
-            this.addLandingSiteToolStripMenuItem.Name = "addLandingSiteToolStripMenuItem";
-            this.addLandingSiteToolStripMenuItem.Size = new System.Drawing.Size(174, 22);
-            this.addLandingSiteToolStripMenuItem.Text = "New landing site ...";
-            // 
-            // addSamplingToolStripMenuItem
-            // 
-            this.addSamplingToolStripMenuItem.Image = global::FAD3.Properties.Resources.InsertSnippet_16x;
-            this.addSamplingToolStripMenuItem.Name = "addSamplingToolStripMenuItem";
-            this.addSamplingToolStripMenuItem.Size = new System.Drawing.Size(174, 22);
-            this.addSamplingToolStripMenuItem.Text = "New sampling ...";
-            // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
             this.toolStripSeparator2.Size = new System.Drawing.Size(171, 6);
-            // 
-            // addEnumeratorToolStripMenuItem
-            // 
-            this.addEnumeratorToolStripMenuItem.Image = global::FAD3.Properties.Resources.VSO_AddUser_16x;
-            this.addEnumeratorToolStripMenuItem.Name = "addEnumeratorToolStripMenuItem";
-            this.addEnumeratorToolStripMenuItem.Size = new System.Drawing.Size(174, 22);
-            this.addEnumeratorToolStripMenuItem.Text = "Add enumerator ...";
-            this.addEnumeratorToolStripMenuItem.TextAlign = System.Drawing.ContentAlignment.BottomRight;
             // 
             // imageList1
             // 
@@ -296,60 +267,31 @@ namespace FAD3
             this.toolStripSeparator4,
             this.exportXlsToolStripMenuItem});
             this.contextListViewMenuStrip.Name = "contextMenuStrip2";
-            this.contextListViewMenuStrip.Size = new System.Drawing.Size(181, 170);
+            this.contextListViewMenuStrip.Size = new System.Drawing.Size(152, 148);
             this.contextListViewMenuStrip.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.contextListViewMenuStrip_ItemClicked);
-            // 
-            // addNewToolStripMenuItem
-            // 
-            this.addNewToolStripMenuItem.Image = global::FAD3.Properties.Resources.Add_16xSM;
-            this.addNewToolStripMenuItem.Name = "addNewToolStripMenuItem";
-            this.addNewToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.addNewToolStripMenuItem.Text = "New";
-            // 
-            // deleteToolStripMenuItem
-            // 
-            this.deleteToolStripMenuItem.Image = global::FAD3.Properties.Resources.Remove_16xSM;
-            this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.deleteToolStripMenuItem.Text = "Delete";
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(177, 6);
-            // 
-            // lengthFreqToolStripMenuItem
-            // 
-            this.lengthFreqToolStripMenuItem.Image = global::FAD3.Properties.Resources.ColumnChart_16x;
-            this.lengthFreqToolStripMenuItem.Name = "lengthFreqToolStripMenuItem";
-            this.lengthFreqToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.lengthFreqToolStripMenuItem.Tag = "LF";
-            this.lengthFreqToolStripMenuItem.Text = "Length-Freq ...";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(148, 6);
             // 
             // gMSToolStripMenuItem
             // 
             this.gMSToolStripMenuItem.Name = "gMSToolStripMenuItem";
-            this.gMSToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.gMSToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
             this.gMSToolStripMenuItem.Tag = "GMS";
             this.gMSToolStripMenuItem.Text = "GMS ...";
             // 
             // catchDataToolStripMenuItem
             // 
             this.catchDataToolStripMenuItem.Name = "catchDataToolStripMenuItem";
-            this.catchDataToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.catchDataToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
             this.catchDataToolStripMenuItem.Text = "Catch data...";
             // 
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(177, 6);
-            // 
-            // exportXlsToolStripMenuItem
-            // 
-            this.exportXlsToolStripMenuItem.Image = global::FAD3.Properties.Resources.ExportFile_16x;
-            this.exportXlsToolStripMenuItem.Name = "exportXlsToolStripMenuItem";
-            this.exportXlsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.exportXlsToolStripMenuItem.Text = "Export xls ...";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(148, 6);
             // 
             // lblTitle
             // 
@@ -385,49 +327,10 @@ namespace FAD3
             this.fileToolStripMenuItem.Text = "File";
             this.fileToolStripMenuItem.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.fileToolStripMenuItem_DropDownItemClicked);
             // 
-            // toolStripFileNewMenuItem
-            // 
-            this.toolStripFileNewMenuItem.Image = global::FAD3.Properties.Resources.VSO_NewFile_16x;
-            this.toolStripFileNewMenuItem.Name = "toolStripFileNewMenuItem";
-            this.toolStripFileNewMenuItem.Size = new System.Drawing.Size(162, 22);
-            this.toolStripFileNewMenuItem.Tag = "new";
-            this.toolStripFileNewMenuItem.Text = "New ...";
-            // 
-            // toolStripMenuItem2
-            // 
-            this.toolStripMenuItem2.Image = global::FAD3.Properties.Resources.OpenFileFromProject_16x;
-            this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(162, 22);
-            this.toolStripMenuItem2.Tag = "open";
-            this.toolStripMenuItem2.Text = "Open ...";
-            // 
-            // toolStripRecentlyOpened
-            // 
-            this.toolStripRecentlyOpened.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.testToolStripRecentOpenedList});
-            this.toolStripRecentlyOpened.Image = global::FAD3.Properties.Resources.History_16x;
-            this.toolStripRecentlyOpened.Name = "toolStripRecentlyOpened";
-            this.toolStripRecentlyOpened.Size = new System.Drawing.Size(162, 22);
-            this.toolStripRecentlyOpened.Text = "Recently opened";
-            // 
-            // testToolStripRecentOpenedList
-            // 
-            this.testToolStripRecentOpenedList.Name = "testToolStripRecentOpenedList";
-            this.testToolStripRecentOpenedList.Size = new System.Drawing.Size(93, 22);
-            this.testToolStripRecentOpenedList.Text = "test";
-            // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
             this.toolStripSeparator1.Size = new System.Drawing.Size(159, 6);
-            // 
-            // exitToolStripMenuItem
-            // 
-            this.exitToolStripMenuItem.Image = global::FAD3.Properties.Resources.Close_16x;
-            this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
-            this.exitToolStripMenuItem.Tag = "exit";
-            this.exitToolStripMenuItem.Text = "Exit";
             // 
             // toolsToolStripMenuItem
             // 
@@ -652,7 +555,7 @@ namespace FAD3
             // toolStripButton5
             // 
             this.toolStripButton5.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButton5.Image = global::FAD3.Properties.Resources.MapTileLayer_16x_24;
+            this.toolStripButton5.Image = global::FAD3.Properties.Resources.internet_web_browser;
             this.toolStripButton5.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButton5.Name = "toolStripButton5";
             this.toolStripButton5.Size = new System.Drawing.Size(28, 28);
@@ -671,6 +574,103 @@ namespace FAD3
             this.toolStripButton6.Text = "toolStripButton6";
             this.toolStripButton6.ToolTipText = "Exit";
             // 
+            // addAOIToolStripMenuItem
+            // 
+            this.addAOIToolStripMenuItem.Image = global::FAD3.Properties.Resources.newAOI;
+            this.addAOIToolStripMenuItem.Name = "addAOIToolStripMenuItem";
+            this.addAOIToolStripMenuItem.Size = new System.Drawing.Size(174, 22);
+            this.addAOIToolStripMenuItem.Text = "New AOI ...";
+            // 
+            // addLandingSiteToolStripMenuItem
+            // 
+            this.addLandingSiteToolStripMenuItem.Image = global::FAD3.Properties.Resources.newLS;
+            this.addLandingSiteToolStripMenuItem.Name = "addLandingSiteToolStripMenuItem";
+            this.addLandingSiteToolStripMenuItem.Size = new System.Drawing.Size(174, 22);
+            this.addLandingSiteToolStripMenuItem.Text = "New landing site ...";
+            // 
+            // addSamplingToolStripMenuItem
+            // 
+            this.addSamplingToolStripMenuItem.Image = global::FAD3.Properties.Resources.InsertSnippet_16x;
+            this.addSamplingToolStripMenuItem.Name = "addSamplingToolStripMenuItem";
+            this.addSamplingToolStripMenuItem.Size = new System.Drawing.Size(174, 22);
+            this.addSamplingToolStripMenuItem.Text = "New sampling ...";
+            // 
+            // addEnumeratorToolStripMenuItem
+            // 
+            this.addEnumeratorToolStripMenuItem.Image = global::FAD3.Properties.Resources.VSO_AddUser_16x;
+            this.addEnumeratorToolStripMenuItem.Name = "addEnumeratorToolStripMenuItem";
+            this.addEnumeratorToolStripMenuItem.Size = new System.Drawing.Size(174, 22);
+            this.addEnumeratorToolStripMenuItem.Text = "Add enumerator ...";
+            this.addEnumeratorToolStripMenuItem.TextAlign = System.Drawing.ContentAlignment.BottomRight;
+            // 
+            // addNewToolStripMenuItem
+            // 
+            this.addNewToolStripMenuItem.Image = global::FAD3.Properties.Resources.Add_16xSM;
+            this.addNewToolStripMenuItem.Name = "addNewToolStripMenuItem";
+            this.addNewToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
+            this.addNewToolStripMenuItem.Text = "New";
+            // 
+            // deleteToolStripMenuItem
+            // 
+            this.deleteToolStripMenuItem.Image = global::FAD3.Properties.Resources.Remove_16xSM;
+            this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
+            this.deleteToolStripMenuItem.Text = "Delete";
+            // 
+            // lengthFreqToolStripMenuItem
+            // 
+            this.lengthFreqToolStripMenuItem.Image = global::FAD3.Properties.Resources.ColumnChart_16x;
+            this.lengthFreqToolStripMenuItem.Name = "lengthFreqToolStripMenuItem";
+            this.lengthFreqToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
+            this.lengthFreqToolStripMenuItem.Tag = "LF";
+            this.lengthFreqToolStripMenuItem.Text = "Length-Freq ...";
+            // 
+            // exportXlsToolStripMenuItem
+            // 
+            this.exportXlsToolStripMenuItem.Image = global::FAD3.Properties.Resources.ExportFile_16x;
+            this.exportXlsToolStripMenuItem.Name = "exportXlsToolStripMenuItem";
+            this.exportXlsToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
+            this.exportXlsToolStripMenuItem.Text = "Export xls ...";
+            // 
+            // toolStripFileNewMenuItem
+            // 
+            this.toolStripFileNewMenuItem.Image = global::FAD3.Properties.Resources.VSO_NewFile_16x;
+            this.toolStripFileNewMenuItem.Name = "toolStripFileNewMenuItem";
+            this.toolStripFileNewMenuItem.Size = new System.Drawing.Size(162, 22);
+            this.toolStripFileNewMenuItem.Tag = "new";
+            this.toolStripFileNewMenuItem.Text = "New ...";
+            // 
+            // toolStripMenuItem2
+            // 
+            this.toolStripMenuItem2.Image = global::FAD3.Properties.Resources.OpenFileFromProject_16x;
+            this.toolStripMenuItem2.Name = "toolStripMenuItem2";
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(162, 22);
+            this.toolStripMenuItem2.Tag = "open";
+            this.toolStripMenuItem2.Text = "Open ...";
+            // 
+            // toolStripRecentlyOpened
+            // 
+            this.toolStripRecentlyOpened.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.testToolStripRecentOpenedList});
+            this.toolStripRecentlyOpened.Image = global::FAD3.Properties.Resources.History_16x;
+            this.toolStripRecentlyOpened.Name = "toolStripRecentlyOpened";
+            this.toolStripRecentlyOpened.Size = new System.Drawing.Size(162, 22);
+            this.toolStripRecentlyOpened.Text = "Recently opened";
+            // 
+            // testToolStripRecentOpenedList
+            // 
+            this.testToolStripRecentOpenedList.Name = "testToolStripRecentOpenedList";
+            this.testToolStripRecentOpenedList.Size = new System.Drawing.Size(93, 22);
+            this.testToolStripRecentOpenedList.Text = "test";
+            // 
+            // exitToolStripMenuItem
+            // 
+            this.exitToolStripMenuItem.Image = global::FAD3.Properties.Resources.Close_16x;
+            this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
+            this.exitToolStripMenuItem.Tag = "exit";
+            this.exitToolStripMenuItem.Text = "Exit";
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -686,6 +686,7 @@ namespace FAD3
             this.Name = "frmMain";
             this.Text = "Fisheries Assessment Database";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+            this.Activated += new System.EventHandler(this.frmMain_Activated);
             this.Load += new System.EventHandler(this.FrmMainLoad);
             this.ResizeEnd += new System.EventHandler(this.frmMain_ResizeEnd);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.frmMain_KeyUp);
