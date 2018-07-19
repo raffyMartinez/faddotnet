@@ -429,8 +429,11 @@ namespace FAD3
                 Text = "Sampling detail";
                 _GearClassName = _lv.Items["GearClass"].SubItems[1].Text;
             }
-            //SetupComboDataSource();
+
             SetFieldsVisible();
+            buttonCancel.Visible = true;
+            buttonOK.Visible = true;
+
             CancelButton = buttonCancel;
         }
 

@@ -12,11 +12,13 @@ namespace FAD3
     public partial class frmGearUsage : Form
     {
         string _GearClassName = "";
+        string _GearClassGuid = "";
         string _GearVarName = "";
         string _GearVarGuid = "";
         string _GearRefCode = "";
         string _TargetAreaName = "";
         string _TargetAreaGuid = "";
+        global.fad3GearEditAction _action;
 
         frmSamplingDetail _Parent;
 
@@ -292,6 +294,74 @@ namespace FAD3
                     FillLocalNames();
                     break;
             } 
+        }
+
+        private void OnlistView_MouseClick(object sender, MouseEventArgs e)
+        {
+
+        }
+
+        private void OnlistView_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                dropDownMenu.Items.Clear();
+
+                switch (((ListView)sender).Name)
+                {
+                    case "listViewWhereUsed":
+                        var tsi = dropDownMenu.Items.Add("Add target area where used");
+                        tsi.Name = "itemAddTargetArea";
+                        break;
+                    case "listViewVariations":
+                        tsi = dropDownMenu.Items.Add("Add a gear variation");
+                        tsi.Name = "itemAddGearVariation";
+                        break;
+                    case "listViewLocalNames":
+                        tsi = dropDownMenu.Items.Add("Add a gear local name");
+                        tsi.Name = "itemAddLocalName";
+                        break;
+                    case "listViewCodes":
+                        tsi = dropDownMenu.Items.Add("Add a gear code");
+                        tsi.Name = "itemAddGearCode";
+                        break;
+
+                }
+            }
+        }
+
+        private void dropDownMenu_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+            var myList = new List<string>();
+            switch (e.ClickedItem.Name){
+                case "itemAddTargetArea":
+                    _action = global.fad3GearEditAction.addAOI;
+                    myList = listViewWhereUsed.Items.Cast<ListViewItem>()
+                                                     .Select(item => item.Text)
+                                                     .ToList();
+                    break;
+                case "itemAddGearVariation":
+                    _action = global.fad3GearEditAction.addGearVariation;
+                    break;
+                case "itemAddLocalName":
+                    _action = global.fad3GearEditAction.addLocalName;
+                    myList = listViewLocalNames.Items.Cast<ListViewItem>()
+                                                     .Select(item => item.Text)
+                                                     .ToList();
+                    break;
+                case "itemAddGearCode":
+                    _action = global.fad3GearEditAction.addGearCode;
+                    break;
+            }
+
+            _GearClassGuid = ((KeyValuePair<string, string>)comboClass.SelectedItem).Key;
+
+            frmGearEditor f = new frmGearEditor();
+            f.GearClassGuid = _GearClassGuid;
+            f.GearVariationGuid = _GearVarGuid;
+            f.Action = _action;
+            f.InList = myList;
+            f.ShowDialog(this);
         }
     }
 }

@@ -28,7 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.listViewVariations = new System.Windows.Forms.ListView();
+            this.dropDownMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.listViewCodes = new System.Windows.Forms.ListView();
             this.listViewWhereUsed = new System.Windows.Forms.ListView();
             this.listViewLocalNames = new System.Windows.Forms.ListView();
@@ -43,39 +45,57 @@
             // 
             // listViewVariations
             // 
+            this.listViewVariations.ContextMenuStrip = this.dropDownMenu;
             this.listViewVariations.Location = new System.Drawing.Point(12, 80);
             this.listViewVariations.Name = "listViewVariations";
             this.listViewVariations.Size = new System.Drawing.Size(220, 283);
             this.listViewVariations.TabIndex = 0;
             this.listViewVariations.UseCompatibleStateImageBehavior = false;
             this.listViewVariations.Click += new System.EventHandler(this.OnlistView_Click);
+            this.listViewVariations.MouseClick += new System.Windows.Forms.MouseEventHandler(this.OnlistView_MouseClick);
+            this.listViewVariations.MouseUp += new System.Windows.Forms.MouseEventHandler(this.OnlistView_MouseUp);
+            // 
+            // dropDownMenu
+            // 
+            this.dropDownMenu.Name = "dropDownMenu";
+            this.dropDownMenu.Size = new System.Drawing.Size(181, 26);
+            this.dropDownMenu.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.dropDownMenu_ItemClicked);
             // 
             // listViewCodes
             // 
+            this.listViewCodes.ContextMenuStrip = this.dropDownMenu;
             this.listViewCodes.Location = new System.Drawing.Point(238, 80);
             this.listViewCodes.Name = "listViewCodes";
             this.listViewCodes.Size = new System.Drawing.Size(220, 283);
             this.listViewCodes.TabIndex = 1;
             this.listViewCodes.UseCompatibleStateImageBehavior = false;
             this.listViewCodes.Click += new System.EventHandler(this.OnlistView_Click);
+            this.listViewCodes.MouseClick += new System.Windows.Forms.MouseEventHandler(this.OnlistView_MouseClick);
+            this.listViewCodes.MouseUp += new System.Windows.Forms.MouseEventHandler(this.OnlistView_MouseUp);
             // 
             // listViewWhereUsed
             // 
+            this.listViewWhereUsed.ContextMenuStrip = this.dropDownMenu;
             this.listViewWhereUsed.Location = new System.Drawing.Point(464, 80);
             this.listViewWhereUsed.Name = "listViewWhereUsed";
             this.listViewWhereUsed.Size = new System.Drawing.Size(220, 283);
             this.listViewWhereUsed.TabIndex = 2;
             this.listViewWhereUsed.UseCompatibleStateImageBehavior = false;
             this.listViewWhereUsed.Click += new System.EventHandler(this.OnlistView_Click);
+            this.listViewWhereUsed.MouseClick += new System.Windows.Forms.MouseEventHandler(this.OnlistView_MouseClick);
+            this.listViewWhereUsed.MouseUp += new System.Windows.Forms.MouseEventHandler(this.OnlistView_MouseUp);
             // 
             // listViewLocalNames
             // 
+            this.listViewLocalNames.ContextMenuStrip = this.dropDownMenu;
             this.listViewLocalNames.Location = new System.Drawing.Point(690, 80);
             this.listViewLocalNames.Name = "listViewLocalNames";
             this.listViewLocalNames.Size = new System.Drawing.Size(220, 283);
             this.listViewLocalNames.TabIndex = 3;
             this.listViewLocalNames.UseCompatibleStateImageBehavior = false;
             this.listViewLocalNames.Click += new System.EventHandler(this.OnlistView_Click);
+            this.listViewLocalNames.MouseClick += new System.Windows.Forms.MouseEventHandler(this.OnlistView_MouseClick);
+            this.listViewLocalNames.MouseUp += new System.Windows.Forms.MouseEventHandler(this.OnlistView_MouseUp);
             // 
             // buttonOk
             // 
@@ -183,5 +203,6 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.ContextMenuStrip dropDownMenu;
     }
 }

@@ -148,8 +148,75 @@ namespace FAD3
             return Success;
         }
 
-        
-        
-        
+
+
+        public static string GearLetterFromGearClass(string GearClassGuid)
+        {
+            var myDT = new DataTable();
+            var myLetter = "";
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    string query = "Select GearLetter from tblGearClass where GearClass ='{" + GearClassGuid + "}'";
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(myDT);
+                    DataRow dr = myDT.Rows[0];
+                    myLetter = dr["GearLetter"].ToString();
+                }
+                catch (Exception ex) { ErrorLogger.Log(ex); }
+            }
+            return myLetter;
+        }
+
+        public static List<string> GearCodesByClass(string GearClassGuid)
+        {
+            var myDT = new DataTable();
+            var myList = new List<string>();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    string query = "SELECT RefGearCode FROM tblGearVariations INNER JOIN tblRefGearCodes ON tblGearVariations.GearVarGUID = " +
+                                   "tblRefGearCodes.GearVar WHERE tblGearVariations.GearClass= '{" + GearClassGuid + "}' " + 
+                                   "ORDER BY tblRefGearCodes.RefGearCode;";
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(myDT);
+                    for (int i = 0; i < myDT.Rows.Count; i++)
+                    {
+                        DataRow dr = myDT.Rows[i];
+                        myList.Add(dr["RefGearCode"].ToString());
+                    }
+                }
+                catch (Exception ex) { ErrorLogger.Log(ex); }
+            }
+            return myList;
+        }
+
+        public static List<string> GearCodeByVariation(string GearVariationGuid)
+        {
+            var myDT = new DataTable();
+            var myList = new List<string>();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    string query = "Select RefGearCode from tblRefGearCodes where GearVar ='{" + GearVariationGuid + "}'";
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(myDT);
+                    for (int i = 0; i < myDT.Rows.Count; i++)
+                    {
+                        DataRow dr = myDT.Rows[i];
+                        myList.Add(dr["RefGearCode"].ToString());
+                    }
+                }
+                catch (Exception ex) { ErrorLogger.Log(ex); }
+            }
+            return myList;
+        }
+
     }
 }

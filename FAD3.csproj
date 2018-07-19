@@ -83,6 +83,12 @@
     <Compile Include="AOI.cs" />
     <Compile Include="ErrorLogger.cs" />
     <Compile Include="extension.cs" />
+    <Compile Include="frmGearEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmGearEditor.Designer.cs">
+      <DependentUpon>frmGearEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="frmGearUsage.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -202,6 +208,9 @@
     <Compile Include="UIRow.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="frmGearEditor.resx">
+      <DependentUpon>frmGearEditor.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmGearUsage.resx">
       <DependentUpon>frmGearUsage.cs</DependentUpon>
     </EmbeddedResource>

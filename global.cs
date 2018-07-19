@@ -94,12 +94,12 @@ namespace FAD3
                 try
                 {
                     conection.Open();
-                   var query = "SELECT LocalNameGUID, LocalName FROM tblGearLocalNames INNER JOIN " +
-                        "(tblRefGearCodes_Usage INNER JOIN tblRefGearUsage_LocalName ON " +
-                        "tblRefGearCodes_Usage.RowNo = tblRefGearUsage_LocalName.GearUsageRow) " +
-                        "ON tblGearLocalNames.LocalNameGUID = tblRefGearUsage_LocalName.GearLocalName " +
-                        "WHERE tblRefGearCodes_Usage.RefGearCode= '" + RefCode +"' AND " + 
-                        "tblRefGearCodes_Usage.TargetAreaGUID= '{" + AOIGuid + "}'";
+                    var query = "SELECT LocalNameGUID, LocalName FROM tblGearLocalNames INNER JOIN " +
+                         "(tblRefGearCodes_Usage INNER JOIN tblRefGearUsage_LocalName ON " +
+                         "tblRefGearCodes_Usage.RowNo = tblRefGearUsage_LocalName.GearUsageRow) " +
+                         "ON tblGearLocalNames.LocalNameGUID = tblRefGearUsage_LocalName.GearLocalName " +
+                         "WHERE tblRefGearCodes_Usage.RefGearCode= '" + RefCode + "' AND " +
+                         "tblRefGearCodes_Usage.TargetAreaGUID= '{" + AOIGuid + "}'";
 
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
@@ -272,6 +272,34 @@ namespace FAD3
             }
         }
 
+        public static List<string> AllGearVariationNames()
+        {
+            var myList = new List<string>();
+            var dt = new DataTable();
+            using (var conection = new OleDbConnection(_ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    var query = "Select Variation from tblGearVariations order by Variation";
+
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(dt);
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        DataRow dr = dt.Rows[i];
+                        myList.Add(dr["Variation"].ToString());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ErrorLogger.Log(ex);
+                }
+            }
+
+            return myList;
+        }
+
         public static string GearClassUsed
         {
             get { return _GearClassUsed; }
@@ -383,7 +411,17 @@ namespace FAD3
             _HasMPH = k1 > 0;
         }
 
-        
+        public enum fad3GearEditAction
+        {
+            addAOI,
+            addLocalName,
+            addGearCode,
+            addGearVariation,
+            editLocalName,
+            editGearVariation,
+            editGearCode
+        }
+
         public enum lvContext
         {
             None = 0,

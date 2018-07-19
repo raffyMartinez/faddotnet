@@ -54,6 +54,7 @@
             this.buttonOK.TabIndex = 1;
             this.buttonOK.Text = "OK";
             this.buttonOK.UseVisualStyleBackColor = true;
+            this.buttonOK.Visible = false;
             this.buttonOK.Click += new System.EventHandler(this.buttonSampling_Click);
             // 
             // buttonCancel
@@ -67,6 +68,7 @@
             this.buttonCancel.TabIndex = 2;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = true;
+            this.buttonCancel.Visible = false;
             this.buttonCancel.Click += new System.EventHandler(this.buttonSampling_Click);
             // 
             // frmSamplingDetail
