@@ -138,7 +138,7 @@ namespace FAD3
         }
 
 
-        private void frmSamplingDetail_FormClosed(object sender, FormClosedEventArgs e)
+        private void OnFormClosed(object sender, FormClosedEventArgs e)
         {
             global.SaveFormSettings(this);
             
@@ -237,7 +237,22 @@ namespace FAD3
                             {
                                 global.GearClassUsed = _lv.Items["GearClass"].Tag.ToString();
                             }
-                            ((ComboBox)ctl).DataSource = new BindingSource(global.GearVariationsUsage(global.GearClassUsed, _AOIGuid), null);
+
+                            if (_GearClassGuid.Length == 0)
+                            {
+                                if (_isNew)
+                                {
+                                    _GearClassGuid = ((KeyValuePair<string, string>)((ComboBox)panelUI.Controls["comboGearClass"]).Items[0]).Key;
+                                }
+                                else
+                                {
+                                    _GearClassGuid = global.GearClassUsed;
+                                }
+                            }
+   
+                            //((ComboBox)ctl).DataSource = new BindingSource(global.GearVariationsUsage(global.GearClassUsed, _AOIGuid), null);
+                            ((ComboBox)ctl).DataSource = new BindingSource(global.GearVariationsUsage(_GearClassGuid, _AOIGuid), null);
+                            
                             break;
                         case "TypeOfVesselUsed":
                             ((ComboBox)ctl).DataSource = new BindingSource(global.VesselTypeDict, null);
@@ -259,10 +274,6 @@ namespace FAD3
                     {
                         Name = "dtxt" + e.Key,
                     };
-                    if (_isNew && e.Key =="SamplingDate")
-                    {
-                        _topControl = ctl;
-                    }
                     break;
                 case "TimeMask":
                     ctl = new MaskedTextBox
@@ -339,6 +350,10 @@ namespace FAD3
                 {
                     switch (e.Key)
                     {
+                        case "SamplingDate":
+                            if (_isNew)
+                                _topControl = ctl;
+                            break;
                         case "TargetArea":
                             ctl.Text = _AOIName;
                             break;
@@ -346,10 +361,29 @@ namespace FAD3
                             ctl.Text = _LandingSiteName;
                             break;
                         case "GearClass":
-                            ctl.Text = _GearClassName;
+                            if(_GearClassName.Length>0)
+                              ctl.Text = _GearClassName;
+                            else
+                            {
+                                ((ComboBox)ctl).With(o => 
+                                {
+                                    var item = o.Items[0];
+                                    o.SelectedItem = item;
+                                });
+                            }
+                            _GearClassGuid = ((KeyValuePair<string, string>)((ComboBox)ctl).SelectedItem).Key;
                             break;
                         case "FishingGear":
-                            ctl.Text = _GearVarName;
+                            if(_GearVarName.Length>0)
+                              ctl.Text = _GearVarName;
+                            else
+                            {
+                                ((ComboBox)ctl).With(o =>
+                                {
+                                    var item = o.Items[0];
+                                    o.SelectedItem = item;
+                                });
+                            }
                             _GearVarGuid = ((KeyValuePair<string, string>)((ComboBox)ctl).SelectedItem).Key;
                             break;
                         case "Enumerator":
@@ -399,7 +433,7 @@ namespace FAD3
                 };
                 panelUI.Controls.Add(btn);
                 btn.Location = new System.Drawing.Point(x, _yPos - 3);
-                btn.Click += new EventHandler(buttonSamplingFields_Click);
+                btn.Click += new EventHandler(OnbuttonSamplingFields_Click);
                 if (e.Key == "Enumerator" && !_isNew)
                 {
                     _topControl = btn;
@@ -408,8 +442,7 @@ namespace FAD3
             _yPos += ControlHt + Spacing;
         }
 
-        private void 
-            frmSamplingDetail_Load(object sender, EventArgs e)
+        private void OnFormLoad(object sender, EventArgs e)
         {
             this.Size = new Size(Width, _lv.Height);
             global.LoadFormSettings(this, true);
@@ -419,7 +452,6 @@ namespace FAD3
             panelUI.SuspendLayout();
             _sampling.ReadUIFromXML();
             AdustControlsPosition();
-            _topControl.Focus();
             panelUI.ResumeLayout();
 
             if (_isNew)
@@ -435,6 +467,7 @@ namespace FAD3
             buttonOK.Visible = true;
 
             CancelButton = buttonCancel;
+            _topControl.Select();
         }
 
 
@@ -575,7 +608,7 @@ namespace FAD3
         }
 
 
-        private void buttonSamplingFields_Click(object sender, EventArgs e)
+        private void OnbuttonSamplingFields_Click(object sender, EventArgs e)
         {
             Button btn = (Button)sender;
             switch (btn.Name)
@@ -609,7 +642,7 @@ namespace FAD3
             }
         }
 
-        private void buttonSampling_Click(object sender, EventArgs e)
+        private void OnbuttonSampling_Click(object sender, EventArgs e)
         {
             Button btn = (Button)sender;
             switch (btn.Name)

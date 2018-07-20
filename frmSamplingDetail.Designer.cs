@@ -55,7 +55,7 @@
             this.buttonOK.Text = "OK";
             this.buttonOK.UseVisualStyleBackColor = true;
             this.buttonOK.Visible = false;
-            this.buttonOK.Click += new System.EventHandler(this.buttonSampling_Click);
+            this.buttonOK.Click += new System.EventHandler(this.OnbuttonSampling_Click);
             // 
             // buttonCancel
             // 
@@ -69,7 +69,7 @@
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = true;
             this.buttonCancel.Visible = false;
-            this.buttonCancel.Click += new System.EventHandler(this.buttonSampling_Click);
+            this.buttonCancel.Click += new System.EventHandler(this.OnbuttonSampling_Click);
             // 
             // frmSamplingDetail
             // 
@@ -85,8 +85,8 @@
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "frmSamplingDetail";
             this.Text = "frmSamplingDetail";
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.frmSamplingDetail_FormClosed);
-            this.Load += new System.EventHandler(this.frmSamplingDetail_Load);
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnFormClosed);
+            this.Load += new System.EventHandler(this.OnFormLoad);
             this.ResumeLayout(false);
 
         }

@@ -53,12 +53,13 @@
             this.listViewVariations.UseCompatibleStateImageBehavior = false;
             this.listViewVariations.Click += new System.EventHandler(this.OnlistView_Click);
             this.listViewVariations.MouseClick += new System.Windows.Forms.MouseEventHandler(this.OnlistView_MouseClick);
+            this.listViewVariations.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnListView_MouseDown);
             this.listViewVariations.MouseUp += new System.Windows.Forms.MouseEventHandler(this.OnlistView_MouseUp);
             // 
             // dropDownMenu
             // 
             this.dropDownMenu.Name = "dropDownMenu";
-            this.dropDownMenu.Size = new System.Drawing.Size(181, 26);
+            this.dropDownMenu.Size = new System.Drawing.Size(61, 4);
             this.dropDownMenu.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.dropDownMenu_ItemClicked);
             // 
             // listViewCodes
@@ -71,6 +72,7 @@
             this.listViewCodes.UseCompatibleStateImageBehavior = false;
             this.listViewCodes.Click += new System.EventHandler(this.OnlistView_Click);
             this.listViewCodes.MouseClick += new System.Windows.Forms.MouseEventHandler(this.OnlistView_MouseClick);
+            this.listViewCodes.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnListView_MouseDown);
             this.listViewCodes.MouseUp += new System.Windows.Forms.MouseEventHandler(this.OnlistView_MouseUp);
             // 
             // listViewWhereUsed
@@ -83,6 +85,7 @@
             this.listViewWhereUsed.UseCompatibleStateImageBehavior = false;
             this.listViewWhereUsed.Click += new System.EventHandler(this.OnlistView_Click);
             this.listViewWhereUsed.MouseClick += new System.Windows.Forms.MouseEventHandler(this.OnlistView_MouseClick);
+            this.listViewWhereUsed.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnListView_MouseDown);
             this.listViewWhereUsed.MouseUp += new System.Windows.Forms.MouseEventHandler(this.OnlistView_MouseUp);
             // 
             // listViewLocalNames
@@ -95,6 +98,7 @@
             this.listViewLocalNames.UseCompatibleStateImageBehavior = false;
             this.listViewLocalNames.Click += new System.EventHandler(this.OnlistView_Click);
             this.listViewLocalNames.MouseClick += new System.Windows.Forms.MouseEventHandler(this.OnlistView_MouseClick);
+            this.listViewLocalNames.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnListView_MouseDown);
             this.listViewLocalNames.MouseUp += new System.Windows.Forms.MouseEventHandler(this.OnlistView_MouseUp);
             // 
             // buttonOk
@@ -184,6 +188,7 @@
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "frmGearUsage";
             this.Text = "Gear variations and target areas where used";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnFormClosed);
             this.Load += new System.EventHandler(this.OnFormLoad);
             this.ResumeLayout(false);
             this.PerformLayout();

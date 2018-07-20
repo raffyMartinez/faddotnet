@@ -28,7 +28,7 @@ namespace FAD3
 		private frmCatch _frmCatch;
 		private frmLenFreq _frmLF;
 		private string _oldMDB = "";
-		private int _StatusStripLabelWidth = 0;
+		private int _statusPanelWidth = 200;
 		private sampling _Sampling = new sampling();
 		private aoi _AOI = new aoi();
 		private landingsite _ls = new landingsite();
@@ -167,10 +167,7 @@ namespace FAD3
 			this.splitContainer1.Panel1MinSize = 200;
 			this.splitContainer1.Panel2MinSize = this.Width - (this.splitContainer1.Panel1MinSize + 100);
 			this.splitContainer1.SplitterWidth = 3;
-			toolStripStatusLabel2.AutoSize = false;
-			lengthFreqToolStripMenuItem.Visible = false;
-			gMSToolStripMenuItem.Visible = false;
-			toolStripSeparator3.Visible = false;
+			
 
             sampling.SetUpUIElement();
             _Sampling.OnUIRowRead += new sampling.ReadUIElement(OnUIRowRead);
@@ -197,12 +194,105 @@ namespace FAD3
 				lblErrorFormOpen.Text = "Please locate the database file where fisheries data is saved." +
 										 System.Environment.NewLine + "You can use the file open menu";
 			}
-			
-			toolStripStatusLabel2.Width = _StatusStripLabelWidth;
-			toolStripStatusLabel3.Width = _StatusStripLabelWidth;
-			toolStripStatusLabel4.Width = _StatusStripLabelWidth;
 
+            statusPanelTargetArea.Width = _statusPanelWidth;
+            statusPanelLandingSite.Width = _statusPanelWidth;
+            statusPanelGearUsed.Width = _statusPanelWidth;
+
+            ConfigDropDownMenu(treeView1);
             SetupSamplingButtonFrame(false);
+
+        }
+
+        private void menuDropDown_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+            switch (e.ClickedItem.Name)
+            {
+                case "menuNewTargetArea":
+                    break;
+                case "menuNewLandingSite":
+                    break;
+                case "menuNewSampling":
+                    NewSamplingForm();
+                    break;
+                case "menuNewEnumerator":
+                    break;
+                case "menuSamplingDetail":
+                    ShowSamplingDetailForm();
+                    break;
+            }
+        }
+
+        private void ConfigDropDownMenu(Control Source, ListViewHitTestInfo lvh)
+        {
+            menuDropDown.Items.Clear();
+            if (lvh.Item != null)
+            {
+                //Note: commented out because I can't make this work for now
+                
+                //var tsi1 = menuDropDown.Items.Add("Detail of selected sampling");
+                //tsi1.Name = "menuSamplingDetail";
+                //_SamplingGUID = lvh.Item.Name;
+
+                //menuDropDown.Items.Add("-");
+            }
+
+            var tsi = menuDropDown.Items.Add("New sampling");
+            tsi.Name = "menuNewSampling";
+ 
+
+        }
+
+        private void ConfigDropDownMenu(Control Source)
+        {
+            menuDropDown.Items.Clear();
+            switch (Source.Name)
+            {
+                case "treeView1":
+                    var tsi = menuDropDown.Items.Add("New target area");
+                    tsi.Name = "menuNewTargetArea";
+                    tsi.Enabled = _TreeLevel == "root";
+
+                    tsi = menuDropDown.Items.Add("New landing site");
+                    tsi.Name = "menuNewLandingSite";
+                    tsi.Enabled = _TreeLevel == "aoi";
+
+                    tsi = menuDropDown.Items.Add("New sampling");
+                    tsi.Name = "menuNewSampling";
+                    tsi.Enabled = _TreeLevel == "sampling" || _TreeLevel=="landing_site" || _TreeLevel =="gear" ;
+
+                    var sep = menuDropDown.Items.Add("-");
+                    sep.Name = "menuSeparator1";
+
+                    tsi = menuDropDown.Items.Add("Enumerators");
+                    tsi.Name = "menuEnumerators";
+                    tsi.Enabled = _TreeLevel == "aoi";
+
+                    tsi = menuDropDown.Items.Add("Landing site properties");
+                    tsi.Name = "menuLandingSiteProp";
+                    tsi.Enabled = _TreeLevel == "landing_site";
+
+                    break;
+                case "listView1":
+                    tsi = menuDropDown.Items.Add("New sampling");
+                    tsi.Name = "menuNewSampling";
+                    tsi.Visible = _TreeLevel == "sampling" || _TreeLevel == "landing_site" || _TreeLevel == "gear";
+
+
+                    sep = menuDropDown.Items.Add("-");
+                    sep.Name = "menuSeparator1";
+                    sep.Visible = _TreeLevel == "landing_site";
+
+                    tsi = menuDropDown.Items.Add("Landing site properties");
+                    tsi.Name = "menuLandingSiteProp";
+                    tsi.Visible = _TreeLevel == "landing_site";
+
+                    tsi = menuDropDown.Items.Add("Target area properties");
+                    tsi.Name = "menuTargetAreaProperties";
+                    tsi.Visible = _TreeLevel == "aoi";
+                    break;
+            }
+
 
         }
 
@@ -218,8 +308,8 @@ namespace FAD3
 					global.mdbPath = filename;
 					names.GetGenus_LocalNames();
 					names.GetLocalNames();
-					_StatusStripLabelWidth = toolStripStatusLabel1.Width;
-					toolStripStatusLabel1.Text = filename;
+					//_StatusStripLabelWidth = statusPanelDBPath.Width;
+					statusPanelDBPath.Text = filename;
 					lblErrorFormOpen.Visible = false;
 					//PopulateTree();
 				}
@@ -244,7 +334,7 @@ namespace FAD3
 				rk.Close();
 				lblErrorFormOpen.Visible = false;
 				PopulateTree();
-				toolStripStatusLabel1.Text = filename;
+				statusPanelDBPath.Text = filename;
 			}
 			else
 			{
@@ -263,7 +353,7 @@ namespace FAD3
 				lblErrorFormOpen.Visible = false;
 
 				PopulateTree();
-				toolStripStatusLabel1.Text = filename;
+				statusPanelDBPath.Text = filename;
 			}
 			else
 			{
@@ -303,12 +393,14 @@ namespace FAD3
 			for (int i = 0; i < myDataTable.Rows.Count; i++)
 			{
 				DataRow dr = myDataTable.Rows[i];
-				bool Exists = root.Nodes.ContainsKey(dr["AOIName"].ToString());
-				if (Exists)
+                //bool Exists = root.Nodes.ContainsKey(dr["AOIName"].ToString());
+                bool Exists = root.Nodes.ContainsKey(dr["AOIGuid"].ToString());
+                if (Exists)
 				{
-					//Debug.WriteLine(dr["AOIName"]);
-					TreeNode myNode = root.Nodes[dr["AOIName"].ToString()];
-					TreeNode myChild = new TreeNode(dr["LSName"].ToString());
+                    //Debug.WriteLine(dr["AOIName"]);
+                    //TreeNode myNode = root.Nodes[dr["AOIName"].ToString()];
+                    TreeNode myNode = root.Nodes[dr["AOIGuid"].ToString()];
+                    TreeNode myChild = new TreeNode(dr["LSName"].ToString());
 					myNode.Nodes.Add(myChild);
 					myChild.Name = dr["LSGUID"].ToString();
 					myChild.Nodes.Add("*dummy*");
@@ -319,8 +411,9 @@ namespace FAD3
 				else
 				{
 					TreeNode myNode = new TreeNode(dr["AOIName"].ToString());
-					myNode.Name = dr["AOIName"].ToString();
-					root.Nodes.Add(myNode);
+                    //myNode.Name = dr["AOIName"].ToString();
+                    myNode.Name = dr["AOIGuid"].ToString();
+                    root.Nodes.Add(myNode);
 					myNode.Tag = dr["AOIGuid"].ToString() + ",aoi";
                     myNode.ImageKey = "AOI";
 
@@ -991,7 +1084,17 @@ namespace FAD3
 
             try
 			{
-				TreeNode nd = treeView1.SelectedNode;
+
+                _AOIName = "";
+                _LandingSiteName = "";
+                _GearVarName = "";
+                _GearClassName = "";
+                _AOIGuid = "";
+                _LandingSiteGuid = "";
+                _GearVarGUID = "";
+                _GearClassGUID = "";
+
+                TreeNode nd = treeView1.SelectedNode;
 				ResetTheBackColor(treeView1);
 				nd.BackColor = Color.Gainsboro;
 				string tag = nd.Tag.ToString();
@@ -1000,17 +1103,21 @@ namespace FAD3
 					string[] arr = tag.Split(',');
 					_TreeLevel = arr[1];
 					SetUPLV(_TreeLevel);
-					toolStripStatusLabel2.Width = _StatusStripLabelWidth;
+					statusPanelTargetArea.Width = _statusPanelWidth;
 					switch (_TreeLevel)
 					{
 						case "gear":
-							toolStripStatusLabel2.Text = treeView1.SelectedNode.Parent.Parent.Text;
-							toolStripStatusLabel3.Text = treeView1.SelectedNode.Parent.Text;
-							toolStripStatusLabel4.Text = treeView1.SelectedNode.Text;
-							addSamplingToolStripMenuItem.Enabled = true;
-							addAOIToolStripMenuItem.Enabled = false;
-							addLandingSiteToolStripMenuItem.Enabled = false;
-							_LSNode = e.Node.Parent;
+                            _AOIName = treeView1.SelectedNode.Parent.Parent.Text;
+                            _AOIGuid = treeView1.SelectedNode.Parent.Parent.Name;
+                            _LandingSiteName = treeView1.SelectedNode.Parent.Text;
+                            _LandingSiteGuid = treeView1.SelectedNode.Parent.Name;
+                            _GearVarName = treeView1.SelectedNode.Text;
+                            var arr1 = treeView1.SelectedNode.Name.Split('|');
+                            _GearVarGUID = arr1[1];
+                            var rv = global.GearClassGuidNameFromGearVarGuid(_GearVarGUID);
+                            _GearClassName = rv.Value;
+                            _GearClassGUID = rv.Key;
+                            _LSNode = e.Node.Parent;
 							break;
 						case "sampling":
 							//arr2 will contain the landing site and gearvar guids
@@ -1025,47 +1132,47 @@ namespace FAD3
 
                             _SamplingMonth = e.Node.Text;
 
-							addSamplingToolStripMenuItem.Enabled = true;
-							addAOIToolStripMenuItem.Enabled = false;
-							addLandingSiteToolStripMenuItem.Enabled = false;
 
-							//this will fill the listview with the samplings for a month-year
-							FillLVSamplingSummary(_LandingSiteGuid, _GearVarGUID, _SamplingMonth);
+                            //this will fill the listview with the samplings for a month-year
+                            FillLVSamplingSummary(_LandingSiteGuid, _GearVarGUID, _SamplingMonth);
 
-							toolStripStatusLabel2.Text = treeView1.SelectedNode.Parent.Parent.Parent.Text;
-							toolStripStatusLabel3.Text = treeView1.SelectedNode.Parent.Parent.Text;
-							toolStripStatusLabel4.Text = treeView1.SelectedNode.Parent.Text;
-							_LSNode = e.Node.Parent.Parent;
+                            _AOIName = treeView1.SelectedNode.Parent.Parent.Parent.Text;
+                            _AOIGuid = treeView1.SelectedNode.Parent.Parent.Parent.Name;
+                            _LandingSiteName = treeView1.SelectedNode.Parent.Parent.Text;
+                            _LandingSiteGuid = treeView1.SelectedNode.Parent.Parent.Name;
+                            _GearVarName = treeView1.SelectedNode.Parent.Text;
+
+                            rv = global.GearClassGuidNameFromGearVarGuid(_GearVarGUID);
+                            _GearClassName = rv.Value;
+                            _GearClassGUID = rv.Key;
+                            _LSNode = e.Node.Parent.Parent;
 							break;
 						case "aoi":
-							toolStripStatusLabel2.Text = treeView1.SelectedNode.Text;
-							toolStripStatusLabel3.Text = "";
-							toolStripStatusLabel4.Text = "";
-							//arr3 = treeView1.SelectedNode.Tag.ToString().Split(',');
-							addLandingSiteToolStripMenuItem.Enabled = true;
-							addAOIToolStripMenuItem.Enabled = false;
-							addSamplingToolStripMenuItem.Enabled = false;
-							addEnumeratorToolStripMenuItem.Visible = true;
-							toolStripSeparator2.Visible = true;
+                            _AOIName = treeView1.SelectedNode.Text;
+                            _AOIGuid = treeView1.SelectedNode.Name;
+                            _LandingSiteName = "";
+                            _LandingSiteGuid = "";
+                            _GearVarName = "";
+                            _GearVarGUID = "";
 							break;
 						case "root":
-							toolStripStatusLabel2.Text = "";
-							toolStripStatusLabel3.Text = "";
-							toolStripStatusLabel4.Text = "";
-							addLandingSiteToolStripMenuItem.Enabled = false;
-							addSamplingToolStripMenuItem.Enabled = false;
-							addAOIToolStripMenuItem.Enabled = true;
-							break;
+
+                            break;
 						case "landing_site":
-							toolStripStatusLabel2.Text = treeView1.SelectedNode.Parent.Text;
-							toolStripStatusLabel3.Text = treeView1.SelectedNode.Text;
-							toolStripStatusLabel4.Text = "";
-							addLandingSiteToolStripMenuItem.Enabled = false;
-							addSamplingToolStripMenuItem.Enabled = true;
-							addAOIToolStripMenuItem.Enabled = false;
-							_LSNode = e.Node;
+                            _AOIName = treeView1.SelectedNode.Parent.Text;
+                            _AOIGuid = treeView1.SelectedNode.Parent.Name;
+                            _LandingSiteName = treeView1.SelectedNode.Text;
+                            _LandingSiteGuid = treeView1.SelectedNode.Name;
+                            _GearVarName = "";
+                            _GearVarGUID = "";
+                            _LSNode = e.Node;
+
 							break;
 					}
+
+                    statusPanelTargetArea.Text = _AOIName;
+                    statusPanelLandingSite.Text = _LandingSiteName;
+                    statusPanelGearUsed.Text = _GearVarName;
 
 				}
 			}
@@ -1322,7 +1429,7 @@ namespace FAD3
                 rk.Close();
                 lblErrorFormOpen.Visible = false;
                 PopulateTree();
-                toolStripStatusLabel1.Text = filename;
+                statusPanelDBPath.Text = filename;
 
                 //add the recently opened file to the MRU
                 _mrulist.AddFile(filename);
@@ -1337,7 +1444,7 @@ namespace FAD3
             ;
 		}
 
-		void ToolStripStatusLabel1DoubleClick(object sender, EventArgs e)
+        void statusPanelDBPath_DoubleClick(object sender, EventArgs e)
 		{
 			Process.Start(Path.GetDirectoryName(global.mdbPath));
 		}
@@ -1459,9 +1566,6 @@ namespace FAD3
 
 		void TreeView1BeforeSelect(object sender, TreeViewCancelEventArgs e)
 		{
-			addEnumeratorToolStripMenuItem.Visible = false;
-			toolStripSeparator2.Visible = false;
-			contextListViewMenuStrip.Tag = "treeview";
 		}
 
 		void OptionsToolStripMenuItemClick(object sender, EventArgs e)
@@ -1592,72 +1696,13 @@ namespace FAD3
         */
 		
 
-		private void listView1_Enter(object sender, EventArgs e)
-		{
-			if (_TreeLevel =="sampling")
-			{
-				listView1.ContextMenuStrip   = contextListViewMenuStrip;
-				contextListViewMenuStrip.Tag = "Listview1";
-
-			}
-			else
-			{
-				listView1.ContextMenuStrip = null;
-			}
-		}
-
-		private void listView3_Enter(object sender, EventArgs e)
-		{
-			contextListViewMenuStrip.Tag = "ListView3";
-		}
 
 
 
 
 
-		private void listView1_MouseDown(object sender, MouseEventArgs e)
-		{
-			addNewToolStripMenuItem.Text = "New sampling";
-			deleteToolStripMenuItem.Text = "Delete sampling";
-			gMSToolStripMenuItem.Visible = false;
-			lengthFreqToolStripMenuItem.Visible = false;
-			catchDataToolStripMenuItem.Visible = false;
-			toolStripSeparator3.Visible =false;
-            exportXlsToolStripMenuItem.Visible = true;
-            toolStripSeparator4.Visible = true;
-            ListViewHitTestInfo lvht = listView1.HitTest(e.Location);
-			if (lvht.Location == ListViewHitTestLocations.None)
-			{
-				deleteToolStripMenuItem.Enabled = false;
-			}
-			else if (lvht.Location == ListViewHitTestLocations.Label)
-			{
-				deleteToolStripMenuItem.Enabled = true; ;
-			}
-		}
 
-		private void listView1_Click(object sender, EventArgs e)
-		{
-			/*ListViewItem lvi = listView1.SelectedItems[0];
-			string tag = listView1.Tag.ToString();
-			if (tag=="sampling")
-			{
-				ShowCatchDetail(lvi);
-				if (tabControl1.SelectedTab.Name == "tabPage2")
-				{
-					if (listView3.Items.Count > 0)
-					{
-						ListViewItem lv = listView3.Items[0];
-						lv.Selected = true;
-						if (_frmLF != null)
-						{
-							_frmLF.CurrentCatchName = lv.Text;
-							_frmLF.CurrentCatchRowNo = lv.Tag.ToString();
-						}
-					}
-				}
-			}*/
-		}
+
 
 
         /*
@@ -1696,7 +1741,16 @@ namespace FAD3
                     f.ShowDialog(this);
                     break;
                 case "gear":
-                    break;
+                    frmGearUsage form = frmGearUsage.GetInstance();
+                    if (!form.Visible)
+                    {
+                        form.Show(this);
+                    }
+                    else
+                    {
+                        form.BringToFront();
+                    }
+                        break;
                 case "fish":
                     break;
                 case "report":
@@ -1838,17 +1892,22 @@ namespace FAD3
                         lvi.BackColor = Color.Gainsboro;
                         break;
                     case "samplingDetail":
-                        frmSamplingDetail fs = new frmSamplingDetail();
-                        fs.SamplingGUID = _SamplingGUID;
-                        fs.LVInterface(listView1);
-                        fs.AOI = _AOI;
-                        fs.AOIGuid = _AOIGuid;
-                        fs.Parent_Form = this;
-                        fs.VesselDimension(_VesLength,_VesWidth,_VesHeight);
-                        fs.Show(this);
+                        ShowSamplingDetailForm();
                         break;
                 }
             }
+        }
+
+        private void ShowSamplingDetailForm()
+        {
+            frmSamplingDetail fs = new frmSamplingDetail();
+            fs.SamplingGUID = _SamplingGUID;
+            fs.LVInterface(listView1);
+            fs.AOI = _AOI;
+            fs.AOIGuid = _AOIGuid;
+            fs.Parent_Form = this;
+            fs.VesselDimension(_VesLength, _VesWidth, _VesHeight);
+            fs.Show(this);
         }
 
         private void BackToSamplingMonth()
@@ -1913,6 +1972,7 @@ namespace FAD3
                     nd = treeView1.SelectedNode;
                     arr = nd.Tag.ToString().Split(',');
 
+                    //arr[1] represents the treeview level clicked
                     switch (arr[1])
                     {
                         case "sampling":
@@ -1926,6 +1986,11 @@ namespace FAD3
                             arr = nd.Parent.Tag.ToString().Split(',');
                             _AOI.AOIGUID = arr[0];
                             _AOI.AOIName = nd.Parent.Text;
+
+                            _AOIName = _AOI.AOIName;
+                            _AOIGuid = _AOI.AOIGUID;
+                            _LandingSiteName = nd.Text;
+                            _LandingSiteGuid = nd.Name;
                             break;
                         case "gear":
                             arr = nd.Parent.Parent.Tag.ToString().Split(',');
@@ -2006,18 +2071,21 @@ namespace FAD3
 
         private void SamplingLevelNewSampling()
         {
-            string[] arr;
-            var nd = treeView1.SelectedNode;
-            _AOIGuid = _AOI.AOIGUID;
-            _AOIName = _AOI.AOIName;
-            arr = nd.Parent.Name.Split('|');
-            _GearVarName = nd.Parent.Text;
-            _GearVarGUID = arr[1];
-             var kvGearClass = global.GearClassFromGearVar(_GearVarGUID);
-            _GearClassGUID = kvGearClass.Key;
-            _GearClassName = kvGearClass.Value;
-            _LandingSiteName = nd.Parent.Parent.Text;
-            _LandingSiteGuid = nd.Parent.Parent.Name;
+            if (_TreeLevel == "sampling" || _TreeLevel=="landing_site")
+            {
+                string[] arr;
+                var nd = treeView1.SelectedNode;
+                _AOIGuid = _AOI.AOIGUID;
+                _AOIName = _AOI.AOIName;
+                arr = nd.Parent.Name.Split('|');
+                _GearVarName = nd.Parent.Text;
+                _GearVarGUID = arr[1];
+                var kvGearClass = global.GearClassFromGearVar(_GearVarGUID);
+                _GearClassGUID = kvGearClass.Key;
+                _GearClassName = kvGearClass.Value;
+                _LandingSiteName = nd.Parent.Parent.Text;
+                _LandingSiteGuid = nd.Parent.Parent.Name;
+            }
         }
 
         private void contextListViewMenuStrip_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
@@ -2030,7 +2098,7 @@ namespace FAD3
                     NewSamplingForm();
                     break;
                 case "deleteToolStripMenuItem":
-                    if (contextListViewMenuStrip.Tag.ToString() == "Listview1")
+                    if (true)
                     {
                         if (_frmCatch == null && _frmLF == null)
                         {
@@ -2085,6 +2153,29 @@ namespace FAD3
         private void frmMain_Activated(object sender, EventArgs e)
         {
             CancelButton = buttonOK.Visible ? buttonOK : null;
+        }
+
+        private void treeView1_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+              ConfigDropDownMenu(treeView1);
+        }
+
+        private void listView1_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                ListView lv = (ListView)sender;
+                ListViewHitTestInfo lvh = lv.HitTest(e.X, e.Y);
+                if (_TreeLevel == "sampling")
+                {
+                    ConfigDropDownMenu(listView1, lvh);
+                }
+                else
+                {
+                    ConfigDropDownMenu(listView1);
+                }
+            }
         }
     }
 }

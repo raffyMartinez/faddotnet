@@ -248,6 +248,31 @@ namespace FAD3
             }
         }
 
+        public static KeyValuePair<string, string> GearClassGuidNameFromGearVarGuid(string GearVarGUID)
+        {
+            
+            var dt = new DataTable();
+            KeyValuePair<string, string> rv = new KeyValuePair<string, string>();
+            using (var conection = new OleDbConnection(_ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    string query = "SELECT tblGearClass.GearClass, GearClassName FROM tblGearClass INNER JOIN tblGearVariations ON " +
+                                   "tblGearClass.GearClass = tblGearVariations.GearClass WHERE GearVarGUID='{" + GearVarGUID + "}'";
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(dt);
+                    DataRow dr = dt.Rows[0];
+                    rv = new KeyValuePair<string, string>(dr["GearClass"].ToString(), dr["GearClassName"].ToString());
+                }
+                catch (Exception ex)
+                {
+                    ErrorLogger.Log(ex);
+                }
+                return rv;
+            }
+        }
+
         public static string GearClassFromGearVarGUID(string GearVarGUID)
          {
             string gearClass = "";

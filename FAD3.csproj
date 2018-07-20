@@ -331,7 +331,9 @@
   <ItemGroup>
     <Content Include="Fatcow-Farm-Fresh-Book-key.ico" />
     <Content Include="Icon1.ico" />
+    <None Include="Resources\help-browser.png" />
     <Content Include="Resources\internet-web-browser.png" />
+    <None Include="Resources\system-file-manager.png" />
     <None Include="Resources\layerAdd.bmp" />
     <None Include="Resources\layer.bmp" />
     <None Include="Resources\db.bmp" />

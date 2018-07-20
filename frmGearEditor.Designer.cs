@@ -64,7 +64,7 @@
             this.textBox.Name = "textBox";
             this.textBox.Size = new System.Drawing.Size(288, 22);
             this.textBox.TabIndex = 2;
-            this.textBox.Validating += new System.ComponentModel.CancelEventHandler(this.textBox_Validating);
+            this.textBox.Validating += new System.ComponentModel.CancelEventHandler(this.OnTextBoxValidating);
             // 
             // checkBox
             // 
@@ -114,7 +114,7 @@
             this.comboBox.Name = "comboBox";
             this.comboBox.Size = new System.Drawing.Size(285, 24);
             this.comboBox.TabIndex = 8;
-            this.comboBox.Validating += new System.ComponentModel.CancelEventHandler(this.comboBox_Validating);
+            this.comboBox.Validating += new System.ComponentModel.CancelEventHandler(this.OnComboBoxValidating);
             // 
             // labelCode
             // 
@@ -146,7 +146,7 @@
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "frmGearEditor";
             this.Text = "Gear editor";
-            this.Load += new System.EventHandler(this.frmGearEditor_Load);
+            this.Load += new System.EventHandler(this.OnFormLoad);
             this.ResumeLayout(false);
             this.PerformLayout();
 

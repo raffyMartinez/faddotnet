@@ -21,6 +21,13 @@ namespace FAD3
         global.fad3GearEditAction _action;
 
         frmSamplingDetail _Parent;
+        private static frmGearUsage _instance;
+
+        public static frmGearUsage GetInstance()
+        {
+            if (_instance == null) _instance = new frmGearUsage();
+            return _instance;
+        }
 
         public  void TargetArea(string TargetAreaName, string TargetAreaGuid)
         {
@@ -60,9 +67,11 @@ namespace FAD3
 
         private void OnFormLoad(object sender, EventArgs e)
         {
-
             var WidthPercent = .8D;
+
+            //fill the combobox with gear class names
             ReadGearClass();
+
             if (_GearClassName.Length > 0)
             {
                 comboClass.Text = _GearClassName;
@@ -87,37 +96,71 @@ namespace FAD3
                 }
             }
 
+            //fill this listview with gear variations belonging to a class
             var lv = listViewVariations;
             ch = lv.Columns.Add("Variation");
             FillVariationsList();
-            lv.Items[_GearVarGuid].Selected = true;
+            if(_GearVarGuid.Length>0)
+              lv.Items[_GearVarGuid].Selected = true;
+            else
+            {
+                lv.Items[0].Selected = true;
+                _GearVarGuid = lv.Items[0].Name;
+            }
             ch.Width = (int)(lv.Width * WidthPercent);
 
+
+            //fill this list view with gear codes belonging to a variation
             lv = listViewCodes;
             var ch1 = lv.Columns.Add("Code");
             var ch2 = lv.Columns.Add("Sub-variation");
             FillRefCodeList();
             ch1.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
             ch2.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
-            lv.Items[_GearRefCode].Selected = true;
-
-            lv = listViewWhereUsed;
-            ch = lv.Columns.Add("Target area of use");
-            FillRefCodeUsage();
-            lv.Items[_TargetAreaGuid].Selected = true;
-            ch.Width = (int)(lv.Width * WidthPercent);
-
-            lv = listViewLocalNames;
-            ch = lv.Columns.Add("Local name");
-            FillLocalNames();
-            ch.Width = (int)(lv.Width * WidthPercent);
-
-            foreach (Control c in Controls)
+            if(_GearRefCode.Length>0)
+              lv.Items[_GearRefCode].Selected = true;
+            else
             {
-                if (c.GetType().ToString() == "System.Windows.Forms.ListView" && c.Name != "listViewLocalNames")
+                lv.Items[0].Selected = true;
+                _GearRefCode = lv.Items[0].Name;
+            }
+
+
+            //fill this list view with target areas where the variation is used
+            if (_GearRefCode.Length > 0)
+            {
+                lv = listViewWhereUsed;
+                ch = lv.Columns.Add("Target area of use");
+                FillRefCodeUsage();
+                if (_TargetAreaGuid.Length > 0)
+                    lv.Items[_TargetAreaGuid].Selected = true;
+                else
                 {
-                    var i = ((ListView)c).SelectedItems[0].Index;
-                    ((ListView)c).EnsureVisible(i);
+                    if (lv.Items.Count > 0)
+                    {
+                        lv.Items[0].Selected = true;
+                        _TargetAreaGuid = lv.Items[0].Name;
+                    }
+                }
+                ch.Width = (int)(lv.Width * WidthPercent);
+            }
+
+
+            //fill this list view with the local names used in a target area
+            if (_TargetAreaGuid.Length > 0)
+            {
+                lv = listViewLocalNames;
+                ch = lv.Columns.Add("Local name");
+                FillLocalNames();
+                ch.Width = (int)(lv.Width * WidthPercent);
+
+                foreach (Control c in Controls)
+                {
+                    if (c.GetType().ToString() == "System.Windows.Forms.ListView" && c.Name != "listViewLocalNames")
+                    {
+                        var i = ((ListView)c).SelectedItems[0].Index;
+                        ((ListView)c).EnsureVisible(i);
+                    }
                 }
             }
 
@@ -301,17 +344,43 @@ namespace FAD3
 
         }
 
-        private void OnlistView_MouseUp(object sender, MouseEventArgs e)
+        private void OnListView_MouseDown(object sender, MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Right)
+            if (e.Button == MouseButtons.Left)
+            {
+                var lv = (ListView)sender;
+                ListViewHitTestInfo info = lv.HitTest(e.X, e.Y);
+                if (info.Item != null)
+                {
+                    switch (lv.Name)
+                    {
+                        case "listViewCodes":
+                            _TargetAreaGuid = "";
+                            break;
+                        case "listViewWhereUsed":
+                            break;
+                        case "listViewVariations":
+                            _GearRefCode = "";
+                            _TargetAreaGuid = "";
+                            break;
+                        case "listViewLocalNames":
+                            break;
+
+                    }
+                }
+            }
+            else if (e.Button == MouseButtons.Right)
             {
                 dropDownMenu.Items.Clear();
+                var lv = (ListView)sender;
+                ListViewHitTestInfo info = lv.HitTest(e.X, e.Y);
 
-                switch (((ListView)sender).Name)
+                switch (lv.Name)
                 {
                     case "listViewWhereUsed":
                         var tsi = dropDownMenu.Items.Add("Add target area where used");
                         tsi.Name = "itemAddTargetArea";
+                        tsi.Enabled = _GearRefCode.Length > 0;
                         break;
                     case "listViewVariations":
                         tsi = dropDownMenu.Items.Add("Add a gear variation");
@@ -320,14 +389,53 @@ namespace FAD3
                     case "listViewLocalNames":
                         tsi = dropDownMenu.Items.Add("Add a gear local name");
                         tsi.Name = "itemAddLocalName";
+                        tsi.Enabled = _TargetAreaGuid.Length > 0;
                         break;
                     case "listViewCodes":
                         tsi = dropDownMenu.Items.Add("Add a gear code");
                         tsi.Name = "itemAddGearCode";
+                        tsi.Enabled = _GearVarGuid.Length > 0;
                         break;
-
                 }
+
+
             }
+        }
+
+        private void OnlistView_MouseUp(object sender, MouseEventArgs e)
+        {
+            //if (e.Button == MouseButtons.Right)
+            //{
+            //    dropDownMenu.Items.Clear();
+            //    var lv = (ListView)sender;
+            //    ListViewHitTestInfo info = lv.HitTest(e.X, e.Y);
+
+            //    switch (lv.Name)
+            //    {
+            //        case "listViewWhereUsed":
+            //            var tsi = dropDownMenu.Items.Add("Add target area where used");
+            //            tsi.Name = "itemAddTargetArea";
+            //            tsi.Enabled = _GearRefCode.Length > 0;
+            //            break;
+            //        case "listViewVariations":
+            //            tsi = dropDownMenu.Items.Add("Add a gear variation");
+            //            tsi.Name = "itemAddGearVariation";
+            //            break;
+            //        case "listViewLocalNames":
+            //            tsi = dropDownMenu.Items.Add("Add a gear local name");
+            //            tsi.Name = "itemAddLocalName";
+            //            tsi.Enabled = _TargetAreaGuid.Length > 0;
+            //            break;
+            //        case "listViewCodes":
+            //            tsi = dropDownMenu.Items.Add("Add a gear code");
+            //            tsi.Name = "itemAddGearCode";
+            //            tsi.Enabled = _GearVarGuid.Length > 0;
+            //            break;
+            //    }
+
+                
+            //}
+
         }
 
         private void dropDownMenu_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
@@ -362,6 +470,11 @@ namespace FAD3
             f.Action = _action;
             f.InList = myList;
             f.ShowDialog(this);
+        }
+
+        private void OnFormClosed(object sender, FormClosedEventArgs e)
+        {
+            _instance = null;
         }
     }
 }

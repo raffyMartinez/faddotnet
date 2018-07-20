@@ -46,7 +46,7 @@ namespace FAD3
             InitializeComponent();
         }
 
-        private void frmGearEditor_Load(object sender, EventArgs e)
+        private void OnFormLoad(object sender, EventArgs e)
         {
             checkBox.Visible = false;
             labelCode.Visible = false;
@@ -164,7 +164,7 @@ namespace FAD3
             }
         }
 
-        private void textBox_Validating(object sender, CancelEventArgs e)
+        private void OnTextBoxValidating(object sender, CancelEventArgs e)
         {
             var s = textBox.Text;
             var msg = "";
@@ -177,7 +177,7 @@ namespace FAD3
                         {
                             if (_List.Contains(s,StringComparer.OrdinalIgnoreCase))
                             {
-                                msg = "Gear variation name already exists. Use another name";
+                                msg = "Gear variation name already in use. Select another name";
                             }
                         }
                         else
@@ -221,7 +221,7 @@ namespace FAD3
             }
         }
 
-        private void comboBox_Validating(object sender, CancelEventArgs e)
+        private void OnComboBoxValidating(object sender, CancelEventArgs e)
         {
             var cbo = (ComboBox)sender;
             var msg = "";
