@@ -159,13 +159,13 @@ namespace FAD3
             Catalog catMDB = new Catalog();
             catMDB.let_ActiveConnection(global.ConnectionString);
 
-            
+
             try
             {
                 catMDB.Tables.Delete("temp_AllNames");
             }
             catch
-            {
+            { }
                 using (var conection = new OleDbConnection(global.ConnectionString))
                 {
 
@@ -203,7 +203,7 @@ namespace FAD3
                     conection.Close();
 
                 }
-            }
+            
         }
 
         public static void GetGenus_LocalNames()

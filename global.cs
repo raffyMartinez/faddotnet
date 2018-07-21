@@ -80,6 +80,12 @@ namespace FAD3
             return _GearVariationsUsage;
         }
 
+        public static Dictionary<string, string> GearVariationsUsage(string GearClassGUID, string AOIGUID, ComboBox c)
+        {
+            getGearVariationsUsage(GearClassGUID, AOIGUID, c);
+            return _GearVariationsUsage;
+        }
+
         public static Dictionary<string, string> VesselTypeDict
         {
             get { return _VesselTypeDict; }
@@ -182,7 +188,7 @@ namespace FAD3
             return myList;
         }
 
-        static void getGearVariationsUsage(string GearClassGUID, string AOIGUID="")
+        static void getGearVariationsUsage(string GearClassGUID, string AOIGUID="", ComboBox c=null)
         {
             _GearVariationsUsage.Clear();
             var dt = new DataTable();
@@ -211,6 +217,8 @@ namespace FAD3
                     {
                         DataRow dr = dt.Rows[i];
                         _GearVariationsUsage.Add(dr["GearVarGUID"].ToString(), dr["Variation"].ToString());
+                        if (c != null)
+                            c.Items.Add(new KeyValuePair<string, string>(dr["GearVarGUID"].ToString(), dr["Variation"].ToString()));
      
                     }
                 }
@@ -718,7 +726,6 @@ namespace FAD3
                     {
                         if (tableList.Contains(tdName))
                         {
-                            //check if data table fields and template table fields are the same
 
                             //check for columns
                             foreach(Column col in catMDB.Tables[tdName].Columns)
@@ -726,12 +733,20 @@ namespace FAD3
                                 colList.Add(col.Name);
                             }
 
-                            foreach(Column col in tblTemplate.Columns)
+                            foreach (Column col in tblTemplate.Columns)
                             {
+                                var mdbCol = new Column();
                                 if (!colList.Contains(col.Name))
                                 {
                                     catMDB.Tables[tdName].Columns.Append(col.Name, col.Type, col.DefinedSize);
                                 }
+                                mdbCol = catMDB.Tables[tdName].Columns[col.Name];
+                                try
+                                {
+                                    mdbCol.Properties["Jet OLEDB:Allow Zero Length"].Value = col.Properties["Jet OLEDB:Allow Zero Length"].Value;
+                                    mdbCol.Properties["Description"].Value = col.Properties["Description"].Value;
+                                }
+                                catch { }
                             }
 
                             //check for indexes
@@ -758,7 +773,7 @@ namespace FAD3
                                     }
                                     try
                                     {
-                                        catMDB.Tables[tdName].Indexes.Append((object)newIndex);
+                                        catMDB.Tables[tdName].Indexes.Append(newIndex);
                                     }
                                     catch(Exception ex)
                                     {
@@ -865,7 +880,32 @@ namespace FAD3
 
 			return myClass;
 		}
-		private static void GetGearClass(){
+
+        public static void GetGearClassEx(ComboBox c)
+        {
+            var myDT = new DataTable();
+            using (var conection = new OleDbConnection(_ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    string query = "Select GearClass, GearLetter, GearClassName from tblGearClass order by GearClassName";
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(myDT);
+                    for (int i = 0; i < myDT.Rows.Count; i++)
+                    {
+                        DataRow dr = myDT.Rows[i];
+                        c.Items.Add(new KeyValuePair<string, string>(dr["GearClass"].ToString(), dr["GearClassName"].ToString()));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ErrorLogger.Log(ex);
+                }
+            }
+        }
+
+        private static void GetGearClass(){
 			var myDT =  new DataTable();
 			using(var conection = new OleDbConnection(_ConnectionString))
 			{

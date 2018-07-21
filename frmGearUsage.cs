@@ -133,7 +133,12 @@ namespace FAD3
                 ch = lv.Columns.Add("Target area of use");
                 FillRefCodeUsage();
                 if (_TargetAreaGuid.Length > 0)
-                    lv.Items[_TargetAreaGuid].Selected = true;
+                { 
+                    if (lv.Items.Count > 0)
+                    {
+                        lv.Items[_TargetAreaGuid].Selected = true;
+                    }
+                }
                 else
                 {
                     if (lv.Items.Count > 0)
@@ -154,14 +159,23 @@ namespace FAD3
                 FillLocalNames();
                 ch.Width = (int)(lv.Width * WidthPercent);
 
-                foreach (Control c in Controls)
-                {
-                    if (c.GetType().ToString() == "System.Windows.Forms.ListView" && c.Name != "listViewLocalNames")
-                    {
-                        var i = ((ListView)c).SelectedItems[0].Index;
-                        ((ListView)c).EnsureVisible(i);
-                    }
-                }
+                //foreach (Control c in Controls)
+                //{
+                //    if (c.GetType().Name == "ListView" && c.Name != "listViewLocalNames")
+                //    {
+                //        var i = ((ListView)c).SelectedItems[0].Index;
+                //        ((ListView)c).EnsureVisible(i);
+                //    }
+                //}
+
+                listViewLocalNames.With( o=>
+                 {
+                     if(o.Items.Count>0)
+                     {
+                         var i = o.SelectedItems[0].Index;
+                         o.EnsureVisible(i);
+                     }
+                 });
             }
 
         }
@@ -294,16 +308,20 @@ namespace FAD3
                     listViewLocalNames.Items.Clear();
 
                     FillRefCodeUsage();
-                    if (!listViewWhereUsed.Items.ContainsKey(_TargetAreaGuid))
-                    {
-                        listViewWhereUsed.Items[0].Selected = true;
-                        _TargetAreaGuid = listViewWhereUsed.Items[0].Name;
+                    if (listViewWhereUsed.Items.Count > 0)
+                    { 
+                        if (!listViewWhereUsed.Items.ContainsKey(_TargetAreaGuid))
+                        {
+
+                            listViewWhereUsed.Items[0].Selected = true;
+                            _TargetAreaGuid = listViewWhereUsed.Items[0].Name;
+                        }
+                        else
+                        {
+                            listViewWhereUsed.Items[_TargetAreaGuid].Selected = true;
+                        }
+                        FillLocalNames();
                     }
-                    else
-                    {
-                        listViewWhereUsed.Items[_TargetAreaGuid].Selected = true;
-                    }
-                    FillLocalNames();
                     break;
                 case "listViewLocalNames":
                     break;
@@ -320,16 +338,19 @@ namespace FAD3
                         _GearRefCode = listViewCodes.Items[0].Name;
                         listViewCodes.Items[_GearRefCode].Selected = true;
                         FillRefCodeUsage();
-                        if (!listViewWhereUsed.Items.ContainsKey(_TargetAreaGuid))
+                        if (listViewWhereUsed.Items.Count > 0)
                         {
-                            listViewWhereUsed.Items[0].Selected = true;
-                            _TargetAreaGuid = listViewWhereUsed.Items[0].Name;
+                            if (!listViewWhereUsed.Items.ContainsKey(_TargetAreaGuid))
+                            {
+                                listViewWhereUsed.Items[0].Selected = true;
+                                _TargetAreaGuid = listViewWhereUsed.Items[0].Name;
+                            }
+                            else
+                            {
+                                listViewWhereUsed.Items[_TargetAreaGuid].Selected = true;
+                            }
+                            FillLocalNames();
                         }
-                        else
-                        {
-                            listViewWhereUsed.Items[_TargetAreaGuid].Selected = true;
-                        }
-                        FillLocalNames();
                     }
                     break;
                 case "listViewWhereUsed":

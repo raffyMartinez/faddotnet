@@ -213,7 +213,12 @@ namespace FAD3
                 case "menuNewLandingSite":
                     break;
                 case "menuNewSampling":
-                    NewSamplingForm();
+                    if (aoi.AOIHaveEnumeratorsEx(_AOIGuid))
+                        NewSamplingForm();
+                    else
+                        MessageBox.Show("Cannot create a new sampling because\n\r" +
+                            "Target area has no enumerator","Cannot create sampling",MessageBoxButtons.OK,
+                            MessageBoxIcon.Information);
                     break;
                 case "menuNewEnumerator":
                     break;

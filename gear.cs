@@ -49,7 +49,7 @@ namespace FAD3
                 catMDB.Tables.Delete("temp_VesselType");
             }
             catch
-            {
+            { }
                 using (var conection = new OleDbConnection(global.ConnectionString))
                 {
 
@@ -80,7 +80,7 @@ namespace FAD3
                     conection.Close();
                     
                 }
-            }
+            
          }
 
         public static bool GetGearCodeCounter(string GearCode, ref long counter)

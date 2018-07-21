@@ -10,6 +10,7 @@ using System;
 using System.Data;
 using System.Data.OleDb;
 using System.Collections.Generic;
+using System.Windows.Forms;
 
 namespace FAD3
 {
@@ -27,8 +28,8 @@ namespace FAD3
         private Dictionary<string,string> _landingSites = new Dictionary<string,string>();
         private Dictionary<string, string> _Enumerators = new Dictionary<string, string>();
 
-		
-		public string MajorGrids{
+
+        public string MajorGrids{
 			get{return _MajorGrids;}
 		}
 		
@@ -212,8 +213,38 @@ namespace FAD3
 			return myName;	
 			}
 		}
-		
-		private void getAOIs(){
+
+        public static Dictionary<string, string> getAOIsEx(ComboBox c = null)
+        {
+            var myList = new Dictionary<string, string>();
+            DataTable dt = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    string query = "SELECT AOIGuid, AOIName FROM tblAOI order by AOIName";
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(dt);
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        DataRow dr = dt.Rows[i];
+                        myList.Add(dr["AOIGuid"].ToString(), dr["AOIName"].ToString());
+                        if (c != null)
+                            c.Items.Add(new KeyValuePair<string, string>(dr["AOIGuid"].ToString(), dr["AOIName"].ToString()));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ErrorLogger.Log(ex);
+                }
+
+                return myList;
+            }
+        }
+
+
+            private void getAOIs(){
             _aois.Clear();
 			DataTable dt = new DataTable();
 			using(var conection = new OleDbConnection(global.ConnectionString))
@@ -235,7 +266,7 @@ namespace FAD3
 			}
 		}
 		
-        public static Dictionary<string, string>LandingSitesFromAOI(string AOIguid)
+        public static Dictionary<string, string>LandingSitesFromAOI(string AOIguid, ComboBox c=null)
         {
             Dictionary<string, string> LandingSites = new Dictionary<string, string>();
             DataTable dt = new DataTable();
@@ -251,6 +282,9 @@ namespace FAD3
                     {
                         DataRow dr = dt.Rows[i];
                         LandingSites.Add(dr["LSGUID"].ToString(), dr["LSName"].ToString());
+
+                        if (c != null)
+                         c.Items.Add(new KeyValuePair<string, string>(dr["LSGUID"].ToString(), dr["LSName"].ToString()));
                     }
                 }
                 catch (Exception ex)
@@ -489,7 +523,7 @@ namespace FAD3
 			return myYears;
 		}
 			
-		static public Dictionary<string, string> AOIEnumeratorsList(string AOIGuid)
+		static public Dictionary<string, string> AOIEnumeratorsList(string AOIGuid, ComboBox c = null)
         {
             Dictionary<string, string> myAOIEnumerators = new Dictionary<string, string>();
             var myDT = new DataTable();
@@ -508,6 +542,11 @@ namespace FAD3
                     {
                         DataRow dr = myDT.Rows[i];
                         myAOIEnumerators.Add(dr["EnumeratorID"].ToString(), dr["EnumeratorName"].ToString());
+                        if(c != null)
+                        {
+                            c.Items.Add( new KeyValuePair<string, string>(dr["EnumeratorID"].ToString(), dr["EnumeratorName"].ToString()));
+                        }
+                            
                     }
                 }
                 catch (Exception ex)
@@ -519,7 +558,7 @@ namespace FAD3
             return myAOIEnumerators;
         }
         
-		private  void getAOIEnumerators()
+		private  void getAOIEnumerators(ComboBox c = null)
 		{
             _Enumerators.Clear();
             var myDT =  new DataTable();
@@ -537,6 +576,7 @@ namespace FAD3
 					for (int i = 0; i < myDT.Rows.Count; i++){
 						DataRow dr = myDT.Rows[i];
 						_Enumerators.Add (dr["EnumeratorID"].ToString(), dr["EnumeratorName"].ToString());
+                        
 					}
 				}
 				catch (Exception ex)

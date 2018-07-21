@@ -221,19 +221,24 @@ namespace FAD3
                         Name = "combo" + e.Key,
                     };
 
+
                     switch (e.Key)
                     {
                         case "Enumerator":
-                            ((ComboBox)ctl).DataSource = new BindingSource(_aoi.Enumerators, null);
+                            //((ComboBox)ctl).DataSource = new BindingSource(_aoi.Enumerators, null);
+                            aoi.AOIEnumeratorsList(_AOIGuid, (ComboBox)ctl);
                             break;
                         case "TargetArea":
-                            ((ComboBox)ctl).DataSource = new BindingSource(_aoi.AOIs, null);
+                            //((ComboBox)ctl).DataSource = new BindingSource(_aoi.AOIs, null);
+                            aoi.getAOIsEx((ComboBox)ctl);
                             break;
                         case "LandingSite":
-                            ((ComboBox)ctl).DataSource = new BindingSource(_aoi.LandingSites, null);
+                            //((ComboBox)ctl).DataSource = new BindingSource(_aoi.LandingSites, null);
+                            aoi.LandingSitesFromAOI(_AOIGuid, (ComboBox)ctl);
                             break;
                         case "GearClass":
-                            ((ComboBox)ctl).DataSource = new BindingSource(global.GearClass, null);
+                            //((ComboBox)ctl).DataSource = new BindingSource(global.GearClass, null);
+                            global.GetGearClassEx((ComboBox)ctl);
                             break;
                         case "FishingGear":
                             if (!_isNew)
@@ -252,12 +257,16 @@ namespace FAD3
                                     _GearClassGuid = global.GearClassUsed;
                                 }
                             }
-   
-                            ((ComboBox)ctl).DataSource = new BindingSource(global.GearVariationsUsage(_GearClassGuid, _AOIGuid), null);
-                            
+
+                            global.GearVariationsUsage(_GearClassGuid, _AOIGuid, (ComboBox)ctl);
+                            //var MySource = global.GearVariationsUsage(_GearClassGuid, _AOIGuid, (ComboBox)ctl);
+                            //if (MySource.Count > 0)
+                            //{
+                            //    ((ComboBox)ctl).DataSource = new BindingSource(MySource, null);
+                            //}
                             break;
                         case "TypeOfVesselUsed":
-                            System.Diagnostics.Debug.Assert(global.VesselTypeDict.Count > 0, "source has no rows");
+                            //System.Diagnostics.Debug.Assert(global.VesselTypeDict.Count > 0, "source has no rows");
                             ((ComboBox)ctl).DataSource = new BindingSource(global.VesselTypeDict, null);
                             break;
                     }
@@ -402,11 +411,17 @@ namespace FAD3
                             {
                                 ((ComboBox)ctl).With(o =>
                                 {
-                                    var item = o.Items[0];
-                                    o.SelectedItem = item;
+                                    if (o.Items.Count > 0)
+                                    {
+                                        var item = o.Items[0];
+                                        o.SelectedItem = item; //combobox text is set here
+                                    }
                                 });
                             }
+
+                            if(ctl.Text.Length>0)
                             _GearVarGuid = ((KeyValuePair<string, string>)((ComboBox)ctl).SelectedItem).Key;
+
                             break;
                         case "Enumerator":
                             ctl.Text = "";
@@ -576,7 +591,7 @@ namespace FAD3
             foreach (Control c in panelUI.Controls)
             {
                 var typeName = c.GetType().Name;
-                if (typeName != "System.Windows.Forms.Button" && typeName != "System.Windows.Forms.Label")
+                if (typeName != "Button" && typeName != "Label")
                 {
                     switch (typeName)
                     {
@@ -881,7 +896,7 @@ namespace FAD3
         private void OnFieldChange(object sender, EventArgs e)
         {
             HideErrorLabels();
-            if (sender.GetType().ToString() == "System.Windows.Forms.ComboBox")
+            if (sender.GetType().Name == "ComboBox")
             {
                 if (((Control)sender).Name=="comboEnumerator")
                 {
@@ -893,62 +908,65 @@ namespace FAD3
         private void OnFieldValidated(object sender, EventArgs e)
         {
             
-            if (sender.GetType().ToString() == "System.Windows.Forms.ComboBox")
+            if (sender.GetType().Name== "ComboBox")
             {
                 var combo = (ComboBox)sender;
                 var targetCombo = new ComboBox();
                 var key = "";
                 var comboItems = new Dictionary<string, string>();
 
-                try
+                if (combo.Text.Length >0)
                 {
-                    //we get the dictionary key of the current item in the combobox
-                    key = ((KeyValuePair<string, string>)combo.SelectedItem).Key;
-                }
-                catch
-                {
-                    key = "";
-                }
-                finally
-                {
-                    if (key.Length > 0)
-                    { 
-                        switch (combo.Name)
+                    try
+                    {
+                        //we get the dictionary key of the current item in the combobox
+                        key = ((KeyValuePair<string, string>)combo.SelectedItem).Key;
+                    }
+                    catch
+                    {
+                        key = "";
+                    }
+                    finally
+                    {
+                        if (key.Length > 0)
                         {
-                            case "comboTargetArea":
-                                targetCombo = (ComboBox)panelUI.Controls["comboLandingSite"];
-                                comboItems = aoi.LandingSitesFromAOI(key);
-                                ChangeComboDataSource(targetCombo, comboItems);
+                            switch (combo.Name)
+                            {
+                                case "comboTargetArea":
+                                    targetCombo = (ComboBox)panelUI.Controls["comboLandingSite"];
+                                    comboItems = aoi.LandingSitesFromAOI(key);
+                                    ChangeComboDataSource(targetCombo, comboItems);
 
-                                targetCombo = (ComboBox)panelUI.Controls["comboEnumerator"];
-                                comboItems = aoi.AOIEnumeratorsList(key);
-                                ChangeComboDataSource(targetCombo, comboItems);
+                                    targetCombo = (ComboBox)panelUI.Controls["comboEnumerator"];
+                                    comboItems = aoi.AOIEnumeratorsList(key);
+                                    ChangeComboDataSource(targetCombo, comboItems);
 
-                                targetCombo = (ComboBox)panelUI.Controls["comboFishingGear"];
-                                string myGearClassGUID = ((KeyValuePair<string, string>)((ComboBox)panelUI.Controls["comboGearClass"]).SelectedItem).Key;
-                                comboItems = global.GearVariationsUsage(myGearClassGUID, key);
-                                ChangeComboDataSource(targetCombo, comboItems);
+                                    targetCombo = (ComboBox)panelUI.Controls["comboFishingGear"];
+                                    string myGearClassGUID = ((KeyValuePair<string, string>)((ComboBox)panelUI.Controls["comboGearClass"]).SelectedItem).Key;
+                                    comboItems = global.GearVariationsUsage(myGearClassGUID, key);
+                                    ChangeComboDataSource(targetCombo, comboItems);
 
 
 
-                                break;
-                            case "comboLandingSite":
-                                break;
-                            case "comboEnumerator":
-                                break;
-                            case "comboGearClass":
-                                _GearClassName = ((ComboBox)panelUI.Controls["comboGearClass"]).Text;
-                                string myAOIGUID = ((KeyValuePair<string, string>)((ComboBox)panelUI.Controls["comboTargetArea"]).SelectedItem).Key;
-                                targetCombo = (ComboBox)panelUI.Controls["comboFishingGear"];
-                                comboItems = global.GearVariationsUsage(key, myAOIGUID);
-                                ChangeComboDataSource(targetCombo, comboItems);
-                                break;
-                            case "comboFishingGear":
-                                break;
-                            case "comboTypeOfVesselUsed":
-                                break;
+                                    break;
+                                case "comboLandingSite":
+                                    break;
+                                case "comboEnumerator":
+                                    break;
+                                case "comboGearClass":
+                                    _GearClassName = ((ComboBox)panelUI.Controls["comboGearClass"]).Text;
+                                    string myAOIGUID = ((KeyValuePair<string, string>)((ComboBox)panelUI.Controls["comboTargetArea"]).SelectedItem).Key;
+                                    targetCombo = (ComboBox)panelUI.Controls["comboFishingGear"];
+                                    comboItems = global.GearVariationsUsage(key, myAOIGUID);
+                                    ChangeComboDataSource(targetCombo, comboItems);
+                                    break;
+                                case "comboFishingGear":
+                                    break;
+                                case "comboTypeOfVesselUsed":
+                                    break;
+                            }
+
                         }
-
                     }
                 }
 
