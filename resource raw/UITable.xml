@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<UITable>
+	<UIRow>
+		<Key>TargetArea</Key>
+		<Label>Target area</Label>
+		<Height>1</Height>
+		<control>ComboBox</control>
+		<ButtonText/>
+		<DataType>lookup</DataType>
+		<ReadOnly>false</ReadOnly>
+		<ToolTip>Name of the target area</ToolTip>
+		<Required>true</Required>
+	</UIRow>
+	<UIRow>
+		<Key>LandingSite</Key>
+		<Label>Landing site</Label>
+		<Height>1</Height>
+		<control>ComboBox</control>
+		<ButtonText/>
+		<DataType>lookup</DataType>
+		<ReadOnly>false</ReadOnly>
+		<ToolTip>Name of the landing site</ToolTip>
+		<Required>true</Required>
+	</UIRow>
+	<UIRow>
+		<Key>SamplingDate</Key>
+		<Label>Sampling date</Label>
+		<Height>1</Height>
+		<control>MaskDate</control>
+		<ButtonText/>
+		<DataType>datetime</DataType>
+		<ReadOnly>false</ReadOnly>
+		<ToolTip>Date of sampling</ToolTip>
+		<Required>true</Required>
+	</UIRow>
+	<UIRow>
+		<Key>SamplingTime</Key>
+		<Label>Sampling time</Label>
+		<Height>1</Height>
+		<control>MaskTime</control>
+		<ButtonText/>
+		<DataType>datetime</DataType>
+		<ReadOnly>false</ReadOnly>
+		<ToolTip>Time of sampling</ToolTip>
+		<Required>true</Required>
+	</UIRow>
+	<UIRow>
+		<Key>Enumerator</Key>
+		<Label>Enumerator</Label>
+		<Height>1</Height>
+		<control>ComboBox</control>
+		<ButtonText>Details</ButtonText>
+		<DataType>lookup</DataType>
+		<ReadOnly>false</ReadOnly>
+		<ToolTip>Name of the enumerator who did the sampling</ToolTip>
+		<Required>true</Required>
+	</UIRow>
+	<UIRow>
+		<Key>spacer</Key>
+		<Label/>
+		<Height>1</Height>
+		<control/>
+		<ButtonText/>
+		<DataType>null</DataType>
+		<ReadOnly>false</ReadOnly>
+		<ToolTip/>
+		<Required>false</Required>
+	</UIRow>
+	<UIRow>
+		<Key>GearClass</Key>
+		<Label>Gear class</Label>
+		<Height>1</Height>
+		<control>ComboBox</control>
+		<ButtonText>Gear usage</ButtonText>
+		<DataType>lookup</DataType>
+		<ReadOnly>false</ReadOnly>
+		<ToolTip>Class of fishing gear used</ToolTip>
+		<Required>true</Required>
+	</UIRow>
+	<UIRow>
+		<Key>FishingGear</Key>
+		<Label>Fishing gear</Label>
+		<Height>1</Height>
+		<control>ComboBox</control>
+		<ButtonText/>
+		<DataType>lookup</DataType>
+		<ReadOnly>false</ReadOnly>
+		<ToolTip>Specific kind of fishing gear used</ToolTip>
+		<Required>true</Required>
+	</UIRow>
+	<UIRow>
+		<Key>GearSpecs</Key>
+		<Label>Gear specs</Label>
+		<Height>5</Height>
+		<control>TextBox</control>
+		<ButtonText>Gear specs</ButtonText>
+		<DataType>string</DataType>
+		<ReadOnly>true</ReadOnly>
+		<ToolTip>Specifications of the gear used</ToolTip>
+		<Required>false</Required>
+	</UIRow>
+	<UIRow>
+		<Key>ReferenceNumber</Key>
+		<Label>Reference number</Label>
+		<Height>1</Height>
+		<control>TextBox</control>
+		<ButtonText>Generate</ButtonText>
+		<DataType>string</DataType>
+		<ReadOnly>true</ReadOnly>
+		<ToolTip>Reference number of the sampled effort</ToolTip>
+		<Required>true</Required>
+	</UIRow>
+	<UIRow>
+		<Key>WeightOfCatch</Key>
+		<Label>Weight of catch</Label>
+		<Height>1</Height>
+		<control>TextBox</control>
+		<ButtonText/>
+		<DataType>double</DataType>
+		<ReadOnly>false</ReadOnly>
+		<ToolTip>Weight of the catch</ToolTip>
+		<Required>false</Required>
+	</UIRow>
+	<UIRow>
+		<Key>WeightOfSample</Key>
+		<Label>Weight of sample</Label>
+		<Height>1</Height>
+		<control>TextBox</control>
+		<ButtonText/>
+		<DataType>double</DataType>
+		<ReadOnly>false</ReadOnly>
+		<ToolTip>Weight of the sample</ToolTip>
+		<Required>false</Required>
+	</UIRow>
+	<UIRow>
+		<Key>HasLiveFish</Key>
+		<Label>Has live fish</Label>
+		<Height>1</Height>
+		<control>CheckBox</control>
+		<ButtonText/>
+		<DataType>bool</DataType>
+		<ReadOnly>false</ReadOnly>
+		<ToolTip>Whether live food fish are landed</ToolTip>
+		<Required>false</Required>
+	</UIRow>
+	<UIRow>
+		<Key>spacer</Key>
+		<Label/>
+		<Height>1</Height>
+		<control/>
+		<ButtonText/>
+		<DataType>null</DataType>
+		<ReadOnly>false</ReadOnly>
+		<ToolTip/>
+		<Required>false</Required>
+	</UIRow>
+	<UIRow>
+		<Key>FishingGround</Key>
+		<Label>Fishing ground</Label>
+		<Height>1</Height>
+		<control>TextBox</control>
+		<ButtonText>Specify</ButtonText>
+		<DataType>string</DataType>
+		<ReadOnly>true</ReadOnly>
+		<ToolTip>Fishing ground grid location of the effort</ToolTip>
+		<Required>false</Required>
+	</UIRow>
+	<UIRow>
+		<Key>AdditionalFishingGround</Key>
+		<Label>Additional fishing ground</Label>
+		<Height>1</Height>
+		<control>TextBox</control>
+		<ButtonText/>
+		<DataType>string</DataType>
+		<ReadOnly>true</ReadOnly>
+		<ToolTip>Additional grid locations of the effort</ToolTip>
+		<Required>false</Required>
+	</UIRow>
+	<UIRow>
+		<Key>DateSet</Key>
+		<Label>Date set</Label>
+		<Height>1</Height>
+		<control>MaskDate</control>
+		<ButtonText/>
+		<DataType>datetime</DataType>
+		<ReadOnly>false</ReadOnly>
+		<ToolTip>Date fishing gear was set</ToolTip>
+		<Required>false</Required>
+	</UIRow>
+	<UIRow>
+		<Key>TimeSet</Key>
+		<Label>Time set</Label>
+		<Height>1</Height>
+		<control>MaskTime</control>
+		<ButtonText/>
+		<DataType>datetime</DataType>
+		<ReadOnly>false</ReadOnly>
+		<ToolTip>Time fishing gear was set</ToolTip>
+		<Required>false</Required>
+	</UIRow>
+	<UIRow>
+		<Key>DateHauled</Key>
+		<Label>Date hauled</Label>
+		<Height>1</Height>
+		<control>MaskDate</control>
+		<ButtonText/>
+		<DataType>datetime</DataType>
+		<ReadOnly>false</ReadOnly>
+		<ToolTip>Date fishing gear was hauled</ToolTip>
+		<Required>false</Required>
+	</UIRow>
+	<UIRow>
+		<Key>TimeHauled</Key>
+		<Label>Time hauled</Label>
+		<Height>1</Height>
+		<control>MaskTime</control>
+		<ButtonText/>
+		<DataType>datetime</DataType>
+		<ReadOnly>false</ReadOnly>
+		<ToolTip>Time fishing gear was hauled</ToolTip>
+		<Required>false</Required>
+	</UIRow>
+	<UIRow>
+		<Key>NumberOfHauls</Key>
+		<Label>Number of hauls</Label>
+		<Height>1</Height>
+		<control>TextBox</control>
+		<ButtonText/>
+		<DataType>int</DataType>
+		<ReadOnly>false</ReadOnly>
+		<ToolTip>Number times gear was hauled</ToolTip>
+		<Required>false</Required>
+	</UIRow>
+	<UIRow>
+		<Key>NumberOfFishers</Key>
+		<Label>Number of fishers</Label>
+		<Height>1</Height>
+		<control>TextBox</control>
+		<ButtonText/>
+		<DataType>int</DataType>
+		<ReadOnly>false</ReadOnly>
+		<ToolTip>Number of fishers in the fishing vessel</ToolTip>
+		<Required>false</Required>
+	</UIRow>
+	<UIRow>
+		<Key>spacer</Key>
+		<Label/>
+		<Height>1</Height>
+		<control/>
+		<ButtonText/>
+		<DataType>null</DataType>
+		<ReadOnly>false</ReadOnly>
+		<ToolTip/>
+		<Required>false</Required>
+	</UIRow>
+	<UIRow>
+		<Key>TypeOfVesselUsed</Key>
+		<Label>Type of vessel used</Label>
+		<Height>1</Height>
+		<control>ComboBox</control>
+		<ButtonText/>
+		<DataType>lookup</DataType>
+		<ReadOnly>false</ReadOnly>
+		<ToolTip>Type of fishing vessel</ToolTip>
+		<Required>true</Required>
+	</UIRow>
+	<UIRow>
+		<Key>Engine</Key>
+		<Label>Engine</Label>
+		<Height>1</Height>
+		<control>TextBox</control>
+		<ButtonText/>
+		<DataType>string</DataType>
+		<ReadOnly>false</ReadOnly>
+		<ToolTip>Engine of the vessel</ToolTip>
+		<Required>false</Required>
+	</UIRow>
+	<UIRow>
+		<Key>EngineHorsepower</Key>
+		<Label>Engine horsepower</Label>
+		<Height>1</Height>
+		<control>TextBox</control>
+		<ButtonText/>
+		<DataType>double</DataType>
+		<ReadOnly>false</ReadOnly>
+		<ToolTip>Engine horsepower</ToolTip>
+		<Required>false</Required>
+	</UIRow>
+	<UIRow>
+		<Key>VesselDimension</Key>
+		<Label>Vessel dimension</Label>
+		<Height>1</Height>
+		<control>TextBox</control>
+		<ButtonText>Specify</ButtonText>
+		<DataType>readonly</DataType>
+		<ReadOnly>true</ReadOnly>
+		<ToolTip>Dimensions of the vessel</ToolTip>
+		<Required>false</Required>
+	</UIRow>
+	<UIRow>
+		<Key>spacer</Key>
+		<Label/>
+		<Height>1</Height>
+		<control/>
+		<ButtonText/>
+		<DataType>null</DataType>
+		<ReadOnly>false</ReadOnly>
+		<ToolTip/>
+		<Required>false</Required>
+	</UIRow>
+	<UIRow>
+		<Key>Notes</Key>
+		<Label>Notes</Label>
+		<Height>5</Height>
+		<control>TextBox</control>
+		<ButtonText/>
+		<DataType>string</DataType>
+		<ReadOnly>false</ReadOnly>
+		<ToolTip>Notes</ToolTip>
+		<Required>false</Required>
+	</UIRow>
+</UITable>

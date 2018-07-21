@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="UITable">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="UIRow" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="UIRow">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="Key" type="xs:string"/>
+                <xs:element name="Label" type="xs:string"/>
+                <xs:element name="Height" type="xs:integer"/>
+                <xs:element name="control" type="xs:string"/>
+		<xs:element name="ButtonText" type="xs:string"/>
+		<xs:element name="DataType" type="xs:string"/>
+		<xs:element name="ReadOnly" type="xs:boolean"/>
+		<xs:element name="ToolTip" type="xs:string"/>
+		<xs:element name="Required" type="xs:boolean"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
