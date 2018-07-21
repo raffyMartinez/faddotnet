@@ -191,8 +191,8 @@ namespace FAD3
 				ErrorLogger.Log("Registry entry for mdb path not found");
 				lblErrorFormOpen.Visible = true;
 				lblTitle.Text = "";
-				lblErrorFormOpen.Text = "Please locate the database file where fisheries data is saved." +
-										 System.Environment.NewLine + "You can use the file open menu";
+				lblErrorFormOpen.Text = "Please locate the database file where fisheries data is saved.\r\n" +
+										 "You can use the file open menu";
 			}
 
             statusPanelTargetArea.Width = _statusPanelWidth;
@@ -236,12 +236,9 @@ namespace FAD3
 
                 //menuDropDown.Items.Add("-");
             }
-
             var tsi = menuDropDown.Items.Add("New sampling");
             tsi.Name = "menuNewSampling";
- 
-
-        }
+         }
 
         private void ConfigDropDownMenu(Control Source)
         {
@@ -325,6 +322,7 @@ namespace FAD3
 
 			return exists;
 		}
+
 		public void NewDBFile(string filename)
 		{
 			if (TestFileExist(filename)) {
@@ -439,7 +437,6 @@ namespace FAD3
 
 		public void RefreshLV(string NodeName, string TreeLevel, bool IsNew = false, string nodeGUID = "")
 		{
-
 			if (IsNew)
 			{
 				TreeNode NewNode = new TreeNode();
@@ -736,39 +733,6 @@ namespace FAD3
 
 
 
-		void SetupLV2()
-		{
-
-			//apply the saved column widths		
-			RegistryKey rk = Registry.CurrentUser.OpenSubKey("SOFTWARE\\FAD3\\ColWidth");
-			try
-			{
-				string rv = rk.GetValue(global.lvContext.CatchAndEffort.ToString(), "NULL").ToString();
-				string[] arr = rv.Split(',');
-				int i = 0;
-			}
-			catch
-			{
-				ErrorLogger.Log("Catch and effort column width not found in registry");
-			}
-		}
-
-		void SetupLV3()
-		{
-
-			//apply the saved column widths	
-			RegistryKey rk = Registry.CurrentUser.OpenSubKey("SOFTWARE\\FAD3\\ColWidth");
-			try
-			{
-				string rv = rk.GetValue(global.lvContext.CatchComposition.ToString(), "NULL").ToString();
-				string[] arr = rv.Split(',');
-				int i = 0;
-			}
-			catch
-			{
-				ErrorLogger.Log("Catch composition column widths not found in registry");
-			}
-		}
 
 		void FillLVSamplingSummary(string LSGUID, string GearGUID, string SamplingMonth)
 		{
@@ -1070,7 +1034,6 @@ namespace FAD3
 			nd2[0].Expand();
 
 			_Sampling.SamplingGUID = SamplingIdentifiers["SamplingID"];
-			SetupLV3();
 			GetSamplingDetailEx1();
 			GetCatchComposition();
 
@@ -1185,6 +1148,10 @@ namespace FAD3
             
         }
 
+        public void RefreshCatchDetail(string SamplingGUID)
+        {
+            ShowCatchDetailEx(SamplingGUID);
+        }
 
         void ShowCatchDetailEx(string SamplingGUID)
         {
@@ -1284,10 +1251,6 @@ namespace FAD3
 	   {
 			_Sampling.SamplingGUID = lvi.Tag.ToString();
 
-			//this will fill the 2 lower list views
-			//SetupLV2();
-			SetupLV3();
-			//GetSamplingDetail();
 			GetSamplingDetailEx1();
 			GetCatchComposition();
 

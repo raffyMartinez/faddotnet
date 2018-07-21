@@ -37,6 +37,9 @@ namespace FAD3
         string _VesWidth = "";
         string _VesHeight = "";
 
+        string _DatePrompt = "";
+        string _TimePrompt = "";
+
         public void VesselDimension(string length, string width, string height)
         {
             _VesHeight = height;
@@ -250,11 +253,11 @@ namespace FAD3
                                 }
                             }
    
-                            //((ComboBox)ctl).DataSource = new BindingSource(global.GearVariationsUsage(global.GearClassUsed, _AOIGuid), null);
                             ((ComboBox)ctl).DataSource = new BindingSource(global.GearVariationsUsage(_GearClassGuid, _AOIGuid), null);
                             
                             break;
                         case "TypeOfVesselUsed":
+                            System.Diagnostics.Debug.Assert(global.VesselTypeDict.Count > 0, "source has no rows");
                             ((ComboBox)ctl).DataSource = new BindingSource(global.VesselTypeDict, null);
                             break;
                     }
@@ -274,12 +277,30 @@ namespace FAD3
                     {
                         Name = "dtxt" + e.Key,
                     };
+
+                    ((MaskedTextBox)ctl).With(o =>
+                    {
+                        o.Mask = "LLL-00-0000";
+                        o.TextMaskFormat = MaskFormat.IncludePromptAndLiterals;
+                        if (_DatePrompt.Length == 0)
+                            _DatePrompt = o.Text;
+                    });
+
                     break;
                 case "TimeMask":
                     ctl = new MaskedTextBox
                     {
                         Name = "ttxt" + e.Key,
                     };
+
+                    ((MaskedTextBox)ctl).With(o =>
+                    {
+                        o.Mask = "00:00";
+                        o.TextMaskFormat = MaskFormat.IncludePromptAndLiterals;
+                        if (_TimePrompt.Length == 0)
+                            _TimePrompt = o.Text;
+                    });
+
                     break;
                 case "Check":
                     ctl = new CheckBox
@@ -290,6 +311,7 @@ namespace FAD3
                 default:
                     break;
             }
+
 
             System.Type type = ctl.GetType();
             if (type.Name != "Control" && cType !="Spacer")
@@ -324,6 +346,7 @@ namespace FAD3
                     if (type.Name != "CheckBox")
                     {
                         ctl.Text = _lv.Items[e.Key].SubItems[1].Text;
+
                         switch (e.Key)
                         {
                             case "FishingGear":
@@ -338,7 +361,6 @@ namespace FAD3
                                 _AOIName = ctl.Text;
                                 _AOIGuid = ((KeyValuePair<string, string>)((ComboBox)ctl).SelectedItem).Key;
                                 break;
-
                         }
                     }
                     else
@@ -548,17 +570,17 @@ namespace FAD3
             }
         }
 
-        private void SaveEdits()
+        private bool SaveEdits()
         {
             var EffortData = new Dictionary<string, string>();
             foreach (Control c in panelUI.Controls)
             {
-                var typeName = c.GetType().ToString();
+                var typeName = c.GetType().Name;
                 if (typeName != "System.Windows.Forms.Button" && typeName != "System.Windows.Forms.Label")
                 {
                     switch (typeName)
                     {
-                        case "System.Windows.Forms.ComboBox":
+                        case "ComboBox":
                             var key = "";
                             if (c.Name != "comboTypeOfVesselUsed")
                             {
@@ -580,11 +602,15 @@ namespace FAD3
                             }
                             EffortData.Add(c.Tag.ToString(), key);
                             break;
-                        case "System.Windows.Forms.TextBox":
-                        case "System.Windows.Forms.MaskedTextBox":
+                        case "TextBox":
                             EffortData.Add(c.Tag.ToString(), c.Text);
                             break;
-                        case "System.Windows.Forms.CheckBox":
+                        case "MaskedTextBox":
+                           // var s = "";
+                            var s = ((MaskedTextBox)c).MaskCompleted ? c.Text : "";
+                            EffortData.Add(c.Tag.ToString(), s);
+                            break;
+                        case "CheckBox":
                             EffortData.Add(c.Tag.ToString(), ((CheckBox)c).Checked.ToString());
                             break;
                     }
@@ -600,10 +626,7 @@ namespace FAD3
             EffortData.Add("SamplingGUID", _samplingGUID);
             EffortData.Add("SamplingType", "1");
 
-            if (_sampling.UpdateEffort(_isNew, EffortData))
-            {
-                ;
-            }
+            return  _sampling.UpdateEffort(_isNew, EffortData);
 
         }
 
@@ -650,8 +673,10 @@ namespace FAD3
                 case "buttonOK":
                     if (ValidateForm())
                     {
-                        SaveEdits();
-                        this.Close();
+                        if (SaveEdits()){
+                            _parent.RefreshCatchDetail(_samplingGUID);
+                            this.Close();
+                        }
                     }
                     break;
                 case "buttonCancel":
@@ -677,6 +702,19 @@ namespace FAD3
             {
                 if (c.Name == "errLabelDateSet" || c.Name == "errLabelTimeSet" ||
                     c.Name == "errLabelDateHauled" || c.Name == "errLabelTimeHauled")
+                {
+                    c.Visible = Visible;
+                }
+            }
+        }
+
+        private void ShowSamplingGearDateTimeErrorLabel(bool Visible)
+        {
+            foreach (Control c in panelUI.Controls)
+            {
+                if (c.Name == "errLabelDateSet" || c.Name == "errLabelTimeSet" ||
+                    c.Name == "errLabelDateHauled" || c.Name == "errLabelTimeHauled" ||
+                    c.Name == "errLabelSamplingDate" || c.Name == "errLabelSamplingTime")
                 {
                     c.Visible = Visible;
                 }
@@ -725,19 +763,21 @@ namespace FAD3
             if (isValidated)
             {
                 isValidated = (
-                    panelUI.Controls["dtxtDateSet"].Text.Length>0 &&
-                    panelUI.Controls["ttxtTimeSet"].Text.Length>0 &&
-                    panelUI.Controls["dtxtDateHauled"].Text.Length > 0 &&
-                    panelUI.Controls["ttxtTimeHauled"].Text.Length > 0
+                        panelUI.Controls["dtxtDateSet"].Text != _DatePrompt &&
+                        panelUI.Controls["ttxtTimeSet"].Text != _TimePrompt &&
+                        panelUI.Controls["dtxtDateHauled"].Text != _DatePrompt &&
+                        panelUI.Controls["ttxtTimeHauled"].Text != _TimePrompt
                     );
                 if (!isValidated)
                 {
                     GearDateTimeIsEmpty = (
-                        panelUI.Controls["dtxtDateSet"].Text.Length == 0 &&
-                        panelUI.Controls["ttxtTimeSet"].Text.Length == 0 &&
-                        panelUI.Controls["dtxtDateHauled"].Text.Length == 0 &&
-                        panelUI.Controls["ttxtTimeHauled"].Text.Length == 0
+                        panelUI.Controls["dtxtDateSet"].Text == _DatePrompt &&
+                        panelUI.Controls["ttxtTimeSet"].Text == _TimePrompt &&
+                        panelUI.Controls["dtxtDateHauled"].Text == _DatePrompt &&
+                        panelUI.Controls["ttxtTimeHauled"].Text == _TimePrompt
                         );
+
+
                     isValidated = GearDateTimeIsEmpty;
                     if(!isValidated)
                     {
@@ -748,7 +788,7 @@ namespace FAD3
                     else
                     {
                         //if catch weight > zero then confirm if datetime of gear set and haul is empty
-                        if (double.Parse(panelUI.Controls["textWeightOfCatch"].Text)>0 && GearDateTimeIsEmpty)
+                        if (panelUI.Controls["textWeightOfCatch"].Text.Length>0 &&  double.Parse(panelUI.Controls["textWeightOfCatch"].Text)>0 && GearDateTimeIsEmpty)
                         {
                             ShowGearDateTimeErrorLabel(true);
                             DialogResult dr = MessageBox.Show("Confirm that date and time of gear set\r\n" +
@@ -764,6 +804,7 @@ namespace FAD3
             //   Date set should be before date hauled                       
             if (isValidated && GearDateTimeIsEmpty==false)
             {
+
                 DateTime samplingDate = DateTime.Parse(panelUI.Controls["dtxtSamplingDate"].Text.ToString());
                 samplingDate = samplingDate.Add(TimeSpan.Parse(panelUI.Controls["ttxtSamplingTime"].Text.ToString()));
 
@@ -780,11 +821,13 @@ namespace FAD3
                     if (!isValidated)
                     {
                         msg = "Date of gear set should be before date of gear haul";
+                        ShowGearDateTimeErrorLabel(true);
                     }
                 }
                 else
                 {
                     msg = "Sampling date should be after date of gear set and haul";
+                    ShowSamplingGearDateTimeErrorLabel(true);
                 }
             }
 
@@ -797,7 +840,6 @@ namespace FAD3
                     msg = "Weight of catch could not be blank";
                 }
             }
-
 
             //Step 5. Weight of sample cannot be more than weight of catch
             if (isValidated && panelUI.Controls["textWeightOfCatch"].Text.Length > 0 &&
@@ -812,6 +854,14 @@ namespace FAD3
                 }
             }
 
+            //Step 6. if catch weight is blank then confirm it
+            if (isValidated && GearDateTimeIsEmpty && panelUI.Controls["textWeightOfCatch"].Text.Length == 0)
+            {
+                DialogResult dr = MessageBox.Show("Confirm that weight of catch is blank", "Please validate",
+                                                   MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
+                isValidated = (dr == DialogResult.Yes);
+            }
+
 
             if (msg.Length>0)
             {
@@ -820,11 +870,17 @@ namespace FAD3
             return isValidated;
         }
 
+        private void HideErrorLabels()
+        {
+            foreach (Control c in panelUI.Controls)
+            { 
+                c.Visible = c.Name.Substring(0, 8) != "errLabel";
+            }
+        }
+
         private void OnFieldChange(object sender, EventArgs e)
         {
-            ShowGearDateTimeErrorLabel(false);
-            ShowRequiredErrorLabel(false);
-            ShowWeightError(false);
+            HideErrorLabels();
             if (sender.GetType().ToString() == "System.Windows.Forms.ComboBox")
             {
                 if (((Control)sender).Name=="comboEnumerator")
@@ -972,7 +1028,7 @@ namespace FAD3
                         try
                         {
                             myDateTime = DateTime.Parse(v);
-                            if (ui.Control.ToString()== "DateMask")
+                            if (ui.Control.ToString() == "DateMask")
                             {
                                 if (myDateTime > DateTime.Now)
                                 {
@@ -981,7 +1037,7 @@ namespace FAD3
                             }
                             else
                             {
-                                if(v.Length != 5)
+                                if (v.Length != 5)
                                 {
                                     msg = "Expected time value should be in a 24 hour format";
                                 }
@@ -989,13 +1045,16 @@ namespace FAD3
                         }
                         catch
                         {
-                            if (ui.Control.ToString() == "DateMask")
+                            if (v != _DatePrompt && v != _TimePrompt)
                             {
-                                msg = "Expected value is a date";
-                            }
-                            else
-                            {
-                                msg = "Expected value is time in a 24-hour format";
+                                if (ui.Control.ToString() == "DateMask")
+                                {
+                                    msg = "Expected value is a date";
+                                }
+                                else
+                                {
+                                    msg = "Expected value is time in a 24-hour format";
+                                }
                             }
                         }
                         break;

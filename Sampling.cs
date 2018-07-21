@@ -783,13 +783,23 @@ namespace FAD3
             {
                 try
                 {
-
+                    var quote = "'";
                     string hp = EffortData["EngineHorsepower"] == "" ? "null" : EffortData["EngineHorsepower"];
                     string wtSample = EffortData["WeightOfSample"] == "" ? "null" : EffortData["WeightOfSample"];
-                    string engine = EffortData["Engine"] == "" ? "null" : EffortData["Engine"];
+                    string wtCatch = EffortData["WeightOfCatch"] == "" ? "null" : EffortData["WeightOfCatch"];
+                    string engine = EffortData["Engine"] == "" ? "" : EffortData["Engine"];
                     string vesL = string.IsNullOrWhiteSpace(EffortData["VesLength"].ToString()) ? "null" : EffortData["VesLength"];
                     string vesH = string.IsNullOrWhiteSpace(EffortData["VesHeight"].ToString()) ? "null" : EffortData["VesHeight"];
                     string vesW = string.IsNullOrWhiteSpace(EffortData["VesWidth"].ToString()) ? "null" : EffortData["VesWidth"];
+                    string NoHauls = string.IsNullOrWhiteSpace(EffortData["NumberOfHauls"].ToString()) ? "null" : EffortData["NumberOfHauls"];
+                    string NoFishers = string.IsNullOrWhiteSpace(EffortData["NumberOfFishers"].ToString()) ? "null" : EffortData["NumberOfFishers"];
+                    string VesselType = string.IsNullOrWhiteSpace(EffortData["TypeOfVesselUsed"].ToString()) ? "null" : EffortData["TypeOfVesselUsed"];
+
+                    string DateSet = string.IsNullOrWhiteSpace(EffortData["DateSet"].ToString()) ? "null" : quote + EffortData["DateSet"] + quote;
+                    string TimeSet = string.IsNullOrWhiteSpace(EffortData["TimeSet"].ToString()) ? "null" : quote + EffortData["TimeSet"] + quote;
+                    string DateHauled = string.IsNullOrWhiteSpace(EffortData["DateHauled"].ToString()) ? "null" : quote + EffortData["DateHauled"] + quote;
+                    string TimeHauled = string.IsNullOrWhiteSpace(EffortData["TimeHauled"].ToString()) ? "null" : quote + EffortData["TimeHauled"] + quote;
+
                     if (isNew)
                     {
                         updateQuery = "Insert into tblSampling (SamplingGUID, GearVarGUID, " +
@@ -797,33 +807,33 @@ namespace FAD3
                             "FishingGround, TimeSet, DateSet, TimeHauled, " +
                             "DateHauled, NoHauls, NoFishers, Engine, hp, " +
                             "WtCatch, WtSample, len, wdt, hgt, LSGUID, " +
-                            "Notes, VesType, SamplingType, HasLiveFish, Enumerator) values ('" +
-                            EffortData["SamplingGUID"] + "', '" +
-                            EffortData["FishingGear"] + "', '" +
-                            EffortData["TargetArea"] + "', '" +
+                            "Notes, VesType, SamplingType, HasLiveFish, Enumerator) values ('{" +
+                            EffortData["SamplingGUID"] + "}', '{" +
+                            EffortData["FishingGear"] + "}', '{" +
+                            EffortData["TargetArea"] + "}', '" +
                             EffortData["ReferenceNumber"] + "', '" +
                             EffortData["SamplingDate"] + "', '" +
                             EffortData["SamplingTime"] + "', '" +
-                            EffortData["FishingGround"] + "', '" +
-                            EffortData["TimeSet"] + "', '" +
-                            EffortData["DateSet"] + "', '" +
-                            EffortData["TimeHauled"] + "', '" +
-                            EffortData["DateHauled"] + "', " +
-                            EffortData["NumberOfHauls"] + "," +
-                            EffortData["NumberOfFishers"] + ", " +
-                            engine + ", " +
+                            EffortData["FishingGround"] + "', " +
+                            TimeSet + ", " +
+                            DateSet + ", " +
+                            TimeHauled + ", " +
+                            DateHauled + ", " +
+                            NoHauls + "," +
+                            NoFishers + ", '" +
+                            engine + "', " +
                             hp + ", " +
-                            EffortData["WeightOfCatch"] + "," +
+                            wtCatch + "," +
                             wtSample + ", " +
                             vesL + "," +
                             vesW + "," +
                             vesH + ", '" +
                             EffortData["LandingSite"] + "', '" +
                             EffortData["Notes"] + "', '" +
-                            EffortData["TypeOfVesselUsed"] + "', " +
+                            VesselType + "', " +
                             EffortData["SamplingType"] + ", " +
-                            EffortData["HasLiveFish"] + ", '" +
-                            EffortData["Enumerator"] + "')";
+                            EffortData["HasLiveFish"] + ", '{" +
+                            EffortData["Enumerator"] + "'})";
                     }
                     else
                     {
@@ -834,22 +844,22 @@ namespace FAD3
                             "SamplingDate ='" + EffortData["SamplingDate"] + "', " +
                             "SamplingTime ='" + EffortData["SamplingTime"] + "', " +
                             "FishingGround = '" + EffortData["FishingGround"] + "', " +
-                            "TimeSet = '" + EffortData["TimeSet"] + "', " +
-                            "DateSet = '" + EffortData["DateSet"] + "', " +
-                            "TimeHauled = '" + EffortData["TimeHauled"] + "', " +
-                            "DateHauled ='" + EffortData["DateHauled"] + "', " +
-                            "NoHauls = " + EffortData["NumberOfHauls"] + ", " +
-                            "NoFishers =" + EffortData["NumberOfFishers"] + ", " +
-                            "Engine =" + engine + "," +
+                            "TimeSet = " +TimeSet + ", " +
+                            "DateSet = " + DateSet + ", " +
+                            "TimeHauled = " + TimeHauled + ", " +
+                            "DateHauled = " + DateHauled + ", " +
+                            "NoHauls = " + NoHauls + ", " +
+                            "NoFishers =" + NoFishers + ", " +
+                            "Engine ='" + engine + "'," +
                             "hp = " + hp + ", " +
-                            "WtCatch =" + EffortData["WeightOfCatch"] + ", " +
+                            "WtCatch =" + wtCatch + ", " +
                             "WtSample =" + wtSample + ", " +
                             "len =" + vesL + ", " +
                             "wdt =" + vesW + ", " +
                             "hgt =" + vesH + ", " +
                             "LSGUID ='{" + EffortData["LandingSite"] + "}', " +
                             "Notes = '" + EffortData["Notes"] + "', " +
-                            "VesType = " + EffortData["TypeOfVesselUsed"] + ", " +
+                            "VesType = " + VesselType + ", " +
                             "SamplingType = " + EffortData["SamplingType"] + ", " +
                             "HasLiveFish = " + EffortData["HasLiveFish"] + ", " +
                             "Enumerator = '{" + EffortData["Enumerator"] + "}' " +
