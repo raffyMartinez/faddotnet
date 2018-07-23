@@ -102,6 +102,7 @@ namespace FAD3
 
         public static void GetLocalNames()
         {
+            _LocalNameListDict.Clear();
             DataTable dt = new DataTable();
             using (var conection = new OleDbConnection(global.ConnectionString))
             {

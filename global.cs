@@ -68,6 +68,10 @@ namespace FAD3
             }
         }
 
+        public static string ApplicationPath
+        {
+            get { return _AppPath; }
+        }
         public static Dictionary<string, string> GearVariationsUsage(string GearClassGUID)
         {
             getGearVariationsUsage(GearClassGUID);
@@ -211,15 +215,17 @@ namespace FAD3
                          query = "Select GearVarGUID, Variation from tblGearVariations where " +
                                  "GearClass = '{" + GearClassGUID + "}' ORDER BY Variation";
                     }
-                    var adapter = new OleDbDataAdapter(query, conection);
-                    adapter.Fill(dt);
-                    for (int i = 0; i < dt.Rows.Count; i++)
+                    using (var adapter = new OleDbDataAdapter(query, conection))
                     {
-                        DataRow dr = dt.Rows[i];
-                        _GearVariationsUsage.Add(dr["GearVarGUID"].ToString(), dr["Variation"].ToString());
-                        if (c != null)
-                            c.Items.Add(new KeyValuePair<string, string>(dr["GearVarGUID"].ToString(), dr["Variation"].ToString()));
-     
+                        adapter.Fill(dt);
+                        for (int i = 0; i < dt.Rows.Count; i++)
+                        {
+                            DataRow dr = dt.Rows[i];
+                            _GearVariationsUsage.Add(dr["GearVarGUID"].ToString(), dr["Variation"].ToString());
+                            if (c != null)
+                                c.Items.Add(new KeyValuePair<string, string>(dr["GearVarGUID"].ToString(), dr["Variation"].ToString()));
+
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -890,12 +896,14 @@ namespace FAD3
                 {
                     conection.Open();
                     string query = "Select GearClass, GearLetter, GearClassName from tblGearClass order by GearClassName";
-                    var adapter = new OleDbDataAdapter(query, conection);
-                    adapter.Fill(myDT);
-                    for (int i = 0; i < myDT.Rows.Count; i++)
+                    using (var adapter = new OleDbDataAdapter(query, conection))
                     {
-                        DataRow dr = myDT.Rows[i];
-                        c.Items.Add(new KeyValuePair<string, string>(dr["GearClass"].ToString(), dr["GearClassName"].ToString()));
+                        adapter.Fill(myDT);
+                        for (int i = 0; i < myDT.Rows.Count; i++)
+                        {
+                            DataRow dr = myDT.Rows[i];
+                            c.Items.Add(new KeyValuePair<string, string>(dr["GearClass"].ToString(), dr["GearClassName"].ToString()));
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -906,7 +914,9 @@ namespace FAD3
         }
 
         private static void GetGearClass(){
-			var myDT =  new DataTable();
+            _GearClass.Clear();
+            _GearClassLetterCodes.Clear();
+            var myDT =  new DataTable();
 			using(var conection = new OleDbConnection(_ConnectionString))
 			{
 				try{
@@ -1008,6 +1018,7 @@ namespace FAD3
 
         private static void GetVesselTypes()
         {
+            _VesselTypeDict.Clear();
             var myDT = new DataTable();
             using (var conection = new OleDbConnection(_ConnectionString))
             {
@@ -1015,12 +1026,14 @@ namespace FAD3
                 {
                     conection.Open();
                     string query = "Select VesselTypeNo, VesselType from temp_VesselType";
-                    var adapter = new OleDbDataAdapter(query, conection);
-                    adapter.Fill(myDT);
-                    for (int i = 0; i < myDT.Rows.Count; i++)
+                    using (var adapter = new OleDbDataAdapter(query, conection))
                     {
-                        DataRow dr = myDT.Rows[i];
-                        _VesselTypeDict.Add(dr[0].ToString(), dr[1].ToString());
+                        adapter.Fill(myDT);
+                        for (int i = 0; i < myDT.Rows.Count; i++)
+                        {
+                            DataRow dr = myDT.Rows[i];
+                            _VesselTypeDict.Add(dr[0].ToString(), dr[1].ToString());
+                        }
                     }
                 }
                 catch (Exception ex) { ErrorLogger.Log(ex); }
@@ -1039,7 +1052,8 @@ namespace FAD3
 
 		private static void  GetProvinces()
 		{
-			var myDT =  new DataTable();
+            _provinceDict.Clear();
+            var myDT =  new DataTable();
 			using(var conection = new OleDbConnection(_ConnectionString))
 			{
 				try{

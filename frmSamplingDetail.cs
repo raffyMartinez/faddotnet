@@ -520,47 +520,7 @@ namespace FAD3
             }
         }
 
-        private void SetupComboDataSource()
-        {
-            foreach(Control ctl in panelUI.Controls)
-            {
-                if (ctl.GetType().Name == "ComboBox")
-                {
-                    switch (ctl.Tag.ToString())
-                    {
-                        case "Enumerator":
-                            ((ComboBox)ctl).DataSource = new BindingSource(_aoi.Enumerators, null);
-                            break;
-                        case "TargetArea":
-                            ((ComboBox)ctl).DataSource = new BindingSource(_aoi.AOIs, null);
-                            break;
-                        case "LandingSite":
-                            ((ComboBox)ctl).DataSource = new BindingSource(_aoi.LandingSites, null);
-                            break;
-                        case "GearClass":
-                            ((ComboBox)ctl).DataSource = new BindingSource(global.GearClass, null);
-                            break;
-                        case "FishingGear":
-                            if (!_isNew)
-                            {
-                                global.GearClassUsed = _lv.Items["GearClass"].Tag.ToString();
-                            }
-                            ((ComboBox)ctl).DataSource = new BindingSource(global.GearVariationsUsage(global.GearClassUsed, _AOIGuid), null);
-                            break;
-                        case "TypeOfVesselUsed":
-                            ((ComboBox)ctl).DataSource = new BindingSource(global.VesselTypeDict, null);
-                            break;
-                    }
-                    ((ComboBox)ctl).With(o =>
-                    {
-                        o.DisplayMember = "Value";
-                        o.ValueMember = "Key";
-                        o.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-                        o.AutoCompleteSource = AutoCompleteSource.ListItems;
-                    });
-                }
-            }
-        }
+      
 
         private void AdustControlsPosition()
         {
@@ -670,12 +630,16 @@ namespace FAD3
                     frmVesselDimension f = new frmVesselDimension();
                     if(_VesLength.Length>0 && _VesHeight.Length>0 && _VesWidth.Length>0)
                       f.VesselDimension(_VesLength, _VesWidth, _VesHeight);
-                    f.Parent = this;
+                    f.Parent_Form = this;
                     f.ShowDialog(this);
                     break;
                 case "btnReferenceNumber":
                     break;
                 case "btnFishingGround":
+                    frmFishingGround fg = new frmFishingGround();
+                    fg.Parent_form = this;
+                    fg.AOIGuid = _AOIGuid;
+                    fg.Show(this);
                     break;
             }
         }

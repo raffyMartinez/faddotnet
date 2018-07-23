@@ -18,7 +18,7 @@ namespace FAD3
             InitializeComponent();
         }
 
-        public frmSamplingDetail Parent
+        public frmSamplingDetail Parent_Form
         {
             get { return _Parent; }
             set { _Parent = value; }

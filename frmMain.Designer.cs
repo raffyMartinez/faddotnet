@@ -106,10 +106,10 @@ namespace FAD3
             // 
             // splitContainer1.Panel2
             // 
-            this.splitContainer1.Panel2.Controls.Add(this.panelSamplingButtons);
             this.splitContainer1.Panel2.Controls.Add(this.lblErrorFormOpen);
-            this.splitContainer1.Panel2.Controls.Add(this.listView1);
             this.splitContainer1.Panel2.Controls.Add(this.lblTitle);
+            this.splitContainer1.Panel2.Controls.Add(this.panelSamplingButtons);
+            this.splitContainer1.Panel2.Controls.Add(this.listView1);
             this.splitContainer1.Size = new System.Drawing.Size(929, 451);
             this.splitContainer1.SplitterDistance = 240;
             this.splitContainer1.TabIndex = 0;
@@ -166,6 +166,7 @@ namespace FAD3
             this.panelSamplingButtons.Name = "panelSamplingButtons";
             this.panelSamplingButtons.Size = new System.Drawing.Size(107, 133);
             this.panelSamplingButtons.TabIndex = 5;
+            this.panelSamplingButtons.Visible = false;
             // 
             // buttonMap
             // 
@@ -228,6 +229,7 @@ namespace FAD3
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.Details;
             this.listView1.DoubleClick += new System.EventHandler(this.listView1_DoubleClick);
+            this.listView1.Leave += new System.EventHandler(this.ListView1Leave);
             this.listView1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.listView1_MouseDown);
             // 
             // lblTitle

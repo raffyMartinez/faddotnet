@@ -83,6 +83,13 @@
     <Compile Include="AOI.cs" />
     <Compile Include="ErrorLogger.cs" />
     <Compile Include="extension.cs" />
+    <Compile Include="FishingGrid.cs" />
+    <Compile Include="frmFishingGround.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmFishingGround.Designer.cs">
+      <DependentUpon>frmFishingGround.cs</DependentUpon>
+    </Compile>
     <Compile Include="frmGearEditor.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -194,6 +201,7 @@
     <Compile Include="gear.cs" />
     <Compile Include="global.cs" />
     <Compile Include="LandingSite.cs" />
+    <Compile Include="LatLngUTMConverter.cs" />
     <Compile Include="mru.cs" />
     <Compile Include="names.cs" />
     <Compile Include="Program.cs" />
@@ -208,6 +216,9 @@
     <Compile Include="UIRow.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="frmFishingGround.resx">
+      <DependentUpon>frmFishingGround.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmGearEditor.resx">
       <DependentUpon>frmGearEditor.cs</DependentUpon>
     </EmbeddedResource>
@@ -287,6 +298,10 @@
   <ItemGroup>
     <None Include="ClassDiagram1.cd" />
     <None Include="fad2_TemporaryKey.pfx" />
+    <None Include="resource raw\UITable.xlsx" />
+    <None Include="resource raw\uitable.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Resources\VSO_NewFile_16x.png" />
   </ItemGroup>
   <ItemGroup>
@@ -332,6 +347,7 @@
     <Content Include="Fatcow-Farm-Fresh-Book-key.ico" />
     <Content Include="Icon1.ico" />
     <None Include="Resources\help-browser.png" />
+    <Content Include="resource raw\UITable.xml" />
     <Content Include="Resources\internet-web-browser.png" />
     <None Include="Resources\system-file-manager.png" />
     <None Include="Resources\layerAdd.bmp" />

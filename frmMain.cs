@@ -12,6 +12,7 @@ using System.Windows.Forms;
 
 using System.Data;
 using System.Data.OleDb;
+using System.Data.SqlClient;
 using Microsoft.Win32;
 using System.Diagnostics;
 using System.Collections.Generic;
@@ -20,21 +21,21 @@ using System.Collections;
 
 namespace FAD3
 {
-	/// <summary>
-	/// Description of frmMain.
-	/// </summary>
-	public partial class frmMain : Form
-	{
-		private frmCatch _frmCatch;
-		private frmLenFreq _frmLF;
-		private string _oldMDB = "";
-		private int _statusPanelWidth = 200;
-		private sampling _Sampling = new sampling();
-		private aoi _AOI = new aoi();
-		private landingsite _ls = new landingsite();
-		private string _TreeLevel = "";
-		private mru _mrulist = new mru();
-		private TreeNode _LSNode;
+    /// <summary>
+    /// Description of frmMain.
+    /// </summary>
+    public partial class frmMain : Form
+    {
+        private frmCatch _frmCatch;
+        private frmLenFreq _frmLF;
+        private string _oldMDB = "";
+        private int _statusPanelWidth = 200;
+        private sampling _Sampling = new sampling();
+        private aoi _AOI = new aoi();
+        private landingsite _ls = new landingsite();
+        private string _TreeLevel = "";
+        private mru _mrulist = new mru();
+        private TreeNode _LSNode;
 
         private string _LandingSiteGuid = "";
         private string _LandingSiteName = "";
@@ -56,101 +57,119 @@ namespace FAD3
         public string AOIGUID
         {
             get { return _AOIGuid; }
-            set { _AOIGuid = value;  }
+            set
+            {
+                if (value != _AOIGuid)
+                {
+                    _AOIGuid = value;
+                    _AOI.AOIGUID = _AOIGuid;
+                    FishingGrid.AOIGuid = _AOIGuid;
+                }
+            }
         }
 
-		public mru MRUList
-		{
-			get { return _mrulist; }
-		}
+        public string AOIName
+        {
+            get { return _AOIName; }
+            set
+            {
+                _AOIName = value;
+                _AOI.AOIName = _AOIName;
+            }
+        }
 
-		public sampling Sampling
-		{
-			get { return _Sampling; }
-		}
+        public mru MRUList
+        {
+            get { return _mrulist; }
+        }
 
-		public aoi AOI
-		{
-			get { return _AOI; }
-		}
+        public sampling Sampling
+        {
+            get { return _Sampling; }
+        }
 
-
-
-
-		public void SamplingUpdate(bool IsNew, string AOIGuid, string LSGUID, string GearName, string GearGUID, string SamplingDate)
-		{
-			TreeNode ls = _LSNode.Parent.Nodes[LSGUID];
-			TreeNode nd_gear;
-			TreeNode nd_samplingDate;
-			DateTime dt = DateTime.Parse(SamplingDate);
-			string myDate = string.Format("{0:MMM-yyyy}", dt);
-			try
-			{
-				if (true)
-				{
-					nd_gear = ls.Nodes[LSGUID + "|" + GearGUID];
-					if (nd_gear == null)
-					{
-						int i = 0;
-						Dictionary<string, string> gears = _Sampling.GearsFromLandingSite(LSGUID);
-						ls.Nodes.Clear();
-						foreach (KeyValuePair<string,string>kv in gears)
-						{
-							nd_gear = ls.Nodes.Add(LSGUID + "|" + kv.Key, kv.Value );
-							nd_gear.Tag = LSGUID + "|" + kv.Key + ",gears";
-							nd_gear.Nodes.Add("**dummy*");
-							i++;
-						}
-
-						nd_gear = ls.Nodes[LSGUID + "|" + GearGUID];
-						nd_samplingDate = nd_gear.FirstNode;
-						nd_samplingDate.Text = myDate;
-						nd_samplingDate.Name = LSGUID + "|" + GearGUID + "|" + myDate;
-						nd_samplingDate.Tag = LSGUID + "|" + GearGUID + ",sampling";
-					}
-					else
-					{
-						nd_samplingDate = nd_gear.Nodes[LSGUID + "|" + GearGUID + "|" + myDate];
-						if (nd_samplingDate == null)
-						{
-							nd_samplingDate = nd_gear.Nodes.Add(LSGUID + "|" + GearGUID + "|" + myDate, myDate);
-							nd_samplingDate.Tag = LSGUID + "|" + GearGUID + ",sampling";
-						}
-					}
-					FillLVSamplingSummary(LSGUID, GearGUID, myDate);
-					treeView1.SelectedNode = nd_samplingDate;
-
-					if (IsNew==false)
-					{
-						GetSamplingDetailEx1();
-					}
-				}
-				else
-				{
-					//FillLVSamplingSummary(LSGUID, GearGUID, myDate);
-					//GetSamplingDetailEx1();
-				}
-			}
-			catch (Exception ex)
-			{
-				ErrorLogger.Log(ex);
-			}
-			
-			
-		}
+        public aoi AOI
+        {
+            get { return _AOI; }
+        }
 
 
-		public frmMain()
-		{
-			//
-			// The InitializeComponent() call is required for Windows Forms designer support.
-			//
-			InitializeComponent();
 
-			//
-			// TODO: Add constructor code after the InitializeComponent() call.
-			//
-		}
+
+        public void SamplingUpdate(bool IsNew, string AOIGuid, string LSGUID, string GearName, string GearGUID, string SamplingDate)
+        {
+            TreeNode ls = _LSNode.Parent.Nodes[LSGUID];
+            TreeNode nd_gear;
+            TreeNode nd_samplingDate;
+            DateTime dt = DateTime.Parse(SamplingDate);
+            string myDate = string.Format("{0:MMM-yyyy}", dt);
+            try
+            {
+                if (true)
+                {
+                    nd_gear = ls.Nodes[LSGUID + "|" + GearGUID];
+                    if (nd_gear == null)
+                    {
+                        int i = 0;
+                        Dictionary<string, string> gears = _Sampling.GearsFromLandingSite(LSGUID);
+                        ls.Nodes.Clear();
+                        foreach (KeyValuePair<string, string> kv in gears)
+                        {
+                            nd_gear = ls.Nodes.Add(LSGUID + "|" + kv.Key, kv.Value);
+                            nd_gear.Tag = LSGUID + "|" + kv.Key + ",gears";
+                            nd_gear.Nodes.Add("**dummy*");
+                            i++;
+                        }
+
+                        nd_gear = ls.Nodes[LSGUID + "|" + GearGUID];
+                        nd_samplingDate = nd_gear.FirstNode;
+                        nd_samplingDate.Text = myDate;
+                        nd_samplingDate.Name = LSGUID + "|" + GearGUID + "|" + myDate;
+                        nd_samplingDate.Tag = LSGUID + "|" + GearGUID + ",sampling";
+                    }
+                    else
+                    {
+                        nd_samplingDate = nd_gear.Nodes[LSGUID + "|" + GearGUID + "|" + myDate];
+                        if (nd_samplingDate == null)
+                        {
+                            nd_samplingDate = nd_gear.Nodes.Add(LSGUID + "|" + GearGUID + "|" + myDate, myDate);
+                            nd_samplingDate.Tag = LSGUID + "|" + GearGUID + ",sampling";
+                        }
+                    }
+                    FillLVSamplingSummary(LSGUID, GearGUID, myDate);
+                    treeView1.SelectedNode = nd_samplingDate;
+
+                    if (IsNew == false)
+                    {
+                        GetSamplingDetailEx1();
+                    }
+                }
+                else
+                {
+                    //FillLVSamplingSummary(LSGUID, GearGUID, myDate);
+                    //GetSamplingDetailEx1();
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorLogger.Log(ex);
+            }
+
+
+        }
+
+
+        public frmMain()
+        {
+            //
+            // The InitializeComponent() call is required for Windows Forms designer support.
+            //
+            InitializeComponent();
+
+            //
+            // TODO: Add constructor code after the InitializeComponent() call.
+            //
+        }
 
 
         private void OnUIRowRead(object sender, UIRowFromXML e)
@@ -163,37 +182,37 @@ namespace FAD3
 
 
         void FrmMainLoad(object sender, EventArgs e)
-		{
-			this.splitContainer1.Panel1MinSize = 200;
-			this.splitContainer1.Panel2MinSize = this.Width - (this.splitContainer1.Panel1MinSize + 100);
-			this.splitContainer1.SplitterWidth = 3;
-			
+        {
+            this.splitContainer1.Panel1MinSize = 200;
+            this.splitContainer1.Panel2MinSize = this.Width - (this.splitContainer1.Panel1MinSize + 100);
+            this.splitContainer1.SplitterWidth = 3;
+
 
             sampling.SetUpUIElement();
             _Sampling.OnUIRowRead += new sampling.ReadUIElement(OnUIRowRead);
 
-			toolStripRecentlyOpened.DropDownItems.Clear();
-			_mrulist = new mru("FAD3", toolStripRecentlyOpened,5);
-			_mrulist.FileSelected += _mrulist_FileSelected;
-			RegistryKey rk = Registry.CurrentUser.OpenSubKey("SOFTWARE\\FAD3");
-			string ReturnValue = "";
+            toolStripRecentlyOpened.DropDownItems.Clear();
+            _mrulist = new mru("FAD3", toolStripRecentlyOpened, 5);
+            _mrulist.FileSelected += _mrulist_FileSelected;
+            RegistryKey rk = Registry.CurrentUser.OpenSubKey("SOFTWARE\\FAD3");
+            string ReturnValue = "";
 
-			try
-			{
-				ReturnValue = rk.GetValue("mdbPath", "NULL").ToString();
-				if (TestFileExist(ReturnValue))
-				{
-					PopulateTree();
-				}
-			}
-			catch
-			{
-				ErrorLogger.Log("Registry entry for mdb path not found");
-				lblErrorFormOpen.Visible = true;
-				lblTitle.Text = "";
-				lblErrorFormOpen.Text = "Please locate the database file where fisheries data is saved.\r\n" +
-										 "You can use the file open menu";
-			}
+            try
+            {
+                ReturnValue = rk.GetValue("mdbPath", "NULL").ToString();
+                if (TestFileExist(ReturnValue))
+                {
+                    PopulateTree();
+                }
+            }
+            catch
+            {
+                ErrorLogger.Log("Registry entry for mdb path not found");
+                lblErrorFormOpen.Visible = true;
+                lblTitle.Text = "";
+                lblErrorFormOpen.Text = "Please locate the database file where fisheries data is saved.\r\n" +
+                                         "You can use the file open menu";
+            }
 
             statusPanelTargetArea.Width = _statusPanelWidth;
             statusPanelLandingSite.Width = _statusPanelWidth;
@@ -213,17 +232,42 @@ namespace FAD3
                 case "menuNewLandingSite":
                     break;
                 case "menuNewSampling":
-                    if (aoi.AOIHaveEnumeratorsEx(_AOIGuid))
-                        NewSamplingForm();
+                    if (FishingGrid.IsCompleteGrid25)
+                    {
+                        if (aoi.AOIHaveEnumeratorsEx(_AOIGuid))
+                            NewSamplingForm();
+                        else
+                            MessageBox.Show("Cannot create a new sampling because\n\r" +
+                                "Target area has no enumerator", "Cannot create sampling", MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+                    }
                     else
+                    {
                         MessageBox.Show("Cannot create a new sampling because\n\r" +
-                            "Target area has no enumerator","Cannot create sampling",MessageBoxButtons.OK,
+                            "target area is not setup for Grid25", "Cannot create sampling", MessageBoxButtons.OK,
                             MessageBoxIcon.Information);
+                    }
                     break;
                 case "menuNewEnumerator":
                     break;
                 case "menuSamplingDetail":
                     ShowSamplingDetailForm();
+                    break;
+                case "menuTargetAreaProp":
+                    frmAOI AOIForm = frmAOI.GetInstance();
+                    if (!AOIForm.Visible)
+                    {
+                        //AOIForm = new frmAOI();
+                        AOIForm.Parent_form = this;
+                        AOIForm.Show(this);
+                    }
+                    else
+                    {
+                        AOIForm.BringToFront();
+                    }
+                    AOIForm.AOI = _AOI;
+                    break;
+                case "menuLandingSiteProp":
                     break;
             }
         }
@@ -234,7 +278,7 @@ namespace FAD3
             if (lvh.Item != null)
             {
                 //Note: commented out because I can't make this work for now
-                
+
                 //var tsi1 = menuDropDown.Items.Add("Detail of selected sampling");
                 //tsi1.Name = "menuSamplingDetail";
                 //_SamplingGUID = lvh.Item.Name;
@@ -243,7 +287,7 @@ namespace FAD3
             }
             var tsi = menuDropDown.Items.Add("New sampling");
             tsi.Name = "menuNewSampling";
-         }
+        }
 
         private void ConfigDropDownMenu(Control Source)
         {
@@ -261,13 +305,17 @@ namespace FAD3
 
                     tsi = menuDropDown.Items.Add("New sampling");
                     tsi.Name = "menuNewSampling";
-                    tsi.Enabled = _TreeLevel == "sampling" || _TreeLevel=="landing_site" || _TreeLevel =="gear" ;
+                    tsi.Enabled = _TreeLevel == "sampling" || _TreeLevel == "landing_site" || _TreeLevel == "gear";
 
                     var sep = menuDropDown.Items.Add("-");
                     sep.Name = "menuSeparator1";
 
                     tsi = menuDropDown.Items.Add("Enumerators");
                     tsi.Name = "menuEnumerators";
+                    tsi.Enabled = _TreeLevel == "aoi";
+
+                    tsi = menuDropDown.Items.Add("Target area properties");
+                    tsi.Name = "menuTargetAreaProp";
                     tsi.Enabled = _TreeLevel == "aoi";
 
                     tsi = menuDropDown.Items.Add("Landing site properties");
@@ -284,421 +332,423 @@ namespace FAD3
                     sep = menuDropDown.Items.Add("-");
                     sep.Name = "menuSeparator1";
                     sep.Visible = _TreeLevel == "landing_site";
-
-                    tsi = menuDropDown.Items.Add("Landing site properties");
-                    tsi.Name = "menuLandingSiteProp";
-                    tsi.Visible = _TreeLevel == "landing_site";
-
-                    tsi = menuDropDown.Items.Add("Target area properties");
-                    tsi.Name = "menuTargetAreaProperties";
-                    tsi.Visible = _TreeLevel == "aoi";
                     break;
             }
 
 
         }
 
-		private bool TestFileExist(string filename)
-		{
-			bool exists = File.Exists(filename);
+        private bool TestFileExist(string filename)
+        {
+            bool exists = File.Exists(filename);
 
-			if (exists)
-			{
-				if (filename != "NULL" && filename != "")
-				{
-					_oldMDB = filename;
-					global.mdbPath = filename;
-					names.GetGenus_LocalNames();
-					names.GetLocalNames();
-					//_StatusStripLabelWidth = statusPanelDBPath.Width;
-					statusPanelDBPath.Text = filename;
-					lblErrorFormOpen.Visible = false;
-					//PopulateTree();
-				}
-			}
-			else
-			{
-				lblTitle.Text = "File not found";
-				MessageBox.Show("Last opened database file" + Environment.NewLine +
-								 filename + Environment.NewLine +
-								 "is not found. Maybe it was deleted, moved, or renamed");
+            if (exists)
+            {
+                if (filename != "NULL" && filename != "")
+                {
+                    _oldMDB = filename;
+                    global.mdbPath = filename;
+                    names.GetGenus_LocalNames();
+                    names.GetLocalNames();
+                    //_StatusStripLabelWidth = statusPanelDBPath.Width;
+                    statusPanelDBPath.Text = filename;
+                    lblErrorFormOpen.Visible = false;
+                    //PopulateTree();
+                }
+            }
+            else
+            {
+                lblTitle.Text = "File not found";
+                MessageBox.Show("Last opened database file" + Environment.NewLine +
+                                 filename + Environment.NewLine +
+                                 "is not found. Maybe it was deleted, moved, or renamed");
 
-			}
+            }
 
-			return exists;
-		}
+            return exists;
+        }
 
-		public void NewDBFile(string filename)
-		{
-			if (TestFileExist(filename)) {
-				global.mdbPath = filename;
-				RegistryKey rk = Registry.CurrentUser.CreateSubKey("SOFTWARE\\FAD3");
-				rk.SetValue("mdbPath", filename, RegistryValueKind.String);
-				rk.Close();
-				lblErrorFormOpen.Visible = false;
-				PopulateTree();
-				statusPanelDBPath.Text = filename;
-			}
-			else
-			{
+        public void NewDBFile(string filename)
+        {
+            if (TestFileExist(filename))
+            {
+                global.mdbPath = filename;
+                RegistryKey rk = Registry.CurrentUser.CreateSubKey("SOFTWARE\\FAD3");
+                rk.SetValue("mdbPath", filename, RegistryValueKind.String);
+                rk.Close();
+                lblErrorFormOpen.Visible = false;
+                PopulateTree();
+                statusPanelDBPath.Text = filename;
+            }
+            else
+            {
 
-			}
-		}
+            }
+        }
 
-		private void _mrulist_FileSelected(string filename)
-		{
-			if (TestFileExist(filename))
-			{
-				global.mdbPath = filename;
-				RegistryKey rk = Registry.CurrentUser.CreateSubKey("SOFTWARE\\FAD3");
-				rk.SetValue("mdbPath", filename, RegistryValueKind.String);
-				rk.Close();
-				lblErrorFormOpen.Visible = false;
+        private void _mrulist_FileSelected(string filename)
+        {
+            if (TestFileExist(filename))
+            {
+                global.mdbPath = filename;
+                RegistryKey rk = Registry.CurrentUser.CreateSubKey("SOFTWARE\\FAD3");
+                rk.SetValue("mdbPath", filename, RegistryValueKind.String);
+                rk.Close();
+                lblErrorFormOpen.Visible = false;
 
-				PopulateTree();
-				statusPanelDBPath.Text = filename;
-			}
-			else
-			{
-				_mrulist.RemoveFile(filename);
-			}
-		}
+                PopulateTree();
+                statusPanelDBPath.Text = filename;
+            }
+            else
+            {
+                _mrulist.RemoveFile(filename);
+            }
+        }
 
-		void PopulateTree()
-		{
-			var myDataTable = new DataTable();
-			try
-			{
-				using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
-				{
-					conection.Open();
+        void PopulateTree()
+        {
+            var myDataTable = new DataTable();
+            try
+            {
+                using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
+                {
+                    conection.Open();
 
-					string query = "SELECT tblAOI.AOIGuid, tblAOI.AOIName, tblLandingSites.LSGUID, tblLandingSites.LSName " +
-								   "FROM tblAOI LEFT JOIN tblLandingSites ON tblAOI.AOIGuid = tblLandingSites.AOIGuid " +
-									"ORDER BY tblAOI.AOIName, tblLandingSites.LSName";
+                    string query = "SELECT tblAOI.AOIGuid, tblAOI.AOIName, tblLandingSites.LSGUID, tblLandingSites.LSName " +
+                                   "FROM tblAOI LEFT JOIN tblLandingSites ON tblAOI.AOIGuid = tblLandingSites.AOIGuid " +
+                                    "ORDER BY tblAOI.AOIName, tblLandingSites.LSName";
 
-					var adapter = new OleDbDataAdapter(query, conection);
-					adapter.Fill(myDataTable);
-				}
+                    using (var adapter = new OleDbDataAdapter(query, conection))
+                        adapter.Fill(myDataTable);
+                }
 
-			}
-			catch (Exception ex)
-			{
-				ErrorLogger.Log(ex);
-			}
+            }
+            catch (Exception ex)
+            {
+                ErrorLogger.Log(ex);
+            }
 
-			this.treeView1.Nodes.Clear();
-			//this.treeView1.
-			TreeNode root = this.treeView1.Nodes.Add("Fisheries Data");
-			root.Name = "root";
-			root.Tag = ",root";
+            this.treeView1.Nodes.Clear();
+            //this.treeView1.
+            TreeNode root = this.treeView1.Nodes.Add("Fisheries Data");
+            root.Name = "root";
+            root.Tag = ",root";
             root.ImageKey = "db";
-			for (int i = 0; i < myDataTable.Rows.Count; i++)
-			{
-				DataRow dr = myDataTable.Rows[i];
+            for (int i = 0; i < myDataTable.Rows.Count; i++)
+            {
+                DataRow dr = myDataTable.Rows[i];
                 //bool Exists = root.Nodes.ContainsKey(dr["AOIName"].ToString());
                 bool Exists = root.Nodes.ContainsKey(dr["AOIGuid"].ToString());
                 if (Exists)
-				{
+                {
                     //Debug.WriteLine(dr["AOIName"]);
                     //TreeNode myNode = root.Nodes[dr["AOIName"].ToString()];
                     TreeNode myNode = root.Nodes[dr["AOIGuid"].ToString()];
                     TreeNode myChild = new TreeNode(dr["LSName"].ToString());
-					myNode.Nodes.Add(myChild);
-					myChild.Name = dr["LSGUID"].ToString();
-					myChild.Nodes.Add("*dummy*");
-					myChild.Tag = dr["LSGUID"].ToString() + ",landing_site";
+                    myNode.Nodes.Add(myChild);
+                    myChild.Name = dr["LSGUID"].ToString();
+                    myChild.Nodes.Add("*dummy*");
+                    myChild.Tag = dr["LSGUID"].ToString() + ",landing_site";
                     myChild.ImageKey = "LandingSite";
 
-				}
-				else
-				{
-					TreeNode myNode = new TreeNode(dr["AOIName"].ToString());
+                }
+                else
+                {
+                    TreeNode myNode = new TreeNode(dr["AOIName"].ToString());
                     //myNode.Name = dr["AOIName"].ToString();
                     myNode.Name = dr["AOIGuid"].ToString();
                     root.Nodes.Add(myNode);
-					myNode.Tag = dr["AOIGuid"].ToString() + ",aoi";
+                    myNode.Tag = dr["AOIGuid"].ToString() + ",aoi";
                     myNode.ImageKey = "AOI";
 
-					if (string.IsNullOrWhiteSpace(dr["LSName"].ToString()))
-					{
-						myNode.Nodes.Add("*dummy*");
-            
-					}
-					else
-					{
-						TreeNode myChild = new TreeNode(dr["LSName"].ToString());
-						myNode.Nodes.Add(myChild);
-						myChild.Nodes.Add("*dummy*");
-						myChild.Tag = dr["LSGUID"].ToString() + ",landing_site";
-						myChild.Name = dr["LSGUID"].ToString();
+                    if (string.IsNullOrWhiteSpace(dr["LSName"].ToString()))
+                    {
+                        myNode.Nodes.Add("*dummy*");
+
+                    }
+                    else
+                    {
+                        TreeNode myChild = new TreeNode(dr["LSName"].ToString());
+                        myNode.Nodes.Add(myChild);
+                        myChild.Nodes.Add("*dummy*");
+                        myChild.Tag = dr["LSGUID"].ToString() + ",landing_site";
+                        myChild.Name = dr["LSGUID"].ToString();
                         myChild.ImageKey = "LandingSite";
                     }
-				}
-			}
-			root.Expand();
-			SetUPLV("root");
-		}
+                }
+            }
+            root.Expand();
+            SetUPLV("root");
+        }
 
-		public void RefreshLV(string NodeName, string TreeLevel, bool IsNew = false, string nodeGUID = "")
-		{
-			if (IsNew)
-			{
-				TreeNode NewNode = new TreeNode();
-				NewNode.Text = NodeName;
-				NewNode.Tag = nodeGUID + "," + TreeLevel;
-				NewNode.Name = NodeName;
-				treeView1.SelectedNode.Nodes.Add(NewNode);
-				treeView1.SelectedNode = NewNode;
-			}
-			else
-			{
-				treeView1.SelectedNode.Text = NodeName;
-			}
-			SetUPLV(TreeLevel);
-		}
+        public void RefreshLV(string NodeName, string TreeLevel, bool IsNew = false, string nodeGUID = "")
+        {
+            if (IsNew)
+            {
+                TreeNode NewNode = new TreeNode();
+                NewNode.Text = NodeName;
+                NewNode.Tag = nodeGUID + "," + TreeLevel;
+                NewNode.Name = NodeName;
+                treeView1.SelectedNode.Nodes.Add(NewNode);
+                treeView1.SelectedNode = NewNode;
+            }
+            else
+            {
+                treeView1.SelectedNode.Text = NodeName;
+            }
+            SetUPLV(TreeLevel);
+        }
 
-		public void RefreshLVEx(string TreeLevel)
-		{
-			SetUPLV(TreeLevel);
-		}
+        public void RefreshLVEx(string TreeLevel)
+        {
+            SetUPLV(TreeLevel);
+        }
 
-		private void SetUPLV(string TreeLevel)
-		{
-			// this will show a list of summaries depending on the level of the node selected
-			//level could be root, AOI, Landing site, gear used, and sampling month
-			int i = 0;
+        private void SetUPLV(string TreeLevel)
+        {
+            // this will show a list of summaries depending on the level of the node selected
+            //level could be root, AOI, Landing site, gear used, and sampling month
 
-			this.listView1.Clear();
-			this.listView1.View = View.Details;
-			this.listView1.FullRowSelect = true;
-			string myData = "";
-			string tag = "";
-			tag = TreeLevel;
-			switch (TreeLevel)
-			{
-				case "root":
-					listView1.Columns.Add("Property");
-					listView1.Columns.Add("Value");
-					ListViewItem lvi = listView1.Items.Add("Database path");
-					lvi.SubItems.Add(global.mdbPath);
+            listView1.SuspendLayout();
 
-					//add sampled years with count for entire database
-					lvi = listView1.Items.Add("");
-					lvi = listView1.Items.Add("Sampled years");
-					foreach (string item in _AOI.SampledYears())
-					{
-						if (i > 0)
-						{
-							lvi = listView1.Items.Add("");
-						}
-						lvi.SubItems.Add(item.ToString());
-						i++;
-					}
+            int i = 0;
 
-					//add AOI with count for entire database
-					lvi = listView1.Items.Add("");
-					lvi = listView1.Items.Add("AOI");
-					i = 0;
-					foreach (KeyValuePair<string, string> kv in _AOI.AOIWithSamplingCount())
-					{
-						if (i > 0)
-						{
-							lvi = listView1.Items.Add("");
-						}
-						lvi.SubItems.Add(kv.Value);
-						i++;
-					}
+            this.listView1.Clear();
+            this.listView1.View = View.Details;
+            this.listView1.FullRowSelect = true;
+            string myData = "";
+            string tag = "";
+            tag = TreeLevel;
+            var DisplaySamplingSummary = false;
+            switch (TreeLevel)
+            {
+                case "root":
+                    listView1.Columns.Add("Property");
+                    listView1.Columns.Add("Value");
+                    ListViewItem lvi = listView1.Items.Add("Database path");
+                    lvi.SubItems.Add(global.mdbPath);
 
-					tag = "database";
-					lblTitle.Text = "Database summary";
-					break;
-				case "aoi":
-					listView1.Columns.Add("Property");
-					listView1.Columns.Add("Value");
-					string[] arr = treeView1.SelectedNode.Tag.ToString().Split(',');
-					_AOI.AOIGUID = arr[0].ToString();
-					myData = _AOI.AOIData();
-					arr = myData.Split('|');
+                    //add sampled years with count for entire database
+                    lvi = listView1.Items.Add("");
+                    lvi = listView1.Items.Add("Sampled years");
+                    foreach (string item in _AOI.SampledYears())
+                    {
+                        if (i > 0)
+                        {
+                            lvi = listView1.Items.Add("");
+                        }
+                        lvi.SubItems.Add(item.ToString());
+                        i++;
+                    }
 
-					//add AOI data for form
-					lvi = listView1.Items.Add("Name");
-					lvi.SubItems.Add(arr[0].ToString());
-					lvi.Tag = "aoi_data";
-					lvi = listView1.Items.Add("Letter");
-					lvi.SubItems.Add(arr[1].ToString());
-					lvi.Tag = "aoi_data";
-					lvi = listView1.Items.Add("Major grids");
-					lvi.SubItems.Add(arr[2].ToString());
-					lvi.Tag = "aoi_data";
+                    //add AOI with count for entire database
+                    lvi = listView1.Items.Add("");
+                    lvi = listView1.Items.Add("AOI");
+                    i = 0;
+                    foreach (KeyValuePair<string, string> kv in _AOI.AOIWithSamplingCount())
+                    {
+                        if (i > 0)
+                        {
+                            lvi = listView1.Items.Add("");
+                        }
+                        lvi.SubItems.Add(kv.Value);
+                        i++;
+                    }
 
-					// add no. of samplings for this AOI
-					lvi = listView1.Items.Add("");
-					lvi = listView1.Items.Add("No. of samplings");
-					lvi.SubItems.Add(_AOI.SampleCount().ToString());
+                    tag = "database";
+                    lblTitle.Text = "Database summary";
+                    break;
+                case "aoi":
+                    listView1.Columns.Add("Property");
+                    listView1.Columns.Add("Value");
+                    string[] arr = treeView1.SelectedNode.Tag.ToString().Split(',');
+                    myData = _AOI.AOIData();
+                    arr = myData.Split('|');
 
-					//add sampled years with count
-					lvi = listView1.Items.Add("Years sampling");
-					i = 0;
-					foreach (KeyValuePair<string, string> item in _AOI.ListYearsWithSamplingCount())
-					{
-						if (i > 0)
-						{
-							lvi = listView1.Items.Add("");
-						}
-						lvi.Name = "YearSampled";
-						lvi.SubItems.Add(item.Key + " : " + item.Value);
-						i++;
-					}
+                    //add AOI data for form
+                    lvi = listView1.Items.Add("Name");
+                    lvi.SubItems.Add(arr[0].ToString());
+                    lvi.Tag = "aoi_data";
+                    lvi = listView1.Items.Add("Code");
+                    lvi.SubItems.Add(arr[1].ToString());
+                    lvi.Tag = "aoi_data";
+                    lvi = listView1.Items.Add("MBR");
+                    lvi.SubItems.Add("");
+                    lvi.Tag = "aoi_data";
+                    lvi = listView1.Items.Add("Grid system");
+                    lvi.Tag = "aoi_data";
+                    lvi.SubItems.Add(FishingGrid.GridTypeName);
 
-					//add enumerators with count
-					lvi = listView1.Items.Add("");
-					lvi = listView1.Items.Add("Enumerators");
-					i = 0;
-					foreach (KeyValuePair<string, string> item in _AOI.EnumeratorsWithCount())
-					{
-						if (i > 0)
-						{
-							lvi = listView1.Items.Add("");
-						}
-						lvi.Name = "Enumerators";
-						arr = item.Value.ToString().Split(',');
-						lvi.SubItems.Add(item.Key + ": " + arr[1].ToString());
-						lvi.Tag = arr[0].ToString();
-						i++;
-					}
 
-					// if there is no sampling then we cannot show enumerators with count
-					// so we just show a simple list
-					if (i==0)
-					{
-						foreach (KeyValuePair<string,string>item in aoi.AOIEnumeratorsList(_AOIGuid))
-						{
-							if (i > 0)
-							{
-								lvi = listView1.Items.Add("");
-							}
-							lvi.Name = "Enumerators";
-							lvi.SubItems.Add(item.Value);
-							lvi.Tag = item.Key;
-							i++;
-						}
-					}
+                    // add no. of samplings for this AOI
+                    lvi = listView1.Items.Add("");
+                    lvi = listView1.Items.Add("No. of samplings");
+                    lvi.SubItems.Add(_AOI.SampleCount().ToString());
 
-					//add landing sites
-					listView1.Items.Add("");
-					lvi = listView1.Items.Add("Landing sites");
-					i = 0;
-					foreach (string item in _AOI.ListLandingSiteWithSamplingCount())
-					{
-						if (i > 0)
-						{
-							lvi = listView1.Items.Add("");
-						}
-						lvi.SubItems.Add(item);
-						i++;
-					}
+                    //add sampled years with count
+                    lvi = listView1.Items.Add("Years sampling");
+                    i = 0;
+                    foreach (KeyValuePair<string, string> item in _AOI.ListYearsWithSamplingCount())
+                    {
+                        if (i > 0)
+                        {
+                            lvi = listView1.Items.Add("");
+                        }
+                        lvi.Name = "YearSampled";
+                        lvi.SubItems.Add(item.Key + " : " + item.Value);
+                        i++;
+                    }
 
-					lblTitle.Text = "Area of interest";
-					break;
+                    //add enumerators with count
+                    lvi = listView1.Items.Add("");
+                    lvi = listView1.Items.Add("Enumerators");
+                    i = 0;
+                    foreach (KeyValuePair<string, string> item in _AOI.EnumeratorsWithCount())
+                    {
+                        if (i > 0)
+                        {
+                            lvi = listView1.Items.Add("");
+                        }
+                        lvi.Name = "Enumerators";
+                        arr = item.Value.ToString().Split(',');
+                        lvi.SubItems.Add(item.Key + ": " + arr[1].ToString());
+                        lvi.Tag = arr[0].ToString();
+                        i++;
+                    }
 
-				case "landing_site":
-					listView1.Columns.Add("Property");
-					listView1.Columns.Add("Value");
+                    // if there is no sampling then we cannot show enumerators with count
+                    // so we just show a simple list
+                    if (i == 0)
+                    {
+                        foreach (KeyValuePair<string, string> item in aoi.AOIEnumeratorsList(_AOIGuid))
+                        {
+                            if (i > 0)
+                            {
+                                lvi = listView1.Items.Add("");
+                            }
+                            lvi.Name = "Enumerators";
+                            lvi.SubItems.Add(item.Value);
+                            lvi.Tag = item.Key;
+                            i++;
+                        }
+                    }
 
-					arr = treeView1.SelectedNode.Tag.ToString().Split(',');
+                    //add landing sites
+                    listView1.Items.Add("");
+                    lvi = listView1.Items.Add("Landing sites");
+                    i = 0;
+                    foreach (string item in _AOI.ListLandingSiteWithSamplingCount())
+                    {
+                        if (i > 0)
+                        {
+                            lvi = listView1.Items.Add("");
+                        }
+                        lvi.SubItems.Add(item);
+                        i++;
+                    }
 
-					//add landing site form data
-					_ls.LandingSiteGUID = arr[0];
-					myData = _ls.LandingSiteData();
-					arr = myData.Split(',');
-					lvi = listView1.Items.Add("Name");
-					lvi.SubItems.Add(arr[0]);
-					lvi = listView1.Items.Add("Municipality");
-					lvi.SubItems.Add(arr[1]);
-					lvi = listView1.Items.Add("Province");
-					lvi.SubItems.Add(arr[2]);
-					lvi = listView1.Items.Add("Longitude");
-					lvi.SubItems.Add(arr[3]);
-					lvi = listView1.Items.Add("Latitude");
-					lvi.SubItems.Add(arr[4]);
+                    lblTitle.Text = "Area of interest";
+                    break;
 
-					//add total number of sampling
-					listView1.Items.Add("");
-					lvi = listView1.Items.Add("No. of samplings");
-					lvi.SubItems.Add(_ls.SampleCount().ToString());
-					listView1.Items.Add("");
+                case "landing_site":
+                    listView1.Columns.Add("Property");
+                    listView1.Columns.Add("Value");
 
-					//add gears sampled
-					Dictionary<string, string> myGears = new Dictionary<string, string>();
-					myGears = _ls.Gears();
-					lvi = listView1.Items.Add("Gears sampled");
-					long n = 0;
-					foreach (KeyValuePair<string, string> item in myGears)
-					{
-						if (n > 0)
-						{
-							lvi = listView1.Items.Add("");
-						}
-						lvi.Tag = item.Key;
-						lvi.SubItems.Add(item.Value);
-						n++;
-					}
+                    arr = treeView1.SelectedNode.Tag.ToString().Split(',');
 
-					//Add months sampled
-					listView1.Items.Add("");
-					lvi = listView1.Items.Add("Months sampled");
-					List<string> myMonths = _ls.MonthsSampled();
-					n = 0;
-					foreach (string item in myMonths)
-					{
-						if (n > 0)
-						{
-							lvi = listView1.Items.Add("");
-						}
-						lvi.SubItems.Add(item);
-						n++;
-					}
+                    //add landing site form data
+                    _ls.LandingSiteGUID = arr[0];
+                    myData = _ls.LandingSiteData();
+                    arr = myData.Split(',');
+                    lvi = listView1.Items.Add("Name");
+                    lvi.SubItems.Add(arr[0]);
+                    lvi = listView1.Items.Add("Municipality");
+                    lvi.SubItems.Add(arr[1]);
+                    lvi = listView1.Items.Add("Province");
+                    lvi.SubItems.Add(arr[2]);
+                    lvi = listView1.Items.Add("Longitude");
+                    lvi.SubItems.Add(arr[3]);
+                    lvi = listView1.Items.Add("Latitude");
+                    lvi.SubItems.Add(arr[4]);
 
-					lblTitle.Text = "Landing site";
-					break;
+                    //add total number of sampling
+                    listView1.Items.Add("");
+                    lvi = listView1.Items.Add("No. of samplings");
+                    lvi.SubItems.Add(_ls.SampleCount().ToString());
+                    listView1.Items.Add("");
 
-				case "gear":
-					listView1.Columns.Add("Property");
-					listView1.Columns.Add("Value");
-					lvi = listView1.Items.Add("Months sampled");
-					arr = treeView1.SelectedNode.Tag.ToString().Split(',');
-					string[] arr2 = arr[0].Split('|');
-					string lsguid = arr2[0];
-					string gearguid = arr2[1];
-					_ls.LandingSiteGUID = lsguid;
-					_ls.GearVarGUID = gearguid;
-					n = 0;
-					foreach (string item in _ls.MonthsSampledEx(gearguid))
-					{
-						if (n > 0)
-						{
-							lvi = listView1.Items.Add("");
-						}
-						lvi.SubItems.Add(item);
-						n++;
-					}
-					lblTitle.Text = "Fishing gear";
-					break;
+                    //add gears sampled
+                    Dictionary<string, string> myGears = new Dictionary<string, string>();
+                    myGears = _ls.Gears();
+                    lvi = listView1.Items.Add("Gears sampled");
+                    long n = 0;
+                    foreach (KeyValuePair<string, string> item in myGears)
+                    {
+                        if (n > 0)
+                        {
+                            lvi = listView1.Items.Add("");
+                        }
+                        lvi.Tag = item.Key;
+                        lvi.SubItems.Add(item.Value);
+                        n++;
+                    }
 
-				case "sampling":
-					this.listView1.Columns.Add("Reference #");
-					this.listView1.Columns.Add("Area of interest");
-					this.listView1.Columns.Add("Landing site");
-					this.listView1.Columns.Add("Fishing ground");
-					this.listView1.Columns.Add("Gear used");
-					this.listView1.Columns.Add("Sampling date");
-					this.listView1.Columns.Add("Weight of catch");
-					this.listView1.Columns.Add("Enumerator");
-					this.listView1.Columns.Add("Catch rows");
-					this.listView1.Columns.Add("Notes");
-					lblTitle.Text = "Sampling";
-					break;
+                    //Add months sampled
+                    listView1.Items.Add("");
+                    lvi = listView1.Items.Add("Months sampled");
+                    List<string> myMonths = _ls.MonthsSampled();
+                    n = 0;
+                    foreach (string item in myMonths)
+                    {
+                        if (n > 0)
+                        {
+                            lvi = listView1.Items.Add("");
+                        }
+                        lvi.SubItems.Add(item);
+                        n++;
+                    }
+
+                    lblTitle.Text = "Landing site";
+                    break;
+
+                case "gear":
+                    listView1.Columns.Add("Property");
+                    listView1.Columns.Add("Value");
+                    lvi = listView1.Items.Add("Months sampled");
+                    arr = treeView1.SelectedNode.Tag.ToString().Split(',');
+                    string[] arr2 = arr[0].Split('|');
+                    string lsguid = arr2[0];
+                    string gearguid = arr2[1];
+                    _ls.LandingSiteGUID = lsguid;
+                    _ls.GearVarGUID = gearguid;
+                    n = 0;
+                    foreach (string item in _ls.MonthsSampledEx(gearguid))
+                    {
+                        if (n > 0)
+                        {
+                            lvi = listView1.Items.Add("");
+                        }
+                        lvi.SubItems.Add(item);
+                        n++;
+                    }
+                    lblTitle.Text = "Fishing gear";
+                    break;
+
+                case "sampling":
+                    this.listView1.Columns.Add("Reference #");
+                    this.listView1.Columns.Add("Area of interest");
+                    this.listView1.Columns.Add("Landing site");
+                    this.listView1.Columns.Add("Fishing ground");
+                    this.listView1.Columns.Add("Gear used");
+                    this.listView1.Columns.Add("Sampling date");
+                    this.listView1.Columns.Add("Weight of catch");
+                    this.listView1.Columns.Add("Enumerator");
+                    this.listView1.Columns.Add("Catch rows");
+                    this.listView1.Columns.Add("Notes");
+                    lblTitle.Text = "Sampling";
+
+                    DisplaySamplingSummary = true;
+                    break;
                 case "samplingDetail":
                     listView1.Columns.Add("Property");
                     listView1.Columns.Add("Value");
@@ -706,179 +756,274 @@ namespace FAD3
                     tag = "samplingDetail";
                     break;
 
-			}
+            }
 
-			//apply column widths  saved in registry
-			listView1.Tag = tag;
-			try
-			{
-				RegistryKey rk = Registry.CurrentUser.OpenSubKey("SOFTWARE\\FAD3\\ColWidth");
-				string rv = rk.GetValue(tag, "NULL").ToString();
-				string[] arr = rv.Split(',');
-				i = 0;
-				foreach (var item in listView1.Columns)
-				{
-					ColumnHeader ch = (ColumnHeader)item;
-					ch.Width = Convert.ToInt32(arr[i]);
-					i++;
-				}
-			}
-			catch (Exception ex)
-			{
-				ErrorLogger.Log(ex);
-			}
+            //apply column widths  saved in registry
+            listView1.Tag = tag;
+            try
+            {
+                RegistryKey rk = Registry.CurrentUser.OpenSubKey("SOFTWARE\\FAD3\\ColWidth");
+                string rv = rk.GetValue(tag, "NULL").ToString();
+                string[] arr = rv.Split(',');
+                i = 0;
+                foreach (var item in listView1.Columns)
+                {
+                    ColumnHeader ch = (ColumnHeader)item;
+                    ch.Width = Convert.ToInt32(arr[i]);
+                    i++;
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorLogger.Log(ex);
+            }
 
-		}
-
-
-		string DatabaseSummary(string SummaryTopic)
-		{
-			return "x";
-		}
-
-
-
-
-		void FillLVSamplingSummary(string LSGUID, string GearGUID, string SamplingMonth)
-		{
-            listView1.SuspendLayout();
-            this.listView1.Items.Clear();
-			string[] arr = SamplingMonth.Split('-');
-			string MonthNumber = "1";
-			switch (arr[0])
-			{
-				case "Jan":
-					MonthNumber = "1";
-					break;
-				case "Feb":
-					MonthNumber = "2";
-					break;
-				case "Mar":
-					MonthNumber = "3";
-					break;
-				case "Apr":
-					MonthNumber = "4";
-					break;
-				case "May":
-					MonthNumber = "5";
-					break;
-				case "Jun":
-					MonthNumber = "6";
-					break;
-				case "Jul":
-					MonthNumber = "7";
-					break;
-				case "Aug":
-					MonthNumber = "8";
-					break;
-				case "Sep":
-					MonthNumber = "9";
-					break;
-				case "Oct":
-					MonthNumber = "10";
-					break;
-				case "Nov":
-					MonthNumber = "11";
-					break;
-				case "Dec":
-					MonthNumber = "12";
-					break;
-			}
-
-			string StartDate = MonthNumber + "/1/" + arr[1];
-			string EndDate = (Convert.ToInt32(MonthNumber) + 1).ToString();
-			if (arr[0] == "Dec")
-			{
-				string newYear = (Convert.ToInt32(arr[1]) + 1).ToString();
-				EndDate = "1/1/" + newYear;
-			}
-			else
-			{
-				EndDate += "/1/" + arr[1];
-			}
-
-
-			var myDT = new DataTable();
-			try
-			{
-				using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
-				{
-					conection.Open();
-					/*string query = "SELECT tblAOI.AOIName, tblLandingSites.LSName, tblGearVariations.Variation, tblSampling.* " +
-								   "FROM tblGearVariations INNER JOIN (tblAOI INNER JOIN (tblLandingSites INNER JOIN tblSampling " +
-								   "ON tblLandingSites.LSGUID = tblSampling.LSGUID) ON tblAOI.AOIGuid = tblLandingSites.AOIGuid) " +
-								   "ON tblGearVariations.GearVarGUID = tblSampling.GearVarGUID " +
-								   "WHERE tblSampling.GearVarGUID=\"" + GearGUID + "\" AND tblSampling.LSGUID= \"" + LSGUID + "\" AND tblSampling.SamplingDate >=#" +
-									StartDate + "# AND tblSampling.SamplingDate <#" + EndDate + "# Order by tblSampling.SamplingDate";   
-				   */
-
-					string query = "SELECT tblSampling.RefNo, tblAOI.AOIName, tblLandingSites.LSName, tblGearVariations.Variation, tblSampling.SamplingDate, tblSampling.WtCatch, tblSampling.FishingGround, tblSampling.NoFishers, tblSampling.VesType, Count(tblCatchComp.RowGUID) AS [Rows], tblSampling.SamplingGUID, tblEnumerators.EnumeratorName, tblSampling.Notes " +
-									"FROM (tblAOI RIGHT JOIN tblLandingSites ON tblAOI.AOIGuid = tblLandingSites.AOIGuid) RIGHT JOIN (tblGearVariations RIGHT JOIN " +
-									   "(tblEnumerators RIGHT JOIN (tblSampling LEFT JOIN tblCatchComp ON tblSampling.SamplingGUID = tblCatchComp.SamplingGUID) ON " +
-									   "tblEnumerators.EnumeratorID = tblSampling.Enumerator) ON tblGearVariations.GearVarGUID = tblSampling.GearVarGUID) ON tblLandingSites.LSGUID = " +
-									   "tblSampling.LSGUID GROUP BY tblSampling.RefNo, tblAOI.AOIName, tblLandingSites.LSName, tblGearVariations.Variation, " +
-									   "tblSampling.SamplingDate, tblSampling.WtCatch, tblSampling.FishingGround, tblSampling.NoFishers, tblSampling.VesType, " +
-									"tblSampling.SamplingGUID, tblEnumerators.EnumeratorName, tblSampling.Notes, tblSampling.SamplingDate, tblSampling.GearVarGUID, tblSampling.LSGUID " +
-								   "HAVING (tblSampling.SamplingDate >=#" + StartDate + "# And tblSampling.SamplingDate <#" + EndDate + "# )AND " +
-									  "tblSampling.GearVarGUID=\"" + GearGUID + "\" AND tblSampling.LSGUID=\"" + LSGUID + "\" " +
-								   "ORDER BY tblSampling.SamplingDate;";
-					var adapter = new OleDbDataAdapter(query, conection);
-					adapter.Fill(myDT);
-					ListViewItem lvi;
-					for (int i = 0; i < myDT.Rows.Count; i++)
-					{
-						DataRow dr = myDT.Rows[i];
-						ListViewItem row = new ListViewItem(dr[0].ToString());
-						row.SubItems.Add(dr[1].ToString());
-						row.SubItems.Add(dr[2].ToString());
-						row.SubItems.Add(dr[6].ToString());
-						row.SubItems.Add(dr[3].ToString());
-						DateTime dt = (DateTime)dr[4];
-						row.SubItems.Add(string.Format("{0:MMM-dd-yyyy}", dt));
-						row.SubItems.Add(dr[5].ToString());
-						row.SubItems.Add(dr[11].ToString());
-						row.SubItems.Add(dr[9].ToString());
-						row.SubItems.Add(dr[12].ToString());
-						//string.Format( "{0:MMM-dd-YYYY}",  row.SubItems.Add (dr[7].ToString())   );
-						lvi = this.listView1.Items.Add(row);
-						lvi.Tag = dr[10].ToString();
-						lvi.Name = dr[10].ToString();
-					}
-
-				}
-			}
-			catch (Exception ex)
-			{
-				ErrorLogger.Log(ex);
-			}
+            if (DisplaySamplingSummary)
+                FillLVSamplingSummary(_LandingSiteGuid, _GearVarGUID, _SamplingMonth);
 
             listView1.ResumeLayout();
-		}
+        }
 
 
-		void TreeView1AfterExpand(object sender, TreeViewEventArgs e)
-		{
+        string DatabaseSummary(string SummaryTopic)
+        {
+            return "x";
+        }
 
-			if (e.Node.FirstNode.Text == "*dummy*")
-			{
-				// we are in a landing site node then we will add gear used nodes
 
-				//node tag contains guid of landing site
-				string[] arr = e.Node.Tag.ToString().Split(',');
-				var myDT = new DataTable();
-				try
-				{
-					using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
-					{
-						conection.Open();
-						// arr[0] contains the landing site guid
-						string lsguid = arr[0];
+        void FillLVSamplingSummary1(string LSGUID, string GearGUID, string SamplingMonth)
+        {
+            //listView1.Visible = false;
+            string[] arr = SamplingMonth.Split('-');
+            string MonthNumber = "1";
+            switch (arr[0])
+            {
+                case "Jan":
+                    MonthNumber = "1";
+                    break;
+                case "Feb":
+                    MonthNumber = "2";
+                    break;
+                case "Mar":
+                    MonthNumber = "3";
+                    break;
+                case "Apr":
+                    MonthNumber = "4";
+                    break;
+                case "May":
+                    MonthNumber = "5";
+                    break;
+                case "Jun":
+                    MonthNumber = "6";
+                    break;
+                case "Jul":
+                    MonthNumber = "7";
+                    break;
+                case "Aug":
+                    MonthNumber = "8";
+                    break;
+                case "Sep":
+                    MonthNumber = "9";
+                    break;
+                case "Oct":
+                    MonthNumber = "10";
+                    break;
+                case "Nov":
+                    MonthNumber = "11";
+                    break;
+                case "Dec":
+                    MonthNumber = "12";
+                    break;
+            }
 
-                        /*
-                          var query = "SELECT DISTINCT tblGearVariations.Variation, tblSampling.LSGUID, tblGearVariations.GearVarGUID " +
-									 "FROM tblGearVariations INNER JOIN tblSampling ON tblGearVariations.GearVarGUID = tblSampling.GearVarGUID " +
-									 "WHERE tblSampling.LSGUID = '{" + lsguid + "}'";
-                        */
+            var StartDate = MonthNumber + "/1/" + arr[1];
+            var EndDate = (Convert.ToInt32(MonthNumber) + 1).ToString();
+            if (arr[0] == "Dec")
+            {
+                var newYear = (Convert.ToInt32(arr[1]) + 1).ToString();
+                EndDate = "1/1/" + newYear;
+            }
+            else
+            {
+                EndDate += "/1/" + arr[1];
+            }
+
+            using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
+            {
+                conection.Open();
+                string query = "SELECT tblSampling.RefNo, tblAOI.AOIName, tblLandingSites.LSName, tblGearVariations.Variation, tblSampling.SamplingDate, tblSampling.WtCatch, tblSampling.FishingGround, tblSampling.NoFishers, tblSampling.VesType, Count(tblCatchComp.RowGUID) AS [Rows], tblSampling.SamplingGUID, tblEnumerators.EnumeratorName, tblSampling.Notes " +
+                "FROM (tblAOI RIGHT JOIN tblLandingSites ON tblAOI.AOIGuid = tblLandingSites.AOIGuid) RIGHT JOIN (tblGearVariations RIGHT JOIN " +
+                "(tblEnumerators RIGHT JOIN (tblSampling LEFT JOIN tblCatchComp ON tblSampling.SamplingGUID = tblCatchComp.SamplingGUID) ON " +
+                "tblEnumerators.EnumeratorID = tblSampling.Enumerator) ON tblGearVariations.GearVarGUID = tblSampling.GearVarGUID) ON tblLandingSites.LSGUID = " +
+                "tblSampling.LSGUID GROUP BY tblSampling.RefNo, tblAOI.AOIName, tblLandingSites.LSName, tblGearVariations.Variation, " +
+                "tblSampling.SamplingDate, tblSampling.WtCatch, tblSampling.FishingGround, tblSampling.NoFishers, tblSampling.VesType, " +
+                "tblSampling.SamplingGUID, tblEnumerators.EnumeratorName, tblSampling.Notes, tblSampling.SamplingDate, tblSampling.GearVarGUID, tblSampling.LSGUID " +
+                "HAVING (tblSampling.SamplingDate >=#" + StartDate + "# And tblSampling.SamplingDate <#" + EndDate + "# )AND " +
+                "tblSampling.GearVarGUID=\"" + GearGUID + "\" AND tblSampling.LSGUID=\"" + LSGUID + "\" " +
+                "ORDER BY tblSampling.SamplingDate;";
+
+                var comSelect = new OleDbCommand(query, conection);
+                var Reader = comSelect.ExecuteReader();
+
+                ListViewItem lvi;
+                while (Reader.Read())
+                {
+                    ListViewItem row = new ListViewItem(Reader[0].ToString());
+                    row.SubItems.Add(Reader[1].ToString());
+                    row.SubItems.Add(Reader[2].ToString());
+                    row.SubItems.Add(Reader[6].ToString());
+                    row.SubItems.Add(Reader[3].ToString());
+                    DateTime dt = Reader.GetDateTime(4);
+                    row.SubItems.Add(string.Format("{0:MMM-dd-yyyy}", dt));
+                    row.SubItems.Add(Reader[5].ToString());
+                    row.SubItems.Add(Reader[11].ToString());
+                    row.SubItems.Add(Reader[9].ToString());
+                    row.SubItems.Add(Reader[12].ToString());
+                    lvi = this.listView1.Items.Add(row);
+                    lvi.Tag = Reader[10].ToString();
+                    lvi.Name = Reader[10].ToString();
+                }
+
+            }
+            //listView1.Visible = true;
+        }
+
+        /// <summary>
+        /// Fills the listview the samplings that took place in a month-year
+        /// </summary>
+        /// <param name="LSGUID"></param>
+        /// <param name="GearGUID"></param>
+        /// <param name="SamplingMonth"></param>
+		void FillLVSamplingSummary(string LSGUID, string GearGUID, string SamplingMonth)
+        {
+            string[] arr = SamplingMonth.Split('-');
+            string MonthNumber = "1";
+            switch (arr[0])
+            {
+                case "Jan":
+                    MonthNumber = "1";
+                    break;
+                case "Feb":
+                    MonthNumber = "2";
+                    break;
+                case "Mar":
+                    MonthNumber = "3";
+                    break;
+                case "Apr":
+                    MonthNumber = "4";
+                    break;
+                case "May":
+                    MonthNumber = "5";
+                    break;
+                case "Jun":
+                    MonthNumber = "6";
+                    break;
+                case "Jul":
+                    MonthNumber = "7";
+                    break;
+                case "Aug":
+                    MonthNumber = "8";
+                    break;
+                case "Sep":
+                    MonthNumber = "9";
+                    break;
+                case "Oct":
+                    MonthNumber = "10";
+                    break;
+                case "Nov":
+                    MonthNumber = "11";
+                    break;
+                case "Dec":
+                    MonthNumber = "12";
+                    break;
+            }
+
+            string StartDate = MonthNumber + "/1/" + arr[1];
+            string EndDate = (Convert.ToInt32(MonthNumber) + 1).ToString();
+            if (arr[0] == "Dec")
+            {
+                string newYear = (Convert.ToInt32(arr[1]) + 1).ToString();
+                EndDate = "1/1/" + newYear;
+            }
+            else
+            {
+                EndDate += "/1/" + arr[1];
+            }
+
+            
+
+
+            using (var myDT = new DataTable())
+            {
+                try
+                {
+                    using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
+                    {
+                        conection.Open();
+
+                        string query = "SELECT tblSampling.RefNo, tblAOI.AOIName, tblLandingSites.LSName, tblGearVariations.Variation, tblSampling.SamplingDate, tblSampling.WtCatch, tblSampling.FishingGround, tblSampling.NoFishers, tblSampling.VesType, Count(tblCatchComp.RowGUID) AS [Rows], tblSampling.SamplingGUID, tblEnumerators.EnumeratorName, tblSampling.Notes " +
+                                        "FROM (tblAOI RIGHT JOIN tblLandingSites ON tblAOI.AOIGuid = tblLandingSites.AOIGuid) RIGHT JOIN (tblGearVariations RIGHT JOIN " +
+                                        "(tblEnumerators RIGHT JOIN (tblSampling LEFT JOIN tblCatchComp ON tblSampling.SamplingGUID = tblCatchComp.SamplingGUID) ON " +
+                                        "tblEnumerators.EnumeratorID = tblSampling.Enumerator) ON tblGearVariations.GearVarGUID = tblSampling.GearVarGUID) ON tblLandingSites.LSGUID = " +
+                                        "tblSampling.LSGUID GROUP BY tblSampling.RefNo, tblAOI.AOIName, tblLandingSites.LSName, tblGearVariations.Variation, " +
+                                        "tblSampling.SamplingDate, tblSampling.WtCatch, tblSampling.FishingGround, tblSampling.NoFishers, tblSampling.VesType, " +
+                                        "tblSampling.SamplingGUID, tblEnumerators.EnumeratorName, tblSampling.Notes, tblSampling.SamplingDate, tblSampling.GearVarGUID, tblSampling.LSGUID " +
+                                        "HAVING (tblSampling.SamplingDate >=#" + StartDate + "# And tblSampling.SamplingDate <#" + EndDate + "# )AND " +
+                                        "tblSampling.GearVarGUID=\"" + GearGUID + "\" AND tblSampling.LSGUID=\"" + LSGUID + "\" " +
+                                        "ORDER BY tblSampling.SamplingDate;";
+                        //using (var adapter = new OleDbDataAdapter(query, conection))
+                        //{
+
+                        var adapter = new OleDbDataAdapter(query, conection);
+                        adapter.Fill(myDT);
+                        ListViewItem lvi;
+                        for (int i = 0; i < myDT.Rows.Count; i++)
+                        {
+                            DataRow dr = myDT.Rows[i];
+                            ListViewItem row = new ListViewItem(dr[0].ToString());
+                            row.SubItems.Add(dr[1].ToString());
+                            row.SubItems.Add(dr[2].ToString());
+                            row.SubItems.Add(dr[6].ToString());
+                            row.SubItems.Add(dr[3].ToString());
+                            DateTime dt = (DateTime)dr[4];
+                            row.SubItems.Add(string.Format("{0:MMM-dd-yyyy}", dt));
+                            row.SubItems.Add(dr[5].ToString());
+                            row.SubItems.Add(dr[11].ToString());
+                            row.SubItems.Add(dr[9].ToString());
+                            row.SubItems.Add(dr[12].ToString());
+
+                            lvi = this.listView1.Items.Add(row);
+                            lvi.Tag = dr[10].ToString();
+                            lvi.Name = dr[10].ToString();
+                        }
+                        //}
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ErrorLogger.Log(ex);
+                }
+            }
+        }
+
+
+        void TreeView1AfterExpand(object sender, TreeViewEventArgs e)
+        {
+
+            if (e.Node.FirstNode.Text == "*dummy*")
+            {
+                // we are in a landing site node then we will add gear used nodes
+
+                //node tag contains guid of landing site
+                string[] arr = e.Node.Tag.ToString().Split(',');
+                var myDT = new DataTable();
+                try
+                {
+                    using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
+                    {
+                        conection.Open();
+                        // arr[0] contains the landing site guid
+                        string lsguid = arr[0];
 
                         var query = "SELECT DISTINCT tblGearClass.GearClassName, tblGearVariations.Variation, tblSampling.LSGUID, " +
                                      "tblGearVariations.GearVarGUID FROM tblGearClass INNER JOIN " +
@@ -887,34 +1032,34 @@ namespace FAD3
                                      "WHERE tblSampling.LSGUID = '{" + lsguid + "}'" +
                                      "ORDER BY tblGearClass.GearClassName, tblGearVariations.Variation";
 
-						var adapter = new OleDbDataAdapter(query, conection);
-						adapter.Fill(myDT);
-						if (myDT.Rows.Count > 0)
-						{
-							for (int i = 0; i < myDT.Rows.Count; i++)
-							{
-								DataRow dr = myDT.Rows[i];
-								TreeNode nd = e.Node; //represents the current node which is the landing site node
-								TreeNode nd1 = new TreeNode();
-								if (i == 0)
-								{
-									//if the node contains the dummy placeholder, rename it to the name of the gear
-									nd.FirstNode.Text = dr["Variation"].ToString();
-									nd1 = nd.FirstNode;
-								}
-								else
-								{
-									//add a new gearvar node and name with the variation field in the query
-									nd1 = nd.Nodes.Add(dr["Variation"].ToString());
-								}
-								//add a dummy placeholder for a new gear node
-								// this will be replaced by a sampling month-year node
-								//later on
-								nd1.Nodes.Add("**dummy*");
+                        var adapter = new OleDbDataAdapter(query, conection);
+                        adapter.Fill(myDT);
+                        if (myDT.Rows.Count > 0)
+                        {
+                            for (int i = 0; i < myDT.Rows.Count; i++)
+                            {
+                                DataRow dr = myDT.Rows[i];
+                                TreeNode nd = e.Node; //represents the current node which is the landing site node
+                                TreeNode nd1 = new TreeNode();
+                                if (i == 0)
+                                {
+                                    //if the node contains the dummy placeholder, rename it to the name of the gear
+                                    nd.FirstNode.Text = dr["Variation"].ToString();
+                                    nd1 = nd.FirstNode;
+                                }
+                                else
+                                {
+                                    //add a new gearvar node and name with the variation field in the query
+                                    nd1 = nd.Nodes.Add(dr["Variation"].ToString());
+                                }
+                                //add a dummy placeholder for a new gear node
+                                // this will be replaced by a sampling month-year node
+                                //later on
+                                nd1.Nodes.Add("**dummy*");
 
-								//tag and name the new gear node with the landingsite and gearvar guid
-								nd1.Tag = dr["LSGUID"].ToString() + "|" + dr["GearVarGUID"].ToString() + ",gear";
-								nd1.Name = dr["LSGUID"].ToString() + "|" + dr["GearVarGUID"].ToString();
+                                //tag and name the new gear node with the landingsite and gearvar guid
+                                nd1.Tag = dr["LSGUID"].ToString() + "|" + dr["GearVarGUID"].ToString() + ",gear";
+                                nd1.Name = dr["LSGUID"].ToString() + "|" + dr["GearVarGUID"].ToString();
 
                                 string iconKey = "";
                                 switch (dr["GearClassName"])
@@ -943,140 +1088,137 @@ namespace FAD3
 
                                 }
                                 nd1.ImageKey = iconKey;
-                                    
-								
-							}
-						}
-						else
-						{
-							e.Node.Nodes.Clear();
-						}
-
-					}
-				}
-				catch (Exception ex)
-				{
-					ErrorLogger.Log(ex);
-				}
-			}
-			else if (e.Node.FirstNode.Text == "**dummy*")
-			{
-
-				//we are in a gear variation node
-
-				var myDT = new DataTable();
-				try
-				{
-					using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
-					{
-						
-
-						conection.Open();
-
-						//node tag contains landing site and gearvar guid
-						string[] arr = e.Node.Tag.ToString().Split(',');
-
-						//arr1 will contain landing site and gearvar guid
-						string[] arr1 = arr[0].ToString().Split('|');
-						string lsguid = arr1[0];
-						string gearguid = arr1[1];
-						var query = "SELECT Format([SamplingDate],'mmm-yyyy') AS sDate FROM tblSampling " +
-									"GROUP BY Format([SamplingDate],'mmm-yyyy'), tblSampling.LSGUID, tblSampling.GearVarGUID, " +
-									"Year([SamplingDate]), Month([SamplingDate]) " +
-									 "HAVING LSGUID ='{" + lsguid + "}' AND GearVarGUID = '{" + gearguid + "}' " +
-									 "ORDER BY Year([SamplingDate]), Month([SamplingDate])";
 
 
-						//Debug.WriteLine(query);
-						var adapter = new OleDbDataAdapter(query, conection);
-						adapter.Fill(myDT);
-						for (int i = 0; i < myDT.Rows.Count; i++)
-						{
-							DataRow dr = myDT.Rows[i];
-							TreeNode nd1 = new TreeNode();
-							if (i == 0)
-							{
-								//if node contains a dummy placeholder, 
-								//rename it to the sampling month-year field
-								e.Node.FirstNode.Text = dr["sDate"].ToString();
-								nd1 = e.Node.FirstNode;
-							}
-							else
-							{
-								nd1 = e.Node.Nodes.Add(dr["sDate"].ToString());
-							}
-							nd1.Tag = lsguid + "|" + gearguid + ",sampling";
-							//nd1.Name = lsguid + "|" + gearguid;
-							nd1.Name = lsguid + "|" + gearguid + "|" + dr["sDate"];
+                            }
+                        }
+                        else
+                        {
+                            e.Node.Nodes.Clear();
+                        }
+
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ErrorLogger.Log(ex);
+                }
+            }
+            else if (e.Node.FirstNode.Text == "**dummy*")
+            {
+
+                //we are in a gear variation node
+
+                var myDT = new DataTable();
+                try
+                {
+                    using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
+                    {
+
+
+                        conection.Open();
+
+                        //node tag contains landing site and gearvar guid
+                        string[] arr = e.Node.Tag.ToString().Split(',');
+
+                        //arr1 will contain landing site and gearvar guid
+                        string[] arr1 = arr[0].ToString().Split('|');
+                        string lsguid = arr1[0];
+                        string gearguid = arr1[1];
+                        var query = "SELECT Format([SamplingDate],'mmm-yyyy') AS sDate FROM tblSampling " +
+                                    "GROUP BY Format([SamplingDate],'mmm-yyyy'), tblSampling.LSGUID, tblSampling.GearVarGUID, " +
+                                    "Year([SamplingDate]), Month([SamplingDate]) " +
+                                     "HAVING LSGUID ='{" + lsguid + "}' AND GearVarGUID = '{" + gearguid + "}' " +
+                                     "ORDER BY Year([SamplingDate]), Month([SamplingDate])";
+
+
+                        //Debug.WriteLine(query);
+                        var adapter = new OleDbDataAdapter(query, conection);
+                        adapter.Fill(myDT);
+                        for (int i = 0; i < myDT.Rows.Count; i++)
+                        {
+                            DataRow dr = myDT.Rows[i];
+                            TreeNode nd1 = new TreeNode();
+                            if (i == 0)
+                            {
+                                //if node contains a dummy placeholder, 
+                                //rename it to the sampling month-year field
+                                e.Node.FirstNode.Text = dr["sDate"].ToString();
+                                nd1 = e.Node.FirstNode;
+                            }
+                            else
+                            {
+                                nd1 = e.Node.Nodes.Add(dr["sDate"].ToString());
+                            }
+                            nd1.Tag = lsguid + "|" + gearguid + ",sampling";
+                            //nd1.Name = lsguid + "|" + gearguid;
+                            nd1.Name = lsguid + "|" + gearguid + "|" + dr["sDate"];
                             nd1.ImageKey = "MonthGear";
-						}
-					}
+                        }
+                    }
 
-				}
-				catch (Exception ex)
-				{
-					ErrorLogger.Log(ex);
-				}
-			}
-		}
+                }
+                catch (Exception ex)
+                {
+                    ErrorLogger.Log(ex);
+                }
+            }
+        }
 
 
 
-		public void EnumeratorSelectedSampling(Dictionary<string,string>SamplingIdentifiers)
-		{
-			TreeNode[] nd = treeView1.Nodes.Find(SamplingIdentifiers["LSGUID"], true);
-			treeView1.SelectedNode = nd[0];
-			nd[0].Expand();
+        public void EnumeratorSelectedSampling(Dictionary<string, string> SamplingIdentifiers)
+        {
+            TreeNode[] nd = treeView1.Nodes.Find(SamplingIdentifiers["LSGUID"], true);
+            treeView1.SelectedNode = nd[0];
+            nd[0].Expand();
 
-			TreeNode[] nd1 = nd[0].Nodes.Find(SamplingIdentifiers["LSGUID"] + "|" + SamplingIdentifiers["GearID"], true);
-			treeView1.SelectedNode = nd1[0];
-			nd1[0].Expand();
+            TreeNode[] nd1 = nd[0].Nodes.Find(SamplingIdentifiers["LSGUID"] + "|" + SamplingIdentifiers["GearID"], true);
+            treeView1.SelectedNode = nd1[0];
+            nd1[0].Expand();
 
-			DateTime dt = DateTime.Parse(SamplingIdentifiers["SamplingDate"]);
-			string myDate = string.Format("{0:MMM-yyyy}", dt);
-			TreeNode[] nd2 = nd1[0].Nodes.Find(SamplingIdentifiers["LSGUID"] + "|" + SamplingIdentifiers["GearID"] + "|" + myDate, true);
-			treeView1.SelectedNode = nd2[0];
-			nd2[0].Expand();
+            DateTime dt = DateTime.Parse(SamplingIdentifiers["SamplingDate"]);
+            string myDate = string.Format("{0:MMM-yyyy}", dt);
+            TreeNode[] nd2 = nd1[0].Nodes.Find(SamplingIdentifiers["LSGUID"] + "|" + SamplingIdentifiers["GearID"] + "|" + myDate, true);
+            treeView1.SelectedNode = nd2[0];
+            nd2[0].Expand();
 
-			_Sampling.SamplingGUID = SamplingIdentifiers["SamplingID"];
-			GetSamplingDetailEx1();
-			GetCatchComposition();
+            _Sampling.SamplingGUID = SamplingIdentifiers["SamplingID"];
+            GetSamplingDetailEx1();
+            GetCatchComposition();
 
-		}
+        }
 
 
         void TreeView1AfterSelect(object sender, TreeViewEventArgs e)
-		{
-			_LSNode = null;
+        {
+            _LSNode = null;
             SetupSamplingButtonFrame(false);
 
             try
-			{
+            {
 
-                _AOIName = "";
                 _LandingSiteName = "";
                 _GearVarName = "";
                 _GearClassName = "";
-                _AOIGuid = "";
                 _LandingSiteGuid = "";
                 _GearVarGUID = "";
                 _GearClassGUID = "";
 
                 TreeNode nd = treeView1.SelectedNode;
-				ResetTheBackColor(treeView1);
-				nd.BackColor = Color.Gainsboro;
-				string tag = nd.Tag.ToString();
-				if (tag != "")
-				{
-					string[] arr = tag.Split(',');
-					_TreeLevel = arr[1];
-					SetUPLV(_TreeLevel);
-					statusPanelTargetArea.Width = _statusPanelWidth;
-					switch (_TreeLevel)
-					{
-						case "gear":
+                ResetTheBackColor(treeView1);
+                nd.BackColor = Color.Gainsboro;
+                string tag = nd.Tag.ToString();
+                if (tag != "")
+                {
+                    string[] arr = tag.Split(',');
+                    _TreeLevel = arr[1];
+                    statusPanelTargetArea.Width = _statusPanelWidth;
+                    switch (_TreeLevel)
+                    {
+                        case "gear":
                             _AOIName = treeView1.SelectedNode.Parent.Parent.Text;
-                            _AOIGuid = treeView1.SelectedNode.Parent.Parent.Name;
+                            this.AOIGUID = treeView1.SelectedNode.Parent.Parent.Name;
                             _LandingSiteName = treeView1.SelectedNode.Parent.Text;
                             _LandingSiteGuid = treeView1.SelectedNode.Parent.Name;
                             _GearVarName = treeView1.SelectedNode.Text;
@@ -1086,26 +1228,21 @@ namespace FAD3
                             _GearClassName = rv.Value;
                             _GearClassGUID = rv.Key;
                             _LSNode = e.Node.Parent;
-							break;
-						case "sampling":
-							//arr2 will contain the landing site and gearvar guids
-							string[] arr2 = arr[0].Split('|');
+                            break;
+                        case "sampling":
+                            //arr2 will contain the landing site and gearvar guids
+                            string[] arr2 = arr[0].Split('|');
                             _LandingSiteGuid = arr2[0];
                             _GearVarGUID = arr2[1];
 
-							//we will look for the aoi ancestor node and get the aoi guid
-							string[] arr3 = treeView1.SelectedNode.Parent.Parent.Parent.Tag.ToString().Split(',');
+                            //we will look for the aoi ancestor node and get the aoi guid
+                            string[] arr3 = treeView1.SelectedNode.Parent.Parent.Parent.Tag.ToString().Split(',');
                             this.AOIGUID = arr3[0];
                             _AOI.AOIGUID = this.AOIGUID;
 
                             _SamplingMonth = e.Node.Text;
-
-
-                            //this will fill the listview with the samplings for a month-year
-                            FillLVSamplingSummary(_LandingSiteGuid, _GearVarGUID, _SamplingMonth);
-
                             _AOIName = treeView1.SelectedNode.Parent.Parent.Parent.Text;
-                            _AOIGuid = treeView1.SelectedNode.Parent.Parent.Parent.Name;
+                            this.AOIGUID = treeView1.SelectedNode.Parent.Parent.Parent.Name;
                             _LandingSiteName = treeView1.SelectedNode.Parent.Parent.Text;
                             _LandingSiteGuid = treeView1.SelectedNode.Parent.Parent.Name;
                             _GearVarName = treeView1.SelectedNode.Parent.Text;
@@ -1114,43 +1251,44 @@ namespace FAD3
                             _GearClassName = rv.Value;
                             _GearClassGUID = rv.Key;
                             _LSNode = e.Node.Parent.Parent;
-							break;
-						case "aoi":
+                            break;
+                        case "aoi":
                             _AOIName = treeView1.SelectedNode.Text;
-                            _AOIGuid = treeView1.SelectedNode.Name;
+                            this.AOIGUID = treeView1.SelectedNode.Name;
                             _LandingSiteName = "";
                             _LandingSiteGuid = "";
                             _GearVarName = "";
                             _GearVarGUID = "";
-							break;
-						case "root":
+                            break;
+                        case "root":
 
                             break;
-						case "landing_site":
+                        case "landing_site":
                             _AOIName = treeView1.SelectedNode.Parent.Text;
-                            _AOIGuid = treeView1.SelectedNode.Parent.Name;
+                            this.AOIGUID = treeView1.SelectedNode.Parent.Name;
                             _LandingSiteName = treeView1.SelectedNode.Text;
                             _LandingSiteGuid = treeView1.SelectedNode.Name;
                             _GearVarName = "";
                             _GearVarGUID = "";
                             _LSNode = e.Node;
 
-							break;
-					}
+                            break;
+                    }
 
+                    SetUPLV(_TreeLevel);
                     statusPanelTargetArea.Text = _AOIName;
                     statusPanelLandingSite.Text = _LandingSiteName;
                     statusPanelGearUsed.Text = _GearVarName;
 
-				}
-			}
-			catch (Exception ex)
+                }
+            }
+            catch (Exception ex)
             {
                 ErrorLogger.Log(ex);
             }
 
             e.Node.SelectedImageKey = e.Node.ImageKey;
-            
+
         }
 
         public void RefreshCatchDetail(string SamplingGUID)
@@ -1167,7 +1305,7 @@ namespace FAD3
             _Sampling.SamplingGUID = SamplingGUID;
             Dictionary<string, string> effortData = _Sampling.CatchAndEffort();
 
-            
+
 
             //the array splits the dictionary item from the name [0] and its guid [1]
             //we make the guid the tag of the listitem
@@ -1189,7 +1327,8 @@ namespace FAD3
 
             foreach (ListViewItem lvi in listView1.Items)
             {
-                switch (lvi.Name){ 
+                switch (lvi.Name)
+                {
                     case "LandingSite":
                     case "Enumerator":
                     case "GearClass":
@@ -1219,161 +1358,161 @@ namespace FAD3
             panelSamplingButtons.Visible = Visible;
             if (Visible)
             {
-                this.panelSamplingButtons.Location = new Point(listView1.Width - panelSamplingButtons.Width-10, listView1.Top + 50);
+                this.panelSamplingButtons.Location = new Point(listView1.Width - panelSamplingButtons.Width - 10, listView1.Top + 50);
             }
             CancelButton = buttonOK.Visible ? buttonOK : null;
         }
 
         void ResetTheBackColor(Control c)
-		{
-			switch (c.Name)
-			{
-				case "listView1":
-				case "listView3":
-					foreach (ListViewItem item in ((ListView)c).Items)
-					{
-						item.BackColor = Color.White;
-					}
-					break;
-				case "treeView1":
-					TreeNodeCollection nodes = treeView1.Nodes;
-					TraverseTree(treeView1.Nodes);
-					break;
-			}
+        {
+            switch (c.Name)
+            {
+                case "listView1":
+                case "listView3":
+                    foreach (ListViewItem item in ((ListView)c).Items)
+                    {
+                        item.BackColor = Color.White;
+                    }
+                    break;
+                case "treeView1":
+                    TreeNodeCollection nodes = treeView1.Nodes;
+                    TraverseTree(treeView1.Nodes);
+                    break;
+            }
 
-		}
+        }
 
-		void TraverseTree(TreeNodeCollection nodes)
-		{
-			foreach (TreeNode child in nodes)
-			{
-				child.BackColor = Color.White;
-				TraverseTree(child.Nodes);
-			}
-		}
+        void TraverseTree(TreeNodeCollection nodes)
+        {
+            foreach (TreeNode child in nodes)
+            {
+                child.BackColor = Color.White;
+                TraverseTree(child.Nodes);
+            }
+        }
 
-		void ShowCatchDetail(ListViewItem lvi)
-	   {
-			_Sampling.SamplingGUID = lvi.Tag.ToString();
+        void ShowCatchDetail(ListViewItem lvi)
+        {
+            _Sampling.SamplingGUID = lvi.Tag.ToString();
 
-			GetSamplingDetailEx1();
-			GetCatchComposition();
+            GetSamplingDetailEx1();
+            GetCatchComposition();
 
 
-			listView1.EnsureVisible(lvi.Index);
-		}
+            listView1.EnsureVisible(lvi.Index);
+        }
 
-		void GetSamplingDetailEx()
-		{
-			Dictionary<string, string> ce = _Sampling.CatchAndEffort();
-			
-		}
+        void GetSamplingDetailEx()
+        {
+            Dictionary<string, string> ce = _Sampling.CatchAndEffort();
 
-		void GetSamplingDetailEx1()
-		{
+        }
+
+        void GetSamplingDetailEx1()
+        {
             ;
-		}
-		void GetSamplingDetail()
-		{
+        }
+        void GetSamplingDetail()
+        {
 
             ;
-		}
+        }
 
-		void GetCatchComposition()
-		{
+        void GetCatchComposition()
+        {
             ;
-		}
+        }
 
-		public static void SaveColumnWidthEx(object sender, string context = "", global.lvContext myContext = global.lvContext.None)
-		{
-			string cw = "";
-			int i = 0;
-			string subKey = "";
-			string SaveContext = "";
-			subKey = "SOFTWARE\\FAD3\\ColWidth";
-			ListView lv = (ListView)sender;
+        public static void SaveColumnWidthEx(object sender, string context = "", global.lvContext myContext = global.lvContext.None)
+        {
+            string cw = "";
+            int i = 0;
+            string subKey = "";
+            string SaveContext = "";
+            subKey = "SOFTWARE\\FAD3\\ColWidth";
+            ListView lv = (ListView)sender;
 
-			foreach (var item in lv.Columns)
-			{
-				ColumnHeader ch = (ColumnHeader)item;
-				if (i == 0)
-				{
-					cw = ch.Width.ToString();
-				}
-				else
-				{
-					cw = cw + "," + ch.Width.ToString();
-				}
-				i++;
-			}
+            foreach (var item in lv.Columns)
+            {
+                ColumnHeader ch = (ColumnHeader)item;
+                if (i == 0)
+                {
+                    cw = ch.Width.ToString();
+                }
+                else
+                {
+                    cw = cw + "," + ch.Width.ToString();
+                }
+                i++;
+            }
 
-			if (context != "")
-			{
-				SaveContext = context;
-			}
-			else if (myContext != global.lvContext.None)
-			{
-				SaveContext = myContext.ToString();
-			}
-			RegistryKey rk = Registry.CurrentUser.CreateSubKey(subKey);
-			rk.SetValue(SaveContext, cw, RegistryValueKind.String);
-			rk.Close();
+            if (context != "")
+            {
+                SaveContext = context;
+            }
+            else if (myContext != global.lvContext.None)
+            {
+                SaveContext = myContext.ToString();
+            }
+            RegistryKey rk = Registry.CurrentUser.CreateSubKey(subKey);
+            rk.SetValue(SaveContext, cw, RegistryValueKind.String);
+            rk.Close();
 
-		}
+        }
 
-		public void SaveColumnWidth(object sender)
-		{
-			string cw = "";
-			string myContext = listView1.Tag.ToString();
-			int i = 0;
-			string subKey = "";
-			ListView lv = (ListView)sender;
-			switch (lv.Name)
-			{
-				case "listView1":
-					subKey = "SOFTWARE\\FAD3\\ColWidth";
-					break;
-				case "listView2":
-					subKey = "SOFTWARE\\FAD3\\ColWidth\\lv2";
-					break;
-				case "listView3":
-					subKey = "SOFTWARE\\FAD3\\ColWidth\\lv3";
-					break;
-				case "listEnumeratorSampling":
-					subKey = "SOFTWARE\\FAD3\\ColWidth\\Enumerator";
-					myContext = "Enumerator";
-					break;
-			}
+        public void SaveColumnWidth(object sender)
+        {
+            string cw = "";
+            string myContext = listView1.Tag.ToString();
+            int i = 0;
+            string subKey = "";
+            ListView lv = (ListView)sender;
+            switch (lv.Name)
+            {
+                case "listView1":
+                    subKey = "SOFTWARE\\FAD3\\ColWidth";
+                    break;
+                case "listView2":
+                    subKey = "SOFTWARE\\FAD3\\ColWidth\\lv2";
+                    break;
+                case "listView3":
+                    subKey = "SOFTWARE\\FAD3\\ColWidth\\lv3";
+                    break;
+                case "listEnumeratorSampling":
+                    subKey = "SOFTWARE\\FAD3\\ColWidth\\Enumerator";
+                    myContext = "Enumerator";
+                    break;
+            }
 
-			foreach (var item in lv.Columns)
-			{
-				ColumnHeader ch = (ColumnHeader)item;
-				if (i == 0)
-				{
-					cw = ch.Width.ToString();
-				}
-				else
-				{
-					cw = cw + "," + ch.Width.ToString();
-				}
-				i++;
-			}
-			RegistryKey rk = Registry.CurrentUser.CreateSubKey(subKey);
-			rk.SetValue(myContext, cw, RegistryValueKind.String);
-			rk.Close();
-		}
+            foreach (var item in lv.Columns)
+            {
+                ColumnHeader ch = (ColumnHeader)item;
+                if (i == 0)
+                {
+                    cw = ch.Width.ToString();
+                }
+                else
+                {
+                    cw = cw + "," + ch.Width.ToString();
+                }
+                i++;
+            }
+            RegistryKey rk = Registry.CurrentUser.CreateSubKey(subKey);
+            rk.SetValue(myContext, cw, RegistryValueKind.String);
+            rk.Close();
+        }
 
-		void ListView1Leave(object sender, EventArgs e)
-		{
-			SaveColumnWidthEx(sender, listView1.Tag.ToString());
-		}
+        void ListView1Leave(object sender, EventArgs e)
+        {
+            SaveColumnWidthEx(sender, listView1.Tag.ToString());
+        }
 
-		void ListView2Leave(object sender, EventArgs e)
-		{
-			SaveColumnWidthEx(sender, myContext:global.lvContext.CatchAndEffort);
-		}
+        void ListView2Leave(object sender, EventArgs e)
+        {
+            SaveColumnWidthEx(sender, myContext: global.lvContext.CatchAndEffort);
+        }
 
-       void ProcessFileOpen()
+        void ProcessFileOpen()
         {
             string filename = "";
             OpenFileDialog ofd = new OpenFileDialog();
@@ -1404,24 +1543,24 @@ namespace FAD3
             }
         }
 
-		
 
 
-		public void UpdatedCatchLine(bool isNew, sampling.CatchLine CatchCompLine)
-		{
+
+        public void UpdatedCatchLine(bool isNew, sampling.CatchLine CatchCompLine)
+        {
             ;
-		}
+        }
 
         void statusPanelDBPath_DoubleClick(object sender, EventArgs e)
-		{
-			Process.Start(Path.GetDirectoryName(global.mdbPath));
-		}
+        {
+            Process.Start(Path.GetDirectoryName(global.mdbPath));
+        }
 
-		void ListView3Leave(object sender, EventArgs e)
-		{
-			//SaveColumnWidth(sender);
-			SaveColumnWidthEx(sender, myContext: global.lvContext.CatchComposition);
-		}
+        void ListView3Leave(object sender, EventArgs e)
+        {
+            //SaveColumnWidth(sender);
+            SaveColumnWidthEx(sender, myContext: global.lvContext.CatchComposition);
+        }
 
 
 
@@ -1532,64 +1671,64 @@ namespace FAD3
 		}
         */
 
-		void TreeView1BeforeSelect(object sender, TreeViewCancelEventArgs e)
-		{
-		}
+        void TreeView1BeforeSelect(object sender, TreeViewCancelEventArgs e)
+        {
+        }
 
-		void OptionsToolStripMenuItemClick(object sender, EventArgs e)
-		{
+        void OptionsToolStripMenuItemClick(object sender, EventArgs e)
+        {
 
-		}
+        }
 
-		void ShowErrorMessagesToolStripMenuItemClick(object sender, EventArgs e)
-		{
-			//showErrorMessagesToolStripMenuItem.Checked = !showErrorMessagesToolStripMenuItem.Checked;
-			//global.ShowErrorMessage = showErrorMessagesToolStripMenuItem.Checked;
-		}
-
-
-
-		void ShowFormCatch()
-		{
-			bool Proceed = true;
-			if (_frmLF!=null)
-			{
-				_frmLF.Close();
-			}
-			if (_frmCatch == null && _frmLF == null)
-			{
-				_frmCatch = new frmCatch();
-				_frmCatch.FormClosed += (o, ea) => _frmCatch = null;
-			}
-			else if (_frmLF == null)
-			{
-				_frmCatch.WindowState = FormWindowState.Normal;
-			}
-			else
-			{
-				Proceed = false;
-			}
-
-			if (Proceed)
-			{
-				try
-				{
-					_frmCatch.Show(this);
-				}
-				catch
-				{
-					_frmCatch.Focus();
-				}
+        void ShowErrorMessagesToolStripMenuItemClick(object sender, EventArgs e)
+        {
+            //showErrorMessagesToolStripMenuItem.Checked = !showErrorMessagesToolStripMenuItem.Checked;
+            //global.ShowErrorMessage = showErrorMessagesToolStripMenuItem.Checked;
+        }
 
 
-				_frmCatch.ParentForm = this;
-				_frmCatch.Sampling = _Sampling;
-			}
-		}
-		void ListView3_DoubleClick(object sender, EventArgs e)
-		{
-			ShowFormCatch();
-		}
+
+        void ShowFormCatch()
+        {
+            bool Proceed = true;
+            if (_frmLF != null)
+            {
+                _frmLF.Close();
+            }
+            if (_frmCatch == null && _frmLF == null)
+            {
+                _frmCatch = new frmCatch();
+                _frmCatch.FormClosed += (o, ea) => _frmCatch = null;
+            }
+            else if (_frmLF == null)
+            {
+                _frmCatch.WindowState = FormWindowState.Normal;
+            }
+            else
+            {
+                Proceed = false;
+            }
+
+            if (Proceed)
+            {
+                try
+                {
+                    _frmCatch.Show(this);
+                }
+                catch
+                {
+                    _frmCatch.Focus();
+                }
+
+
+                _frmCatch.ParentForm = this;
+                _frmCatch.Sampling = _Sampling;
+            }
+        }
+        void ListView3_DoubleClick(object sender, EventArgs e)
+        {
+            ShowFormCatch();
+        }
 
         /*
 		void AddNewToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1630,15 +1769,15 @@ namespace FAD3
 
 
 
-		private void buttonEdit_Click(object sender, EventArgs e)
-		{
-			frmEffort frm = new frmEffort();
-			frm.AOI = _AOI;
-			frm.ParentForm(this);
-			frm.LandingSite = _ls;
-			frm.Sampling = _Sampling;
-			frm.ShowDialog();
-		}
+        private void buttonEdit_Click(object sender, EventArgs e)
+        {
+            frmEffort frm = new frmEffort();
+            frm.AOI = _AOI;
+            frm.ParentForm(this);
+            frm.LandingSite = _ls;
+            frm.Sampling = _Sampling;
+            frm.ShowDialog();
+        }
 
 
         /*
@@ -1662,7 +1801,7 @@ namespace FAD3
 			}
 		}
         */
-		
+
 
 
 
@@ -1718,7 +1857,7 @@ namespace FAD3
                     {
                         form.BringToFront();
                     }
-                        break;
+                    break;
                 case "fish":
                     break;
                 case "report":
@@ -1889,7 +2028,7 @@ namespace FAD3
             listView1.TopItem = listView1.Items[_topLVItemIndex];
         }
 
-        private void buttonSamplingClick (object sender, EventArgs e)
+        private void buttonSamplingClick(object sender, EventArgs e)
         {
             Button b = (Button)sender;
             switch (b.Name)
@@ -1936,70 +2075,9 @@ namespace FAD3
                     f2.ShowDialog(this);
                     break;
                 case "addSamplingToolStripMenuItem":
-                    TreeNode nd = new TreeNode();
-                    nd = treeView1.SelectedNode;
-                    arr = nd.Tag.ToString().Split(',');
-
-                    //arr[1] represents the treeview level clicked
-                    switch (arr[1])
-                    {
-                        case "sampling":
-                            arr = nd.Parent.Parent.Parent.Tag.ToString().Split(',');
-                            _AOI.AOIGUID = arr[0];
-                            _AOI.AOIName = nd.Parent.Parent.Parent.Text;
-
-                            SamplingLevelNewSampling();
-                            break;
-                        case "landing_site":
-                            arr = nd.Parent.Tag.ToString().Split(',');
-                            _AOI.AOIGUID = arr[0];
-                            _AOI.AOIName = nd.Parent.Text;
-
-                            _AOIName = _AOI.AOIName;
-                            _AOIGuid = _AOI.AOIGUID;
-                            _LandingSiteName = nd.Text;
-                            _LandingSiteGuid = nd.Name;
-                            break;
-                        case "gear":
-                            arr = nd.Parent.Parent.Tag.ToString().Split(',');
-                            _AOI.AOIGUID = arr[0];
-                            _AOI.AOIName = nd.Parent.Parent.Text;
-                            break;
-                    }
-                    arr = nd.Tag.ToString().Split(',');
                     if (_AOI.HaveEnumerators)
                     {
-                        switch (arr[1])
-                        {
-                            case "sampling":
-                                _LSNode = nd.Parent.Parent;
-                                arr = _LSNode.Tag.ToString().Split(',');
-                                _ls.LandingSiteGUID = arr[0];
-                                _ls.LandingSiteName = nd.Parent.Parent.Text;
-                                _ls.GearVariationName = nd.Parent.Text;
-                                arr = nd.Tag.ToString().Split(',');
-                                arr1 = arr[0].Split('|');
-                                _ls.GearVarGUID = arr1[1];
-                                break;
-                            case "landing_site":
-                                _LSNode = nd;
-                                _ls.LandingSiteGUID = arr[0];
-                                _ls.LandingSiteName = nd.Text;
-                                break;
-                            case "gear":
-                                _LSNode = nd.Parent;
-                                arr = _LSNode.Tag.ToString().Split(',');
-                                _ls.LandingSiteGUID = arr[0];
-                                _ls.LandingSiteName = _LSNode.Text;
-                                _ls.GearVariationName = nd.Text;
-                                arr = nd.Tag.ToString().Split(',');
-                                arr1 = arr[0].Split('|');
-                                _ls.GearVarGUID = arr1[1];
-                                break;
-                        }
-
                         NewSamplingForm();
-
                     }
                     else
                     {
@@ -2025,8 +2103,8 @@ namespace FAD3
                 GearClassGuid = _GearClassGUID,
                 GearVarGuid = _GearVarGUID,
                 GearVarName = _GearVarName,
-                AOIGuid = _AOIGuid,
-                AOIName = _AOIName,
+                AOIGuid = AOIGUID,
+                AOIName = AOIName,
                 LandingSiteName = _LandingSiteName,
                 LandingSiteGuid = _LandingSiteGuid,
                 AOI = _AOI
@@ -2037,24 +2115,6 @@ namespace FAD3
 
         }
 
-        private void SamplingLevelNewSampling()
-        {
-            if (_TreeLevel == "sampling" || _TreeLevel=="landing_site")
-            {
-                string[] arr;
-                var nd = treeView1.SelectedNode;
-                _AOIGuid = _AOI.AOIGUID;
-                _AOIName = _AOI.AOIName;
-                arr = nd.Parent.Name.Split('|');
-                _GearVarName = nd.Parent.Text;
-                _GearVarGUID = arr[1];
-                var kvGearClass = global.GearClassFromGearVar(_GearVarGUID);
-                _GearClassGUID = kvGearClass.Key;
-                _GearClassName = kvGearClass.Value;
-                _LandingSiteName = nd.Parent.Parent.Text;
-                _LandingSiteGuid = nd.Parent.Parent.Name;
-            }
-        }
 
         private void contextListViewMenuStrip_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
@@ -2062,7 +2122,6 @@ namespace FAD3
             switch (tsi.Name)
             {
                 case "addNewToolStripMenuItem":
-                    SamplingLevelNewSampling();
                     NewSamplingForm();
                     break;
                 case "deleteToolStripMenuItem":
@@ -2126,7 +2185,7 @@ namespace FAD3
         private void treeView1_MouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
-              ConfigDropDownMenu(treeView1);
+                ConfigDropDownMenu(treeView1);
         }
 
         private void listView1_MouseDown(object sender, MouseEventArgs e)

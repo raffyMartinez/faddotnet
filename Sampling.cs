@@ -23,6 +23,7 @@ namespace FAD3
     {
         public event ReadUIElement OnUIRowRead;
         public delegate void ReadUIElement(sampling s, UIRowFromXML e);
+        
 
         private string _SamplingGUID = "";
         private long _CatchAndEffortPropertyCount = 0;

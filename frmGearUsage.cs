@@ -168,14 +168,15 @@ namespace FAD3
                 //    }
                 //}
 
-                listViewLocalNames.With( o=>
-                 {
-                     if(o.Items.Count>0)
-                     {
-                         var i = o.SelectedItems[0].Index;
-                         o.EnsureVisible(i);
-                     }
-                 });
+                //listViewLocalNames.With(o =>
+                //{
+                //    if (o.Items.Count > 0)
+                //    {
+                //        o.Items[0].Selected = true;
+                //        var i = o.SelectedItems[0].Index;
+                //        o.EnsureVisible(i);
+                //    }
+                //});
             }
 
         }

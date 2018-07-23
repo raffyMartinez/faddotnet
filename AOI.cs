@@ -19,7 +19,7 @@ namespace FAD3
 	/// </summary>
 	public class aoi
 	{
-		private string _AOIGUID="";
+        private string _AOIGUID="";
 		private string _AOIName="";
 		private string _AOILetter="";
 		private string _MajorGrids="";
@@ -224,14 +224,16 @@ namespace FAD3
                 {
                     conection.Open();
                     string query = "SELECT AOIGuid, AOIName FROM tblAOI order by AOIName";
-                    var adapter = new OleDbDataAdapter(query, conection);
-                    adapter.Fill(dt);
-                    for (int i = 0; i < dt.Rows.Count; i++)
+                    using (var adapter = new OleDbDataAdapter(query, conection))
                     {
-                        DataRow dr = dt.Rows[i];
-                        myList.Add(dr["AOIGuid"].ToString(), dr["AOIName"].ToString());
-                        if (c != null)
-                            c.Items.Add(new KeyValuePair<string, string>(dr["AOIGuid"].ToString(), dr["AOIName"].ToString()));
+                        adapter.Fill(dt);
+                        for (int i = 0; i < dt.Rows.Count; i++)
+                        {
+                            DataRow dr = dt.Rows[i];
+                            myList.Add(dr["AOIGuid"].ToString(), dr["AOIName"].ToString());
+                            if (c != null)
+                                c.Items.Add(new KeyValuePair<string, string>(dr["AOIGuid"].ToString(), dr["AOIName"].ToString()));
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -276,15 +278,17 @@ namespace FAD3
                 {
                     conection.Open();
                     string query = "SELECT LSGUID, LSName FROM tblLandingSites WHERE AOIGuid= \"" + AOIguid + "\" order by LSName";
-                    var adapter = new OleDbDataAdapter(query, conection);
-                    adapter.Fill(dt);
-                    for (int i = 0; i < dt.Rows.Count; i++)
+                    using (var adapter = new OleDbDataAdapter(query, conection))
                     {
-                        DataRow dr = dt.Rows[i];
-                        LandingSites.Add(dr["LSGUID"].ToString(), dr["LSName"].ToString());
+                        adapter.Fill(dt);
+                        for (int i = 0; i < dt.Rows.Count; i++)
+                        {
+                            DataRow dr = dt.Rows[i];
+                            LandingSites.Add(dr["LSGUID"].ToString(), dr["LSName"].ToString());
 
-                        if (c != null)
-                         c.Items.Add(new KeyValuePair<string, string>(dr["LSGUID"].ToString(), dr["LSName"].ToString()));
+                            if (c != null)
+                                c.Items.Add(new KeyValuePair<string, string>(dr["LSGUID"].ToString(), dr["LSName"].ToString()));
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -445,14 +449,13 @@ namespace FAD3
 				try
 				{
 					conection.Open();
-					string query="Select AOIName, Letter, MajorGridList from tblAOI where AOIGuid = \"" + _AOIGUID + "\"";		
+					string query="Select AOIName, Letter from tblAOI where AOIGuid = \"" + _AOIGUID + "\"";		
 					var adapter = new OleDbDataAdapter(query, conection);
 					adapter.Fill(dt);
 					for( int i=0; i < dt.Rows.Count; i++){
 						DataRow dr = dt.Rows[i];
 						myData.Add("AOIName", dr["AOIName"].ToString());
-						myData.Add("Letter", dr["Letter"].ToString());
-						myData.Add("MajorGridList", dr["MajorGridList"].ToString());
+						myData.Add("Code", dr["Letter"].ToString());
 					}
 				}
 				catch (Exception ex)
@@ -536,17 +539,19 @@ namespace FAD3
 
                     string query = "Select EnumeratorID, EnumeratorName from tblEnumerators where TargetArea =\"" + AOIGuid + "\" " +
                                     "Order by EnumeratorName";
-                    var adapter = new OleDbDataAdapter(query, conection);
-                    adapter.Fill(myDT);
-                    for (int i = 0; i < myDT.Rows.Count; i++)
+                    using (var adapter = new OleDbDataAdapter(query, conection))
                     {
-                        DataRow dr = myDT.Rows[i];
-                        myAOIEnumerators.Add(dr["EnumeratorID"].ToString(), dr["EnumeratorName"].ToString());
-                        if(c != null)
+                        adapter.Fill(myDT);
+                        for (int i = 0; i < myDT.Rows.Count; i++)
                         {
-                            c.Items.Add( new KeyValuePair<string, string>(dr["EnumeratorID"].ToString(), dr["EnumeratorName"].ToString()));
+                            DataRow dr = myDT.Rows[i];
+                            myAOIEnumerators.Add(dr["EnumeratorID"].ToString(), dr["EnumeratorName"].ToString());
+                            if (c != null)
+                            {
+                                c.Items.Add(new KeyValuePair<string, string>(dr["EnumeratorID"].ToString(), dr["EnumeratorName"].ToString()));
+                            }
+
                         }
-                            
                     }
                 }
                 catch (Exception ex)
