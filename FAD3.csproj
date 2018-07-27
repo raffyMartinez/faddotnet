@@ -62,6 +62,12 @@
   <PropertyGroup>
     <ApplicationIcon>Fatcow-Farm-Fresh-Book-key.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>FAD3.Program</StartupObject>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -83,6 +89,12 @@
     <Compile Include="AOI.cs" />
     <Compile Include="ErrorLogger.cs" />
     <Compile Include="extension.cs" />
+    <Compile Include="FGExtentForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FGExtentForm.Designer.cs">
+      <DependentUpon>FGExtentForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="FishingGrid.cs" />
     <Compile Include="frmFishingGround.cs">
       <SubType>Form</SubType>
@@ -138,23 +150,11 @@
     <Compile Include="frmEditLF.Designer.cs">
       <DependentUpon>frmEditLF.cs</DependentUpon>
     </Compile>
-    <Compile Include="frmEffort.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmEffort.Designer.cs">
-      <DependentUpon>frmEffort.cs</DependentUpon>
-    </Compile>
     <Compile Include="frmEnumerator.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="frmEnumerator.Designer.cs">
       <DependentUpon>frmEnumerator.cs</DependentUpon>
-    </Compile>
-    <Compile Include="frmFG.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmFG.Designer.cs">
-      <DependentUpon>frmFG.cs</DependentUpon>
     </Compile>
     <Compile Include="frmEditGMS.cs">
       <SubType>Form</SubType>
@@ -202,6 +202,19 @@
     <Compile Include="global.cs" />
     <Compile Include="LandingSite.cs" />
     <Compile Include="LatLngUTMConverter.cs" />
+    <Compile Include="ManageGearSpecsClass.cs" />
+    <Compile Include="ManageGearSpecsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ManageGearSpecsForm.Designer.cs">
+      <DependentUpon>ManageGearSpecsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ManageMRUForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ManageMRUForm.Designer.cs">
+      <DependentUpon>ManageMRUForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="mru.cs" />
     <Compile Include="names.cs" />
     <Compile Include="Program.cs" />
@@ -216,6 +229,9 @@
     <Compile Include="UIRow.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="FGExtentForm.resx">
+      <DependentUpon>FGExtentForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmFishingGround.resx">
       <DependentUpon>frmFishingGround.cs</DependentUpon>
     </EmbeddedResource>
@@ -240,14 +256,8 @@
     <EmbeddedResource Include="frmEditLF.resx">
       <DependentUpon>frmEditLF.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmEffort.resx">
-      <DependentUpon>frmEffort.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="frmEnumerator.resx">
       <DependentUpon>frmEnumerator.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmFG.resx">
-      <DependentUpon>frmFG.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmEditGMS.resx">
       <DependentUpon>frmEditGMS.cs</DependentUpon>
@@ -272,6 +282,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmVesselDimension.resx">
       <DependentUpon>frmVesselDimension.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ManageGearSpecsForm.resx">
+      <DependentUpon>ManageGearSpecsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ManageMRUForm.resx">
+      <DependentUpon>ManageMRUForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

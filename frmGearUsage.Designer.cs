@@ -54,7 +54,6 @@
             this.listViewVariations.Click += new System.EventHandler(this.OnlistView_Click);
             this.listViewVariations.MouseClick += new System.Windows.Forms.MouseEventHandler(this.OnlistView_MouseClick);
             this.listViewVariations.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnListView_MouseDown);
-            this.listViewVariations.MouseUp += new System.Windows.Forms.MouseEventHandler(this.OnlistView_MouseUp);
             // 
             // dropDownMenu
             // 
@@ -73,7 +72,6 @@
             this.listViewCodes.Click += new System.EventHandler(this.OnlistView_Click);
             this.listViewCodes.MouseClick += new System.Windows.Forms.MouseEventHandler(this.OnlistView_MouseClick);
             this.listViewCodes.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnListView_MouseDown);
-            this.listViewCodes.MouseUp += new System.Windows.Forms.MouseEventHandler(this.OnlistView_MouseUp);
             // 
             // listViewWhereUsed
             // 
@@ -86,7 +84,6 @@
             this.listViewWhereUsed.Click += new System.EventHandler(this.OnlistView_Click);
             this.listViewWhereUsed.MouseClick += new System.Windows.Forms.MouseEventHandler(this.OnlistView_MouseClick);
             this.listViewWhereUsed.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnListView_MouseDown);
-            this.listViewWhereUsed.MouseUp += new System.Windows.Forms.MouseEventHandler(this.OnlistView_MouseUp);
             // 
             // listViewLocalNames
             // 
@@ -99,7 +96,6 @@
             this.listViewLocalNames.Click += new System.EventHandler(this.OnlistView_Click);
             this.listViewLocalNames.MouseClick += new System.Windows.Forms.MouseEventHandler(this.OnlistView_MouseClick);
             this.listViewLocalNames.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnListView_MouseDown);
-            this.listViewLocalNames.MouseUp += new System.Windows.Forms.MouseEventHandler(this.OnlistView_MouseUp);
             // 
             // buttonOk
             // 

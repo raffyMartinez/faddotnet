@@ -209,6 +209,8 @@ namespace FAD3
 
         public static void GetGenus_LocalNames()
         {
+            _LocalNameList.Clear();
+            _GenusList.Clear();
             DataTable dt = new DataTable();
             using (var conection = new OleDbConnection(global.ConnectionString))
             {

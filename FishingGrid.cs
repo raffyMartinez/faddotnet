@@ -17,18 +17,51 @@ namespace FAD3
         private static fadGridType _gt = fadGridType.gridTypeNone;
         private static List<string> _UTMZones = new List<string>();
         private static string _appPath;
+        private static fadSubgridSyle _SubGridStyle = fadSubgridSyle.SubgridStyleNone;
 
         static FishingGrid()
         {
-            _UTMZones.Add("Zone 50N");
-            _UTMZones.Add("Zone 51N");
+            _UTMZones.Add("50N");
+            _UTMZones.Add("51N");
             _appPath = global.ApplicationPath;
+        }
+
+        public static fadSubgridSyle SubGridStyle
+        {
+            get { return _SubGridStyle; }
+            set
+            {
+                _SubGridStyle = value;
+                SaveSubGridType();
+            }
         }
 
         public static fadGridType GridType
         {
             get { return _gt; }
+
         }
+
+        public static bool ValidGridCorners(string ULGrid, string LRGrid)
+        {
+            var EastingUL = 0;
+            var NorthingUL = 0;
+            var EastingLR = 0;
+            var NorthingLR = 0;
+
+            Grid25_to_UTM(ULGrid,  out EastingUL, out NorthingUL);
+            Grid25_to_UTM(LRGrid, out EastingLR, out NorthingLR);
+
+            return EastingUL <= EastingLR && NorthingUL >= NorthingLR;
+        }
+
+        public static bool ValidFGName(fadUTMZone UTMZone, string FGGridName, out string ErrMsg)
+        {
+            bool ValidName = false;
+            ParseGridName(UTMZone, FGGridName, out ValidName, out ErrMsg);
+            return ValidName;
+        }
+
 
         public static string GridTypeName
         {
@@ -53,6 +86,22 @@ namespace FAD3
             }
         }
 
+        public static fadUTMZone ZoneFromZoneName(string ZoneName)
+        {
+            fadUTMZone myZone = fadUTMZone.utmZone_Undefined;
+            switch (ZoneName)
+            {
+                case "50N":
+                    myZone = fadUTMZone.utmZone50N;
+                    break;
+                case "51N":
+                    myZone = fadUTMZone.utmZone51N;
+                    break;
+            }
+            return myZone;
+
+        }
+
         public static string UTMZoneName
         {
             get
@@ -61,10 +110,10 @@ namespace FAD3
                 switch (_utmZone)
                 {
                     case fadUTMZone.utmZone50N:
-                        ZoneName = "Zone 50N";
+                        ZoneName = "50N";
                         break;
                     case fadUTMZone.utmZone51N:
-                        ZoneName = "Zone 51N";
+                        ZoneName = "51N";
                         break;
                 }
                 return ZoneName;
@@ -75,10 +124,69 @@ namespace FAD3
         {
             get
             {
-                return  _gt == fadGridType.gridTypeGrid25 && _grid25.UTMZone != fadUTMZone.utmZone_Undefined
+                return _gt == fadGridType.gridTypeGrid25 && _grid25.UTMZone != fadUTMZone.utmZone_Undefined
                         && _grid25.Bounds.Count > 0 && _grid25.GridSet.Count > 0;
- 
+
             }
+        }
+
+        public static GridNameStruct ParseGridName(fadUTMZone UTMZone, string GridName, out bool ValidName, out string ErrMsg)
+        {
+            ErrMsg = "";
+            GridNameStruct myNameStruct = new GridNameStruct();
+            var arr = GridName.Split('-');
+            ValidName = arr.Length == 2;
+            if (ValidName)
+            {
+                try
+                {
+                    int MajorGrid = int.Parse(arr[0]);
+                    SetParametersOfZone(UTMZone);
+                    ValidName = MajorGrid <= _grid25.MaxGridNumber;
+                    if (ValidName)
+                    {
+
+                        var col = arr[1].Substring(0, 1).ToUpper().ToCharArray()[0];
+                        try
+                        {
+                            var row = int.Parse(arr[1].Substring(1, arr[1].Length - 1));
+                            ValidName = (row > 0 && row < 26 && col >= 'A' && col < 'Z');
+                            if (!ValidName)
+                            {
+                                ErrMsg = "Column names must be from A to Y \r\nand row names mut be from 1 to 25";
+                            }
+                            else
+                            {
+                                myNameStruct.MajorGridNumber = MajorGrid;
+                                myNameStruct.ColumnName = col.ToString();
+                                myNameStruct.ColumnNameChar = col;
+                                myNameStruct.RowName = row;
+                            }
+                        }
+                        catch
+                        {
+                            ValidName = false;
+                            ErrMsg = "Column names must be from A to Y \r\nand row names mut be from 1 to 25";
+                        }
+
+                    }
+                    else
+                    {
+                        ErrMsg = "MajorGrid number must not exceed " + _grid25.MaxGridNumber;
+                    }
+                }
+                catch
+                {
+                    ValidName = false;
+                    ErrMsg = arr[0] + " is not a correct major grid name";
+                }
+            }
+            else
+            {
+                ErrMsg = "Fishing ground grid name is not correct";
+            }
+
+            return myNameStruct;
         }
 
         public static List<string> UTMZones
@@ -96,13 +204,19 @@ namespace FAD3
             {
                 _AOIGuid = value;
                 _gt = SetupFishingGrid(_AOIGuid);
+                GetSubgridType();
             }
         }
 
         public static fadUTMZone UTMZone
         {
             get { return _utmZone; }
-            set { _utmZone = value; }
+            set
+            {
+                _utmZone = value;
+                SetParametersOfZone(_utmZone);
+            }
+
         }
 
         public static Grid25Struct Grid25
@@ -132,6 +246,21 @@ namespace FAD3
             utmZone51N
         }
 
+        public enum fadSubgridSyle
+        {
+            SubgridStyleNone,
+            SubgridStyle4,
+            SubgridStyle9
+        }
+
+        public struct GridNameStruct
+        {
+            public int MajorGridNumber { get; set; }
+            public string ColumnName { get; set; }
+            public char ColumnNameChar { get; set; }
+            public int RowName { get; set; }
+        }
+
         public struct LLBounds
         {
             public double ulX;
@@ -142,7 +271,6 @@ namespace FAD3
             public string lrGridName;
             public string gridDescription;
         }
-
 
         public static bool MinorGridIsInland(string MinorGridName)
         {
@@ -166,6 +294,30 @@ namespace FAD3
             return IsInland;
         }
 
+
+        static void SetParametersOfZone(fadUTMZone Zone)
+        {
+            //set major grids in a utm zone
+            _grid25.UTMZone = Zone;
+            switch (_grid25.UTMZone)
+            {
+                case fadUTMZone.utmZone51N:
+                    _grid25.MajorGridXOrigin = -500000;
+                    _grid25.MajorGridYOrigin = 350000;
+                    _grid25.MajorGridColumns = 30;
+                    _grid25.MaxGridNumber = 1230;
+                    _grid25.CellSize = 2000;
+                    break;
+                case fadUTMZone.utmZone50N:
+                    _grid25.MajorGridXOrigin = 300000;
+                    _grid25.MajorGridYOrigin = 800000;
+                    _grid25.MajorGridColumns = 15;
+                    _grid25.MaxGridNumber = 270;
+                    _grid25.CellSize = 2000;
+                    break;
+            }
+            _grid25.MajorGridSizeMeters = 50000;
+        }
         /// <summary>
         /// Sets up the fishing ground
         /// 1. reads the grid system used
@@ -229,26 +381,7 @@ namespace FAD3
 
                                         if (UTMZoneSet)
                                         {
-                                            //set major grids in a utm zone
-                                            _grid25.UTMZone = _utmZone;
-                                            switch (_grid25.UTMZone)
-                                            {
-                                                case fadUTMZone.utmZone51N:
-                                                    _grid25.MajorGridXOrigin = -500000;
-                                                    _grid25.MajorGridYOrigin = 350000;
-                                                    _grid25.MajorGridColumns = 30;
-                                                    _grid25.MaxGridNumber = 1230;
-                                                    _grid25.CellSize = 2000;
-                                                    break;
-                                                case fadUTMZone.utmZone50N:
-                                                    _grid25.MajorGridXOrigin = 300000;
-                                                    _grid25.MajorGridYOrigin = 800000;
-                                                    _grid25.MajorGridColumns = 15;
-                                                    _grid25.MaxGridNumber = 270;
-                                                    _grid25.CellSize = 2000;
-                                                    break;
-                                            }
-                                            _grid25.MajorGridSizeMeters = 50000;
+                                            SetParametersOfZone(_utmZone);
 
                                             //read fishing grid bounds
                                             var myBound = new LLBounds();
@@ -383,6 +516,88 @@ namespace FAD3
             }
         }
 
+        public static bool MajorGridFound(string MajorGridName)
+        {
+            return _grid25.GridSet.Contains(MajorGridName);
+        }
+
+        public static List<String> AdditionalFishingGrounds(string SamplingGuid)
+        {
+            var myList = new List<string>();
+            using (var dt = new DataTable())
+            {
+                using (var conection = new OleDbConnection(global.ConnectionString))
+                {
+                    try
+                    {
+                        conection.Open();
+                        var query = "Select GridName from tblGrid where SamplingGUID ='{" + SamplingGuid + "}'";
+
+                        using (var adapter = new OleDbDataAdapter(query, conection))
+                        {
+                            adapter.Fill(dt);
+                            for (int i = 0; i < dt.Rows.Count; i++)
+                            {
+                                var dr = dt.Rows[i];
+                                myList.Add(dr["GridName"].ToString());
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        ErrorLogger.Log(ex);
+                    }
+                }
+            }
+
+            return myList;
+        }
+
+        private static bool SaveSubGridType()
+        {
+            var Success = false;
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    var sql = "Update tblAOI set SubgridStyle =" + (int)_SubGridStyle + " where AOIGuid ='{" + _AOIGuid + "}'";
+                    OleDbCommand update = new OleDbCommand(sql, conn);
+                    conn.Open();
+                    Success = (update.ExecuteNonQuery() > 0);
+                    conn.Close();
+                }
+                catch { }
+            }
+            return Success;
+        }
+
+        private static void GetSubgridType()
+        {
+            using (var dt = new DataTable())
+            {
+                using (var conection = new OleDbConnection(global.ConnectionString))
+                {
+                    try
+                    {
+                        conection.Open();
+                        string query = "SELECT SubgridStyle FROM tblAOI WHERE AOIGuid='{" + _AOIGuid + "}'";
+                        using (var adapter = new OleDbDataAdapter(query, conection))
+                        {
+                            adapter.Fill(dt);
+                            DataRow dr = dt.Rows[0];
+                            _SubGridStyle = (fadSubgridSyle)int.Parse(dr["SubgridStyle"].ToString());
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        ErrorLogger.Log(ex);
+                    }
+
+                }
+            }
+
+        }
+
         static int MajorGridColPosition(int GridNo)
         {
             var rv = 0;
@@ -447,6 +662,14 @@ namespace FAD3
             int x, y = 0;
             MinorGridCentroid(GridName, out x, out y);
             return UTMZoneName + " " + x + " " + y;
+
+        }
+
+        public static string Grid25_to_UTM(string GridName, out int Easting, out int Northing)
+        {
+            Easting = Northing = 0;
+            MinorGridCentroid(GridName, out Easting, out Northing);
+            return UTMZoneName + " " + Easting + " " + Northing;
 
         }
 

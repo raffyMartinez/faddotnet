@@ -24,10 +24,14 @@ namespace FAD3
         //private ToolStripSeparator Separator;
         private ToolStripMenuItem[] MenuItems;
 
+
         // Raised when the user selects a file from the MRU list.
         public delegate void FileSelectedEventHandler(string file_name);
         public event FileSelectedEventHandler FileSelected;
 
+        //Raise when the user wants to manage the MRU
+        public delegate void ManageMRUEventHandler(object sender, EventArgs e);
+        public event ManageMRUEventHandler ManageMRU;
 
 
         // Constructor.
@@ -62,6 +66,27 @@ namespace FAD3
 
             // Display the items.
             ShowFiles();
+
+            //Add menu item to manage this list
+            if (FileInfos.Count > 0)
+            {
+                _MyMenu.DropDownItems.Add("-");
+                var MenuItem = _MyMenu.DropDownItems.Add("Manage this list");
+                MenuItem.Name = "menuManageMRUList";
+                MenuItem.ToolTipText = "Manage list of recent items";
+                MenuItem.Click += ManageMRU_Click;
+            }
+        }
+
+        public List<FileInfo> FileList
+        {
+            get { return FileInfos; }
+            set
+            {
+                FileInfos = value;
+                ShowFiles();
+                SaveFiles();
+            }
         }
 
         // Load saved items from the Registry.
@@ -76,7 +101,7 @@ namespace FAD3
                 {
                     FileInfos.Add(new FileInfo(file_name));
                 }
-            }           
+            }
         }
 
         // Save the current items in the Registry.
@@ -151,6 +176,7 @@ namespace FAD3
                 MenuItems[i].Tag = FileInfos[i];
                 MenuItems[i].Click -= File_Click;
                 MenuItems[i].Click += File_Click;
+                MenuItems[i].ToolTipText = FileInfos[i].FullName;
             }
             for (int i = FileInfos.Count; i < _NumFiles; i++)
             {
@@ -174,5 +200,12 @@ namespace FAD3
             }
         }
 
+        // The user wants to be able to manage the list MRU files
+        // How this is implemented is left to the user.
+        private void ManageMRU_Click(object sender, EventArgs e)
+        {
+            //Raise the event
+            ManageMRU(sender, e);
+        }
     }
 }

@@ -25,6 +25,8 @@ namespace FAD3
         private bool _IsNew = false;
         static frmAOI _instance;
         private frmMain _parent_form;
+        int _MouseX;
+        int _MouseY;
 
         public frmMain Parent_form
         {
@@ -90,6 +92,7 @@ namespace FAD3
                         tabPageName = "tabGrid25";
                         break;
                 }
+
                 if (FishingGrid.GridType != FishingGrid.fadGridType.gridTypeNone)
                 {
                     var mytab = tabAOI.TabPages[tabPageName];
@@ -102,6 +105,7 @@ namespace FAD3
                     comboUTMZone.Items.Add(item.ToString());
                 }
                 comboUTMZone.Text = FishingGrid.UTMZoneName;
+                comboSubGrid.SelectedIndex = (int)FishingGrid.SubGridStyle;
             }
         }
 
@@ -111,14 +115,15 @@ namespace FAD3
         {
             txtName.Focus();
             var lv = (ListView)tabAOI.TabPages["tabGrid25"].Controls["lvMaps"];
-            lv.With( o=>
-            {
-                o.View = View.Details;
-                o.Columns.Add("Description");
-                o.Columns.Add("Upper left");
-                o.Columns.Add("Lower right");
-                o.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
-            });
+            lv.With(o =>
+           {
+               o.View = View.Details;
+               o.Columns.Add("Description");
+               o.Columns.Add("Upper left");
+               o.Columns.Add("Lower right");
+               o.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
+               o.FullRowSelect = true;
+           });
 
         }
 
@@ -136,12 +141,12 @@ namespace FAD3
             }
         }
 
-        void Button2Click(object sender, EventArgs e)
+        void OnButtonCancelClick(object sender, EventArgs e)
         {
             this.Close();
         }
 
-        void Button1Click(object sender, EventArgs e)
+        void OnButtonOKClick(object sender, EventArgs e)
         {
             Dictionary<string, string> MyData = new Dictionary<string, string>();
             if (!string.IsNullOrEmpty(txtName.Text) &&
@@ -182,6 +187,9 @@ namespace FAD3
 
         private void frmAOI_FormClosed(object sender, FormClosedEventArgs e)
         {
+            if (FishingGrid.GridType == FishingGrid.fadGridType.gridTypeGrid25)
+                FishingGrid.SubGridStyle = (FishingGrid.fadSubgridSyle)comboSubGrid.SelectedIndex;
+
             _instance = null;
         }
 
@@ -194,6 +202,66 @@ namespace FAD3
         {
             //TabPage tp = ((TabControl)sender).SelectedTab;
             //ShowTabPanels(tp.Name);
+        }
+
+        private void lvMaps_MouseDown(object sender, MouseEventArgs e)
+        {
+            _MouseX = e.X;
+            _MouseY = e.Y;
+        }
+
+        private void lvMaps_DoubleClick(object sender, EventArgs e)
+        {
+            var HitItem = lvMaps.HitTest(_MouseX, _MouseY);
+            var lvi = HitItem.Item;
+            if (lvi != null)
+            {
+                ShowGridMapForm(lvi);
+            }
+            else
+            {
+                ShowGridMapForm();
+            }
+        }
+
+        private void ShowGridMapForm(ListViewItem lvi = null)
+        {
+            FGExtentForm fge;
+            if (lvi == null)
+            {
+                fge = new FGExtentForm();
+                fge.UTMZone = FishingGrid.ZoneFromZoneName(comboUTMZone.Text);
+            }
+            else
+            {
+                var UTMZone = FishingGrid.ZoneFromZoneName(comboUTMZone.Text);
+                fge = new FGExtentForm(UTMZone, lvi.Text, lvi.SubItems[1].Text, lvi.SubItems[2].Text);
+            }
+            fge.ShowDialog(this);
+        }
+
+        private void OnbuttonGrid25_Click(object sender, EventArgs e)
+        {
+            switch (((Button)sender).Name)
+            {
+                case "buttonAddMap":
+                    if (comboUTMZone.Text.Length > 0)
+                    {
+                        if (lvMaps.SelectedItems.Count == 0)
+                            ShowGridMapForm();
+                        else
+                            ShowGridMapForm(lvMaps.SelectedItems[0]);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Please select a UTM zone", "UTM zone is missing", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        comboUTMZone.Select();
+                    }
+
+                    break;
+                case "buttonRemoveMap":
+                    break;
+            }
         }
     }
 }

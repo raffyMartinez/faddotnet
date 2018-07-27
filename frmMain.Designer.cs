@@ -42,22 +42,23 @@ namespace FAD3
             this.treeView1 = new System.Windows.Forms.TreeView();
             this.menuDropDown = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
+            this.labelErrorDetail = new System.Windows.Forms.Label();
+            this.lblErrorFormOpen = new System.Windows.Forms.Label();
+            this.lblTitle = new System.Windows.Forms.Label();
             this.panelSamplingButtons = new System.Windows.Forms.Panel();
             this.buttonMap = new System.Windows.Forms.Button();
             this.buttonCatch = new System.Windows.Forms.Button();
             this.buttonOK = new System.Windows.Forms.Button();
-            this.lblErrorFormOpen = new System.Windows.Forms.Label();
             this.listView1 = new System.Windows.Forms.ListView();
-            this.lblTitle = new System.Windows.Forms.Label();
-            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
-            this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuMenuBar = new System.Windows.Forms.MenuStrip();
+            this.menuFile = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripFileNewMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripFileOpen = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripRecentlyOpened = new System.Windows.Forms.ToolStripMenuItem();
             this.testToolStripRecentOpenedList = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuTools = new System.Windows.Forms.ToolStripMenuItem();
             this.resetReferenceNumbersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.referenceNumberRangeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.coordinateFormatToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -66,7 +67,7 @@ namespace FAD3
             this.uTMZone50ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.uTMZone51ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.showErrorMessagesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.onlineManualToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
@@ -75,21 +76,21 @@ namespace FAD3
             this.statusPanelLandingSite = new System.Windows.Forms.ToolStripStatusLabel();
             this.statusPanelGearUsed = new System.Windows.Forms.ToolStripStatusLabel();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-            this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
-            this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
-            this.toolStripButton3 = new System.Windows.Forms.ToolStripButton();
-            this.toolStripButton4 = new System.Windows.Forms.ToolStripButton();
-            this.toolStripButton5 = new System.Windows.Forms.ToolStripButton();
-            this.toolStripButton6 = new System.Windows.Forms.ToolStripButton();
+            this.tsToolbar = new System.Windows.Forms.ToolStrip();
+            this.tbButtonAbout = new System.Windows.Forms.ToolStripButton();
+            this.tbButtonGears = new System.Windows.Forms.ToolStripButton();
+            this.tbButtonSpecies = new System.Windows.Forms.ToolStripButton();
+            this.tbButtonReport = new System.Windows.Forms.ToolStripButton();
+            this.tbButtonMap = new System.Windows.Forms.ToolStripButton();
+            this.tbButtonExit = new System.Windows.Forms.ToolStripButton();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
             this.panelSamplingButtons.SuspendLayout();
-            this.menuStrip1.SuspendLayout();
+            this.menuMenuBar.SuspendLayout();
             this.statusStrip1.SuspendLayout();
-            this.toolStrip1.SuspendLayout();
+            this.tsToolbar.SuspendLayout();
             this.SuspendLayout();
             // 
             // splitContainer1
@@ -106,6 +107,7 @@ namespace FAD3
             // 
             // splitContainer1.Panel2
             // 
+            this.splitContainer1.Panel2.Controls.Add(this.labelErrorDetail);
             this.splitContainer1.Panel2.Controls.Add(this.lblErrorFormOpen);
             this.splitContainer1.Panel2.Controls.Add(this.lblTitle);
             this.splitContainer1.Panel2.Controls.Add(this.panelSamplingButtons);
@@ -130,7 +132,6 @@ namespace FAD3
             this.treeView1.Size = new System.Drawing.Size(234, 445);
             this.treeView1.TabIndex = 0;
             this.treeView1.AfterExpand += new System.Windows.Forms.TreeViewEventHandler(this.TreeView1AfterExpand);
-            this.treeView1.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.TreeView1BeforeSelect);
             this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreeView1AfterSelect);
             this.treeView1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.treeView1_MouseDown);
             // 
@@ -155,6 +156,39 @@ namespace FAD3
             this.imageList1.Images.SetKeyName(8, "seines");
             this.imageList1.Images.SetKeyName(9, "traps");
             this.imageList1.Images.SetKeyName(10, "db");
+            // 
+            // labelErrorDetail
+            // 
+            this.labelErrorDetail.BackColor = System.Drawing.SystemColors.Window;
+            this.labelErrorDetail.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelErrorDetail.Location = new System.Drawing.Point(249, 271);
+            this.labelErrorDetail.Name = "labelErrorDetail";
+            this.labelErrorDetail.Size = new System.Drawing.Size(284, 108);
+            this.labelErrorDetail.TabIndex = 6;
+            this.labelErrorDetail.Text = "label1";
+            this.labelErrorDetail.Visible = false;
+            // 
+            // lblErrorFormOpen
+            // 
+            this.lblErrorFormOpen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblErrorFormOpen.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblErrorFormOpen.Location = new System.Drawing.Point(-1, 179);
+            this.lblErrorFormOpen.Name = "lblErrorFormOpen";
+            this.lblErrorFormOpen.Size = new System.Drawing.Size(683, 92);
+            this.lblErrorFormOpen.TabIndex = 4;
+            this.lblErrorFormOpen.Text = "label1";
+            this.lblErrorFormOpen.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblErrorFormOpen.Visible = false;
+            // 
+            // lblTitle
+            // 
+            this.lblTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblTitle.Location = new System.Drawing.Point(3, 3);
+            this.lblTitle.Name = "lblTitle";
+            this.lblTitle.Size = new System.Drawing.Size(481, 22);
+            this.lblTitle.TabIndex = 2;
+            this.lblTitle.Text = "label1";
             // 
             // panelSamplingButtons
             // 
@@ -201,19 +235,6 @@ namespace FAD3
             this.buttonOK.UseVisualStyleBackColor = true;
             this.buttonOK.Click += new System.EventHandler(this.buttonSamplingClick);
             // 
-            // lblErrorFormOpen
-            // 
-            this.lblErrorFormOpen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.lblErrorFormOpen.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblErrorFormOpen.Location = new System.Drawing.Point(-1, 179);
-            this.lblErrorFormOpen.Name = "lblErrorFormOpen";
-            this.lblErrorFormOpen.Size = new System.Drawing.Size(683, 92);
-            this.lblErrorFormOpen.TabIndex = 4;
-            this.lblErrorFormOpen.Text = "label1";
-            this.lblErrorFormOpen.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lblErrorFormOpen.Visible = false;
-            // 
             // listView1
             // 
             this.listView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -232,39 +253,30 @@ namespace FAD3
             this.listView1.Leave += new System.EventHandler(this.ListView1Leave);
             this.listView1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.listView1_MouseDown);
             // 
-            // lblTitle
+            // menuMenuBar
             // 
-            this.lblTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblTitle.Location = new System.Drawing.Point(3, 3);
-            this.lblTitle.Name = "lblTitle";
-            this.lblTitle.Size = new System.Drawing.Size(481, 22);
-            this.lblTitle.TabIndex = 2;
-            this.lblTitle.Text = "label1";
+            this.menuMenuBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuFile,
+            this.menuTools,
+            this.menuHelp});
+            this.menuMenuBar.Location = new System.Drawing.Point(0, 0);
+            this.menuMenuBar.Name = "menuMenuBar";
+            this.menuMenuBar.Size = new System.Drawing.Size(929, 24);
+            this.menuMenuBar.TabIndex = 1;
+            this.menuMenuBar.Text = "menuStrip1";
             // 
-            // menuStrip1
+            // menuFile
             // 
-            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStripMenuItem,
-            this.toolsToolStripMenuItem,
-            this.helpToolStripMenuItem});
-            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
-            this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(929, 24);
-            this.menuStrip1.TabIndex = 1;
-            this.menuStrip1.Text = "menuStrip1";
-            // 
-            // fileToolStripMenuItem
-            // 
-            this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuFile.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripFileNewMenuItem,
-            this.toolStripMenuItem2,
+            this.toolStripFileOpen,
             this.toolStripRecentlyOpened,
             this.toolStripSeparator1,
             this.exitToolStripMenuItem});
-            this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
-            this.fileToolStripMenuItem.Text = "File";
-            this.fileToolStripMenuItem.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.fileToolStripMenuItem_DropDownItemClicked);
+            this.menuFile.Name = "menuFile";
+            this.menuFile.Size = new System.Drawing.Size(37, 20);
+            this.menuFile.Text = "File";
+            this.menuFile.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnMenuFile_DropDownItemClicked);
             // 
             // toolStripFileNewMenuItem
             // 
@@ -274,13 +286,13 @@ namespace FAD3
             this.toolStripFileNewMenuItem.Tag = "new";
             this.toolStripFileNewMenuItem.Text = "New ...";
             // 
-            // toolStripMenuItem2
+            // toolStripFileOpen
             // 
-            this.toolStripMenuItem2.Image = global::FAD3.Properties.Resources.OpenFileFromProject_16x;
-            this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(162, 22);
-            this.toolStripMenuItem2.Tag = "open";
-            this.toolStripMenuItem2.Text = "Open ...";
+            this.toolStripFileOpen.Image = global::FAD3.Properties.Resources.OpenFileFromProject_16x;
+            this.toolStripFileOpen.Name = "toolStripFileOpen";
+            this.toolStripFileOpen.Size = new System.Drawing.Size(162, 22);
+            this.toolStripFileOpen.Tag = "open";
+            this.toolStripFileOpen.Text = "Open ...";
             // 
             // toolStripRecentlyOpened
             // 
@@ -310,19 +322,19 @@ namespace FAD3
             this.exitToolStripMenuItem.Tag = "exit";
             this.exitToolStripMenuItem.Text = "Exit";
             // 
-            // toolsToolStripMenuItem
+            // menuTools
             // 
-            this.toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuTools.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.resetReferenceNumbersToolStripMenuItem,
             this.referenceNumberRangeToolStripMenuItem,
             this.coordinateFormatToolStripMenuItem,
             this.symbolFontsToolStripMenuItem,
             this.generateGridMapToolStripMenuItem,
             this.showErrorMessagesToolStripMenuItem});
-            this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
-            this.toolsToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
-            this.toolsToolStripMenuItem.Text = "Tools";
-            this.toolsToolStripMenuItem.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.toolsToolStripMenuItem_DropDownItemClicked);
+            this.menuTools.Name = "menuTools";
+            this.menuTools.Size = new System.Drawing.Size(48, 20);
+            this.menuTools.Text = "Tools";
+            this.menuTools.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnMenuTools_DropDownItemClicked);
             // 
             // resetReferenceNumbersToolStripMenuItem
             // 
@@ -383,15 +395,15 @@ namespace FAD3
             this.showErrorMessagesToolStripMenuItem.Tag = "showError";
             this.showErrorMessagesToolStripMenuItem.Text = "Show error messages";
             // 
-            // helpToolStripMenuItem
+            // menuHelp
             // 
-            this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuHelp.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.aboutToolStripMenuItem,
             this.onlineManualToolStripMenuItem});
-            this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
-            this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
-            this.helpToolStripMenuItem.Text = "Help";
-            this.helpToolStripMenuItem.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.helpToolStripMenuItem_DropDownItemClicked);
+            this.menuHelp.Name = "menuHelp";
+            this.menuHelp.Size = new System.Drawing.Size(44, 20);
+            this.menuHelp.Text = "Help";
+            this.menuHelp.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnMenuHelp_DropDownItemClicked);
             // 
             // aboutToolStripMenuItem
             // 
@@ -426,7 +438,7 @@ namespace FAD3
             this.statusPanelDBPath.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
             | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
             | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
-            this.statusPanelDBPath.BorderStyle = System.Windows.Forms.Border3DStyle.Sunken;
+            this.statusPanelDBPath.BorderStyle = System.Windows.Forms.Border3DStyle.Etched;
             this.statusPanelDBPath.DoubleClickEnabled = true;
             this.statusPanelDBPath.Name = "statusPanelDBPath";
             this.statusPanelDBPath.Size = new System.Drawing.Size(53, 21);
@@ -439,7 +451,7 @@ namespace FAD3
             this.statusPanelTargetArea.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
             | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
             | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
-            this.statusPanelTargetArea.BorderStyle = System.Windows.Forms.Border3DStyle.Sunken;
+            this.statusPanelTargetArea.BorderStyle = System.Windows.Forms.Border3DStyle.Etched;
             this.statusPanelTargetArea.Name = "statusPanelTargetArea";
             this.statusPanelTargetArea.Size = new System.Drawing.Size(80, 21);
             this.statusPanelTargetArea.Text = "Target area";
@@ -451,7 +463,7 @@ namespace FAD3
             this.statusPanelLandingSite.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
             | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
             | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
-            this.statusPanelLandingSite.BorderStyle = System.Windows.Forms.Border3DStyle.Sunken;
+            this.statusPanelLandingSite.BorderStyle = System.Windows.Forms.Border3DStyle.Etched;
             this.statusPanelLandingSite.Name = "statusPanelLandingSite";
             this.statusPanelLandingSite.Size = new System.Drawing.Size(4, 21);
             this.statusPanelLandingSite.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -462,7 +474,7 @@ namespace FAD3
             this.statusPanelGearUsed.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
             | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
             | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
-            this.statusPanelGearUsed.BorderStyle = System.Windows.Forms.Border3DStyle.Sunken;
+            this.statusPanelGearUsed.BorderStyle = System.Windows.Forms.Border3DStyle.Etched;
             this.statusPanelGearUsed.Name = "statusPanelGearUsed";
             this.statusPanelGearUsed.Size = new System.Drawing.Size(4, 21);
             this.statusPanelGearUsed.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -471,118 +483,117 @@ namespace FAD3
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
             // 
-            // toolStrip1
+            // tsToolbar
             // 
-            this.toolStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
-            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripButton1,
-            this.toolStripButton2,
-            this.toolStripButton3,
-            this.toolStripButton4,
-            this.toolStripButton5,
-            this.toolStripButton6});
-            this.toolStrip1.Location = new System.Drawing.Point(0, 24);
-            this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(929, 31);
-            this.toolStrip1.TabIndex = 3;
-            this.toolStrip1.Text = "toolStrip1";
-            this.toolStrip1.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.toolStrip1_ItemClicked);
+            this.tsToolbar.ImageScalingSize = new System.Drawing.Size(24, 24);
+            this.tsToolbar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tbButtonAbout,
+            this.tbButtonGears,
+            this.tbButtonSpecies,
+            this.tbButtonReport,
+            this.tbButtonMap,
+            this.tbButtonExit});
+            this.tsToolbar.Location = new System.Drawing.Point(0, 24);
+            this.tsToolbar.Name = "tsToolbar";
+            this.tsToolbar.Size = new System.Drawing.Size(929, 31);
+            this.tsToolbar.TabIndex = 3;
+            this.tsToolbar.Text = "tsToolbar";
+            this.tsToolbar.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnToolbar_ItemClicked);
             // 
-            // toolStripButton1
+            // tbButtonAbout
             // 
-            this.toolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton1.Image")));
-            this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.White;
-            this.toolStripButton1.Name = "toolStripButton1";
-            this.toolStripButton1.Size = new System.Drawing.Size(28, 28);
-            this.toolStripButton1.Tag = "about";
-            this.toolStripButton1.Text = "toolStripButton1";
-            this.toolStripButton1.ToolTipText = "About the software";
+            this.tbButtonAbout.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tbButtonAbout.Image = ((System.Drawing.Image)(resources.GetObject("tbButtonAbout.Image")));
+            this.tbButtonAbout.ImageTransparentColor = System.Drawing.Color.White;
+            this.tbButtonAbout.Name = "tbButtonAbout";
+            this.tbButtonAbout.Size = new System.Drawing.Size(28, 28);
+            this.tbButtonAbout.Tag = "about";
+            this.tbButtonAbout.Text = "toolStripButton1";
+            this.tbButtonAbout.ToolTipText = "About the software";
             // 
-            // toolStripButton2
+            // tbButtonGears
             // 
-            this.toolStripButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButton2.Image = global::FAD3.Properties.Resources.imHook;
-            this.toolStripButton2.ImageTransparentColor = System.Drawing.Color.White;
-            this.toolStripButton2.Name = "toolStripButton2";
-            this.toolStripButton2.Size = new System.Drawing.Size(28, 28);
-            this.toolStripButton2.Tag = "gear";
-            this.toolStripButton2.Text = "toolStripButton2";
-            this.toolStripButton2.ToolTipText = "Fishing gears";
+            this.tbButtonGears.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tbButtonGears.Image = global::FAD3.Properties.Resources.imHook;
+            this.tbButtonGears.ImageTransparentColor = System.Drawing.Color.White;
+            this.tbButtonGears.Name = "tbButtonGears";
+            this.tbButtonGears.Size = new System.Drawing.Size(28, 28);
+            this.tbButtonGears.Tag = "gear";
+            this.tbButtonGears.Text = "toolStripButton2";
+            this.tbButtonGears.ToolTipText = "Fishing gears";
             // 
-            // toolStripButton3
+            // tbButtonSpecies
             // 
-            this.toolStripButton3.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButton3.Image = global::FAD3.Properties.Resources.fish2;
-            this.toolStripButton3.ImageTransparentColor = System.Drawing.Color.White;
-            this.toolStripButton3.Name = "toolStripButton3";
-            this.toolStripButton3.Size = new System.Drawing.Size(28, 28);
-            this.toolStripButton3.Tag = "fish";
-            this.toolStripButton3.Text = "toolStripButton3";
-            this.toolStripButton3.ToolTipText = "Species caught";
+            this.tbButtonSpecies.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tbButtonSpecies.Image = global::FAD3.Properties.Resources.fish2;
+            this.tbButtonSpecies.ImageTransparentColor = System.Drawing.Color.White;
+            this.tbButtonSpecies.Name = "tbButtonSpecies";
+            this.tbButtonSpecies.Size = new System.Drawing.Size(28, 28);
+            this.tbButtonSpecies.Tag = "fish";
+            this.tbButtonSpecies.Text = "toolStripButton3";
+            this.tbButtonSpecies.ToolTipText = "Species caught";
             // 
-            // toolStripButton4
+            // tbButtonReport
             // 
-            this.toolStripButton4.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButton4.Image = global::FAD3.Properties.Resources.system_file_manager;
-            this.toolStripButton4.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton4.Name = "toolStripButton4";
-            this.toolStripButton4.Size = new System.Drawing.Size(28, 28);
-            this.toolStripButton4.Tag = "report";
-            this.toolStripButton4.Text = "Report";
+            this.tbButtonReport.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tbButtonReport.Image = global::FAD3.Properties.Resources.system_file_manager;
+            this.tbButtonReport.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tbButtonReport.Name = "tbButtonReport";
+            this.tbButtonReport.Size = new System.Drawing.Size(28, 28);
+            this.tbButtonReport.Tag = "report";
+            this.tbButtonReport.Text = "Report";
             // 
-            // toolStripButton5
+            // tbButtonMap
             // 
-            this.toolStripButton5.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButton5.Image = global::FAD3.Properties.Resources.internet_web_browser;
-            this.toolStripButton5.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton5.Name = "toolStripButton5";
-            this.toolStripButton5.Size = new System.Drawing.Size(28, 28);
-            this.toolStripButton5.Tag = "map";
-            this.toolStripButton5.Text = "toolStripButton5";
-            this.toolStripButton5.ToolTipText = "Map";
+            this.tbButtonMap.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tbButtonMap.Image = global::FAD3.Properties.Resources.internet_web_browser;
+            this.tbButtonMap.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tbButtonMap.Name = "tbButtonMap";
+            this.tbButtonMap.Size = new System.Drawing.Size(28, 28);
+            this.tbButtonMap.Tag = "map";
+            this.tbButtonMap.Text = "toolStripButton5";
+            this.tbButtonMap.ToolTipText = "Map";
             // 
-            // toolStripButton6
+            // tbButtonExit
             // 
-            this.toolStripButton6.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButton6.Image = global::FAD3.Properties.Resources.im_exit;
-            this.toolStripButton6.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton6.Name = "toolStripButton6";
-            this.toolStripButton6.Size = new System.Drawing.Size(28, 28);
-            this.toolStripButton6.Tag = "exit";
-            this.toolStripButton6.Text = "toolStripButton6";
-            this.toolStripButton6.ToolTipText = "Exit";
+            this.tbButtonExit.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tbButtonExit.Image = global::FAD3.Properties.Resources.im_exit;
+            this.tbButtonExit.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tbButtonExit.Name = "tbButtonExit";
+            this.tbButtonExit.Size = new System.Drawing.Size(28, 28);
+            this.tbButtonExit.Tag = "exit";
+            this.tbButtonExit.Text = "toolStripButton6";
+            this.tbButtonExit.ToolTipText = "Exit";
             // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(929, 530);
-            this.Controls.Add(this.toolStrip1);
+            this.Controls.Add(this.tsToolbar);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.splitContainer1);
-            this.Controls.Add(this.menuStrip1);
+            this.Controls.Add(this.menuMenuBar);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
-            this.MainMenuStrip = this.menuStrip1;
+            this.MainMenuStrip = this.menuMenuBar;
             this.Name = "frmMain";
             this.Text = "Fisheries Assessment Database";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Activated += new System.EventHandler(this.frmMain_Activated);
             this.Load += new System.EventHandler(this.FrmMainLoad);
             this.ResizeEnd += new System.EventHandler(this.frmMain_ResizeEnd);
-            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.frmMain_KeyUp);
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
             this.panelSamplingButtons.ResumeLayout(false);
-            this.menuStrip1.ResumeLayout(false);
-            this.menuStrip1.PerformLayout();
+            this.menuMenuBar.ResumeLayout(false);
+            this.menuMenuBar.PerformLayout();
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
-            this.toolStrip1.ResumeLayout(false);
-            this.toolStrip1.PerformLayout();
+            this.tsToolbar.ResumeLayout(false);
+            this.tsToolbar.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -592,24 +603,24 @@ namespace FAD3
 		private System.Windows.Forms.ToolStripStatusLabel statusPanelTargetArea;
 		private System.Windows.Forms.ToolStripStatusLabel statusPanelDBPath;
 		private System.Windows.Forms.OpenFileDialog openFileDialog1;
-		private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem2;
+		private System.Windows.Forms.ToolStripMenuItem toolStripFileOpen;
 		private System.Windows.Forms.TreeView treeView1;
 		private System.Windows.Forms.StatusStrip statusStrip1;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
 		private System.Windows.Forms.ToolStripMenuItem toolStripFileNewMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
-		private System.Windows.Forms.MenuStrip menuStrip1;
+		private System.Windows.Forms.ToolStripMenuItem menuFile;
+		private System.Windows.Forms.MenuStrip menuMenuBar;
 		private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.ToolStripMenuItem toolStripRecentlyOpened;
         private System.Windows.Forms.ToolStripMenuItem testToolStripRecentOpenedList;
         private System.Windows.Forms.ImageList imageList1;
-        private System.Windows.Forms.ToolStrip toolStrip1;
-        private System.Windows.Forms.ToolStripButton toolStripButton1;
-        private System.Windows.Forms.ToolStripButton toolStripButton2;
-        private System.Windows.Forms.ToolStripButton toolStripButton3;
-        private System.Windows.Forms.ToolStripButton toolStripButton4;
-        private System.Windows.Forms.ToolStripMenuItem toolsToolStripMenuItem;
+        private System.Windows.Forms.ToolStrip tsToolbar;
+        private System.Windows.Forms.ToolStripButton tbButtonAbout;
+        private System.Windows.Forms.ToolStripButton tbButtonGears;
+        private System.Windows.Forms.ToolStripButton tbButtonSpecies;
+        private System.Windows.Forms.ToolStripButton tbButtonReport;
+        private System.Windows.Forms.ToolStripMenuItem menuTools;
         private System.Windows.Forms.ToolStripMenuItem resetReferenceNumbersToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem referenceNumberRangeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem coordinateFormatToolStripMenuItem;
@@ -617,12 +628,12 @@ namespace FAD3
         private System.Windows.Forms.ToolStripMenuItem generateGridMapToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem uTMZone50ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem uTMZone51ToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem menuHelp;
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem onlineManualToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem showErrorMessagesToolStripMenuItem;
-        private System.Windows.Forms.ToolStripButton toolStripButton5;
-        private System.Windows.Forms.ToolStripButton toolStripButton6;
+        private System.Windows.Forms.ToolStripButton tbButtonMap;
+        private System.Windows.Forms.ToolStripButton tbButtonExit;
         private System.Windows.Forms.Label lblErrorFormOpen;
         private System.Windows.Forms.ListView listView1;
         private System.Windows.Forms.Label lblTitle;
@@ -631,5 +642,6 @@ namespace FAD3
         private System.Windows.Forms.Button buttonCatch;
         private System.Windows.Forms.Button buttonOK;
         private System.Windows.Forms.ContextMenuStrip menuDropDown;
+        private System.Windows.Forms.Label labelErrorDetail;
     }
 }

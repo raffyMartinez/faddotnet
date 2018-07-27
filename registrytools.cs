@@ -161,7 +161,7 @@ namespace FAD3
             {
                 sub_key.DeleteValue(name);
             }
-            catch
+            catch(ArgumentException)
             {
             }
         }

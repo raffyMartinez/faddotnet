@@ -23,7 +23,7 @@ namespace FAD3
     {
         public event ReadUIElement OnUIRowRead;
         public delegate void ReadUIElement(sampling s, UIRowFromXML e);
-        
+
 
         private string _SamplingGUID = "";
         private long _CatchAndEffortPropertyCount = 0;
@@ -40,78 +40,82 @@ namespace FAD3
             //SetUpUIElement();
         }
 
+        /// <summary>
+        /// setup a struct that contain elements of fish landing sampling
+        /// to be used later for validation and error checking the sampling form
+        /// </summary>
         static public void SetUpUIElement()
         {
+
             string xmlFile = global.AppPath + "\\UITable.xml";
-            if (System.IO.File.Exists(xmlFile))
+            var doc = new XmlDocument();
+            doc.Load(xmlFile);
+            XmlElement root = doc.DocumentElement;
+            XmlNodeList nodeList = root.SelectNodes("//UIRow");
+            foreach (XmlNode n in nodeList)
             {
-                var doc = new XmlDocument();
-                doc.Load(xmlFile);
-                XmlElement root = doc.DocumentElement;
-                XmlNodeList nodeList = root.SelectNodes("//UIRow");
-                foreach (XmlNode n in nodeList)
+                //UIRowFromXML row = new UIRowFromXML();
+                UserInterfaceStructure uistruct = new UserInterfaceStructure();
+                foreach (XmlNode c in n)
                 {
-                    //UIRowFromXML row = new UIRowFromXML();
-                    UserInterfaceStructure uistruct = new UserInterfaceStructure();
-                    foreach (XmlNode c in n)
+                    string val = c.Name;
+                    switch (val)
                     {
-                        string val = c.Name;
-                        switch (val)
-                        {
-                            case "Required":
-                                uistruct.Required = bool.Parse(c.InnerText);
-                                break;
-                            case "ToolTip":
-                                uistruct.ToolTip = c.InnerText;
-                                break;
-                            case "ReadOnly":
-                                uistruct.ReadOnly = bool.Parse(c.InnerText);
-                                break;
-                            case "DataType":
-                                uistruct.DataType = c.InnerText;
-                                break;
-                            case "Key":
-                                uistruct.Key = c.InnerText;
-                                break;
-                            case "Label":
-                                uistruct.Label = c.InnerText;
-                                break;
-                            case "Height":
-                                uistruct.Height = int.Parse(c.InnerText);
-                                break;
-                            case "ButtonText":
-                                uistruct.ButtonText = c.InnerText;
-                                break;
-                            case "control":
-                                switch (c.InnerText)
-                                {
-                                    case "TextBox":
-                                        uistruct.Control = UserInterfaceStructure.UIControlType.TextBox;
-                                        break;
-                                    case "ComboBox":
-                                        uistruct.Control = UserInterfaceStructure.UIControlType.ComboBox;
-                                        break;
-                                    case "CheckBox":
-                                        uistruct.Control = UserInterfaceStructure.UIControlType.Check;
-                                        break;
-                                    case "MaskDate":
-                                        uistruct.Control = UserInterfaceStructure.UIControlType.DateMask;
-                                        break;
-                                    case "MaskTime":
-                                        uistruct.Control = UserInterfaceStructure.UIControlType.TimeMask;
-                                        break;
-                                    default:
-                                        uistruct.Control = UserInterfaceStructure.UIControlType.Spacer;
-                                        break;
-                                }
-                                break;
-                        }
-                    }
-                    if (uistruct.Key != "spacer")
-                    {
-                        _uis.Add(uistruct.Key, uistruct);
+                        case "Required":
+                            uistruct.Required = bool.Parse(c.InnerText);
+                            break;
+                        case "ToolTip":
+                            uistruct.ToolTip = c.InnerText;
+                            break;
+                        case "ReadOnly":
+                            uistruct.ReadOnly = bool.Parse(c.InnerText);
+                            break;
+                        case "DataType":
+                            uistruct.DataType = c.InnerText;
+                            break;
+                        case "Key":
+                            uistruct.Key = c.InnerText;
+                            break;
+                        case "Label":
+                            uistruct.Label = c.InnerText;
+                            break;
+                        case "Height":
+                            uistruct.Height = int.Parse(c.InnerText);
+                            break;
+                        case "ButtonText":
+                            uistruct.ButtonText = c.InnerText;
+                            break;
+                        case "control":
+                            switch (c.InnerText)
+                            {
+                                case "TextBox":
+                                    uistruct.Control = UserInterfaceStructure.UIControlType.TextBox;
+                                    break;
+                                case "ComboBox":
+                                    uistruct.Control = UserInterfaceStructure.UIControlType.ComboBox;
+                                    break;
+                                case "CheckBox":
+                                    uistruct.Control = UserInterfaceStructure.UIControlType.Check;
+                                    break;
+                                case "MaskDate":
+                                    uistruct.Control = UserInterfaceStructure.UIControlType.DateMask;
+                                    break;
+                                case "MaskTime":
+                                    uistruct.Control = UserInterfaceStructure.UIControlType.TimeMask;
+                                    break;
+                                default:
+                                    uistruct.Control = UserInterfaceStructure.UIControlType.Spacer;
+                                    break;
+                            }
+                            break;
                     }
                 }
+
+                if (uistruct.Key != "spacer")
+                {
+                    _uis.Add(uistruct.Key, uistruct);
+                }
+
             }
         }
 
@@ -776,7 +780,7 @@ namespace FAD3
             return myList;
         }
 
-        public bool UpdateEffort(bool isNew, Dictionary<string, string> EffortData)
+        public bool UpdateEffort(bool isNew, Dictionary<string, string> EffortData, List<string> FishingGrounds)
         {
             bool Success = false;
             string updateQuery = "";
@@ -785,21 +789,22 @@ namespace FAD3
                 try
                 {
                     var quote = "'";
-                    string hp = EffortData["EngineHorsepower"] == "" ? "null" : EffortData["EngineHorsepower"];
-                    string wtSample = EffortData["WeightOfSample"] == "" ? "null" : EffortData["WeightOfSample"];
-                    string wtCatch = EffortData["WeightOfCatch"] == "" ? "null" : EffortData["WeightOfCatch"];
-                    string engine = EffortData["Engine"] == "" ? "" : EffortData["Engine"];
-                    string vesL = string.IsNullOrWhiteSpace(EffortData["VesLength"].ToString()) ? "null" : EffortData["VesLength"];
-                    string vesH = string.IsNullOrWhiteSpace(EffortData["VesHeight"].ToString()) ? "null" : EffortData["VesHeight"];
-                    string vesW = string.IsNullOrWhiteSpace(EffortData["VesWidth"].ToString()) ? "null" : EffortData["VesWidth"];
-                    string NoHauls = string.IsNullOrWhiteSpace(EffortData["NumberOfHauls"].ToString()) ? "null" : EffortData["NumberOfHauls"];
-                    string NoFishers = string.IsNullOrWhiteSpace(EffortData["NumberOfFishers"].ToString()) ? "null" : EffortData["NumberOfFishers"];
-                    string VesselType = string.IsNullOrWhiteSpace(EffortData["TypeOfVesselUsed"].ToString()) ? "null" : EffortData["TypeOfVesselUsed"];
-
-                    string DateSet = string.IsNullOrWhiteSpace(EffortData["DateSet"].ToString()) ? "null" : quote + EffortData["DateSet"] + quote;
-                    string TimeSet = string.IsNullOrWhiteSpace(EffortData["TimeSet"].ToString()) ? "null" : quote + EffortData["TimeSet"] + quote;
-                    string DateHauled = string.IsNullOrWhiteSpace(EffortData["DateHauled"].ToString()) ? "null" : quote + EffortData["DateHauled"] + quote;
-                    string TimeHauled = string.IsNullOrWhiteSpace(EffortData["TimeHauled"].ToString()) ? "null" : quote + EffortData["TimeHauled"] + quote;
+                    var hp = EffortData["EngineHorsepower"] == "" ? "null" : EffortData["EngineHorsepower"];
+                    var wtSample = EffortData["WeightOfSample"] == "" ? "null" : EffortData["WeightOfSample"];
+                    var wtCatch = EffortData["WeightOfCatch"] == "" ? "null" : EffortData["WeightOfCatch"];
+                    var engine = EffortData["Engine"] == "" ? "" : EffortData["Engine"];
+                    var vesL = string.IsNullOrWhiteSpace(EffortData["VesLength"].ToString()) ? "null" : EffortData["VesLength"];
+                    var vesH = string.IsNullOrWhiteSpace(EffortData["VesHeight"].ToString()) ? "null" : EffortData["VesHeight"];
+                    var vesW = string.IsNullOrWhiteSpace(EffortData["VesWidth"].ToString()) ? "null" : EffortData["VesWidth"];
+                    var NoHauls = string.IsNullOrWhiteSpace(EffortData["NumberOfHauls"].ToString()) ? "null" : EffortData["NumberOfHauls"];
+                    var NoFishers = string.IsNullOrWhiteSpace(EffortData["NumberOfFishers"].ToString()) ? "null" : EffortData["NumberOfFishers"];
+                    var VesselType = string.IsNullOrWhiteSpace(EffortData["TypeOfVesselUsed"].ToString()) ? "null" : EffortData["TypeOfVesselUsed"];
+                    var FishingGround = FishingGrounds.Count > 0 ? FishingGrounds[0] : "";
+                    var DateSet = string.IsNullOrWhiteSpace(EffortData["DateSet"].ToString()) ? "null" : quote + EffortData["DateSet"] + quote;
+                    var TimeSet = string.IsNullOrWhiteSpace(EffortData["TimeSet"].ToString()) ? "null" : quote + EffortData["TimeSet"] + quote;
+                    var DateHauled = string.IsNullOrWhiteSpace(EffortData["DateHauled"].ToString()) ? "null" : quote + EffortData["DateHauled"] + quote;
+                    var TimeHauled = string.IsNullOrWhiteSpace(EffortData["TimeHauled"].ToString()) ? "null" : quote + EffortData["TimeHauled"] + quote;
+                    var SamplingGuid = EffortData["SamplingGUID"];
 
                     if (isNew)
                     {
@@ -809,8 +814,8 @@ namespace FAD3
                             "DateHauled, NoHauls, NoFishers, Engine, hp, " +
                             "WtCatch, WtSample, len, wdt, hgt, LSGUID, " +
                             "Notes, VesType, SamplingType, HasLiveFish, Enumerator) values ('{" +
-                            EffortData["SamplingGUID"] + "}', '{" +
-                            EffortData["FishingGear"] + "}', '{" +
+                            SamplingGuid + "}', '{" +
+                            FishingGround + "}', '{" +
                             EffortData["TargetArea"] + "}', '" +
                             EffortData["ReferenceNumber"] + "', '" +
                             EffortData["SamplingDate"] + "', '" +
@@ -844,8 +849,8 @@ namespace FAD3
                             "RefNo ='" + EffortData["ReferenceNumber"] + "', " +
                             "SamplingDate ='" + EffortData["SamplingDate"] + "', " +
                             "SamplingTime ='" + EffortData["SamplingTime"] + "', " +
-                            "FishingGround = '" + EffortData["FishingGround"] + "', " +
-                            "TimeSet = " +TimeSet + ", " +
+                            "FishingGround = '" + FishingGround + "', " +
+                            "TimeSet = " + TimeSet + ", " +
                             "DateSet = " + DateSet + ", " +
                             "TimeHauled = " + TimeHauled + ", " +
                             "DateHauled = " + DateHauled + ", " +
@@ -864,12 +869,18 @@ namespace FAD3
                             "SamplingType = " + EffortData["SamplingType"] + ", " +
                             "HasLiveFish = " + EffortData["HasLiveFish"] + ", " +
                             "Enumerator = '{" + EffortData["Enumerator"] + "}' " +
-                            "Where SamplingGUID = '{" + EffortData["SamplingGUID"] + "}'";
+                            "Where SamplingGUID = '{" + SamplingGuid + "}'";
                     }
-                    OleDbCommand update = new OleDbCommand(updateQuery, conn);
-                    conn.Open();
-                    Success = (update.ExecuteNonQuery() > 0);
-                    conn.Close();
+
+                    using (OleDbCommand update = new OleDbCommand(updateQuery, conn))
+                    {
+                        conn.Open();
+                        Success = (update.ExecuteNonQuery() > 0);
+                        conn.Close();
+                    }
+
+                    if (Success && FishingGrounds.Count > 1)
+                        SaveAdditionalFishingGrounds(FishingGrounds, SamplingGuid);
                 }
                 catch (Exception ex)
                 {
@@ -880,124 +891,31 @@ namespace FAD3
             return Success;
         }
 
-        // static void SetUpUIElement(DataColumn col = null, string ColumnName="")
-        //{
-        //    UserInterfaceStructure.UIControlType c=UserInterfaceStructure.UIControlType.TextBox;
-        //    bool Proceed = true;
-        //    string RowLabel = "";
-        //    string ButtonLabel = "";
-        //    string cName = ColumnName.Length > 0 ? ColumnName : col.ColumnName;
-        //    string key = cName;
-        //    switch (cName)
-        //    {
-        //        case "ReferenceNumber":
-        //            RowLabel = "Reference number";
-        //            ButtonLabel = "Generate";
-        //            break;
+        private void SaveAdditionalFishingGrounds(List<string> FishingGrounds, string SamplingGUID)
+        {
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                var sql = "Delete * from tblGrid where SamplingGuid = '{" + SamplingGUID + "}'";
+                using (OleDbCommand update = new OleDbCommand(sql, conn))
+                {
+                    update.ExecuteNonQuery();
+                }
 
-        //        case "TargetArea":
-        //            c = UserInterfaceStructure.UIControlType.ComboBox;
-        //            RowLabel = "Target area";
-        //            break;
-        //        case "LandingSite":
-        //            c = UserInterfaceStructure.UIControlType.ComboBox;
-        //            RowLabel = "Landing site";
-        //            break;
-        //        case "SamplingDate":
-        //            c = UserInterfaceStructure.UIControlType.DateMask;
-        //            RowLabel = "Date of sampling";
-        //            break;
-        //        case "SamplingTime":
-        //            c = UserInterfaceStructure.UIControlType.TimeMask;
-        //            RowLabel = "Time of sampling";
-        //            break;
-        //        case "Enumerator":
-        //            c = UserInterfaceStructure.UIControlType.ComboBox;
-        //            RowLabel = "Enumerator";
-        //            ButtonLabel = "Details";
-        //            break;
-        //        case "GearClass":
-        //            c = UserInterfaceStructure.UIControlType.ComboBox;
-        //            RowLabel = "Gear class";
-        //            ButtonLabel = "Gear usage";
-        //            break;
-        //        case "FishingGear":
-        //            c = UserInterfaceStructure.UIControlType.ComboBox;
-        //            RowLabel = "Gear used";
-        //            break;
-        //        case "FishingGround":
-        //            RowLabel = "Fishing ground";
-        //            ButtonLabel = "Specify";
-        //            break;
-        //        case "DateSet":
-        //            c = UserInterfaceStructure.UIControlType.DateMask;
-        //            RowLabel = "Date of gear set";
-        //            break;
-        //        case "TimeSet":
-        //            c = UserInterfaceStructure.UIControlType.TimeMask;
-        //            RowLabel = "Time of gear set";
-        //            break;
-        //        case "DateHauled":
-        //            c = UserInterfaceStructure.UIControlType.DateMask;
-        //            RowLabel = "Date of gear hauled";
-        //            break;
-        //        case "TimeHauled":
-        //            c = UserInterfaceStructure.UIControlType.TimeMask;
-        //            RowLabel = "Time of gear hauled";
-        //            break;
-        //        case "NumberOfHauls":
-        //            RowLabel = "Number of hauls";
-        //            break;
-        //        case "NumberOfFishers":
-        //            RowLabel = "Number of fishers";
-        //            break;
-        //        case "WeightOfCatch":
-        //            RowLabel = "Weight of catch";
-        //            break;
-        //        case "WeightOfSample":
-        //            RowLabel = "Weight of sample";
-        //            key = "WeightOfSample";
-        //            break;
-        //        case "HasLiveFish":
-        //            c = UserInterfaceStructure.UIControlType.Check;
-        //            RowLabel = "Live fish included";
-        //            key = "HasLiveFish";
-        //            break;
-        //        case "VesType":
-        //            c = UserInterfaceStructure.UIControlType.ComboBox;
-        //            RowLabel = "Type of vessel used";
-        //            key = "TypeOfVesselUsed";
-        //            break;
-        //        case "Engine":
-        //            RowLabel = "Engine";
-        //            break;
-        //        case "hp":
-        //            RowLabel = "Engine hp";
-        //            key = "EngineHorsepower";
-        //            break;
-        //        case "len":
-        //            RowLabel = "Vessel dimension";
-        //            key = "VesselDimension";
-        //            ButtonLabel = "Specify";
-        //            break;
-        //        case "Notes":
-        //            RowLabel = "Notes";
-        //            break;
-        //        case "GearSpecs":
-        //            ButtonLabel = "Gear specs";
-        //            RowLabel = "Gear specs";
-        //            break;
-        //        default:
-        //            Proceed = false;
-        //            break;
-        //    }
-
-        //    //if (Proceed)
-        //    //{
-        //    //    UserInterfaceStructure ui = new UserInterfaceStructure(c, RowLabel, cName, ButtonLabel);
-        //    //    _uis.Add(key, ui);
-        //    //}
-        //}
+                for (int n=1; n<FishingGrounds.Count; n++)
+                {
+                    sql = "Insert into tblGrid (SamplingGuid, GridName,RowGUID) values ('{"
+                            + SamplingGUID + "}', '"
+                            + FishingGrounds[n] + "', '{"
+                            + Guid.NewGuid() + "}')";
+                    using (OleDbCommand update = new OleDbCommand(sql, conn))
+                    {
+                        update.ExecuteNonQuery();
+                    }
+                }
+                conn.Close();
+            }
+        }
 
         public Dictionary<string, string> CatchAndEffort()
         {
@@ -1152,16 +1070,6 @@ namespace FAD3
                     {
                         _SampleWtFromTotalCatch = double.Parse(dr["WtSample"].ToString());
                     }
-
-
-                    /*
-                     _uis = new Dictionary<string, UserInterfaceStructure>();
-                     foreach (DataColumn c in dr.Table.Columns)
-                     {
-                        SetUpUIElement(c);
-                     }
-                        SetUpUIElement(null, "GearSpecs");
-                    */
 
                 }
             }

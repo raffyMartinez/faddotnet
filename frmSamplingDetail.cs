@@ -40,6 +40,35 @@ namespace FAD3
         string _DatePrompt = "";
         string _TimePrompt = "";
 
+        List<string> _FishingGrounds;
+
+        public List<string> FishingGrounds
+        {
+            get { return _FishingGrounds; }
+            set
+            {
+                _FishingGrounds = value;
+
+                if (_FishingGrounds.Count > 0)
+                { 
+                    ((TextBox)panelUI.Controls["textFishingGround"]).Text = _FishingGrounds[0];
+
+                    if (_FishingGrounds.Count > 1)
+                        ((TextBox)panelUI.Controls["textAdditionalFishingGround"]).With(o =>
+                        {
+                            o.Clear();
+                            for (int i = 1; i < _FishingGrounds.Count; i++)
+                              o.Text += _FishingGrounds[i] + ", ";
+
+                            o.Text = o.Text.Substring(0, o.Text.Length - 2);
+
+                        });
+                
+
+                }
+            }
+        }
+
         public void VesselDimension(string length, string width, string height)
         {
             _VesHeight = height;
@@ -48,7 +77,7 @@ namespace FAD3
 
             try
             {
-               _txtVesselDimension.Text = "(LxWxH): " + _VesLength + " x " + _VesWidth + " x " + _VesHeight;
+                _txtVesselDimension.Text = "(LxWxH): " + _VesLength + " x " + _VesWidth + " x " + _VesHeight;
             }
             catch
             {
@@ -105,7 +134,7 @@ namespace FAD3
             set { _GearVarGuid = value; }
         }
 
-        public  aoi AOI
+        public aoi AOI
         {
             get { return _aoi; }
             set { _aoi = value; }
@@ -124,7 +153,7 @@ namespace FAD3
             set { _isNew = value; }
         }
 
-        public string  SamplingGUID
+        public string SamplingGUID
         {
             get { return _samplingGUID; }
             set { _samplingGUID = value; }
@@ -144,7 +173,7 @@ namespace FAD3
         private void OnFormClosed(object sender, FormClosedEventArgs e)
         {
             global.SaveFormSettings(this);
-            
+
         }
 
         private void OnUIRowRead(object sender, UIRowFromXML e)
@@ -186,7 +215,8 @@ namespace FAD3
             }
 
             //setup error labels
-            if (cType !="Spacer") {
+            if (cType != "Spacer")
+            {
                 Font f = new Font(lbl.Font.FontFamily, 8, FontStyle.Bold);
                 Label lblError = new Label()
                 {
@@ -323,7 +353,7 @@ namespace FAD3
 
 
             System.Type type = ctl.GetType();
-            if (type.Name != "Control" && cType !="Spacer")
+            if (type.Name != "Control" && cType != "Spacer")
             {
                 ToolTip tt = new ToolTip
                 {
@@ -338,7 +368,8 @@ namespace FAD3
                  {
                      o.Location = new System.Drawing.Point(x, _yPos);
                      o.Tag = e.Key;
-                     if (type.Name !="CheckBox") {
+                     if (type.Name != "CheckBox")
+                     {
                          o.Size = new System.Drawing.Size(_ControlWidth, ht + SizeAdjust);
                          if (e.Height != 1)
                          {
@@ -370,11 +401,18 @@ namespace FAD3
                                 _AOIName = ctl.Text;
                                 _AOIGuid = ((KeyValuePair<string, string>)((ComboBox)ctl).SelectedItem).Key;
                                 break;
+                            case "AdditionalFishingGround":
+                                //var myList = FishingGrid.AdditionalFishingGrounds(_samplingGUID);
+
+                                //foreach (var item in myList)
+                                //    ((TextBox)ctl).Text += item + "\r\n";
+
+                                break;
                         }
                     }
                     else
                     {
-                        ((CheckBox)ctl).Checked = _lv.Items[e.Key].Text == "True";
+                        ((CheckBox)ctl).Checked = _lv.Items[e.Key].SubItems[1].Text == "True";
                     }
                 }
                 else
@@ -392,11 +430,11 @@ namespace FAD3
                             ctl.Text = _LandingSiteName;
                             break;
                         case "GearClass":
-                            if(_GearClassName.Length>0)
-                              ctl.Text = _GearClassName;
+                            if (_GearClassName.Length > 0)
+                                ctl.Text = _GearClassName;
                             else
                             {
-                                ((ComboBox)ctl).With(o => 
+                                ((ComboBox)ctl).With(o =>
                                 {
                                     var item = o.Items[0];
                                     o.SelectedItem = item;
@@ -405,8 +443,8 @@ namespace FAD3
                             _GearClassGuid = ((KeyValuePair<string, string>)((ComboBox)ctl).SelectedItem).Key;
                             break;
                         case "FishingGear":
-                            if(_GearVarName.Length>0)
-                              ctl.Text = _GearVarName;
+                            if (_GearVarName.Length > 0)
+                                ctl.Text = _GearVarName;
                             else
                             {
                                 ((ComboBox)ctl).With(o =>
@@ -419,8 +457,8 @@ namespace FAD3
                                 });
                             }
 
-                            if(ctl.Text.Length>0)
-                            _GearVarGuid = ((KeyValuePair<string, string>)((ComboBox)ctl).SelectedItem).Key;
+                            if (ctl.Text.Length > 0)
+                                _GearVarGuid = ((KeyValuePair<string, string>)((ComboBox)ctl).SelectedItem).Key;
 
                             break;
                         case "Enumerator":
@@ -466,7 +504,8 @@ namespace FAD3
                 {
                     Name = "btn" + e.Key,
                     Text = ButtonText,
-                    Size = new System.Drawing.Size(_ControlWidth / 2, (int)(ht * 1.7))
+                    Size = new System.Drawing.Size(_ControlWidth / 2, (int)(ht * 1.7)),
+                    Tag = e.Key
                 };
                 panelUI.Controls.Add(btn);
                 btn.Location = new System.Drawing.Point(x, _yPos - 3);
@@ -513,21 +552,21 @@ namespace FAD3
             foreach (Control ctl in panelUI.Controls)
             {
                 var tName = ctl.GetType().Name;
-               if (tName != "Button" && tName != "Label")
+                if (tName != "Button" && tName != "Label")
                 {
                     ctl.Visible = true;
                 }
             }
         }
 
-      
+
 
         private void AdustControlsPosition()
         {
             foreach (Control c in panelUI.Controls)
             {
                 System.Type type = c.GetType();
-                if (type.Name !="Label")
+                if (type.Name != "Label")
                 {
                     if (type.Name == "Button")
                     {
@@ -538,7 +577,7 @@ namespace FAD3
                         c.Left = _WidestLabel + 25;
                     }
                 }
-                else if(c.Name.Substring(0,8)=="errLabel")
+                else if (c.Name.Substring(0, 8) == "errLabel")
                 {
                     c.Left = _WidestLabel + _ControlWidth + 25;
                 }
@@ -559,7 +598,8 @@ namespace FAD3
                             var key = "";
                             if (c.Name != "comboTypeOfVesselUsed")
                             {
-                                if (c.Text.Length>0) {
+                                if (c.Text.Length > 0)
+                                {
                                     key = ((KeyValuePair<string, string>)((ComboBox)c).SelectedItem).Key;
                                 }
                             }
@@ -581,7 +621,7 @@ namespace FAD3
                             EffortData.Add(c.Tag.ToString(), c.Text);
                             break;
                         case "MaskedTextBox":
-                           // var s = "";
+                            // var s = "";
                             var s = ((MaskedTextBox)c).MaskCompleted ? c.Text : "";
                             EffortData.Add(c.Tag.ToString(), s);
                             break;
@@ -601,7 +641,9 @@ namespace FAD3
             EffortData.Add("SamplingGUID", _samplingGUID);
             EffortData.Add("SamplingType", "1");
 
-            return  _sampling.UpdateEffort(_isNew, EffortData);
+            PopulateFGList();
+
+            return _sampling.UpdateEffort(_isNew, EffortData, _FishingGrounds);
 
         }
 
@@ -614,34 +656,57 @@ namespace FAD3
                 case "btnEnumerator":
                     break;
                 case "btnGearClass":
-                    frmGearUsage fgu = new frmGearUsage
+                    frmGearUsage form = frmGearUsage.GetInstance();
+                    if (!form.Visible)
                     {
-                        GearClassName = _GearClassName,
-                        GearRefCode = _GearRefCode,
-                        Parent_Form = this
-                    };
-                    fgu.TargetArea(_AOIName, _AOIGuid);
-                    fgu.GearVariation(_GearVarName, _GearVarGuid);
-                    fgu.ShowDialog(this);
+                        form.Show(this);
+                    }
+                    else
+                    {
+                        form.BringToFront();
+                    }
+
+                    form.With(o =>
+                    {
+                        o.GearClassName = _GearClassName;
+                        o.GearRefCode = _GearRefCode;
+                        o.Parent_Form = this;
+                        o.TargetArea(_AOIName, _AOIGuid);
+                        o.GearVariation(_GearVarName, _GearVarGuid);
+                        o.PopulateLists();
+
+                    });
                     break;
                 case "btnGearSpecs":
                     break;
                 case "btnVesselDimension":
                     frmVesselDimension f = new frmVesselDimension();
-                    if(_VesLength.Length>0 && _VesHeight.Length>0 && _VesWidth.Length>0)
-                      f.VesselDimension(_VesLength, _VesWidth, _VesHeight);
+                    if (_VesLength.Length > 0 && _VesHeight.Length > 0 && _VesWidth.Length > 0)
+                        f.VesselDimension(_VesLength, _VesWidth, _VesHeight);
                     f.Parent_Form = this;
                     f.ShowDialog(this);
                     break;
                 case "btnReferenceNumber":
                     break;
                 case "btnFishingGround":
+                    PopulateFGList();
                     frmFishingGround fg = new frmFishingGround();
+                    fg.FishingGrounds = _FishingGrounds;
                     fg.Parent_form = this;
                     fg.AOIGuid = _AOIGuid;
                     fg.Show(this);
                     break;
             }
+        }
+
+        private void PopulateFGList()
+        {
+            _FishingGrounds = new List<string>();
+            _FishingGrounds.Add(((TextBox)panelUI.Controls["textFishingGround"]).Text);
+            var t = (TextBox)panelUI.Controls["textAdditionalFishingGround"];
+            var arr = t.Text.Length > 0 ? t.Text.Split(',') : null;
+            for (int n = 0; arr != null && n < arr.Length; n++)
+                _FishingGrounds.Add(arr[n].Trim());
         }
 
         private void OnbuttonSampling_Click(object sender, EventArgs e)
@@ -652,7 +717,8 @@ namespace FAD3
                 case "buttonOK":
                     if (ValidateForm())
                     {
-                        if (SaveEdits()){
+                        if (SaveEdits())
+                        {
                             _parent.RefreshCatchDetail(_samplingGUID);
                             this.Close();
                         }
@@ -666,9 +732,10 @@ namespace FAD3
 
         private void ShowRequiredErrorLabel(bool Visible)
         {
-            foreach(Control c in panelUI.Controls)
+            foreach (Control c in panelUI.Controls)
             {
-                if (c.Name.Substring(0,8)=="errLabel") {
+                if (c.Name.Substring(0, 8) == "errLabel")
+                {
                     sampling.UserInterfaceStructure ui = sampling.uis[c.Tag.ToString()];
                     c.Visible = ui.Required && Visible;
                 }
@@ -704,7 +771,7 @@ namespace FAD3
         {
             foreach (Control c in panelUI.Controls)
             {
-                if (c.Name == "errLabelWeightOfCatch" || c.Name == "errLabelWeightOfSample" )
+                if (c.Name == "errLabelWeightOfCatch" || c.Name == "errLabelWeightOfSample")
                 {
                     c.Visible = Visible;
                 }
@@ -713,7 +780,7 @@ namespace FAD3
 
         private bool ValidateForm()
         {
-            bool isValidated=true;
+            bool isValidated = true;
             bool GearDateTimeIsEmpty = false;
             string msg = "";
 
@@ -727,7 +794,7 @@ namespace FAD3
                     //in the tag of the control 
                     sampling.UserInterfaceStructure ui = sampling.uis[c.Tag.ToString()];
 
-                    if (ui.Required && c.Text.Length==0)
+                    if (ui.Required && c.Text.Length == 0)
                     {
                         isValidated = false;
                         msg = "A required field is missing";
@@ -758,7 +825,7 @@ namespace FAD3
 
 
                     isValidated = GearDateTimeIsEmpty;
-                    if(!isValidated)
+                    if (!isValidated)
                     {
                         ShowGearDateTimeErrorLabel(true);
                         msg = "Date and times of gear set and haul should \r\n" +
@@ -767,7 +834,7 @@ namespace FAD3
                     else
                     {
                         //if catch weight > zero then confirm if datetime of gear set and haul is empty
-                        if (panelUI.Controls["textWeightOfCatch"].Text.Length>0 &&  double.Parse(panelUI.Controls["textWeightOfCatch"].Text)>0 && GearDateTimeIsEmpty)
+                        if (panelUI.Controls["textWeightOfCatch"].Text.Length > 0 && double.Parse(panelUI.Controls["textWeightOfCatch"].Text) > 0 && GearDateTimeIsEmpty)
                         {
                             ShowGearDateTimeErrorLabel(true);
                             DialogResult dr = MessageBox.Show("Confirm that date and time of gear set\r\n" +
@@ -781,7 +848,7 @@ namespace FAD3
 
             //Step 3. Datetime for set and haul should be before sampling date and time and
             //   Date set should be before date hauled                       
-            if (isValidated && GearDateTimeIsEmpty==false)
+            if (isValidated && GearDateTimeIsEmpty == false)
             {
 
                 DateTime samplingDate = DateTime.Parse(panelUI.Controls["dtxtSamplingDate"].Text.ToString());
@@ -842,9 +909,9 @@ namespace FAD3
             }
 
 
-            if (msg.Length>0)
+            if (msg.Length > 0)
             {
-                MessageBox.Show(msg,"Validation error",MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                MessageBox.Show(msg, "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
             return isValidated;
         }
@@ -852,7 +919,7 @@ namespace FAD3
         private void HideErrorLabels()
         {
             foreach (Control c in panelUI.Controls)
-            { 
+            {
                 c.Visible = c.Name.Substring(0, 8) != "errLabel";
             }
         }
@@ -862,24 +929,24 @@ namespace FAD3
             HideErrorLabels();
             if (sender.GetType().Name == "ComboBox")
             {
-                if (((Control)sender).Name=="comboEnumerator")
+                if (((Control)sender).Name == "comboEnumerator")
                 {
                     //System.Diagnostics.Debugger.Break();
                 }
-                
+
             }
         }
         private void OnFieldValidated(object sender, EventArgs e)
         {
-            
-            if (sender.GetType().Name== "ComboBox")
+
+            if (sender.GetType().Name == "ComboBox")
             {
                 var combo = (ComboBox)sender;
                 var targetCombo = new ComboBox();
                 var key = "";
                 var comboItems = new Dictionary<string, string>();
 
-                if (combo.Text.Length >0)
+                if (combo.Text.Length > 0)
                 {
                     try
                     {
@@ -937,13 +1004,13 @@ namespace FAD3
             }
 
         }
-        private void ChangeComboDataSource(ComboBox cbo, Dictionary<string,string> comboItems)
+        private void ChangeComboDataSource(ComboBox cbo, Dictionary<string, string> comboItems)
         {
             cbo.With
             (o =>
             {
-                //o.Text = "";
-                if (comboItems.Count > 0)
+            //o.Text = "";
+            if (comboItems.Count > 0)
                 {
                     o.DataSource = new BindingSource(comboItems, null);
                     o.DisplayMember = "Value";
@@ -986,7 +1053,8 @@ namespace FAD3
 
             string v = ((Control)sender).Text;
             string msg = "";
-            if (!ui.ReadOnly && v.Length>0) {
+            if (!ui.ReadOnly && v.Length > 0)
+            {
                 switch (ui.DataType)
                 {
                     case "string":
@@ -1065,7 +1133,7 @@ namespace FAD3
                                 if (ui.Key == "WeightOfCatch")
                                 {
                                     var bt = MessageBoxButtons.YesNo;
-                                    DialogResult dr = MessageBox.Show("Accept zero catch?", "Please verify", bt,MessageBoxIcon.Exclamation);
+                                    DialogResult dr = MessageBox.Show("Accept zero catch?", "Please verify", bt, MessageBoxIcon.Exclamation);
                                     if (dr == DialogResult.No)
                                     {
                                         e.Cancel = true;
@@ -1084,9 +1152,9 @@ namespace FAD3
                         break;
                 }
 
-                if  (msg.Length>0)
+                if (msg.Length > 0)
                 {
-                    MessageBox.Show(msg,"Validation error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    MessageBox.Show(msg, "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     e.Cancel = true;
                 }
             }

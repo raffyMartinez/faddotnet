@@ -19,7 +19,7 @@ namespace FAD3
 	/// </summary>
 	public class landingsite
 	{
-		private string _LandingSiteGUID = "";
+        private string _LandingSiteGUID = "";
 		private long _GearUsedCount = 0;
 		private string _LandingSiteName = "";
 		private string _GearVariationName = "";

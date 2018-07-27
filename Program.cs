@@ -25,8 +25,20 @@ namespace FAD3
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
 
-            Application.Run(new frmMain());
-		}
-		
-	}
+
+            global.TestRequiredFilesExists();
+            try
+            {
+                Application.Run(new frmMain());
+            }
+            catch (ObjectDisposedException) { }
+            //TODO: error when closing the file when file close on the menu bar is used 
+            
+            //System.ObjectDisposedException: 'Cannot access a disposed object.
+            //Object name: 'ToolStripDropDownMenu'.'
+
+
+        }
+
+    }
 }

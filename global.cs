@@ -42,7 +42,43 @@ namespace FAD3
         private static readonly string _ConnectionStringTemplate = "";
         private static long _RefNoRangeMin = 0;
         private static long _RefNoRangeMax = 0;
+        private static bool _TemplateFileExists = true;
+        private static bool _UITemplateFileExists = true;
+        private static bool _InlandGridDBFileExists = true;
+        private static bool _AllRequiredFilesExists = true;
+        private static string _MissingRequiredFiles;
+
+        public static string MissingRequiredFiles
+        {
+            get
+            {
+                var s = _TemplateFileExists ? "" : "\r\n- template.mdb";
+                s += _UITemplateFileExists ? "" : "\r\n- UITable.xml";
+                s += _InlandGridDBFileExists ? "" : "\r\n- grid25inland.mdb";
+
+                return s;
+            }
+        }
         
+        public static bool AllRequiredFilesExists
+        {
+            get { return _AllRequiredFilesExists; }
+        }
+
+        public static bool UITemplateFileExists
+        {
+            get { return _UITemplateFileExists; }
+        }
+
+        public static bool InlandGridDBFileExists
+        {
+            get { return _InlandGridDBFileExists; }
+        }
+
+        public static bool TemplateFileExists
+        {
+            get { return _TemplateFileExists; }
+        }
 
         static global()
         {
@@ -51,6 +87,8 @@ namespace FAD3
             _ConnectionStringTemplate = "Provider=Microsoft.JET.OLEDB.4.0;data source=" + _AppPath + "\\template.mdb";
             ReadRefNoRange();
         }
+
+
 
         /// <summary>
         /// Reads from the registry the range of reference numbers
@@ -67,6 +105,15 @@ namespace FAD3
                 _RefNoRangeMax = long.Parse(arr[1]);
             }
         }
+
+        public static void TestRequiredFilesExists()
+        {
+            _UITemplateFileExists = File.Exists(ApplicationPath + "\\UITable.xml");
+            _TemplateFileExists = File.Exists(ApplicationPath + "\\template.mdb");
+            _InlandGridDBFileExists = File.Exists(ApplicationPath + "\\grid25inland.mdb");
+            _AllRequiredFilesExists = _UITemplateFileExists && _TemplateFileExists && _InlandGridDBFileExists;
+        }
+
 
         public static string ApplicationPath
         {
@@ -450,6 +497,13 @@ namespace FAD3
             _HasMPH = k1 > 0;
         }
 
+        public enum fad3DataStatus
+        {
+            statusFromDB,
+            statusNew,
+            statusEdited,
+            statusForDeletion
+        }
         public enum fad3GearEditAction
         {
             addAOI,
@@ -704,132 +758,138 @@ namespace FAD3
 
             //put columns here
             List<string> colList = new List<string>();
-
-            string connTemplate = "Provider=Microsoft.JET.OLEDB.4.0;data source=" + _AppPath + "\\template.mdb";
-            string connMDB = "Provider=Microsoft.JET.OLEDB.4.0;data source=" + mdbPath;
-            Catalog catTemplate = new Catalog();
-            Catalog catMDB = new Catalog();
-            try
-            {
-                catTemplate.let_ActiveConnection(connTemplate);
-                catMDB.let_ActiveConnection(connMDB);
-
-                //fill up list of data tables
-                foreach (Table tblData in catMDB.Tables)
+            //if (File.Exists(_AppPath + "\\template.mdb"))
+            //{
+                string connTemplate = "Provider=Microsoft.JET.OLEDB.4.0;data source=" + _AppPath + "\\template.mdb";
+                string connMDB = "Provider=Microsoft.JET.OLEDB.4.0;data source=" + mdbPath;
+                Catalog catTemplate = new Catalog();
+                Catalog catMDB = new Catalog();
+                try
                 {
-                    string tdName = tblData.Name;
-                    if (tdName.Substring(0, 4) != "MSys" && tdName.Substring(0, 5) != "temp_")
-                    {
-                        tableList.Add(tdName);
-                    }
-                }
+                    catTemplate.let_ActiveConnection(connTemplate);
+                    catMDB.let_ActiveConnection(connMDB);
 
-                //get table names  in the template database
-                foreach (Table tblTemplate in catTemplate.Tables)
-                {
-                    string tdName = tblTemplate.Name;
-                    if (tdName.Substring(0,4) !="MSys" && tdName.Substring(0,5) != "temp_")
+                    //fill up list of data tables
+                    foreach (Table tblData in catMDB.Tables)
                     {
-                        if (tableList.Contains(tdName))
+                        string tdName = tblData.Name;
+                        if (tdName.Substring(0, 4) != "MSys" && tdName.Substring(0, 5) != "temp_")
                         {
+                            tableList.Add(tdName);
+                        }
+                    }
 
-                            //check for columns
-                            foreach(Column col in catMDB.Tables[tdName].Columns)
+                    //get table names  in the template database
+                    foreach (Table tblTemplate in catTemplate.Tables)
+                    {
+                        string tdName = tblTemplate.Name;
+                        if (tdName.Substring(0, 4) != "MSys" && tdName.Substring(0, 5) != "temp_")
+                        {
+                            if (tableList.Contains(tdName))
                             {
-                                colList.Add(col.Name);
-                            }
 
-                            foreach (Column col in tblTemplate.Columns)
-                            {
-                                var mdbCol = new Column();
-                                if (!colList.Contains(col.Name))
+                                //check for columns
+                                foreach (Column col in catMDB.Tables[tdName].Columns)
                                 {
-                                    catMDB.Tables[tdName].Columns.Append(col.Name, col.Type, col.DefinedSize);
+                                    colList.Add(col.Name);
                                 }
-                                mdbCol = catMDB.Tables[tdName].Columns[col.Name];
-                                try
+
+                                foreach (Column col in tblTemplate.Columns)
                                 {
-                                    mdbCol.Properties["Jet OLEDB:Allow Zero Length"].Value = col.Properties["Jet OLEDB:Allow Zero Length"].Value;
-                                    mdbCol.Properties["Description"].Value = col.Properties["Description"].Value;
-                                }
-                                catch { }
-                            }
-
-                            //check for indexes
-                            colList.Clear();
-
-                            foreach(Index i in catMDB.Tables[tdName].Indexes)
-                            {
-                                colList.Add(i.Name);
-                            }
-
-                            foreach(Index i in tblTemplate.Indexes)
-                            {
-                                if (!colList.Contains(i.Name))
-                                {
-                                    Index newIndex = new Index
+                                    var mdbCol = new Column();
+                                    if (!colList.Contains(col.Name))
                                     {
-                                        Name = i.Name,
-                                        Unique = i.Unique,
-                                        PrimaryKey = i.PrimaryKey
-                                    };
+                                        catMDB.Tables[tdName].Columns.Append(col.Name, col.Type, col.DefinedSize);
+                                    }
+                                    mdbCol = catMDB.Tables[tdName].Columns[col.Name];
+                                    try
+                                    {
+                                        mdbCol.Properties["Jet OLEDB:Allow Zero Length"].Value = col.Properties["Jet OLEDB:Allow Zero Length"].Value;
+                                        mdbCol.Properties["Description"].Value = col.Properties["Description"].Value;
+                                    }
+                                    catch { }
+                                }
+
+                                //check for indexes
+                                colList.Clear();
+
+                                foreach (Index i in catMDB.Tables[tdName].Indexes)
+                                {
+                                    colList.Add(i.Name);
+                                }
+
+                                foreach (Index i in tblTemplate.Indexes)
+                                {
+                                    if (!colList.Contains(i.Name))
+                                    {
+                                        Index newIndex = new Index
+                                        {
+                                            Name = i.Name,
+                                            Unique = i.Unique,
+                                            PrimaryKey = i.PrimaryKey
+                                        };
+                                        foreach (Column c in i.Columns)
+                                        {
+                                            newIndex.Columns.Append(c.Name);
+                                        }
+                                        try
+                                        {
+                                            catMDB.Tables[tdName].Indexes.Append(newIndex);
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            //TODO: Find out this error
+                                            ErrorLogger.Log(ex);
+                                            // adding a new index to an existing table
+                                            // always end in an COM error
+                                        }
+                                    }
+                                }
+
+                            }
+                            else
+                            {
+                                //append new tables that are not found in the template database
+                                Table newTable = new Table();
+                                newTable.Name = tdName;
+
+                                //create columns
+                                foreach (Column col in tblTemplate.Columns)
+                                {
+                                    newTable.Columns.Append(col.Name, col.Type, col.DefinedSize);
+                                }
+
+                                //create indexes
+                                foreach (Index i in tblTemplate.Indexes)
+                                {
+                                    Index newIndex = new Index();
                                     foreach (Column c in i.Columns)
                                     {
                                         newIndex.Columns.Append(c.Name);
                                     }
-                                    try
-                                    {
-                                        catMDB.Tables[tdName].Indexes.Append(newIndex);
-                                    }
-                                    catch(Exception ex)
-                                    {
-                                        //TODO: Find out this error
-                                        ErrorLogger.Log(ex);
-                                        // adding a new index to an existing table
-                                        // always end in an COM error
-                                    }
+                                    newIndex.Name = i.Name;
+                                    newIndex.PrimaryKey = i.PrimaryKey;
+                                    newTable.Indexes.Append(newIndex);
                                 }
+
+                                //finally append the new table
+                                catMDB.Tables.Append(newTable);
                             }
 
                         }
-                        else
-                        {
-                            //append new tables that are not found in the template database
-                            Table newTable = new Table();
-                            newTable.Name = tdName;
-
-                            //create columns
-                            foreach (Column col in tblTemplate.Columns)
-                            {
-                                newTable.Columns.Append(col.Name, col.Type, col.DefinedSize);
-                            }
-
-                            //create indexes
-                            foreach (Index i in tblTemplate.Indexes)
-                            {
-                                Index newIndex = new Index();
-                                foreach (Column c in i.Columns)
-                                {
-                                    newIndex.Columns.Append(c.Name);
-                                }
-                                newIndex.Name = i.Name;
-                                newIndex.PrimaryKey = i.PrimaryKey;
-                                newTable.Indexes.Append(newIndex);
-                            }
-
-                            //finally append the new table
-                            catMDB.Tables.Append(newTable);
-                        }
-                        
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                ErrorLogger.Log(ex, true);
-                cancel = true;
-            }
-
+                catch (Exception ex)
+                {
+                    ErrorLogger.Log(ex, true);
+                    cancel = true;
+                }
+            //}
+            //else
+            //{
+            //    FileExists = false;
+            //    cancel = true;
+            //}
             return !cancel;
         }
 
@@ -1013,6 +1073,7 @@ namespace FAD3
                     GetGearClass();
                     GetVesselTypes();
                 }
+                
 			}
 		}
 
