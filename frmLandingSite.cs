@@ -104,7 +104,7 @@ namespace FAD3
 		
 		void SetMunicipalitiesCombo(long ProvNo )
 		{
-			global.ProvinceNo(ProvNo);
+			global.MunicipalitiesFromProvinceNo(ProvNo);
 			//comboBox2.Items.Clear();
 			comboBox2.DataSource = new BindingSource(global.munDict,null);
 			comboBox2.DisplayMember = "Value";

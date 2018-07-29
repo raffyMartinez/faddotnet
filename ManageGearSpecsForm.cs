@@ -18,12 +18,18 @@ namespace FAD3
         int HiddenColIndex;
         List<string> _DeletedSpecsRow = new List<string>();
 
-        public ManageGearSpecsForm(string GearVarGuid, string GearVarName)
+        public ManageGearSpecsForm(string GearVarGuid, string GearVarName = null)
         {
             InitializeComponent();
             _GearVarGuid = GearVarGuid;
-            _GearVarName = GearVarName;
-            ManageGearSpecsClass.GearVariation(_GearVarGuid, _GearVarName);
+            if (GearVarName == null)
+                ManageGearSpecsClass.GearVarGuid(GearVarGuid);
+            else
+            {
+                _GearVarName = GearVarName;
+                ManageGearSpecsClass.GearVariation(_GearVarGuid, _GearVarName);
+            }
+
             _GearSpecs = ManageGearSpecsClass.GearSpecifications;
         }
 
@@ -125,8 +131,15 @@ namespace FAD3
                     Type = lvi.SubItems[1].Text,
                     Notes = lvi.SubItems[2].Text,
                     DataStatus = ds,
-                    RowGuid = lvi.Name
+                    RowGuid = lvi.Name,
                 };
+
+                if(spec.Sequence != lvi.Index + 1)
+                {
+                    spec.DataStatus = global.fad3DataStatus.statusEdited;
+                    spec.Sequence = lvi.Index + 1;
+                }
+
                 _GearSpecs.Add(spec);
             }
 

@@ -48,7 +48,7 @@
             this.listViewVariations.ContextMenuStrip = this.dropDownMenu;
             this.listViewVariations.Location = new System.Drawing.Point(12, 80);
             this.listViewVariations.Name = "listViewVariations";
-            this.listViewVariations.Size = new System.Drawing.Size(220, 283);
+            this.listViewVariations.Size = new System.Drawing.Size(259, 283);
             this.listViewVariations.TabIndex = 0;
             this.listViewVariations.UseCompatibleStateImageBehavior = false;
             this.listViewVariations.Click += new System.EventHandler(this.OnlistView_Click);
@@ -64,9 +64,9 @@
             // listViewCodes
             // 
             this.listViewCodes.ContextMenuStrip = this.dropDownMenu;
-            this.listViewCodes.Location = new System.Drawing.Point(238, 80);
+            this.listViewCodes.Location = new System.Drawing.Point(277, 80);
             this.listViewCodes.Name = "listViewCodes";
-            this.listViewCodes.Size = new System.Drawing.Size(220, 283);
+            this.listViewCodes.Size = new System.Drawing.Size(181, 283);
             this.listViewCodes.TabIndex = 1;
             this.listViewCodes.UseCompatibleStateImageBehavior = false;
             this.listViewCodes.Click += new System.EventHandler(this.OnlistView_Click);
@@ -129,7 +129,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(235, 61);
+            this.label2.Location = new System.Drawing.Point(274, 61);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(79, 16);
             this.label2.TabIndex = 7;

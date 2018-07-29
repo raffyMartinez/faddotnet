@@ -65,6 +65,16 @@ namespace FAD3
             InitializeComponent();
         }
 
+        static void FillGearVarSpecsColumn(ListView lv)
+        {
+            foreach (ListViewItem lvi in lv.Items)
+            {
+                lvi.SubItems.Add("");
+                if (gear.GearVarHasSpecsTemplate(lvi.Name))
+                    lvi.SubItems[1].Text = "x";
+            }
+        }
+
         public void PopulateLists()
         {
             var WidthPercent = .8D;
@@ -85,7 +95,7 @@ namespace FAD3
 
             foreach (Control c in Controls)
             {
-                if (c.GetType().ToString() == "System.Windows.Forms.ListView")
+                if (c.GetType().Name == "ListView")
                 {
                     ((ListView)c).With(o =>
                     {
@@ -100,6 +110,8 @@ namespace FAD3
             //fill this listview with gear variations belonging to a class
             var lv = listViewVariations;
             ch = lv.Columns.Add("Variation");
+            var cw = ch.Width;
+            lv.Columns.Add("Specs");
             FillVariationsList();
             if (_GearVarGuid.Length > 0)
                 lv.Items[_GearVarGuid].Selected = true;
@@ -108,7 +120,9 @@ namespace FAD3
                 lv.Items[0].Selected = true;
                 _GearVarGuid = lv.Items[0].Name;
             }
-            ch.Width = (int)(lv.Width * WidthPercent);
+            ch.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+            if (ch.Width < cw) ch.Width = cw;
+            FillGearVarSpecsColumn(lv);
 
 
             //fill this list view with gear codes belonging to a variation
@@ -171,7 +185,7 @@ namespace FAD3
         private void FillLocalNames()
         {
             listViewLocalNames.Items.Clear();
-            var list = global.GearLocalName_TargetArea(_GearRefCode, _TargetAreaGuid);
+            var list = gear.GearLocalName_TargetArea(_GearRefCode, _TargetAreaGuid);
             foreach (var i in list)
             {
                 var lvi = new ListViewItem
@@ -187,7 +201,7 @@ namespace FAD3
         private void FillRefCodeUsage()
         {
             listViewWhereUsed.Items.Clear();
-            var list = global.TargetAreaUsed_RefCode(_GearRefCode);
+            var list = gear.TargetAreaUsed_RefCode(_GearRefCode);
             foreach (var i in list)
             {
                 var lvi = new ListViewItem
@@ -202,7 +216,7 @@ namespace FAD3
         private void FillRefCodeList()
         {
             listViewCodes.Items.Clear();
-            var list = global.GearSubVariations(_GearVarGuid);
+            var list = gear.GearSubVariations(_GearVarGuid);
             foreach (KeyValuePair<string, bool> kv in list)
             {
                 var lvi = new ListViewItem
@@ -220,15 +234,17 @@ namespace FAD3
         {
             listViewVariations.Items.Clear();
             var key = ((KeyValuePair<string, string>)comboClass.SelectedItem).Key;
-            var list = global.GearVariationsUsage(key);
-            foreach (KeyValuePair<string, string> kv in list)
+            var list = gear.GearVariationsWithSpecs(key);
+            foreach (var item in list)
             {
                 var lvi = new ListViewItem
                 {
-                    Name = kv.Key,
-                    Text = kv.Value
+                    Name = item.Item1,
+                    Text = item.Item2
                 };
+                lvi.SubItems.Add(item.Item3 ? "x" : "");
                 listViewVariations.Items.Add(lvi);
+                
             }
         }
 
@@ -236,7 +252,7 @@ namespace FAD3
         {
             comboClass.With(o =>
             {
-                o.DataSource = new BindingSource(global.GearClass, null);
+                o.DataSource = new BindingSource(gear.GearClass, null);
                 o.DisplayMember = "Value";
                 o.ValueMember = "Key";
                 o.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
@@ -259,6 +275,12 @@ namespace FAD3
                     listViewVariations.Items.Clear();
 
                     FillVariationsList();
+                    var ch = listViewVariations.Columns[0];
+                    var cw = ch.Width;
+                    ch.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+                    if (ch.Width < cw) ch.Width = cw;
+                    FillGearVarSpecsColumn(listViewVariations);
+
                     if (listViewVariations.Items.Count > 0)
                     {
                         if (listViewVariations.Items.ContainsKey(_GearVarGuid))

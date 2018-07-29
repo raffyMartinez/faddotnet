@@ -201,7 +201,7 @@ namespace FAD3
                 Tag = e.Key
             };
             panelUI.Controls.Add(lbl);
-            lbl.Location = new System.Drawing.Point(x, _yPos);
+            lbl.Location = new Point(x, _yPos);
             if (lbl.Width > _WidestLabel)
                 _WidestLabel = lbl.Width;
 
@@ -223,14 +223,14 @@ namespace FAD3
                     Name = "errLabel" + e.Key,
                     Text = "!",
                     AutoSize = true,
-                    Size = new System.Drawing.Size(3, 40),
+                    Size = new Size(3, 40),
                     Font = f,
                     Tag = e.Key,
                     Visible = false,
                     ForeColor = Color.Red
                 };
                 panelUI.Controls.Add(lblError);
-                lblError.Location = new System.Drawing.Point(x, _yPos);
+                lblError.Location = new Point(x, _yPos);
             }
 
 
@@ -268,12 +268,12 @@ namespace FAD3
                             break;
                         case "GearClass":
                             //((ComboBox)ctl).DataSource = new BindingSource(global.GearClass, null);
-                            global.GetGearClassEx((ComboBox)ctl);
+                            gear.GetGearClassEx((ComboBox)ctl);
                             break;
                         case "FishingGear":
                             if (!_isNew)
                             {
-                                global.GearClassUsed = _lv.Items["GearClass"].Tag.ToString();
+                                gear.GearClassUsed = _lv.Items["GearClass"].Tag.ToString();
                             }
 
                             if (_GearClassGuid.Length == 0)
@@ -284,11 +284,11 @@ namespace FAD3
                                 }
                                 else
                                 {
-                                    _GearClassGuid = global.GearClassUsed;
+                                    _GearClassGuid = gear.GearClassUsed;
                                 }
                             }
 
-                            global.GearVariationsUsage(_GearClassGuid, _AOIGuid, (ComboBox)ctl);
+                            gear.GearVariationsUsage(_GearClassGuid, _AOIGuid, (ComboBox)ctl);
                             //var MySource = global.GearVariationsUsage(_GearClassGuid, _AOIGuid, (ComboBox)ctl);
                             //if (MySource.Count > 0)
                             //{
@@ -406,7 +406,9 @@ namespace FAD3
 
                                 //foreach (var item in myList)
                                 //    ((TextBox)ctl).Text += item + "\r\n";
-
+                                break;
+                            case "GearSpecs":
+                                ctl.Text = ManageGearSpecsClass.GetSampledSpecsEx(_samplingGUID);
                                 break;
                         }
                     }
@@ -508,8 +510,8 @@ namespace FAD3
                     Tag = e.Key
                 };
                 panelUI.Controls.Add(btn);
-                btn.Location = new System.Drawing.Point(x, _yPos - 3);
-                btn.Click += new EventHandler(OnbuttonSamplingFields_Click);
+                btn.Location = new Point(x, _yPos - 3);
+                btn.Click += OnbuttonSamplingFields_Click;
                 if (e.Key == "Enumerator" && !_isNew)
                 {
                     _topControl = btn;
@@ -678,6 +680,17 @@ namespace FAD3
                     });
                     break;
                 case "btnGearSpecs":
+                    SampledGear_SpecsForm sgf = SampledGear_SpecsForm.GetInstance(_GearVarGuid, _GearVarName);
+                    
+                    if (!sgf.Visible)
+                    {
+                        sgf.Show(this);
+                    }
+                    else
+                    {
+                        sgf.BringToFront();
+                    }
+                    sgf.SamplingGUID = _samplingGUID;
                     break;
                 case "btnVesselDimension":
                     frmVesselDimension f = new frmVesselDimension();
@@ -974,7 +987,7 @@ namespace FAD3
 
                                     targetCombo = (ComboBox)panelUI.Controls["comboFishingGear"];
                                     string myGearClassGUID = ((KeyValuePair<string, string>)((ComboBox)panelUI.Controls["comboGearClass"]).SelectedItem).Key;
-                                    comboItems = global.GearVariationsUsage(myGearClassGUID, key);
+                                    comboItems = gear.GearVariationsUsage(myGearClassGUID, key);
                                     ChangeComboDataSource(targetCombo, comboItems);
 
 
@@ -988,7 +1001,7 @@ namespace FAD3
                                     _GearClassName = ((ComboBox)panelUI.Controls["comboGearClass"]).Text;
                                     string myAOIGUID = ((KeyValuePair<string, string>)((ComboBox)panelUI.Controls["comboTargetArea"]).SelectedItem).Key;
                                     targetCombo = (ComboBox)panelUI.Controls["comboFishingGear"];
-                                    comboItems = global.GearVariationsUsage(key, myAOIGUID);
+                                    comboItems = gear.GearVariationsUsage(key, myAOIGUID);
                                     ChangeComboDataSource(targetCombo, comboItems);
                                     break;
                                 case "comboFishingGear":

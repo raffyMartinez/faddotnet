@@ -13,7 +13,6 @@ namespace FAD3
         private static List<string> _GenusList = new List<string>();
         private static List<string> _LocalNameList = new List<string>();
         private static Dictionary<string, string> _LocalNameListDict = new Dictionary<string, string>();
-        private static Dictionary<string, string> _GearLocalNameListDict = new Dictionary<string, string>();
         private static Dictionary<string,string> _speciesList = new Dictionary<string,string>();
         private static string _Genus = "";
         private static long _LocalNamesCount = 0;
@@ -30,15 +29,6 @@ namespace FAD3
         public static long NamesCount
         {
             get { return _LocalNamesCount + _SciNamesCount; }
-        }
-
-        public static Dictionary<string,string> GearLocalNames
-        {
-            get
-            {
-                GetGearLocalNames();
-                return _GearLocalNameListDict;
-            }
         }
 
         public static long LocalNamesCount
@@ -117,31 +107,6 @@ namespace FAD3
                     {
                         DataRow dr = dt.Rows[i];
                         _LocalNameListDict.Add(dr["NameNo"].ToString(), dr["Name1"].ToString());
-                    }
-                }
-                catch (Exception ex)
-                {
-                    ErrorLogger.Log(ex);
-                }
-            }
-        }
-
-         static void GetGearLocalNames()
-        {
-            DataTable dt = new DataTable();
-            using (var conection = new OleDbConnection(global.ConnectionString))
-            {
-                try
-                {
-                    conection.Open();
-                    string query = "SELECT LocalName, LocalNameGUID FROM tblGearLocalNames ORDER BY LocalName";
-                    var adapter = new OleDbDataAdapter(query, conection);
-                    adapter.Fill(dt);
-
-                    for (int i = 0; i < dt.Rows.Count; i++)
-                    {
-                        DataRow dr = dt.Rows[i];
-                        _GearLocalNameListDict.Add(dr["LocalNameGUID"].ToString(), dr["LocalName"].ToString());
                     }
                 }
                 catch (Exception ex)

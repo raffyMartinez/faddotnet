@@ -113,7 +113,7 @@ namespace FAD3
             {
                 case
                 global.fad3GearEditAction.addGearVariation:
-                    _List = global.AllGearVariationNames();
+                    _List = gear.AllGearVariationNames();
                     foreach (var item in _List)
                     {
                         listBox.Items.Add(item);
@@ -137,7 +137,7 @@ namespace FAD3
                         if (_action == global.fad3GearEditAction.addAOI)
                             o.DataSource = new BindingSource(AOI.AOIs, null);
                         else
-                            o.DataSource = new BindingSource(names.GearLocalNames, null); ;
+                            o.DataSource = new BindingSource(gear.GearLocalNames, null); ;
 
                         o.DisplayMember = "Value";
                         o.ValueMember = "Key";

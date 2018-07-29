@@ -52,6 +52,18 @@ namespace FAD3
         private string _VesLength = "";
         private string _VesWidth = "";
         private string _VesHeight = "";
+        private bool _SetupSampledGearSpec = false;
+
+
+        public string SamplingGUID
+        {
+            get { return _SamplingGUID; }
+            set
+            {
+                _SamplingGUID = value;
+
+            }
+        }
 
         public static int TextWidth(string text, Font f)
         {
@@ -1147,7 +1159,7 @@ namespace FAD3
                             _GearVarName = treeView1.SelectedNode.Text;
                             var arr1 = treeView1.SelectedNode.Name.Split('|');
                             _GearVarGUID = arr1[1];
-                            var rv = global.GearClassGuidNameFromGearVarGuid(_GearVarGUID);
+                            var rv = gear.GearClassGuidNameFromGearVarGuid(_GearVarGUID);
                             _GearClassName = rv.Value;
                             _GearClassGUID = rv.Key;
                             _LSNode = e.Node.Parent;
@@ -1170,7 +1182,7 @@ namespace FAD3
                             _LandingSiteGuid = treeView1.SelectedNode.Parent.Parent.Name;
                             _GearVarName = treeView1.SelectedNode.Parent.Text;
 
-                            rv = global.GearClassGuidNameFromGearVarGuid(_GearVarGUID);
+                            rv = gear.GearClassGuidNameFromGearVarGuid(_GearVarGUID);
                             _GearClassName = rv.Value;
                             _GearClassGUID = rv.Key;
                             _LSNode = e.Node.Parent.Parent;
@@ -1257,7 +1269,9 @@ namespace FAD3
                     case "Enumerator":
                     case "GearClass":
                     case "FishingGear":
+                        break;
                     case "GearSpecs":
+                        lvi.SubItems[1].Text = ManageGearSpecsClass.GetSampledSpecsEx(_SamplingGUID, Truncated:true);
                         break;
                     case "AdditionalFishingGround":
                         foreach (var item in FishingGrid.AdditionalFishingGrounds(_SamplingGUID))
@@ -1567,7 +1581,7 @@ namespace FAD3
                         break;
                     case "sampling":
                         SetUPLV("samplingDetail");
-                        _SamplingGUID = lvi.Tag.ToString();
+                        SamplingGUID = lvi.Tag.ToString();
                         ShowCatchDetailEx(_SamplingGUID);
                         lvi.BackColor = Color.Gainsboro;
                         break;
@@ -1702,10 +1716,11 @@ namespace FAD3
 
         private void listView1_MouseDown(object sender, MouseEventArgs e)
         {
+            ListView lv = (ListView)sender;
+            ListViewHitTestInfo lvh = lv.HitTest(e.X, e.Y);
             if (e.Button == MouseButtons.Right)
             {
-                ListView lv = (ListView)sender;
-                ListViewHitTestInfo lvh = lv.HitTest(e.X, e.Y);
+
                 if (_TreeLevel == "sampling")
                 {
                     ConfigDropDownMenu(listView1, lvh);
@@ -1714,6 +1729,10 @@ namespace FAD3
                 {
                     ConfigDropDownMenu(listView1);
                 }
+            }
+            else
+            {
+                if (listView1.Tag.ToString() == "sampling" &&  lvh.Item !=null ) SamplingGUID = lvh.Item.Tag.ToString();
             }
         }
 

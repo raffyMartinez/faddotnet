@@ -68,7 +68,7 @@ namespace FAD3
 			set{
 				_GearVarGUID = value;
 				string MyGearClass = GearClassFromGearVar(_GearVarGUID);
-                global.GearClassUsed = MyGearClass;
+                gear.GearClassUsed = MyGearClass;
 			}
 		}
 		
