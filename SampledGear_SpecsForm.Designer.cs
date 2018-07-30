@@ -58,13 +58,14 @@
             // 
             // buttonCancel
             // 
-            this.buttonCancel.CausesValidation = false;
+            this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.buttonCancel.Location = new System.Drawing.Point(271, 417);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(58, 25);
             this.buttonCancel.TabIndex = 2;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = true;
+            this.buttonCancel.Click += new System.EventHandler(this.Onbutton_Click);
             // 
             // labelTitle
             // 
@@ -97,6 +98,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.CancelButton = this.buttonCancel;
             this.CausesValidation = false;
             this.ClientSize = new System.Drawing.Size(397, 479);
             this.Controls.Add(this.statusBar);
@@ -111,6 +113,7 @@
             this.Text = "SampledGear_SpecsForm";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnSpecsForm_FormClosed);
             this.Load += new System.EventHandler(this.OnSpecsForm_Load);
+            this.Click += new System.EventHandler(this.Onbutton_Click);
             this.statusBar.ResumeLayout(false);
             this.statusBar.PerformLayout();
             this.ResumeLayout(false);

@@ -40,7 +40,20 @@ namespace FAD3
         string _DatePrompt = "";
         string _TimePrompt = "";
 
+        bool _SampledGearSpecIsEdited;
+
         List<string> _FishingGrounds;
+
+        public bool SampledGearSpecIsEdited
+        {
+            get { return _SampledGearSpecIsEdited; }
+            set
+            {
+                _SampledGearSpecIsEdited = value;
+                if (_SampledGearSpecIsEdited)
+                    panelUI.Controls["textGearSpecs"].Text = ManageGearSpecsClass.PreSavedSampledGearSpec();
+            }
+        }
 
         public List<string> FishingGrounds
         {
@@ -173,6 +186,7 @@ namespace FAD3
         private void OnFormClosed(object sender, FormClosedEventArgs e)
         {
             global.SaveFormSettings(this);
+            ManageGearSpecsClass.SampledGearSpecs.Clear();
 
         }
 
@@ -645,8 +659,10 @@ namespace FAD3
 
             PopulateFGList();
 
-            return _sampling.UpdateEffort(_isNew, EffortData, _FishingGrounds);
-
+            if (_sampling.UpdateEffort(_isNew, EffortData, _FishingGrounds))
+                return ManageGearSpecsClass.SaveSampledGearSpecs();
+            else
+                return false;
         }
 
 
@@ -680,7 +696,7 @@ namespace FAD3
                     });
                     break;
                 case "btnGearSpecs":
-                    SampledGear_SpecsForm sgf = SampledGear_SpecsForm.GetInstance(_GearVarGuid, _GearVarName);
+                    SampledGear_SpecsForm sgf = SampledGear_SpecsForm.GetInstance(_GearVarGuid, _GearVarName, this);
                     
                     if (!sgf.Visible)
                     {

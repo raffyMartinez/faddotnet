@@ -52,8 +52,9 @@ namespace FAD3
         private string _VesLength = "";
         private string _VesWidth = "";
         private string _VesHeight = "";
-        private bool _SetupSampledGearSpec = false;
 
+        private int _MouseX = 0;
+        private int _MouseY = 0;
 
         public string SamplingGUID
         {
@@ -922,7 +923,10 @@ namespace FAD3
 
 
                                 row.SubItems.Add(dr[3].ToString());                         //enumerator
-                                row.SubItems.Add("");                                       //gear specs
+                                
+                                //gear specs
+                                row.SubItems.Add(ManageGearSpecsClass.SampledGearHasSpecs(dr[6].ToString()) ? "x":"");                                       //gear specs
+
                                 row.SubItems.Add(dr[4].ToString());                         //notes
 
                                 lvi = this.listView1.Items.Add(row);
@@ -1586,7 +1590,14 @@ namespace FAD3
                         lvi.BackColor = Color.Gainsboro;
                         break;
                     case "samplingDetail":
-                        ShowSamplingDetailForm();
+                        if(lvi.Name =="GearSpecs")
+                        {
+                            var s = ManageGearSpecsClass.GetSampledSpecsEx(_SamplingGUID);
+                            if (s.Length == 0) s = "Gear specs not found";
+                            MessageBox.Show(s, "Gear specifications", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                        else
+                          ShowSamplingDetailForm();
                         break;
                 }
             }
@@ -1742,6 +1753,5 @@ namespace FAD3
             f.Parent_form = this;
             f.ShowDialog(this);
         }
-
     }
 }

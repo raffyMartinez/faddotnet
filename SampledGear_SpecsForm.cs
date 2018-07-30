@@ -11,13 +11,14 @@ namespace FAD3
 {
     public partial class SampledGear_SpecsForm : Form
     {
-        public SampledGear_SpecsForm(string GearVarGuid, string GearVarName)
+        public SampledGear_SpecsForm(string GearVarGuid, string GearVarName, frmSamplingDetail Parent_Form)
         {
             InitializeComponent();
             _GearVarGuid = GearVarGuid;
             _GearVarName = GearVarName;
             ManageGearSpecsClass.GearVariation(_GearVarGuid, GearVarName);
             _GearSpecs = ManageGearSpecsClass.GearSpecifications;
+            _Parent_form = Parent_Form;
         }
 
         private string _SamplingGUID;
@@ -25,8 +26,11 @@ namespace FAD3
         private string _GearVarGuid;
         private string _GearVarName;
         private List<ManageGearSpecsClass.GearSpecification> _GearSpecs = new List<ManageGearSpecsClass.GearSpecification>();
-        private Dictionary<string, ManageGearSpecsClass.SampledGearSpecData> _SampledGearSpecs = new Dictionary<string, ManageGearSpecsClass.SampledGearSpecData>();
         private bool IsNew = true;
+        private bool _SampledGearSpecDataIsEdited = false;
+        private frmSamplingDetail _Parent_form;
+
+
 
         public string SamplingGUID
         {
@@ -35,22 +39,25 @@ namespace FAD3
             {
                 _SamplingGUID = value;
                 ManageGearSpecsClass.SamplingGuid = _SamplingGUID;
-                if (_GearSpecs.Count > 0 && ManageGearSpecsClass.HasSampledGearSpecs)
+
+                //if a gear spec template for the sampled gear exists (_GearSpecs.Count>0) and
+                //the sampled gear has spec data in the database OR there are unsaved edits
+                if (_GearSpecs.Count > 0 && (ManageGearSpecsClass.HasSampledGearSpecs || ManageGearSpecsClass.HasUnsavedSampledGearSpecEdits))
                 {
-                    _SampledGearSpecs = ManageGearSpecsClass.SampledGearSpecs;
-                    FillFields();
+                    FillFields(); //fills the form controls with the specifications data
                 }
             }
         }
 
-        public static SampledGear_SpecsForm GetInstance(string GearVarGuid, string GearVarName)
+        public static SampledGear_SpecsForm GetInstance(string GearVarGuid, string GearVarName, frmSamplingDetail Parent_Form)
         {
-            if (_instance == null) _instance = new SampledGear_SpecsForm(GearVarGuid, GearVarName);
+            if (_instance == null) _instance = new SampledGear_SpecsForm(GearVarGuid, GearVarName, Parent_Form);
             return _instance;
         }
 
         private void OnSpecsForm_Load(object sender, EventArgs e)
         {
+            //show a message that gear variation has no template specs
             if (_GearSpecs.Count == 0)
             {
                 buttonOk.Visible = buttonCancel.Visible = labelTitle.Visible = false;
@@ -95,6 +102,8 @@ namespace FAD3
 
 
             }
+
+            //Dynamically create fields based on the template
             else
             {
                 var x = 10;
@@ -138,11 +147,6 @@ namespace FAD3
                     c.Tag = spec.Type + "|" + global.fad3DataStatus.statusFromDB.ToString();
                     var arr = spec.Property.Split(' ');
                     c.Name = spec.RowGuid;
-                    //for (int n = 0; n < arr.Length; n++)
-                    //{
-                    //    arr[n] = arr[n].Substring(0, 1).ToUpper() + arr[n].Substring(1, arr[n].Length - 1);
-                    //    c.Name += arr[n];
-                    //}
 
                     if (spec.Notes.Length > 0)
                     {
@@ -179,16 +183,20 @@ namespace FAD3
 
         }
 
+
+        /// <summary>
+        /// fill the controls (textbox and combobox) with the specifications data of the sampled gear
+        /// </summary>
         private void FillFields()
         {
-            if (ManageGearSpecsClass.HasSampledGearSpecs)
+            if (ManageGearSpecsClass.HasSampledGearSpecs || ManageGearSpecsClass.HasUnsavedSampledGearSpecEdits)
             {
                 foreach (Control c in panelUI.Controls)
                 {
                     if ((c.GetType().Name == "TextBox" || c.GetType().Name == "ComboBox") &&
-                         _SampledGearSpecs.Keys.Contains(c.Name))
+                         ManageGearSpecsClass.SampledGearSpecs.Keys.Contains(c.Name))
                     {
-                        var spec = _SampledGearSpecs[c.Name];
+                        var spec = ManageGearSpecsClass.SampledGearSpecs[c.Name];
                         c.Text = spec.SpecValue;
                         IsNew = false;
                     }
@@ -196,6 +204,11 @@ namespace FAD3
             }
         }
 
+        /// <summary>
+        /// Events for the buttons when there is no gear spec template
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnButtonNoSpecs_Click(object sender, EventArgs e)
         {
             switch (((Button)sender).Name)
@@ -250,10 +263,14 @@ namespace FAD3
                 {
                     var ds = global.fad3DataStatus.statusFromDB.ToString();
                     if (IsNew)
+                    {
                         ds = global.fad3DataStatus.statusNew.ToString();
+                        _SampledGearSpecDataIsEdited = true;
+                    }
                     else
                         ds = global.fad3DataStatus.statusEdited.ToString();
 
+                    //set the tag of the control
                     o.Tag = arr[0] + "|" + ds;
                 }
 
@@ -277,7 +294,10 @@ namespace FAD3
                     {
                         var ds = global.fad3DataStatus.statusFromDB.ToString();
                         if (IsNew)
+                        {
                             ds = global.fad3DataStatus.statusNew.ToString();
+                            _SampledGearSpecDataIsEdited = true;
+                        }
                         else
                             ds = global.fad3DataStatus.statusEdited.ToString();
 
@@ -288,28 +308,64 @@ namespace FAD3
             });
         }
 
-        private bool SaveSampledGearSpecs()
+
+        /// <summary>
+        /// determine if the form's data has been edited
+        /// </summary>
+        private void TestForEdits()
         {
-            _SampledGearSpecs.Clear();
-            foreach (Control c in panelUI.Controls)
+            if (IsNew)
             {
-                var spec = new ManageGearSpecsClass.SampledGearSpecData();
-                if (c.GetType().Name=="TextBox" || c.GetType().Name == "ComboBox" )
+                foreach(Control c in panelUI.Controls)
                 {
-                    var arr = c.Tag.ToString().Split('|');
-                    if (IsNew) spec.RowID = Guid.NewGuid().ToString();
-                    spec.SpecGUID = c.Name;
-                    spec.SpecValue = c.Text;
-                    var ds = global.fad3DataStatus.statusFromDB;
-                    if (Enum.TryParse(arr[1], out ds)) spec.DataStatus = ds;
-                    spec.SamplingGUID = _SamplingGUID;
-                    _SampledGearSpecs.Add(spec.SpecGUID, spec);
+                    if(c.GetType().Name =="TextBox" || c.GetType().Name=="ComboBox")
+                    {
+                        _SampledGearSpecDataIsEdited = c.Text.Length > 0;
+                        if (_SampledGearSpecDataIsEdited) break;
+                    }
                 }
             }
+            else
+            {
+                foreach (KeyValuePair<string, ManageGearSpecsClass.SampledGearSpecData> kv in ManageGearSpecsClass.SampledGearSpecs)
+                {
+                    _SampledGearSpecDataIsEdited = panelUI.Controls[kv.Value.SpecGUID].Text != kv.Value.SpecValue;
+                    if (_SampledGearSpecDataIsEdited) break;
+                }
+            }
+        }
 
 
+        /// <summary>
+        /// replaces data from the sampled specs dictionary with the edited data
+        /// </summary>
+        private void PreSaveSampledGearSpecs()
+        {
+            //test if data is edited
+            TestForEdits();
 
-            return ManageGearSpecsClass.SaveSampledGearSpecs(_SampledGearSpecs);
+            if (_SampledGearSpecDataIsEdited)
+            {
+                ManageGearSpecsClass.SetSampledGearSpecsForPreSave();
+                foreach (Control c in panelUI.Controls)
+                {
+                    var spec = new ManageGearSpecsClass.SampledGearSpecData();
+                    if (c.GetType().Name == "TextBox" || c.GetType().Name == "ComboBox")
+                    {
+                        var arr = c.Tag.ToString().Split('|');
+                        if (IsNew) spec.RowID = Guid.NewGuid().ToString();
+                        spec.SpecGUID = c.Name;
+                        spec.SpecValue = c.Text;
+                        spec.SpecName = ManageGearSpecsClass.SpecNameFromSpecGUID(spec.SpecGUID);
+                        var ds = global.fad3DataStatus.statusFromDB;
+                        if (Enum.TryParse(arr[1], out ds)) spec.DataStatus = ds;
+                        spec.SamplingGUID = _SamplingGUID;
+
+                        ManageGearSpecsClass.SampledGearSpecs.Add(spec.SpecGUID, spec);
+                    }
+                }
+                _Parent_form.SampledGearSpecIsEdited = true;
+            }
         }
 
         private void Onbutton_Click(object sender, EventArgs e)
@@ -317,7 +373,8 @@ namespace FAD3
             switch (((Button)sender).Name)
             {
                 case "buttonOk":
-                    if (SaveSampledGearSpecs()) Close();
+                    PreSaveSampledGearSpecs();
+                    Close();
                     break;
                 case "buttonCancel":
                     Close();

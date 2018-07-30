@@ -12,31 +12,71 @@ namespace FAD3
         static string _GearVarName;
         static string _SamplingGuid;
         static bool _HasSampledGearSpecs;
+        static bool _HasUnsavedSampledGearSpecEdits;
 
         //this field contains the template for gear specs of a given gear variation
         static List<GearSpecification> _GearSpecifications = new List<GearSpecification>();
 
-        //this field contains the data of each spec of the sampled gear
+        //this field contains the spec data of the sampled gear
         static Dictionary<string, SampledGearSpecData> _SampledGearSpecs = new Dictionary<string, SampledGearSpecData>();
 
+
+        /// <summary>
+        /// Assigns the SamplingGuid.
+        /// A new GUID sets the _HasUnsavedSampledGearSpecEdits to false
+        /// </summary>
         public static string SamplingGuid
         {
             get { return _SamplingGuid; }
             set
             {
+                //set flag to false if sampling guid changes
+                if (_SamplingGuid != value)
+                    _HasUnsavedSampledGearSpecEdits = false;
+
                 _SamplingGuid = value;
 
-                //if a gear has a specs template then we get the sampled gear specs
-                //GetSampledGearSpecs will fill the _SampledGearSpecs Dictionary
-                if (_GearSpecifications.Count > 0) GetSampledGearSpecs();
+                //get the specs of the sampled gear from the database
+                if (!_HasUnsavedSampledGearSpecEdits && _GearSpecifications.Count > 0)
+                    //if a gear has a specs template then we get the sampled gear specs
+                    //GetSampledGearSpecs will fill the _SampledGearSpecs Dictionary
+                    GetSampledGearSpecs();
             }
         }
 
+
+        /// <summary>
+        /// Boolean. Returns if there are unsaved edits in the sampled gear's specifications
+        /// </summary>
+        public static bool HasUnsavedSampledGearSpecEdits
+        {
+            get { return _HasUnsavedSampledGearSpecEdits; }
+        }
+
+        /// <summary>
+        /// Clears the sampled gear spec dictionary so that it will
+        /// receive the edited or new data and then sets the
+        /// _HasUnsavedSampledGearSpecEdits flag to true
+        /// </summary>
+        public static void SetSampledGearSpecsForPreSave()
+        {
+            _SampledGearSpecs.Clear();
+            _HasUnsavedSampledGearSpecEdits = true;
+
+        }
+
+
+        /// <summary>
+        /// Dictionary. Returns the specifications of the sampled gear
+        /// </summary>
         public static Dictionary<string, SampledGearSpecData> SampledGearSpecs
         {
             get { return _SampledGearSpecs; }
         }
 
+        /// <summary>
+        /// struct that holds the template for the specs of a gear variation
+        /// </summary>
         public struct GearSpecification
         {
             public string Property { get; set; }
@@ -47,16 +87,26 @@ namespace FAD3
             public int Sequence { get; set; }
         }
 
+        /// <summary>
+        /// structure that holds the data of sampled gear's specs
+        /// </summary>
         public struct SampledGearSpecData
         {
+            private static global.fad3DataStatus _DataStatus;
+            public global.fad3DataStatus DataStatus { get; set; }
             public string SpecGUID { get; set; }
-            public string SpecValue { get; set; }
+            public string SpecName { get; set; }
             public string SamplingGUID { get; set; }
             public string RowID { get; set; }
-            public global.fad3DataStatus DataStatus { get; set; }
+            public string SpecValue { get; set; }
+
+
+
         }
 
-        //if the dictionary has specs data for the sampled gear
+        /// <summary>
+        /// Boolean. If there is specs data for the sampled gear in the database
+        /// </summary>
         public static bool HasSampledGearSpecs
         {
             get { return _HasSampledGearSpecs; }
@@ -85,6 +135,9 @@ namespace FAD3
             GetGearSpecs();  //get spec template of the gear variation
         }
 
+        /// <summary>
+        /// List. Returns the specifications template for the gear variation
+        /// </summary>
         public static List<GearSpecification> GearSpecifications
         {
             get { return _GearSpecifications; }
@@ -94,17 +147,18 @@ namespace FAD3
         /// <summary>
         /// save the specs of the gear that was sampled
         /// </summary>
-        /// <param name="SampledGearSpecs"></param>
-        /// <returns></returns>
-        public static bool SaveSampledGearSpecs(Dictionary<string, SampledGearSpecData> SampledGearSpecs)
+        public static bool SaveSampledGearSpecs()
         {
             using (var con = new OleDbConnection(global.ConnectionString))
             {
                 con.Open();
                 var sql = "";
                 var Success = false;
-                foreach (KeyValuePair<string, SampledGearSpecData> kv in SampledGearSpecs)
+                bool[] SaveSuccess = new bool[_SampledGearSpecs.Count];
+                var n = 0;
+                foreach (KeyValuePair<string, SampledGearSpecData> kv in _SampledGearSpecs)
                 {
+                    sql = "";
                     if (kv.Value.DataStatus == global.fad3DataStatus.statusNew)
                     {
                         sql = "Insert into tblSampledGearSpec (RowID, SamplingGUID, SpecID, [Value]) values ('{" +
@@ -130,15 +184,59 @@ namespace FAD3
                         {
                             Success = (update.ExecuteNonQuery() > 0);
                             //TODO: what to do if Success=false?
+
+                            SaveSuccess[n] = Success;
                             sql = "";
                         }
+                    n++;
+                }
+
+                //If all specs were successfully saved then set flag to false
+                _HasUnsavedSampledGearSpecEdits = false;
+                for (int i = 0; i < SaveSuccess.Length - 1; i++)
+                {
+                    if (!SaveSuccess[i])
+                    {
+                        _HasUnsavedSampledGearSpecEdits = true;
+                        break;
+                    }
                 }
             }
-            return true;
+
+            //return true if there are no unsaved edits
+            return !_HasUnsavedSampledGearSpecEdits;
+        }
+
+
+
+        /// <summary>
+        /// Boolean. Determine if the sampled gear has a specifications template
+        /// </summary>
+        /// <param name="SamplingGuid"></param>
+        /// <returns></returns>
+        public static bool SampledGearHasSpecs(string SamplingGuid)
+        {
+            var HasSpecs = false;
+            using (var con = new OleDbConnection(global.ConnectionString))
+            {
+                var sql = "SELECT TOP 1 SamplingGUID FROM tblGearSpecs INNER JOIN tblSampledGearSpec ON " +
+                          "tblGearSpecs.RowID = tblSampledGearSpec.SpecID WHERE tblGearSpecs.Version = '2' " +
+                          "AND tblSampledGearSpec.SamplingGUID ='{" + SamplingGuid + "}'";
+
+                using (var dt = new DataTable())
+                {
+                    con.Open();
+                    var adapter = new OleDbDataAdapter(sql, con);
+                    adapter.Fill(dt);
+                    HasSpecs = dt.Rows.Count > 0;
+                }
+            }
+            return HasSpecs;
         }
 
         /// <summary>
-        /// retrieve the specs of the gear that was sampled
+        /// Retrieve the specs of the gear that was sampled.
+        /// A Dictionary (_SampledGearSpecs) is filled.
         /// </summary>
         static void GetSampledGearSpecs()
         {
@@ -146,8 +244,10 @@ namespace FAD3
             {
                 _HasSampledGearSpecs = false;
                 _SampledGearSpecs.Clear();
-                var sql = "Select RowID, SpecID, Value from tblSampledGearSpec " +
-                    "where SamplingGUID = '{" + _SamplingGuid + "}'";
+                var sql = "SELECT tblGearSpecs.RowID, ElementName, SpecID, Value " +
+                    "FROM tblGearSpecs INNER JOIN tblSampledGearSpec ON tblGearSpecs.RowID = tblSampledGearSpec.SpecID " +
+                    "WHERE tblGearSpecs.Version = '2' AND tblSampledGearSpec.SamplingGUID = '{" + _SamplingGuid + "}'";
+
 
                 using (var dt = new DataTable())
                 {
@@ -163,6 +263,7 @@ namespace FAD3
                         s.SpecValue = dr["Value"].ToString();
                         s.SamplingGUID = _SamplingGuid;
                         s.SpecGUID = dr["SpecID"].ToString();
+                        s.SpecName = dr["ElementName"].ToString();
                         s.DataStatus = global.fad3DataStatus.statusFromDB;
 
                         _SampledGearSpecs.Add(s.SpecGUID, s);
@@ -174,7 +275,8 @@ namespace FAD3
 
 
         /// <summary>
-        /// Fills the template List gear specifications of a given gear variation
+        /// Gets the template for the gear specifications of a given gear variation
+        /// A List (_GearSpecifications) is filled
         /// </summary>
         static void GetGearSpecs()
         {
@@ -260,8 +362,42 @@ namespace FAD3
             return true;
         }
 
+
         /// <summary>
-        /// returns a sampled gear specs in string format
+        /// Returns the Property/Specification name given a specification guid
+        /// </summary>
+        /// <param name="SpecGuid"></param>
+        /// <returns></returns>
+        public static string SpecNameFromSpecGUID(string SpecGuid)
+        {
+            var SpecName = "";
+            foreach (GearSpecification item in _GearSpecifications)
+            {
+                if (item.RowGuid == SpecGuid)
+                {
+                    SpecName = item.Property;
+                    break;
+                }
+            }
+            return SpecName;
+        }
+
+        /// <summary>
+        /// returns a string of the presaved specifications of the sampled gear
+        /// </summary>
+        /// <returns></returns>
+        public static string PreSavedSampledGearSpec()
+        {
+            var s = "";
+            foreach (KeyValuePair<string, SampledGearSpecData> kv in _SampledGearSpecs)
+            {
+                s += kv.Value.SpecName + ": " + kv.Value.SpecValue + "\r\n";
+            }
+            return s;
+        }
+
+        /// <summary>
+        /// returns the saved sampled gear specs in string format
         /// </summary>
         /// <param name="SamplingGuid"></param>
         /// <param name="Truncated"></param>

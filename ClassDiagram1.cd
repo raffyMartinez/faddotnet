@@ -5,43 +5,6 @@
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
-    <NestedTypes>
-      <Enum Name="FAD3.global.fad3DataStatus" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>global.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Enum>
-      <Enum Name="FAD3.global.fad3GearEditAction" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>global.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Enum>
-      <Enum Name="FAD3.global.lvContext" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>global.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Enum>
-      <Enum Name="FAD3.global.CatchMeristics" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>global.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Enum>
-      <Enum Name="FAD3.global.sex" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>global.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Enum>
-      <Enum Name="FAD3.global.Taxa" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>global.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Enum>
-      <Enum Name="FAD3.global.FishCrabGMS" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>global.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Enum>
-    </NestedTypes>
     <TypeIdentifier>
       <HashCode>AGYEARAAQMAhMigwgAAgoCIAAQMkQwgCCiMAAIMAAgA=</HashCode>
       <FileName>global.cs</FileName>
@@ -59,23 +22,6 @@
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
-    <NestedTypes>
-      <Delegate Name="FAD3.sampling.ReadUIElement" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Sampling.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Delegate>
-      <Struct Name="FAD3.sampling.UserInterfaceStructure" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Sampling.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Struct>
-      <Struct Name="FAD3.sampling.CatchLine" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Sampling.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Struct>
-    </NestedTypes>
     <TypeIdentifier>
       <HashCode>RAACAAIhAAAAEIAQCABAQAEgBACBEACAAlACAKRBQCw=</HashCode>
       <FileName>Sampling.cs</FileName>
@@ -84,7 +30,7 @@
   <Class Name="FAD3.frmSamplingDetail" Collapsed="true">
     <Position X="7.75" Y="0.5" Width="2.5" />
     <TypeIdentifier>
-      <HashCode>oSAQ4SNgUCQcOMCcwUCgBoESEGiCgAAGAEJAYAkIIAg=</HashCode>
+      <HashCode>oSAQ4SNgUCQcOMCcwUCgBoESEGiCgAAGCEJAYAkIIAg=</HashCode>
       <FileName>frmSamplingDetail.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -128,7 +74,7 @@
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
     <NestedTypes>
-      <Struct Name="FAD3.ManageGearSpecsClass.GearSpecification">
+      <Struct Name="FAD3.ManageGearSpecsClass.GearSpecification" Collapsed="true">
         <TypeIdentifier>
           <NewMemberFileName>ManageGearSpecsClass.cs</NewMemberFileName>
         </TypeIdentifier>
@@ -140,7 +86,7 @@
       </Struct>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>MAAQAQABAAREAAAAQAAgAAAAEAiAABAAIAAAAAAgBAA=</HashCode>
+      <HashCode>MAAQIQADAAREAAAAQAAgAAAAEQiAABBgIAAAAAAgBAA=</HashCode>
       <FileName>ManageGearSpecsClass.cs</FileName>
     </TypeIdentifier>
   </Class>
