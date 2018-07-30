@@ -655,6 +655,28 @@ namespace FAD3
 			}
 			EnumeratorCount=myCount;
 			return rv;
-		}		
-	}
+		}
+
+        public static string AOICodeFromGuid(string AOIGuid)
+        {
+            var code = "";
+            using (var con = new OleDbConnection(global.ConnectionString))
+            {
+                con.Open();
+                var sql = "Select Letter from tblAOI where AOIGuid = '{" + AOIGuid + "}'";
+
+                using (var dt = new DataTable())
+                {
+                    var adapter = new OleDbDataAdapter(sql, con);
+                    adapter.Fill(dt);
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        code = row["Letter"].ToString();
+                    }
+                }
+            }
+
+            return code;
+        }
+    }
 }

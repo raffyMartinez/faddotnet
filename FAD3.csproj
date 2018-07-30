@@ -199,6 +199,12 @@
       <DependentUpon>frmVesselDimension.cs</DependentUpon>
     </Compile>
     <Compile Include="gear.cs" />
+    <Compile Include="GenerateRefNumberForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GenerateRefNumberForm.Designer.cs">
+      <DependentUpon>GenerateRefNumberForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="global.cs" />
     <Compile Include="LandingSite.cs" />
     <Compile Include="LatLngUTMConverter.cs" />
@@ -224,6 +230,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="ReferenceNumberManager.cs" />
     <Compile Include="registrytools.cs" />
     <Compile Include="SampledGear_SpecsForm.cs">
       <SubType>Form</SubType>
@@ -288,6 +295,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmVesselDimension.resx">
       <DependentUpon>frmVesselDimension.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GenerateRefNumberForm.resx">
+      <DependentUpon>GenerateRefNumberForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ManageGearSpecsForm.resx">
       <DependentUpon>ManageGearSpecsForm.cs</DependentUpon>

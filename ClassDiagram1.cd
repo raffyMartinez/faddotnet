@@ -1,19 +1,56 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
-  <Class Name="FAD3.global" Collapsed="true">
+  <Class Name="FAD3.global">
     <Position X="3.5" Y="1.25" Width="3.25" />
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
+    <NestedTypes>
+      <Enum Name="FAD3.global.fad3DataStatus" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>global.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Enum Name="FAD3.global.fad3GearEditAction" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>global.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Enum Name="FAD3.global.lvContext" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>global.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Enum Name="FAD3.global.CatchMeristics" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>global.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Enum Name="FAD3.global.sex" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>global.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Enum Name="FAD3.global.Taxa" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>global.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Enum Name="FAD3.global.FishCrabGMS" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>global.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
     <TypeIdentifier>
-      <HashCode>AGYEARAAQMAhMigwgAAgoCIAAQMkQwgCCiMAAIMAAgA=</HashCode>
+      <HashCode>AGYEARAAQMAhMigwgAAgoCIAAQIgAwgCCCMAAIMAAgA=</HashCode>
       <FileName>global.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="FAD3.aoi" Collapsed="true">
+  <Class Name="FAD3.aoi">
     <Position X="0.5" Y="1.25" Width="2.75" />
     <TypeIdentifier>
-      <HashCode>AIQAYiABUAgCAICEIAIAEALBAEAAAEIAAUAEAigBIAw=</HashCode>
+      <HashCode>AIQAaiABUAgCAICEIAIAEALBAEAAAEIAAUAEAigBIAw=</HashCode>
       <FileName>AOI.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -54,7 +91,7 @@
       <FileName>LatLngUTMConverter.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="FAD3.gear">
+  <Class Name="FAD3.gear" Collapsed="true">
     <Position X="7" Y="1.5" Width="3.25" />
     <TypeIdentifier>
       <HashCode>BqCAggAgJAASAQoABoAQgAAAAAAAUCBEgAAgASMkAQA=</HashCode>
@@ -68,33 +105,35 @@
       <FileName>mru.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="FAD3.ManageGearSpecsClass">
-    <Position X="3.5" Y="2.25" Width="3" />
+  <Class Name="FAD3.ManageGearSpecsClass" Collapsed="true">
+    <Position X="8" Y="2.25" Width="3" />
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
-    <NestedTypes>
-      <Struct Name="FAD3.ManageGearSpecsClass.GearSpecification" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>ManageGearSpecsClass.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Struct>
-      <Struct Name="FAD3.ManageGearSpecsClass.SampledGearSpecData" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>ManageGearSpecsClass.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Struct>
-    </NestedTypes>
     <TypeIdentifier>
       <HashCode>MAAQIQADAAREAAAAQAAgAAAAEQiAABBgIAAAAAAgBAA=</HashCode>
       <FileName>ManageGearSpecsClass.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="FAD3.names">
-    <Position X="0.5" Y="2" Width="2.25" />
+    <Position X="5.25" Y="2" Width="2.25" />
     <TypeIdentifier>
       <HashCode>IAAQAAQACEAAAFACgACggAAAAAAIAAAAAEACAQAAQFA=</HashCode>
       <FileName>names.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FAD3.ReferenceNumberManager">
+    <Position X="8" Y="3" Width="2.75" />
+    <NestedTypes>
+      <Struct Name="FAD3.ReferenceNumberManager.VariationCode" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>ReferenceNumberManager.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AhBAAAAgAIAIgAAAAACAAAQAABEESEAAAwACIAAAAAA=</HashCode>
+      <FileName>ReferenceNumberManager.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Font Name="Segoe UI" Size="9" />

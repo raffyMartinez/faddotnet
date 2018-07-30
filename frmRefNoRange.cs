@@ -27,7 +27,7 @@ namespace FAD3
                 this.Close();
             else if (b.Name == "buttonReset")
             {
-                global.SetRefNoRange(true);
+                ReferenceNumberManager.SetRefNoRange(true);
                 this.Close();
             }
             else
@@ -38,7 +38,7 @@ namespace FAD3
                 {
                     if (_MaxVal > _MinVal)
                     {
-                        global.SetRefNoRange(false, _MinVal, _MaxVal);
+                        ReferenceNumberManager.SetRefNoRange(false, _MinVal, _MaxVal);
                         this.Close();
                     }
                     else
@@ -75,8 +75,8 @@ namespace FAD3
         private void frmRefNoRange_Load(object sender, EventArgs e)
         {
             long min, max = 0;
-            global.ReadRefNoRange();
-            global.GetRefNoRange(out min, out max);
+            ReferenceNumberManager.ReadRefNoRange();
+            ReferenceNumberManager.GetRefNoRange(out min, out max);
             if (min>=0 && max>0)
             {
                 _MinVal = min;

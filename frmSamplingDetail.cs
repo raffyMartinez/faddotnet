@@ -40,6 +40,8 @@ namespace FAD3
         string _DatePrompt = "";
         string _TimePrompt = "";
 
+        string _NewReferenceNumber = "";
+
         bool _SampledGearSpecIsEdited;
 
         List<string> _FishingGrounds;
@@ -55,6 +57,12 @@ namespace FAD3
             }
         }
 
+        public void NewReferenceNumber(string NewRefNumber)
+        {
+            _NewReferenceNumber = NewRefNumber;
+            panelUI.Controls["textReferenceNumber"].Text = _NewReferenceNumber;
+        }
+
         public List<string> FishingGrounds
         {
             get { return _FishingGrounds; }
@@ -63,7 +71,7 @@ namespace FAD3
                 _FishingGrounds = value;
 
                 if (_FishingGrounds.Count > 0)
-                { 
+                {
                     ((TextBox)panelUI.Controls["textFishingGround"]).Text = _FishingGrounds[0];
 
                     if (_FishingGrounds.Count > 1)
@@ -71,12 +79,12 @@ namespace FAD3
                         {
                             o.Clear();
                             for (int i = 1; i < _FishingGrounds.Count; i++)
-                              o.Text += _FishingGrounds[i] + ", ";
+                                o.Text += _FishingGrounds[i] + ", ";
 
                             o.Text = o.Text.Substring(0, o.Text.Length - 2);
 
                         });
-                
+
 
                 }
             }
@@ -526,10 +534,17 @@ namespace FAD3
                 panelUI.Controls.Add(btn);
                 btn.Location = new Point(x, _yPos - 3);
                 btn.Click += OnbuttonSamplingFields_Click;
-                if (e.Key == "Enumerator" && !_isNew)
+
+                switch (e.Key)
                 {
-                    _topControl = btn;
+                    case "Enumerator":
+                        if (!IsNew) _topControl = btn;
+                        break;
+                    case "ReferenceNumber":
+                        btn.Enabled = IsNew;
+                        break;
                 }
+
             }
             _yPos += ControlHt + Spacing;
         }
@@ -697,7 +712,7 @@ namespace FAD3
                     break;
                 case "btnGearSpecs":
                     SampledGear_SpecsForm sgf = SampledGear_SpecsForm.GetInstance(_GearVarGuid, _GearVarName, this);
-                    
+
                     if (!sgf.Visible)
                     {
                         sgf.Show(this);
@@ -716,6 +731,19 @@ namespace FAD3
                     f.ShowDialog(this);
                     break;
                 case "btnReferenceNumber":
+                    if (CheckRequiredForRefNumber())
+                    {
+                        var txt = (MaskedTextBox)panelUI.Controls["dtxtSamplingDate"];
+                        ReferenceNumberManager.SetAOI_GearVariation(_AOIGuid, _GearVarGuid, DateTime.Parse(txt.Text));
+                        GenerateRefNumberForm grf = new GenerateRefNumberForm();
+                        grf.Parent_Form = this;
+                        grf.ShowDialog(this);
+                    }
+                    else
+                    {
+                        ShowReferenceNumberRequiredErrorLabel();
+                        MessageBox.Show("Some required fields not filled up", "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
                     break;
                 case "btnFishingGround":
                     PopulateFGList();
@@ -726,6 +754,64 @@ namespace FAD3
                     fg.Show(this);
                     break;
             }
+        }
+
+        private void ShowReferenceNumberRequiredErrorLabel()
+        {
+            foreach (Control c in panelUI.Controls)
+            {
+                if (c.Name.Substring(0, 8) == "errLabel")
+                {
+                    switch (c.Tag.ToString())
+                    {
+                        case "SamplingDate":
+                        case "SamplingTime":
+                        case "GearClass":
+                        case "TypeOfVesselUsed":
+                        case "FishingGear":
+                        case "Enumerator":
+                        case "TargetArea":
+                        case "LandingSite":
+                            c.Visible = true;
+                            break;
+                    }
+                }
+            }
+        }
+
+        private bool CheckRequiredForRefNumber()
+        {
+            var valid = true;
+            foreach (Control c in panelUI.Controls)
+            {
+                if (c.GetType().Name != "Label" && c.GetType().Name != "Button")
+                {
+                    switch (c.Tag.ToString())
+                    {
+                        case "SamplingDate":
+                            valid = (c.Text != _DatePrompt);
+                            break;
+                        case "SamplingTime":
+                            valid = (c.Text != _TimePrompt);
+                            break;
+                        case "GearClass":
+                        case "TypeOfVesselUsed":
+                        case "FishingGear":
+                        case "Enumerator":
+                        case "TargetArea":
+                        case "LandingSite":
+                            if (c.Text.Length == 0)
+                            {
+                                valid = false;
+                            }
+
+                            break;
+                    }
+
+                    if (!valid) break;
+                }
+            }
+            return valid;
         }
 
         private void PopulateFGList()
@@ -748,6 +834,7 @@ namespace FAD3
                     {
                         if (SaveEdits())
                         {
+                            if (IsNew) ReferenceNumberManager.UpdateRefCodeCounter();
                             _parent.RefreshCatchDetail(_samplingGUID);
                             this.Close();
                         }
@@ -1038,8 +1125,8 @@ namespace FAD3
             cbo.With
             (o =>
             {
-            //o.Text = "";
-            if (comboItems.Count > 0)
+                //o.Text = "";
+                if (comboItems.Count > 0)
                 {
                     o.DataSource = new BindingSource(comboItems, null);
                     o.DisplayMember = "Value";
@@ -1147,9 +1234,18 @@ namespace FAD3
                                 e.Cancel = !aoi.AOIHaveEnumeratorsEx(key);
                                 if (e.Cancel)
                                     msg = "Cannot use the selected target area because it does not have enumerators";
+                                else
+                                {
+                                    _AOIName = cbo.Text;
+                                    _AOIGuid = key;
+                                }
 
                                 break;
                             case "GearClass":
+                                break;
+                            case "FishingGear":
+                                _GearVarName = cbo.Text;
+                                _GearVarGuid = ((KeyValuePair<string, string>)cbo.SelectedItem).Key;
                                 break;
                         }
                         break;

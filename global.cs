@@ -35,8 +35,6 @@ namespace FAD3
         private static bool _HasMPH = false;
         private static bool _MapIsOpen;
         private static readonly string _ConnectionStringTemplate = "";
-        private static long _RefNoRangeMin = 0;
-        private static long _RefNoRangeMax = 0;
         private static bool _TemplateFileExists = true;
         private static bool _UITemplateFileExists = true;
         private static bool _InlandGridDBFileExists = true;
@@ -98,26 +96,10 @@ namespace FAD3
             TestMPH();
             _AppPath = Application.StartupPath.ToString();
             _ConnectionStringTemplate = "Provider=Microsoft.JET.OLEDB.4.0;data source=" + _AppPath + "\\template.mdb";
-            ReadRefNoRange();
+            ReferenceNumberManager.ReadRefNoRange();
         }
 
 
-
-        /// <summary>
-        /// Reads from the registry the range of reference numbers
-        /// that is assigned to a computer
-        /// </summary>
-        public static void ReadRefNoRange()
-        {
-            RegistryKey rk = Registry.CurrentUser.OpenSubKey("SOFTWARE\\FAD3");
-            string ReturnValue = rk.GetValue("RNRange", "NULL").ToString();
-            if (ReturnValue.Length > 0 && ReturnValue != "NULL")
-            {
-                string[] arr = ReturnValue.Split('|');
-                _RefNoRangeMin = long.Parse(arr[0]);
-                _RefNoRangeMax = long.Parse(arr[1]);
-            }
-        }
 
 
         /// <summary>
@@ -232,28 +214,6 @@ namespace FAD3
             RegistryKey sub_key = reg_key.CreateSubKey("FORMSTATE");
             RegistryKey sub_key1 = sub_key.CreateSubKey(formName);
             sub_key1.SetValue(name, value);
-        }
-
-        public static void GetRefNoRange(out long min, out long max)
-        {
-            min = _RefNoRangeMin;
-            max = _RefNoRangeMax;
-
-        }
-
-        public static void SetRefNoRange(bool Reset = false, long min = 0, long max = 0)
-        {
-            RegistryKey rk = Registry.CurrentUser.CreateSubKey("SOFTWARE\\FAD3");
-
-            if (Reset)
-            {
-                rk.DeleteValue("RNRange");
-                _RefNoRangeMin = _RefNoRangeMax = 0;
-            }
-            else
-                rk.SetValue("RNRange", min.ToString() + "|" + max.ToString(), RegistryValueKind.String);
-
-            rk.Close();
         }
 
         public static bool HasMPH
