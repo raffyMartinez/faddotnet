@@ -12,7 +12,6 @@ namespace FAD3
     public partial class frmEditGMS : Form
     {
         private string _CatchCompRowGUID;
-        private frmLenFreq _ParentForm;
         private bool _IsNew;
         private string _RowGUID;
         private global.Taxa _taxa;
@@ -85,11 +84,6 @@ namespace FAD3
             Text = "Edit GMS data";
         }
 
-        public new frmLenFreq ParentForm
-        {
-            get { return _ParentForm; }
-            set { _ParentForm = value; }
-        }
 
         public string CatchCompRowGUID
         {
@@ -128,8 +122,7 @@ namespace FAD3
             }
             if (sampling.UpdateGMS(_IsNew, wt, len, sex, stage, gonadwt, _CatchCompRowGUID, _RowGUID))
             {
-                _ParentForm.EditedGMSEx(_IsNew, wt, len, comboSex.Text,
-                                       comboStage.Text, gonadwt, _RowGUID);
+
                 if (chkContinue.Checked)
                 {
                     txtLen.Text = "";

@@ -230,6 +230,12 @@ namespace FAD3
             _HasMPH = k1 > 0;
         }
 
+        public enum fad3CatchSubRow
+        {
+            none,
+            LF,
+            GMS
+        }
         public enum fad3DataStatus
         {
             statusFromDB,

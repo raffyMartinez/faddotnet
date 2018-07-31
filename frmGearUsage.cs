@@ -506,6 +506,9 @@ namespace FAD3
                     ManageGearSpecsForm ff = new ManageGearSpecsForm(listViewVariations.SelectedItems[0].Name,
                                                              listViewVariations.SelectedItems[0].Text);
                     ff.ShowDialog(this);
+
+                    //refresh the list to show new changes
+                    FillVariationsList();
                     break;
             }
         }

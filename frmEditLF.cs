@@ -14,7 +14,6 @@ namespace FAD3
         private string _RowGUID;
         private string _CatchCompRowGUID;
         private string _CurrentCatchName;
-        private frmLenFreq _ParentForm;
         private bool _IsNew;
 
         public string CurrentCatchName
@@ -40,11 +39,6 @@ namespace FAD3
             _IsNew = false;
         }
 
-        public new frmLenFreq ParentForm
-        {
-            get { return _ParentForm; }
-            set { _ParentForm = value; }
-        }
             
             public string CatchCompRowGUID
         {
@@ -79,7 +73,7 @@ namespace FAD3
                 long Freq = long.Parse(txtFreq.Text);
                 if (sampling.UpdateLF(_IsNew, LenClass, Freq, _CatchCompRowGUID, _RowGUID))
                 {
-                    _ParentForm.EditedLF(_IsNew, _RowGUID,LenClass,Freq);
+                    //_ParentForm.EditedLF(_IsNew, _RowGUID,LenClass,Freq);
                     if (checkContinue.Checked==false)
                     {
                         this.Close();

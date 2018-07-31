@@ -249,9 +249,9 @@ namespace FAD3
             this.listView1.TabIndex = 3;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.Details;
-            this.listView1.DoubleClick += new System.EventHandler(this.listView1_DoubleClick);
+            this.listView1.DoubleClick += new System.EventHandler(this.OnListView_DoubleClick);
             this.listView1.Leave += new System.EventHandler(this.ListView1Leave);
-            this.listView1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.listView1_MouseDown);
+            this.listView1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnListView_MouseDown);
             // 
             // menuMenuBar
             // 

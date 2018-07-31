@@ -327,6 +327,25 @@ namespace FAD3
             get { return _uis; }
         }
 
+        public struct LFLine
+        {
+            public double Length { get; set; }
+            public int Freq { get; set; }
+        }
+
+        public struct GMSLine
+        {
+            public string CatchRowGUID { get; set; }
+            public double? Length { get; set; }
+            public double? Weight { get; set; }
+            public global.sex Sex { get; set; }
+            public global.FishCrabGMS GMS { get; set; }
+            public double? GonadWeight { get; set; }
+            public global.Taxa Taxa { get; set; }
+            public string TaxaName { get; set; }
+
+        }
+
         public struct CatchLine
         {
             /// <summary>
@@ -345,8 +364,8 @@ namespace FAD3
             private readonly string _SamplingGUID;
             private readonly double _CatchWeight;
             private long? _CatchCount;
-            private double _CatchSubsampleWt;
-            private long _CatchSubsampleCount;
+            private double? _CatchSubsampleWt;
+            private long? _CatchSubsampleCount;
             private bool _FromTotalCatch;
             private Identification _NameType;
             private bool _LiveFish;
@@ -418,13 +437,13 @@ namespace FAD3
                 set { _NameType = value; }
             }
 
-            public double CatchSubsampleWt
+            public double? CatchSubsampleWt
             {
                 get { return _CatchSubsampleWt; }
                 set { _CatchSubsampleWt = value; }
             }
 
-            public long CatchSubsampleCount
+            public long? CatchSubsampleCount
             {
                 get { return _CatchSubsampleCount; }
                 set { _CatchSubsampleCount = value; }
@@ -623,9 +642,9 @@ namespace FAD3
             return myRow;
         }
 
-        public List<CatchLine> CatchComp()
+        public Dictionary<string, CatchLine> CatchComp()
         {
-            List<CatchLine> myCatch = new List<CatchLine>();
+            Dictionary<string, CatchLine> myCatch = new Dictionary<string, CatchLine>();
             DataTable dt = new DataTable();
             string CatchName = "";
             long? CatchCount = null;
@@ -647,16 +666,23 @@ namespace FAD3
                     _TotalWtOfFromTotal = 0;
                     for (int i = 0; i < dt.Rows.Count; i++)
                     {
+                        CatchCount = null;
                         DataRow dr = dt.Rows[i];
                         try { CatchName = dr["Name1"].ToString() + " " + dr["Name2"].ToString(); }
                         catch { CatchName = dr["Name1"].ToString(); }
 
-                        try { CatchCount = Convert.ToInt32(dr["ct"]); }
-                        catch { CatchCount = null; }
+                        if (dr["ct"].ToString().Length > 0)
+                        {
+                            try { CatchCount = int.Parse(dr["ct"].ToString()); }
+                            catch { CatchCount = null; }
+                        }
 
                         CatchLine myLine = new CatchLine(CatchName, dr["SamplingGUID"].ToString(),
                                         dr["CatchCompRow"].ToString(), dr["NameGUID"].ToString(),
                                         Convert.ToDouble(dr["wt"]), CatchCount);
+
+                        myLine.CatchSubsampleWt = null;
+                        myLine.CatchSubsampleCount = null;
 
                         if (dr["swt"] != DBNull.Value)
                         {
@@ -668,8 +694,9 @@ namespace FAD3
                             myLine.CatchSubsampleCount = Convert.ToInt32(dr["sct"]);
                         }
 
-                        myLine.FromTotalCatch = Convert.ToBoolean(dr["FromTotal"]);
-                        myCatch.Add(myLine);
+                        myLine.FromTotalCatch = bool.Parse(dr["FromTotal"].ToString());
+                        myCatch.Add(dr["CatchCompRow"].ToString(), myLine);
+
                         if (dr["FromTotal"].ToString() == "True")
                         {
                             _TotalWtOfFromTotal += Convert.ToDouble(dr["wt"].ToString());
@@ -684,9 +711,10 @@ namespace FAD3
 
             return myCatch;
         }
-        public static Dictionary<string, string[]> GMSData(string CatchCompRowNo)
+
+        public static Dictionary<string, GMSLine> GMSData(string CatchCompRowNo)
         {
-            Dictionary<string, string[]> mydata = new Dictionary<string, string[]>();
+            Dictionary<string, GMSLine> mydata = new Dictionary<string, GMSLine>();
             var dt = new DataTable();
             using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
             {
@@ -707,15 +735,28 @@ namespace FAD3
                     for (int i = 0; i < dt.Rows.Count; i++)
                     {
                         DataRow dr = dt.Rows[i];
-                        string[] arr = new string[7];
-                        arr[0] = dr["Len"].ToString();
-                        arr[1] = dr["Wt"].ToString();
-                        arr[2] = dr["Sex"].ToString();
-                        arr[3] = dr["GMS"].ToString();
-                        arr[4] = dr["GonadWt"].ToString();
-                        arr[5] = dr["TaxaNo"].ToString();
-                        arr[6] = dr["Taxa"].ToString();
-                        mydata.Add(dr["RowGUID"].ToString(), arr);
+
+                        global.FishCrabGMS gms;
+                        Enum.TryParse(dr["GMS"].ToString(), out gms);
+                        global.sex sex;
+                        Enum.TryParse(dr["Sex"].ToString(), out sex);
+                        global.Taxa taxa;
+                        Enum.TryParse(dr["TaxaNo"].ToString(), out taxa);
+                        var myGMS = new GMSLine
+                        {
+                            TaxaName = dr["Taxa"].ToString(),
+                            Taxa = taxa,
+                            Sex = sex,
+                            GMS = gms
+                        };
+                        if (dr["Len"].ToString().Length > 0)
+                            myGMS.Length = double.Parse(dr["Len"].ToString());
+                        if (dr["Wt"].ToString().Length > 0)
+                            myGMS.Weight = double.Parse(dr["GonadWt"].ToString());
+                        if (dr["GonadWt"].ToString().Length > 0)
+                            myGMS.GonadWeight = double.Parse(dr["GonadWt"].ToString());
+
+                        mydata.Add(dr["RowGUID"].ToString(), myGMS);
                     }
                 }
                 catch (Exception ex)
@@ -725,9 +766,10 @@ namespace FAD3
             }
             return mydata;
         }
-        public static Dictionary<string, string[]> LFData(string CatchCompRowNo)
+
+        public static Dictionary<string, LFLine> LFData(string CatchCompRowNo)
         {
-            Dictionary<string, string[]> mydata = new Dictionary<string, string[]>();
+            Dictionary<string, LFLine> mydata = new Dictionary<string, LFLine>();
             var dt = new DataTable();
             using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
             {
@@ -740,10 +782,13 @@ namespace FAD3
                     for (int i = 0; i < dt.Rows.Count; i++)
                     {
                         DataRow dr = dt.Rows[i];
-                        string[] arr = new string[2];
-                        arr[0] = dr["LenClass"].ToString();
-                        arr[1] = dr["Freq"].ToString();
-                        mydata.Add(dr["RowGUID"].ToString(), arr);
+
+                        var myLF = new LFLine
+                        {
+                            Length = double.Parse(dr["lenClass"].ToString()),
+                            Freq = int.Parse(dr["Freq"].ToString())
+                        };
+                        mydata.Add(dr["RowGUID"].ToString(), myLF);
                     }
                 }
                 catch (Exception ex)
@@ -813,14 +858,14 @@ namespace FAD3
                             "FishingGround, TimeSet, DateSet, TimeHauled, " +
                             "DateHauled, NoHauls, NoFishers, Engine, hp, " +
                             "WtCatch, WtSample, len, wdt, hgt, LSGUID, " +
-                            "Notes, VesType, SamplingType, HasLiveFish, Enumerator) values ('{" +
+                            "Notes, VesType, SamplingType, HasLiveFish, Enumerator, DateEncoded) values ('{" +
                             SamplingGuid + "}', '{" +
-                            FishingGround + "}', '{" +
+                            EffortData["FishingGear"] + "}', '{" +
                             EffortData["TargetArea"] + "}', '" +
                             EffortData["ReferenceNumber"] + "', '" +
                             EffortData["SamplingDate"] + "', '" +
                             EffortData["SamplingTime"] + "', '" +
-                            EffortData["FishingGround"] + "', " +
+                            FishingGround + "', " +
                             TimeSet + ", " +
                             DateSet + ", " +
                             TimeHauled + ", " +
@@ -839,7 +884,8 @@ namespace FAD3
                             VesselType + "', " +
                             EffortData["SamplingType"] + ", " +
                             EffortData["HasLiveFish"] + ", '{" +
-                            EffortData["Enumerator"] + "'})";
+                            EffortData["Enumerator"] + "}', '" +
+                            DateTime.Now + "')";
                     }
                     else
                     {
@@ -902,7 +948,7 @@ namespace FAD3
                     update.ExecuteNonQuery();
                 }
 
-                for (int n=1; n<FishingGrounds.Count; n++)
+                for (int n = 1; n < FishingGrounds.Count; n++)
                 {
                     sql = "Insert into tblGrid (SamplingGuid, GridName,RowGUID) values ('{"
                             + SamplingGUID + "}', '"
@@ -1069,6 +1115,18 @@ namespace FAD3
                     if (dr["WtSample"].ToString().Length > 0)
                     {
                         _SampleWtFromTotalCatch = double.Parse(dr["WtSample"].ToString());
+                    }
+
+
+                    myVal = dr["DateEncoded"].ToString();
+                    if (myVal != "")
+                    {
+                        dt = Convert.ToDateTime(myVal);
+                        PropertyValue.Add("DateEncoded", string.Format("{0:MMM-dd-yyyy HH:mm}", dt));
+                    }
+                    else
+                    {
+                        PropertyValue.Add("DateEncoded", "");
                     }
 
                 }

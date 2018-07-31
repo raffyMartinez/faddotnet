@@ -180,7 +180,7 @@ namespace FAD3
             set { _samplingGUID = value; }
         }
 
-        public void LVInterface(ListView lv)
+        public void ListViewSamplingDetail(ListView lv)
         {
             _lv = lv;
         }
@@ -195,7 +195,7 @@ namespace FAD3
         {
             global.SaveFormSettings(this);
             ManageGearSpecsClass.SampledGearSpecs.Clear();
-
+            if (IsNew) _parent.NewSamplingDataEntryCancelled();
         }
 
         private void OnUIRowRead(object sender, UIRowFromXML e)
@@ -663,13 +663,14 @@ namespace FAD3
                 }
             }
 
-            if (_isNew)
-                _samplingGUID = Guid.NewGuid().ToString();
-
             EffortData.Add("VesLength", _VesLength);
             EffortData.Add("VesHeight", _VesHeight);
             EffortData.Add("VesWidth", _VesWidth);
+
+            if (_isNew)
+                _samplingGUID = Guid.NewGuid().ToString();
             EffortData.Add("SamplingGUID", _samplingGUID);
+
             EffortData.Add("SamplingType", "1");
 
             PopulateFGList();
@@ -841,6 +842,7 @@ namespace FAD3
                     }
                     break;
                 case "buttonCancel":
+                    if (IsNew) _parent.NewSamplingDataEntryCancelled();
                     this.Close();
                     break;
             }
@@ -1023,6 +1025,14 @@ namespace FAD3
                                                    MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
                 isValidated = (dr == DialogResult.Yes);
             }
+
+            //if(isValidated)
+            //{
+            //    _AOIGuid = ((KeyValuePair<string, string>)((ComboBox)panelUI.Controls["comboTargetArea"]).SelectedItem).Key;
+            //    _LandingSiteGuid = ((KeyValuePair<string, string>)((ComboBox)panelUI.Controls["comboLandingSite"]).SelectedItem).Key;
+            //    _GearClassGuid = ((KeyValuePair<string, string>)((ComboBox)panelUI.Controls["comboGearClass"]).SelectedItem).Key;
+            //    _GearVarGuid = ((KeyValuePair<string, string>)((ComboBox)panelUI.Controls["comboFishingGear"]).SelectedItem).Key;                
+            //}
 
 
             if (msg.Length > 0)

@@ -177,11 +177,12 @@ namespace FAD3
                 using (var con = new OleDbConnection(global.ConnectionString))
                 {
                     if (_Has_AOI_Year_GearCode)
-                        sql = "Update tblRefCodeCounter set Counter = " + _counter + " where GearRefCode = '" + _AOI_Year_GearCode + "'";
+                        sql = "Update tblRefCodeCounter set [Counter] = " + _counter + " where GearRefCode = '" + _AOI_Year_GearCode + "'";
                     else
-                        sql = "Insert into tblRefCodeCounter (GearRefCode, Counter) values ('" + _AOI_Year_GearCode + "', " + _counter + ")";
+                        sql = "Insert into tblRefCodeCounter (GearRefCode, [Counter]) values ('" + _AOI_Year_GearCode + "', " + _counter + ")";
 
                     if (sql.Length > 0)
+                        con.Open();
                         using (OleDbCommand update = new OleDbCommand(sql, con))
                         {
                             Success = (update.ExecuteNonQuery() > 0);

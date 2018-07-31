@@ -134,7 +134,7 @@ namespace FAD3
                     RowGuid = lvi.Name,
                 };
 
-                if(spec.Sequence != lvi.Index + 1)
+                if (spec.Sequence != lvi.Index + 1 && ds != global.fad3DataStatus.statusNew)
                 {
                     spec.DataStatus = global.fad3DataStatus.statusEdited;
                     spec.Sequence = lvi.Index + 1;

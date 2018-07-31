@@ -168,12 +168,6 @@
     <Compile Include="frmLandingSite.Designer.cs">
       <DependentUpon>frmLandingSite.cs</DependentUpon>
     </Compile>
-    <Compile Include="frmLenFreq.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmLenFreq.Designer.cs">
-      <DependentUpon>frmLenFreq.cs</DependentUpon>
-    </Compile>
     <Compile Include="frmMain.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -277,9 +271,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmLandingSite.resx">
       <DependentUpon>frmLandingSite.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmLenFreq.resx">
-      <DependentUpon>frmLenFreq.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmMain.resx">
       <DependentUpon>frmMain.cs</DependentUpon>
