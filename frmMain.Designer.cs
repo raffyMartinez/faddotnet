@@ -211,7 +211,7 @@ namespace FAD3
             this.buttonMap.TabIndex = 2;
             this.buttonMap.Text = "Map";
             this.buttonMap.UseVisualStyleBackColor = true;
-            this.buttonMap.Click += new System.EventHandler(this.buttonSamplingClick);
+            this.buttonMap.Click += new System.EventHandler(this.OnbuttonSamplingClick);
             // 
             // buttonCatch
             // 
@@ -222,7 +222,7 @@ namespace FAD3
             this.buttonCatch.TabIndex = 1;
             this.buttonCatch.Text = "Catch";
             this.buttonCatch.UseVisualStyleBackColor = true;
-            this.buttonCatch.Click += new System.EventHandler(this.buttonSamplingClick);
+            this.buttonCatch.Click += new System.EventHandler(this.OnbuttonSamplingClick);
             // 
             // buttonOK
             // 
@@ -233,7 +233,7 @@ namespace FAD3
             this.buttonOK.TabIndex = 0;
             this.buttonOK.Text = "OK";
             this.buttonOK.UseVisualStyleBackColor = true;
-            this.buttonOK.Click += new System.EventHandler(this.buttonSamplingClick);
+            this.buttonOK.Click += new System.EventHandler(this.OnbuttonSamplingClick);
             // 
             // listView1
             // 

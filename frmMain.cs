@@ -3,9 +3,10 @@
  * User: Raffy
  * Date: 8/7/2016
  * Time: 1:53 PM
- * 
+ *
  * To change this template use Tools | Options | Coding | Edit Standard Headers.
  */
+
 using System;
 using System.Drawing;
 using System.Windows.Forms;
@@ -29,6 +30,7 @@ namespace FAD3
         //private frmCatch _frmCatch;
         //private frmLenFreq _frmLF;
         private string _oldMDB = "";
+
         private int _statusPanelWidth = 200;
         private sampling _Sampling = new sampling();
         private aoi _AOI = new aoi();
@@ -58,7 +60,6 @@ namespace FAD3
         private bool _subListExisting = false;
         private global.fad3CatchSubRow _CatchSubRow;
 
-
         public void NewSamplingDataEntryCancelled()
         {
             if (listView1.Tag.ToString() == "samplingDetail") BackToSamplingMonth();
@@ -70,7 +71,6 @@ namespace FAD3
             set
             {
                 _SamplingGUID = value;
-
             }
         }
 
@@ -82,7 +82,6 @@ namespace FAD3
                 Font = f
             };
             return l.Width;
-
         }
 
         public string AOIGUID
@@ -136,7 +135,6 @@ namespace FAD3
             //
         }
 
-
         private void OnUIRowRead(object sender, UIRowFromXML e)
         {
             ListViewItem lvi = listView1.Items.Add(e.RowLabel);
@@ -144,9 +142,7 @@ namespace FAD3
             lvi.SubItems.Add("");
         }
 
-
-
-        void FrmMainLoad(object sender, EventArgs e)
+        private void FrmMainLoad(object sender, EventArgs e)
         {
             this.splitContainer1.Panel1MinSize = 200;
             this.splitContainer1.Panel2MinSize = this.Width - (this.splitContainer1.Panel1MinSize + 100);
@@ -193,7 +189,6 @@ namespace FAD3
                 }
                 catch
                 {
-
                     ErrorLogger.Log("Registry entry for mdb path not found");
                     lblErrorFormOpen.Visible = true;
                     lblTitle.Text = "";
@@ -267,8 +262,10 @@ namespace FAD3
             {
                 case "menuNewTargetArea":
                     break;
+
                 case "menuNewLandingSite":
                     break;
+
                 case "menuNewSampling":
                     if (FishingGrid.IsCompleteGrid25)
                     {
@@ -286,11 +283,14 @@ namespace FAD3
                             MessageBoxIcon.Information);
                     }
                     break;
+
                 case "menuNewEnumerator":
                     break;
+
                 case "menuSamplingDetail":
                     ShowSamplingDetailForm();
                     break;
+
                 case "menuTargetAreaProp":
                     frmAOI AOIForm = frmAOI.GetInstance();
                     if (!AOIForm.Visible)
@@ -305,7 +305,16 @@ namespace FAD3
                     }
                     AOIForm.AOI = _AOI;
                     break;
+
                 case "menuLandingSiteProp":
+                    break;
+
+                case "menuEditLFTable":
+                    ShowLFForm();
+                    break;
+
+                case "menuNewLFTable":
+                    ShowLFForm(IsNew: true);
                     break;
             }
         }
@@ -361,15 +370,31 @@ namespace FAD3
                     tsi.Enabled = _TreeLevel == "landing_site";
 
                     break;
+
                 case "listView1":
                     tsi = menuDropDown.Items.Add("New sampling");
                     tsi.Name = "menuNewSampling";
                     tsi.Visible = _TreeLevel == "sampling" || _TreeLevel == "landing_site" || _TreeLevel == "gear";
 
-
                     sep = menuDropDown.Items.Add("-");
                     sep.Name = "menuSeparator1";
                     sep.Visible = _TreeLevel == "landing_site";
+                    break;
+
+                case "lvCatch":
+                    break;
+
+                case "lvLF_GMS":
+                    if (((ListView)Source).Items.Count > 0)
+                    {
+                        tsi = menuDropDown.Items.Add("Edit Length-frequency table");
+                        tsi.Name = "menuEditLFTable";
+                    }
+                    else
+                    {
+                        tsi = menuDropDown.Items.Add("New Length-frequency table");
+                        tsi.Name = "menuNewLFTable";
+                    }
                     break;
             }
         }
@@ -410,7 +435,6 @@ namespace FAD3
         public void NewDBFile(string filename)
         {
             SetupTree(filename);
-
         }
 
         private void _mrulist_FileSelected(string filename)
@@ -420,10 +444,9 @@ namespace FAD3
             {
                 _mrulist.RemoveFile(filename);
             }
-
         }
 
-        void PopulateTree()
+        private void PopulateTree()
         {
             using (var myDataTable = new DataTable())
             {
@@ -440,13 +463,11 @@ namespace FAD3
                         using (var adapter = new OleDbDataAdapter(query, conection))
                             adapter.Fill(myDataTable);
                     }
-
                 }
                 catch (Exception ex)
                 {
                     ErrorLogger.Log(ex);
                 }
-
 
                 this.treeView1.Nodes.Clear();
                 //this.treeView1.
@@ -470,7 +491,6 @@ namespace FAD3
                         myChild.Nodes.Add("*dummy*");
                         myChild.Tag = dr["LSGUID"].ToString() + ",landing_site";
                         myChild.ImageKey = "LandingSite";
-
                     }
                     else
                     {
@@ -484,7 +504,6 @@ namespace FAD3
                         if (string.IsNullOrWhiteSpace(dr["LSName"].ToString()))
                         {
                             myNode.Nodes.Add("*dummy*");
-
                         }
                         else
                         {
@@ -552,6 +571,7 @@ namespace FAD3
                     listView1.Columns.Add("Value");
                     lblTitle.Text = "Database summary";
                     break;
+
                 case "aoi":
                     listView1.Columns.Add("Property");
                     listView1.Columns.Add("Value");
@@ -582,12 +602,12 @@ namespace FAD3
                     this.listView1.Columns.Add("Notes");
                     lblTitle.Text = "Sampling";
                     break;
+
                 case "samplingDetail":
                     listView1.Columns.Add("Property");
                     listView1.Columns.Add("Value");
                     lblTitle.Text = "Sampling detail";
                     break;
-
             }
 
             //apply column widths saved in registry
@@ -599,8 +619,10 @@ namespace FAD3
                 case "sampling":
                     FillLVSamplingSummary(_LandingSiteGuid, _GearVarGUID, _SamplingMonth);
                     break;
+
                 case "samplingDetail":
                     break;
+
                 case "gear":
                     lvi = listView1.Items.Add("Months sampled");
                     var arr = treeView1.SelectedNode.Tag.ToString().Split(',');
@@ -620,6 +642,7 @@ namespace FAD3
                         n++;
                     }
                     break;
+
                 case "root":
                     lvi = listView1.Items.Add("Database path");
                     lvi.SubItems.Add(global.mdbPath);
@@ -651,6 +674,7 @@ namespace FAD3
                         i++;
                     }
                     break;
+
                 case "aoi":
                     arr = treeView1.SelectedNode.Tag.ToString().Split(',');
                     myData = _AOI.AOIData();
@@ -669,7 +693,6 @@ namespace FAD3
                     lvi = listView1.Items.Add("Grid system");
                     lvi.Tag = "aoi_data";
                     lvi.SubItems.Add(FishingGrid.GridTypeName);
-
 
                     // add no. of samplings for this AOI
                     lvi = listView1.Items.Add("");
@@ -738,6 +761,7 @@ namespace FAD3
                         i++;
                     }
                     break;
+
                 case "landing_site":
                     arr = treeView1.SelectedNode.Tag.ToString().Split(',');
 
@@ -795,11 +819,8 @@ namespace FAD3
                     break;
             }
 
-
-
             listView1.ResumeLayout();
         }
-
 
         private void ApplyListViewColumnWidth(string TreeLevel)
         {
@@ -824,11 +845,10 @@ namespace FAD3
             }
         }
 
-        string DatabaseSummary(string SummaryTopic)
+        private string DatabaseSummary(string SummaryTopic)
         {
             return "x";
         }
-
 
         /// <summary>
         /// Fills the listview with the samplings that took place in a month-year
@@ -836,7 +856,7 @@ namespace FAD3
         /// <param name="LSGUID"></param>
         /// <param name="GearGUID"></param>
         /// <param name="SamplingMonth"></param>
-		void FillLVSamplingSummary(string LSGUID, string GearGUID, string SamplingMonth)
+		private void FillLVSamplingSummary(string LSGUID, string GearGUID, string SamplingMonth)
         {
             var CompleteGrid25 = FishingGrid.IsCompleteGrid25;
             string[] arr = SamplingMonth.Split('-');
@@ -846,36 +866,47 @@ namespace FAD3
                 case "Jan":
                     MonthNumber = "1";
                     break;
+
                 case "Feb":
                     MonthNumber = "2";
                     break;
+
                 case "Mar":
                     MonthNumber = "3";
                     break;
+
                 case "Apr":
                     MonthNumber = "4";
                     break;
+
                 case "May":
                     MonthNumber = "5";
                     break;
+
                 case "Jun":
                     MonthNumber = "6";
                     break;
+
                 case "Jul":
                     MonthNumber = "7";
                     break;
+
                 case "Aug":
                     MonthNumber = "8";
                     break;
+
                 case "Sep":
                     MonthNumber = "9";
                     break;
+
                 case "Oct":
                     MonthNumber = "10";
                     break;
+
                 case "Nov":
                     MonthNumber = "11";
                     break;
+
                 case "Dec":
                     MonthNumber = "12";
                     break;
@@ -893,9 +924,6 @@ namespace FAD3
                 EndDate += "/1/" + arr[1];
             }
 
-
-
-
             using (var myDT = new DataTable())
             {
                 try
@@ -910,8 +938,6 @@ namespace FAD3
                                         "tblEnumerators.EnumeratorName, tblSampling.Notes, tblSampling.WtCatch, tblSampling.SamplingGUID, tblSampling.IsGrid25FG, tblSampling.LSGUID, " +
                                         "tblSampling.[GearVarGUID], tblSampling.[SamplingDate], tblSampling.DateEncoded HAVING tblSampling.LSGUID= '{" + LSGUID + "}' AND tblSampling.[GearVarGUID]= '{" + GearGUID + "}'" +
                                         "AND SamplingDate >=#" + StartDate + "# And SamplingDate < #" + EndDate + "#  ORDER BY DateEncoded";
-
-
 
                         using (var adapter = new OleDbDataAdapter(query, conection))
                         {
@@ -928,7 +954,6 @@ namespace FAD3
                                 var fishingGround = dr["FishingGround"].ToString();         //fishing ground
                                 row.SubItems.Add(fishingGround);
 
-
                                 if (CompleteGrid25)                                         //position
                                 {
                                     if (fishingGround.Length > 0)
@@ -942,7 +967,6 @@ namespace FAD3
                                 }
                                 else
                                     row.SubItems.Add("");
-
 
                                 row.SubItems.Add(dr["EnumeratorName"].ToString());          //enumerator
 
@@ -965,15 +989,13 @@ namespace FAD3
             }
         }
 
-
         /// <summary>
         /// this will fill the tree with the nodes below the level of Landing site
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void TreeView1AfterExpand(object sender, TreeViewEventArgs e)
+        private void TreeView1AfterExpand(object sender, TreeViewEventArgs e)
         {
-
             if (e.Node.FirstNode.Text == "*dummy*")
             {
                 // we are in a landing site node then we will add gear used nodes
@@ -1031,36 +1053,38 @@ namespace FAD3
                                     case "Lines":
                                         iconKey = "lines";
                                         break;
+
                                     case "Traps":
                                         iconKey = "traps";
                                         break;
+
                                     case "Impounding nets":
                                         iconKey = "impound";
                                         break;
+
                                     case "Seines and dragnets":
                                         iconKey = "seines";
                                         break;
+
                                     case "Others":
                                         iconKey = "others";
                                         break;
+
                                     case "Gillnets":
                                         iconKey = "nets";
                                         break;
+
                                     case "Jigs":
                                         iconKey = "jigs";
                                         break;
-
                                 }
                                 nd1.ImageKey = iconKey;
-
-
                             }
                         }
                         else
                         {
                             e.Node.Nodes.Clear();
                         }
-
                     }
                 }
                 catch (Exception ex)
@@ -1070,7 +1094,6 @@ namespace FAD3
             }
             else if (e.Node.FirstNode.Text == "**dummy*")
             {
-
                 //we are in a gear variation node
 
                 var myDT = new DataTable();
@@ -1078,8 +1101,6 @@ namespace FAD3
                 {
                     using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
                     {
-
-
                         conection.Open();
 
                         //node tag contains landing site and gearvar guid
@@ -1095,7 +1116,6 @@ namespace FAD3
                                      "HAVING LSGUID ='{" + lsguid + "}' AND GearVarGUID = '{" + gearguid + "}' " +
                                      "ORDER BY Year([SamplingDate]), Month([SamplingDate])";
 
-
                         //Debug.WriteLine(query);
                         var adapter = new OleDbDataAdapter(query, conection);
                         adapter.Fill(myDT);
@@ -1105,7 +1125,7 @@ namespace FAD3
                             TreeNode nd1 = new TreeNode();
                             if (i == 0)
                             {
-                                //if node contains a dummy placeholder, 
+                                //if node contains a dummy placeholder,
                                 //rename it to the sampling month-year field
                                 e.Node.FirstNode.Text = dr["sDate"].ToString();
                                 nd1 = e.Node.FirstNode;
@@ -1120,7 +1140,6 @@ namespace FAD3
                             nd1.ImageKey = "MonthGear";
                         }
                     }
-
                 }
                 catch (Exception ex)
                 {
@@ -1128,8 +1147,6 @@ namespace FAD3
                 }
             }
         }
-
-
 
         public void EnumeratorSelectedSampling(Dictionary<string, string> SamplingIdentifiers)
         {
@@ -1150,15 +1167,13 @@ namespace FAD3
             _Sampling.SamplingGUID = SamplingIdentifiers["SamplingID"];
         }
 
-
-        void TreeView1AfterSelect(object sender, TreeViewEventArgs e)
+        private void TreeView1AfterSelect(object sender, TreeViewEventArgs e)
         {
             _LSNode = null;
             SetupSamplingButtonFrame(false);
 
             try
             {
-
                 _LandingSiteName = "";
                 _GearVarName = "";
                 _GearClassName = "";
@@ -1190,6 +1205,7 @@ namespace FAD3
                             _GearClassGUID = rv.Key;
                             _LSNode = e.Node.Parent;
                             break;
+
                         case "sampling":
                             //arr2 will contain the landing site and gearvar guids
                             string[] arr2 = arr[0].Split('|');
@@ -1213,6 +1229,7 @@ namespace FAD3
                             _GearClassGUID = rv.Key;
                             _LSNode = e.Node.Parent.Parent;
                             break;
+
                         case "aoi":
                             _AOIName = treeView1.SelectedNode.Text;
                             this.AOIGUID = treeView1.SelectedNode.Name;
@@ -1221,8 +1238,10 @@ namespace FAD3
                             _GearVarName = "";
                             _GearVarGUID = "";
                             break;
+
                         case "root":
                             break;
+
                         case "landing_site":
                             _AOIName = treeView1.SelectedNode.Parent.Text;
                             this.AOIGUID = treeView1.SelectedNode.Parent.Name;
@@ -1239,7 +1258,6 @@ namespace FAD3
                     statusPanelTargetArea.Text = _AOIName;
                     statusPanelLandingSite.Text = _LandingSiteName;
                     statusPanelGearUsed.Text = _GearVarName;
-
                 }
             }
             catch (Exception ex)
@@ -1248,7 +1266,6 @@ namespace FAD3
             }
 
             e.Node.SelectedImageKey = e.Node.ImageKey;
-
         }
 
         public void RefreshCatchDetail(string SamplingGUID)
@@ -1268,7 +1285,7 @@ namespace FAD3
         /// fills the listview with the complete effort data from a fish landing sampling
         /// </summary>
         /// <param name="SamplingGUID"></param>
-        void ShowCatchDetailEx(string SamplingGUID = "")
+        private void ShowCatchDetailEx(string SamplingGUID = "")
         {
             listView1.Items.Clear();
             _Sampling.ReadUIFromXML();
@@ -1307,9 +1324,11 @@ namespace FAD3
                         case "GearClass":
                         case "FishingGear":
                             break;
+
                         case "GearSpecs":
                             lvi.SubItems[1].Text = ManageGearSpecsClass.GetSampledSpecsEx(_SamplingGUID, Truncated: true);
                             break;
+
                         case "AdditionalFishingGround":
                             foreach (var item in FishingGrid.AdditionalFishingGrounds(_SamplingGUID))
                             {
@@ -1319,8 +1338,10 @@ namespace FAD3
                             if (lvi.SubItems[1].Text.Length > 0)
                                 lvi.SubItems[1].Text = lvi.SubItems[1].Text.Substring(0, lvi.SubItems[1].Text.Length - 2);
                             break;
+
                         case "spacer":
                             break;
+
                         default:
                             lvi.SubItems[1].Text = effortData[lvi.Name];
                             break;
@@ -1338,18 +1359,15 @@ namespace FAD3
             lvi1 = listView1.Items.Add("DateEncoded", "Date encoded", null);
             if (SamplingGUID.Length > 0) lvi1.SubItems.Add(DateEncoded);
 
-
             //position sampling buttons and make it visible
             SetupSamplingButtonFrame(true);
-
-
         }
 
         /// <summary>
         /// positions, shows or hides the buttons of a sampled fishing effort
         /// </summary>
         /// <param name="Visible"></param>
-        void SetupSamplingButtonFrame(bool Visible)
+        private void SetupSamplingButtonFrame(bool Visible)
         {
             panelSamplingButtons.Visible = Visible;
             if (Visible)
@@ -1359,7 +1377,7 @@ namespace FAD3
             CancelButton = buttonOK.Visible ? buttonOK : null;
         }
 
-        void ResetTheBackColor(Control c)
+        private void ResetTheBackColor(Control c)
         {
             switch (c.Name)
             {
@@ -1369,15 +1387,15 @@ namespace FAD3
                         item.BackColor = Color.White;
                     }
                     break;
+
                 case "treeView1":
                     TreeNodeCollection nodes = treeView1.Nodes;
                     TraverseTreeAndResetColor(treeView1.Nodes);
                     break;
             }
-
         }
 
-        void TraverseTreeAndResetColor(TreeNodeCollection nodes)
+        private void TraverseTreeAndResetColor(TreeNodeCollection nodes)
         {
             foreach (TreeNode child in nodes)
             {
@@ -1426,17 +1444,15 @@ namespace FAD3
             RegistryKey rk = Registry.CurrentUser.CreateSubKey(subKey);
             rk.SetValue(SaveContext, cw, RegistryValueKind.String);
             rk.Close();
-
         }
 
-        void ListView1Leave(object sender, EventArgs e)
+        private void ListView1Leave(object sender, EventArgs e)
         {
             if (listView1.Columns.Count > 0)
                 SaveColumnWidthEx(sender, listView1.Tag.ToString());
-
         }
 
-        void ProcessFileOpen()
+        private void ProcessFileOpen()
         {
             string filename = "";
             OpenFileDialog ofd = new OpenFileDialog();
@@ -1461,8 +1477,7 @@ namespace FAD3
             }
         }
 
-
-        void statusPanelDBPath_DoubleClick(object sender, EventArgs e)
+        private void statusPanelDBPath_DoubleClick(object sender, EventArgs e)
         {
             Process.Start(Path.GetDirectoryName(global.mdbPath));
         }
@@ -1476,6 +1491,7 @@ namespace FAD3
                     frmAbout f = new frmAbout();
                     f.ShowDialog(this);
                     break;
+
                 case "gear":
                     frmGearUsage form = frmGearUsage.GetInstance();
                     if (!form.Visible)
@@ -1488,14 +1504,18 @@ namespace FAD3
                     }
                     form.PopulateLists();
                     break;
+
                 case "fish":
                     break;
+
                 case "report":
                     break;
+
                 case "map":
                     frmMap fm = new frmMap();
                     fm.Show(this);
                     break;
+
                 case "exit":
                     AppExit();
 
@@ -1515,22 +1535,24 @@ namespace FAD3
             {
                 case "resetRefNos":
                     break;
+
                 case "refNoRange":
                     frmRefNoRange f = new frmRefNoRange();
                     f.ShowDialog();
                     break;
+
                 case "coordFormat":
                     break;
+
                 case "symbolFonts":
                     break;
+
                 case "showError":
                     showErrorMessagesToolStripMenuItem.Checked = !showErrorMessagesToolStripMenuItem.Checked;
                     global.ShowErrorMessage = showErrorMessagesToolStripMenuItem.Checked;
                     break;
             }
         }
-
-
 
         private void generateGridMapToolStripMenuItem_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
@@ -1539,6 +1561,7 @@ namespace FAD3
             {
                 case "zone50":
                     break;
+
                 case "zone51":
                     break;
             }
@@ -1553,6 +1576,7 @@ namespace FAD3
                     frmAbout f = new frmAbout();
                     f.ShowDialog();
                     break;
+
                 case "onlineManual":
                     break;
             }
@@ -1568,9 +1592,11 @@ namespace FAD3
                     f.ParentForm(this);
                     f.ShowDialog(this);
                     break;
+
                 case "open":
                     ProcessFileOpen();
                     break;
+
                 case "exit":
                     AppExit();
                     break;
@@ -1582,6 +1608,7 @@ namespace FAD3
             switch (((ListView)sender).Name)
             {
                 case "listView1":
+                    SetupCatchListView(Show: false);
                     ListViewItem lvi = new ListViewItem();
                     _topLVItemIndex = listView1.TopItem.Index;
                     foreach (var item in listView1.SelectedItems)
@@ -1610,12 +1637,14 @@ namespace FAD3
                                     }
                                 }
                                 break;
+
                             case "database":
                                 if (lvi.Text == "Database path")
                                 {
                                     Process.Start(Path.GetDirectoryName(global.mdbPath));
                                 }
                                 break;
+
                             case "landing_site":
 
                                 string[] arr1 = treeView1.SelectedNode.Tag.ToString().Split(',');
@@ -1625,14 +1654,17 @@ namespace FAD3
                                 fls.AOIGUID = arr1[0].ToString();
                                 fls.Show();
                                 break;
+
                             case "gear":
                                 break;
+
                             case "sampling":
                                 SetUPLV("samplingDetail");
                                 SamplingGUID = lvi.Tag.ToString();
                                 ShowCatchDetailEx(_SamplingGUID);
                                 lvi.BackColor = Color.Gainsboro;
                                 break;
+
                             case "samplingDetail":
                                 if (lvi.Name == "GearSpecs")
                                 {
@@ -1646,9 +1678,44 @@ namespace FAD3
                         }
                     }
                     break;
+
                 case "lvCatch":
+
+                    break;
+
+                case "lvLF_GMS":
+                    ShowLFForm();
                     break;
             }
+        }
+
+        private void ShowLFForm(bool IsNew = false)
+        {
+            var lvCatch = GetLVCatch();
+            LengthFreqForm lff;
+
+            lff = new LengthFreqForm(IsNew, _Sampling,
+                                      lvCatch.SelectedItems[0].Name,
+                                      lvCatch.SelectedItems[0].SubItems[1].Text);
+
+            lff.ShowDialog(this);
+            Show_LF_GMS_List(lvCatch.SelectedItems[0].Name);
+        }
+
+        private ListView GetLVCatch()
+        {
+            if (_subListExisting)
+                return (ListView)splitContainer1.Panel2.Controls["lvCatch"];
+            else
+                return null;
+        }
+
+        private ListView GetLVLF_GMS()
+        {
+            if (_subListExisting)
+                return (ListView)splitContainer1.Panel2.Controls["lvLF_GMS"];
+            else
+                return null;
         }
 
         private void ShowSamplingDetailForm()
@@ -1673,7 +1740,7 @@ namespace FAD3
             listView1.TopItem = listView1.Items[_topLVItemIndex];
         }
 
-        private void buttonSamplingClick(object sender, EventArgs e)
+        private void OnbuttonSamplingClick(object sender, EventArgs e)
         {
             Button b = (Button)sender;
             switch (b.Name)
@@ -1682,33 +1749,46 @@ namespace FAD3
                     SetupCatchListView(Show: false);
                     BackToSamplingMonth();
                     break;
+
                 case "buttonCatch":
                     SetupCatchListView();
                     ShowCatchComposition(_SamplingGUID);
                     break;
+
                 case "buttonMap":
                     break;
+
                 case "btnSubClose":
-                    SetupCatchListView(Show: false);
+                    var lvLF_GMS = GetLVLF_GMS();
+                    if (lvLF_GMS.Visible)
+                    {
+                        lvLF_GMS.Visible = false;
+                    }
+                    else
+                    {
+                        SetupCatchListView(Show: false);
+                    }
                     break;
+
                 case "btnSubLF":
                     SetupLF_GMSListView(Show: true, Content: global.fad3CatchSubRow.LF);
                     _CatchSubRow = global.fad3CatchSubRow.LF;
+                    Show_LF_GMS_List(GetLVCatch().SelectedItems[0].Name);
                     break;
+
                 case "btnSubGMS":
                     SetupLF_GMSListView(Show: true, Content: global.fad3CatchSubRow.GMS);
                     _CatchSubRow = global.fad3CatchSubRow.GMS;
+                    Show_LF_GMS_List(GetLVCatch().SelectedItems[0].Name);
                     break;
-
             }
-
         }
 
         private void ShowCatchComposition(string SamplingGuid)
         {
             if (_subListExisting)
             {
-                ListView lv = (ListView)splitContainer1.Panel2.Controls["lvCatch"];
+                ListView lv = GetLVCatch();
                 lv.Items.Clear();
                 int n = 1;
                 foreach (KeyValuePair<string, sampling.CatchLine> kv in _Sampling.CatchComp())
@@ -1728,6 +1808,8 @@ namespace FAD3
                     n++;
                 }
 
+                if (lv.Items.Count > 0)
+                    lv.Items[0].Selected = true;
 
                 foreach (ColumnHeader c in lv.Columns)
                 {
@@ -1743,11 +1825,13 @@ namespace FAD3
                         case "Computed count":
                             c.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
                             break;
+
                         case "Name of catch":
-                            c.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+                            if (lv.Items.Count > 0)
+                                c.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+                            else
+                                c.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
                             break;
-
-
                     }
                 }
             }
@@ -1832,8 +1916,10 @@ namespace FAD3
                         o.Columns.Add("CompCt", "Computed count");
                         o.Columns.Add("spacer", "");
                         o.BringToFront();
-                        o.Click += OnListView_DoubleClick;
+                        o.DoubleClick += OnListView_DoubleClick;
                         o.MouseDown += OnListView_MouseDown;
+                        o.ContextMenu = listView1.ContextMenu;
+                        o.HideSelection = false;
                     });
 
                     ListView lvLF_GMS = new ListView();
@@ -1848,6 +1934,10 @@ namespace FAD3
                         o.BringToFront();
                         o.FullRowSelect = true;
                         o.Visible = false;
+                        o.DoubleClick += OnListView_DoubleClick;
+                        o.MouseDown += OnListView_MouseDown;
+                        o.ContextMenu = listView1.ContextMenu;
+                        o.HideSelection = false;
                     });
 
                     Panel SubPanel = new Panel
@@ -1894,9 +1984,9 @@ namespace FAD3
                         UseVisualStyleBackColor = true
                     };
 
-                    btnSubClose.Click += buttonSamplingClick;
-                    btnSubLF.Click += buttonSamplingClick;
-                    btnSubGMS.Click += buttonSamplingClick;
+                    btnSubClose.Click += OnbuttonSamplingClick;
+                    btnSubLF.Click += OnbuttonSamplingClick;
+                    btnSubGMS.Click += OnbuttonSamplingClick;
 
                     SubPanel.Controls.Add(btnSubClose);
                     SubPanel.Controls.Add(btnSubLF);
@@ -1909,7 +1999,6 @@ namespace FAD3
                     btnSubGMS.Top = btnSubLF.Top + btnSubLF.Height + 5;
                     SubPanel.BringToFront();
                 }
-
             }
             else
             {
@@ -1952,6 +2041,7 @@ namespace FAD3
                     f1.Text = "New AOI";
                     f1.ShowDialog(this);
                     break;
+
                 case "addLandingSiteToolStripMenuItem":
                     arr = treeView1.SelectedNode.Tag.ToString().Split(',');
                     frmLandingSite f2 = new frmLandingSite();
@@ -1961,6 +2051,7 @@ namespace FAD3
                     f2.Text = "New landing site";
                     f2.ShowDialog(this);
                     break;
+
                 case "addSamplingToolStripMenuItem":
                     if (_AOI.HaveEnumerators)
                     {
@@ -1972,6 +2063,7 @@ namespace FAD3
                                         "before you can add your first sampling");
                     }
                     break;
+
                 case "addEnumeratorToolStripMenuItem":
                     frmEnumerator f4 = new frmEnumerator();
                     f4.AOI = _AOI;
@@ -2011,9 +2103,7 @@ namespace FAD3
             f3.ListViewSamplingDetail(listView1);
             f3.Parent_Form = this;
             f3.ShowDialog(this);
-
         }
-
 
         private void frmMain_Activated(object sender, EventArgs e)
         {
@@ -2024,20 +2114,24 @@ namespace FAD3
         {
             if (e.Button == MouseButtons.Right)
                 ConfigDropDownMenu(treeView1);
+
+            SetupCatchListView(Show: false);
         }
 
         private void OnListView_MouseDown(object sender, MouseEventArgs e)
         {
             ListView lv = (ListView)sender;
-            ListViewHitTestInfo lvh = lv.HitTest(e.X, e.Y);
+            _MouseX = e.Location.X;
+            _MouseY = e.Location.Y;
+            ListViewHitTestInfo lvh = lv.HitTest(_MouseX, _MouseY);
             switch (lv.Name)
             {
                 case "listView1":
                     if (e.Button == MouseButtons.Right)
                     {
-
                         if (_TreeLevel == "sampling")
                         {
+                            Text = "x: " + _MouseX + " y: " + _MouseY;
                             ConfigDropDownMenu(listView1, lvh);
                         }
                         else
@@ -2050,54 +2144,77 @@ namespace FAD3
                         if (listView1.Tag.ToString() == "sampling" && lvh.Item != null) SamplingGUID = lvh.Item.Tag.ToString();
                     }
                     break;
+
                 case "lvCatch":
-                    var lvc = (ListView)splitContainer1.Panel2.Controls["lvLF_GMS"];
-                    lvc.Items.Clear();
-                    int n = 1;
-                    if (lvh.Item != null)
+                    if (e.Button == MouseButtons.Right)
                     {
-                        if (_CatchSubRow == global.fad3CatchSubRow.LF)
+                        ConfigDropDownMenu(GetLVCatch());
+                    }
+                    else
+                    {
+                        if (lvh.Item != null)
                         {
-                            foreach (KeyValuePair<string, sampling.LFLine> kv in sampling.LFData(lvh.Item.Name))
-                            {
-                                var lvi = new ListViewItem(new string[]
-                                {
+                            Show_LF_GMS_List(lvh.Item.Name);
+                        }
+                    }
+                    break;
+
+                case "lvLF_GMS":
+                    if (e.Button == MouseButtons.Right)
+                    {
+                        Text = "x: " + _MouseX + " y: " + _MouseY;
+                        ConfigDropDownMenu(lv);
+                        menuDropDown.Show(lv, new Point(_MouseX, _MouseY));
+                    }
+                    else
+                    {
+                    }
+                    break;
+            }
+        }
+
+        private void Show_LF_GMS_List(string CatchRowGuid)
+        {
+            var lvc = GetLVLF_GMS();
+            lvc.Items.Clear();
+            int n = 1;
+            if (_CatchSubRow == global.fad3CatchSubRow.LF)
+            {
+                foreach (KeyValuePair<string, sampling.LFLine> kv in _Sampling.LFData(CatchRowGuid))
+                {
+                    var lvi = new ListViewItem(new string[]
+                    {
                                     n.ToString(),
                                     kv.Value.Length.ToString(),
                                     kv.Value.Freq.ToString()
-                                });
-                                lvi.Name = kv.Key;
-                                lvc.Items.Add(lvi);
-                                n++;
-                            }
-                        }
-                        else if (_CatchSubRow == global.fad3CatchSubRow.GMS)
-                        {
-                            foreach(KeyValuePair<string, sampling.GMSLine> kv in sampling.GMSData(lvh.Item.Name))
-                            {
-                                var lvi = new ListViewItem(new string[]
-                                {
+                    });
+                    lvi.Name = kv.Key;
+                    lvc.Items.Add(lvi);
+                    n++;
+                }
+            }
+            else if (_CatchSubRow == global.fad3CatchSubRow.GMS)
+            {
+                foreach (KeyValuePair<string, sampling.GMSLine> kv in sampling.GMSData(CatchRowGuid))
+                {
+                    var lvi = new ListViewItem(new string[]
+                    {
                                     n.ToString(),
                                     kv.Value.Length.ToString(),
                                     kv.Value.Weight.ToString(),
                                     kv.Value.Sex.ToString(),
                                     kv.Value.GMS.ToString(),
                                     kv.Value.GonadWeight.ToString()
-                                });
-                                lvi.Name = kv.Key;
-                                lvc.Items.Add(lvi);
-                                n++;
-                            }
-                        }
-                    }
+                    });
+                    lvi.Name = kv.Key;
+                    lvc.Items.Add(lvi);
+                    n++;
+                }
+            }
 
-                    foreach (ColumnHeader c in lvc.Columns)
-                    {
-                        c.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
-                    }
-                    break;
-                case "lvLF_GMS":
-                    break;
+            foreach (ColumnHeader c in lvc.Columns)
+            {
+                c.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
             }
         }
 

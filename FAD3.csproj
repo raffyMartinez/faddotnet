@@ -78,6 +78,9 @@
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Drawing" />
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.ValueTuple.4.5.0\lib\portable-net40+sl4+win8+wp8\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Forms.DataVisualization" />
     <Reference Include="System.Xml" />
@@ -144,12 +147,6 @@
     <Compile Include="frmCatch.Designer.cs">
       <DependentUpon>frmCatch.cs</DependentUpon>
     </Compile>
-    <Compile Include="frmEditLF.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmEditLF.Designer.cs">
-      <DependentUpon>frmEditLF.cs</DependentUpon>
-    </Compile>
     <Compile Include="frmEnumerator.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -202,6 +199,12 @@
     <Compile Include="global.cs" />
     <Compile Include="LandingSite.cs" />
     <Compile Include="LatLngUTMConverter.cs" />
+    <Compile Include="LengthFreqForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LengthFreqForm.Designer.cs">
+      <DependentUpon>LengthFreqForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="ManageGearSpecsClass.cs" />
     <Compile Include="ManageGearSpecsForm.cs">
       <SubType>Form</SubType>
@@ -260,9 +263,6 @@
     <EmbeddedResource Include="frmCatch.resx">
       <DependentUpon>frmCatch.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmEditLF.resx">
-      <DependentUpon>frmEditLF.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="frmEnumerator.resx">
       <DependentUpon>frmEnumerator.cs</DependentUpon>
     </EmbeddedResource>
@@ -289,6 +289,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GenerateRefNumberForm.resx">
       <DependentUpon>GenerateRefNumberForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LengthFreqForm.resx">
+      <DependentUpon>LengthFreqForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ManageGearSpecsForm.resx">
       <DependentUpon>ManageGearSpecsForm.cs</DependentUpon>
@@ -324,6 +327,7 @@
   <ItemGroup>
     <None Include="ClassDiagram1.cd" />
     <None Include="fad2_TemporaryKey.pfx" />
+    <None Include="packages.config" />
     <None Include="resource raw\UITable.xlsx" />
     <None Include="resource raw\uitable.xsd">
       <SubType>Designer</SubType>
