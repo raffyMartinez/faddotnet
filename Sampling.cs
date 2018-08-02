@@ -35,8 +35,6 @@ namespace FAD3
 
         private double _TotalCatchWt = 0;
 
-        //private static bool _HasGenusList=false;
-        //private string _NameGUID = "";
         private double _TotalWtOfFromTotal = 0;
 
         static sampling()
@@ -62,14 +60,14 @@ namespace FAD3
             get { return _uis; }
         }
 
-        public long LFRowsCount
-        {
-            get { return _LFRowsCount; }
-        }
-
         public long CatchAndEffortPropertyCount
         {
             get { return _CatchAndEffortPropertyCount; }
+        }
+
+        public long LFRowsCount
+        {
+            get { return _LFRowsCount; }
         }
 
         public string ReferenceNo
@@ -228,7 +226,7 @@ namespace FAD3
             return Success;
         }
 
-        public static Dictionary<string, GMSLine> GMSData(string CatchCompRowNo)
+        public Dictionary<string, GMSLine> GMSData(string CatchCompRowNo)
         {
             Dictionary<string, GMSLine> mydata = new Dictionary<string, GMSLine>();
             var dt = new DataTable();
@@ -263,7 +261,8 @@ namespace FAD3
                             TaxaName = dr["Taxa"].ToString(),
                             Taxa = taxa,
                             Sex = sex,
-                            GMS = gms
+                            GMS = gms,
+                            DataStatus = global.fad3DataStatus.statusFromDB
                         };
                         if (dr["Len"].ToString().Length > 0)
                             myGMS.Length = double.Parse(dr["Len"].ToString());
@@ -280,51 +279,6 @@ namespace FAD3
                     ErrorLogger.Log(ex);
                 }
             }
-            return mydata;
-        }
-
-        /// <summary>
-        /// Reads LF data from the database and returns it as as Dictionary
-        /// with the catch row as key and LF structure as value
-        /// </summary>
-        /// <param name="CatchCompRowNo"></param>
-        /// <returns></returns>
-        public Dictionary<string, LFLine> LFData(string CatchCompRowNo)
-        {
-            _LFRowsCount = 0;
-            Dictionary<string, LFLine> mydata = new Dictionary<string, LFLine>();
-            var dt = new DataTable();
-            using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
-            {
-                try
-                {
-                    conection.Open();
-                    string query = "SELECT RowGUID, Sequence, LenClass, Freq FROM tblLF WHERE tblLF.CatchCompRow='{" + CatchCompRowNo + "}' ORDER BY Sequence, LenClass";
-                    var adapter = new OleDbDataAdapter(query, conection);
-                    adapter.Fill(dt);
-                    for (int i = 0; i < dt.Rows.Count; i++)
-                    {
-                        DataRow dr = dt.Rows[i];
-
-                        var myLF = new LFLine
-                        {
-                            Length = double.Parse(dr["lenClass"].ToString()),
-                            Freq = int.Parse(dr["Freq"].ToString()),
-                            DataStatus = global.fad3DataStatus.statusFromDB,
-                            LFRowGuid = dr["RowGUID"].ToString(),
-                            CatchRowGuid = CatchCompRowNo,
-                            Sequence = dr["Sequence"] == DBNull.Value ? -1 : int.Parse(dr["Sequence"].ToString())
-                        };
-                        mydata.Add(dr["RowGUID"].ToString(), myLF);
-                    }
-                    _LFRowsCount++;
-                }
-                catch (Exception ex)
-                {
-                    ErrorLogger.Log(ex);
-                }
-            }
-
             return mydata;
         }
 
@@ -419,8 +373,8 @@ namespace FAD3
         }
 
         public static bool UpdateGMS(bool isNew, Double? wt, double? len, global.sex sex,
-                                     global.FishCrabGMS stage, double? gonadwt,
-                                     string CatchCompRow, string RowGUID)
+                                             global.FishCrabGMS stage, double? gonadwt,
+                                             string CatchCompRow, string RowGUID)
         {
             bool Success = false;
             string query = "";
@@ -466,65 +420,11 @@ namespace FAD3
             return Success;
         }
 
-        public bool SaveEditedLF(Dictionary<string, LFLine> LFData)
-        {
-            var SaveCount = 0;
-            foreach (KeyValuePair<string, LFLine> kv in LFData)
-            {
-                if (UpdateLF(kv.Value.Length, kv.Value.Freq, kv.Value.Sequence,
-                          kv.Value.CatchRowGuid, kv.Value.LFRowGuid, kv.Value.DataStatus))
-                    SaveCount++;
-            }
-
-            return SaveCount == LFData.Count;
-        }
-
-        private bool UpdateLF(double LenClass, long ClassCount, int Sequence,
-                              string CatchCompRow, string RowGUID, global.fad3DataStatus DataStatus)
-        {
-            bool Success = false;
-            string query = "";
-            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
-            {
-                try
-                {
-                    if (DataStatus == global.fad3DataStatus.statusNew)
-                    {
-                        query = "Insert into tblLF (LenClass, Freq, CatchCompRow, RowGUID, Sequence) values (" +
-                            LenClass + ", " + ClassCount + ", '{" + CatchCompRow + "}', '{" + RowGUID + "}', " + Sequence + ")";
-                    }
-                    else if (DataStatus == global.fad3DataStatus.statusEdited)
-                    {
-                        query = "Update tblLF " +
-                            "set LenClass = " + LenClass + ", " +
-                             "Freq= " + ClassCount + ", " +
-                             "Sequence= " + Sequence + " " +
-                             "Where RowGUID ='{" + RowGUID + "}'";
-                    }
-                    else if (DataStatus == global.fad3DataStatus.statusForDeletion)
-                    {
-                        query = "Delete * from tblLF where RowGUID = '{" + RowGUID + "}'";
-                    }
-                    if (query.Length > 0)
-                    {
-                        OleDbCommand update = new OleDbCommand(query, conn);
-                        conn.Open();
-                        Success = (update.ExecuteNonQuery() > 0);
-                        conn.Close();
-                    }
-                    else
-                    {
-                        Success = true;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    ErrorLogger.Log(ex);
-                }
-            }
-            return Success;
-        }
-
+        /// <summary>
+        /// reads the catch and effort data of a sampled fish landing and returs a
+        /// Dictionary object of keys and values
+        /// </summary>
+        /// <returns></returns>
         public Dictionary<string, string> CatchAndEffort()
         {
             string myVal = "";
@@ -714,7 +614,7 @@ namespace FAD3
                                    "tblCatchDetail.ct, tblCatchDetail.swt, tblCatchDetail.sct, tblCatchDetail.FromTotal " +
                                    "FROM(tblSampling INNER JOIN(tblCatchComp INNER JOIN temp_AllNames ON tblCatchComp.NameGUID = temp_AllNames.NameNo) " +
                                    "ON tblSampling.SamplingGUID = tblCatchComp.SamplingGUID) INNER JOIN tblCatchDetail ON tblCatchComp.RowGUID = " +
-                                   "tblCatchDetail.CatchCompRow WHERE tblSampling.SamplingGUID = '{" + _SamplingGUID + "}'";
+                                   "tblCatchDetail.CatchCompRow WHERE tblSampling.SamplingGUID = '{" + _SamplingGUID + "}' ORDER BY tblCatchComp.Sequence";
 
                     Debug.WriteLine(query);
                     var adapter = new OleDbDataAdapter(query, conection);
@@ -843,6 +743,51 @@ namespace FAD3
                 }
                 return myList;
             }
+        }
+
+        /// <summary>
+        /// Reads LF data from the database and returns it as as Dictionary
+        /// with the catch row as key and LF structure as value
+        /// </summary>
+        /// <param name="CatchCompRowNo"></param>
+        /// <returns></returns>
+        public Dictionary<string, LFLine> LFData(string CatchCompRowNo)
+        {
+            _LFRowsCount = 0;
+            Dictionary<string, LFLine> mydata = new Dictionary<string, LFLine>();
+            var dt = new DataTable();
+            using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
+            {
+                try
+                {
+                    conection.Open();
+                    string query = "SELECT RowGUID, Sequence, LenClass, Freq FROM tblLF WHERE tblLF.CatchCompRow='{" + CatchCompRowNo + "}' ORDER BY Sequence, LenClass";
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(dt);
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        DataRow dr = dt.Rows[i];
+
+                        var myLF = new LFLine
+                        {
+                            Length = double.Parse(dr["lenClass"].ToString()),
+                            Freq = int.Parse(dr["Freq"].ToString()),
+                            DataStatus = global.fad3DataStatus.statusFromDB,
+                            LFRowGuid = dr["RowGUID"].ToString(),
+                            CatchRowGuid = CatchCompRowNo,
+                            Sequence = dr["Sequence"] == DBNull.Value ? -1 : int.Parse(dr["Sequence"].ToString())
+                        };
+                        mydata.Add(dr["RowGUID"].ToString(), myLF);
+                    }
+                    _LFRowsCount++;
+                }
+                catch (Exception ex)
+                {
+                    ErrorLogger.Log(ex);
+                }
+            }
+
+            return mydata;
         }
 
         public List<string> MonthsFromLSandGear(string landingsiteguid, string gearguid)
@@ -985,6 +930,19 @@ namespace FAD3
             }
         }
 
+        public bool SaveEditedLF(Dictionary<string, LFLine> LFData)
+        {
+            var SaveCount = 0;
+            foreach (KeyValuePair<string, LFLine> kv in LFData)
+            {
+                if (UpdateLF(kv.Value.Length, kv.Value.Freq, kv.Value.Sequence,
+                          kv.Value.CatchRowGuid, kv.Value.LFRowGuid, kv.Value.DataStatus))
+                    SaveCount++;
+            }
+
+            return SaveCount == LFData.Count;
+        }
+
         public bool UpdateEffort(bool isNew, Dictionary<string, string> EffortData, List<string> FishingGrounds)
         {
             bool Success = false;
@@ -1121,6 +1079,52 @@ namespace FAD3
                 }
                 conn.Close();
             }
+        }
+
+        private bool UpdateLF(double LenClass, long ClassCount, int Sequence,
+                                              string CatchCompRow, string RowGUID, global.fad3DataStatus DataStatus)
+        {
+            bool Success = false;
+            string query = "";
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    if (DataStatus == global.fad3DataStatus.statusNew)
+                    {
+                        query = "Insert into tblLF (LenClass, Freq, CatchCompRow, RowGUID, Sequence) values (" +
+                            LenClass + ", " + ClassCount + ", '{" + CatchCompRow + "}', '{" + RowGUID + "}', " + Sequence + ")";
+                    }
+                    else if (DataStatus == global.fad3DataStatus.statusEdited)
+                    {
+                        query = "Update tblLF " +
+                            "set LenClass = " + LenClass + ", " +
+                             "Freq= " + ClassCount + ", " +
+                             "Sequence= " + Sequence + " " +
+                             "Where RowGUID ='{" + RowGUID + "}'";
+                    }
+                    else if (DataStatus == global.fad3DataStatus.statusForDeletion)
+                    {
+                        query = "Delete * from tblLF where RowGUID = '{" + RowGUID + "}'";
+                    }
+                    if (query.Length > 0)
+                    {
+                        OleDbCommand update = new OleDbCommand(query, conn);
+                        conn.Open();
+                        Success = (update.ExecuteNonQuery() > 0);
+                        conn.Close();
+                    }
+                    else
+                    {
+                        Success = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ErrorLogger.Log(ex);
+                }
+            }
+            return Success;
         }
 
         public struct CatchLine
@@ -1383,15 +1387,16 @@ namespace FAD3
             public global.Taxa Taxa { get; set; }
             public string TaxaName { get; set; }
             public double? Weight { get; set; }
+            public global.fad3DataStatus DataStatus { get; set; }
         }
 
         public struct LFLine
         {
+            public string CatchRowGuid { get; set; }
+            public global.fad3DataStatus DataStatus { get; set; }
             public int Freq { get; set; }
             public double Length { get; set; }
-            public global.fad3DataStatus DataStatus { get; set; }
             public string LFRowGuid { get; set; }
-            public string CatchRowGuid { get; set; }
             public int Sequence { get; set; }
         }
 

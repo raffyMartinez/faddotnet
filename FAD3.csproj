@@ -197,6 +197,12 @@
       <DependentUpon>GenerateRefNumberForm.cs</DependentUpon>
     </Compile>
     <Compile Include="global.cs" />
+    <Compile Include="GMSDataEntryForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GMSDataEntryForm.Designer.cs">
+      <DependentUpon>GMSDataEntryForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="LandingSite.cs" />
     <Compile Include="LatLngUTMConverter.cs" />
     <Compile Include="LengthFreqForm.cs">
@@ -289,6 +295,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GenerateRefNumberForm.resx">
       <DependentUpon>GenerateRefNumberForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GMSDataEntryForm.resx">
+      <DependentUpon>GMSDataEntryForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="LengthFreqForm.resx">
       <DependentUpon>LengthFreqForm.cs</DependentUpon>

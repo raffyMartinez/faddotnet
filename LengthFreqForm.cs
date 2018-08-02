@@ -1,28 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace FAD3
 {
     public partial class LengthFreqForm : Form
     {
-        private string _CatchRowGuid = "";
         private string _CatchName = "";
+        private string _CatchRowGuid = "";
+        private double _IntervalSize = .5;
         private bool _IsNew = false;
+        private int _labelAdjust = 2;
+        private TextBox _LastFreq;
+        private TextBox _LastLen;
+        private int _row = 1;
         private sampling _sampling;
         private int _spacer = 3;
-
-        private int _y = 0;
-        private int _row = 1;
-        private int _labelAdjust = 2;
-        private TextBox _lastLen;
-        private TextBox _LastFreq;
         private bool _UpdateSequence = false;
+        private int _y = 5;
+        private bool _UniqueLenghtClasses = false;
+        private List<double> _LengthClasses = new List<double>();
+        private double _OldLength;
 
         public LengthFreqForm(bool IsNew, sampling sampling, string CatchRowGuid, string CatchName)
         {
@@ -36,6 +36,10 @@ namespace FAD3
             {
                 labelTitle.Text = "New length-frequency table for " + CatchName;
             }
+            checkUniqueIntervals.Checked = true;
+            textIntervalSize.Text = _IntervalSize.ToString("0.00");
+            checkUseSize.Checked = true;
+            _UniqueLenghtClasses = checkUniqueIntervals.Checked;
             PopulateFieldControls(IsNew);
         }
 
@@ -83,8 +87,10 @@ namespace FAD3
                 o.Location = new Point(textLen.Left + textLen.Width + _spacer, _y);
                 o.Text = Freq;
             });
-            _lastLen = textLen;
+
+            _LastLen = textLen;
             _LastFreq = textFreq;
+
             if (Len.Length == 0 && Freq.Length == 0 && LFRowGuid.Length == 0)
             {
                 var thisTag = new Tuple<int, string, global.fad3DataStatus>(_row, Guid.NewGuid().ToString(), global.fad3DataStatus.statusNew);
@@ -104,83 +110,37 @@ namespace FAD3
             textFreq.Validating += OnTextValidating;
             textLen.TextChanged += OnTextChanged;
             textFreq.TextChanged += OnTextChanged;
+            textLen.Enter += OnTextEntered;
+            textLen.KeyDown += OnText_KeyDown;
 
             _y += labelRow.Height + _spacer;
             _row++;
         }
 
         /// <summary>
-        /// Populates fields if LF data exists or adds a new row
+        /// returns the frequency given a row number and also
+        /// returns the edit status of the frequency field
         /// </summary>
-        /// <param name="IsNew"></param>
-        private void PopulateFieldControls(bool IsNew)
+        /// <param name="rowNumber"></param>
+        /// <returns></returns>
+        private (int, global.fad3DataStatus) GetFreqValue(int rowNumber)
         {
-            if (IsNew)
+            int rv = 0;
+            global.fad3DataStatus ds = global.fad3DataStatus.statusFromDB;
+            foreach (Control c in panelUI.Controls)
             {
-                AddRow();
-            }
-            else
-            {
-                foreach (KeyValuePair<string, sampling.LFLine> kv in _sampling.LFData(_CatchRowGuid))
+                if (c.GetType().Name == "TextBox")
                 {
-                    if (!_UpdateSequence) _UpdateSequence = kv.Value.Sequence == -1;
-                    AddRow(kv.Value.Length.ToString(), kv.Value.Freq.ToString(), kv.Value.LFRowGuid);
-                }
-            }
-        }
-
-        /// <summary>
-        /// validate Len-Freq field entries
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void OnTextValidating(object sender, CancelEventArgs e)
-        {
-            var msg = "";
-            ((TextBox)sender).With(o =>
-            {
-                var s = o.Text;
-                if (s.Length > 0)
-                {
-                    switch (o.Name)
+                    var thisTag = (Tuple<int, string, global.fad3DataStatus>)c.Tag;
+                    if (thisTag.Item1 == rowNumber && c.Name == "textFreq")
                     {
-                        case "textLen":
-                            //could be a double
-                            Double Len;
-                            msg = "Expected value is a number greater than zero";
-                            if (double.TryParse(s, out Len))
-                            {
-                                if (Len <= 0)
-                                    e.Cancel = true;
-                            }
-                            else
-                            {
-                                e.Cancel = true;
-                            }
-
-                            break;
-
-                        case "textFreq":
-                            //must be an int
-                            int Freq;
-                            msg = "Expected value is a whole number greater than zero";
-                            if (int.TryParse(s, out Freq))
-                            {
-                                //test if input is a whole number
-                                if (Freq <= 0 || int.Parse(s) != Freq)
-                                    e.Cancel = true;
-                            }
-                            else
-                            {
-                                e.Cancel = true;
-                            }
-                            break;
+                        rv = int.Parse(c.Text);
+                        ds = thisTag.Item3;
+                        break;
                     }
                 }
-            });
-
-            if (e.Cancel)
-                MessageBox.Show(msg, "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
+            return (rv, ds);
         }
 
         private void OnButtonClick(object sender, EventArgs e)
@@ -219,7 +179,7 @@ namespace FAD3
                     break;
 
                 case "buttonAdd":
-                    if (_lastLen.Text.Length > 0 && _LastFreq.Text.Length > 0)
+                    if (_LastLen.Text.Length > 0 && _LastFreq.Text.Length > 0)
                         AddRow();
                     else
                         MessageBox.Show("You have to fill up all fields",
@@ -232,6 +192,146 @@ namespace FAD3
             }
         }
 
+        private void OnTextChanged(object sender, EventArgs e)
+        {
+            ((TextBox)sender).With(o =>
+            {
+                var thisTag = (Tuple<int, string, global.fad3DataStatus>)o.Tag;
+                if (thisTag.Item3 != global.fad3DataStatus.statusNew)
+                {
+                    var editedTag = new Tuple<int, string, global.fad3DataStatus>(thisTag.Item1, thisTag.Item2, global.fad3DataStatus.statusEdited);
+                    o.Tag = editedTag;
+                }
+            });
+        }
+
+        /// <summary>
+        /// validate Len-Freq field entries
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnTextValidating(object sender, CancelEventArgs e)
+        {
+            var msg = "";
+            ((TextBox)sender).With(o =>
+            {
+                var s = o.Text;
+                var DataStatus = ((Tuple<int, string, global.fad3DataStatus>)o.Tag).Item3;
+                if (s.Length > 0)
+                {
+                    switch (o.Name)
+                    {
+                        case "textLen":
+                            //could be a double
+                            Double Len;
+                            msg = "Expected value is a number greater than zero";
+                            if (double.TryParse(s, out Len) && Len > 0)
+                            {
+                                if (checkUseSize.Checked)
+                                {
+                                    if (Len < _IntervalSize || (Len % _IntervalSize) != 0)
+                                    {
+                                        msg = "Length must not be smaller and should be evenly divisible by the interval size";
+                                        e.Cancel = true;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                e.Cancel = true;
+                            }
+
+                            if (!e.Cancel && _UniqueLenghtClasses && _LengthClasses.Contains(Len))
+                            {
+                                //if the datastatus is original (fromDB) then the value is okay
+                                if (DataStatus != global.fad3DataStatus.statusFromDB)
+                                {
+                                    e.Cancel = true;
+                                    msg = "Length class already in the table";
+                                }
+                            }
+
+                            if (!e.Cancel)
+                            {
+                                //remove the previous value of the field if it is in the list of lengths
+                                if (Len != _OldLength && _LengthClasses.Contains(_OldLength) && DataStatus != global.fad3DataStatus.statusNew)
+                                {
+                                    _LengthClasses.Remove(_OldLength);
+                                }
+                                _LengthClasses.Add(Len);
+                                o.Text = Len.ToString("0.00");
+                            }
+
+                            if (e.Cancel)
+                                CancelButton = null;
+                            else
+                                CancelButton = buttonCancel;
+
+                            break;
+
+                        case "textFreq":
+                            //must be an int
+                            int Freq;
+                            msg = "Expected value is a whole number greater than zero";
+                            if (int.TryParse(s, out Freq))
+                            {
+                                //test if input is a whole number
+                                if (Freq <= 0 || int.Parse(s) != Freq)
+                                    e.Cancel = true;
+                            }
+                            else
+                            {
+                                e.Cancel = true;
+                            }
+                            break;
+                    }
+                }
+            });
+
+            if (e.Cancel)
+                MessageBox.Show(msg, "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+        }
+
+        /// <summary>
+        /// Populates fields if LF data exists or adds a new row
+        /// </summary>
+        /// <param name="IsNew"></param>
+        private void PopulateFieldControls(bool IsNew)
+        {
+            if (IsNew)
+            {
+                //adds a new row of empty fields
+                AddRow();
+            }
+            else
+            {
+                foreach (KeyValuePair<string, sampling.LFLine> kv in _sampling.LFData(_CatchRowGuid))
+                {
+                    //if Sequence is -1, it means that the sequence field in the source
+                    //database is null, so we set the _UpdateSequence flag to true.
+                    //This will make all form fields DataStatus to Edited so that during
+                    //Save, an update query will fill up the  null sequence field.
+                    if (!_UpdateSequence) _UpdateSequence = kv.Value.Sequence == -1;
+
+                    //adds a new row with fields containing length and frequency
+                    var Len = kv.Value.Length;
+                    AddRow(Len.ToString("0.00"), kv.Value.Freq.ToString(), kv.Value.LFRowGuid);
+
+                    //Add to the list of unique length classes
+                    if (!_LengthClasses.Contains(Len))
+                    {
+                        _LengthClasses.Add(Len);
+                        if (_LengthClasses.Count == 1) _OldLength = Len;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// collects all the data in the form fields and puts them in a Dictionary. The
+        /// Dictionary is passed to the SaveEditedLF function.
+        /// </summary>
+        /// <returns></returns>
         private bool SaveLFData()
         {
             var LFDict = new Dictionary<string, sampling.LFLine>();
@@ -248,11 +348,17 @@ namespace FAD3
                         {
                             case "textLen":
                                 myLF.Length = double.Parse(s);
-                                var result = GetFreqValue(thisTag.Item1);
-                                myLF.Freq = result.Item1;
+
+                                //we get the frequency value of the current length
+                                var FreqPair = GetFreqValue(thisTag.Item1);
+                                myLF.Freq = FreqPair.Item1;
+
+                                //if Length field is unchanged, we get the edit status of the
+                                //frequency field.
                                 myLF.DataStatus = thisTag.Item3;
                                 if (myLF.DataStatus == global.fad3DataStatus.statusFromDB)
-                                    myLF.DataStatus = result.Item2;
+                                    myLF.DataStatus = FreqPair.Item2;
+
                                 myLF.LFRowGuid = thisTag.Item2;
                                 myLF.CatchRowGuid = _CatchRowGuid;
                                 myLF.Sequence = thisTag.Item1;
@@ -266,35 +372,65 @@ namespace FAD3
             return _sampling.SaveEditedLF(LFDict);
         }
 
-        private (int, global.fad3DataStatus) GetFreqValue(int rowNumber)
+        /// <summary>
+        /// Validation rules for the Interval size field
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OntextIntervalSize_Validating(object sender, CancelEventArgs e)
         {
-            int rv = 0;
-            global.fad3DataStatus ds = global.fad3DataStatus.statusFromDB;
-            foreach (Control c in panelUI.Controls)
+            var msg = "";
+            ((TextBox)sender).With(o =>
             {
-                if (c.GetType().Name == "TextBox")
+                var s = o.Text;
+                if (s.Length > 0)
                 {
-                    var thisTag = (Tuple<int, string, global.fad3DataStatus>)c.Tag;
-                    if (thisTag.Item1 == rowNumber && c.Name == "textFreq")
+                    msg = "Expected value is a number greater than zero";
+                    double interval = 0;
+                    if (Double.TryParse(s, out interval))
                     {
-                        rv = int.Parse(c.Text);
-                        ds = thisTag.Item3;
-                        break;
+                        if (interval <= 0)
+                        {
+                            e.Cancel = true;
+                        }
+                        else
+                        {
+                            _IntervalSize = interval;
+                            o.Text = _IntervalSize.ToString("0.00");
+                        }
+                    }
+                    else
+                    {
+                        e.Cancel = true;
                     }
                 }
+            });
+
+            if (e.Cancel)
+            {
+                MessageBox.Show(msg, "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            return (rv, ds);
         }
 
-        private void OnTextChanged(object sender, EventArgs e)
+        private void OnTextEntered(object sender, EventArgs e)
         {
             ((TextBox)sender).With(o =>
             {
-                var thisTag = (Tuple<int, string, global.fad3DataStatus>)o.Tag;
-                if (thisTag.Item3 != global.fad3DataStatus.statusNew)
+                if (o.Name == "textLen" && o.Text.Length > 0)
                 {
-                    var editedTag = new Tuple<int, string, global.fad3DataStatus>(thisTag.Item1, thisTag.Item2, global.fad3DataStatus.statusEdited);
-                    o.Tag = editedTag;
+                    _OldLength = double.Parse(o.Text);
+                }
+            });
+        }
+
+        private void OnText_KeyDown(object sender, KeyEventArgs e)
+        {
+            ((TextBox)sender).With(o =>
+            {
+                if (o.Name == "textLen" && e.KeyCode == Keys.Escape &&
+                    ((Tuple<int, string, global.fad3DataStatus>)o.Tag).Item3 != global.fad3DataStatus.statusNew)
+                {
+                    o.Text = _OldLength.ToString();
                 }
             });
         }
