@@ -32,10 +32,10 @@ namespace FAD3
             _CatchName = CatchName;
             _sampling = sampling;
             _IsNew = IsNew;
-            labelTitle.Text = "GMS data table for " + CatchName;
+            labelTitle.Text = $"GMS data table for {CatchName}";
             if (IsNew)
             {
-                labelTitle.Text = "New GMS data table for " + CatchName;
+                labelTitle.Text = $"New GMS data table for {CatchName}";
             }
             PopulateFieldControls(IsNew);
         }

@@ -3,9 +3,10 @@
  * User: Raffy
  * Date: 8/8/2016
  * Time: 11:01 AM
- * 
+ *
  * To change this template use Tools | Options | Coding | Edit Standard Headers.
  */
+
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -16,13 +17,12 @@ using System.Windows.Forms;
 using ADOX;
 using Microsoft.Win32;
 
-
 namespace FAD3
 {
     /// <summary>
     /// Description of global.
     /// </summary>
-    /// 
+    ///
     public static class global
     {
         private static Dictionary<string, string> _VesselTypeDict = new Dictionary<string, string>();
@@ -99,9 +99,6 @@ namespace FAD3
             ReferenceNumberManager.ReadRefNoRange();
         }
 
-
-
-
         /// <summary>
         /// Test if the files required by the application to run are present
         /// </summary>
@@ -129,9 +126,6 @@ namespace FAD3
             get { return _VesselTypeDict; }
         }
 
-
-
-
         /// <summary>
         /// set window position from registry
         /// </summary>
@@ -156,7 +150,6 @@ namespace FAD3
                     (int)GetSetting(frm.Name, "FormHeight", frm.Height));
             }
             frm.WindowState = (FormWindowState)GetSetting(frm.Name, "FormWindowState", frm.WindowState);
-
         }
 
         /// <summary>
@@ -166,7 +159,7 @@ namespace FAD3
         /// <param name="name"></param>
         /// <param name="default_value"></param>
         /// <returns></returns>
-        static object GetSetting(string formName, string name, object default_value)
+        private static object GetSetting(string formName, string name, object default_value)
         {
             RegistryKey reg_key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\FAD3", true);
             RegistryKey sub_key = reg_key.CreateSubKey("FORMSTATE");
@@ -198,8 +191,6 @@ namespace FAD3
                 SaveSetting(frm.Name, "FormWidth", frm.RestoreBounds.Width);
                 SaveSetting(frm.Name, "FormHeight", frm.RestoreBounds.Height);
             }
-
-
         }
 
         /// <summary>
@@ -208,7 +199,7 @@ namespace FAD3
         /// <param name="formName"></param>
         /// <param name="name"></param>
         /// <param name="value"></param>
-        static void SaveSetting(string formName, string name, object value)
+        private static void SaveSetting(string formName, string name, object value)
         {
             RegistryKey reg_key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\FAD3", true);
             RegistryKey sub_key = reg_key.CreateSubKey("FORMSTATE");
@@ -236,6 +227,7 @@ namespace FAD3
             LF,
             GMS
         }
+
         public enum fad3DataStatus
         {
             statusFromDB,
@@ -243,6 +235,7 @@ namespace FAD3
             statusEdited,
             statusForDeletion
         }
+
         public enum fad3GearEditAction
         {
             addAOI,
@@ -311,8 +304,6 @@ namespace FAD3
             set { _ShowErrorMessage = value; }
         }
 
-
-
         public static Dictionary<FishCrabGMS, string> GMSStages(Taxa taxa, ref bool Success)
         {
             Success = false;
@@ -329,6 +320,7 @@ namespace FAD3
                     myStages.Add(FishCrabGMS.FishStg5Spent, "Spent");
                     Success = true;
                     break;
+
                 case Taxa.Crabs:
                     myStages.Add(FishCrabGMS.AllTaxaNotDetermined, "Not determined");
                     myStages.Add(FishCrabGMS.FemaleCrabImmature, "Immature");
@@ -336,6 +328,7 @@ namespace FAD3
                     myStages.Add(FishCrabGMS.FemaleCrabBerried, "Berried");
                     Success = true;
                     break;
+
                 case Taxa.Lobsters:
                 case Taxa.Sea_cucumbers:
                 case Taxa.Sea_urchins:
@@ -359,59 +352,76 @@ namespace FAD3
             {
                 case "To_be_determined":
                     break;
+
                 case "Fish":
                     switch (stage)
                     {
                         case FishCrabGMS.AllTaxaNotDetermined:
                             gms_stage = "Not determined";
                             break;
+
                         case FishCrabGMS.FishJuvenile:
                             gms_stage = "Juvenile";
                             break;
+
                         case FishCrabGMS.FishStg1Immature:
                             gms_stage = "Immature";
                             break;
+
                         case FishCrabGMS.FishStg2Maturing:
                             gms_stage = "Maturing";
                             break;
+
                         case FishCrabGMS.FishStg3Mature:
                             gms_stage = "Mature";
                             break;
+
                         case FishCrabGMS.FishStg4Gravid:
                             gms_stage = "Gravid";
                             break;
+
                         case FishCrabGMS.FishStg5Spent:
                             gms_stage = "Spent";
                             break;
                     }
                     break;
+
                 case "Shrimps":
                     break;
+
                 case "Cephalopods":
                     break;
+
                 case "Crabs":
                     switch (stage)
                     {
                         case FishCrabGMS.AllTaxaNotDetermined:
                             gms_stage = "Not determined";
                             break;
+
                         case FishCrabGMS.FemaleCrabImmature:
                             gms_stage = "Immature";
                             break;
+
                         case FishCrabGMS.FemaleCrabMature:
                             gms_stage = "Mature";
                             break;
+
                         case FishCrabGMS.FemaleCrabBerried:
                             gms_stage = "Berried";
                             break;
                     }
                     break;
+
                 case "Shells":
                     break;
+
                 case "Lobsters":
                     break;
+
                 case "Sea_cucumbers":
                     break;
+
                 case "Sea_urchins":
                     break;
             }
@@ -429,43 +439,54 @@ namespace FAD3
                         case "Not determined":
                             myStage = FishCrabGMS.AllTaxaNotDetermined;
                             break;
+
                         case "Juvenile":
                             myStage = FishCrabGMS.FishJuvenile;
                             break;
+
                         case "Immature":
                             myStage = FishCrabGMS.FishStg1Immature;
                             break;
+
                         case "Maturing":
                             myStage = FishCrabGMS.FishStg2Maturing;
                             break;
+
                         case "Mature":
                             myStage = FishCrabGMS.FishStg3Mature;
                             break;
+
                         case "Gravid":
                             myStage = FishCrabGMS.FishStg4Gravid;
                             break;
+
                         case "Spent":
                             myStage = FishCrabGMS.FishStg5Spent;
                             break;
                     }
                     break;
+
                 case Taxa.Crabs:
                     switch (stage)
                     {
                         case "Not determined":
                             myStage = FishCrabGMS.AllTaxaNotDetermined;
                             break;
+
                         case "Immature":
                             myStage = FishCrabGMS.FemaleCrabImmature;
                             break;
+
                         case "Mature":
                             myStage = FishCrabGMS.FemaleCrabMature;
                             break;
+
                         case "Berried":
                             myStage = FishCrabGMS.FemaleCrabBerried;
                             break;
                     }
                     break;
+
                 default:
                     myStage = FishCrabGMS.AllTaxaNotDetermined;
                     break;
@@ -476,7 +497,6 @@ namespace FAD3
 
         public static bool CheckDB(string mdbPath)
         {
-
             bool cancel = false;
 
             //put data tables here
@@ -513,7 +533,6 @@ namespace FAD3
                     {
                         if (tableList.Contains(tdName))
                         {
-
                             //check for columns
                             foreach (Column col in catMDB.Tables[tdName].Columns)
                             {
@@ -571,7 +590,6 @@ namespace FAD3
                                     }
                                 }
                             }
-
                         }
                         else
                         {
@@ -601,7 +619,6 @@ namespace FAD3
                             //finally append the new table
                             catMDB.Tables.Append(newTable);
                         }
-
                     }
                 }
             }
@@ -628,7 +645,7 @@ namespace FAD3
                 try
                 {
                     conection.Open();
-                    string query = "Select TaxaNo from tblAllSpecies where SpeciesGUID = '{" + CatchNameGUID + "}'";
+                    string query = $"Select TaxaNo from tblAllSpecies where SpeciesGUID = '{{{CatchNameGUID}}}'";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
                     DataRow dr = dt.Rows[0];
@@ -654,7 +671,7 @@ namespace FAD3
                 try
                 {
                     conection.Open();
-                    string query = "Select MunNo, Municipality from Municipalities where ProvNo= " + ProvinceNo + " Order By Municipality";
+                    string query = $"Select MunNo, Municipality from Municipalities where ProvNo=  {ProvinceNo} Order By Municipality";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(myDT);
                     _munDict.Clear();
@@ -696,7 +713,6 @@ namespace FAD3
                     gear.FillGearClasses();
                     GetVesselTypes();
                 }
-
             }
         }
 
@@ -812,8 +828,6 @@ namespace FAD3
                 ErrorLogger.Log(ex);
             }
         }
-
-
 
         public static bool MapIsOpen
         {

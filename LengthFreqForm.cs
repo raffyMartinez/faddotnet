@@ -31,10 +31,10 @@ namespace FAD3
             _CatchName = CatchName;
             _sampling = sampling;
             _IsNew = IsNew;
-            labelTitle.Text = "Length-frequency table for " + CatchName;
+            labelTitle.Text = $"Length-frequency table for {CatchName}";
             if (IsNew)
             {
-                labelTitle.Text = "New length-frequency table for " + CatchName;
+                labelTitle.Text = $"New length-frequency table for {CatchName}";
             }
             checkUniqueIntervals.Checked = true;
             textIntervalSize.Text = _IntervalSize.ToString("0.00");

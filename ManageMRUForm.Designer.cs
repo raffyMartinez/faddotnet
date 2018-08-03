@@ -30,18 +30,18 @@
         {
             this.components = new System.ComponentModel.Container();
             this.listBoxFiles = new System.Windows.Forms.ListBox();
-            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.dropDownMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.menuOpen = new System.Windows.Forms.ToolStripMenuItem();
             this.menuRemove = new System.Windows.Forms.ToolStripMenuItem();
             this.buttonOK = new System.Windows.Forms.Button();
             this.buttonCancel = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
-            this.contextMenuStrip1.SuspendLayout();
+            this.dropDownMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // listBoxFiles
             // 
-            this.listBoxFiles.ContextMenuStrip = this.contextMenuStrip1;
+            this.listBoxFiles.ContextMenuStrip = this.dropDownMenu;
             this.listBoxFiles.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.listBoxFiles.FormattingEnabled = true;
             this.listBoxFiles.ItemHeight = 15;
@@ -49,26 +49,27 @@
             this.listBoxFiles.Name = "listBoxFiles";
             this.listBoxFiles.Size = new System.Drawing.Size(448, 259);
             this.listBoxFiles.TabIndex = 0;
+            this.listBoxFiles.MouseDown += new System.Windows.Forms.MouseEventHandler(this.listBoxFiles_MouseDown);
             // 
-            // contextMenuStrip1
+            // dropDownMenu
             // 
-            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.dropDownMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuOpen,
             this.menuRemove});
-            this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(118, 48);
-            this.contextMenuStrip1.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnMenuItem_ItemClicked);
+            this.dropDownMenu.Name = "contextMenuStrip1";
+            this.dropDownMenu.Size = new System.Drawing.Size(181, 70);
+            this.dropDownMenu.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnMenuItem_ItemClicked);
             // 
             // menuOpen
             // 
             this.menuOpen.Name = "menuOpen";
-            this.menuOpen.Size = new System.Drawing.Size(117, 22);
+            this.menuOpen.Size = new System.Drawing.Size(180, 22);
             this.menuOpen.Text = "Open";
             // 
             // menuRemove
             // 
             this.menuRemove.Name = "menuRemove";
-            this.menuRemove.Size = new System.Drawing.Size(117, 22);
+            this.menuRemove.Size = new System.Drawing.Size(180, 22);
             this.menuRemove.Text = "Remove";
             // 
             // buttonOK
@@ -114,7 +115,7 @@
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "ManageMRUForm";
             this.Text = "Manage recently opened files";
-            this.contextMenuStrip1.ResumeLayout(false);
+            this.dropDownMenu.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -125,7 +126,7 @@
         private System.Windows.Forms.ListBox listBoxFiles;
         private System.Windows.Forms.Button buttonOK;
         private System.Windows.Forms.Button buttonCancel;
-        private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
+        private System.Windows.Forms.ContextMenuStrip dropDownMenu;
         private System.Windows.Forms.ToolStripMenuItem menuOpen;
         private System.Windows.Forms.ToolStripMenuItem menuRemove;
         private System.Windows.Forms.Label label1;

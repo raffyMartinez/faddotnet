@@ -11,40 +11,40 @@ namespace FAD3
 {
     public partial class frmSamplingDetail : Form
     {
-        Dictionary<string, sampling.UserInterfaceStructure> _uis = new Dictionary<string, sampling.UserInterfaceStructure>();
-        sampling _sampling;
-        string _samplingGUID = "";
-        ListView _lv;
-        Control _topControl;
-        string _AOIGuid = "";
-        int _WidestLabel = 0;
-        int _ControlWidth = 200;
-        int _yPos;
-        string _AOIName = "";
-        string _LandingSiteName = "";
-        string _LandingSiteGuid = "";
-        string _GearClassName = "";
-        string _GearClassGuid = "";
-        string _GearVarName = "";
-        string _GearVarGuid = "";
-        string _GearRefCode = "";
-        frmMain _parent;
-        bool _isNew;
-        aoi _aoi;
-        TextBox _txtVesselDimension = new TextBox();
+        private Dictionary<string, sampling.UserInterfaceStructure> _uis = new Dictionary<string, sampling.UserInterfaceStructure>();
+        private sampling _sampling;
+        private string _samplingGUID = "";
+        private ListView _lv;
+        private Control _topControl;
+        private string _AOIGuid = "";
+        private int _WidestLabel = 0;
+        private int _ControlWidth = 200;
+        private int _yPos;
+        private string _AOIName = "";
+        private string _LandingSiteName = "";
+        private string _LandingSiteGuid = "";
+        private string _GearClassName = "";
+        private string _GearClassGuid = "";
+        private string _GearVarName = "";
+        private string _GearVarGuid = "";
+        private string _GearRefCode = "";
+        private frmMain _parent;
+        private bool _isNew;
+        private aoi _aoi;
+        private TextBox _txtVesselDimension = new TextBox();
 
-        string _VesLength = "";
-        string _VesWidth = "";
-        string _VesHeight = "";
+        private string _VesLength = "";
+        private string _VesWidth = "";
+        private string _VesHeight = "";
 
-        string _DatePrompt = "";
-        string _TimePrompt = "";
+        private string _DatePrompt = "";
+        private string _TimePrompt = "";
 
-        string _NewReferenceNumber = "";
+        private string _NewReferenceNumber = "";
 
-        bool _SampledGearSpecIsEdited;
+        private bool _SampledGearSpecIsEdited;
 
-        List<string> _FishingGrounds;
+        private List<string> _FishingGrounds;
 
         public bool SampledGearSpecIsEdited
         {
@@ -82,10 +82,7 @@ namespace FAD3
                                 o.Text += _FishingGrounds[i] + ", ";
 
                             o.Text = o.Text.Substring(0, o.Text.Length - 2);
-
                         });
-
-
                 }
             }
         }
@@ -117,7 +114,6 @@ namespace FAD3
             get { return _AOIGuid; }
             set { _AOIGuid = value; }
         }
-
 
         public string LandingSiteName
         {
@@ -167,7 +163,6 @@ namespace FAD3
             set { _parent = value; }
         }
 
-
         public bool IsNew
         {
             get { return _isNew; }
@@ -190,7 +185,6 @@ namespace FAD3
             InitializeComponent();
         }
 
-
         private void OnFormClosed(object sender, FormClosedEventArgs e)
         {
             global.SaveFormSettings(this);
@@ -203,15 +197,12 @@ namespace FAD3
             int ht = 16;
             int x = 0;
 
-
             int Spacing = 15;
             string cType;
             int SizeAdjust = 50;
             string ButtonText;
             int ControlHt = 0;
             Control ctl = new Control();
-
-
 
             //setup the labels
             Label lbl = new Label
@@ -255,7 +246,6 @@ namespace FAD3
                 lblError.Location = new Point(x, _yPos);
             }
 
-
             //setup the field controls
             switch (cType)
             {
@@ -263,16 +253,15 @@ namespace FAD3
                     ctl = new TextBox
                     {
                         Name = "text" + e.Key
-
                     };
                     ((TextBox)ctl).ReadOnly = e.ReadOnly;
                     break;
+
                 case "ComboBox":
                     ctl = new ComboBox
                     {
                         Name = "combo" + e.Key,
                     };
-
 
                     switch (e.Key)
                     {
@@ -280,18 +269,22 @@ namespace FAD3
                             //((ComboBox)ctl).DataSource = new BindingSource(_aoi.Enumerators, null);
                             aoi.AOIEnumeratorsList(_AOIGuid, (ComboBox)ctl);
                             break;
+
                         case "TargetArea":
                             //((ComboBox)ctl).DataSource = new BindingSource(_aoi.AOIs, null);
                             aoi.getAOIsEx((ComboBox)ctl);
                             break;
+
                         case "LandingSite":
                             //((ComboBox)ctl).DataSource = new BindingSource(_aoi.LandingSites, null);
                             aoi.LandingSitesFromAOI(_AOIGuid, (ComboBox)ctl);
                             break;
+
                         case "GearClass":
                             //((ComboBox)ctl).DataSource = new BindingSource(global.GearClass, null);
                             gear.GetGearClassEx((ComboBox)ctl);
                             break;
+
                         case "FishingGear":
                             if (!_isNew)
                             {
@@ -317,6 +310,7 @@ namespace FAD3
                             //    ((ComboBox)ctl).DataSource = new BindingSource(MySource, null);
                             //}
                             break;
+
                         case "TypeOfVesselUsed":
                             //System.Diagnostics.Debug.Assert(global.VesselTypeDict.Count > 0, "source has no rows");
                             ((ComboBox)ctl).DataSource = new BindingSource(global.VesselTypeDict, null);
@@ -330,9 +324,11 @@ namespace FAD3
                         o.AutoCompleteSource = AutoCompleteSource.ListItems;
                     });
                     break;
+
                 case "Spacer":
                     ControlHt = 35;
                     break;
+
                 case "DateMask":
                     ctl = new MaskedTextBox
                     {
@@ -348,6 +344,7 @@ namespace FAD3
                     });
 
                     break;
+
                 case "TimeMask":
                     ctl = new MaskedTextBox
                     {
@@ -363,16 +360,17 @@ namespace FAD3
                     });
 
                     break;
+
                 case "Check":
                     ctl = new CheckBox
                     {
                         Name = "chk" + e.Key
                     };
                     break;
+
                 default:
                     break;
             }
-
 
             System.Type type = ctl.GetType();
             if (type.Name != "Control" && cType != "Spacer")
@@ -384,7 +382,6 @@ namespace FAD3
                 tt.SetToolTip(ctl, e.ToolTip);
 
                 panelUI.Controls.Add(ctl);
-
 
                 ctl.With(o =>
                  {
@@ -402,7 +399,6 @@ namespace FAD3
                      ControlHt = o.Height;
                  });
 
-
                 if (!_isNew)
                 {
                     if (type.Name != "CheckBox")
@@ -415,20 +411,24 @@ namespace FAD3
                                 _GearVarName = ctl.Text;
                                 _GearVarGuid = ((KeyValuePair<string, string>)((ComboBox)ctl).SelectedItem).Key;
                                 break;
+
                             case "ReferenceNumber":
                                 var arr = ctl.Text.Split('-');
                                 _GearRefCode = arr[1];
                                 break;
+
                             case "TargetArea":
                                 _AOIName = ctl.Text;
                                 _AOIGuid = ((KeyValuePair<string, string>)((ComboBox)ctl).SelectedItem).Key;
                                 break;
+
                             case "AdditionalFishingGround":
                                 //var myList = FishingGrid.AdditionalFishingGrounds(_samplingGUID);
 
                                 //foreach (var item in myList)
                                 //    ((TextBox)ctl).Text += item + "\r\n";
                                 break;
+
                             case "GearSpecs":
                                 ctl.Text = ManageGearSpecsClass.GetSampledSpecsEx(_samplingGUID);
                                 break;
@@ -447,12 +447,15 @@ namespace FAD3
                             if (_isNew)
                                 _topControl = ctl;
                             break;
+
                         case "TargetArea":
                             ctl.Text = _AOIName;
                             break;
+
                         case "LandingSite":
                             ctl.Text = _LandingSiteName;
                             break;
+
                         case "GearClass":
                             if (_GearClassName.Length > 0)
                                 ctl.Text = _GearClassName;
@@ -466,6 +469,7 @@ namespace FAD3
                             }
                             _GearClassGuid = ((KeyValuePair<string, string>)((ComboBox)ctl).SelectedItem).Key;
                             break;
+
                         case "FishingGear":
                             if (_GearVarName.Length > 0)
                                 ctl.Text = _GearVarName;
@@ -485,9 +489,11 @@ namespace FAD3
                                 _GearVarGuid = ((KeyValuePair<string, string>)((ComboBox)ctl).SelectedItem).Key;
 
                             break;
+
                         case "Enumerator":
                             ctl.Text = "";
                             break;
+
                         case "TypeOfVesselUsed":
                             ctl.Text = "Motorized";
                             break;
@@ -540,11 +546,11 @@ namespace FAD3
                     case "Enumerator":
                         if (!IsNew) _topControl = btn;
                         break;
+
                     case "ReferenceNumber":
                         btn.Enabled = IsNew;
                         break;
                 }
-
             }
             _yPos += ControlHt + Spacing;
         }
@@ -577,7 +583,6 @@ namespace FAD3
             _topControl.Select();
         }
 
-
         private void SetFieldsVisible()
         {
             foreach (Control ctl in panelUI.Controls)
@@ -589,8 +594,6 @@ namespace FAD3
                 }
             }
         }
-
-
 
         private void AdustControlsPosition()
         {
@@ -648,14 +651,17 @@ namespace FAD3
                             }
                             EffortData.Add(c.Tag.ToString(), key);
                             break;
+
                         case "TextBox":
                             EffortData.Add(c.Tag.ToString(), c.Text);
                             break;
+
                         case "MaskedTextBox":
                             // var s = "";
                             var s = ((MaskedTextBox)c).MaskCompleted ? c.Text : "";
                             EffortData.Add(c.Tag.ToString(), s);
                             break;
+
                         case "CheckBox":
                             EffortData.Add(c.Tag.ToString(), ((CheckBox)c).Checked.ToString());
                             break;
@@ -681,7 +687,6 @@ namespace FAD3
                 return false;
         }
 
-
         private void OnbuttonSamplingFields_Click(object sender, EventArgs e)
         {
             Button btn = (Button)sender;
@@ -689,6 +694,7 @@ namespace FAD3
             {
                 case "btnEnumerator":
                     break;
+
                 case "btnGearClass":
                     frmGearUsage form = frmGearUsage.GetInstance();
                     if (!form.Visible)
@@ -708,9 +714,9 @@ namespace FAD3
                         o.TargetArea(_AOIName, _AOIGuid);
                         o.GearVariation(_GearVarName, _GearVarGuid);
                         o.PopulateLists();
-
                     });
                     break;
+
                 case "btnGearSpecs":
                     SampledGear_SpecsForm sgf = SampledGear_SpecsForm.GetInstance(_GearVarGuid, _GearVarName, this);
 
@@ -724,6 +730,7 @@ namespace FAD3
                     }
                     sgf.SamplingGUID = _samplingGUID;
                     break;
+
                 case "btnVesselDimension":
                     frmVesselDimension f = new frmVesselDimension();
                     if (_VesLength.Length > 0 && _VesHeight.Length > 0 && _VesWidth.Length > 0)
@@ -731,6 +738,7 @@ namespace FAD3
                     f.Parent_Form = this;
                     f.ShowDialog(this);
                     break;
+
                 case "btnReferenceNumber":
                     if (CheckRequiredForRefNumber())
                     {
@@ -746,6 +754,7 @@ namespace FAD3
                         MessageBox.Show("Some required fields not filled up", "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     break;
+
                 case "btnFishingGround":
                     PopulateFGList();
                     frmFishingGround fg = new frmFishingGround();
@@ -792,9 +801,11 @@ namespace FAD3
                         case "SamplingDate":
                             valid = (c.Text != _DatePrompt);
                             break;
+
                         case "SamplingTime":
                             valid = (c.Text != _TimePrompt);
                             break;
+
                         case "GearClass":
                         case "TypeOfVesselUsed":
                         case "FishingGear":
@@ -836,11 +847,12 @@ namespace FAD3
                         if (SaveEdits())
                         {
                             if (IsNew) ReferenceNumberManager.UpdateRefCodeCounter();
-                            _parent.RefreshCatchDetail(_samplingGUID);
+                            _parent.RefreshCatchDetail(_samplingGUID, _isNew);
                             this.Close();
                         }
                     }
                     break;
+
                 case "buttonCancel":
                     if (IsNew) _parent.NewSamplingDataEntryCancelled();
                     this.Close();
@@ -908,8 +920,8 @@ namespace FAD3
                 Type t = c.GetType();
                 if (t.Name != "Label" && t.Name != "Button")
                 {
-                    //we want to get the UserInterfaceStructure element specified 
-                    //in the tag of the control 
+                    //we want to get the UserInterfaceStructure element specified
+                    //in the tag of the control
                     sampling.UserInterfaceStructure ui = sampling.uis[c.Tag.ToString()];
 
                     if (ui.Required && c.Text.Length == 0)
@@ -921,7 +933,6 @@ namespace FAD3
                     }
                 }
             }
-
 
             //Step 2. Datetime for set and haul should all be filled in or should all be blank
             if (isValidated)
@@ -940,7 +951,6 @@ namespace FAD3
                         panelUI.Controls["dtxtDateHauled"].Text == _DatePrompt &&
                         panelUI.Controls["ttxtTimeHauled"].Text == _TimePrompt
                         );
-
 
                     isValidated = GearDateTimeIsEmpty;
                     if (!isValidated)
@@ -965,10 +975,9 @@ namespace FAD3
             }
 
             //Step 3. Datetime for set and haul should be before sampling date and time and
-            //   Date set should be before date hauled                       
+            //   Date set should be before date hauled
             if (isValidated && GearDateTimeIsEmpty == false)
             {
-
                 DateTime samplingDate = DateTime.Parse(panelUI.Controls["dtxtSamplingDate"].Text.ToString());
                 samplingDate = samplingDate.Add(TimeSpan.Parse(panelUI.Controls["ttxtSamplingTime"].Text.ToString()));
 
@@ -1031,9 +1040,8 @@ namespace FAD3
             //    _AOIGuid = ((KeyValuePair<string, string>)((ComboBox)panelUI.Controls["comboTargetArea"]).SelectedItem).Key;
             //    _LandingSiteGuid = ((KeyValuePair<string, string>)((ComboBox)panelUI.Controls["comboLandingSite"]).SelectedItem).Key;
             //    _GearClassGuid = ((KeyValuePair<string, string>)((ComboBox)panelUI.Controls["comboGearClass"]).SelectedItem).Key;
-            //    _GearVarGuid = ((KeyValuePair<string, string>)((ComboBox)panelUI.Controls["comboFishingGear"]).SelectedItem).Key;                
+            //    _GearVarGuid = ((KeyValuePair<string, string>)((ComboBox)panelUI.Controls["comboFishingGear"]).SelectedItem).Key;
             //}
-
 
             if (msg.Length > 0)
             {
@@ -1059,12 +1067,11 @@ namespace FAD3
                 {
                     //System.Diagnostics.Debugger.Break();
                 }
-
             }
         }
+
         private void OnFieldValidated(object sender, EventArgs e)
         {
-
             if (sender.GetType().Name == "ComboBox")
             {
                 var combo = (ComboBox)sender;
@@ -1103,13 +1110,14 @@ namespace FAD3
                                     comboItems = gear.GearVariationsUsage(myGearClassGUID, key);
                                     ChangeComboDataSource(targetCombo, comboItems);
 
-
-
                                     break;
+
                                 case "comboLandingSite":
                                     break;
+
                                 case "comboEnumerator":
                                     break;
+
                                 case "comboGearClass":
                                     _GearClassName = ((ComboBox)panelUI.Controls["comboGearClass"]).Text;
                                     string myAOIGUID = ((KeyValuePair<string, string>)((ComboBox)panelUI.Controls["comboTargetArea"]).SelectedItem).Key;
@@ -1117,19 +1125,19 @@ namespace FAD3
                                     comboItems = gear.GearVariationsUsage(key, myAOIGUID);
                                     ChangeComboDataSource(targetCombo, comboItems);
                                     break;
+
                                 case "comboFishingGear":
                                     break;
+
                                 case "comboTypeOfVesselUsed":
                                     break;
                             }
-
                         }
                     }
                 }
-
             }
-
         }
+
         private void ChangeComboDataSource(ComboBox cbo, Dictionary<string, string> comboItems)
         {
             cbo.With
@@ -1164,6 +1172,7 @@ namespace FAD3
                         panelUI.Controls["comboFishingGear"].Text = "";
                         panelUI.Controls["comboEnumerator"].Text = "";
                         break;
+
                     case "comboGearClass":
                         panelUI.Controls["comboFishingGear"].Text = "";
                         break;
@@ -1185,6 +1194,7 @@ namespace FAD3
                 {
                     case "string":
                         break;
+
                     case "int":
                         try
                         {
@@ -1199,6 +1209,7 @@ namespace FAD3
                             msg = "Expected value is a whole number greater than zero";
                         }
                         break;
+
                     case "datetime":
                         DateTime myDateTime;
                         try
@@ -1234,6 +1245,7 @@ namespace FAD3
                             }
                         }
                         break;
+
                     case "lookup":
                         var key = "";
                         var cbo = (ComboBox)panelUI.Controls["combo" + ui.Key];
@@ -1251,14 +1263,17 @@ namespace FAD3
                                 }
 
                                 break;
+
                             case "GearClass":
                                 break;
+
                             case "FishingGear":
                                 _GearVarName = cbo.Text;
                                 _GearVarGuid = ((KeyValuePair<string, string>)cbo.SelectedItem).Key;
                                 break;
                         }
                         break;
+
                     case "double":
                         try
                         {
@@ -1294,6 +1309,5 @@ namespace FAD3
                 }
             }
         }
-
     }
 }

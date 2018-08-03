@@ -10,11 +10,10 @@ using System.Windows.Forms;
 
 namespace FAD3
 {
-
     public partial class ManageMRUForm : Form
     {
         private List<FileInfo> _FileList;
-        frmMain _parent_form;
+        private frmMain _parent_form;
 
         public ManageMRUForm()
         {
@@ -36,7 +35,6 @@ namespace FAD3
                         listBoxFiles.Items.Add(_FileList[i].FullName);
                     }
                 }
-
             }
         }
 
@@ -47,16 +45,19 @@ namespace FAD3
                 case "menuOpen":
 
                     break;
+
                 case "menuRemove":
                     if (listBoxFiles.Items.Count > 0)
                     {
-                        listBoxFiles.Items.Remove(listBoxFiles.Items[listBoxFiles.SelectedIndex]);
-                        ((ContextMenuStrip)sender).Items["menuRemove"].Enabled = listBoxFiles.Items.Count > 0;
-                        ((ContextMenuStrip)sender).Items["menuOpen"].Enabled = listBoxFiles.Items.Count > 0;
+                        if (listBoxFiles.SelectedIndex >= 0)
+                        {
+                            listBoxFiles.Items.Remove(listBoxFiles.Items[listBoxFiles.SelectedIndex]);
+                            ((ContextMenuStrip)sender).Items["menuRemove"].Enabled = listBoxFiles.Items.Count > 0;
+                            ((ContextMenuStrip)sender).Items["menuOpen"].Enabled = listBoxFiles.Items.Count > 0;
+                        }
                     }
                     break;
             }
-
         }
 
         private void Onbutton_Click(object sender, EventArgs e)
@@ -73,11 +74,22 @@ namespace FAD3
                         _parent_form.MRUList.FileList = _FileList;
                         this.Close();
                         break;
+
                     case "buttonCancel":
                         this.Close();
                         break;
                 }
             });
+        }
+
+        private void listBoxFiles_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                var Enabled = listBoxFiles.SelectedIndex >= 0;
+                dropDownMenu.Items["menuRemove"].Enabled = Enabled;
+                dropDownMenu.Items["menuOpen"].Enabled = Enabled;
+            }
         }
     }
 }
