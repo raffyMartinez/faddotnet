@@ -39,7 +39,6 @@ namespace FAD3
         public static fadGridType GridType
         {
             get { return _gt; }
-
         }
 
         public static bool ValidGridCorners(string ULGrid, string LRGrid)
@@ -49,7 +48,7 @@ namespace FAD3
             var EastingLR = 0;
             var NorthingLR = 0;
 
-            Grid25_to_UTM(ULGrid,  out EastingUL, out NorthingUL);
+            Grid25_to_UTM(ULGrid, out EastingUL, out NorthingUL);
             Grid25_to_UTM(LRGrid, out EastingLR, out NorthingLR);
 
             return EastingUL <= EastingLR && NorthingUL >= NorthingLR;
@@ -62,7 +61,6 @@ namespace FAD3
             return ValidName;
         }
 
-
         public static string GridTypeName
         {
             get
@@ -73,11 +71,13 @@ namespace FAD3
                     case fadGridType.gridTypeNone:
                         gridTypeName = "Not defined";
                         break;
+
                     case fadGridType.gridTypeGrid25:
                         gridTypeName = "Grid25";
                         if (!IsCompleteGrid25)
                             gridTypeName += " (Incomplete)";
                         break;
+
                     case fadGridType.gridTypeOther:
                         gridTypeName = "Other grid";
                         break;
@@ -94,12 +94,12 @@ namespace FAD3
                 case "50N":
                     myZone = fadUTMZone.utmZone50N;
                     break;
+
                 case "51N":
                     myZone = fadUTMZone.utmZone51N;
                     break;
             }
             return myZone;
-
         }
 
         public static string UTMZoneName
@@ -112,6 +112,7 @@ namespace FAD3
                     case fadUTMZone.utmZone50N:
                         ZoneName = "50N";
                         break;
+
                     case fadUTMZone.utmZone51N:
                         ZoneName = "51N";
                         break;
@@ -126,7 +127,6 @@ namespace FAD3
             {
                 return _gt == fadGridType.gridTypeGrid25 && _grid25.UTMZone != fadUTMZone.utmZone_Undefined
                         && _grid25.Bounds.Count > 0 && _grid25.GridSet.Count > 0;
-
             }
         }
 
@@ -145,7 +145,6 @@ namespace FAD3
                     ValidName = MajorGrid <= _grid25.MaxGridNumber;
                     if (ValidName)
                     {
-
                         var col = arr[1].Substring(0, 1).ToUpper().ToCharArray()[0];
                         try
                         {
@@ -168,7 +167,6 @@ namespace FAD3
                             ValidName = false;
                             ErrMsg = "Column names must be from A to Y \r\nand row names mut be from 1 to 25";
                         }
-
                     }
                     else
                     {
@@ -216,14 +214,12 @@ namespace FAD3
                 _utmZone = value;
                 SetParametersOfZone(_utmZone);
             }
-
         }
 
         public static Grid25Struct Grid25
         {
             get { return _grid25; }
         }
-
 
         public enum fadCornerType
         {
@@ -281,7 +277,7 @@ namespace FAD3
                 try
                 {
                     con.Open();
-                    string query = "Select grid_name from tblGrid25Inland where grid_name ='" + MinorGridName + "'";
+                    string query = $"Select grid_name from tblGrid25Inland where grid_name ='{MinorGridName}'";
                     using (var dt = new DataTable())
                     {
                         var adapter = new OleDbDataAdapter(query, con);
@@ -294,8 +290,7 @@ namespace FAD3
             return IsInland;
         }
 
-
-        static void SetParametersOfZone(fadUTMZone Zone)
+        private static void SetParametersOfZone(fadUTMZone Zone)
         {
             //set major grids in a utm zone
             _grid25.UTMZone = Zone;
@@ -308,6 +303,7 @@ namespace FAD3
                     _grid25.MaxGridNumber = 1230;
                     _grid25.CellSize = 2000;
                     break;
+
                 case fadUTMZone.utmZone50N:
                     _grid25.MajorGridXOrigin = 300000;
                     _grid25.MajorGridYOrigin = 800000;
@@ -318,6 +314,7 @@ namespace FAD3
             }
             _grid25.MajorGridSizeMeters = 50000;
         }
+
         /// <summary>
         /// Sets up the fishing ground
         /// 1. reads the grid system used
@@ -340,7 +337,7 @@ namespace FAD3
                 {
                     _utmZone = fadUTMZone.utmZone_Undefined;
                     con.Open();
-                    string query = "Select * from tblAOIOtherGrid where AOIGUID ='{" + AOIGuid + "}'";
+                    string query = $"Select * from tblAOIOtherGrid where AOIGUID ={{{AOIGuid}}}";
                     using (var dt = new DataTable())
                     {
                         var adapter = new OleDbDataAdapter(query, con);
@@ -348,7 +345,7 @@ namespace FAD3
                         gt = dt.Rows.Count > 0 ? fadGridType.gridTypeOther : fadGridType.gridTypeNone;
                         if (gt == fadGridType.gridTypeNone)
                         {
-                            query = "Select UseGrid25, UTMZone, UpperLeftGrid, LowerRightGrid, GridDescription from tblAOI where AOIGuid = '{" + AOIGuid + "}'";
+                            query = $"Select UseGrid25, UTMZone, UpperLeftGrid, LowerRightGrid, GridDescription from tblAOI where AOIGuid = {{{AOIGuid}}}";
                             using (adapter = new OleDbDataAdapter(query, con))
                             {
                                 adapter.Fill(dt);
@@ -367,11 +364,13 @@ namespace FAD3
                                                 ZoneNumber = 51;
                                                 ZoneLetter = "N";
                                                 break;
+
                                             case "50N":
                                                 _utmZone = fadUTMZone.utmZone50N;
                                                 ZoneNumber = 50;
                                                 ZoneLetter = "N";
                                                 break;
+
                                             default:
                                                 UTMZoneSet = false;
                                                 break;
@@ -404,12 +403,11 @@ namespace FAD3
                                                 myBound.lrGridName = lr;
                                                 myBound.ulGridName = ul;
 
-
                                                 _grid25.Bounds.Add(myBound);
                                             }
 
                                             //read additional grids
-                                            query = "Select UpperLeft, LowerRight, GridDescription from tblAdditionalAOIExtent where AOIGuid ='{" + AOIGuid + "}'";
+                                            query = $"Select UpperLeft, LowerRight, GridDescription from tblAdditionalAOIExtent where AOIGuid ={{{AOIGuid}}}";
                                             using (adapter = new OleDbDataAdapter(query, con))
                                             {
                                                 adapter.Fill(dt);
@@ -424,7 +422,6 @@ namespace FAD3
 
                                                         if (lr.Length > 0 && ul.Length > 0)
                                                         {
-
                                                             Grid25ToLL(dr["LowerRight"].ToString(), out x, out y, fadCornerType.cornerTypeLowerRight);
                                                             myBound = new LLBounds();
                                                             myBound.lrX = x;
@@ -448,7 +445,6 @@ namespace FAD3
                                     }
                                 }
                             }
-
                         }
                     }
                 }
@@ -470,6 +466,7 @@ namespace FAD3
                         x_mtr += 1000;
                         y_mtr -= 1000;
                         break;
+
                     case fadCornerType.cornerTypeUpperLeft:
                         x_mtr -= 1000;
                         y_mtr += 1000;
@@ -487,7 +484,7 @@ namespace FAD3
         ///Fills a list containing the major grid numbers found inside the extents
         /// of a fishing ground
         /// </summary>
-        static void CalculateGridSet()
+        private static void CalculateGridSet()
         {
             _grid25.GridSet.Clear();
             foreach (var item in _grid25.Bounds)
@@ -531,7 +528,7 @@ namespace FAD3
                     try
                     {
                         conection.Open();
-                        var query = "Select GridName from tblGrid where SamplingGUID ='{" + SamplingGuid + "}'";
+                        var query = $"Select GridName from tblGrid where SamplingGUID ={{{SamplingGuid}}}";
 
                         using (var adapter = new OleDbDataAdapter(query, conection))
                         {
@@ -560,7 +557,7 @@ namespace FAD3
             {
                 try
                 {
-                    var sql = "Update tblAOI set SubgridStyle =" + (int)_SubGridStyle + " where AOIGuid ='{" + _AOIGuid + "}'";
+                    var sql = $"Update tblAOI set SubgridStyle = {(int)_SubGridStyle} where AOIGuid ={{{AOIGuid}}}";
                     OleDbCommand update = new OleDbCommand(sql, conn);
                     conn.Open();
                     Success = (update.ExecuteNonQuery() > 0);
@@ -580,7 +577,7 @@ namespace FAD3
                     try
                     {
                         conection.Open();
-                        string query = "SELECT SubgridStyle FROM tblAOI WHERE AOIGuid='{" + _AOIGuid + "}'";
+                        string query = $"SELECT SubgridStyle FROM tblAOI WHERE AOIGuid= {{{_AOIGuid}}}";
                         using (var adapter = new OleDbDataAdapter(query, conection))
                         {
                             adapter.Fill(dt);
@@ -592,13 +589,11 @@ namespace FAD3
                     {
                         ErrorLogger.Log(ex);
                     }
-
                 }
             }
-
         }
 
-        static int MajorGridColPosition(int GridNo)
+        private static int MajorGridColPosition(int GridNo)
         {
             var rv = 0;
             var colCount = _grid25.MajorGridColumns;
@@ -618,24 +613,23 @@ namespace FAD3
             return rv;
         }
 
-
-        static int GridYOrigin(int GridNo)
+        private static int GridYOrigin(int GridNo)
         {
             return MajorGridRowPosition(GridNo) * _grid25.MajorGridSizeMeters + (_grid25.MajorGridYOrigin - _grid25.MajorGridSizeMeters);
         }
 
-        static int MajorGridRowPosition(int GridNo)
+        private static int MajorGridRowPosition(int GridNo)
         {
             double d = (GridNo / _grid25.MajorGridColumns);
             return (int)Math.Floor(d) + 1;
         }
 
-        static int GridXOrigin(int GridNo)
+        private static int GridXOrigin(int GridNo)
         {
             return MajorGridColPosition(GridNo) * _grid25.MajorGridSizeMeters + (_grid25.MajorGridXOrigin + (-50000));
         }
 
-        static void MinorGridCentroid(string minorGridName, out int x, out int y)
+        private static void MinorGridCentroid(string minorGridName, out int x, out int y)
         {
             var arr = minorGridName.Split('-');
             var MajorGrid = int.Parse(arr[0].ToString().Trim());
@@ -662,7 +656,6 @@ namespace FAD3
             int x, y = 0;
             MinorGridCentroid(GridName, out x, out y);
             return UTMZoneName + " " + x + " " + y;
-
         }
 
         public static string Grid25_to_UTM(string GridName, out int Easting, out int Northing)
@@ -670,20 +663,16 @@ namespace FAD3
             Easting = Northing = 0;
             MinorGridCentroid(GridName, out Easting, out Northing);
             return UTMZoneName + " " + Easting + " " + Northing;
-
         }
 
         private static void CleanGridName()
         {
-
         }
 
         public static void ReadGridDetails(string AOIGuid)
         {
             ;
         }
-
-
 
         public struct Grid25Struct
         {
@@ -716,5 +705,4 @@ namespace FAD3
             }
         }
     }
-
 }

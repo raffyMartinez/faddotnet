@@ -57,11 +57,11 @@ namespace FAD3
             using (var con = new OleDbConnection(global.ConnectionString))
             {
                 con.Open();
-                string query = "SELECT tblRefGearCodes_Usage.RefGearCode, RowNo, SubVariation " +
-                               "FROM tblRefGearCodes INNER JOIN tblRefGearCodes_Usage ON " +
-                               "tblRefGearCodes.RefGearCode = tblRefGearCodes_Usage.RefGearCode " +
-                               "WHERE TargetAreaGUID = {" + _AOIGuid + "} AND " +
-                               "GearVar = {" + _GearVariationGuid + "}";
+                string query = $@"SELECT tblRefGearCodes_Usage.RefGearCode, RowNo, SubVariation
+                                  FROM tblRefGearCodes INNER JOIN tblRefGearCodes_Usage ON
+                                  tblRefGearCodes.RefGearCode = tblRefGearCodes_Usage.RefGearCode
+                                  WHERE TargetAreaGUID = {{{_AOIGuid}}} AND
+                                  GearVar = {{{_GearVariationGuid}}}";
 
                 using (var dt = new DataTable())
                 {
@@ -93,12 +93,12 @@ namespace FAD3
                 try
                 {
                     conection.Open();
-                    var query = "SELECT LocalName FROM tblGearLocalNames INNER JOIN " +
-                         "(tblRefGearCodes_Usage INNER JOIN tblRefGearUsage_LocalName ON " +
-                         "tblRefGearCodes_Usage.RowNo = tblRefGearUsage_LocalName.GearUsageRow) " +
-                         "ON tblGearLocalNames.LocalNameGUID = tblRefGearUsage_LocalName.GearLocalName " +
-                         "WHERE tblRefGearCodes_Usage.RefGearCode= '" + RefCode + "' AND " +
-                         "tblRefGearCodes_Usage.TargetAreaGUID= '{" + _AOIGuid + "}'";
+                    var query = $@"SELECT LocalName FROM tblGearLocalNames INNER JOIN
+                         (tblRefGearCodes_Usage INNER JOIN tblRefGearUsage_LocalName ON
+                         tblRefGearCodes_Usage.RowNo = tblRefGearUsage_LocalName.GearUsageRow)
+                         ON tblGearLocalNames.LocalNameGUID = tblRefGearUsage_LocalName.GearLocalName
+                         WHERE tblRefGearCodes_Usage.RefGearCode= '{RefCode}' AND
+                         tblRefGearCodes_Usage.TargetAreaGUID= {{{_AOIGuid}}}";
 
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
@@ -111,14 +111,11 @@ namespace FAD3
                 }
                 catch
                 {
-
                 }
             }
 
             return LocalNames;
-
         }
-
 
         public static string GetNextReferenceNumber(string GearCode)
         {
@@ -129,7 +126,7 @@ namespace FAD3
             using (var con = new OleDbConnection(global.ConnectionString))
             {
                 con.Open();
-                var sql = "Select Counter from tblRefCodeCounter where GearRefCode = '" + _AOI_Year_GearCode + "'";
+                var sql = $"Select Counter from tblRefCodeCounter where GearRefCode = {{{_AOI_Year_GearCode}}}";
 
                 using (var dt = new DataTable())
                 {
@@ -177,22 +174,21 @@ namespace FAD3
                 using (var con = new OleDbConnection(global.ConnectionString))
                 {
                     if (_Has_AOI_Year_GearCode)
-                        sql = "Update tblRefCodeCounter set [Counter] = " + _counter + " where GearRefCode = '" + _AOI_Year_GearCode + "'";
+                        sql = $"Update tblRefCodeCounter set [Counter] = {_counter} where GearRefCode = {{{_AOI_Year_GearCode}}}";
                     else
-                        sql = "Insert into tblRefCodeCounter (GearRefCode, [Counter]) values ('" + _AOI_Year_GearCode + "', " + _counter + ")";
+                        sql = "Insert into tblRefCodeCounter (GearRefCode, [Counter]) values {{{_AOI_Year_GearCode}}}, {_counter})";
 
                     if (sql.Length > 0)
                         con.Open();
-                        using (OleDbCommand update = new OleDbCommand(sql, con))
-                        {
-                            Success = (update.ExecuteNonQuery() > 0);
-                            //TODO: what to do if Success=false?
-                        }
+                    using (OleDbCommand update = new OleDbCommand(sql, con))
+                    {
+                        Success = (update.ExecuteNonQuery() > 0);
+                        //TODO: what to do if Success=false?
+                    }
                 }
             }
             return Success;
         }
-
 
         public static void SetRefNoRange(bool Reset = false, long min = 0, long max = 0)
         {
@@ -213,7 +209,6 @@ namespace FAD3
         {
             min = _RefNoRangeMin;
             max = _RefNoRangeMax;
-
         }
 
         public struct VariationCode
@@ -223,7 +218,6 @@ namespace FAD3
             public string RowGuid { get; set; }
             public string AOIGuid { get; set; }
             public string LocalNames { get; set; }
-
         }
     }
 }

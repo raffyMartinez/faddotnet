@@ -8,21 +8,23 @@ using ADOX;
 
 namespace FAD3
 {
-    static class names
+    internal static class names
     {
         private static List<string> _GenusList = new List<string>();
         private static List<string> _LocalNameList = new List<string>();
         private static Dictionary<string, string> _LocalNameListDict = new Dictionary<string, string>();
-        private static Dictionary<string,string> _speciesList = new Dictionary<string,string>();
+        private static Dictionary<string, string> _speciesList = new Dictionary<string, string>();
         private static string _Genus = "";
         private static long _LocalNamesCount = 0;
         private static long _SciNamesCount = 0;
 
-        public static string Genus {
+        public static string Genus
+        {
             get { return _Genus; }
             set
-            { _Genus = value;
-                GetSpecies();  
+            {
+                _Genus = value;
+                GetSpecies();
             }
         }
 
@@ -38,7 +40,7 @@ namespace FAD3
 
         public static long SciNamesCount
         {
-            get { return  _SciNamesCount; }
+            get { return _SciNamesCount; }
         }
 
         private static void GetSpecies()
@@ -49,8 +51,8 @@ namespace FAD3
                 try
                 {
                     conection.Open();
-                    string query = "SELECT Name2, NameNo FROM temp_AllNames " +
-                          "WHERE Name1 = '" + _Genus + "'  ORDER BY Name2";
+                    string query = $@"SELECT Name2, NameNo FROM temp_AllNames
+                                      WHERE Name1 = '{_Genus}'  ORDER BY Name2";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
                     _speciesList.Clear();
@@ -76,10 +78,10 @@ namespace FAD3
                 try
                 {
                     conection.Open();
-                    string query = "Select ListedFB from tblAllSpecies where SpeciesGUID = '{" + NameGUID + "}'";
+                    string query = $"Select ListedFB from tblAllSpecies where SpeciesGUID = {{{NameGUID}}}";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
-                    DataRow dr= dt.Rows[0];
+                    DataRow dr = dt.Rows[0];
                     isListed = bool.Parse(dr["ListedFB"].ToString());
                 }
                 catch (Exception ex)
@@ -99,7 +101,7 @@ namespace FAD3
                 try
                 {
                     conection.Open();
-                    string query = "SELECT Name1, NameNo FROM temp_AllNames WHERE Identification = 'Local names' ORDER BY Name1";
+                    const string query = "SELECT Name1, NameNo FROM temp_AllNames WHERE Identification = 'Local names' ORDER BY Name1";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
 
@@ -125,51 +127,47 @@ namespace FAD3
             Catalog catMDB = new Catalog();
             catMDB.let_ActiveConnection(global.ConnectionString);
 
-
             try
             {
                 catMDB.Tables.Delete("temp_AllNames");
             }
             catch
             { }
-                using (var conection = new OleDbConnection(global.ConnectionString))
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                OleDbCommand cmd = new OleDbCommand()
                 {
+                    Connection = conection,
+                };
 
-                    OleDbCommand cmd = new OleDbCommand()
-                    {
-                        Connection = conection,                            
-                    };
+                conection.Open();
 
-                    conection.Open();
-
-                    //select into query
-                    string sql = "SELECT Name AS Name1, '' AS Name2, NameNo, 'Local names' AS Identification INTO temp_AllNames FROM tblBaseLocalNames";
-                    cmd.CommandText = sql;
-                    try
-                    {
-                        _LocalNamesCount = cmd.ExecuteNonQuery();
-                    }
-                    catch(Exception ex)
-                    {
-                        ErrorLogger.Log(ex);
-                    }
-
-                    //insert into to append the results from the select into query
-                    sql = "INSERT INTO temp_AllNames ( Name1, Name2, NameNo, Identification ) SELECT Genus, species, SpeciesGUID, 'Species names' AS Identification FROM tblAllSpecies";
-                    cmd.CommandText = sql;
-                    try
-                    {
-                        _SciNamesCount += cmd.ExecuteNonQuery();
-                    }
-                    catch (Exception ex)
-                    {
-                        ErrorLogger.Log(ex);
-                    }
-
-                    conection.Close();
-
+                //select into query
+                string sql = "SELECT Name AS Name1, '' AS Name2, NameNo, 'Local names' AS Identification INTO temp_AllNames FROM tblBaseLocalNames";
+                cmd.CommandText = sql;
+                try
+                {
+                    _LocalNamesCount = cmd.ExecuteNonQuery();
                 }
-            
+                catch (Exception ex)
+                {
+                    ErrorLogger.Log(ex);
+                }
+
+                //insert into to append the results from the select into query
+                sql = "INSERT INTO temp_AllNames ( Name1, Name2, NameNo, Identification ) SELECT Genus, species, SpeciesGUID, 'Species names' AS Identification FROM tblAllSpecies";
+                cmd.CommandText = sql;
+                try
+                {
+                    _SciNamesCount += cmd.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    ErrorLogger.Log(ex);
+                }
+
+                conection.Close();
+            }
         }
 
         public static void GetGenus_LocalNames()
@@ -182,8 +180,7 @@ namespace FAD3
                 try
                 {
                     conection.Open();
-                    string query = "SELECT DISTINCT Name1, Identification FROM temp_AllNames " +
-                                 "ORDER BY Name1";
+                    const string query = "SELECT DISTINCT Name1, Identification FROM temp_AllNames ORDER BY Name1";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
 
@@ -207,7 +204,7 @@ namespace FAD3
             }
         }
 
-        public static Dictionary<string,string> speciesList 
+        public static Dictionary<string, string> speciesList
         {
             get { return _speciesList; }
         }
@@ -219,7 +216,8 @@ namespace FAD3
 
         public static Dictionary<string, string> LocalNameListDict
         {
-            get {
+            get
+            {
                 GetLocalNames();
                 return _LocalNameListDict;
             }

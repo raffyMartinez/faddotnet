@@ -8,18 +8,17 @@ namespace FAD3
 {
     public static class ManageGearSpecsClass
     {
-        static string _GearVarGuid;
-        static string _GearVarName;
-        static string _SamplingGuid;
-        static bool _HasSampledGearSpecs;
-        static bool _HasUnsavedSampledGearSpecEdits;
+        private static string _GearVarGuid;
+        private static string _GearVarName;
+        private static string _SamplingGuid;
+        private static bool _HasSampledGearSpecs;
+        private static bool _HasUnsavedSampledGearSpecEdits;
 
         //this field contains the template for gear specs of a given gear variation
-        static List<GearSpecification> _GearSpecifications = new List<GearSpecification>();
+        private static List<GearSpecification> _GearSpecifications = new List<GearSpecification>();
 
         //this field contains the spec data of the sampled gear
-        static Dictionary<string, SampledGearSpecData> _SampledGearSpecs = new Dictionary<string, SampledGearSpecData>();
-
+        private static Dictionary<string, SampledGearSpecData> _SampledGearSpecs = new Dictionary<string, SampledGearSpecData>();
 
         /// <summary>
         /// Assigns the SamplingGuid.
@@ -44,7 +43,6 @@ namespace FAD3
             }
         }
 
-
         /// <summary>
         /// Boolean. Returns if there are unsaved edits in the sampled gear's specifications
         /// </summary>
@@ -62,9 +60,7 @@ namespace FAD3
         {
             _SampledGearSpecs.Clear();
             _HasUnsavedSampledGearSpecEdits = true;
-
         }
-
 
         /// <summary>
         /// Dictionary. Returns the specifications of the sampled gear
@@ -99,9 +95,6 @@ namespace FAD3
             public string SamplingGUID { get; set; }
             public string RowID { get; set; }
             public string SpecValue { get; set; }
-
-
-
         }
 
         /// <summary>
@@ -111,7 +104,6 @@ namespace FAD3
         {
             get { return _HasSampledGearSpecs; }
         }
-
 
         /// <summary>
         /// Set gear variation GUID and then read the specs template of the gear
@@ -143,7 +135,6 @@ namespace FAD3
             get { return _GearSpecifications; }
         }
 
-
         /// <summary>
         /// save the specs of the gear that was sampled
         /// </summary>
@@ -161,22 +152,22 @@ namespace FAD3
                     sql = "";
                     if (kv.Value.DataStatus == global.fad3DataStatus.statusNew)
                     {
-                        sql = "Insert into tblSampledGearSpec (RowID, SamplingGUID, SpecID, [Value]) values ('{" +
-                                kv.Value.RowID + "}', '{" +
-                                _SamplingGuid + "}', '{" +
-                                kv.Value.SpecGUID + "}', '" +
-                                kv.Value.SpecValue + "')";
+                        sql = $@"Insert into tblSampledGearSpec (RowID, SamplingGUID, SpecID, [Value]) values (
+                                '{kv.Value.RowID}',
+                                {{{ _SamplingGuid}}},
+                                '{kv.Value.SpecGUID}',
+                                '{kv.Value.SpecValue}')";
                     }
                     else if (kv.Value.DataStatus == global.fad3DataStatus.statusEdited)
                     {
-                        sql = "Update tblSampledGearSpec set [Value] = '" +
-                            kv.Value.SpecValue + "' where SamplingGUID = '{" +
-                            kv.Value.SamplingGUID + "}' and SpecID = '{" +
-                            kv.Value.SpecGUID + "}'";
+                        sql = $@"Update tblSampledGearSpec set
+                            [Value] = '{kv.Value.SpecValue}' where
+                            SamplingGUID = {{{kv.Value.SamplingGUID}}} and
+                            SpecID = {{{kv.Value.SpecGUID}}}";
                     }
                     else if (kv.Value.DataStatus == global.fad3DataStatus.statusForDeletion)
                     {
-                        sql = "Delete * from tblSampleGearSpec where RowID = '{" + kv.Value.RowID + "}'";
+                        sql = $"Delete * from tblSampleGearSpec where RowID = {{{kv.Value.RowID}}}";
                     }
 
                     if (sql.Length > 0)
@@ -207,8 +198,6 @@ namespace FAD3
             return !_HasUnsavedSampledGearSpecEdits;
         }
 
-
-
         /// <summary>
         /// Boolean. Determine if the sampled gear has a specifications template
         /// </summary>
@@ -219,9 +208,9 @@ namespace FAD3
             var HasSpecs = false;
             using (var con = new OleDbConnection(global.ConnectionString))
             {
-                var sql = "SELECT TOP 1 SamplingGUID FROM tblGearSpecs INNER JOIN tblSampledGearSpec ON " +
-                          "tblGearSpecs.RowID = tblSampledGearSpec.SpecID WHERE tblGearSpecs.Version = '2' " +
-                          "AND tblSampledGearSpec.SamplingGUID ='{" + SamplingGuid + "}'";
+                var sql = $@"SELECT TOP 1 SamplingGUID FROM tblGearSpecs INNER JOIN tblSampledGearSpec ON
+                          tblGearSpecs.RowID = tblSampledGearSpec.SpecID WHERE tblGearSpecs.Version = '2'
+                          AND tblSampledGearSpec.SamplingGUID ={{{SamplingGuid}}}";
 
                 using (var dt = new DataTable())
                 {
@@ -238,16 +227,15 @@ namespace FAD3
         /// Retrieve the specs of the gear that was sampled.
         /// A Dictionary (_SampledGearSpecs) is filled.
         /// </summary>
-        static void GetSampledGearSpecs()
+        private static void GetSampledGearSpecs()
         {
             using (var con = new OleDbConnection(global.ConnectionString))
             {
                 _HasSampledGearSpecs = false;
                 _SampledGearSpecs.Clear();
-                var sql = "SELECT tblGearSpecs.RowID, ElementName, SpecID, Value " +
-                    "FROM tblGearSpecs INNER JOIN tblSampledGearSpec ON tblGearSpecs.RowID = tblSampledGearSpec.SpecID " +
-                    "WHERE tblGearSpecs.Version = '2' AND tblSampledGearSpec.SamplingGUID = '{" + _SamplingGuid + "}'";
-
+                var sql = $@"SELECT tblGearSpecs.RowID, ElementName, SpecID, Value
+                    FROM tblGearSpecs INNER JOIN tblSampledGearSpec ON tblGearSpecs.RowID = tblSampledGearSpec.SpecID
+                    WHERE tblGearSpecs.Version = '2' AND tblSampledGearSpec.SamplingGUID = {{{_SamplingGuid}}}";
 
                 using (var dt = new DataTable())
                 {
@@ -273,20 +261,19 @@ namespace FAD3
             }
         }
 
-
         /// <summary>
         /// Gets the template for the gear specifications of a given gear variation
         /// A List (_GearSpecifications) is filled
         /// </summary>
-        static void GetGearSpecs()
+        private static void GetGearSpecs()
         {
             _GearSpecifications.Clear();
             using (var con = new OleDbConnection(global.ConnectionString))
             {
                 con.Open();
-                string query = "Select RowID, ElementName, Description, ElementType, Sequence " +
-                               "from tblGearSpecs where Version = '2' and GearVarGuid ='{" +
-                               _GearVarGuid + "}' order by sequence";
+                string query = $@"Select RowID, ElementName, Description, ElementType, Sequence
+                               from tblGearSpecs where Version = '2' and GearVarGuid ={{{_GearVarGuid}}}
+                               order by sequence";
                 using (var dt = new DataTable())
                 {
                     var adapter = new OleDbDataAdapter(query, con);
@@ -325,28 +312,28 @@ namespace FAD3
                 {
                     if (spec.DataStatus == global.fad3DataStatus.statusEdited)
                     {
-                        sql = "Update tblGearSpecs set " +
-                              "ElementName ='" + spec.Property + "', " +
-                              "ElementType = '" + spec.Type + "', " +
-                              "Description = '" + spec.Notes + "', " +
-                              "Sequence = " + spec.Sequence + ", " +
-                              "Version = '2' where RowID = '{" + spec.RowGuid + "}'";
+                        sql = $@"Update tblGearSpecs set
+                              ElementName ='{spec.Property}',
+                              ElementType = '{spec.Type}',
+                              Description = '{spec.Notes}',
+                              Sequence =  {spec.Sequence},
+                              Version = '2' where RowID = {{{spec.RowGuid}}}";
                     }
                     else if (spec.DataStatus == global.fad3DataStatus.statusNew)
                     {
-                        sql = "Insert into tblGearSpecs (ElementName, ElementType, Description, Sequence, Version, RowId, GearVarGuid) " +
-                              "values ('" +
-                              spec.Property + "', '" +
-                              spec.Type + "', '" +
-                              spec.Notes + "', " +
-                              spec.Sequence + ", '" +
-                              Version + "', '{" +
-                              Guid.NewGuid().ToString() + "}', '{" +
-                              _GearVarGuid + "}')";
+                        sql = $@"Insert into tblGearSpecs (ElementName, ElementType, Description, Sequence, Version, RowId, GearVarGuid)
+                              values (
+                              '{spec.Property}',
+                              '{spec.Type}',
+                              '{spec.Notes}',
+                              {spec.Sequence},
+                              '{Version}',
+                              {{{Guid.NewGuid().ToString()}}},
+                              {{{_GearVarGuid}}})";
                     }
                     else if (spec.DataStatus == global.fad3DataStatus.statusForDeletion)
                     {
-                        sql = "Delete * from tblGearSpecs where RowID ='{" + spec.RowGuid + "}'";
+                        sql = $"Delete * from tblGearSpecs where RowID = {{{spec.RowGuid}}}";
                     }
 
                     if (sql.Length > 0)
@@ -361,7 +348,6 @@ namespace FAD3
             }
             return true;
         }
-
 
         /// <summary>
         /// Returns the Property/Specification name given a specification guid
@@ -411,10 +397,10 @@ namespace FAD3
             using (var con = new OleDbConnection(global.ConnectionString))
             {
                 con.Open();
-                var sql = "SELECT ElementName, Value FROM tblGearSpecs INNER JOIN " +
-                      "tblSampledGearSpec ON tblGearSpecs.RowID = tblSampledGearSpec.SpecID " +
-                      "WHERE SamplingGUID = '{" + SamplingGuid + "}' AND Version = '2' " +
-                      "ORDER BY sequence";
+                var sql = $@"SELECT ElementName, Value FROM tblGearSpecs INNER JOIN
+                      tblSampledGearSpec ON tblGearSpecs.RowID = tblSampledGearSpec.SpecID
+                      WHERE SamplingGUID = {{{SamplingGuid}}} AND Version = '2'
+                      ORDER BY sequence";
                 using (var dt = new DataTable())
                 {
                     var adapter = new OleDbDataAdapter(sql, con);
@@ -429,7 +415,6 @@ namespace FAD3
                         }
                     }
                 }
-
             }
 
             if (Truncated && s.Length > 0)
@@ -447,7 +432,5 @@ namespace FAD3
             else
                 return s;
         }
-
-
     }
 }

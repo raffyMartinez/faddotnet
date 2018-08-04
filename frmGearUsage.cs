@@ -11,21 +11,21 @@ namespace FAD3
 {
     public partial class frmGearUsage : Form
     {
-        string _GearClassName = "";
-        string _GearClassGuid = "";
-        string _GearVarName = "";
-        string _GearVarGuid = "";
-        string _GearRefCode = "";
-        string _TargetAreaName = "";
-        string _TargetAreaGuid = "";
-        global.fad3GearEditAction _action;
+        private string _GearClassName = "";
+        private string _GearClassGuid = "";
+        private string _GearVarName = "";
+        private string _GearVarGuid = "";
+        private string _GearRefCode = "";
+        private string _TargetAreaName = "";
+        private string _TargetAreaGuid = "";
+        private global.fad3GearEditAction _action;
 
-        frmSamplingDetail _Parent;
+        private frmSamplingDetail _Parent;
         private static frmGearUsage _instance;
 
-        public static frmGearUsage GetInstance()
+        public static frmGearUsage GetInstance(string GearVarGuid = "", string TargetAreaGuid = "", string GearClassName = "")
         {
-            if (_instance == null) _instance = new frmGearUsage();
+            if (_instance == null) _instance = new frmGearUsage(GearVarGuid, TargetAreaGuid, GearClassName);
             return _instance;
         }
 
@@ -33,7 +33,6 @@ namespace FAD3
         {
             _TargetAreaName = TargetAreaName;
             _TargetAreaGuid = TargetAreaGuid;
-
         }
 
         public string GearRefCode
@@ -60,12 +59,15 @@ namespace FAD3
             set { _Parent = value; }
         }
 
-        public frmGearUsage()
+        public frmGearUsage(string GearVarGuid = "", string TargetAreaGuid = "", string GearClassName = "")
         {
             InitializeComponent();
+            _GearVarGuid = GearVarGuid;
+            _TargetAreaGuid = TargetAreaGuid;
+            _GearClassName = GearClassName;
         }
 
-        static void FillGearVarSpecsColumn(ListView lv)
+        private static void FillGearVarSpecsColumn(ListView lv)
         {
             foreach (ListViewItem lvi in lv.Items)
             {
@@ -124,7 +126,6 @@ namespace FAD3
             if (ch.Width < cw) ch.Width = cw;
             FillGearVarSpecsColumn(lv);
 
-
             //fill this list view with gear codes belonging to a variation
             lv = listViewCodes;
             var ch1 = lv.Columns.Add("Code");
@@ -139,7 +140,6 @@ namespace FAD3
                 lv.Items[0].Selected = true;
                 _GearRefCode = lv.Items[0].Name;
             }
-
 
             //fill this list view with target areas where the variation is used
             if (_GearRefCode.Length > 0)
@@ -165,7 +165,6 @@ namespace FAD3
                 ch.Width = (int)(lv.Width * WidthPercent);
             }
 
-
             //fill this list view with the local names used in a target area
             if (_TargetAreaGuid.Length > 0)
             {
@@ -178,8 +177,7 @@ namespace FAD3
 
         private void OnFormLoad(object sender, EventArgs e)
         {
-
-
+            PopulateLists();
         }
 
         private void FillLocalNames()
@@ -195,7 +193,6 @@ namespace FAD3
                 };
                 listViewLocalNames.Items.Add(lvi);
             }
-
         }
 
         private void FillRefCodeUsage()
@@ -227,7 +224,6 @@ namespace FAD3
                 listViewCodes.Items.Add(lvi);
                 lvi.SubItems.Add(kv.Value.ToString());
             }
-
         }
 
         private void FillVariationsList()
@@ -244,7 +240,6 @@ namespace FAD3
                 };
                 lvi.SubItems.Add(item.Item3 ? "x" : "");
                 listViewVariations.Items.Add(lvi);
-                
             }
         }
 
@@ -263,7 +258,6 @@ namespace FAD3
         private void comboClass_Validated(object sender, EventArgs e)
         {
             var cbo = (ComboBox)sender;
-
 
             switch (cbo.Name)
             {
@@ -322,7 +316,6 @@ namespace FAD3
                     {
                         if (!listViewWhereUsed.Items.ContainsKey(_TargetAreaGuid))
                         {
-
                             listViewWhereUsed.Items[0].Selected = true;
                             _TargetAreaGuid = listViewWhereUsed.Items[0].Name;
                         }
@@ -333,8 +326,10 @@ namespace FAD3
                         FillLocalNames();
                     }
                     break;
+
                 case "listViewLocalNames":
                     break;
+
                 case "listViewVariations":
                     _GearVarGuid = lvi.Name;
 
@@ -363,6 +358,7 @@ namespace FAD3
                         }
                     }
                     break;
+
                 case "listViewWhereUsed":
                     _TargetAreaGuid = lvi.Name;
                     FillLocalNames();
@@ -372,7 +368,6 @@ namespace FAD3
 
         private void OnlistView_MouseClick(object sender, MouseEventArgs e)
         {
-
         }
 
         private void OnListView_MouseDown(object sender, MouseEventArgs e)
@@ -388,15 +383,17 @@ namespace FAD3
                         case "listViewCodes":
                             _TargetAreaGuid = "";
                             break;
+
                         case "listViewWhereUsed":
                             break;
+
                         case "listViewVariations":
                             _GearRefCode = "";
                             _TargetAreaGuid = "";
                             break;
+
                         case "listViewLocalNames":
                             break;
-
                     }
                 }
             }
@@ -417,6 +414,7 @@ namespace FAD3
                         tsi.Name = "itemDeleteTargetArea";
                         tsi.Enabled = info.Item != null;
                         break;
+
                     case "listViewVariations":
                         tsi = dropDownMenu.Items.Add("Add a gear variation");
                         tsi.Name = "itemAddGearVariation";
@@ -434,6 +432,7 @@ namespace FAD3
                         tsi.Name = "itemManageGearSpecs";
                         tsi.Enabled = info.Item != null;
                         break;
+
                     case "listViewLocalNames":
                         tsi = dropDownMenu.Items.Add("Add a gear local name");
                         tsi.Name = "itemAddLocalName";
@@ -443,6 +442,7 @@ namespace FAD3
                         tsi.Name = "itemDeleteLocalName";
                         tsi.Enabled = info.Item != null;
                         break;
+
                     case "listViewCodes":
                         tsi = dropDownMenu.Items.Add("Add a gear code");
                         tsi.Name = "itemAddGearCode";
@@ -453,11 +453,8 @@ namespace FAD3
                         tsi.Enabled = info.Item != null;
                         break;
                 }
-
-
             }
         }
-
 
         private void dropDownMenu_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
@@ -470,18 +467,22 @@ namespace FAD3
                                                      .Select(item => item.Text)
                                                      .ToList();
                     break;
+
                 case "itemAddGearVariation":
                     _action = global.fad3GearEditAction.addGearVariation;
                     break;
+
                 case "itemAddLocalName":
                     _action = global.fad3GearEditAction.addLocalName;
                     myList = listViewLocalNames.Items.Cast<ListViewItem>()
                                                      .Select(item => item.Text)
                                                      .ToList();
                     break;
+
                 case "itemAddGearCode":
                     _action = global.fad3GearEditAction.addGearCode;
                     break;
+
                 case "itemManageGearSpecs":
                     break;
             }
@@ -502,6 +503,7 @@ namespace FAD3
                     };
                     f.ShowDialog(this);
                     break;
+
                 case "itemManageGearSpecs":
                     ManageGearSpecsForm ff = new ManageGearSpecsForm(listViewVariations.SelectedItems[0].Name,
                                                              listViewVariations.SelectedItems[0].Text);

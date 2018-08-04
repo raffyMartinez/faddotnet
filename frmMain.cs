@@ -1253,7 +1253,6 @@ namespace FAD3
                     {
                         form.BringToFront();
                     }
-                    form.PopulateLists();
                     break;
 
                 case "fish":

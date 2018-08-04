@@ -722,7 +722,7 @@ namespace FAD3
                     break;
 
                 case "btnGearClass":
-                    frmGearUsage form = frmGearUsage.GetInstance();
+                    frmGearUsage form = frmGearUsage.GetInstance(_GearVarGuid, _AOIGuid, _GearClassName);
                     if (!form.Visible)
                     {
                         form.Show(this);
@@ -734,12 +734,11 @@ namespace FAD3
 
                     form.With(o =>
                     {
-                        o.GearClassName = _GearClassName;
+                        //o.GearClassName = _GearClassName;
                         o.GearRefCode = _GearRefCode;
                         o.Parent_Form = this;
                         o.TargetArea(_AOIName, _AOIGuid);
                         o.GearVariation(_GearVarName, _GearVarGuid);
-                        o.PopulateLists();
                     });
                     break;
 
