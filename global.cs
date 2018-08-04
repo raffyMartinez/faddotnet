@@ -645,7 +645,7 @@ namespace FAD3
                 try
                 {
                     conection.Open();
-                    string query = $"Select TaxaNo from tblAllSpecies where SpeciesGUID = '{{{CatchNameGUID}}}'";
+                    string query = $"Select TaxaNo from tblAllSpecies where SpeciesGUID = {{{CatchNameGUID}}}";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
                     DataRow dr = dt.Rows[0];

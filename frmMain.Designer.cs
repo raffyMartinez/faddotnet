@@ -39,7 +39,7 @@ namespace FAD3
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.treeView1 = new System.Windows.Forms.TreeView();
+            this.treeMain = new System.Windows.Forms.TreeView();
             this.menuDropDown = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.labelErrorDetail = new System.Windows.Forms.Label();
@@ -49,7 +49,7 @@ namespace FAD3
             this.buttonMap = new System.Windows.Forms.Button();
             this.buttonCatch = new System.Windows.Forms.Button();
             this.buttonOK = new System.Windows.Forms.Button();
-            this.listView1 = new System.Windows.Forms.ListView();
+            this.lvMain = new System.Windows.Forms.ListView();
             this.menuMenuBar = new System.Windows.Forms.MenuStrip();
             this.menuFile = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripFileNewMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -103,7 +103,7 @@ namespace FAD3
             // 
             // splitContainer1.Panel1
             // 
-            this.splitContainer1.Panel1.Controls.Add(this.treeView1);
+            this.splitContainer1.Panel1.Controls.Add(this.treeMain);
             // 
             // splitContainer1.Panel2
             // 
@@ -111,29 +111,29 @@ namespace FAD3
             this.splitContainer1.Panel2.Controls.Add(this.lblErrorFormOpen);
             this.splitContainer1.Panel2.Controls.Add(this.lblTitle);
             this.splitContainer1.Panel2.Controls.Add(this.panelSamplingButtons);
-            this.splitContainer1.Panel2.Controls.Add(this.listView1);
+            this.splitContainer1.Panel2.Controls.Add(this.lvMain);
             this.splitContainer1.Size = new System.Drawing.Size(929, 451);
             this.splitContainer1.SplitterDistance = 240;
             this.splitContainer1.TabIndex = 0;
             // 
             // treeView1
             // 
-            this.treeView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.treeMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.treeView1.ContextMenuStrip = this.menuDropDown;
-            this.treeView1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.treeView1.ImageIndex = 0;
-            this.treeView1.ImageList = this.imageList1;
-            this.treeView1.Location = new System.Drawing.Point(3, 3);
-            this.treeView1.Name = "treeView1";
-            this.treeView1.RightToLeftLayout = true;
-            this.treeView1.SelectedImageIndex = 0;
-            this.treeView1.Size = new System.Drawing.Size(234, 445);
-            this.treeView1.TabIndex = 0;
-            this.treeView1.AfterExpand += new System.Windows.Forms.TreeViewEventHandler(this.TreeView1AfterExpand);
-            this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreeView1AfterSelect);
-            this.treeView1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.treeView1_MouseDown);
+            this.treeMain.ContextMenuStrip = this.menuDropDown;
+            this.treeMain.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.treeMain.ImageIndex = 0;
+            this.treeMain.ImageList = this.imageList1;
+            this.treeMain.Location = new System.Drawing.Point(3, 3);
+            this.treeMain.Name = "treeView1";
+            this.treeMain.RightToLeftLayout = true;
+            this.treeMain.SelectedImageIndex = 0;
+            this.treeMain.Size = new System.Drawing.Size(234, 445);
+            this.treeMain.TabIndex = 0;
+            this.treeMain.AfterExpand += new System.Windows.Forms.TreeViewEventHandler(this.TreeView1AfterExpand);
+            this.treeMain.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreeView1AfterSelect);
+            this.treeMain.MouseDown += new System.Windows.Forms.MouseEventHandler(this.treeView1_MouseDown);
             // 
             // menuDropDown
             // 
@@ -237,21 +237,21 @@ namespace FAD3
             // 
             // listView1
             // 
-            this.listView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.lvMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.listView1.ContextMenuStrip = this.menuDropDown;
-            this.listView1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.listView1.Location = new System.Drawing.Point(-1, 28);
-            this.listView1.MultiSelect = false;
-            this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(683, 415);
-            this.listView1.TabIndex = 3;
-            this.listView1.UseCompatibleStateImageBehavior = false;
-            this.listView1.View = System.Windows.Forms.View.Details;
-            this.listView1.DoubleClick += new System.EventHandler(this.OnListView_DoubleClick);
-            this.listView1.Leave += new System.EventHandler(this.ListView1Leave);
-            this.listView1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnListView_MouseDown);
+            this.lvMain.ContextMenuStrip = this.menuDropDown;
+            this.lvMain.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lvMain.Location = new System.Drawing.Point(-1, 28);
+            this.lvMain.MultiSelect = false;
+            this.lvMain.Name = "listView1";
+            this.lvMain.Size = new System.Drawing.Size(683, 415);
+            this.lvMain.TabIndex = 3;
+            this.lvMain.UseCompatibleStateImageBehavior = false;
+            this.lvMain.View = System.Windows.Forms.View.Details;
+            this.lvMain.DoubleClick += new System.EventHandler(this.OnListView_DoubleClick);
+            this.lvMain.Leave += new System.EventHandler(this.ListView1Leave);
+            this.lvMain.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnListView_MouseDown);
             // 
             // menuMenuBar
             // 
@@ -604,7 +604,7 @@ namespace FAD3
 		private System.Windows.Forms.ToolStripStatusLabel statusPanelDBPath;
 		private System.Windows.Forms.OpenFileDialog openFileDialog1;
 		private System.Windows.Forms.ToolStripMenuItem toolStripFileOpen;
-		private System.Windows.Forms.TreeView treeView1;
+		private System.Windows.Forms.TreeView treeMain;
 		private System.Windows.Forms.StatusStrip statusStrip1;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
 		private System.Windows.Forms.ToolStripMenuItem toolStripFileNewMenuItem;
@@ -635,7 +635,7 @@ namespace FAD3
         private System.Windows.Forms.ToolStripButton tbButtonMap;
         private System.Windows.Forms.ToolStripButton tbButtonExit;
         private System.Windows.Forms.Label lblErrorFormOpen;
-        private System.Windows.Forms.ListView listView1;
+        private System.Windows.Forms.ListView lvMain;
         private System.Windows.Forms.Label lblTitle;
         private System.Windows.Forms.Panel panelSamplingButtons;
         private System.Windows.Forms.Button buttonMap;

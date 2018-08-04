@@ -169,18 +169,18 @@ namespace FAD3
 
         public void EnumeratorSelectedSampling(Dictionary<string, string> SamplingIdentifiers)
         {
-            TreeNode[] nd = treeView1.Nodes.Find(SamplingIdentifiers["LSGUID"], true);
-            treeView1.SelectedNode = nd[0];
+            TreeNode[] nd = treeMain.Nodes.Find(SamplingIdentifiers["LSGUID"], true);
+            treeMain.SelectedNode = nd[0];
             nd[0].Expand();
 
             TreeNode[] nd1 = nd[0].Nodes.Find(SamplingIdentifiers["LSGUID"] + "|" + SamplingIdentifiers["GearID"], true);
-            treeView1.SelectedNode = nd1[0];
+            treeMain.SelectedNode = nd1[0];
             nd1[0].Expand();
 
             DateTime dt = DateTime.Parse(SamplingIdentifiers["SamplingDate"]);
             string myDate = string.Format("{0:MMM-yyyy}", dt);
             TreeNode[] nd2 = nd1[0].Nodes.Find(SamplingIdentifiers["LSGUID"] + "|" + SamplingIdentifiers["GearID"] + "|" + myDate, true);
-            treeView1.SelectedNode = nd2[0];
+            treeMain.SelectedNode = nd2[0];
             nd2[0].Expand();
 
             _Sampling.SamplingGUID = SamplingIdentifiers["SamplingID"];
@@ -196,24 +196,27 @@ namespace FAD3
             //if (listView1.Tag.ToString() == "samplingDetail") BackToSamplingMonth();
         }
 
-        public void RefreshCatchDetail(string SamplingGUID, bool NewSampling = false)
+        public void RefreshCatchDetail(string SamplingGUID, bool NewSampling,
+                                       DateTime SamplingDate, string GearVarGuid, string LandingSiteGuid)
         {
             _SamplingGUID = SamplingGUID;
             _newSamplingEntered = NewSampling;
-            listView1.Columns.With(o =>
+            lvMain.Columns.With(o =>
             {
                 o.Clear();
                 o.Add("Property");
                 o.Add("Value");
             });
             ApplyListViewColumnWidth("samplingDetail");
-            ShowCatchDetailEx(_SamplingGUID);
             if (_newSamplingEntered)
             {
-                _MonthYear = DateTime.Parse(listView1.Items["SamplingDate"].SubItems[1].Text).ToString("MMM-yyyy");
-                _MonthYearGearVar = listView1.Items["FishingGear"].Tag.ToString();
-                _MonthYearLandingSite = listView1.Items["LandingSite"].Tag.ToString();
+                _MonthYear = SamplingDate.ToString("MMM-yyyy");
+                _MonthYearGearVar = GearVarGuid;
+                _MonthYearLandingSite = LandingSiteGuid;
+                RefreshTreeForNewSampling();
             }
+            SetUPLV("samplingDetail");
+            ShowCatchDetailEx(_SamplingGUID);
         }
 
         public void RefreshLV(string NodeName, string TreeLevel, bool IsNew = false, string nodeGUID = "")
@@ -224,12 +227,12 @@ namespace FAD3
                 NewNode.Text = NodeName;
                 NewNode.Tag = nodeGUID + "," + TreeLevel;
                 NewNode.Name = NodeName;
-                treeView1.SelectedNode.Nodes.Add(NewNode);
-                treeView1.SelectedNode = NewNode;
+                treeMain.SelectedNode.Nodes.Add(NewNode);
+                treeMain.SelectedNode = NewNode;
             }
             else
             {
-                treeView1.SelectedNode.Text = NodeName;
+                treeMain.SelectedNode.Text = NodeName;
             }
             SetUPLV(TreeLevel);
         }
@@ -263,14 +266,14 @@ namespace FAD3
         private void ApplyListViewColumnWidth(string TreeLevel)
         {
             //apply column widths saved in registry
-            listView1.Tag = TreeLevel;
+            lvMain.Tag = TreeLevel;
             try
             {
                 RegistryKey rk = Registry.CurrentUser.OpenSubKey("SOFTWARE\\FAD3\\ColWidth");
-                string rv = rk.GetValue(listView1.Tag.ToString(), "NULL").ToString();
+                string rv = rk.GetValue(lvMain.Tag.ToString(), "NULL").ToString();
                 string[] arr = rv.Split(',');
                 var i = 0;
-                foreach (var item in listView1.Columns)
+                foreach (var item in lvMain.Columns)
                 {
                     ColumnHeader ch = (ColumnHeader)item;
                     ch.Width = Convert.ToInt32(arr[i]);
@@ -283,184 +286,83 @@ namespace FAD3
             }
         }
 
-        private void BackToSamplingMonth()
+        /// <summary>
+        /// refreshes tree for any new sampling
+        /// </summary>
+        private void RefreshTreeForNewSampling()
         {
-            SetupSamplingButtonFrame(false);
-            SetUPLV(_TreeLevel);
-            listView1.Focus();
-            var lvi = new ListViewItem(_SamplingGUID);
-            if (listView1.Items.Contains(lvi))
+            if (_newSamplingEntered)
             {
-                lvi.Selected = true;
-                lvi.EnsureVisible();
-                listView1.TopItem = listView1.Items[_topLVItemIndex];
-            }
-            else
-            {
-                var gearNodeName = gear.GearVarNameFromGearGuid(_MonthYearGearVar);
-                var gearNodeImageKey = gear.GearVarNodeImageKeyFromGearVar(_MonthYearGearVar);
-                var gearNodeNameKey = $"{_MonthYearLandingSite}|{_MonthYearGearVar}";
-                var gearNodeTag = Tuple.Create(_MonthYearLandingSite, _MonthYearGearVar, "gear");
+                var LandingSiteNode = new TreeNode();
 
                 var gearNode = new TreeNode();
-                gearNode.Name = gearNodeNameKey;
-                gearNode.Text = gearNodeName;
-                gearNode.Tag = gearNodeTag;
-                gearNode.ImageKey = gearNodeImageKey;
+                gearNode.Name = $"{_MonthYearLandingSite}|{_MonthYearGearVar}";
+                gearNode.Text = gear.GearVarNameFromGearGuid(_MonthYearGearVar);
+                gearNode.Tag = Tuple.Create(_MonthYearLandingSite, _MonthYearGearVar, "gear");
+                gearNode.ImageKey = gear.GearVarNodeImageKeyFromGearVar(_MonthYearGearVar);
 
                 var node = new TreeNode(_MonthYear);
                 node.Name = $"{_MonthYearLandingSite}|{_MonthYearGearVar}|{_MonthYear}";
                 node.Tag = Tuple.Create(_MonthYearLandingSite, _MonthYearGearVar, "sampling");
                 node.ImageKey = "MonthGear";
 
-                var myTag = (Tuple<string, string, string>)treeView1.SelectedNode.Tag;
+                var myTag = (Tuple<string, string, string>)treeMain.SelectedNode.Tag;
                 var treeLevel = myTag.Item3;
 
-                if (!treeView1.SelectedNode.IsExpanded) treeView1.SelectedNode.Expand();
+                if (!treeMain.SelectedNode.IsExpanded) treeMain.SelectedNode.Expand();
                 switch (treeLevel)
                 {
                     case "sampling":
-                        if (!treeView1.SelectedNode.Parent.Parent.Nodes.ContainsKey(gearNodeNameKey) && _newSamplingEntered)
-                        {
-                            treeView1.SelectedNode.Nodes.Add(gearNode);
-                            //treeView1.SelectedNode = gearNode;
-                            gearNode.Nodes.Add(node);
-                        }
-                        else
-                        {
-                            gearNode = treeView1.SelectedNode.Parent.Parent.Nodes[gearNodeNameKey];
-                            if (!gearNode.IsExpanded) gearNode.Expand();
-                            if (!gearNode.Nodes.ContainsKey(node.Name))
-                            {
-                                gearNode.Nodes.Add(node);
-                            }
-                            else
-                            {
-                                node = gearNode.Nodes[node.Name];
-                            }
-                        }
+                        LandingSiteNode = treeMain.SelectedNode.Parent.Parent;
                         break;
 
                     case "gear":
-                        if (!treeView1.SelectedNode.Parent.Nodes.ContainsKey(gearNodeNameKey) && _newSamplingEntered)
-                        {
-                            treeView1.SelectedNode.Nodes.Add(gearNode);
-                            //treeView1.SelectedNode = gearNode;
-                            gearNode.Nodes.Add(node);
-                        }
-                        else
-                        {
-                            gearNode = treeView1.SelectedNode.Parent.Nodes[gearNodeNameKey];
-                            if (!gearNode.IsExpanded) gearNode.Expand();
-                            if (!gearNode.Nodes.ContainsKey(node.Name))
-                            {
-                                gearNode.Nodes.Add(node);
-                            }
-                            else
-                            {
-                                node = gearNode.Nodes[node.Name];
-                            }
-                        }
+                        LandingSiteNode = treeMain.SelectedNode.Parent;
                         break;
 
                     case "landing_site":
-                        if (!treeView1.SelectedNode.Nodes.ContainsKey(gearNodeNameKey) && _newSamplingEntered)
-                        {
-                            treeView1.SelectedNode.Nodes.Add(gearNode);
-                            //treeView1.SelectedNode = gearNode;
-                            gearNode.Nodes.Add(node);
-                        }
-                        else
-                        {
-                            gearNode = treeView1.SelectedNode.Nodes[gearNodeNameKey];
-                            if (!gearNode.IsExpanded) gearNode.Expand();
-                            if (!gearNode.Nodes.ContainsKey(node.Name))
-                            {
-                                gearNode.Nodes.Add(node);
-                            }
-                            else
-                            {
-                                node = gearNode.Nodes[node.Name];
-                            }
-                        }
+                        LandingSiteNode = treeMain.SelectedNode;
                         break;
                 }
-                treeView1.SelectedNode = node;
+
+                if (!LandingSiteNode.Nodes.ContainsKey(gearNode.Name))
+                {
+                    LandingSiteNode.Nodes.Add(gearNode);
+                    gearNode.Nodes.Add(node);
+                }
+                else
+                {
+                    gearNode = LandingSiteNode.Nodes[gearNode.Name];
+                    if (!gearNode.IsExpanded) gearNode.Expand();
+                    if (!gearNode.Nodes.ContainsKey(node.Name))
+                    {
+                        gearNode.Nodes.Add(node);
+                    }
+                    else
+                    {
+                        node = gearNode.Nodes[node.Name];
+                    }
+                }
+                treeMain.SelectedNode = node;
             }
         }
 
-        //private void BackToSamplingMonth1()
-        //{
-        //    SetupSamplingButtonFrame(false);
-        //    SetUPLV(_TreeLevel);
-        //    listView1.Focus();
-        //    var lvi = new ListViewItem(_SamplingGUID);
-        //    if (listView1.Items.Contains(lvi))
-        //    {
-        //        lvi.Selected = true;
-        //        lvi.EnsureVisible();
-        //        listView1.TopItem = listView1.Items[_topLVItemIndex];
-        //    }
-        //    else
-        //    {
-        //        var gearNode = new TreeNode();
-        //        var node = new TreeNode(_MonthYear);
-        //        var gearNodeName = gear.GearVarNameFromGearGuid(_MonthYearGearVar);
-        //        var gearNodeImageKey = gear.GearVarNodeImageKeyFromGearVar(_MonthYearGearVar);
-        //        var gearNodeNameKey = _MonthYearLandingSite + "|" + _MonthYearGearVar;
-        //        var gearNodeTag = Tuple.Create(_MonthYearLandingSite, _MonthYearGearVar, "gear");
-        //        node.Name = _MonthYearLandingSite + "|" + _MonthYearGearVar + "|" + _MonthYear;
-        //        node.Tag = Tuple.Create(_MonthYearLandingSite, _MonthYearGearVar, "sampling");
-        //        node.ImageKey = "MonthGear";
-        //        var myTag = (Tuple<string, string, string>)treeView1.SelectedNode.Tag;
-        //        switch (myTag.Item3)
-        //        {
-        //            case "gear":
-        //                if (!treeView1.SelectedNode.Nodes.ContainsKey(node.Name) && _newSamplingEntered)
-        //                {
-        //                    treeView1.SelectedNode.Nodes.Add(node);
-        //                }
-        //                treeView1.SelectedNode = node;
-        //                break;
-
-        //            case "sampling":
-        //                if (!treeView1.SelectedNode.Parent.Parent.Nodes.ContainsKey(gearNameKey) && _newSamplingEntered)
-        //                {
-        //                    gearNode = treeView1.SelectedNode.Parent.Parent.Nodes.Add(gearName);
-        //                    gearNode.Name = gearNameKey;
-        //                    gearNode.Tag = gearTag;
-        //                    gearNode.ImageKey = gearImageKey;
-        //                    gearNode.Nodes.Add(node);
-        //                }
-        //                else
-        //                {
-        //                    gearNode = treeView1.SelectedNode.Parent.Parent.Nodes[gearNameKey];
-        //                    if (!gearNode.Nodes.ContainsKey(node.Name))
-        //                    {
-        //                        gearNode.Nodes.Add(node);
-        //                    }
-        //                }
-        //                treeView1.SelectedNode = node;
-
-        //                break;
-
-        //            case "landing_site":
-        //                gearNode.Name = gearNameKey;
-        //                gearNode.Text = gearName;
-        //                gearNode.Tag = gearTag;
-        //                gearNode.ImageKey = gearImageKey;
-        //                if (!treeView1.SelectedNode.Nodes.ContainsKey(gearNode.Name) && _newSamplingEntered)
-        //                {
-        //                    treeView1.SelectedNode.Nodes.Add(gearNode);
-        //                    treeView1.SelectedNode = gearNode;
-        //                    gearNode.Nodes.Add(node);
-        //                    treeView1.SelectedNode = node;
-        //                }
-        //                break;
-        //        }
-        //        _newSamplingEntered = false;
-        //    }
-        //}
+        /// <summary>
+        /// adds to the tree
+        /// </summary>
+        private void BackToSamplingMonth()
+        {
+            SetupSamplingButtonFrame(false);
+            SetUPLV(_TreeLevel);
+            lvMain.Focus();
+            var lvi = lvMain.Items[_SamplingGUID];
+            if (lvMain.Items.Contains(lvi))
+            {
+                lvi.Selected = true;
+                lvi.EnsureVisible();
+                lvMain.TopItem = lvMain.Items[_topLVItemIndex];
+            }
+        }
 
         private void ConfigDropDownMenu(Control Source, ListViewHitTestInfo lvh)
         {
@@ -582,7 +484,7 @@ namespace FAD3
                     break;
 
                 case "addLandingSiteToolStripMenuItem":
-                    arr = treeView1.SelectedNode.Tag.ToString().Split(',');
+                    arr = treeMain.SelectedNode.Tag.ToString().Split(',');
                     frmLandingSite f2 = new frmLandingSite();
 
                     f2.AddNew();
@@ -700,20 +602,13 @@ namespace FAD3
                     {
                         conection.Open();
 
-                        //string query = "SELECT tblSampling.RefNo, SamplingDate, FishingGround, EnumeratorName, Notes, WtCatch, tblSampling.SamplingGUID, IsGrid25FG, Count(tblCatchComp.RowGUID) AS [rows] " +
-                        //                "FROM (tblEnumerators RIGHT JOIN tblSampling ON tblEnumerators.EnumeratorID = tblSampling.Enumerator) LEFT JOIN tblCatchComp " +
-                        //                "ON tblSampling.SamplingGUID = tblCatchComp.SamplingGUID GROUP BY tblSampling.SamplingDate, tblSampling.RefNo, tblSampling.FishingGround, " +
-                        //                "tblEnumerators.EnumeratorName, tblSampling.Notes, tblSampling.WtCatch, tblSampling.SamplingGUID, tblSampling.IsGrid25FG, tblSampling.LSGUID, " +
-                        //                "tblSampling.[GearVarGUID], tblSampling.[SamplingDate], tblSampling.DateEncoded HAVING tblSampling.LSGUID= '{" + LSGUID + "}' AND tblSampling.[GearVarGUID]= '{" + GearGUID + "}'" +
-                        //                "AND SamplingDate >=#" + StartDate + "# And SamplingDate < #" + EndDate + "#  ORDER BY DateEncoded";
-
                         string query = $@"SELECT tblSampling.RefNo, SamplingDate, FishingGround, EnumeratorName, Notes, WtCatch, tblSampling.SamplingGUID,
                                         IsGrid25FG, Count(tblCatchComp.RowGUID) AS [rows] FROM (tblEnumerators RIGHT JOIN tblSampling ON
                                         tblEnumerators.EnumeratorID = tblSampling.Enumerator) LEFT JOIN tblCatchComp ON
                                         tblSampling.SamplingGUID = tblCatchComp.SamplingGUID GROUP BY tblSampling.SamplingDate,
                                         tblSampling.RefNo, tblSampling.FishingGround, tblEnumerators.EnumeratorName, tblSampling.Notes, tblSampling.WtCatch,
                                         tblSampling.SamplingGUID, tblSampling.IsGrid25FG, tblSampling.LSGUID, tblSampling.[GearVarGUID], tblSampling.[SamplingDate],
-                                        tblSampling.DateEncoded HAVING tblSampling.LSGUID= '{{{LSGUID}}}' AND tblSampling.[GearVarGUID]= '{{{GearGUID}}}' AND
+                                        tblSampling.DateEncoded HAVING tblSampling.LSGUID= {{{LSGUID}}} AND tblSampling.[GearVarGUID]= {{{GearGUID}}} AND
                                         SamplingDate >=# {StartDate} # And SamplingDate < # {EndDate} #  ORDER BY DateEncoded";
 
                         using (var adapter = new OleDbDataAdapter(query, conection))
@@ -752,7 +647,7 @@ namespace FAD3
 
                                 row.SubItems.Add(dr["Notes"].ToString());                   //notes
 
-                                lvi = this.listView1.Items.Add(row);
+                                lvi = this.lvMain.Items.Add(row);
                                 lvi.Tag = dr["SamplingGUID"].ToString();                    //sampling guid
                                 lvi.Name = dr["SamplingGUID"].ToString();
                             }
@@ -774,8 +669,8 @@ namespace FAD3
         private void frmMain_ResizeEnd(object sender, EventArgs e)
         {
             splitContainer1.Width = this.Width;
-            listView1.Width = splitContainer1.Panel2.Width;
-            listView1.Height = splitContainer1.Panel2.Height;
+            lvMain.Width = splitContainer1.Panel2.Width;
+            lvMain.Height = splitContainer1.Panel2.Height;
         }
 
         private void FrmMainLoad(object sender, EventArgs e)
@@ -854,7 +749,7 @@ namespace FAD3
             statusPanelLandingSite.Width = _statusPanelWidth;
             statusPanelGearUsed.Width = _statusPanelWidth;
 
-            ConfigDropDownMenu(treeView1);
+            ConfigDropDownMenu(treeMain);
             SetupSamplingButtonFrame(false);
         }
 
@@ -889,8 +784,8 @@ namespace FAD3
 
         private void ListView1Leave(object sender, EventArgs e)
         {
-            if (listView1.Columns.Count > 0)
-                SaveColumnWidthEx(sender, listView1.Tag.ToString());
+            if (lvMain.Columns.Count > 0)
+                SaveColumnWidthEx(sender, lvMain.Tag.ToString());
         }
 
         /// <summary>
@@ -898,7 +793,7 @@ namespace FAD3
         /// </summary>
         private void ListViewNewSampling()
         {
-            if (listView1.Tag.ToString() == "samplingDetail")
+            if (lvMain.Tag.ToString() == "samplingDetail")
             {
                 ShowCatchDetailEx();
             }
@@ -940,7 +835,9 @@ namespace FAD3
 
         private void menuDropDown_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
-            switch (e.ClickedItem.Name)
+            var ItemName = e.ClickedItem.Name;
+            e.ClickedItem.Owner.Hide();
+            switch (ItemName)
             {
                 case "menuNewTargetArea":
                     break;
@@ -954,10 +851,12 @@ namespace FAD3
                         if (aoi.AOIHaveEnumeratorsEx(_AOIGuid))
                             NewSamplingForm();
                         else
+                        {
                             MessageBox.Show("Cannot create a new sampling because target area has no enumerator",
                                               "Cannot create sampling",
                                               MessageBoxButtons.OK,
                                               MessageBoxIcon.Information);
+                        }
                     }
                     else
                     {
@@ -979,7 +878,6 @@ namespace FAD3
                     frmAOI AOIForm = frmAOI.GetInstance();
                     if (!AOIForm.Visible)
                     {
-                        //AOIForm = new frmAOI();
                         AOIForm.Parent_form = this;
                         AOIForm.Show(this);
                     }
@@ -1021,31 +919,31 @@ namespace FAD3
                     MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
             if (DialogResult == DialogResult.OK)
             {
-                if (listView1.Tag.ToString() == "sampling")
+                if (lvMain.Tag.ToString() == "sampling")
                 {
                     if (sampling.DeleteSampling(SamplingGUID))
                     {
-                        listView1.Items.Remove(listView1.Items[SamplingGUID]);
-                        if (listView1.Items.Count >= 1)
+                        lvMain.Items.Remove(lvMain.Items[SamplingGUID]);
+                        if (lvMain.Items.Count >= 1)
                         {
-                            listView1.Items[0].Selected = true;
+                            lvMain.Items[0].Selected = true;
                         }
                         else
                         {
-                            var parentNode = treeView1.SelectedNode.Parent;
+                            var parentNode = treeMain.SelectedNode.Parent;
                             if (parentNode.Nodes.Count == 1)
                             {
                                 parentNode.Parent.Nodes.Remove(parentNode);
                             }
                             else
                             {
-                                treeView1.Nodes.Remove(treeView1.SelectedNode);
-                                treeView1.SelectedNode = parentNode;
+                                treeMain.Nodes.Remove(treeMain.SelectedNode);
+                                treeMain.SelectedNode = parentNode;
                             }
                         }
                     }
                 }
-                else if (listView1.Tag.ToString() == "samplingDetail")
+                else if (lvMain.Tag.ToString() == "samplingDetail")
                 {
                 }
             }
@@ -1076,7 +974,7 @@ namespace FAD3
                 LandingSiteGuid = _LandingSiteGuid,
                 AOI = _AOI
             };
-            f3.ListViewSamplingDetail(listView1);
+            f3.ListViewSamplingDetail(lvMain);
             f3.Parent_Form = this;
             f3.ShowDialog(this);
         }
@@ -1112,15 +1010,19 @@ namespace FAD3
                     break;
 
                 case "btnSubLF":
-                    SetupLF_GMSListView(Show: true, Content: global.fad3CatchSubRow.LF);
-                    _CatchSubRow = global.fad3CatchSubRow.LF;
-                    Show_LF_GMS_List(GetLVCatch().SelectedItems[0].Name);
+                    if (SetupLF_GMSListView(Show: true, Content: global.fad3CatchSubRow.LF))
+                    {
+                        _CatchSubRow = global.fad3CatchSubRow.LF;
+                        Show_LF_GMS_List(GetLVCatch().SelectedItems[0].Name);
+                    }
                     break;
 
                 case "btnSubGMS":
-                    SetupLF_GMSListView(Show: true, Content: global.fad3CatchSubRow.GMS);
-                    _CatchSubRow = global.fad3CatchSubRow.GMS;
-                    Show_LF_GMS_List(GetLVCatch().SelectedItems[0].Name);
+                    if (SetupLF_GMSListView(Show: true, Content: global.fad3CatchSubRow.GMS))
+                    {
+                        _CatchSubRow = global.fad3CatchSubRow.GMS;
+                        Show_LF_GMS_List(GetLVCatch().SelectedItems[0].Name);
+                    }
                     break;
             }
         }
@@ -1132,11 +1034,11 @@ namespace FAD3
                 case "listView1":
                     SetupCatchListView(Show: false);
                     ListViewItem lvi = new ListViewItem();
-                    _topLVItemIndex = listView1.TopItem.Index;
-                    foreach (var item in listView1.SelectedItems)
+                    _topLVItemIndex = lvMain.TopItem.Index;
+                    foreach (var item in lvMain.SelectedItems)
                     {
                         lvi = (ListViewItem)item;
-                        string tag = listView1.Tag.ToString();
+                        string tag = lvMain.Tag.ToString();
                         switch (tag)
                         {
                             case "aoi":
@@ -1144,7 +1046,7 @@ namespace FAD3
                                 {
                                     if (lvi.Tag.ToString() == "aoi_data")
                                     {
-                                        string[] arr = treeView1.SelectedNode.Tag.ToString().Split(',');
+                                        string[] arr = treeMain.SelectedNode.Tag.ToString().Split(',');
                                         _AOI.AOIGUID = arr[0];
                                         frmAOI f = new frmAOI();
                                         f.AOI = _AOI;
@@ -1169,10 +1071,10 @@ namespace FAD3
 
                             case "landing_site":
 
-                                string[] arr1 = treeView1.SelectedNode.Tag.ToString().Split(',');
+                                string[] arr1 = treeMain.SelectedNode.Tag.ToString().Split(',');
                                 frmLandingSite fls = new frmLandingSite();
                                 fls.LandingSite = _ls;
-                                arr1 = treeView1.SelectedNode.Parent.Tag.ToString().Split(',');
+                                arr1 = treeMain.SelectedNode.Parent.Tag.ToString().Split(',');
                                 fls.AOIGUID = arr1[0].ToString();
                                 fls.Show();
                                 break;
@@ -1223,17 +1125,17 @@ namespace FAD3
             switch (lv.Name)
             {
                 case "listView1":
-                    if (listView1.Tag.ToString() == "sampling" && lvh.Item != null) SamplingGUID = lvh.Item.Tag.ToString();
+                    if (lvMain.Tag.ToString() == "sampling" && lvh.Item != null) SamplingGUID = lvh.Item.Tag.ToString();
                     if (e.Button == MouseButtons.Right)
                     {
                         if (_TreeLevel == "sampling")
                         {
                             Text = "x: " + _MouseX + " y: " + _MouseY;
-                            ConfigDropDownMenu(listView1, lvh);
+                            ConfigDropDownMenu(lvMain, lvh);
                         }
                         else
                         {
-                            ConfigDropDownMenu(listView1);
+                            ConfigDropDownMenu(lvMain);
                         }
                     }
                     break;
@@ -1269,6 +1171,7 @@ namespace FAD3
         private void OnMenuFile_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
             ToolStripItem tsi = e.ClickedItem;
+            e.ClickedItem.Owner.Hide();
             switch (tsi.Tag)
             {
                 case "new":
@@ -1290,6 +1193,7 @@ namespace FAD3
         private void OnMenuHelp_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
             ToolStripItem tsi = e.ClickedItem;
+            e.ClickedItem.Owner.Hide();
             switch (tsi.Tag)
             {
                 case "about":
@@ -1305,6 +1209,7 @@ namespace FAD3
         private void OnMenuTools_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
             ToolStripItem tsi = e.ClickedItem;
+            e.ClickedItem.Owner.Hide();
             switch (tsi.Tag)
             {
                 case "resetRefNos":
@@ -1371,7 +1276,7 @@ namespace FAD3
 
         private void OnUIRowRead(object sender, UIRowFromXML e)
         {
-            ListViewItem lvi = listView1.Items.Add(e.RowLabel);
+            ListViewItem lvi = lvMain.Items.Add(e.RowLabel);
             lvi.Name = e.Key;
             lvi.SubItems.Add("");
         }
@@ -1400,8 +1305,8 @@ namespace FAD3
                     ErrorLogger.Log(ex);
                 }
 
-                this.treeView1.Nodes.Clear();
-                TreeNode root = this.treeView1.Nodes.Add("Fisheries Data");
+                this.treeMain.Nodes.Clear();
+                TreeNode root = this.treeMain.Nodes.Add("Fisheries Data");
                 root.Name = "root";
                 root.Tag = Tuple.Create("root", "", "root");
                 root.ImageKey = "db";
@@ -1485,8 +1390,8 @@ namespace FAD3
                     break;
 
                 case "treeView1":
-                    TreeNodeCollection nodes = treeView1.Nodes;
-                    TraverseTreeAndResetColor(treeView1.Nodes);
+                    TreeNodeCollection nodes = treeMain.Nodes;
+                    TraverseTreeAndResetColor(treeMain.Nodes);
                     break;
             }
         }
@@ -1508,10 +1413,10 @@ namespace FAD3
                     lvCatch.With(o =>
                     {
                         o.Name = "lvCatch";
-                        o.Font = listView1.Font;
-                        o.Width = listView1.Width;
-                        o.Height = listView1.Height / 2;
-                        o.Location = new Point(listView1.Location.X, listView1.Top + listView1.Height / 2);
+                        o.Font = lvMain.Font;
+                        o.Width = lvMain.Width;
+                        o.Height = lvMain.Height / 2;
+                        o.Location = new Point(lvMain.Location.X, lvMain.Top + lvMain.Height / 2);
                         o.View = View.Details;
                         o.FullRowSelect = true;
                         o.Columns.Add("Row", "Row");
@@ -1527,7 +1432,7 @@ namespace FAD3
                         o.BringToFront();
                         o.DoubleClick += OnListView_DoubleClick;
                         o.MouseDown += OnListView_MouseDown;
-                        o.ContextMenu = listView1.ContextMenu;
+                        o.ContextMenu = lvMain.ContextMenu;
                         o.HideSelection = false;
                     });
 
@@ -1545,7 +1450,7 @@ namespace FAD3
                         o.Visible = false;
                         o.DoubleClick += OnListView_DoubleClick;
                         o.MouseDown += OnListView_MouseDown;
-                        o.ContextMenu = listView1.ContextMenu;
+                        o.ContextMenu = lvMain.ContextMenu;
                         o.HideSelection = false;
                     });
 
@@ -1603,7 +1508,7 @@ namespace FAD3
 
                     splitContainer1.Panel2.Controls.Add(SubPanel);
                     SubPanel.Location = new Point(panelSamplingButtons.Location.X,
-                                                   lvCatch.Top - (listView1.Top - panelSamplingButtons.Top));
+                                                   lvCatch.Top - (lvMain.Top - panelSamplingButtons.Top));
                     btnSubLF.Top = btnSubClose.Top + btnSubClose.Height + 5;
                     btnSubGMS.Top = btnSubLF.Top + btnSubLF.Height + 5;
                     SubPanel.BringToFront();
@@ -1629,16 +1534,18 @@ namespace FAD3
             }
         }
 
-        private void SetupLF_GMSListView(bool Show = true, global.fad3CatchSubRow Content = global.fad3CatchSubRow.none)
+        private bool SetupLF_GMSListView(bool Show = true, global.fad3CatchSubRow Content = global.fad3CatchSubRow.none)
         {
+            var Proceed = false;
             if (_subListExisting)
             {
                 var lv = (ListView)splitContainer1.Panel2.Controls["lvLF_GMS"];
                 var lvCatch = (ListView)splitContainer1.Panel2.Controls["lvCatch"];
+
                 lv.Items.Clear();
                 lv.Columns.Clear();
                 {
-                    if (Show)
+                    if (Show && lvCatch.Items.Count > 0)
                     {
                         lv.Visible = true;
                         lv.Left = lvCatch.Columns["NameOfCatch"].Width + lvCatch.Columns["Row"].Width +
@@ -1665,13 +1572,18 @@ namespace FAD3
                             lv.Columns.Add("Gonad wt");
                             lv.Columns.Add("");
                         }
+                        Proceed = true;
                     }
                     else
                     {
                         lv.Visible = false;
+                        MessageBox.Show("Catch composition is empty", "Validation error",
+                                         MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                 }
             }
+
+            return Proceed;
         }
 
         /// <summary>
@@ -1681,13 +1593,13 @@ namespace FAD3
         /// <param name="TreeLevel"></param>
         private void SetUPLV(string TreeLevel)
         {
-            listView1.SuspendLayout();
+            lvMain.SuspendLayout();
 
             int i = 0;
 
-            this.listView1.Clear();
-            this.listView1.View = View.Details;
-            this.listView1.FullRowSelect = true;
+            this.lvMain.Clear();
+            this.lvMain.View = View.Details;
+            this.lvMain.FullRowSelect = true;
 
             string myData = "";
             ListViewItem lvi;
@@ -1696,45 +1608,45 @@ namespace FAD3
             switch (TreeLevel)
             {
                 case "root":
-                    listView1.Columns.Add("Property");
-                    listView1.Columns.Add("Value");
+                    lvMain.Columns.Add("Property");
+                    lvMain.Columns.Add("Value");
                     lblTitle.Text = "Database summary";
                     break;
 
                 case "aoi":
-                    listView1.Columns.Add("Property");
-                    listView1.Columns.Add("Value");
+                    lvMain.Columns.Add("Property");
+                    lvMain.Columns.Add("Value");
                     lblTitle.Text = "Area of interest";
                     break;
 
                 case "landing_site":
-                    listView1.Columns.Add("Property");
-                    listView1.Columns.Add("Value");
+                    lvMain.Columns.Add("Property");
+                    lvMain.Columns.Add("Value");
                     lblTitle.Text = "Landing site";
                     break;
 
                 case "gear":
-                    listView1.Columns.Add("Property");
-                    listView1.Columns.Add("Value");
+                    lvMain.Columns.Add("Property");
+                    lvMain.Columns.Add("Value");
                     lblTitle.Text = "Fishing gear";
                     break;
 
                 case "sampling":
-                    this.listView1.Columns.Add("Reference #");
-                    this.listView1.Columns.Add("Sampling date");
-                    this.listView1.Columns.Add("Catch composition");
-                    this.listView1.Columns.Add("Weight of catch");
-                    this.listView1.Columns.Add("Fishing ground");
-                    this.listView1.Columns.Add("Position");
-                    this.listView1.Columns.Add("Enumerator");
-                    this.listView1.Columns.Add("Gear specs");
-                    this.listView1.Columns.Add("Notes");
+                    this.lvMain.Columns.Add("Reference #");
+                    this.lvMain.Columns.Add("Sampling date");
+                    this.lvMain.Columns.Add("Catch composition");
+                    this.lvMain.Columns.Add("Weight of catch");
+                    this.lvMain.Columns.Add("Fishing ground");
+                    this.lvMain.Columns.Add("Position");
+                    this.lvMain.Columns.Add("Enumerator");
+                    this.lvMain.Columns.Add("Gear specs");
+                    this.lvMain.Columns.Add("Notes");
                     lblTitle.Text = "Sampling";
                     break;
 
                 case "samplingDetail":
-                    listView1.Columns.Add("Property");
-                    listView1.Columns.Add("Value");
+                    lvMain.Columns.Add("Property");
+                    lvMain.Columns.Add("Value");
                     lblTitle.Text = "Sampling detail";
                     break;
             }
@@ -1753,15 +1665,8 @@ namespace FAD3
                     break;
 
                 case "gear":
-                    lvi = listView1.Items.Add("Months sampled");
-                    var myTag = (Tuple<string, string, string>)treeView1.SelectedNode.Tag;
-                    //var arr = treeView1.SelectedNode.Tag.ToString().Split(',');
-                    //var arr2 = arr[0].Split('|');
-                    //var lsguid = arr2[0];
-                    //var gearguid = arr2[1];
-                    //_ls.LandingSiteGUID = lsguid;
-                    //_ls.GearVarGUID = gearguid;
-
+                    lvi = lvMain.Items.Add("Months sampled");
+                    var myTag = (Tuple<string, string, string>)treeMain.SelectedNode.Tag;
                     _ls.LandingSiteGUID = myTag.Item1;
                     _ls.GearVarGUID = myTag.Item2;
                     var n = 0;
@@ -1769,7 +1674,7 @@ namespace FAD3
                     {
                         if (n > 0)
                         {
-                            lvi = listView1.Items.Add("");
+                            lvi = lvMain.Items.Add("");
                         }
                         lvi.SubItems.Add(item);
                         n++;
@@ -1777,31 +1682,31 @@ namespace FAD3
                     break;
 
                 case "root":
-                    lvi = listView1.Items.Add("Database path");
+                    lvi = lvMain.Items.Add("Database path");
                     lvi.SubItems.Add(global.mdbPath);
 
                     //add sampled years with count for entire database
-                    lvi = listView1.Items.Add("");
-                    lvi = listView1.Items.Add("Sampled years");
+                    lvi = lvMain.Items.Add("");
+                    lvi = lvMain.Items.Add("Sampled years");
                     foreach (string item in _AOI.SampledYears())
                     {
                         if (i > 0)
                         {
-                            lvi = listView1.Items.Add("");
+                            lvi = lvMain.Items.Add("");
                         }
                         lvi.SubItems.Add(item.ToString());
                         i++;
                     }
 
                     //add AOI with count for entire database
-                    lvi = listView1.Items.Add("");
-                    lvi = listView1.Items.Add("AOI");
+                    lvi = lvMain.Items.Add("");
+                    lvi = lvMain.Items.Add("AOI");
                     i = 0;
                     foreach (KeyValuePair<string, string> kv in _AOI.AOIWithSamplingCount())
                     {
                         if (i > 0)
                         {
-                            lvi = listView1.Items.Add("");
+                            lvi = lvMain.Items.Add("");
                         }
                         lvi.SubItems.Add(kv.Value);
                         i++;
@@ -1814,32 +1719,32 @@ namespace FAD3
                     var arr = myData.Split('|');
 
                     //add AOI data for form
-                    lvi = listView1.Items.Add("Name");
+                    lvi = lvMain.Items.Add("Name");
                     lvi.SubItems.Add(arr[0].ToString());
                     lvi.Tag = "aoi_data";
-                    lvi = listView1.Items.Add("Code");
+                    lvi = lvMain.Items.Add("Code");
                     lvi.SubItems.Add(arr[1].ToString());
                     lvi.Tag = "aoi_data";
-                    lvi = listView1.Items.Add("MBR");
+                    lvi = lvMain.Items.Add("MBR");
                     lvi.SubItems.Add("");
                     lvi.Tag = "aoi_data";
-                    lvi = listView1.Items.Add("Grid system");
+                    lvi = lvMain.Items.Add("Grid system");
                     lvi.Tag = "aoi_data";
                     lvi.SubItems.Add(FishingGrid.GridTypeName);
 
                     // add no. of samplings for this AOI
-                    lvi = listView1.Items.Add("");
-                    lvi = listView1.Items.Add("No. of samplings");
+                    lvi = lvMain.Items.Add("");
+                    lvi = lvMain.Items.Add("No. of samplings");
                     lvi.SubItems.Add(_AOI.SampleCount().ToString());
 
                     //add sampled years with count
-                    lvi = listView1.Items.Add("Years sampling");
+                    lvi = lvMain.Items.Add("Years sampling");
                     i = 0;
                     foreach (KeyValuePair<string, string> item in _AOI.ListYearsWithSamplingCount())
                     {
                         if (i > 0)
                         {
-                            lvi = listView1.Items.Add("");
+                            lvi = lvMain.Items.Add("");
                         }
                         lvi.Name = "YearSampled";
                         lvi.SubItems.Add(item.Key + " : " + item.Value);
@@ -1847,14 +1752,14 @@ namespace FAD3
                     }
 
                     //add enumerators with count
-                    lvi = listView1.Items.Add("");
-                    lvi = listView1.Items.Add("Enumerators");
+                    lvi = lvMain.Items.Add("");
+                    lvi = lvMain.Items.Add("Enumerators");
                     i = 0;
                     foreach (KeyValuePair<string, string> item in _AOI.EnumeratorsWithCount())
                     {
                         if (i > 0)
                         {
-                            lvi = listView1.Items.Add("");
+                            lvi = lvMain.Items.Add("");
                         }
                         lvi.Name = "Enumerators";
                         arr = item.Value.ToString().Split(',');
@@ -1871,7 +1776,7 @@ namespace FAD3
                         {
                             if (i > 0)
                             {
-                                lvi = listView1.Items.Add("");
+                                lvi = lvMain.Items.Add("");
                             }
                             lvi.Name = "Enumerators";
                             lvi.SubItems.Add(item.Value);
@@ -1881,14 +1786,14 @@ namespace FAD3
                     }
 
                     //add landing sites
-                    listView1.Items.Add("");
-                    lvi = listView1.Items.Add("Landing sites");
+                    lvMain.Items.Add("");
+                    lvi = lvMain.Items.Add("Landing sites");
                     i = 0;
                     foreach (string item in _AOI.ListLandingSiteWithSamplingCount())
                     {
                         if (i > 0)
                         {
-                            lvi = listView1.Items.Add("");
+                            lvi = lvMain.Items.Add("");
                         }
                         lvi.SubItems.Add(item);
                         i++;
@@ -1896,40 +1801,38 @@ namespace FAD3
                     break;
 
                 case "landing_site":
-                    //arr = treeView1.SelectedNode.Tag.ToString().Split(',');
 
                     //add landing site form data
-                    //_ls.LandingSiteGUID = arr[0];
                     _ls.LandingSiteGUID = _LandingSiteGuid;
                     myData = _ls.LandingSiteData();
                     arr = myData.Split(',');
-                    lvi = listView1.Items.Add("Name");
+                    lvi = lvMain.Items.Add("Name");
                     lvi.SubItems.Add(arr[0]);
-                    lvi = listView1.Items.Add("Municipality");
+                    lvi = lvMain.Items.Add("Municipality");
                     lvi.SubItems.Add(arr[1]);
-                    lvi = listView1.Items.Add("Province");
+                    lvi = lvMain.Items.Add("Province");
                     lvi.SubItems.Add(arr[2]);
-                    lvi = listView1.Items.Add("Longitude");
+                    lvi = lvMain.Items.Add("Longitude");
                     lvi.SubItems.Add(arr[3]);
-                    lvi = listView1.Items.Add("Latitude");
+                    lvi = lvMain.Items.Add("Latitude");
                     lvi.SubItems.Add(arr[4]);
 
                     //add total number of sampling
-                    listView1.Items.Add("");
-                    lvi = listView1.Items.Add("No. of samplings");
+                    lvMain.Items.Add("");
+                    lvi = lvMain.Items.Add("No. of samplings");
                     lvi.SubItems.Add(_ls.SampleCount().ToString());
-                    listView1.Items.Add("");
+                    lvMain.Items.Add("");
 
                     //add gears sampled
                     Dictionary<string, string> myGears = new Dictionary<string, string>();
                     myGears = _ls.Gears();
-                    lvi = listView1.Items.Add("Gears sampled");
+                    lvi = lvMain.Items.Add("Gears sampled");
                     n = 0;
                     foreach (KeyValuePair<string, string> item in myGears)
                     {
                         if (n > 0)
                         {
-                            lvi = listView1.Items.Add("");
+                            lvi = lvMain.Items.Add("");
                         }
                         lvi.Tag = item.Key;
                         lvi.SubItems.Add(item.Value);
@@ -1937,15 +1840,15 @@ namespace FAD3
                     }
 
                     //Add months sampled
-                    listView1.Items.Add("");
-                    lvi = listView1.Items.Add("Months sampled");
+                    lvMain.Items.Add("");
+                    lvi = lvMain.Items.Add("Months sampled");
                     List<string> myMonths = _ls.MonthsSampled();
                     n = 0;
                     foreach (string item in myMonths)
                     {
                         if (n > 0)
                         {
-                            lvi = listView1.Items.Add("");
+                            lvi = lvMain.Items.Add("");
                         }
                         lvi.SubItems.Add(item);
                         n++;
@@ -1953,7 +1856,7 @@ namespace FAD3
                     break;
             }
 
-            listView1.ResumeLayout();
+            lvMain.ResumeLayout();
         }
 
         /// <summary>
@@ -1965,7 +1868,7 @@ namespace FAD3
             panelSamplingButtons.Visible = Visible;
             if (Visible)
             {
-                this.panelSamplingButtons.Location = new Point(listView1.Width - panelSamplingButtons.Width - 10, listView1.Top + 50);
+                this.panelSamplingButtons.Location = new Point(lvMain.Width - panelSamplingButtons.Width - 10, lvMain.Top + 50);
             }
             CancelButton = buttonOK.Visible ? buttonOK : null;
         }
@@ -2107,7 +2010,7 @@ namespace FAD3
         /// <param name="SamplingGUID"></param>
         private void ShowCatchDetailEx(string SamplingGUID = "")
         {
-            listView1.Items.Clear();
+            lvMain.Items.Clear();
             _Sampling.ReadUIFromXML();
             var DateEncoded = "";
 
@@ -2120,22 +2023,22 @@ namespace FAD3
                 //the array splits the dictionary item from the name [0] and its guid [1]
                 //we make the guid the tag of the listitem
                 string[] arr1 = effortData["LandingSite"].Split('|');
-                listView1.Items["LandingSite"].SubItems[1].Text = arr1[0];
-                listView1.Items["LandingSite"].Tag = arr1[1];
+                lvMain.Items["LandingSite"].SubItems[1].Text = arr1[0];
+                lvMain.Items["LandingSite"].Tag = arr1[1];
 
                 arr1 = effortData["Enumerator"].Split('|');
-                listView1.Items["Enumerator"].SubItems[1].Text = arr1[0];
-                listView1.Items["Enumerator"].Tag = arr1[1];
+                lvMain.Items["Enumerator"].SubItems[1].Text = arr1[0];
+                lvMain.Items["Enumerator"].Tag = arr1[1];
 
                 arr1 = effortData["GearClass"].Split('|');
-                listView1.Items["GearClass"].SubItems[1].Text = arr1[0];
-                listView1.Items["GearClass"].Tag = arr1[1];
+                lvMain.Items["GearClass"].SubItems[1].Text = arr1[0];
+                lvMain.Items["GearClass"].Tag = arr1[1];
 
                 arr1 = effortData["FishingGear"].Split('|');
-                listView1.Items["FishingGear"].SubItems[1].Text = arr1[0];
-                listView1.Items["FishingGear"].Tag = arr1[1];
+                lvMain.Items["FishingGear"].SubItems[1].Text = arr1[0];
+                lvMain.Items["FishingGear"].Tag = arr1[1];
 
-                foreach (ListViewItem lvi in listView1.Items)
+                foreach (ListViewItem lvi in lvMain.Items)
                 {
                     switch (lvi.Name)
                     {
@@ -2175,8 +2078,8 @@ namespace FAD3
                 DateEncoded = effortData["DateEncoded"];
             }
 
-            var lvi1 = listView1.Items.Add("");
-            lvi1 = listView1.Items.Add("DateEncoded", "Date encoded", null);
+            var lvi1 = lvMain.Items.Add("");
+            lvi1 = lvMain.Items.Add("DateEncoded", "Date encoded", null);
             if (SamplingGUID.Length > 0) lvi1.SubItems.Add(DateEncoded);
 
             //position sampling buttons and make it visible
@@ -2200,7 +2103,7 @@ namespace FAD3
         {
             frmSamplingDetail fs = new frmSamplingDetail();
             fs.SamplingGUID = _SamplingGUID;
-            fs.ListViewSamplingDetail(listView1);
+            fs.ListViewSamplingDetail(lvMain);
             fs.AOI = _AOI;
             fs.AOIGuid = _AOIGuid;
             fs.Parent_Form = this;
@@ -2225,7 +2128,7 @@ namespace FAD3
         private void treeView1_MouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
-                ConfigDropDownMenu(treeView1);
+                ConfigDropDownMenu(treeMain);
 
             SetupCatchListView(Show: false);
         }
@@ -2252,7 +2155,7 @@ namespace FAD3
                                      tblGearVariations.GearVarGUID FROM tblGearClass INNER JOIN
                                      (tblGearVariations INNER JOIN tblSampling ON tblGearVariations.GearVarGUID = tblSampling.GearVarGUID)
                                      ON tblGearClass.GearClass = tblGearVariations.GearClass
-                                     WHERE tblSampling.LSGUID = '{{{lsguid}}}'
+                                     WHERE tblSampling.LSGUID = {{{lsguid}}}
                                      ORDER BY tblGearClass.GearClassName, tblGearVariations.Variation";
 
                         var adapter = new OleDbDataAdapter(query, conection);
@@ -2311,7 +2214,7 @@ namespace FAD3
                         var query = $@"SELECT Format([SamplingDate],'mmm-yyyy') AS sDate FROM tblSampling
                                     GROUP BY Format([SamplingDate],'mmm-yyyy'), tblSampling.LSGUID, tblSampling.GearVarGUID,
                                     Year([SamplingDate]), Month([SamplingDate])
-                                    HAVING LSGUID ='{{{lsguid}}}' AND GearVarGUID = '{{{gearguid}}}'
+                                    HAVING LSGUID ={{{lsguid}}} AND GearVarGUID = {{{gearguid}}}
                                     ORDER BY Year([SamplingDate]), Month([SamplingDate])";
 
                         var adapter = new OleDbDataAdapter(query, conection);
@@ -2358,8 +2261,8 @@ namespace FAD3
                 _GearVarGUID = "";
                 _GearClassGUID = "";
 
-                TreeNode nd = treeView1.SelectedNode;
-                ResetTheBackColor(treeView1);
+                TreeNode nd = treeMain.SelectedNode;
+                ResetTheBackColor(treeMain);
                 nd.BackColor = Color.Gainsboro;
 
                 var myTag = (Tuple<string, string, string>)nd.Tag;
@@ -2369,11 +2272,11 @@ namespace FAD3
                 switch (_TreeLevel)
                 {
                     case "gear":
-                        _AOIName = treeView1.SelectedNode.Parent.Parent.Text;
-                        this.AOIGUID = treeView1.SelectedNode.Parent.Parent.Name;
-                        _LandingSiteName = treeView1.SelectedNode.Parent.Text;
-                        _LandingSiteGuid = treeView1.SelectedNode.Parent.Name;
-                        _GearVarName = treeView1.SelectedNode.Text;
+                        _AOIName = treeMain.SelectedNode.Parent.Parent.Text;
+                        this.AOIGUID = treeMain.SelectedNode.Parent.Parent.Name;
+                        _LandingSiteName = treeMain.SelectedNode.Parent.Text;
+                        _LandingSiteGuid = treeMain.SelectedNode.Parent.Name;
+                        _GearVarName = treeMain.SelectedNode.Text;
                         _GearVarGUID = myTag.Item2;
                         var rv = gear.GearClassGuidNameFromGearVarGuid(_GearVarGUID);
                         _GearClassName = rv.Value;
@@ -2386,15 +2289,13 @@ namespace FAD3
                         _GearVarGUID = myTag.Item2;
 
                         //we will look for the aoi ancestor node and get the aoi guid
-                        this.AOIGUID = ((Tuple<string, string, string>)treeView1.SelectedNode.Parent.Parent.Parent.Tag).Item1;
+                        this.AOIGUID = ((Tuple<string, string, string>)treeMain.SelectedNode.Parent.Parent.Parent.Tag).Item1;
                         _AOI.AOIGUID = this.AOIGUID;
 
                         _SamplingMonth = e.Node.Text;
-                        _AOIName = treeView1.SelectedNode.Parent.Parent.Parent.Text;
-                        //this.AOIGUID = treeView1.SelectedNode.Parent.Parent.Parent.Name;
-                        _LandingSiteName = treeView1.SelectedNode.Parent.Parent.Text;
-                        //_LandingSiteGuid = treeView1.SelectedNode.Parent.Parent.Name;
-                        _GearVarName = treeView1.SelectedNode.Parent.Text;
+                        _AOIName = treeMain.SelectedNode.Parent.Parent.Parent.Text;
+                        _LandingSiteName = treeMain.SelectedNode.Parent.Parent.Text;
+                        _GearVarName = treeMain.SelectedNode.Parent.Text;
 
                         rv = gear.GearClassGuidNameFromGearVarGuid(_GearVarGUID);
                         _GearClassName = rv.Value;
@@ -2403,8 +2304,8 @@ namespace FAD3
                         break;
 
                     case "aoi":
-                        _AOIName = treeView1.SelectedNode.Text;
-                        this.AOIGUID = treeView1.SelectedNode.Name;
+                        _AOIName = treeMain.SelectedNode.Text;
+                        this.AOIGUID = treeMain.SelectedNode.Name;
                         _LandingSiteName = "";
                         _LandingSiteGuid = "";
                         _GearVarName = "";
@@ -2415,10 +2316,10 @@ namespace FAD3
                         break;
 
                     case "landing_site":
-                        _AOIName = treeView1.SelectedNode.Parent.Text;
-                        this.AOIGUID = treeView1.SelectedNode.Parent.Name;
-                        _LandingSiteName = treeView1.SelectedNode.Text;
-                        _LandingSiteGuid = treeView1.SelectedNode.Name;
+                        _AOIName = treeMain.SelectedNode.Parent.Text;
+                        this.AOIGUID = treeMain.SelectedNode.Parent.Name;
+                        _LandingSiteName = treeMain.SelectedNode.Text;
+                        _LandingSiteGuid = treeMain.SelectedNode.Name;
                         _GearVarName = "";
                         _GearVarGUID = "";
                         _LSNode = e.Node;

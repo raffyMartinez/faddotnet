@@ -102,7 +102,7 @@ namespace FAD3
                 try
                 {
                     conection.Open();
-                    string query = $"SELECT TOP 1 EnumeratorID FROM tblEnumerators WHERE TargetArea ='{{{AOIGuid}}}'";
+                    string query = $"SELECT TOP 1 EnumeratorID FROM tblEnumerators WHERE TargetArea ={{{AOIGuid}}}";
                     var command = new OleDbCommand(query, conection);
                     var reader = command.ExecuteReader();
                     HasEnumerator = reader.HasRows;
@@ -123,7 +123,7 @@ namespace FAD3
                 try
                 {
                     conection.Open();
-                    string query = $"SELECT TOP 1 EnumeratorID FROM tblEnumerators WHERE TargetArea ='{{{_AOIGUID}}}'";
+                    string query = $"SELECT TOP 1 EnumeratorID FROM tblEnumerators WHERE TargetArea ={{{_AOIGUID}}}";
                     var command = new OleDbCommand(query, conection);
                     var reader = command.ExecuteReader();
                     _HaveEnumerators = reader.HasRows;
@@ -172,8 +172,8 @@ namespace FAD3
                     if (isNew)
                     {
                         updateQuery = $@"Insert into tblEnumerators (TargetArea, EnumeratorId, EnumeratorName,HireDate,Active) values (
-                                '{{{EnumeratorData["TargetArea"]}}}',
-                                '{{{EnumeratorData["EnumeratorId"]}}}',
+                                {{{EnumeratorData["TargetArea"]}}}
+                                {{{EnumeratorData["EnumeratorId"]}}}
                                 '{EnumeratorData["EnumeratorName"]}',
                                 '{EnumeratorData["HireDate"]}',
                                 {EnumeratorData["Active"]})";
@@ -184,7 +184,7 @@ namespace FAD3
                             EnumeratorName = '{EnumeratorData["EnumeratorName"]}',
                             HireDate = '{EnumeratorData["HireDate"]}',
                             Active = {EnumeratorData["Active"]} where
-                            EnumeratorId= '{{{EnumeratorData["EnumeratorId"]}}}'";
+                            EnumeratorId= {{{EnumeratorData["EnumeratorId"]}}}";
                     }
                     OleDbCommand update = new OleDbCommand(updateQuery, conn);
                     conn.Open();
@@ -208,7 +208,7 @@ namespace FAD3
                 try
                 {
                     conection.Open();
-                    string query = $"SELECT AOIName, Letter, MajorGridList from tblAOI WHERE AOIGuid= '{{{_AOIGUID}}}'";
+                    string query = $"SELECT AOIName, Letter, MajorGridList from tblAOI WHERE AOIGuid= {{{_AOIGUID}}}";
                     var command = new OleDbCommand(query, conection);
                     var reader = command.ExecuteReader();
                     if (reader.Read())
@@ -291,7 +291,7 @@ namespace FAD3
                 try
                 {
                     conection.Open();
-                    string query = $"SELECT LSGUID, LSName FROM tblLandingSites WHERE AOIGuid= '{{{AOIguid}}}' order by LSName";
+                    string query = $"SELECT LSGUID, LSName FROM tblLandingSites WHERE AOIGuid= {{{AOIguid}}} order by LSName";
                     using (var adapter = new OleDbDataAdapter(query, conection))
                     {
                         adapter.Fill(dt);
@@ -327,7 +327,7 @@ namespace FAD3
                 try
                 {
                     conection.Open();
-                    string query = $"SELECT Count(SamplingGUID) AS n FROM tblSampling WHERE AOI= '{{{_AOIGUID}}}'";
+                    string query = $"SELECT Count(SamplingGUID) AS n FROM tblSampling WHERE AOI= {{{_AOIGUID}}}";
 
                     var command = new OleDbCommand(query, conection);
                     var reader = command.ExecuteReader();
@@ -384,7 +384,7 @@ namespace FAD3
                     conection.Open();
                     string query = $@"SELECT tblLandingSites.LSName, Count(tblSampling.SamplingGUID) AS n
                                    FROM tblLandingSites LEFT JOIN tblSampling ON tblLandingSites.LSGUID = tblSampling.LSGUID
-                                   WHERE tblLandingSites.AOIGuid = '{{{_AOIGUID}}}' GROUP BY tblLandingSites.LSName";
+                                   WHERE tblLandingSites.AOIGuid = {{{_AOIGUID}}} GROUP BY tblLandingSites.LSName";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
                     for (int i = 0; i < dt.Rows.Count; i++)
@@ -411,7 +411,7 @@ namespace FAD3
                 try
                 {
                     conection.Open();
-                    string query = $"SELECT LSGUID, LSName FROM tblLandingSites WHERE AOIGuid= '{{{_AOIGUID}}}' order by LSName";
+                    string query = $"SELECT LSGUID, LSName FROM tblLandingSites WHERE AOIGuid= {{{_AOIGUID}}} order by LSName";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
                     for (int i = 0; i < dt.Rows.Count; i++)
@@ -437,20 +437,20 @@ namespace FAD3
                 {
                     if (IsNew)
                     {
-                        updateQuery = "Insert into tblAOI (AOIGUID, AOIName, Letter, MajorGridList) " +
-                            "Values ('{" +
-                                  AOIData["AOIGUID"] + "}', '" +
-                                  AOIData["AOIName"] + "', '" +
-                                  AOIData["Letter"] + "', '" +
-                                  AOIData["MajorGridList"] + "') ";
+                        updateQuery = $@"Insert into tblAOI (AOIGUID, AOIName, Letter, MajorGridList)
+                            Values (
+                                  {{{AOIData["AOIGUID"]}}},
+                                  {{{AOIData["AOIName"]}}},
+                                  '{AOIData["Letter"]}',
+                                  '{AOIData["MajorGridList"]}')";
                     }
                     else
                     {
-                        updateQuery = "Update tblAOI set " +
-                            " AOIName = '" + AOIData["AOIName"] +
-                            "', Letter = '" + AOIData["Letter"] +
-                            "', MajorGridList = '" + AOIData["MajorGridList"] +
-                            "' Where AOIGUID = '{" + AOIData["AOIGUID"] + "}'";
+                        updateQuery = $@"Update tblAOI set
+                            AOIName = {{{AOIData["AOIName"]}}},
+                            Letter = '{AOIData["Letter"]}',
+                            MajorGridList = '{AOIData["MajorGridList"]}'
+                            Where AOIGUID = {{{AOIData["AOIGUID"]}}}";
                     }
                     OleDbCommand update = new OleDbCommand(updateQuery, conn);
                     conn.Open();
@@ -474,7 +474,7 @@ namespace FAD3
                 try
                 {
                     conection.Open();
-                    string query = "Select AOIName, Letter from tblAOI where AOIGuid = \"" + _AOIGUID + "\"";
+                    string query = $"Select AOIName, Letter from tblAOI where AOIGuid = {{{_AOIGUID}}}";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
                     for (int i = 0; i < dt.Rows.Count; i++)
@@ -502,7 +502,7 @@ namespace FAD3
                 {
                     conection.Open();
 
-                    string query = "Select AOIName, Letter, MajorGridList from tblAOI where AOIGuid = \"" + _AOIGUID + "\"";
+                    string query = $"Select AOIName, Letter, MajorGridList from tblAOI where AOIGuid = {{{_AOIGUID}}}";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(myDT);
                     DataRow dr = myDT.Rows[0];
@@ -535,8 +535,8 @@ namespace FAD3
                 try
                 {
                     conection.Open();
-                    string query = "SELECT Year([SamplingDate]) AS sYear, Count(tblSampling.SamplingGUID) AS n " +
-                                    "FROM tblSampling WHERE AOI=\"" + _AOIGUID + "\" GROUP BY Year([SamplingDate])";
+                    string query = $@"SELECT Year([SamplingDate]) AS sYear, Count(tblSampling.SamplingGUID) AS n
+                                      FROM tblSampling WHERE AOI= {{{_AOIGUID}}} GROUP BY Year([SamplingDate])";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(myDT);
                     for (int i = 0; i < myDT.Rows.Count; i++)
@@ -563,8 +563,8 @@ namespace FAD3
                 {
                     conection.Open();
 
-                    string query = "Select EnumeratorID, EnumeratorName from tblEnumerators where TargetArea =\"" + AOIGuid + "\" " +
-                                    "Order by EnumeratorName";
+                    string query = $@"Select EnumeratorID, EnumeratorName from tblEnumerators where TargetArea = {{{AOIGuid}}}
+                                      Order by EnumeratorName";
                     using (var adapter = new OleDbDataAdapter(query, conection))
                     {
                         adapter.Fill(myDT);
@@ -598,8 +598,8 @@ namespace FAD3
                 {
                     conection.Open();
 
-                    string query = "Select EnumeratorID, EnumeratorName from tblEnumerators where TargetArea =\"" + _AOIGUID + "\" " +
-                                    "Order by EnumeratorName";
+                    string query = $@"Select EnumeratorID, EnumeratorName from tblEnumerators where TargetArea = {{{_AOIGUID}}}
+                                      Order by EnumeratorName";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(myDT);
                     for (int i = 0; i < myDT.Rows.Count; i++)
@@ -624,10 +624,10 @@ namespace FAD3
                 try
                 {
                     conection.Open();
-                    string query = "SELECT EnumeratorID, EnumeratorName, Count(Enumerator) AS n " +
-                                   "FROM tblEnumerators LEFT JOIN tblSampling ON tblEnumerators.EnumeratorID = tblSampling.Enumerator " +
-                                   "GROUP BY tblEnumerators.EnumeratorID, tblEnumerators.EnumeratorName, tblEnumerators.TargetArea " +
-                                   "HAVING tblEnumerators.TargetArea ='{" + _AOIGUID + "}'";
+                    string query = $@"SELECT EnumeratorID, EnumeratorName, Count(Enumerator) AS n
+                                      FROM tblEnumerators LEFT JOIN tblSampling ON tblEnumerators.EnumeratorID = tblSampling.Enumerator
+                                      GROUP BY tblEnumerators.EnumeratorID, tblEnumerators.EnumeratorName, tblEnumerators.TargetArea
+                                      HAVING tblEnumerators.TargetArea ={{{_AOIGUID}}}";
 
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
@@ -655,7 +655,7 @@ namespace FAD3
                 try
                 {
                     conection.Open();
-                    string query = "Select EnumeratorID, EnumeratorName from tblEnumerators where TargetArea =\"" + _AOIGUID + "\"";
+                    string query = $"Select EnumeratorID, EnumeratorName from tblEnumerators where TargetArea ={{{_AOIGUID}}}";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(myDT);
 
@@ -685,7 +685,7 @@ namespace FAD3
             using (var con = new OleDbConnection(global.ConnectionString))
             {
                 con.Open();
-                var sql = "Select Letter from tblAOI where AOIGuid = '{" + AOIGuid + "}'";
+                var sql = $"Select Letter from tblAOI where AOIGuid = {{{AOIGuid}}}";
 
                 using (var dt = new DataTable())
                 {

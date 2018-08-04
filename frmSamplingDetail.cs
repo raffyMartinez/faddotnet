@@ -39,6 +39,9 @@ namespace FAD3
 
         private string _DatePrompt = "";
         private string _TimePrompt = "";
+        private DateTime _SamplingDate;
+        private bool _SamplingDateSet = false;
+        private DateTime _DateSetHaul;
 
         private string _NewReferenceNumber = "";
 
@@ -506,11 +509,15 @@ namespace FAD3
                 }
 
                 //define the events that the fields will respond to
-                ctl.Validating += new CancelEventHandler(OnFieldValidate);
-                ctl.TextChanged += new EventHandler(OnFieldChange);
-                ctl.Validated += new EventHandler(OnFieldValidated);
+                ctl.Validating += OnFieldValidate;
+                ctl.TextChanged += OnFieldChange;
+                ctl.Validated += OnFieldValidated;
+                ctl.GotFocus += OnFieldGotFocus;
+
                 if (type.Name == "ComboBox")
-                    ((ComboBox)ctl).SelectedIndexChanged += new EventHandler(OnComboSelectedIndexChanged);
+                    ((ComboBox)ctl).SelectedIndexChanged += OnComboSelectedIndexChanged;
+                else if (cType == "DateMask")
+                    ((MaskedTextBox)ctl).KeyDown += OnmaskedText_KeyDown;
 
                 if (e.Key == "VesselDimension")
                     _txtVesselDimension = (TextBox)ctl;
@@ -553,6 +560,25 @@ namespace FAD3
                 }
             }
             _yPos += ControlHt + Spacing;
+        }
+
+        private void OnFieldGotFocus(object sender, EventArgs e)
+        {
+            switch (((Control)sender).Tag.ToString())
+            {
+                case "DateSet":
+                case "DateHauled":
+                    if (!_SamplingDateSet)
+                    {
+                        var theSamplingDate = GetFieldText("SamplingDate");
+                        if (DateTime.TryParse(theSamplingDate, out _SamplingDate))
+                        {
+                            _DateSetHaul = _SamplingDate;
+                            _SamplingDateSet = true;
+                        }
+                    }
+                    break;
+            }
         }
 
         private void OnFormLoad(object sender, EventArgs e)
@@ -757,10 +783,8 @@ namespace FAD3
 
                 case "btnFishingGround":
                     PopulateFGList();
-                    frmFishingGround fg = new frmFishingGround();
+                    frmFishingGround fg = new frmFishingGround(_AOIGuid, this);
                     fg.FishingGrounds = _FishingGrounds;
-                    fg.Parent_form = this;
-                    fg.AOIGuid = _AOIGuid;
                     fg.Show(this);
                     break;
             }
@@ -829,7 +853,14 @@ namespace FAD3
         private void PopulateFGList()
         {
             _FishingGrounds = new List<string>();
-            _FishingGrounds.Add(((TextBox)panelUI.Controls["textFishingGround"]).Text);
+            ((TextBox)panelUI.Controls["textFishingGround"]).With(o =>
+            {
+                if (o.Text.Length > 0)
+                {
+                    _FishingGrounds.Add(o.Text);
+                }
+            });
+
             var t = (TextBox)panelUI.Controls["textAdditionalFishingGround"];
             var arr = t.Text.Length > 0 ? t.Text.Split(',') : null;
             for (int n = 0; arr != null && n < arr.Length; n++)
@@ -847,7 +878,7 @@ namespace FAD3
                         if (SaveEdits())
                         {
                             if (IsNew) ReferenceNumberManager.UpdateRefCodeCounter();
-                            _parent.RefreshCatchDetail(_samplingGUID, _isNew);
+                            _parent.RefreshCatchDetail(_samplingGUID, _isNew, _SamplingDate, _GearVarGuid, _LandingSiteGuid);
                             this.Close();
                         }
                     }
@@ -1244,6 +1275,7 @@ namespace FAD3
                                 }
                             }
                         }
+
                         break;
 
                     case "lookup":
@@ -1307,6 +1339,76 @@ namespace FAD3
                     MessageBox.Show(msg, "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     e.Cancel = true;
                 }
+                else
+                {
+                    ((Control)sender).With(o =>
+                    {
+                        switch (o.Tag.ToString())
+                        {
+                            case "SamplingDate":
+                                _SamplingDateSet = false;
+                                if (o.Text != _DatePrompt)
+                                {
+                                    if (DateTime.TryParse(o.Text, out _SamplingDate))
+                                        _SamplingDateSet = true;
+                                }
+                                break;
+
+                            case "LandingSite":
+                                _LandingSiteGuid = ((KeyValuePair<string, string>)((ComboBox)o).SelectedItem).Key;
+                                break;
+
+                            case "FishingGear":
+                                _GearVarGuid = ((KeyValuePair<string, string>)((ComboBox)o).SelectedItem).Key;
+                                break;
+                        }
+                    });
+                }
+            }
+        }
+
+        private string GetFieldText(string DataType)
+        {
+            var FieldText = "";
+            foreach (Control c in panelUI.Controls)
+            {
+                if (c.Tag.ToString() == DataType && (c.GetType().Name != "Label" || c.GetType().Name != "Button"))
+                {
+                    FieldText = c.Text;
+                }
+            }
+            return FieldText;
+        }
+
+        private void OnmaskedText_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (_SamplingDateSet)
+            {
+                var Proceed = false;
+                ((MaskedTextBox)sender).With(o =>
+                {
+                    if (e.KeyCode == Keys.OemMinus || e.KeyCode == Keys.Subtract)
+                    {
+                        _DateSetHaul = _DateSetHaul.AddDays(-1);
+                        Proceed = true;
+                    }
+                    else if (e.KeyCode == Keys.Oemplus || e.KeyCode == Keys.Add)
+                    {
+                        _DateSetHaul = _DateSetHaul.AddDays(1);
+                        Proceed = true;
+                    }
+
+                    if (Proceed)
+                    {
+                        switch (o.Tag.ToString())
+                        {
+                            case "DateSet":
+                            case "DateHauled":
+                                o.Text = _DateSetHaul.ToString("MMM-dd-yyyy");
+                                break;
+                        }
+                    }
+                });
             }
         }
     }

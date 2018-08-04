@@ -104,19 +104,19 @@ namespace FAD3
             {
                 try
                 {
-                    query = $"Delete * from tblCatchDetail where CatchCompRow ='{{{CatchLineGUID}}}'";
+                    query = $"Delete * from tblCatchDetail where CatchCompRow ={{{CatchLineGUID}}}";
                     OleDbCommand update = new OleDbCommand(query, conn);
                     conn.Open();
                     Success = (update.ExecuteNonQuery() > 0);
                     conn.Close();
 
-                    query = $"Delete * from tblGMS where CatchCompRow ='{{{CatchLineGUID}}}'";
+                    query = $"Delete * from tblGMS where CatchCompRow ={{{CatchLineGUID}}}";
                     update = new OleDbCommand(query, conn);
                     conn.Open();
                     update.ExecuteNonQuery();
                     conn.Close();
 
-                    query = $"Delete * from tblLF where CatchCompRow ='{{{CatchLineGUID}}}'";
+                    query = $"Delete * from tblLF where CatchCompRow ={{{CatchLineGUID}}}";
                     update = new OleDbCommand(query, conn);
                     conn.Open();
                     update.ExecuteNonQuery();
@@ -124,7 +124,7 @@ namespace FAD3
 
                     if (Success)
                     {
-                        query = $"Delete * from tblCatchComp where RowGUID ='{{{CatchLineGUID}}}'";
+                        query = $"Delete * from tblCatchComp where RowGUID ={{{CatchLineGUID}}}";
                         update = new OleDbCommand(query, conn);
                         conn.Open();
                         Success = (update.ExecuteNonQuery() > 0);
@@ -146,7 +146,7 @@ namespace FAD3
             {
                 try
                 {
-                    string query = $"Delete * from tblGMS where RowGUID = '{{{RowGUID}}}'";
+                    string query = $"Delete * from tblGMS where RowGUID = {{{RowGUID}}}";
                     OleDbCommand update = new OleDbCommand(query, conn);
                     conn.Open();
                     Success = (update.ExecuteNonQuery() > 0);
@@ -167,7 +167,7 @@ namespace FAD3
             {
                 try
                 {
-                    string query = $"Delete * from tblLF where RowGUID = '{{{RowGUID}}}'";
+                    string query = $"Delete * from tblLF where RowGUID = {{{RowGUID}}}";
                     OleDbCommand update = new OleDbCommand(query, conn);
                     conn.Open();
                     Success = (update.ExecuteNonQuery() > 0);
@@ -192,7 +192,7 @@ namespace FAD3
                 conection.Open();
                 //Delete GMS data
                 query = $@"DELETE tblGMS.* FROM tblCatchComp INNER JOIN tblGMS ON
-                        tblCatchComp.RowGUID = tblGMS.CatchCompRow WHERE SamplingGUID= '{{{samplingGUID}}}'";
+                        tblCatchComp.RowGUID = tblGMS.CatchCompRow WHERE SamplingGUID= {{{samplingGUID}}}";
                 using (OleDbCommand update = new OleDbCommand(query, conection))
                 {
                     update.ExecuteNonQuery();
@@ -201,7 +201,7 @@ namespace FAD3
                 //Delete LF data
                 query = $@"DELETE tblLF.* FROM tblCatchComp INNER JOIN tblLF ON
                         tblCatchComp.RowGUID = tblLF.CatchCompRow
-                        WHERE tblCatchComp.SamplingGUID = '{{{samplingGUID}}}'";
+                        WHERE tblCatchComp.SamplingGUID = {{{samplingGUID}}}";
                 using (OleDbCommand update = new OleDbCommand(query, conection))
                 {
                     update.ExecuteNonQuery();
@@ -210,7 +210,7 @@ namespace FAD3
                 //Delete CatchDetail data
                 query = $@"DELETE tblCatchDetail.* FROM tblCatchComp INNER JOIN tblCatchDetail
                         ON tblCatchComp.RowGUID = tblCatchDetail.CatchCompRow
-                        WHERE tblCatchComp.SamplingGUID = '{{{samplingGUID}}}'";
+                        WHERE tblCatchComp.SamplingGUID = {{{samplingGUID}}}";
                 using (OleDbCommand update = new OleDbCommand(query, conection))
                 {
                     update.ExecuteNonQuery();
@@ -218,7 +218,7 @@ namespace FAD3
 
                 //we delete the children catch composition data
 
-                query = $@"Delete * from tblCatchComp WHERE tblCatchComp.SamplingGUID = '{{{samplingGUID}}}'";
+                query = $@"Delete * from tblCatchComp WHERE tblCatchComp.SamplingGUID = {{{samplingGUID}}}";
                 using (OleDbCommand update = new OleDbCommand(query, conection))
                 {
                     update.ExecuteNonQuery();
@@ -226,7 +226,7 @@ namespace FAD3
 
                 //now we delete the parent catch and effort data
 
-                query = $"Delete * from tblSampling where SamplingGUID = '{{{samplingGUID}}}'";
+                query = $"Delete * from tblSampling where SamplingGUID = {{{samplingGUID}}}";
                 using (OleDbCommand update = new OleDbCommand(query, conection))
                 {
                     Success = (update.ExecuteNonQuery() > 0);
@@ -252,7 +252,7 @@ namespace FAD3
                                    tblCatchComp.RowGUID = tblGMS.CatchCompRow) ON
                                    tblAllSpecies.SpeciesGUID = tblCatchComp.NameGUID)
                                    ON tblTaxa.TaxaNo = tblAllSpecies.TaxaNo
-                                   WHERE tblGMS.CatchCompRow ='{{{CatchCompRowNo}}}'";
+                                   WHERE tblGMS.CatchCompRow ={{{CatchCompRowNo}}}";
 
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
@@ -400,16 +400,16 @@ namespace FAD3
                     if (isNew)
                     {
                         query = $@"Insert into tblGMS (Len, Wt, Sex, GMS, CatchCompRow, RowGUID, Gonadwt) values
-                                 ({slen} , {swt} , {(int)sex} , {(int)stage} , '{{{CatchCompRow}}}', '{{{RowGUID}}}', {sgonadwt})";
+                                 ({slen} , {swt} , {(int)sex} , {(int)stage} , {{{CatchCompRow}}}, {{{RowGUID}}}, {sgonadwt})";
                     }
                     else
                     {
-                        query = "Update tblGMS set Len =" + slen + ", " +
-                                                  "Wt= " + swt + ", " +
-                                                  "Sex =" + (int)sex + ", " +
-                                                  "GMS =" + (int)stage + ", " +
-                                                  "GonadWt =" + sgonadwt + " " +
-                                                  "Where RowGUID = '{" + RowGUID + "}'";
+                        query = $@"Update tblGMS set Len= {slen},
+                                                  Wt= {swt},
+                                                  Sex= {(int)sex},
+                                                  GMS= {(int)stage},
+                                                  GonadWt= {sgonadwt}
+                                                  Where RowGUID = {{{RowGUID}}}";
                     }
                     OleDbCommand update = new OleDbCommand(query, conn);
                     conn.Open();
@@ -446,7 +446,7 @@ namespace FAD3
                         ((tblGearClass RIGHT JOIN tblGearVariations ON tblGearClass.GearClass = tblGearVariations.GearClass) RIGHT JOIN (tblEnumerators
                         RIGHT JOIN tblSampling ON tblEnumerators.EnumeratorID = tblSampling.Enumerator) ON tblGearVariations.GearVarGUID =
                         tblSampling.GearVarGUID) ON tblLandingSites.LSGUID = tblSampling.LSGUID
-                        WHERE tblSampling.SamplingGUID= '{{{_SamplingGUID}}}'";
+                        WHERE tblSampling.SamplingGUID= {{{_SamplingGUID}}}";
 
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(myDT);
@@ -619,7 +619,7 @@ namespace FAD3
                                    tblCatchDetail.ct, tblCatchDetail.swt, tblCatchDetail.sct, tblCatchDetail.FromTotal
                                    FROM(tblSampling INNER JOIN(tblCatchComp INNER JOIN temp_AllNames ON tblCatchComp.NameGUID = temp_AllNames.NameNo)
                                    ON tblSampling.SamplingGUID = tblCatchComp.SamplingGUID) INNER JOIN tblCatchDetail ON tblCatchComp.RowGUID =
-                                   tblCatchDetail.CatchCompRow WHERE tblSampling.SamplingGUID = '{{{_SamplingGUID}}}' ORDER BY tblCatchComp.Sequence";
+                                   tblCatchDetail.CatchCompRow WHERE tblSampling.SamplingGUID = {{{_SamplingGUID}}} ORDER BY tblCatchComp.Sequence";
 
                     Debug.WriteLine(query);
                     var adapter = new OleDbDataAdapter(query, conection);
@@ -688,7 +688,7 @@ namespace FAD3
                          FROM((tblSampling INNER JOIN(tblCatchComp INNER JOIN temp_AllNames ON tblCatchComp.NameGUID = temp_AllNames.NameNo)
                          ON tblSampling.SamplingGUID = tblCatchComp.SamplingGUID) INNER JOIN tblCatchDetail ON
                          tblCatchComp.RowGUID = tblCatchDetail.CatchCompRow) LEFT JOIN tblTaxa ON tblCatchComp.Taxa = tblTaxa.TaxaNo
-                         WHERE tblCatchDetail.CatchCompRow ='{{{RowGUID}}}'";
+                         WHERE tblCatchDetail.CatchCompRow ={{{RowGUID}}}";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
 
@@ -732,7 +732,7 @@ namespace FAD3
                     conection.Open();
                     string query = $@"SELECT DISTINCT tblSampling.GearVarGUID, Variation FROM tblGearVariations
                                    INNER JOIN tblSampling ON tblGearVariations.GearVarGUID = tblSampling.GearVarGUID
-                                   WHERE tblSampling.LSGUID ='{{{lsguid}}}'";
+                                   WHERE tblSampling.LSGUID ={{{lsguid}}}";
 
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
@@ -766,7 +766,7 @@ namespace FAD3
                 try
                 {
                     conection.Open();
-                    string query = $"SELECT RowGUID, Sequence, LenClass, Freq FROM tblLF WHERE tblLF.CatchCompRow='{{{CatchCompRowNo}}}' ORDER BY Sequence, LenClass";
+                    string query = $"SELECT RowGUID, Sequence, LenClass, Freq FROM tblLF WHERE tblLF.CatchCompRow={{{CatchCompRowNo}}} ORDER BY Sequence, LenClass";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
                     for (int i = 0; i < dt.Rows.Count; i++)
@@ -806,7 +806,7 @@ namespace FAD3
                     conection.Open();
                     string query = $@"SELECT DISTINCT Format([SamplingDate],'mmm - yyyy') AS sMonthYear
                                    FROM tblSampling WHERE GearVarGUID='{" + gearguid + "}' AND
-                                   LSGUID='{{{landingsiteguid}}}' ORDER BY
+                                   LSGUID={{{landingsiteguid}}} ORDER BY
                                    Format([SamplingDate],'mmm - yyyy')";
 
                     var adapter = new OleDbDataAdapter(query, conection);
@@ -834,7 +834,7 @@ namespace FAD3
                 try
                 {
                     conection.Open();
-                    string query = $"Select GridName from tblGrid where SamplingGUID = '{{{_SamplingGUID}}}'";
+                    string query = $"Select GridName from tblGrid where SamplingGUID = {{{_SamplingGUID}}}";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
                     for (int i = 0; i < dt.Rows.Count; i++)
@@ -957,21 +957,21 @@ namespace FAD3
                 try
                 {
                     var quote = "'";
-                    var hp = EffortData["EngineHorsepower"] == "" ? "null" : EffortData["EngineHorsepower"];
-                    var wtSample = EffortData["WeightOfSample"] == "" ? "null" : EffortData["WeightOfSample"];
-                    var wtCatch = EffortData["WeightOfCatch"] == "" ? "null" : EffortData["WeightOfCatch"];
-                    var engine = EffortData["Engine"] == "" ? "" : EffortData["Engine"];
-                    var vesL = string.IsNullOrWhiteSpace(EffortData["VesLength"].ToString()) ? "null" : EffortData["VesLength"];
-                    var vesH = string.IsNullOrWhiteSpace(EffortData["VesHeight"].ToString()) ? "null" : EffortData["VesHeight"];
-                    var vesW = string.IsNullOrWhiteSpace(EffortData["VesWidth"].ToString()) ? "null" : EffortData["VesWidth"];
-                    var NoHauls = string.IsNullOrWhiteSpace(EffortData["NumberOfHauls"].ToString()) ? "null" : EffortData["NumberOfHauls"];
-                    var NoFishers = string.IsNullOrWhiteSpace(EffortData["NumberOfFishers"].ToString()) ? "null" : EffortData["NumberOfFishers"];
-                    var VesselType = string.IsNullOrWhiteSpace(EffortData["TypeOfVesselUsed"].ToString()) ? "null" : EffortData["TypeOfVesselUsed"];
+                    var hp = EffortData["EngineHorsepower"].Length == 0 ? "null" : EffortData["EngineHorsepower"];
+                    var wtSample = EffortData["WeightOfSample"].Length == 0 ? "null" : EffortData["WeightOfSample"];
+                    var wtCatch = EffortData["WeightOfCatch"].Length == 0 ? "null" : EffortData["WeightOfCatch"];
+                    var engine = EffortData["Engine"].Length == 0 ? "" : EffortData["Engine"];
+                    var vesL = string.IsNullOrWhiteSpace(EffortData["VesLength"]) ? "null" : EffortData["VesLength"];
+                    var vesH = string.IsNullOrWhiteSpace(EffortData["VesHeight"]) ? "null" : EffortData["VesHeight"];
+                    var vesW = string.IsNullOrWhiteSpace(EffortData["VesWidth"]) ? "null" : EffortData["VesWidth"];
+                    var NoHauls = string.IsNullOrWhiteSpace(EffortData["NumberOfHauls"]) ? "null" : EffortData["NumberOfHauls"];
+                    var NoFishers = string.IsNullOrWhiteSpace(EffortData["NumberOfFishers"]) ? "null" : EffortData["NumberOfFishers"];
+                    var VesselType = string.IsNullOrWhiteSpace(EffortData["TypeOfVesselUsed"]) ? "null" : EffortData["TypeOfVesselUsed"];
                     var FishingGround = FishingGrounds.Count > 0 ? FishingGrounds[0] : "";
-                    var DateSet = string.IsNullOrWhiteSpace(EffortData["DateSet"].ToString()) ? "null" : quote + EffortData["DateSet"] + quote;
-                    var TimeSet = string.IsNullOrWhiteSpace(EffortData["TimeSet"].ToString()) ? "null" : quote + EffortData["TimeSet"] + quote;
-                    var DateHauled = string.IsNullOrWhiteSpace(EffortData["DateHauled"].ToString()) ? "null" : quote + EffortData["DateHauled"] + quote;
-                    var TimeHauled = string.IsNullOrWhiteSpace(EffortData["TimeHauled"].ToString()) ? "null" : quote + EffortData["TimeHauled"] + quote;
+                    var DateSet = string.IsNullOrWhiteSpace(EffortData["DateSet"]) ? "null" : quote + EffortData["DateSet"] + quote;
+                    var TimeSet = string.IsNullOrWhiteSpace(EffortData["TimeSet"]) ? "null" : quote + EffortData["TimeSet"] + quote;
+                    var DateHauled = string.IsNullOrWhiteSpace(EffortData["DateHauled"]) ? "null" : quote + EffortData["DateHauled"] + quote;
+                    var TimeHauled = string.IsNullOrWhiteSpace(EffortData["TimeHauled"]) ? "null" : quote + EffortData["TimeHauled"] + quote;
                     var SamplingGuid = EffortData["SamplingGUID"];
 
                     if (isNew)
@@ -980,9 +980,9 @@ namespace FAD3
                             FishingGround, TimeSet, DateSet, TimeHauled, DateHauled, NoHauls, NoFishers, Engine, hp,
                             WtCatch, WtSample, len, wdt, hgt, LSGUID,  Notes, VesType, SamplingType, HasLiveFish, Enumerator,
                             DateEncoded) values (
-                            '{{{SamplingGuid}}}',
-                            '{{{EffortData["FishingGear"]}}}',
-                            '{{{EffortData["TargetArea"]}}}',
+                            {{{SamplingGuid}}},
+                            {{{EffortData["FishingGear"]}}},
+                            {{{EffortData["TargetArea"]}}},
                             '{EffortData["ReferenceNumber"]}',
                             '{EffortData["SamplingDate"]}',
                             '{EffortData["SamplingTime"]}',
@@ -998,19 +998,19 @@ namespace FAD3
                             {wtCatch},
                             {wtSample},
                             {vesL}, {vesW}, {vesH},
-                            '{{{EffortData["LandingSite"]}}}',
+                            {{{EffortData["LandingSite"]}}},
                             '{EffortData["Notes"]}',
                             '{VesselType}',
                             {EffortData["SamplingType"]},
                             {EffortData["HasLiveFish"]},
-                            '{{{EffortData["Enumerator"]}}}',
+                            {{{EffortData["Enumerator"]}}},
                             '{DateTime.Now}')";
                     }
                     else
                     {
                         updateQuery = $@"Update tblSampling set
-                            GearVarGUID ='{{{EffortData["FishingGear"]}}}',
-                            AOI ='{{{EffortData["TargetArea"]}}}',
+                            GearVarGUID ={{{EffortData["FishingGear"]}}},
+                            AOI ={{{EffortData["TargetArea"]}}},
                             RefNo ='{EffortData["ReferenceNumber"]}',
                             SamplingDate ='{EffortData["SamplingDate"]}',
                             SamplingTime ='{EffortData["SamplingTime"]}',
@@ -1026,13 +1026,13 @@ namespace FAD3
                             WtCatch ={wtCatch},
                             WtSample ={wtSample},
                             len ={vesL}, wdt ={vesW}, hgt ={vesH},
-                            LSGUID ='{{{EffortData["LandingSite"]}}}',
+                            LSGUID ={{{EffortData["LandingSite"]}}},
                             Notes = '{EffortData["Notes"]}',
                             VesType ={VesselType},
                             SamplingType ={EffortData["SamplingType"]},
                             HasLiveFish = {EffortData["HasLiveFish"]},
-                            Enumerator = '{{{EffortData["Enumerator"]}}}'
-                            Where SamplingGUID = '{{{SamplingGuid}}}'";
+                            Enumerator = {{{EffortData["Enumerator"]}}}
+                            Where SamplingGUID = {{{SamplingGuid}}}";
                     }
 
                     using (OleDbCommand update = new OleDbCommand(updateQuery, conn))
@@ -1059,7 +1059,7 @@ namespace FAD3
             using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
             {
                 conn.Open();
-                var sql = $"Delete * from tblGrid where SamplingGuid = '{{{SamplingGUID}}}'";
+                var sql = $"Delete * from tblGrid where SamplingGuid = {{{SamplingGUID}}}";
                 using (OleDbCommand update = new OleDbCommand(sql, conn))
                 {
                     update.ExecuteNonQuery();
@@ -1067,10 +1067,12 @@ namespace FAD3
 
                 for (int n = 1; n < FishingGrounds.Count; n++)
                 {
-                    sql = $@"Insert into tblGrid (SamplingGuid, GridName,RowGUID) values (
-                            '{{{SamplingGUID}}}',
-                            '{FishingGrounds[n]}',
-                            '{{{Guid.NewGuid()}}}')";
+                    sql = $@"Insert into tblGrid (SamplingGuid, GridName,RowGUID) values
+                            (
+                              {{{SamplingGUID}}},
+                              '{FishingGrounds[n]}',
+                              {{{Guid.NewGuid()}}}
+                            )";
                     using (OleDbCommand update = new OleDbCommand(sql, conn))
                     {
                         update.ExecuteNonQuery();
@@ -1091,18 +1093,20 @@ namespace FAD3
                 {
                     if (DataStatus == global.fad3DataStatus.statusNew)
                     {
-                        query = $@"Insert into tblLF (LenClass, Freq, CatchCompRow, RowGUID, Sequence) values (
-                            {LenClass}, {ClassCount}, '{{{CatchCompRow}}}', '{{{RowGUID}}}', {Sequence})";
+                        query = $@"Insert into tblLF (LenClass, Freq, CatchCompRow, RowGUID, Sequence) values
+                                    ({LenClass}, {ClassCount}, {{{CatchCompRow}}}, {{{RowGUID}}}, {Sequence})";
                     }
                     else if (DataStatus == global.fad3DataStatus.statusEdited)
                     {
-                        query = $@"Update tblLF set LenClass = {LenClass},
-                                Freq= {ClassCount}, Sequence= {Sequence}
-                                Where RowGUID ='{{{RowGUID}}}'";
+                        query = $@"Update tblLF set
+                                   LenClass = {LenClass},
+                                   Freq= {ClassCount},
+                                   Sequence= {Sequence}
+                                   Where RowGUID ={{{RowGUID}}}";
                     }
                     else if (DataStatus == global.fad3DataStatus.statusForDeletion)
                     {
-                        query = $"Delete * from tblLF where RowGUID = '{{{RowGUID}}}'";
+                        query = $"Delete * from tblLF where RowGUID = {{{RowGUID}}}";
                     }
                     if (query.Length > 0)
                     {
@@ -1276,16 +1280,16 @@ namespace FAD3
                         {
                             //RowGUID = Guid.NewGuid().ToString();
                             updateQuery = $@"Insert into tblCatchComp (NameGUID, NameType,RowGUID,SamplingGUID) values (
-                                          '{{{ _CatchNameGIUD}}}', {Convert.ToInt16(_NameType)}, '{{{_CatchLineGUID}}}', '{{{_SamplingGUID}}}')";
+                                          {{{ _CatchNameGIUD}}}, {Convert.ToInt16(_NameType)}, {{{_CatchLineGUID}}}, {{{_SamplingGUID}}})";
                         }
                         else
                         {
                             if (SaveCatchDetail(isNew, "", _CatchDetailRowGUID))
                             {
                                 updateQuery = $@"Update tblCatchComp set
-                                    NameGUID = '{{{_CatchNameGIUD}}}',
+                                    NameGUID = {{{_CatchNameGIUD}}},
                                     NameType = {Convert.ToInt16(_NameType)}
-                                    WHERE RowGUID = '{{{_CatchLineGUID}}}'";
+                                    WHERE RowGUID = {{{_CatchLineGUID}}}";
                             }
                         }
                         OleDbCommand update = new OleDbCommand(updateQuery, conn);
@@ -1324,14 +1328,14 @@ namespace FAD3
                             if (_CatchCount == null)
                             {
                                 updateQuery = $@"Insert into tblCatchDetail (wt,swt,sct,CatchCompRow,RowGUID,FromTotal,Live) values (
-                                               {_CatchWeight}, {_CatchSubsampleWt}, {_CatchSubsampleCount}, '{{{CatchCompRow}}}', '{{{RowGUID}}}',
+                                               {_CatchWeight}, {_CatchSubsampleWt}, {_CatchSubsampleCount}, {{{CatchCompRow}}}, {{{RowGUID}}},
                                                {_FromTotalCatch}, {_LiveFish})";
                             }
                             else
                             {
                                 updateQuery = $@"Insert into tblCatchDetail (wt,ct,swt,sct,CatchCompRow,RowGUID,FromTotal,Live) values (
                                                {_CatchWeight}, {(long)_CatchCount},  {_CatchSubsampleWt}, {_CatchSubsampleCount},
-                                               '{{{CatchCompRow}}}', '{{{RowGUID}}}', {_FromTotalCatch}, {_LiveFish})";
+                                               {{{CatchCompRow}}}, {{{RowGUID}}}, {_FromTotalCatch}, {_LiveFish})";
                             }
                         }
                         else
@@ -1341,7 +1345,7 @@ namespace FAD3
                                 updateQuery = $@"Update tblCatchDetail set
                                            wt = {CatchWeight}, swt= {_CatchSubsampleWt},
                                            sct = {_CatchSubsampleCount}, FromTotal = {_FromTotalCatch},
-                                           Live = {_LiveFish} Where RowGUID = '{{{CatchDetailRowGUID}}}'";
+                                           Live = {_LiveFish} Where RowGUID = {{{CatchDetailRowGUID}}}";
                             }
                             else
                             {
@@ -1352,7 +1356,7 @@ namespace FAD3
                                            sct = {_CatchSubsampleCount},
                                            FromTotal = {_FromTotalCatch},
                                            Live = {_LiveFish}
-                                           Where RowGUID = '{{{CatchDetailRowGUID}}}'";
+                                           Where RowGUID = {{{CatchDetailRowGUID}}}";
                             }
                         }
                         OleDbCommand update = new OleDbCommand(updateQuery, conn);

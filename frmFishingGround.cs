@@ -11,20 +11,18 @@ namespace FAD3
 {
     public partial class frmFishingGround : Form
     {
-        public frmFishingGround()
+        private static frmFishingGround _instance;
+        private int _mouseX;
+        private int _mouseY;
+        private List<string> _FishingGrounds;
+        private ListViewItem _selectedItem;
+
+        public frmFishingGround(string AOIGuid, frmSamplingDetail Parent)
         {
             InitializeComponent();
+            this.AOIGuid = AOIGuid;
+            Parent_form = Parent;
         }
-
-        string _AOIGuid = "";
-        frmSamplingDetail _Parent_form;
-        FishingGrid.fadGridType _gt;
-        static frmFishingGround _instance;
-        int _mouseX;
-        int _mouseY;
-        List<string> _FishingGrounds;
-        ListViewItem _selectedItem;
-
 
         public List<string> FishingGrounds
         {
@@ -32,32 +30,18 @@ namespace FAD3
             set { _FishingGrounds = value; }
         }
 
+        public frmSamplingDetail Parent_form { get; }
 
-        public frmSamplingDetail Parent_form
+        public static frmFishingGround GetInstance(string AOIGuid, frmSamplingDetail Parent)
         {
-            get { return _Parent_form; }
-            set { _Parent_form = value; }
-        }
-
-        public static frmFishingGround GetInstance()
-        {
-            if (_instance == null) _instance = new frmFishingGround();
+            if (_instance == null) _instance = new frmFishingGround(AOIGuid, Parent);
             return _instance;
         }
 
-        public string AOIGuid
-        {
-            get { return _AOIGuid; }
-            set
-            {
-                _AOIGuid = value;
-                //_gt = FishingGrid.SetupFishingGrid(_AOIGuid);
-            }
-        }
+        public string AOIGuid { get; } = "";
 
         private void OnFormClosed(object sender, FormClosedEventArgs e)
         {
-
             _instance = null;
         }
 
@@ -83,13 +67,11 @@ namespace FAD3
             else if (FishingGrid.GridType == FishingGrid.fadGridType.gridTypeOther)
             {
                 tabFG.TabPages["tabGridOther"].Select();
-
             }
         }
 
         private void FromListViewToTextBox(string lvText)
         {
-
             var arr = lvText.Split('-');
             textBoxGridNo.Text = arr[0];
             textBoxColumn.Text = arr[1].Substring(0, 1);
@@ -128,6 +110,7 @@ namespace FAD3
                         if (FishingGrid.MajorGridFound(s) == false)
                             msg = "Grid number not found in the maps";
                         break;
+
                     case "textBoxColumn":
                         if (s.Length == 1)
                         {
@@ -143,6 +126,7 @@ namespace FAD3
                             msg = "Grid column not found";
                         }
                         break;
+
                     case "textBoxRow":
                         try
                         {
@@ -211,9 +195,11 @@ namespace FAD3
                         msg = "Please fill up all fields";
                     }
                     break;
+
                 case "buttonRemove":
                     lvGrids.Items.Remove(_selectedItem);
                     break;
+
                 case "buttonRemoveAll":
                     lvGrids.Clear();
                     break;
@@ -223,8 +209,6 @@ namespace FAD3
             {
                 MessageBox.Show(msg, "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
-
-
         }
 
         private void OnTextBox_KeyDown(object sender, KeyEventArgs e)
@@ -239,9 +223,11 @@ namespace FAD3
                         case "textBoxGridNo":
                             textBoxColumn.Select();
                             break;
+
                         case "textBoxColumn":
                             textBoxRow.Select();
                             break;
+
                         case "textBoxRow":
                             buttonAdd.Select();
                             break;
@@ -260,9 +246,10 @@ namespace FAD3
                     {
                         _FishingGrounds.Add(item.Text);
                     }
-                    _Parent_form.FishingGrounds = _FishingGrounds;
+                    Parent_form.FishingGrounds = _FishingGrounds;
                     this.Close();
                     break;
+
                 case "buttonCancel":
                     this.Close();
                     break;

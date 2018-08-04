@@ -144,7 +144,7 @@ namespace FAD3
                 try
                 {
                     conection.Open();
-                    string query = $"Select GearLetter from tblGearClass where GearClass ='{{{GearClassGuid}}}'";
+                    string query = $"Select GearLetter from tblGearClass where GearClass ={{{GearClassGuid}}}";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(myDT);
                     DataRow dr = myDT.Rows[0];
@@ -166,7 +166,7 @@ namespace FAD3
                     conection.Open();
                     string query = $@"SELECT RefGearCode FROM tblGearVariations INNER JOIN tblRefGearCodes ON
                                    tblGearVariations.GearVarGUID = tblRefGearCodes.GearVar WHERE
-                                   tblGearVariations.GearClass= '{{{GearClassGuid}}}'
+                                   tblGearVariations.GearClass= {{{GearClassGuid}}}
                                    ORDER BY tblRefGearCodes.RefGearCode";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(myDT);
@@ -190,7 +190,7 @@ namespace FAD3
                 try
                 {
                     conection.Open();
-                    string query = $"Select RefGearCode from tblRefGearCodes where GearVar ='{{{GearVariationGuid}}}'";
+                    string query = $"Select RefGearCode from tblRefGearCodes where GearVar ={{{GearVariationGuid}}}";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(myDT);
                     for (int i = 0; i < myDT.Rows.Count; i++)
@@ -219,15 +219,15 @@ namespace FAD3
                     if (AOIGUID.Length > 0)
                     {
                         query = $@"SELECT DISTINCT GearVarGUID, Variation FROM tblGearVariations INNER JOIN
-                                   (tblRefGearCodes INNER JOIN tblRefGearCodes_Usage ON tblRefGearCodes.RefGearCode
+                                   (tblRefGearCodes INNER JOIN tblRefGearCodes_Usage ON tblRefGearCodes.RefGearCode =
                                    tblRefGearCodes_Usage.RefGearCode) ON tblGearVariations.GearVarGUID =
-                                   tblRefGearCodes.GearVar WHERE tblRefGearCodes_Usage.TargetAreaGUID= '{{{AOIGUID}}}'
+                                   tblRefGearCodes.GearVar WHERE tblRefGearCodes_Usage.TargetAreaGUID= {{{AOIGUID}}}
                                    AND tblGearVariations.GearClass={{{GearClassGUID}}} ORDER BY Variation";
                     }
                     else
                     {
                         query = $@"Select GearVarGUID, Variation from tblGearVariations where
-                                   GearClass = '{{{GearClassGUID}}}' ORDER BY Variation";
+                                   GearClass = {{{GearClassGUID}}} ORDER BY Variation";
                     }
                     using (var adapter = new OleDbDataAdapter(query, conection))
                     {
@@ -317,7 +317,7 @@ namespace FAD3
                     conection.Open();
                     query = $@"SELECT RefGearCode, SubVariation FROM tblGearVariations
                             LEFT JOIN tblRefGearCodes ON tblGearVariations.GearVarGUID = tblRefGearCodes.GearVar WHERE
-                            tblGearVariations.GearVarGUID = '{{{GearVarGUID}}}'";
+                            tblGearVariations.GearVarGUID = {{{GearVarGUID}}}";
 
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
@@ -377,7 +377,7 @@ namespace FAD3
                          tblRefGearCodes_Usage.RowNo = tblRefGearUsage_LocalName.GearUsageRow)
                          ON tblGearLocalNames.LocalNameGUID = tblRefGearUsage_LocalName.GearLocalName
                          WHERE tblRefGearCodes_Usage.RefGearCode= '{RefCode}' AND
-                         tblRefGearCodes_Usage.TargetAreaGUID= '{{{AOIGuid}}}'";
+                         tblRefGearCodes_Usage.TargetAreaGUID= {{{AOIGuid}}}";
 
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
@@ -499,7 +499,7 @@ namespace FAD3
                 {
                     conection.Open();
                     string query = $@"SELECT tblGearClass.GearClass, GearClassName FROM tblGearClass INNER JOIN tblGearVariations ON
-                                   tblGearClass.GearClass = tblGearVariations.GearClass WHERE GearVarGUID='{{{GearVarGUID}}}'";
+                                   tblGearClass.GearClass = tblGearVariations.GearClass WHERE GearVarGUID={{{GearVarGUID}}}";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
                     DataRow dr = dt.Rows[0];
@@ -524,7 +524,7 @@ namespace FAD3
                     conection.Open();
                     string query = $@"SELECT tblGearClass.GearClass, tblGearClass.GearClassName FROM tblGearClass
                                    INNER JOIN tblGearVariations ON tblGearClass.GearClass =
-                                   tblGearVariations.GearClass WHERE tblGearVariations.GearVarGUID='{{{varGUID}}}'";
+                                   tblGearVariations.GearClass WHERE tblGearVariations.GearVarGUID={{{varGUID}}}";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
                     _GearVar.Clear();
@@ -552,7 +552,7 @@ namespace FAD3
                 {
                     conection.Open();
                     string query = $@"SELECT GearClassName FROM tblGearClass INNER JOIN tblGearVariations ON
-                                   tblGearClass.GearClass = tblGearVariations.GearClass WHERE GearVarGUID='{{{GearVarGUID}}}'";
+                                   tblGearClass.GearClass = tblGearVariations.GearClass WHERE GearVarGUID={{{GearVarGUID}}}";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
                     DataRow dr = dt.Rows[0];
@@ -611,7 +611,7 @@ namespace FAD3
             using (var conection = new OleDbConnection(global.ConnectionString))
             {
                 conection.Open();
-                string query = $"SELECT Variation FROM tblGearVariations  WHERE GearVarGUID='{{{GearVarGuid}}}'";
+                string query = $"SELECT Variation FROM tblGearVariations  WHERE GearVarGUID={{{GearVarGuid}}}";
                 using (var adapter = new OleDbDataAdapter(query, conection))
                 {
                     adapter.Fill(dt);
@@ -700,7 +700,7 @@ namespace FAD3
             using (var con = new OleDbConnection(global.ConnectionString))
             {
                 var sql = $@"Select Top 1 GearVarGuid from tblGearSpecs
-                          where GearVarGuid = '{{{GearVarGuid}}}' and
+                          where GearVarGuid = {{{GearVarGuid}}} and
                           Version = '2'";
 
                 using (var dt = new DataTable())
