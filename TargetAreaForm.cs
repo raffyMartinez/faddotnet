@@ -225,10 +225,15 @@ namespace FAD3
             var Success = false;
             var tabPage = tabAOI.SelectedTab.Name;
 
+            if (_IsNew)
+            {
+                _AOI.AOIGUID = Guid.NewGuid().ToString();
+            }
+
             Dictionary<string, string> TargetAreaData = new Dictionary<string, string>();
             TargetAreaData.Add("AOIName", txtName.Text);
             TargetAreaData.Add("Letter", txtCode.Text);
-            TargetAreaData.Add("AOIGUID", _IsNew ? Guid.NewGuid().ToString() : _AOI.AOIGUID);
+            TargetAreaData.Add("AOIGUID", _AOI.AOIGUID);
             TargetAreaData.Add("DataStatus", _IsNew ?
                                               global.fad3DataStatus.statusNew.ToString() :
                                               global.fad3DataStatus.statusEdited.ToString());
@@ -247,6 +252,8 @@ namespace FAD3
                     {
                         var Map = Tuple.Create(lvi.Text, lvi.SubItems[1].Text,
                                                lvi.SubItems[2].Text);
+
+                        //var Map = (MapName: lvi.Text, ULGrid: lvi.SubItems[1].Text, LRGrid: lvi.SubItems[2].Text);
                         Maps.Add(lvi.Text, Map);
                     }
                     FirstMap = lvMaps.Items[0].Text;
@@ -275,7 +282,7 @@ namespace FAD3
                         {
                             if (_IsNew)
                             {
-                                _parent_form.NewTargetArea(txtName.Text, txtCode.Text);
+                                _parent_form.NewTargetArea(txtName.Text, _AOI.AOIGUID);
                             }
                             else
                             {

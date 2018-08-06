@@ -690,6 +690,17 @@ namespace FAD3
             ;
         }
 
+        private static void DeleteAdditionalFishingGroundMaps(string TargetAreaGuid)
+        {
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                var sql = $"Delete * from tblAdditionalAOIExtent where AOIGuid = {{{TargetAreaGuid}}}";
+                OleDbCommand update = new OleDbCommand(sql, conn);
+                conn.Open();
+                update.ExecuteNonQuery();
+            }
+        }
+
         public static bool SaveTargetAreaGrid25(string TargetAreaGuid, bool UseGrid25, string UTMZone = "",
                                int SubGridStyle = 0, Dictionary<string, Tuple<string, string, string>> Maps = null,
                                string FirstMap = "")
@@ -729,6 +740,10 @@ namespace FAD3
                 {
                     Success = SaveAdditionalFishingGroundMaps(TargetAreaGuid, FirstMap, Maps);
                 }
+                else
+                {
+                    DeleteAdditionalFishingGroundMaps(TargetAreaGuid);
+                }
             }
 
             return Success;
@@ -737,23 +752,21 @@ namespace FAD3
         private static bool SaveAdditionalFishingGroundMaps(string TargetAreaGuid, string FirstMap, Dictionary<string, Tuple<string, string, string>> Maps)
         {
             var SaveCount = 0;
+
+            DeleteAdditionalFishingGroundMaps(TargetAreaGuid);
+
             using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
             {
                 conn.Open();
-
-                var sql = $"Delete * from tblAdditionalAOIExtent where AOIGuid = {{{TargetAreaGuid}}}";
-                OleDbCommand update = new OleDbCommand(sql, conn);
-                update.ExecuteNonQuery();
-
                 foreach (var item in Maps.Values)
                 {
                     if (item.Item1 != FirstMap)
                     {
-                        sql = $@"Insert into tblAdditionalAOIExtent
+                        var sql = $@"Insert into tblAdditionalAOIExtent
                             (AOIGuid, GridDescription, UpperLeft, LowerRight, RowNumber)
                             values
                             ({{{TargetAreaGuid}}},'{item.Item1}','{item.Item2}','{item.Item3}', {{{Guid.NewGuid().ToString()}}})";
-                        update = new OleDbCommand(sql, conn);
+                        OleDbCommand update = new OleDbCommand(sql, conn);
                         if (update.ExecuteNonQuery() > 0) SaveCount++;
                     }
                 }

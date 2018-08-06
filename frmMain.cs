@@ -395,7 +395,7 @@ namespace FAD3
             menuDropDown.Items.Clear();
             switch (Source.Name)
             {
-                case "treeView1":
+                case "treeMain":
                     var tsi = menuDropDown.Items.Add("New target area");
                     tsi.Name = "menuNewTargetArea";
                     tsi.Enabled = _TreeLevel == "root";
@@ -1716,7 +1716,7 @@ namespace FAD3
                     break;
 
                 case "aoi":
-                    //arr = treeView1.SelectedNode.Tag.ToString().Split(',');
+                    //arr = treeMain.SelectedNode.Tag.ToString().Split(',');
                     myData = _AOI.AOIData();
                     var arr = myData.Split('|');
 
