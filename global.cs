@@ -14,7 +14,6 @@ using System.IO;
 using System.Data.OleDb;
 using System.Diagnostics;
 using System.Windows.Forms;
-using ADOX;
 using Microsoft.Win32;
 
 namespace FAD3
@@ -54,6 +53,11 @@ namespace FAD3
 
                 return s;
             }
+        }
+
+        public static string MDBPath
+        {
+            get { return _mdbPath; }
         }
 
         /// <summary>
@@ -191,6 +195,21 @@ namespace FAD3
                 SaveSetting(frm.Name, "FormWidth", frm.RestoreBounds.Width);
                 SaveSetting(frm.Name, "FormHeight", frm.RestoreBounds.Height);
             }
+        }
+
+        public static bool TextIsAlphaNumeric(string text)
+        {
+            var arr = text.ToLower().ToCharArray();
+            var IsAlphaNumeric = true;
+            for (int n = 0; n < arr.Length; n++)
+            {
+                if ((arr[n] < '0' || arr[n] > '9') && (arr[n] < 'a' || arr[n] > 'z'))
+                {
+                    IsAlphaNumeric = false;
+                    break;
+                }
+            }
+            return IsAlphaNumeric;
         }
 
         /// <summary>
@@ -495,147 +514,6 @@ namespace FAD3
             return myStage;
         }
 
-        public static bool CheckDB(string mdbPath)
-        {
-            bool cancel = false;
-
-            //put data tables here
-            List<string> tableList = new List<string>();
-
-            //put columns here
-            List<string> colList = new List<string>();
-            //if (File.Exists(_AppPath + "\\template.mdb"))
-            //{
-            string connTemplate = "Provider=Microsoft.JET.OLEDB.4.0;data source=" + _AppPath + "\\template.mdb";
-            string connMDB = "Provider=Microsoft.JET.OLEDB.4.0;data source=" + mdbPath;
-            Catalog catTemplate = new Catalog();
-            Catalog catMDB = new Catalog();
-            try
-            {
-                catTemplate.let_ActiveConnection(connTemplate);
-                catMDB.let_ActiveConnection(connMDB);
-
-                //fill up list of data tables
-                foreach (Table tblData in catMDB.Tables)
-                {
-                    string tdName = tblData.Name;
-                    if (tdName.Substring(0, 4) != "MSys" && tdName.Substring(0, 5) != "temp_")
-                    {
-                        tableList.Add(tdName);
-                    }
-                }
-
-                //get table names  in the template database
-                foreach (Table tblTemplate in catTemplate.Tables)
-                {
-                    string tdName = tblTemplate.Name;
-                    if (tdName.Substring(0, 4) != "MSys" && tdName.Substring(0, 5) != "temp_")
-                    {
-                        if (tableList.Contains(tdName))
-                        {
-                            //check for columns
-                            foreach (Column col in catMDB.Tables[tdName].Columns)
-                            {
-                                colList.Add(col.Name);
-                            }
-
-                            foreach (Column col in tblTemplate.Columns)
-                            {
-                                var mdbCol = new Column();
-                                if (!colList.Contains(col.Name))
-                                {
-                                    catMDB.Tables[tdName].Columns.Append(col.Name, col.Type, col.DefinedSize);
-                                }
-                                mdbCol = catMDB.Tables[tdName].Columns[col.Name];
-                                try
-                                {
-                                    mdbCol.Properties["Jet OLEDB:Allow Zero Length"].Value = col.Properties["Jet OLEDB:Allow Zero Length"].Value;
-                                    mdbCol.Properties["Description"].Value = col.Properties["Description"].Value;
-                                }
-                                catch { }
-                            }
-
-                            //check for indexes
-                            colList.Clear();
-
-                            foreach (Index i in catMDB.Tables[tdName].Indexes)
-                            {
-                                colList.Add(i.Name);
-                            }
-
-                            foreach (Index i in tblTemplate.Indexes)
-                            {
-                                if (!colList.Contains(i.Name))
-                                {
-                                    Index newIndex = new Index
-                                    {
-                                        Name = i.Name,
-                                        Unique = i.Unique,
-                                        PrimaryKey = i.PrimaryKey
-                                    };
-                                    foreach (Column c in i.Columns)
-                                    {
-                                        newIndex.Columns.Append(c.Name);
-                                    }
-                                    try
-                                    {
-                                        catMDB.Tables[tdName].Indexes.Append(newIndex);
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        //TODO: Find out this error
-                                        ErrorLogger.Log(ex);
-                                        // adding a new index to an existing table
-                                        // always end in an COM error
-                                    }
-                                }
-                            }
-                        }
-                        else
-                        {
-                            //append new tables that are not found in the template database
-                            Table newTable = new Table();
-                            newTable.Name = tdName;
-
-                            //create columns
-                            foreach (Column col in tblTemplate.Columns)
-                            {
-                                newTable.Columns.Append(col.Name, col.Type, col.DefinedSize);
-                            }
-
-                            //create indexes
-                            foreach (Index i in tblTemplate.Indexes)
-                            {
-                                Index newIndex = new Index();
-                                foreach (Column c in i.Columns)
-                                {
-                                    newIndex.Columns.Append(c.Name);
-                                }
-                                newIndex.Name = i.Name;
-                                newIndex.PrimaryKey = i.PrimaryKey;
-                                newTable.Indexes.Append(newIndex);
-                            }
-
-                            //finally append the new table
-                            catMDB.Tables.Append(newTable);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                ErrorLogger.Log(ex, true);
-                cancel = true;
-            }
-            //}
-            //else
-            //{
-            //    FileExists = false;
-            //    cancel = true;
-            //}
-            return !cancel;
-        }
-
         public static Taxa TaxaFromCatchNameGUID(string CatchNameGUID)
         {
             Taxa taxa = Taxa.To_be_determined;
@@ -703,7 +581,7 @@ namespace FAD3
             get { return _mdbPath; }
             set
             {
-                if (CheckDB(value))
+                if (DBCheck.CheckDB(value))
                 {
                     _mdbPath = value;
                     _ConnectionString = "Provider=Microsoft.JET.OLEDB.4.0;data source=" + _mdbPath;

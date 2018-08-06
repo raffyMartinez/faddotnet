@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Data.OleDb;
 using System.Data;
-using ADOX;
+
+//using ADOX;
+using dao;
 
 namespace FAD3
 {
@@ -122,53 +124,93 @@ namespace FAD3
         /// Makes a new table of names (local and scientific names) derived from
         /// the the local names table and the scientific names table
         /// </summary>
+
         public static void MakeAllNames()
         {
-            Catalog catMDB = new Catalog();
-            catMDB.let_ActiveConnection(global.ConnectionString);
+            var dbe = new DBEngine();
+            var dbData = dbe.OpenDatabase(global.mdbPath);
+
+            var sql = @"SELECT Name AS Name1, '' AS Name2, NameNo, 'Local names' as Identification From tblBaseLocalNames
+                                UNION ALL SELECT Genus AS Name1, species AS Name2, SpeciesGUID AS NameNo,  'Species names' as Identification
+                                FROM tblAllSpecies";
 
             try
             {
-                catMDB.Tables.Delete("temp_AllNames");
+                dbData.QueryDefs.Delete("qryAllNames");
             }
-            catch
-            { }
-            using (var conection = new OleDbConnection(global.ConnectionString))
+            catch { }
+            try
             {
-                OleDbCommand cmd = new OleDbCommand()
-                {
-                    Connection = conection,
-                };
-
-                conection.Open();
-
-                //select into query
-                string sql = "SELECT Name AS Name1, '' AS Name2, NameNo, 'Local names' AS Identification INTO temp_AllNames FROM tblBaseLocalNames";
-                cmd.CommandText = sql;
-                try
-                {
-                    _LocalNamesCount = cmd.ExecuteNonQuery();
-                }
-                catch (Exception ex)
-                {
-                    ErrorLogger.Log(ex);
-                }
-
-                //insert into to append the results from the select into query
-                sql = "INSERT INTO temp_AllNames ( Name1, Name2, NameNo, Identification ) SELECT Genus, species, SpeciesGUID, 'Species names' AS Identification FROM tblAllSpecies";
-                cmd.CommandText = sql;
-                try
-                {
-                    _SciNamesCount += cmd.ExecuteNonQuery();
-                }
-                catch (Exception ex)
-                {
-                    ErrorLogger.Log(ex);
-                }
-
-                conection.Close();
+                dbData.TableDefs.Delete("temp_AllNames");
             }
+            catch { }
+
+            var qd = dbData.CreateQueryDef("qryAllNames", sql);
+            dbData.QueryDefs.Refresh();
+            qd.Close();
+
+            sql = "SELECT qryAllNames.* INTO temp_AllNames FROM qryAllNames";
+            qd = dbData.CreateQueryDef("", sql);
+            qd.Execute();
+            qd.Close();
+
+            dbData.TableDefs.Refresh();
+            dbData.QueryDefs.Delete("qryAllNames");
+
+            qd = null;
+
+            dbData.Close();
+            dbData = null;
         }
+
+        //commented out because this used ADO which was replaced with DAO - see aboce
+        //public static void MakeAllNames1()
+        //{
+        //    Catalog catMDB = new Catalog();
+        //    catMDB.let_ActiveConnection(global.ConnectionString);
+
+        //    try
+        //    {
+        //        catMDB.Tables.Delete("temp_AllNames");
+        //    }
+        //    catch
+        //    { }
+        //    using (var conection = new OleDbConnection(global.ConnectionString))
+        //    {
+        //        OleDbCommand cmd = new OleDbCommand()
+        //        {
+        //            Connection = conection,
+        //        };
+
+        //        conection.Open();
+
+        //        //select into query
+        //        string sql = "SELECT Name AS Name1, '' AS Name2, NameNo, 'Local names' AS Identification INTO temp_AllNames FROM tblBaseLocalNames";
+        //        cmd.CommandText = sql;
+        //        try
+        //        {
+        //            _LocalNamesCount = cmd.ExecuteNonQuery();
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            ErrorLogger.Log(ex);
+        //        }
+
+        //        //insert into to append the results from the select into query
+        //        sql = "INSERT INTO temp_AllNames ( Name1, Name2, NameNo, Identification ) SELECT Genus, species, SpeciesGUID, 'Species names' AS Identification FROM tblAllSpecies";
+        //        cmd.CommandText = sql;
+        //        try
+        //        {
+        //            _SciNamesCount += cmd.ExecuteNonQuery();
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            ErrorLogger.Log(ex);
+        //        }
+
+        //        conection.Close();
+        //    }
+        //}
 
         public static void GetGenus_LocalNames()
         {

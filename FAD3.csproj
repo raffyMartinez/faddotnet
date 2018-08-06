@@ -67,6 +67,10 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <RunCodeAnalysis>false</RunCodeAnalysis>
+    <LangVersion>7.2</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -90,6 +94,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AOI.cs" />
+    <Compile Include="DBCheck.cs" />
     <Compile Include="ErrorLogger.cs" />
     <Compile Include="extension.cs" />
     <Compile Include="FGExtentForm.cs">
@@ -135,11 +140,11 @@
     <Compile Include="frmAbout.Designer.cs">
       <DependentUpon>frmAbout.cs</DependentUpon>
     </Compile>
-    <Compile Include="frmAOI.cs">
+    <Compile Include="TargetAreaForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmAOI.Designer.cs">
-      <DependentUpon>frmAOI.cs</DependentUpon>
+    <Compile Include="TargetAreaForm.Designer.cs">
+      <DependentUpon>TargetAreaForm.cs</DependentUpon>
     </Compile>
     <Compile Include="frmCatch.cs">
       <SubType>Form</SubType>
@@ -263,8 +268,8 @@
     <EmbeddedResource Include="frmAbout.resx">
       <DependentUpon>frmAbout.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmAOI.resx">
-      <DependentUpon>frmAOI.cs</DependentUpon>
+    <EmbeddedResource Include="TargetAreaForm.resx">
+      <DependentUpon>TargetAreaForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmCatch.resx">
       <DependentUpon>frmCatch.cs</DependentUpon>
@@ -410,15 +415,6 @@
     <None Include="Resources\jigs.bmp" />
   </ItemGroup>
   <ItemGroup>
-    <COMReference Include="ADOX">
-      <Guid>{00000600-0000-0010-8000-00AA006D2EA4}</Guid>
-      <VersionMajor>2</VersionMajor>
-      <VersionMinor>8</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </COMReference>
     <COMReference Include="AxMapWinGIS">
       <Guid>{C368D713-CC5F-40ED-9F53-F84FE197B96A}</Guid>
       <VersionMajor>4</VersionMajor>
@@ -426,6 +422,15 @@
       <Lcid>0</Lcid>
       <WrapperTool>aximp</WrapperTool>
       <Isolated>False</Isolated>
+    </COMReference>
+    <COMReference Include="DAO">
+      <Guid>{00025E01-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>5</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
     <COMReference Include="MapWinGIS">
       <Guid>{C368D713-CC5F-40ED-9F53-F84FE197B96A}</Guid>

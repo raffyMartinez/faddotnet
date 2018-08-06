@@ -11,10 +11,11 @@ namespace FAD3
 {
     public partial class FGExtentForm : Form
     {
-        FishingGrid.fadUTMZone _UTMZone;
-        string _MapDescription;
-        string _ULGrid;
-        string _LRGrid;
+        private FishingGrid.fadUTMZone _UTMZone;
+        private string _MapDescription;
+        private string _ULGrid;
+        private string _LRGrid;
+        private TargetAreaForm _Parent_form;
 
         public FishingGrid.fadUTMZone UTMZone
         {
@@ -22,12 +23,13 @@ namespace FAD3
             set { _UTMZone = value; }
         }
 
-        public FGExtentForm()
+        public FGExtentForm(TargetAreaForm Parent)
         {
             InitializeComponent();
+            _Parent_form = Parent;
         }
 
-        public FGExtentForm(FishingGrid.fadUTMZone UTMZone, string MapDescription, string ULGrid, string LRGrid)
+        public FGExtentForm(TargetAreaForm Parent, FishingGrid.fadUTMZone UTMZone, string MapDescription, string ULGrid, string LRGrid)
         {
             InitializeComponent();
             _MapDescription = MapDescription;
@@ -36,8 +38,7 @@ namespace FAD3
             textBoxDescription.Text = _MapDescription;
             textBoxLRGrid.Text = _LRGrid;
             textBoxULGrid.Text = _ULGrid;
-
-
+            _Parent_form = Parent;
         }
 
         private void OntextBoxGrid_Validating(object sender, CancelEventArgs e)
@@ -53,7 +54,11 @@ namespace FAD3
                         case "textBoxULGrid":
                         case "textBoxLRGrid":
                             e.Cancel = FishingGrid.ValidFGName(_UTMZone, o.Text, out msg) == false;
+                            if (!e.Cancel)
+                                o.Text = o.Text.ToUpper();
+
                             break;
+
                         case "textBoxDescription":
                             if (o.Text.Length < 6)
                             {
@@ -66,7 +71,6 @@ namespace FAD3
 
                 if (e.Cancel)
                     MessageBox.Show(msg, "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-
             });
         }
 
@@ -77,15 +81,18 @@ namespace FAD3
                 case "buttonOK":
                     if (FishingGrid.ValidGridCorners(textBoxULGrid.Text, textBoxLRGrid.Text))
                     {
+                        _Parent_form.SetFishingGround(textBoxDescription.Text,
+                                                      textBoxULGrid.Text,
+                                                      textBoxLRGrid.Text);
                         Close();
                     }
                     else
                     {
-
                         MessageBox.Show("Upper left grid must be at the left and top of lower right grid",
-                                         "Validation error",MessageBoxButtons.OK,MessageBoxIcon.Exclamation);
+                                         "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     }
                     break;
+
                 case "buttonCancel":
                     Close();
                     break;

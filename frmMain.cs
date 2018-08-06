@@ -237,6 +237,10 @@ namespace FAD3
             SetUPLV(TreeLevel);
         }
 
+        /// <summary>
+        /// refreshes contents of main listview given tree level
+        /// </summary>
+        /// <param name="TreeLevel"></param>
         public void RefreshLVEx(string TreeLevel)
         {
             SetUPLV(TreeLevel);
@@ -419,7 +423,7 @@ namespace FAD3
 
                     break;
 
-                case "listView1":
+                case "lvMain":
                     tsi = menuDropDown.Items.Add("New sampling");
                     tsi.Name = "menuNewSampling";
                     tsi.Visible = _TreeLevel == "sampling" || _TreeLevel == "landing_site" || _TreeLevel == "gear";
@@ -477,7 +481,7 @@ namespace FAD3
             switch (tsi.Name)
             {
                 case "addAOIToolStripMenuItem":
-                    frmAOI f1 = new frmAOI();
+                    TargetAreaForm f1 = new TargetAreaForm(this, IsNew: true);
                     f1.AddNew();
                     f1.Text = "New AOI";
                     f1.ShowDialog(this);
@@ -782,7 +786,7 @@ namespace FAD3
                 return null;
         }
 
-        private void ListView1Leave(object sender, EventArgs e)
+        private void OnListViewLeave(object sender, EventArgs e)
         {
             if (lvMain.Columns.Count > 0)
                 SaveColumnWidthEx(sender, lvMain.Tag.ToString());
@@ -840,6 +844,8 @@ namespace FAD3
             switch (ItemName)
             {
                 case "menuNewTargetArea":
+                    TargetAreaForm tf = new TargetAreaForm(this, IsNew: true);
+                    tf.ShowDialog(this);
                     break;
 
                 case "menuNewLandingSite":
@@ -875,10 +881,9 @@ namespace FAD3
                     break;
 
                 case "menuTargetAreaProp":
-                    frmAOI AOIForm = frmAOI.GetInstance();
+                    TargetAreaForm AOIForm = TargetAreaForm.GetInstance(this, IsNew: false);
                     if (!AOIForm.Visible)
                     {
-                        AOIForm.Parent_form = this;
                         AOIForm.Show(this);
                     }
                     else
@@ -1031,7 +1036,7 @@ namespace FAD3
         {
             switch (((ListView)sender).Name)
             {
-                case "listView1":
+                case "lvMain":
                     SetupCatchListView(Show: false);
                     ListViewItem lvi = new ListViewItem();
                     _topLVItemIndex = lvMain.TopItem.Index;
@@ -1046,11 +1051,11 @@ namespace FAD3
                                 {
                                     if (lvi.Tag.ToString() == "aoi_data")
                                     {
-                                        string[] arr = treeMain.SelectedNode.Tag.ToString().Split(',');
-                                        _AOI.AOIGUID = arr[0];
-                                        frmAOI f = new frmAOI();
-                                        f.AOI = _AOI;
+                                        var myTag = (Tuple<string, string, string>)treeMain.SelectedNode.Tag;
+                                        _AOI.AOIGUID = myTag.Item1;
+                                        TargetAreaForm f = new TargetAreaForm(this, IsNew: false);
                                         f.Show();
+                                        f.AOI = _AOI;
                                     }
                                     else if (lvi.Name == "Enumerators")
                                     {
@@ -1124,7 +1129,7 @@ namespace FAD3
             ListViewHitTestInfo lvh = lv.HitTest(_MouseX, _MouseY);
             switch (lv.Name)
             {
-                case "listView1":
+                case "lvMain":
                     if (lvMain.Tag.ToString() == "sampling" && lvh.Item != null) SamplingGUID = lvh.Item.Tag.ToString();
                     if (e.Button == MouseButtons.Right)
                     {
@@ -1328,7 +1333,8 @@ namespace FAD3
                         TreeNode myNode = new TreeNode(dr["AOIName"].ToString());
                         myNode.Name = dr["AOIGuid"].ToString();
                         root.Nodes.Add(myNode);
-                        myNode.Tag = Tuple.Create(dr["AOIGuid"].ToString(), "", "aoi");
+                        //myNode.Tag = Tuple.Create(dr["AOIGuid"].ToString(), "", "aoi");
+                        myNode.Tag = Tuple.Create(myNode.Name, "", "aoi");
                         myNode.ImageKey = "AOI";
 
                         if (string.IsNullOrWhiteSpace(dr["LSName"].ToString()))
@@ -1381,7 +1387,7 @@ namespace FAD3
         {
             switch (c.Name)
             {
-                case "listView1":
+                case "lvMain":
                     foreach (ListViewItem item in ((ListView)c).Items)
                     {
                         item.BackColor = Color.White;
@@ -1596,56 +1602,49 @@ namespace FAD3
 
             int i = 0;
 
-            this.lvMain.Clear();
-            this.lvMain.View = View.Details;
-            this.lvMain.FullRowSelect = true;
+            lvMain.Clear();
+            lvMain.View = View.Details;
+            lvMain.FullRowSelect = true;
 
             string myData = "";
             ListViewItem lvi;
 
             //setup columns in the listview
+            lvMain.Columns.Add("Property");
+            lvMain.Columns.Add("Value");
             switch (TreeLevel)
             {
                 case "root":
-                    lvMain.Columns.Add("Property");
-                    lvMain.Columns.Add("Value");
                     lblTitle.Text = "Database summary";
                     break;
 
                 case "aoi":
-                    lvMain.Columns.Add("Property");
-                    lvMain.Columns.Add("Value");
                     lblTitle.Text = "Area of interest";
                     break;
 
                 case "landing_site":
-                    lvMain.Columns.Add("Property");
-                    lvMain.Columns.Add("Value");
                     lblTitle.Text = "Landing site";
                     break;
 
                 case "gear":
-                    lvMain.Columns.Add("Property");
-                    lvMain.Columns.Add("Value");
                     lblTitle.Text = "Fishing gear";
                     break;
 
                 case "sampling":
-                    this.lvMain.Columns.Add("Reference #");
-                    this.lvMain.Columns.Add("Sampling date");
-                    this.lvMain.Columns.Add("Catch composition");
-                    this.lvMain.Columns.Add("Weight of catch");
-                    this.lvMain.Columns.Add("Fishing ground");
-                    this.lvMain.Columns.Add("Position");
-                    this.lvMain.Columns.Add("Enumerator");
-                    this.lvMain.Columns.Add("Gear specs");
-                    this.lvMain.Columns.Add("Notes");
+                    lvMain.Columns.Clear();
+                    lvMain.Columns.Add("Reference #");
+                    lvMain.Columns.Add("Sampling date");
+                    lvMain.Columns.Add("Catch composition");
+                    lvMain.Columns.Add("Weight of catch");
+                    lvMain.Columns.Add("Fishing ground");
+                    lvMain.Columns.Add("Position");
+                    lvMain.Columns.Add("Enumerator");
+                    lvMain.Columns.Add("Gear specs");
+                    lvMain.Columns.Add("Notes");
                     lblTitle.Text = "Sampling";
                     break;
 
                 case "samplingDetail":
-                    lvMain.Columns.Add("Property");
-                    lvMain.Columns.Add("Value");
                     lblTitle.Text = "Sampling detail";
                     break;
             }
@@ -1856,6 +1855,19 @@ namespace FAD3
             }
 
             lvMain.ResumeLayout();
+        }
+
+        public void NewTargetArea(string TargetAreaName, string TargetAreaGuid)
+        {
+            TreeNode nd = new TreeNode
+            {
+                Text = TargetAreaName,
+                Name = TargetAreaGuid,
+                ImageKey = "AOI"
+            };
+            nd.Tag = Tuple.Create(TargetAreaGuid, "", "aoi");
+            treeMain.Nodes["root"].Nodes.Add(nd);
+            treeMain.SelectedNode = nd;
         }
 
         /// <summary>
@@ -2124,7 +2136,7 @@ namespace FAD3
             }
         }
 
-        private void treeView1_MouseDown(object sender, MouseEventArgs e)
+        private void OntreeMain_MouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
                 ConfigDropDownMenu(treeMain);
@@ -2137,7 +2149,7 @@ namespace FAD3
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void TreeView1AfterExpand(object sender, TreeViewEventArgs e)
+        private void OntreeMainAfterExpand(object sender, TreeViewEventArgs e)
         {
             if (e.Node.FirstNode.Text == "*dummy*")
             {
@@ -2246,7 +2258,7 @@ namespace FAD3
             }
         }
 
-        private void TreeView1AfterSelect(object sender, TreeViewEventArgs e)
+        private void OnTreeMainAfterSelect(object sender, TreeViewEventArgs e)
         {
             _LSNode = null;
             SetupSamplingButtonFrame(false);

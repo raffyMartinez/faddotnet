@@ -8,7 +8,7 @@
  */
 namespace FAD3
 {
-	partial class frmAOI
+	partial class TargetAreaForm
 	{
 		/// <summary>
 		/// Designer variable used to keep track of non-visual components.
@@ -37,7 +37,7 @@ namespace FAD3
 		private void InitializeComponent()
 		{
             this.txtName = new System.Windows.Forms.TextBox();
-            this.txtLetter = new System.Windows.Forms.TextBox();
+            this.txtCode = new System.Windows.Forms.TextBox();
             this.buttonOK = new System.Windows.Forms.Button();
             this.buttonCancel = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
@@ -68,14 +68,16 @@ namespace FAD3
             this.txtName.Name = "txtName";
             this.txtName.Size = new System.Drawing.Size(217, 23);
             this.txtName.TabIndex = 0;
+            this.txtName.Validating += new System.ComponentModel.CancelEventHandler(this.OnTextBoxValidating);
             // 
-            // txtLetter
+            // txtCode
             // 
-            this.txtLetter.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtLetter.Location = new System.Drawing.Point(112, 64);
-            this.txtLetter.Name = "txtLetter";
-            this.txtLetter.Size = new System.Drawing.Size(217, 23);
-            this.txtLetter.TabIndex = 1;
+            this.txtCode.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtCode.Location = new System.Drawing.Point(112, 64);
+            this.txtCode.Name = "txtCode";
+            this.txtCode.Size = new System.Drawing.Size(217, 23);
+            this.txtCode.TabIndex = 1;
+            this.txtCode.Validating += new System.ComponentModel.CancelEventHandler(this.OnTextBoxValidating);
             // 
             // buttonOK
             // 
@@ -86,7 +88,7 @@ namespace FAD3
             this.buttonOK.TabIndex = 3;
             this.buttonOK.Text = "Ok";
             this.buttonOK.UseVisualStyleBackColor = true;
-            this.buttonOK.Click += new System.EventHandler(this.OnButtonOKClick);
+            this.buttonOK.Click += new System.EventHandler(this.OnMainButtonClick);
             // 
             // buttonCancel
             // 
@@ -98,7 +100,7 @@ namespace FAD3
             this.buttonCancel.TabIndex = 4;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = true;
-            this.buttonCancel.Click += new System.EventHandler(this.OnButtonCancelClick);
+            this.buttonCancel.Click += new System.EventHandler(this.OnMainButtonClick);
             // 
             // label1
             // 
@@ -153,10 +155,6 @@ namespace FAD3
             // comboSubGrid
             // 
             this.comboSubGrid.FormattingEnabled = true;
-            this.comboSubGrid.Items.AddRange(new object[] {
-            "None",
-            "4",
-            "9"});
             this.comboSubGrid.Location = new System.Drawing.Point(105, 49);
             this.comboSubGrid.Name = "comboSubGrid";
             this.comboSubGrid.Size = new System.Drawing.Size(93, 24);
@@ -270,7 +268,7 @@ namespace FAD3
             this.tabMBR.Text = "MBR";
             this.tabMBR.UseVisualStyleBackColor = true;
             // 
-            // frmAOI
+            // TargetAreaForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -281,13 +279,13 @@ namespace FAD3
             this.Controls.Add(this.label1);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.buttonOK);
-            this.Controls.Add(this.txtLetter);
+            this.Controls.Add(this.txtCode);
             this.Controls.Add(this.txtName);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
-            this.Name = "frmAOI";
-            this.Text = "frmAOI";
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.frmAOI_FormClosed);
-            this.Load += new System.EventHandler(this.FrmAOILoad);
+            this.Name = "TargetAreaForm";
+            this.Text = "Target area";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnFormClosed);
+            this.Load += new System.EventHandler(this.OnFormLoad);
             this.tabAOI.ResumeLayout(false);
             this.tabGrid25.ResumeLayout(false);
             this.tabGrid25.PerformLayout();
@@ -301,7 +299,7 @@ namespace FAD3
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.Button buttonCancel;
 		private System.Windows.Forms.Button buttonOK;
-		private System.Windows.Forms.TextBox txtLetter;
+		private System.Windows.Forms.TextBox txtCode;
 		private System.Windows.Forms.TextBox txtName;
         private System.Windows.Forms.TabControl tabAOI;
         private System.Windows.Forms.TabPage tabGrid25;

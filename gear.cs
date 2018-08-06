@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Data;
 using System.Data.OleDb;
-using ADOX;
+
+//using ADOX;
+using dao;
 using System.Windows.Forms;
 
 namespace FAD3
@@ -36,44 +38,79 @@ namespace FAD3
 
         public static void MakeVesselTypeTable()
         {
-            Catalog catMDB = new Catalog();
-            catMDB.let_ActiveConnection(global.ConnectionString);
+            var dbe = new DBEngine();
+            var dbData = dbe.OpenDatabase(global.mdbPath);
 
             try
             {
-                catMDB.Tables.Delete("temp_VesselType");
+                dbData.TableDefs.Delete("temp_VesselType");
             }
-            catch
-            { }
-            using (var conection = new OleDbConnection(global.ConnectionString))
-            {
-                OleDbCommand cmd = new OleDbCommand()
-                {
-                    Connection = conection,
-                };
+            catch { }
 
-                conection.Open();
+            string sql = "SELECT 1 AS VesselTypeNo, 'Motorized' AS VesselType into temp_VesselType";
+            var qd = dbData.CreateQueryDef("", sql);
+            qd.Execute();
 
-                //select into query
-                string sql = "SELECT 1 AS VesselTypeNo, 'Motorized' AS VesselType into temp_VesselType";
-                cmd.CommandText = sql;
-                cmd.ExecuteNonQuery();
+            sql = "Insert into temp_VesselType (VesselTypeNo, VesselType) values (2,'Non-Motorized')";
+            qd = dbData.CreateQueryDef("", sql);
+            qd.Execute();
 
-                sql = "Insert into temp_VesselType (VesselTypeNo, VesselType) values (2,'Non-Motorized')";
-                cmd.CommandText = sql;
-                cmd.ExecuteNonQuery();
+            sql = "Insert into temp_VesselType (VesselTypeNo, VesselType) values (3,'No vessel used')";
+            qd = dbData.CreateQueryDef("", sql);
+            qd.Execute();
 
-                sql = "Insert into temp_VesselType (VesselTypeNo, VesselType) values (3,'No vessel used')";
-                cmd.CommandText = sql;
-                cmd.ExecuteNonQuery();
+            sql = "Insert into temp_VesselType (VesselTypeNo, VesselType) values (4,'Not provided')";
+            qd = dbData.CreateQueryDef("", sql);
+            qd.Execute();
 
-                sql = "Insert into temp_VesselType (VesselTypeNo, VesselType) values (4,'Not provided')";
-                cmd.CommandText = sql;
-                cmd.ExecuteNonQuery();
+            qd.Close();
+            qd = null;
 
-                conection.Close();
-            }
+            dbData.Close();
+            dbData = null;
         }
+
+        //commented out because this used ADO and now using DAO
+        //public static void MakeVesselTypeTable()
+        //{
+        //    Catalog catMDB = new Catalog();
+        //    catMDB.let_ActiveConnection(global.ConnectionString);
+
+        //    try
+        //    {
+        //        catMDB.Tables.Delete("temp_VesselType");
+        //    }
+        //    catch
+        //    { }
+        //    using (var conection = new OleDbConnection(global.ConnectionString))
+        //    {
+        //        OleDbCommand cmd = new OleDbCommand()
+        //        {
+        //            Connection = conection,
+        //        };
+
+        //        conection.Open();
+
+        //        //select into query
+        //        string sql = "SELECT 1 AS VesselTypeNo, 'Motorized' AS VesselType into temp_VesselType";
+        //        cmd.CommandText = sql;
+        //        cmd.ExecuteNonQuery();
+
+        //        sql = "Insert into temp_VesselType (VesselTypeNo, VesselType) values (2,'Non-Motorized')";
+        //        cmd.CommandText = sql;
+        //        cmd.ExecuteNonQuery();
+
+        //        sql = "Insert into temp_VesselType (VesselTypeNo, VesselType) values (3,'No vessel used')";
+        //        cmd.CommandText = sql;
+        //        cmd.ExecuteNonQuery();
+
+        //        sql = "Insert into temp_VesselType (VesselTypeNo, VesselType) values (4,'Not provided')";
+        //        cmd.CommandText = sql;
+        //        cmd.ExecuteNonQuery();
+
+        //        conection.Close();
+        //    }
+        //}
 
         public static bool GetGearCodeCounter(string GearCode, ref long counter)
         {

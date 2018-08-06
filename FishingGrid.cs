@@ -18,12 +18,17 @@ namespace FAD3
         private static List<string> _UTMZones = new List<string>();
         private static string _appPath;
         private static fadSubgridSyle _SubGridStyle = fadSubgridSyle.SubgridStyleNone;
+        private static List<string> _SubGridStyleList = new List<string>();
 
         static FishingGrid()
         {
             _UTMZones.Add("50N");
             _UTMZones.Add("51N");
             _appPath = global.ApplicationPath;
+
+            _SubGridStyleList.Add("None");
+            _SubGridStyleList.Add("4");
+            _SubGridStyleList.Add("9");
         }
 
         public static fadSubgridSyle SubGridStyle
@@ -34,6 +39,11 @@ namespace FAD3
                 _SubGridStyle = value;
                 SaveSubGridType();
             }
+        }
+
+        public static List<string> SubGridStyles
+        {
+            get { return _SubGridStyleList; }
         }
 
         public static fadGridType GridType
@@ -193,6 +203,12 @@ namespace FAD3
             {
                 return _UTMZones;
             }
+        }
+
+        public static void Refresh()
+        {
+            _gt = SetupFishingGrid(_AOIGuid);
+            GetSubgridType();
         }
 
         public static string AOIGuid
@@ -672,6 +688,78 @@ namespace FAD3
         public static void ReadGridDetails(string AOIGuid)
         {
             ;
+        }
+
+        public static bool SaveTargetAreaGrid25(string TargetAreaGuid, bool UseGrid25, string UTMZone = "",
+                               int SubGridStyle = 0, Dictionary<string, Tuple<string, string, string>> Maps = null,
+                               string FirstMap = "")
+        {
+            var sql = "";
+            var Success = false;
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                if (UseGrid25)
+                {
+                    sql = $@"Update tblAOI set
+                         UseGrid25 = {UseGrid25},
+                         UTMZone = '{UTMZone}',
+                         SubgridStyle = {SubGridStyle},
+                         GridDescription = '{Maps[FirstMap].Item1}',
+                         UpperLeftGrid = '{Maps[FirstMap].Item2}',
+                         LowerRightGrid = '{Maps[FirstMap].Item3}'
+                         where AOIGuid = {{{TargetAreaGuid}}}";
+                }
+                else
+                {
+                    sql = $@"Update tblAOI set
+                         UseGrid25 = {UseGrid25},
+                         UTMZone = '',
+                         SubgridStyle = 0,
+                         GridDescription = '',
+                         UpperLeftGrid = '',
+                         LowerRightGrid = ''
+                         where AOIGuid = {{{TargetAreaGuid}}}";
+                }
+
+                OleDbCommand update = new OleDbCommand(sql, conn);
+                conn.Open();
+                Success = (update.ExecuteNonQuery() > 0);
+
+                if (Success && Maps.Count > 1 && UseGrid25)
+                {
+                    Success = SaveAdditionalFishingGroundMaps(TargetAreaGuid, FirstMap, Maps);
+                }
+            }
+
+            return Success;
+        }
+
+        private static bool SaveAdditionalFishingGroundMaps(string TargetAreaGuid, string FirstMap, Dictionary<string, Tuple<string, string, string>> Maps)
+        {
+            var SaveCount = 0;
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+
+                var sql = $"Delete * from tblAdditionalAOIExtent where AOIGuid = {{{TargetAreaGuid}}}";
+                OleDbCommand update = new OleDbCommand(sql, conn);
+                update.ExecuteNonQuery();
+
+                foreach (var item in Maps.Values)
+                {
+                    if (item.Item1 != FirstMap)
+                    {
+                        sql = $@"Insert into tblAdditionalAOIExtent
+                            (AOIGuid, GridDescription, UpperLeft, LowerRight, RowNumber)
+                            values
+                            ({{{TargetAreaGuid}}},'{item.Item1}','{item.Item2}','{item.Item3}', {{{Guid.NewGuid().ToString()}}})";
+                        update = new OleDbCommand(sql, conn);
+                        if (update.ExecuteNonQuery() > 0) SaveCount++;
+                    }
+                }
+            }
+
+            return SaveCount > 0;
         }
 
         public struct Grid25Struct

@@ -8,9 +8,9 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
-using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace FAD3
@@ -186,10 +186,9 @@ namespace FAD3
                             Active = {EnumeratorData["Active"]} where
                             EnumeratorId= {{{EnumeratorData["EnumeratorId"]}}}";
                     }
-                    OleDbCommand update = new OleDbCommand(updateQuery, conn);
                     conn.Open();
+                    OleDbCommand update = new OleDbCommand(updateQuery, conn);
                     Success = (update.ExecuteNonQuery() > 0);
-
                     conn.Close();
                 }
                 catch (Exception ex)
@@ -208,7 +207,7 @@ namespace FAD3
                 try
                 {
                     conection.Open();
-                    string query = $"SELECT AOIName, Letter, MajorGridList from tblAOI WHERE AOIGuid= {{{_AOIGUID}}}";
+                    string query = $"SELECT AOIName, Letter, MajorGridList from tblAOI WHERE AOIGuid= '{{{_AOIGUID}}}'";
                     var command = new OleDbCommand(query, conection);
                     var reader = command.ExecuteReader();
                     if (reader.Read())
@@ -427,7 +426,12 @@ namespace FAD3
             }
         }
 
-        public static bool UpdateData(bool IsNew, Dictionary<string, string> AOIData)
+        public static bool DeleteTargetArea(string TargetAreaGuid)
+        {
+            return true;
+        }
+
+        public static bool UpdateData(Dictionary<string, string> AOIData)
         {
             string updateQuery = "";
             bool Success = false;
@@ -435,28 +439,33 @@ namespace FAD3
             {
                 try
                 {
-                    if (IsNew)
+                    var DataStatus = global.fad3DataStatus.statusFromDB;
+                    Enum.TryParse(AOIData["DataStatus"], out DataStatus);
+                    if (DataStatus == global.fad3DataStatus.statusNew)
                     {
-                        updateQuery = $@"Insert into tblAOI (AOIGUID, AOIName, Letter, MajorGridList)
+                        updateQuery = $@"Insert into tblAOI (AOIGUID, AOIName, Letter)
                             Values (
                                   {{{AOIData["AOIGUID"]}}},
-                                  {{{AOIData["AOIName"]}}},
-                                  '{AOIData["Letter"]}',
-                                  '{AOIData["MajorGridList"]}')";
+                                  '{AOIData["AOIName"]}',
+                                  '{AOIData["Letter"]}')";
                     }
-                    else
+                    else if (DataStatus == global.fad3DataStatus.statusEdited)
                     {
                         updateQuery = $@"Update tblAOI set
-                            AOIName = {{{AOIData["AOIName"]}}},
-                            Letter = '{AOIData["Letter"]}',
-                            MajorGridList = '{AOIData["MajorGridList"]}'
+                            AOIName = '{AOIData["AOIName"]}'
                             Where AOIGUID = {{{AOIData["AOIGUID"]}}}";
                     }
+                    else if (DataStatus == global.fad3DataStatus.statusForDeletion)
+                    {
+                        updateQuery = $"Delete * from tbaAOI where AOIGUID={{{AOIData["AOIGUID"]}}}";
+                    }
+
                     OleDbCommand update = new OleDbCommand(updateQuery, conn);
                     conn.Open();
                     Success = (update.ExecuteNonQuery() > 0);
                     conn.Close();
                 }
+                catch (System.Data.OleDb.OleDbException ex) { }
                 catch (Exception ex)
                 {
                     ErrorLogger.Log(ex);

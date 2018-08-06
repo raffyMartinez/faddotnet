@@ -116,7 +116,7 @@ namespace FAD3
             this.splitContainer1.SplitterDistance = 240;
             this.splitContainer1.TabIndex = 0;
             // 
-            // treeView1
+            // treeMain
             // 
             this.treeMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
@@ -126,14 +126,14 @@ namespace FAD3
             this.treeMain.ImageIndex = 0;
             this.treeMain.ImageList = this.imageList1;
             this.treeMain.Location = new System.Drawing.Point(3, 3);
-            this.treeMain.Name = "treeView1";
+            this.treeMain.Name = "treeMain";
             this.treeMain.RightToLeftLayout = true;
             this.treeMain.SelectedImageIndex = 0;
             this.treeMain.Size = new System.Drawing.Size(234, 445);
             this.treeMain.TabIndex = 0;
-            this.treeMain.AfterExpand += new System.Windows.Forms.TreeViewEventHandler(this.TreeView1AfterExpand);
-            this.treeMain.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreeView1AfterSelect);
-            this.treeMain.MouseDown += new System.Windows.Forms.MouseEventHandler(this.treeView1_MouseDown);
+            this.treeMain.AfterExpand += new System.Windows.Forms.TreeViewEventHandler(this.OntreeMainAfterExpand);
+            this.treeMain.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.OnTreeMainAfterSelect);
+            this.treeMain.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OntreeMain_MouseDown);
             // 
             // menuDropDown
             // 
@@ -188,7 +188,6 @@ namespace FAD3
             this.lblTitle.Name = "lblTitle";
             this.lblTitle.Size = new System.Drawing.Size(481, 22);
             this.lblTitle.TabIndex = 2;
-            this.lblTitle.Text = "label1";
             // 
             // panelSamplingButtons
             // 
@@ -235,7 +234,7 @@ namespace FAD3
             this.buttonOK.UseVisualStyleBackColor = true;
             this.buttonOK.Click += new System.EventHandler(this.OnbuttonSamplingClick);
             // 
-            // listView1
+            // lvMain
             // 
             this.lvMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
@@ -244,13 +243,13 @@ namespace FAD3
             this.lvMain.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lvMain.Location = new System.Drawing.Point(-1, 28);
             this.lvMain.MultiSelect = false;
-            this.lvMain.Name = "listView1";
+            this.lvMain.Name = "lvMain";
             this.lvMain.Size = new System.Drawing.Size(683, 415);
             this.lvMain.TabIndex = 3;
             this.lvMain.UseCompatibleStateImageBehavior = false;
             this.lvMain.View = System.Windows.Forms.View.Details;
             this.lvMain.DoubleClick += new System.EventHandler(this.OnListView_DoubleClick);
-            this.lvMain.Leave += new System.EventHandler(this.ListView1Leave);
+            this.lvMain.Leave += new System.EventHandler(this.OnListViewLeave);
             this.lvMain.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnListView_MouseDown);
             // 
             // menuMenuBar
