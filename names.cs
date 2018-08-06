@@ -163,55 +163,6 @@ namespace FAD3
             dbData = null;
         }
 
-        //commented out because this used ADO which was replaced with DAO - see aboce
-        //public static void MakeAllNames1()
-        //{
-        //    Catalog catMDB = new Catalog();
-        //    catMDB.let_ActiveConnection(global.ConnectionString);
-
-        //    try
-        //    {
-        //        catMDB.Tables.Delete("temp_AllNames");
-        //    }
-        //    catch
-        //    { }
-        //    using (var conection = new OleDbConnection(global.ConnectionString))
-        //    {
-        //        OleDbCommand cmd = new OleDbCommand()
-        //        {
-        //            Connection = conection,
-        //        };
-
-        //        conection.Open();
-
-        //        //select into query
-        //        string sql = "SELECT Name AS Name1, '' AS Name2, NameNo, 'Local names' AS Identification INTO temp_AllNames FROM tblBaseLocalNames";
-        //        cmd.CommandText = sql;
-        //        try
-        //        {
-        //            _LocalNamesCount = cmd.ExecuteNonQuery();
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            ErrorLogger.Log(ex);
-        //        }
-
-        //        //insert into to append the results from the select into query
-        //        sql = "INSERT INTO temp_AllNames ( Name1, Name2, NameNo, Identification ) SELECT Genus, species, SpeciesGUID, 'Species names' AS Identification FROM tblAllSpecies";
-        //        cmd.CommandText = sql;
-        //        try
-        //        {
-        //            _SciNamesCount += cmd.ExecuteNonQuery();
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            ErrorLogger.Log(ex);
-        //        }
-
-        //        conection.Close();
-        //    }
-        //}
-
         public static void GetGenus_LocalNames()
         {
             _LocalNameList.Clear();

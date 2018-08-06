@@ -70,48 +70,6 @@ namespace FAD3
             dbData = null;
         }
 
-        //commented out because this used ADO and now using DAO
-        //public static void MakeVesselTypeTable()
-        //{
-        //    Catalog catMDB = new Catalog();
-        //    catMDB.let_ActiveConnection(global.ConnectionString);
-
-        //    try
-        //    {
-        //        catMDB.Tables.Delete("temp_VesselType");
-        //    }
-        //    catch
-        //    { }
-        //    using (var conection = new OleDbConnection(global.ConnectionString))
-        //    {
-        //        OleDbCommand cmd = new OleDbCommand()
-        //        {
-        //            Connection = conection,
-        //        };
-
-        //        conection.Open();
-
-        //        //select into query
-        //        string sql = "SELECT 1 AS VesselTypeNo, 'Motorized' AS VesselType into temp_VesselType";
-        //        cmd.CommandText = sql;
-        //        cmd.ExecuteNonQuery();
-
-        //        sql = "Insert into temp_VesselType (VesselTypeNo, VesselType) values (2,'Non-Motorized')";
-        //        cmd.CommandText = sql;
-        //        cmd.ExecuteNonQuery();
-
-        //        sql = "Insert into temp_VesselType (VesselTypeNo, VesselType) values (3,'No vessel used')";
-        //        cmd.CommandText = sql;
-        //        cmd.ExecuteNonQuery();
-
-        //        sql = "Insert into temp_VesselType (VesselTypeNo, VesselType) values (4,'Not provided')";
-        //        cmd.CommandText = sql;
-        //        cmd.ExecuteNonQuery();
-
-        //        conection.Close();
-        //    }
-        //}
-
         public static bool GetGearCodeCounter(string GearCode, ref long counter)
         {
             var dt = new DataTable();

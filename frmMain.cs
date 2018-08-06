@@ -17,6 +17,8 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 
+//using dao;
+
 namespace FAD3
 {
     /// <summary>
@@ -606,14 +608,16 @@ namespace FAD3
                     {
                         conection.Open();
 
-                        string query = $@"SELECT tblSampling.RefNo, SamplingDate, FishingGround, EnumeratorName, Notes, WtCatch, tblSampling.SamplingGUID,
-                                        IsGrid25FG, Count(tblCatchComp.RowGUID) AS [rows] FROM (tblEnumerators RIGHT JOIN tblSampling ON
-                                        tblEnumerators.EnumeratorID = tblSampling.Enumerator) LEFT JOIN tblCatchComp ON
-                                        tblSampling.SamplingGUID = tblCatchComp.SamplingGUID GROUP BY tblSampling.SamplingDate,
-                                        tblSampling.RefNo, tblSampling.FishingGround, tblEnumerators.EnumeratorName, tblSampling.Notes, tblSampling.WtCatch,
-                                        tblSampling.SamplingGUID, tblSampling.IsGrid25FG, tblSampling.LSGUID, tblSampling.[GearVarGUID], tblSampling.[SamplingDate],
-                                        tblSampling.DateEncoded HAVING tblSampling.LSGUID= {{{LSGUID}}} AND tblSampling.[GearVarGUID]= {{{GearGUID}}} AND
-                                        SamplingDate >=# {StartDate} # And SamplingDate < # {EndDate} #  ORDER BY DateEncoded";
+                        string query = $@"SELECT tblSampling.RefNo, tblSampling.SamplingDate, tblSampling.FishingGround, tblEnumerators.EnumeratorName,
+                                          tblSampling.Notes, tblSampling.WtCatch, tblSampling.SamplingGUID, tblSampling.IsGrid25FG, (SELECT TOP 1 'x' AS
+                                          HasSpec FROM tblGearSpecs INNER JOIN tblSampledGearSpec ON tblGearSpecs.RowID = tblSampledGearSpec.SpecID
+                                          WHERE tblGearSpecs.Version='2' AND tblSampledGearSpec.SamplingGUID=[tblSampling.SamplingGUID]) AS Specs,
+                                          (SELECT Count(SamplingGUID) AS n FROM tblCatchComp GROUP BY tblCatchComp.SamplingGUID HAVING
+                                          tblCatchComp.SamplingGUID=[tblSampling.SamplingGUID]) AS [rows]
+                                          FROM tblEnumerators RIGHT JOIN tblSampling ON tblEnumerators.EnumeratorID = tblSampling.Enumerator
+                                          WHERE tblSampling.SamplingDate >#{StartDate}# And tblSampling.SamplingDate <#{EndDate}# AND
+                                          tblSampling.LSGUID={{{LSGUID}}} AND tblSampling.GearVarGUID={{{GearGUID}}}
+                                          ORDER BY tblSampling.DateEncoded";
 
                         using (var adapter = new OleDbDataAdapter(query, conection))
                         {
@@ -647,7 +651,8 @@ namespace FAD3
                                 row.SubItems.Add(dr["EnumeratorName"].ToString());          //enumerator
 
                                 //gear specs
-                                row.SubItems.Add(ManageGearSpecsClass.SampledGearHasSpecs(dr[6].ToString()) ? "x" : "");                                       //gear specs
+                                //row.SubItems.Add(ManageGearSpecsClass.SampledGearHasSpecs(dr[6].ToString()) ? "x" : "");                                       //gear specs
+                                row.SubItems.Add(dr["Specs"].ToString());
 
                                 row.SubItems.Add(dr["Notes"].ToString());                   //notes
 
@@ -1333,8 +1338,7 @@ namespace FAD3
                         TreeNode myNode = new TreeNode(dr["AOIName"].ToString());
                         myNode.Name = dr["AOIGuid"].ToString();
                         root.Nodes.Add(myNode);
-                        //myNode.Tag = Tuple.Create(dr["AOIGuid"].ToString(), "", "aoi");
-                        myNode.Tag = Tuple.Create(myNode.Name, "", "aoi");
+                        myNode.Tag = Tuple.Create(dr["AOIGuid"].ToString(), "", "aoi");
                         myNode.ImageKey = "AOI";
 
                         if (string.IsNullOrWhiteSpace(dr["LSName"].ToString()))
@@ -1394,7 +1398,7 @@ namespace FAD3
                     }
                     break;
 
-                case "treeView1":
+                case "treeMain":
                     TreeNodeCollection nodes = treeMain.Nodes;
                     TraverseTreeAndResetColor(treeMain.Nodes);
                     break;
@@ -2293,25 +2297,22 @@ namespace FAD3
                         _GearClassName = rv.Value;
                         _GearClassGUID = rv.Key;
                         _LSNode = e.Node.Parent;
+
                         break;
 
                     case "sampling":
-                        _LandingSiteGuid = myTag.Item1;
-                        _GearVarGUID = myTag.Item2;
-
-                        //we will look for the aoi ancestor node and get the aoi guid
-                        this.AOIGUID = ((Tuple<string, string, string>)treeMain.SelectedNode.Parent.Parent.Parent.Tag).Item1;
-                        _AOI.AOIGUID = this.AOIGUID;
-
-                        _SamplingMonth = e.Node.Text;
                         _AOIName = treeMain.SelectedNode.Parent.Parent.Parent.Text;
+                        this.AOIGUID = ((Tuple<string, string, string>)treeMain.SelectedNode.Parent.Parent.Parent.Tag).Item1;
                         _LandingSiteName = treeMain.SelectedNode.Parent.Parent.Text;
+                        _LandingSiteGuid = myTag.Item1;
                         _GearVarName = treeMain.SelectedNode.Parent.Text;
-
+                        _GearVarGUID = myTag.Item2;
                         rv = gear.GearClassGuidNameFromGearVarGuid(_GearVarGUID);
                         _GearClassName = rv.Value;
                         _GearClassGUID = rv.Key;
                         _LSNode = e.Node.Parent.Parent;
+                        _SamplingMonth = e.Node.Text;
+
                         break;
 
                     case "aoi":
@@ -2345,7 +2346,7 @@ namespace FAD3
             }
             catch (Exception ex)
             {
-                ErrorLogger.Log(ex);
+                ErrorLogger.Log(ex.Message);
             }
 
             e.Node.SelectedImageKey = e.Node.ImageKey;
