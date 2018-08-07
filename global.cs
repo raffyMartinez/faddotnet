@@ -38,6 +38,7 @@ namespace FAD3
         private static bool _UITemplateFileExists = true;
         private static bool _InlandGridDBFileExists = true;
         private static bool _AllRequiredFilesExists = true;
+        private static CoordinateDisplayFormat _CoordDisplayFormat = CoordinateDisplayFormat.DegreeDecimal;
         //private static string _MissingRequiredFiles;
 
         /// <summary>
@@ -52,6 +53,16 @@ namespace FAD3
                 s += _InlandGridDBFileExists ? "" : "\r\n- grid25inland.mdb";
 
                 return s;
+            }
+        }
+
+        public static CoordinateDisplayFormat CoordinateDisplay
+        {
+            get { return _CoordDisplayFormat; }
+            set
+            {
+                _CoordDisplayFormat = value;
+                SaveCoordinateDisplayFormat();
             }
         }
 
@@ -101,6 +112,7 @@ namespace FAD3
             _AppPath = Application.StartupPath.ToString();
             _ConnectionStringTemplate = "Provider=Microsoft.JET.OLEDB.4.0;data source=" + _AppPath + "\\template.mdb";
             ReferenceNumberManager.ReadRefNoRange();
+            GetCoordinateDisplayFormat();
         }
 
         /// <summary>
@@ -226,6 +238,27 @@ namespace FAD3
             sub_key1.SetValue(name, value);
         }
 
+        private static void GetCoordinateDisplayFormat()
+        {
+            var rv = "";
+            RegistryKey reg_key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\FAD3", true);
+            try
+            {
+                rv = reg_key.GetValue("CoordinateFormat").ToString();
+            }
+            catch
+            {
+                rv = CoordinateDisplayFormat.DegreeDecimal.ToString();
+            }
+            _CoordDisplayFormat = (CoordinateDisplayFormat)Enum.Parse(typeof(CoordinateDisplayFormat), rv);
+        }
+
+        private static void SaveCoordinateDisplayFormat()
+        {
+            RegistryKey reg_key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\FAD3", true);
+            reg_key.SetValue("CoordinateFormat", _CoordDisplayFormat.ToString());
+        }
+
         public static bool HasMPH
         {
             get { return _HasMPH; }
@@ -301,6 +334,14 @@ namespace FAD3
             Lobsters,
             Sea_cucumbers,
             Sea_urchins,
+        }
+
+        public enum CoordinateDisplayFormat
+        {
+            DegreeDecimal,
+            DegreeMinute,
+            DegreeMinuteSecond,
+            UTM
         }
 
         public enum FishCrabGMS
@@ -556,7 +597,7 @@ namespace FAD3
                     for (int i = 0; i < myDT.Rows.Count; i++)
                     {
                         DataRow dr = myDT.Rows[i];
-                        _munDict.Add(Convert.ToInt32(dr[0]), dr[1].ToString());
+                        _munDict.Add(Convert.ToInt32(dr["MunNo"]), dr["Municipality"].ToString());
                     }
                 }
                 catch (Exception ex) { ErrorLogger.Log(ex); }
@@ -586,7 +627,7 @@ namespace FAD3
                     _mdbPath = value;
                     _ConnectionString = "Provider=Microsoft.JET.OLEDB.4.0;data source=" + _mdbPath;
                     names.MakeAllNames();
-                    gear.MakeVesselTypeTable();
+                    FishingVessel.MakeVesselTypeTable();
                     GetProvinces();
                     gear.FillGearClasses();
                     GetVesselTypes();

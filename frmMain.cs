@@ -476,9 +476,6 @@ namespace FAD3
 
         private void contextMenuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
-            string[] arr = new string[0];
-            string[] arr1 = new string[0];
-
             ToolStripItem tsi = e.ClickedItem;
             switch (tsi.Name)
             {
@@ -490,11 +487,8 @@ namespace FAD3
                     break;
 
                 case "addLandingSiteToolStripMenuItem":
-                    arr = treeMain.SelectedNode.Tag.ToString().Split(',');
-                    frmLandingSite f2 = new frmLandingSite();
-
+                    frmLandingSite f2 = new frmLandingSite(_AOI);
                     f2.AddNew();
-                    f2.AOIGUID = arr[0];
                     f2.Text = "New landing site";
                     f2.ShowDialog(this);
                     break;
@@ -854,6 +848,8 @@ namespace FAD3
                     break;
 
                 case "menuNewLandingSite":
+                    frmLandingSite fls = new frmLandingSite(_AOI);
+                    fls.ShowDialog(this);
                     break;
 
                 case "menuNewSampling":
@@ -1081,11 +1077,8 @@ namespace FAD3
 
                             case "landing_site":
 
-                                string[] arr1 = treeMain.SelectedNode.Tag.ToString().Split(',');
-                                frmLandingSite fls = new frmLandingSite();
+                                frmLandingSite fls = new frmLandingSite(_AOI);
                                 fls.LandingSite = _ls;
-                                arr1 = treeMain.SelectedNode.Parent.Tag.ToString().Split(',');
-                                fls.AOIGUID = arr1[0].ToString();
                                 fls.Show();
                                 break;
 
@@ -1108,6 +1101,10 @@ namespace FAD3
                                                         "Gear specifications",
                                                         MessageBoxButtons.OK,
                                                         MessageBoxIcon.Information);
+                                    else
+                                    {
+                                        MessageBox.Show(s, "Gear specifications", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                    }
                                 }
                                 else
                                     ShowSamplingDetailForm();
@@ -1231,6 +1228,8 @@ namespace FAD3
                     break;
 
                 case "coordFormat":
+                    CoordinateFormatSelectForm cdf = new CoordinateFormatSelectForm();
+                    cdf.ShowDialog(this);
                     break;
 
                 case "symbolFonts":
@@ -1669,10 +1668,9 @@ namespace FAD3
                 case "gear":
                     lvi = lvMain.Items.Add("Months sampled");
                     var myTag = (Tuple<string, string, string>)treeMain.SelectedNode.Tag;
-                    _ls.LandingSiteGUID = myTag.Item1;
-                    _ls.GearVarGUID = myTag.Item2;
+                    gear.GearVarGUID = myTag.Item2;
                     var n = 0;
-                    foreach (string item in _ls.MonthsSampledEx(_ls.GearVarGUID))
+                    foreach (string item in gear.MonthsSampledByGear(myTag.Item1))
                     {
                         if (n > 0)
                         {

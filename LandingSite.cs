@@ -11,6 +11,7 @@ using System;
 using System.Data;
 using System.Data.OleDb;
 using System.Collections.Generic;
+using ISO_Classes;
 
 //using System.Diagnostics;
 
@@ -24,16 +25,14 @@ namespace FAD3
         private string _LandingSiteGUID = "";
         private long _GearUsedCount = 0;
         private string _LandingSiteName = "";
-        private string _GearVariationName = "";
-        private string _GearVarGUID = "";
-        private string _GearClassNameFromGearVar = "";
         private double _xCoord = 0;
         private double _yCoord = 0;
         private long _LandingSiteDataCountEx = 0;
+        private Coordinate _Coordinate;
 
-        public string GearClassNameFromGearVar
+        public Coordinate Coordinate
         {
-            get { return _GearClassNameFromGearVar; }
+            get { return _Coordinate; }
         }
 
         public double xCoord
@@ -66,23 +65,6 @@ namespace FAD3
             return deg.ToString() + "° " + string.Format("{0:0.00000}", min);
         }
 
-        public string GearVarGUID
-        {
-            get { return _GearVarGUID; }
-            set
-            {
-                _GearVarGUID = value;
-                string MyGearClass = GearClassFromGearVar(_GearVarGUID);
-                gear.GearClassUsed = MyGearClass;
-            }
-        }
-
-        public string GearVariationName
-        {
-            get { return _GearVariationName; }
-            set { _GearVariationName = value; }
-        }
-
         public landingsite()
         {
             //empty default constructor
@@ -99,11 +81,10 @@ namespace FAD3
             _LandingSiteGUID = LandingSiteGUID;
         }
 
-        public long GearUsedCount
-        {
-            get { return _GearUsedCount; }
-        }
-
+        /// <summary>
+        /// returns the number of samplings from a landing site
+        /// </summary>
+        /// <returns></returns>
         public long SampleCount()
         {
             int myCount = 0;
@@ -121,34 +102,12 @@ namespace FAD3
             return myCount;
         }
 
-        private string GearClassFromGearVar(string GearVarGUID)
-        {
-            string GearClassNo = "";
-            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
-            {
-                try
-                {
-                    string sql = $@"SELECT tblGearVariations.GearClass, tblGearClass.GearClassName
-                       FROM tblGearClass INNER JOIN tblGearVariations ON tblGearClass.GearClass = tblGearVariations.GearClass
-                       WHERE GearVarGUID={{{GearVarGUID}}}";
-                    OleDbCommand query = new OleDbCommand(sql, conn);
-                    conn.Open();
-                    OleDbDataReader rd = query.ExecuteReader();
-                    while (rd.Read())
-                    {
-                        GearClassNo = rd["GearClass"].ToString();
-                        _GearClassNameFromGearVar = rd["GearClassName"].ToString();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    ErrorLogger.Log(ex);
-                }
-
-                return GearClassNo;
-            }
-        }
-
+        /// <summary>
+        /// updates the data of a landing site
+        /// </summary>
+        /// <param name="isNew"></param>
+        /// <param name="LSData"></param>
+        /// <returns></returns>
         public static bool UpdateData(bool isNew, Dictionary<string, string> LSData)
         {
             bool Success = false;
@@ -194,44 +153,13 @@ namespace FAD3
         public string LandingSiteGUID
         {
             get { return _LandingSiteGUID; }
-            set
-            {
-                _LandingSiteGUID = value;
-                _GearVarGUID = "";
-                _GearVariationName = "";
-                _GearClassNameFromGearVar = "";
-            }
+            set { _LandingSiteGUID = value; }
         }
 
-        public List<string> MonthsSampledEx(string GearUsed)
-        {
-            List<string> myMonths = new List<string>();
-            var myDT = new DataTable();
-            using (var conection = new OleDbConnection(global.ConnectionString))
-            {
-                try
-                {
-                    conection.Open();
-                    string query = $@"SELECT Format([SamplingDate],'mmm-yyyy') AS sMonth, Count(SamplingGUID) AS n
-                                      FROM tblSampling GROUP BY Format([SamplingDate],'mmm-yyyy'), LSGUID,
-                                      GearVarGUID, Year([SamplingDate]), Month([SamplingDate])
-                                      HAVING LSGUID={{{_LandingSiteGUID}}} AND GearVarGUID={{{_GearVarGUID}}}
-                                      ORDER BY Year([SamplingDate]), Month([SamplingDate])";
-
-                    //Debug.WriteLine (query);
-                    var adapter = new OleDbDataAdapter(query, conection);
-                    adapter.Fill(myDT);
-                    for (int i = 0; i < myDT.Rows.Count; i++)
-                    {
-                        DataRow dr = myDT.Rows[i];
-                        myMonths.Add(dr["sMonth"].ToString() + ": " + dr["n"].ToString());
-                    }
-                }
-                catch (Exception ex) { ErrorLogger.Log(ex); }
-            }
-            return myMonths;
-        }
-
+        /// <summary>
+        /// provides a List that contains the months and counts of samplings done per month
+        /// </summary>
+        /// <returns></returns>
         public List<string> MonthsSampled()
         {
             List<string> myList = new List<string>();
@@ -257,6 +185,10 @@ namespace FAD3
             return myList;
         }
 
+        /// <summary>
+        /// returns a Dictionary containing the gears and number of samplings per gear in the Landing site
+        /// </summary>
+        /// <returns></returns>
         public Dictionary<string, string> Gears()
         {
             Dictionary<string, string> myGears = new Dictionary<string, string>();
@@ -285,6 +217,10 @@ namespace FAD3
             return myGears;
         }
 
+        /// <summary>
+        /// Used in a landing site form to provides data about a landing site
+        /// </summary>
+        /// <returns></returns>
         public Dictionary<string, string> LandingSiteDataEx()
         {
             Dictionary<string, string> myLSData = new Dictionary<string, string>();
@@ -322,6 +258,10 @@ namespace FAD3
             return myLSData;
         }
 
+        /// <summary>
+        /// Provides a summary view of a landing site and is used in the main form
+        /// </summary>
+        /// <returns></returns>
         public string LandingSiteData()
         {
             string rv = "";

@@ -1,11 +1,12 @@
 ﻿using dao;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace FAD3
 {
     /// <summary>
-    /// updates tables in the data mdb based on contents of template mdb. Uses DAO because ADO will not work.
+    /// updates tables, indexes and relations in the data mdb based on contents of template mdb. Uses DAO because ADO will not work.
     /// </summary>
     public static class DBCheck
     {
@@ -101,69 +102,66 @@ namespace FAD3
                             {
                                 dataIndex = o.CreateIndex(templateIndex.Name);
                                 dataIndex.Fields = templateIndex.Fields;
-                                o.Indexes.Append(dataIndex);
-                                o.Indexes.Refresh();
-                            });
-                        }
-                        dataIndex = dbData.TableDefs[tdTemplate.Name].Indexes[templateIndex.Name];
-                        try
-                        {
-                            if (dataIndex.Primary != templateIndex.Primary &&
-                               dataIndex.Required != templateIndex.Required &&
-                               dataIndex.IgnoreNulls != templateIndex.IgnoreNulls)
-                            {
+
                                 dataIndex.Primary = templateIndex.Primary;
                                 dataIndex.Required = templateIndex.Primary;
                                 dataIndex.IgnoreNulls = templateIndex.IgnoreNulls;
-                            }
-                        }
-                        catch (NullReferenceException ex)
-                        {
-                            //ignore it here
-                        }
-                        catch (Exception ex)
-                        {
-                            ErrorLogger.Log(ex.Message);
+                                dataIndex.Unique = templateIndex.Unique;
+
+                                o.Indexes.Append(dataIndex);
+                                o.Indexes.Refresh();
+                            });
                         }
                     }
                 }
             }
 
-            //the next lines supposes to update the relationships in the data table
-            //can't make this work for now
+            colList.Clear();
+            foreach (Relation rel in dbData.Relations)
+            {
+                colList.Add(rel.Table + "|" + rel.ForeignTable);
+            }
 
-            //colList.Clear();
-            //foreach (Relation rel in dbData.Relations)
-            //{
-            //    colList.Add(rel.Name);
-            //}
+            foreach (Relation templateRel in dbTemplate.Relations)
+            {
+                var dataRel = new Relation();
+                if (!colList.Contains(templateRel.Table + "|" + templateRel.ForeignTable))
+                {
+                    dataRel = dbData.CreateRelation(templateRel.Name, templateRel.Table, templateRel.ForeignTable);
+                    foreach (Field f in templateRel.Fields)
+                    {
+                        dataRel.Fields.Append(dataRel.CreateField(f.Name));
+                        dataRel.Fields[f.Name].ForeignName = templateRel.Fields[f.Name].ForeignName;
+                    }
 
-            //foreach (Relation templateRel in dbTemplate.Relations)
-            //{
-            //    var dataRel = new Relation();
-            //    if (!colList.Contains(templateRel.Name))
-            //    {
-            //        dataRel = dbData.CreateRelation(templateRel.Name, templateRel.Table, templateRel.ForeignTable);
-            //        foreach (Field f in templateRel.Fields)
-            //        {
-            //            dataRel.Fields.Append(dataRel.CreateField(f.Name));
-            //            dataRel.Fields[f.Name].ForeignName = f.Name + "_frel";
-            //        }
-            //        if (!colList.Contains(dataRel.Name)) dbData.Relations.Append(dataRel);
-            //        dbData.Relations.Refresh();
-            //    }
-            //    dataRel = dbData.Relations[templateRel.Name];
-            //    foreach (Field f in templateRel.Fields)
-            //    {
-            //        dataRel.Fields.Append(dataRel.CreateField(f.Name));
-            //        dataRel.Fields[f.Name].ForeignName = f.Name;
-            //    }
-            //}
+                    try
+                    {
+                        dbData.Relations.Append(dataRel);
+                    }
+                    catch
+                    {
+                        dataRel.Name += "1";
+                        try
+                        {
+                            dbData.Relations.Append(dataRel);
+                        }
+                        catch (Exception ex)
+                        {
+                            ErrorLogger.Log($"{ex.Message}\r\n{ex.Source}");
+                        }
+                    }
+                    finally
+                    {
+                        dbData.Relations.Refresh();
+                    }
+                }
+            }
 
             dbData.Close();
             dbTemplate.Close();
             dbData = null;
             dbTemplate = null;
+
             return true;
         }
     }

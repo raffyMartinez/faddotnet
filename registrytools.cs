@@ -8,7 +8,7 @@ using Microsoft.Win32;
 
 namespace FAD3
 {
-    public class RegistryTools
+    public static class RegistryTools
     {
         // Save a value.
         public static void SaveSetting(string app_name, string name, object value)
@@ -55,29 +55,34 @@ namespace FAD3
                     case "ComboBox":
                         child.Text = GetSetting(app_name, child.Name, child.Text).ToString();
                         break;
+
                     case "CheckBox":
                         CheckBox chk = child as CheckBox;
                         chk.Checked = bool.Parse(GetSetting(app_name,
                             child.Name, chk.Checked.ToString()).ToString());
                         break;
+
                     case "RadioButton":
                         RadioButton rad = child as RadioButton;
                         rad.Checked = bool.Parse(GetSetting(app_name,
                             child.Name, rad.Checked.ToString()).ToString());
                         break;
+
                     case "VScrollBar":
                         VScrollBar vscr = child as VScrollBar;
                         vscr.Value = (int)GetSetting(app_name, child.Name, vscr.Value);
                         break;
+
                     case "HScrollBar":
                         HScrollBar hscr = child as HScrollBar;
                         hscr.Value = (int)GetSetting(app_name, child.Name, hscr.Value);
                         break;
+
                     case "NumericUpDown":
                         NumericUpDown nud = child as NumericUpDown;
                         nud.Value = decimal.Parse(GetSetting(app_name, child.Name, nud.Value).ToString());
                         break;
-                    // Add other control types here.
+                        // Add other control types here.
                 }
 
                 // Recursively restore the child's children.
@@ -124,27 +129,32 @@ namespace FAD3
                     case "ComboBox":
                         SaveSetting(app_name, child.Name, child.Text);
                         break;
+
                     case "CheckBox":
                         CheckBox chk = child as CheckBox;
                         SaveSetting(app_name, child.Name, chk.Checked.ToString());
                         break;
+
                     case "RadioButton":
                         RadioButton rad = child as RadioButton;
                         SaveSetting(app_name, child.Name, rad.Checked.ToString());
                         break;
+
                     case "VScrollBar":
                         VScrollBar vscr = child as VScrollBar;
                         SaveSetting(app_name, child.Name, vscr.Value);
                         break;
+
                     case "HScrollBar":
                         HScrollBar hscr = child as HScrollBar;
                         SaveSetting(app_name, child.Name, hscr.Value);
                         break;
+
                     case "NumericUpDown":
                         NumericUpDown nud = child as NumericUpDown;
                         SaveSetting(app_name, child.Name, nud.Value);
                         break;
-                    // Add other control types here.
+                        // Add other control types here.
                 }
 
                 // Recursively save the child's children.
@@ -161,10 +171,9 @@ namespace FAD3
             {
                 sub_key.DeleteValue(name);
             }
-            catch(ArgumentException)
+            catch (ArgumentException)
             {
             }
         }
     }
-
 }

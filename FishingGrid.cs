@@ -702,7 +702,7 @@ namespace FAD3
         }
 
         public static bool SaveTargetAreaGrid25(string TargetAreaGuid, bool UseGrid25, string UTMZone = "",
-                               int SubGridStyle = 0, Dictionary<string, Tuple<string, string, string>> Maps = null,
+                               int SubGridStyle = 0, Dictionary<string, (string MapName, string ULGrid, string LRGrid)> Maps = null,
                                string FirstMap = "")
         {
             var sql = "";
@@ -715,9 +715,9 @@ namespace FAD3
                          UseGrid25 = {UseGrid25},
                          UTMZone = '{UTMZone}',
                          SubgridStyle = {SubGridStyle},
-                         GridDescription = '{Maps[FirstMap].Item1}',
-                         UpperLeftGrid = '{Maps[FirstMap].Item2}',
-                         LowerRightGrid = '{Maps[FirstMap].Item3}'
+                         GridDescription = '{Maps[FirstMap].MapName}',
+                         UpperLeftGrid = '{Maps[FirstMap].ULGrid}',
+                         LowerRightGrid = '{Maps[FirstMap].LRGrid}'
                          where AOIGuid = {{{TargetAreaGuid}}}";
                 }
                 else
@@ -749,7 +749,7 @@ namespace FAD3
             return Success;
         }
 
-        private static bool SaveAdditionalFishingGroundMaps(string TargetAreaGuid, string FirstMap, Dictionary<string, Tuple<string, string, string>> Maps)
+        private static bool SaveAdditionalFishingGroundMaps(string TargetAreaGuid, string FirstMap, Dictionary<string, (string MapName, string ULGrid, string LRGrid)> Maps)
         {
             var SaveCount = 0;
 
@@ -765,7 +765,7 @@ namespace FAD3
                         var sql = $@"Insert into tblAdditionalAOIExtent
                             (AOIGuid, GridDescription, UpperLeft, LowerRight, RowNumber)
                             values
-                            ({{{TargetAreaGuid}}},'{item.Item1}','{item.Item2}','{item.Item3}', {{{Guid.NewGuid().ToString()}}})";
+                            ({{{TargetAreaGuid}}},'{item.MapName}','{item.ULGrid}','{item.LRGrid}', {{{Guid.NewGuid().ToString()}}})";
                         OleDbCommand update = new OleDbCommand(sql, conn);
                         if (update.ExecuteNonQuery() > 0) SaveCount++;
                     }

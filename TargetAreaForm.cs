@@ -240,7 +240,7 @@ namespace FAD3
 
             if (aoi.UpdateData(TargetAreaData))
             {
-                var Maps = new Dictionary<string, Tuple<string, string, string>>();
+                var Maps = new Dictionary<string, (string MapName, string ULGrid, string LRGrid)>();
                 var FirstMap = "";
                 var Zone = "";
                 var SubGridStyle = 0;
@@ -250,8 +250,7 @@ namespace FAD3
 
                     foreach (ListViewItem lvi in lvMaps.Items)
                     {
-                        var Map = Tuple.Create(lvi.Text, lvi.SubItems[1].Text,
-                                               lvi.SubItems[2].Text);
+                        var Map = (lvi.Text, lvi.SubItems[1].Text, lvi.SubItems[2].Text);
 
                         //var Map = (MapName: lvi.Text, ULGrid: lvi.SubItems[1].Text, LRGrid: lvi.SubItems[2].Text);
                         Maps.Add(lvi.Text, Map);

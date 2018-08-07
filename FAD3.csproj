@@ -94,6 +94,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AOI.cs" />
+    <Compile Include="Coordinate.cs" />
+    <Compile Include="CoordinateEntryForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CoordinateEntryForm.Designer.cs">
+      <DependentUpon>CoordinateEntryForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CoordinateFormatSelectForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CoordinateFormatSelectForm.Designer.cs">
+      <DependentUpon>CoordinateFormatSelectForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="DBCheck.cs" />
     <Compile Include="ErrorLogger.cs" />
     <Compile Include="extension.cs" />
@@ -104,6 +117,7 @@
       <DependentUpon>FGExtentForm.cs</DependentUpon>
     </Compile>
     <Compile Include="FishingGrid.cs" />
+    <Compile Include="FishingVessel.cs" />
     <Compile Include="frmFishingGround.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -250,6 +264,12 @@
     <Compile Include="UIRow.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="CoordinateEntryForm.resx">
+      <DependentUpon>CoordinateEntryForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CoordinateFormatSelectForm.resx">
+      <DependentUpon>CoordinateFormatSelectForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FGExtentForm.resx">
       <DependentUpon>FGExtentForm.cs</DependentUpon>
     </EmbeddedResource>
