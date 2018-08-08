@@ -108,6 +108,7 @@ namespace FAD3
             this.textCoord.Location = new System.Drawing.Point(131, 181);
             this.textCoord.Margin = new System.Windows.Forms.Padding(4);
             this.textCoord.Name = "textCoord";
+            this.textCoord.ReadOnly = true;
             this.textCoord.Size = new System.Drawing.Size(185, 22);
             this.textCoord.TabIndex = 3;
             this.textCoord.Tag = "x";
@@ -131,7 +132,7 @@ namespace FAD3
             this.buttonOk.TabIndex = 5;
             this.buttonOk.Text = "Ok";
             this.buttonOk.UseVisualStyleBackColor = true;
-            this.buttonOk.Click += new System.EventHandler(this.OnButtoClick);
+            this.buttonOk.Click += new System.EventHandler(this.OnButtonClick);
             // 
             // buttonCancel
             // 
@@ -144,7 +145,7 @@ namespace FAD3
             this.buttonCancel.TabIndex = 6;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = true;
-            this.buttonCancel.Click += new System.EventHandler(this.OnButtoClick);
+            this.buttonCancel.Click += new System.EventHandler(this.OnButtonClick);
             // 
             // frmLandingSite
             // 

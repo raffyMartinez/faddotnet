@@ -38,9 +38,13 @@ namespace FAD3
         private string _LandingSiteName = "";
         private landingsite _ls = new landingsite();
         private TreeNode _LSNode;
+        private string _MonthYear;
+        private string _MonthYearGearVar;
+        private string _MonthYearLandingSite;
         private int _MouseX = 0;
         private int _MouseY = 0;
         private mru _mrulist = new mru();
+        private bool _newSamplingEntered;
         private string _oldMDB = "";
         private sampling _Sampling = new sampling();
         private string _SamplingGUID = "";
@@ -52,10 +56,6 @@ namespace FAD3
         private string _VesHeight = "";
         private string _VesLength = "";
         private string _VesWidth = "";
-        private bool _newSamplingEntered;
-        private string _MonthYear;
-        private string _MonthYearGearVar;
-        private string _MonthYearLandingSite;
 
         public frmMain()
         {
@@ -193,13 +193,37 @@ namespace FAD3
             SetupTree(filename);
         }
 
+        public void NewLandingSite(string NodeName, string nodeGUID)
+        {
+            TreeNode NewNode = new TreeNode();
+            NewNode.Text = NodeName;
+            NewNode.Tag = Tuple.Create(nodeGUID, "", "landing_site");
+            NewNode.Name = nodeGUID;
+            NewNode.ImageKey = "LandingSite";
+            treeMain.SelectedNode.Nodes.Add(NewNode);
+            treeMain.SelectedNode = NewNode;
+        }
+
         public void NewSamplingDataEntryCancelled()
         {
             //if (listView1.Tag.ToString() == "samplingDetail") BackToSamplingMonth();
         }
 
+        public void NewTargetArea(string TargetAreaName, string TargetAreaGuid)
+        {
+            TreeNode nd = new TreeNode
+            {
+                Text = TargetAreaName,
+                Name = TargetAreaGuid,
+                ImageKey = "AOI"
+            };
+            nd.Tag = Tuple.Create(TargetAreaGuid, "", "aoi");
+            treeMain.Nodes["root"].Nodes.Add(nd);
+            treeMain.SelectedNode = nd;
+        }
+
         public void RefreshCatchDetail(string SamplingGUID, bool NewSampling,
-                                       DateTime SamplingDate, string GearVarGuid, string LandingSiteGuid)
+                                               DateTime SamplingDate, string GearVarGuid, string LandingSiteGuid)
         {
             _SamplingGUID = SamplingGUID;
             _newSamplingEntered = NewSampling;
@@ -221,31 +245,17 @@ namespace FAD3
             ShowCatchDetailEx(_SamplingGUID);
         }
 
-        public void RefreshLV(string NodeName, string TreeLevel, bool IsNew = false, string nodeGUID = "")
-        {
-            if (IsNew)
-            {
-                TreeNode NewNode = new TreeNode();
-                NewNode.Text = NodeName;
-                NewNode.Tag = nodeGUID + "," + TreeLevel;
-                NewNode.Name = NodeName;
-                treeMain.SelectedNode.Nodes.Add(NewNode);
-                treeMain.SelectedNode = NewNode;
-            }
-            else
-            {
-                treeMain.SelectedNode.Text = NodeName;
-            }
-            SetUPLV(TreeLevel);
-        }
-
         /// <summary>
         /// refreshes contents of main listview given tree level
         /// </summary>
         /// <param name="TreeLevel"></param>
-        public void RefreshLVEx(string TreeLevel)
+        public void RefreshLV(string TreeLevel)
         {
             SetUPLV(TreeLevel);
+            if (TreeLevel == "landing_site" || TreeLevel == "aoi")
+            {
+                treeMain.SelectedNode.Text = lvMain.Items["name"].SubItems[1].Text;
+            }
         }
 
         private void _mrulist_FileSelected(string filename)
@@ -289,67 +299,6 @@ namespace FAD3
             catch (Exception ex)
             {
                 ErrorLogger.Log(ex);
-            }
-        }
-
-        /// <summary>
-        /// refreshes tree for any new sampling
-        /// </summary>
-        private void RefreshTreeForNewSampling()
-        {
-            if (_newSamplingEntered)
-            {
-                var LandingSiteNode = new TreeNode();
-
-                var gearNode = new TreeNode();
-                gearNode.Name = $"{_MonthYearLandingSite}|{_MonthYearGearVar}";
-                gearNode.Text = gear.GearVarNameFromGearGuid(_MonthYearGearVar);
-                gearNode.Tag = Tuple.Create(_MonthYearLandingSite, _MonthYearGearVar, "gear");
-                gearNode.ImageKey = gear.GearVarNodeImageKeyFromGearVar(_MonthYearGearVar);
-
-                var node = new TreeNode(_MonthYear);
-                node.Name = $"{_MonthYearLandingSite}|{_MonthYearGearVar}|{_MonthYear}";
-                node.Tag = Tuple.Create(_MonthYearLandingSite, _MonthYearGearVar, "sampling");
-                node.ImageKey = "MonthGear";
-
-                var myTag = (Tuple<string, string, string>)treeMain.SelectedNode.Tag;
-                var treeLevel = myTag.Item3;
-
-                if (!treeMain.SelectedNode.IsExpanded) treeMain.SelectedNode.Expand();
-                switch (treeLevel)
-                {
-                    case "sampling":
-                        LandingSiteNode = treeMain.SelectedNode.Parent.Parent;
-                        break;
-
-                    case "gear":
-                        LandingSiteNode = treeMain.SelectedNode.Parent;
-                        break;
-
-                    case "landing_site":
-                        LandingSiteNode = treeMain.SelectedNode;
-                        break;
-                }
-
-                if (!LandingSiteNode.Nodes.ContainsKey(gearNode.Name))
-                {
-                    LandingSiteNode.Nodes.Add(gearNode);
-                    gearNode.Nodes.Add(node);
-                }
-                else
-                {
-                    gearNode = LandingSiteNode.Nodes[gearNode.Name];
-                    if (!gearNode.IsExpanded) gearNode.Expand();
-                    if (!gearNode.Nodes.ContainsKey(node.Name))
-                    {
-                        gearNode.Nodes.Add(node);
-                    }
-                    else
-                    {
-                        node = gearNode.Nodes[node.Name];
-                    }
-                }
-                treeMain.SelectedNode = node;
             }
         }
 
@@ -474,52 +423,55 @@ namespace FAD3
             }
         }
 
-        private void contextMenuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
-        {
-            ToolStripItem tsi = e.ClickedItem;
-            switch (tsi.Name)
-            {
-                case "addAOIToolStripMenuItem":
-                    TargetAreaForm f1 = new TargetAreaForm(this, IsNew: true);
-                    f1.AddNew();
-                    f1.Text = "New AOI";
-                    f1.ShowDialog(this);
-                    break;
-
-                case "addLandingSiteToolStripMenuItem":
-                    frmLandingSite f2 = new frmLandingSite(_AOI);
-                    f2.AddNew();
-                    f2.Text = "New landing site";
-                    f2.ShowDialog(this);
-                    break;
-
-                case "addSamplingToolStripMenuItem":
-                    if (_AOI.HaveEnumerators)
-                    {
-                        NewSamplingForm();
-                    }
-                    else
-                    {
-                        MessageBox.Show(@"You need to add enumerators first
-                                        before you can add your first sampling", "Missing enumerators",
-                                        MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                    break;
-
-                case "addEnumeratorToolStripMenuItem":
-                    frmEnumerator f4 = new frmEnumerator();
-                    f4.AOI = _AOI;
-                    f4.AddNew();
-                    f4.ShowDialog();
-                    break;
-            }
-        }
-
         private string DatabaseSummary(string SummaryTopic)
         {
             return "x";
         }
 
+        private void DeleteSampling()
+        {
+            DialogResult = MessageBox.Show("Please confirm deleting of sampling", "Confirmation",
+                    MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
+            if (DialogResult == DialogResult.OK)
+            {
+                if (lvMain.Tag.ToString() == "sampling")
+                {
+                    if (sampling.DeleteSampling(SamplingGUID))
+                    {
+                        lvMain.Items.Remove(lvMain.Items[SamplingGUID]);
+                        if (lvMain.Items.Count >= 1)
+                        {
+                            lvMain.Items[0].Selected = true;
+                        }
+                        else
+                        {
+                            var parentNode = treeMain.SelectedNode.Parent;
+                            if (parentNode.Nodes.Count == 1)
+                            {
+                                parentNode.Parent.Nodes.Remove(parentNode);
+                            }
+                            else
+                            {
+                                treeMain.Nodes.Remove(treeMain.SelectedNode);
+                                treeMain.SelectedNode = parentNode;
+                            }
+                        }
+                    }
+                }
+                else if (lvMain.Tag.ToString() == "samplingDetail")
+                {
+                }
+            }
+        }
+
+        //        case "addEnumeratorToolStripMenuItem":
+        //            frmEnumerator f4 = new frmEnumerator();
+        //            f4.AOI = _AOI;
+        //            f4.AddNew();
+        //            f4.ShowDialog();
+        //            break;
+        //    }
+        //}
         /// <summary>
         /// Fills the listview with the samplings that took place in a month-year
         /// </summary>
@@ -664,11 +616,28 @@ namespace FAD3
             }
         }
 
+        //        case "addSamplingToolStripMenuItem":
+        //            if (_AOI.HaveEnumerators)
+        //            {
+        //                NewSamplingForm();
+        //            }
+        //            else
+        //            {
+        //                MessageBox.Show(@"You need to add enumerators first
+        //                                before you can add your first sampling", "Missing enumerators",
+        //                                MessageBoxButtons.OK, MessageBoxIcon.Information);
+        //            }
+        //            break;
         private void frmMain_Activated(object sender, EventArgs e)
         {
             CancelButton = buttonOK.Visible ? buttonOK : null;
         }
 
+        //        case "addLandingSiteToolStripMenuItem":
+        //            frmLandingSite f2 = new frmLandingSite(_AOI, this, IsNew: true);
+        //            f2.Text = "New landing site";
+        //            f2.ShowDialog(this);
+        //            break;
         private void frmMain_ResizeEnd(object sender, EventArgs e)
         {
             splitContainer1.Width = this.Width;
@@ -676,6 +645,17 @@ namespace FAD3
             lvMain.Height = splitContainer1.Panel2.Height;
         }
 
+        //private void contextMenuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        //{
+        //    ToolStripItem tsi = e.ClickedItem;
+        //    switch (tsi.Name)
+        //    {
+        //        case "addAOIToolStripMenuItem":
+        //            TargetAreaForm f1 = new TargetAreaForm(this, IsNew: true);
+        //            f1.AddNew();
+        //            f1.Text = "New AOI";
+        //            f1.ShowDialog(this);
+        //            break;
         private void FrmMainLoad(object sender, EventArgs e)
         {
             this.splitContainer1.Panel1MinSize = 200;
@@ -785,12 +765,6 @@ namespace FAD3
                 return null;
         }
 
-        private void OnListViewLeave(object sender, EventArgs e)
-        {
-            if (lvMain.Columns.Count > 0)
-                SaveColumnWidthEx(sender, lvMain.Tag.ToString());
-        }
-
         /// <summary>
         /// shows the sampling detail listview but without any text on the sub-items
         /// </summary>
@@ -848,7 +822,7 @@ namespace FAD3
                     break;
 
                 case "menuNewLandingSite":
-                    frmLandingSite fls = new frmLandingSite(_AOI);
+                    frmLandingSite fls = new frmLandingSite(_AOI, this, _ls, IsNew: true);
                     fls.ShowDialog(this);
                     break;
 
@@ -917,51 +891,6 @@ namespace FAD3
                     DeleteSampling();
                     break;
             }
-        }
-
-        private void DeleteSampling()
-        {
-            DialogResult = MessageBox.Show("Please confirm deleting of sampling", "Confirmation",
-                    MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
-            if (DialogResult == DialogResult.OK)
-            {
-                if (lvMain.Tag.ToString() == "sampling")
-                {
-                    if (sampling.DeleteSampling(SamplingGUID))
-                    {
-                        lvMain.Items.Remove(lvMain.Items[SamplingGUID]);
-                        if (lvMain.Items.Count >= 1)
-                        {
-                            lvMain.Items[0].Selected = true;
-                        }
-                        else
-                        {
-                            var parentNode = treeMain.SelectedNode.Parent;
-                            if (parentNode.Nodes.Count == 1)
-                            {
-                                parentNode.Parent.Nodes.Remove(parentNode);
-                            }
-                            else
-                            {
-                                treeMain.Nodes.Remove(treeMain.SelectedNode);
-                                treeMain.SelectedNode = parentNode;
-                            }
-                        }
-                    }
-                }
-                else if (lvMain.Tag.ToString() == "samplingDetail")
-                {
-                }
-            }
-        }
-
-        private void ShowGMSForm(bool isNew = false)
-        {
-            var lvCatch = GetLVCatch();
-            GMSDataEntryForm fgms = new GMSDataEntryForm(isNew, _Sampling,
-                                      lvCatch.SelectedItems[0].Name,
-                                      lvCatch.SelectedItems[0].SubItems[1].Text);
-            fgms.ShowDialog(this);
         }
 
         private void NewSamplingForm()
@@ -1076,9 +1005,7 @@ namespace FAD3
                                 break;
 
                             case "landing_site":
-
-                                frmLandingSite fls = new frmLandingSite(_AOI);
-                                fls.LandingSite = _ls;
+                                frmLandingSite fls = new frmLandingSite(_AOI, this, _ls);
                                 fls.Show();
                                 break;
 
@@ -1173,6 +1100,12 @@ namespace FAD3
                     }
                     break;
             }
+        }
+
+        private void OnListViewLeave(object sender, EventArgs e)
+        {
+            if (lvMain.Columns.Count > 0)
+                SaveColumnWidthEx(sender, lvMain.Tag.ToString());
         }
 
         private void OnMenuFile_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
@@ -1282,6 +1215,218 @@ namespace FAD3
             }
         }
 
+        private void OntreeMain_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+                ConfigDropDownMenu(treeMain);
+
+            SetupCatchListView(Show: false);
+        }
+
+        /// <summary>
+        /// this will fill the tree with the nodes below the level of Landing site
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OntreeMainAfterExpand(object sender, TreeViewEventArgs e)
+        {
+            if (e.Node.FirstNode.Text == "*dummy*")
+            {
+                // we are in a landing site node then we will add gear used nodes
+                var myDT = new DataTable();
+                try
+                {
+                    using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
+                    {
+                        conection.Open();
+                        string lsguid = ((Tuple<string, string, string>)e.Node.Tag).Item1;
+
+                        var query = $@"SELECT DISTINCT tblGearClass.GearClassName, tblGearVariations.Variation, tblSampling.LSGUID,
+                                     tblGearVariations.GearVarGUID FROM tblGearClass INNER JOIN
+                                     (tblGearVariations INNER JOIN tblSampling ON tblGearVariations.GearVarGUID = tblSampling.GearVarGUID)
+                                     ON tblGearClass.GearClass = tblGearVariations.GearClass
+                                     WHERE tblSampling.LSGUID = {{{lsguid}}}
+                                     ORDER BY tblGearClass.GearClassName, tblGearVariations.Variation";
+
+                        var adapter = new OleDbDataAdapter(query, conection);
+                        adapter.Fill(myDT);
+                        if (myDT.Rows.Count > 0)
+                        {
+                            for (int i = 0; i < myDT.Rows.Count; i++)
+                            {
+                                DataRow dr = myDT.Rows[i];
+                                TreeNode nd = e.Node; //represents the current node which is the landing site node
+                                TreeNode nd1 = new TreeNode();
+                                if (i == 0)
+                                {
+                                    //if the node contains the dummy placeholder, rename it to the name of the gear
+                                    nd.FirstNode.Text = dr["Variation"].ToString();
+                                    nd1 = nd.FirstNode;
+                                }
+                                else
+                                {
+                                    //add a new gearvar node and name with the variation field in the query
+                                    nd1 = nd.Nodes.Add(dr["Variation"].ToString());
+                                }
+                                //add a dummy placeholder for a new gear node
+                                // this will be replaced by a sampling month-year node
+                                //later on
+                                nd1.Nodes.Add("**dummy*");
+                                nd1.Tag = Tuple.Create(dr["LSGUID"].ToString(), dr["GearVarGUID"].ToString(), "gear");
+                                nd1.Name = dr["LSGUID"].ToString() + "|" + dr["GearVarGUID"].ToString();
+                                nd1.ImageKey = gear.GearClassImageKeyFromGearClasName(dr["GearClassName"].ToString());
+                            }
+                        }
+                        else
+                        {
+                            e.Node.Nodes.Clear();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ErrorLogger.Log(ex);
+                }
+            }
+            else if (e.Node.FirstNode.Text == "**dummy*")
+            {
+                //we are in a gear variation node and then add month-year sampling nodes
+
+                var myDT = new DataTable();
+                try
+                {
+                    using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
+                    {
+                        conection.Open();
+                        var myTag = (Tuple<string, string, string>)e.Node.Tag;
+                        var lsguid = myTag.Item1;
+                        var gearguid = myTag.Item2;
+                        var query = $@"SELECT Format([SamplingDate],'mmm-yyyy') AS sDate FROM tblSampling
+                                    GROUP BY Format([SamplingDate],'mmm-yyyy'), tblSampling.LSGUID, tblSampling.GearVarGUID,
+                                    Year([SamplingDate]), Month([SamplingDate])
+                                    HAVING LSGUID ={{{lsguid}}} AND GearVarGUID = {{{gearguid}}}
+                                    ORDER BY Year([SamplingDate]), Month([SamplingDate])";
+
+                        var adapter = new OleDbDataAdapter(query, conection);
+                        adapter.Fill(myDT);
+                        for (int i = 0; i < myDT.Rows.Count; i++)
+                        {
+                            DataRow dr = myDT.Rows[i];
+                            TreeNode nd1 = new TreeNode();
+                            if (i == 0)
+                            {
+                                //if node contains a dummy placeholder,
+                                //rename it to the sampling month-year field
+                                e.Node.FirstNode.Text = dr["sDate"].ToString();
+                                nd1 = e.Node.FirstNode;
+                            }
+                            else
+                            {
+                                nd1 = e.Node.Nodes.Add(dr["sDate"].ToString());
+                            }
+                            nd1.Tag = Tuple.Create(lsguid, gearguid, "sampling");
+                            nd1.Name = lsguid + "|" + gearguid + "|" + dr["sDate"];
+                            nd1.ImageKey = "MonthGear";
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ErrorLogger.Log(ex);
+                }
+            }
+        }
+
+        private void OnTreeMainAfterSelect(object sender, TreeViewEventArgs e)
+        {
+            _LSNode = null;
+            SetupSamplingButtonFrame(false);
+
+            try
+            {
+                _LandingSiteName = "";
+                _GearVarName = "";
+                _GearClassName = "";
+                _LandingSiteGuid = "";
+                _GearVarGUID = "";
+                _GearClassGUID = "";
+
+                TreeNode nd = treeMain.SelectedNode;
+                ResetTheBackColor(treeMain);
+                nd.BackColor = Color.Gainsboro;
+
+                var myTag = (Tuple<string, string, string>)nd.Tag;
+                _TreeLevel = myTag.Item3;
+
+                statusPanelTargetArea.Width = _statusPanelWidth;
+                switch (_TreeLevel)
+                {
+                    case "gear":
+                        _AOIName = treeMain.SelectedNode.Parent.Parent.Text;
+                        this.AOIGUID = treeMain.SelectedNode.Parent.Parent.Name;
+                        _LandingSiteName = treeMain.SelectedNode.Parent.Text;
+                        _LandingSiteGuid = treeMain.SelectedNode.Parent.Name;
+                        _GearVarName = treeMain.SelectedNode.Text;
+                        _GearVarGUID = myTag.Item2;
+                        var rv = gear.GearClassGuidNameFromGearVarGuid(_GearVarGUID);
+                        _GearClassName = rv.Value;
+                        _GearClassGUID = rv.Key;
+                        _LSNode = e.Node.Parent;
+
+                        break;
+
+                    case "sampling":
+                        _AOIName = treeMain.SelectedNode.Parent.Parent.Parent.Text;
+                        this.AOIGUID = ((Tuple<string, string, string>)treeMain.SelectedNode.Parent.Parent.Parent.Tag).Item1;
+                        _LandingSiteName = treeMain.SelectedNode.Parent.Parent.Text;
+                        _LandingSiteGuid = myTag.Item1;
+                        _GearVarName = treeMain.SelectedNode.Parent.Text;
+                        _GearVarGUID = myTag.Item2;
+                        rv = gear.GearClassGuidNameFromGearVarGuid(_GearVarGUID);
+                        _GearClassName = rv.Value;
+                        _GearClassGUID = rv.Key;
+                        _LSNode = e.Node.Parent.Parent;
+                        _SamplingMonth = e.Node.Text;
+
+                        break;
+
+                    case "aoi":
+                        _AOIName = treeMain.SelectedNode.Text;
+                        this.AOIGUID = treeMain.SelectedNode.Name;
+                        _LandingSiteName = "";
+                        _LandingSiteGuid = "";
+                        _GearVarName = "";
+                        _GearVarGUID = "";
+                        break;
+
+                    case "root":
+                        break;
+
+                    case "landing_site":
+                        _AOIName = treeMain.SelectedNode.Parent.Text;
+                        this.AOIGUID = treeMain.SelectedNode.Parent.Name;
+                        _LandingSiteName = treeMain.SelectedNode.Text;
+                        _LandingSiteGuid = treeMain.SelectedNode.Name;
+                        _GearVarName = "";
+                        _GearVarGUID = "";
+                        _LSNode = e.Node;
+
+                        break;
+                }
+
+                SetUPLV(_TreeLevel);
+                statusPanelTargetArea.Text = _AOIName;
+                statusPanelLandingSite.Text = _LandingSiteName;
+                statusPanelGearUsed.Text = _GearVarName;
+            }
+            catch (Exception ex)
+            {
+                ErrorLogger.Log(ex.Message);
+            }
+
+            e.Node.SelectedImageKey = e.Node.ImageKey;
+        }
+
         private void OnUIRowRead(object sender, UIRowFromXML e)
         {
             ListViewItem lvi = lvMain.Items.Add(e.RowLabel);
@@ -1383,6 +1528,67 @@ namespace FAD3
 
                 //add the recently opened file to the MRU
                 _mrulist.AddFile(filename);
+            }
+        }
+
+        /// <summary>
+        /// refreshes tree for any new sampling
+        /// </summary>
+        private void RefreshTreeForNewSampling()
+        {
+            if (_newSamplingEntered)
+            {
+                var LandingSiteNode = new TreeNode();
+
+                var gearNode = new TreeNode();
+                gearNode.Name = $"{_MonthYearLandingSite}|{_MonthYearGearVar}";
+                gearNode.Text = gear.GearVarNameFromGearGuid(_MonthYearGearVar);
+                gearNode.Tag = Tuple.Create(_MonthYearLandingSite, _MonthYearGearVar, "gear");
+                gearNode.ImageKey = gear.GearVarNodeImageKeyFromGearVar(_MonthYearGearVar);
+
+                var node = new TreeNode(_MonthYear);
+                node.Name = $"{_MonthYearLandingSite}|{_MonthYearGearVar}|{_MonthYear}";
+                node.Tag = Tuple.Create(_MonthYearLandingSite, _MonthYearGearVar, "sampling");
+                node.ImageKey = "MonthGear";
+
+                var myTag = (Tuple<string, string, string>)treeMain.SelectedNode.Tag;
+                var treeLevel = myTag.Item3;
+
+                if (!treeMain.SelectedNode.IsExpanded) treeMain.SelectedNode.Expand();
+                switch (treeLevel)
+                {
+                    case "sampling":
+                        LandingSiteNode = treeMain.SelectedNode.Parent.Parent;
+                        break;
+
+                    case "gear":
+                        LandingSiteNode = treeMain.SelectedNode.Parent;
+                        break;
+
+                    case "landing_site":
+                        LandingSiteNode = treeMain.SelectedNode;
+                        break;
+                }
+
+                if (!LandingSiteNode.Nodes.ContainsKey(gearNode.Name))
+                {
+                    LandingSiteNode.Nodes.Add(gearNode);
+                    gearNode.Nodes.Add(node);
+                }
+                else
+                {
+                    gearNode = LandingSiteNode.Nodes[gearNode.Name];
+                    if (!gearNode.IsExpanded) gearNode.Expand();
+                    if (!gearNode.Nodes.ContainsKey(node.Name))
+                    {
+                        gearNode.Nodes.Add(node);
+                    }
+                    else
+                    {
+                        node = gearNode.Nodes[node.Name];
+                    }
+                }
+                treeMain.SelectedNode = node;
             }
         }
 
@@ -1719,11 +1925,11 @@ namespace FAD3
                     var arr = myData.Split('|');
 
                     //add AOI data for form
-                    lvi = lvMain.Items.Add("Name");
-                    lvi.SubItems.Add(arr[0].ToString());
+                    lvi = lvMain.Items.Add("name", "Name", null);
+                    lvi.SubItems.Add(arr[0]);
                     lvi.Tag = "aoi_data";
                     lvi = lvMain.Items.Add("Code");
-                    lvi.SubItems.Add(arr[1].ToString());
+                    lvi.SubItems.Add(arr[1]);
                     lvi.Tag = "aoi_data";
                     lvi = lvMain.Items.Add("MBR");
                     lvi.SubItems.Add("");
@@ -1804,18 +2010,17 @@ namespace FAD3
 
                     //add landing site form data
                     _ls.LandingSiteGUID = _LandingSiteGuid;
-                    myData = _ls.LandingSiteData();
-                    arr = myData.Split(',');
-                    lvi = lvMain.Items.Add("Name");
-                    lvi.SubItems.Add(arr[0]);
-                    lvi = lvMain.Items.Add("Municipality");
-                    lvi.SubItems.Add(arr[1]);
-                    lvi = lvMain.Items.Add("Province");
-                    lvi.SubItems.Add(arr[2]);
-                    lvi = lvMain.Items.Add("Longitude");
-                    lvi.SubItems.Add(arr[3]);
-                    lvi = lvMain.Items.Add("Latitude");
-                    lvi.SubItems.Add(arr[4]);
+                    _ls.LandingSiteDataEx().With(o =>
+                    {
+                        lvi = lvMain.Items.Add("name", "Name", null);
+                        lvi.SubItems.Add(o["LSName"]);
+                        lvi = lvMain.Items.Add("Municipality");
+                        lvi.SubItems.Add(o["Municipality"]);
+                        lvi = lvMain.Items.Add("Province");
+                        lvi.SubItems.Add(o["ProvinceName"]);
+                        lvi = lvMain.Items.Add("Coordinate");
+                        lvi.SubItems.Add(o["CoordinateStringXY"]);
+                    });
 
                     //add total number of sampling
                     lvMain.Items.Add("");
@@ -1857,19 +2062,6 @@ namespace FAD3
             }
 
             lvMain.ResumeLayout();
-        }
-
-        public void NewTargetArea(string TargetAreaName, string TargetAreaGuid)
-        {
-            TreeNode nd = new TreeNode
-            {
-                Text = TargetAreaName,
-                Name = TargetAreaGuid,
-                ImageKey = "AOI"
-            };
-            nd.Tag = Tuple.Create(TargetAreaGuid, "", "aoi");
-            treeMain.Nodes["root"].Nodes.Add(nd);
-            treeMain.SelectedNode = nd;
         }
 
         /// <summary>
@@ -2099,6 +2291,15 @@ namespace FAD3
             SetupSamplingButtonFrame(true);
         }
 
+        private void ShowGMSForm(bool isNew = false)
+        {
+            var lvCatch = GetLVCatch();
+            GMSDataEntryForm fgms = new GMSDataEntryForm(isNew, _Sampling,
+                                      lvCatch.SelectedItems[0].Name,
+                                      lvCatch.SelectedItems[0].SubItems[1].Text);
+            fgms.ShowDialog(this);
+        }
+
         private void ShowLFForm(bool IsNew = false)
         {
             var lvCatch = GetLVCatch();
@@ -2136,218 +2337,6 @@ namespace FAD3
                 child.BackColor = Color.White;
                 TraverseTreeAndResetColor(child.Nodes);
             }
-        }
-
-        private void OntreeMain_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Right)
-                ConfigDropDownMenu(treeMain);
-
-            SetupCatchListView(Show: false);
-        }
-
-        /// <summary>
-        /// this will fill the tree with the nodes below the level of Landing site
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void OntreeMainAfterExpand(object sender, TreeViewEventArgs e)
-        {
-            if (e.Node.FirstNode.Text == "*dummy*")
-            {
-                // we are in a landing site node then we will add gear used nodes
-                var myDT = new DataTable();
-                try
-                {
-                    using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
-                    {
-                        conection.Open();
-                        string lsguid = ((Tuple<string, string, string>)e.Node.Tag).Item1;
-
-                        var query = $@"SELECT DISTINCT tblGearClass.GearClassName, tblGearVariations.Variation, tblSampling.LSGUID,
-                                     tblGearVariations.GearVarGUID FROM tblGearClass INNER JOIN
-                                     (tblGearVariations INNER JOIN tblSampling ON tblGearVariations.GearVarGUID = tblSampling.GearVarGUID)
-                                     ON tblGearClass.GearClass = tblGearVariations.GearClass
-                                     WHERE tblSampling.LSGUID = {{{lsguid}}}
-                                     ORDER BY tblGearClass.GearClassName, tblGearVariations.Variation";
-
-                        var adapter = new OleDbDataAdapter(query, conection);
-                        adapter.Fill(myDT);
-                        if (myDT.Rows.Count > 0)
-                        {
-                            for (int i = 0; i < myDT.Rows.Count; i++)
-                            {
-                                DataRow dr = myDT.Rows[i];
-                                TreeNode nd = e.Node; //represents the current node which is the landing site node
-                                TreeNode nd1 = new TreeNode();
-                                if (i == 0)
-                                {
-                                    //if the node contains the dummy placeholder, rename it to the name of the gear
-                                    nd.FirstNode.Text = dr["Variation"].ToString();
-                                    nd1 = nd.FirstNode;
-                                }
-                                else
-                                {
-                                    //add a new gearvar node and name with the variation field in the query
-                                    nd1 = nd.Nodes.Add(dr["Variation"].ToString());
-                                }
-                                //add a dummy placeholder for a new gear node
-                                // this will be replaced by a sampling month-year node
-                                //later on
-                                nd1.Nodes.Add("**dummy*");
-                                nd1.Tag = Tuple.Create(dr["LSGUID"].ToString(), dr["GearVarGUID"].ToString(), "gear");
-                                nd1.Name = dr["LSGUID"].ToString() + "|" + dr["GearVarGUID"].ToString();
-                                nd1.ImageKey = gear.GearClassImageKeyFromGearClasName(dr["GearClassName"].ToString());
-                            }
-                        }
-                        else
-                        {
-                            e.Node.Nodes.Clear();
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    ErrorLogger.Log(ex);
-                }
-            }
-            else if (e.Node.FirstNode.Text == "**dummy*")
-            {
-                //we are in a gear variation node and then add month-year sampling nodes
-
-                var myDT = new DataTable();
-                try
-                {
-                    using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
-                    {
-                        conection.Open();
-                        var myTag = (Tuple<string, string, string>)e.Node.Tag;
-                        var lsguid = myTag.Item1;
-                        var gearguid = myTag.Item2;
-                        var query = $@"SELECT Format([SamplingDate],'mmm-yyyy') AS sDate FROM tblSampling
-                                    GROUP BY Format([SamplingDate],'mmm-yyyy'), tblSampling.LSGUID, tblSampling.GearVarGUID,
-                                    Year([SamplingDate]), Month([SamplingDate])
-                                    HAVING LSGUID ={{{lsguid}}} AND GearVarGUID = {{{gearguid}}}
-                                    ORDER BY Year([SamplingDate]), Month([SamplingDate])";
-
-                        var adapter = new OleDbDataAdapter(query, conection);
-                        adapter.Fill(myDT);
-                        for (int i = 0; i < myDT.Rows.Count; i++)
-                        {
-                            DataRow dr = myDT.Rows[i];
-                            TreeNode nd1 = new TreeNode();
-                            if (i == 0)
-                            {
-                                //if node contains a dummy placeholder,
-                                //rename it to the sampling month-year field
-                                e.Node.FirstNode.Text = dr["sDate"].ToString();
-                                nd1 = e.Node.FirstNode;
-                            }
-                            else
-                            {
-                                nd1 = e.Node.Nodes.Add(dr["sDate"].ToString());
-                            }
-                            nd1.Tag = Tuple.Create(lsguid, gearguid, "sampling");
-                            nd1.Name = lsguid + "|" + gearguid + "|" + dr["sDate"];
-                            nd1.ImageKey = "MonthGear";
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    ErrorLogger.Log(ex);
-                }
-            }
-        }
-
-        private void OnTreeMainAfterSelect(object sender, TreeViewEventArgs e)
-        {
-            _LSNode = null;
-            SetupSamplingButtonFrame(false);
-
-            try
-            {
-                _LandingSiteName = "";
-                _GearVarName = "";
-                _GearClassName = "";
-                _LandingSiteGuid = "";
-                _GearVarGUID = "";
-                _GearClassGUID = "";
-
-                TreeNode nd = treeMain.SelectedNode;
-                ResetTheBackColor(treeMain);
-                nd.BackColor = Color.Gainsboro;
-
-                var myTag = (Tuple<string, string, string>)nd.Tag;
-                _TreeLevel = myTag.Item3;
-
-                statusPanelTargetArea.Width = _statusPanelWidth;
-                switch (_TreeLevel)
-                {
-                    case "gear":
-                        _AOIName = treeMain.SelectedNode.Parent.Parent.Text;
-                        this.AOIGUID = treeMain.SelectedNode.Parent.Parent.Name;
-                        _LandingSiteName = treeMain.SelectedNode.Parent.Text;
-                        _LandingSiteGuid = treeMain.SelectedNode.Parent.Name;
-                        _GearVarName = treeMain.SelectedNode.Text;
-                        _GearVarGUID = myTag.Item2;
-                        var rv = gear.GearClassGuidNameFromGearVarGuid(_GearVarGUID);
-                        _GearClassName = rv.Value;
-                        _GearClassGUID = rv.Key;
-                        _LSNode = e.Node.Parent;
-
-                        break;
-
-                    case "sampling":
-                        _AOIName = treeMain.SelectedNode.Parent.Parent.Parent.Text;
-                        this.AOIGUID = ((Tuple<string, string, string>)treeMain.SelectedNode.Parent.Parent.Parent.Tag).Item1;
-                        _LandingSiteName = treeMain.SelectedNode.Parent.Parent.Text;
-                        _LandingSiteGuid = myTag.Item1;
-                        _GearVarName = treeMain.SelectedNode.Parent.Text;
-                        _GearVarGUID = myTag.Item2;
-                        rv = gear.GearClassGuidNameFromGearVarGuid(_GearVarGUID);
-                        _GearClassName = rv.Value;
-                        _GearClassGUID = rv.Key;
-                        _LSNode = e.Node.Parent.Parent;
-                        _SamplingMonth = e.Node.Text;
-
-                        break;
-
-                    case "aoi":
-                        _AOIName = treeMain.SelectedNode.Text;
-                        this.AOIGUID = treeMain.SelectedNode.Name;
-                        _LandingSiteName = "";
-                        _LandingSiteGuid = "";
-                        _GearVarName = "";
-                        _GearVarGUID = "";
-                        break;
-
-                    case "root":
-                        break;
-
-                    case "landing_site":
-                        _AOIName = treeMain.SelectedNode.Parent.Text;
-                        this.AOIGUID = treeMain.SelectedNode.Parent.Name;
-                        _LandingSiteName = treeMain.SelectedNode.Text;
-                        _LandingSiteGuid = treeMain.SelectedNode.Name;
-                        _GearVarName = "";
-                        _GearVarGUID = "";
-                        _LSNode = e.Node;
-
-                        break;
-                }
-
-                SetUPLV(_TreeLevel);
-                statusPanelTargetArea.Text = _AOIName;
-                statusPanelLandingSite.Text = _LandingSiteName;
-                statusPanelGearUsed.Text = _GearVarName;
-            }
-            catch (Exception ex)
-            {
-                ErrorLogger.Log(ex.Message);
-            }
-
-            e.Node.SelectedImageKey = e.Node.ImageKey;
         }
     }
 }

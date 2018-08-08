@@ -222,7 +222,7 @@ namespace FAD3
 				foreach(Form f in Application.OpenForms){
 					if(f.Name=="frmMain"){
 						fr=(frmMain)f;
-						fr.RefreshLVEx("aoi");
+						fr.RefreshLV("aoi");
 					}
 				}
 				this.Close();

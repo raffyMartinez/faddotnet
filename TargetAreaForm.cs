@@ -286,7 +286,7 @@ namespace FAD3
                             else
                             {
                                 FishingGrid.Refresh();
-                                _parent_form.RefreshLVEx("aoi");
+                                _parent_form.RefreshLV("aoi");
                             }
                             Close();
                         }

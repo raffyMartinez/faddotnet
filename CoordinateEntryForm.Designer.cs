@@ -39,7 +39,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(17, 26);
+            this.label1.Location = new System.Drawing.Point(17, 61);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(67, 16);
             this.label1.TabIndex = 0;
@@ -48,7 +48,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(17, 62);
+            this.label2.Location = new System.Drawing.Point(17, 30);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(55, 16);
             this.label2.TabIndex = 2;
@@ -56,7 +56,7 @@
             // 
             // mtextLongitude
             // 
-            this.mtextLongitude.Location = new System.Drawing.Point(91, 26);
+            this.mtextLongitude.Location = new System.Drawing.Point(91, 61);
             this.mtextLongitude.Name = "mtextLongitude";
             this.mtextLongitude.Size = new System.Drawing.Size(160, 22);
             this.mtextLongitude.TabIndex = 3;
@@ -65,7 +65,7 @@
             // 
             // mtextLatitude
             // 
-            this.mtextLatitude.Location = new System.Drawing.Point(91, 59);
+            this.mtextLatitude.Location = new System.Drawing.Point(91, 27);
             this.mtextLatitude.Name = "mtextLatitude";
             this.mtextLatitude.Size = new System.Drawing.Size(160, 22);
             this.mtextLatitude.TabIndex = 4;
@@ -80,7 +80,7 @@
             this.buttonOK.TabIndex = 5;
             this.buttonOK.Text = "OK";
             this.buttonOK.UseVisualStyleBackColor = true;
-            this.buttonOK.Click += new System.EventHandler(this.buttonOK_Click);
+            this.buttonOK.Click += new System.EventHandler(this.Onbutton_Click);
             // 
             // buttonCancel
             // 
@@ -111,6 +111,7 @@
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "CoordinateEntryForm";
             this.Text = "Coordinates";
+            this.Shown += new System.EventHandler(this.CoordinateEntryForm_Shown);
             this.ResumeLayout(false);
             this.PerformLayout();
 

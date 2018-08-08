@@ -7,12 +7,11 @@ namespace FAD3
 {
     public partial class CoordinateEntryForm : Form
     {
-        private (double? x, double? y) _LandingSitePosition;
         private frmLandingSite _Parent_form;
         private string _XCoordinatePrompt;
         private string _YCoordinatePrompt;
         private Coordinate _Coordinate;
-        private global.CoordinateDisplayFormat _CoordFormat;
+        private global.CoordinateDisplayFormat _CoordinateFormat;
 
         private float _LonDeg;
         private float _LatDeg;
@@ -23,11 +22,7 @@ namespace FAD3
         private bool _IsNorth;
         private bool _IsEast;
 
-        private char _DegreeSign = '°';
         private char _SecondSign = '"';
-        private char _NS;
-        private char _EW;
-
         private bool _IsNew;
 
         public Coordinate Coordinate
@@ -36,32 +31,41 @@ namespace FAD3
             set { _Coordinate = value; }
         }
 
-        public CoordinateEntryForm(bool IsNew, frmLandingSite Parent, (double? x, double? y) LandingSitePosition)
+        public CoordinateEntryForm(bool IsNew, frmLandingSite Parent, Coordinate coordinate)
         {
             InitializeComponent();
-            _LandingSitePosition = LandingSitePosition;
             _Parent_form = Parent;
             _IsNew = IsNew;
+            _Coordinate = coordinate;
 
-            _CoordFormat = global.CoordinateDisplay;
-            switch (_CoordFormat)
+            var format = "D";
+            _CoordinateFormat = global.CoordinateDisplay;
+
+            if (!_IsNew)
+            {
+                _Coordinate.GetD(out _LatDeg, out _LonDeg);
+            }
+
+            switch (_CoordinateFormat)
             {
                 case global.CoordinateDisplayFormat.DegreeDecimal:
-                    mtextLongitude.Mask = "L 000.00000°";
-                    mtextLatitude.Mask = "L 00.00000°";
-                    _Coordinate.GetD(out _LatDeg, out _LonDeg);
+                    mtextLongitude.Mask = $"000.0000° L";
+                    mtextLatitude.Mask = $"00.0000° L";
+
                     break;
 
                 case global.CoordinateDisplayFormat.DegreeMinute:
-                    mtextLongitude.Mask = "L 000°00.000'";
-                    mtextLatitude.Mask = "L 00°00.000'";
-                    _Coordinate.GetDM(out _LatDeg, out _LatMin, out _IsNorth, out _LonDeg, out _LonMin, out _IsEast);
+                    mtextLongitude.Mask = $"000°00.00' L";
+                    mtextLatitude.Mask = $"00°00.00' L";
+                    if (!_IsNew) _Coordinate.GetDM(out _LatDeg, out _LatMin, out _IsNorth, out _LonDeg, out _LonMin, out _IsEast);
+                    format = "DM";
                     break;
 
                 case global.CoordinateDisplayFormat.DegreeMinuteSecond:
-                    mtextLongitude.Mask = $"L 000°00'00.00{_SecondSign}";
-                    mtextLatitude.Mask = $"L 00°00'00.00{_SecondSign}";
-                    _Coordinate.GetDMS(out _LatDeg, out _LatMin, out _LatSec, out _IsNorth, out _LonDeg, out _LonMin, out _LonSec, out _IsEast);
+                    mtextLongitude.Mask = $"000°00'00.0{_SecondSign} L";
+                    mtextLatitude.Mask = $"00°00'00.0{_SecondSign} L";
+                    if (!_IsNew) _Coordinate.GetDMS(out _LatDeg, out _LatMin, out _LatSec, out _IsNorth, out _LonDeg, out _LonMin, out _LonSec, out _IsEast);
+                    format = "DMS";
                     break;
 
                 case global.CoordinateDisplayFormat.UTM:
@@ -72,42 +76,12 @@ namespace FAD3
             _XCoordinatePrompt = mtextLongitude.Text;
             _YCoordinatePrompt = mtextLatitude.Text;
 
-            if (LandingSitePosition.x != null && LandingSitePosition.y != null)
+            if (!_IsNew)
             {
-                _Coordinate.Latitude = (float)_LandingSitePosition.y;
-                _Coordinate.Longitude = (float)_LandingSitePosition.x;
-
-                _NS = _LatDeg < 0 ? 'S' : 'N';
-                _EW = _LonDeg < 0 ? 'W' : 'E';
-
-                switch (_CoordFormat)
-                {
-                    case global.CoordinateDisplayFormat.DegreeDecimal:
-                        mtextLatitude.Text = $"{_NS} {_LatDeg}{_DegreeSign}";
-                        mtextLongitude.Text = $"{_EW} {_LonDeg}{_DegreeSign}";
-                        break;
-
-                    case global.CoordinateDisplayFormat.DegreeMinute:
-                        mtextLatitude.Text = $"{_NS} {_LatDeg}{_DegreeSign}.{_LatMin}'";
-                        mtextLongitude.Text = $"{_EW} {_LonDeg}{_DegreeSign}.{_LonMin}'";
-                        break;
-
-                    case global.CoordinateDisplayFormat.DegreeMinuteSecond:
-                        mtextLatitude.Text = $"{_NS} {_LatDeg}{_DegreeSign}.{_LatMin}'{_LatSec}{_SecondSign}";
-                        mtextLongitude.Text = $"{_EW} {_LonDeg}{_DegreeSign}.{_LonMin}'{_LatSec}{_SecondSign}";
-                        break;
-
-                    case global.CoordinateDisplayFormat.UTM:
-                        mtextLongitude.Mask = "";
-                        mtextLatitude.Mask = "";
-                        break;
-                }
+                var CoordString = _Coordinate.ToString(format).Split(' ');
+                mtextLongitude.Text = CoordString[1];
+                mtextLatitude.Text = CoordString[0];
             }
-        }
-
-        public (double? x, double? y) LandingSitePosition
-        {
-            get { return _LandingSitePosition; }
         }
 
         private void Onbutton_Click(object sender, EventArgs e)
@@ -117,8 +91,15 @@ namespace FAD3
                 case "buttonOK":
                     if (mtextLatitude.Text != _YCoordinatePrompt && mtextLongitude.Text != _XCoordinatePrompt)
                     {
-                        _Parent_form.LandingSiteCoordinate(_LandingSitePosition);
+                        _Coordinate.SetDMS(_LatDeg, _LatMin, _LatSec, _IsNorth, _LonDeg, _LonMin, _LonSec, _IsEast);
+                        _Parent_form.RefreshCoordinate();
                         Close();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Please fill up both coordinates", "Validation error",
+                                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        mtextLatitude.Focus();
                     }
                     break;
 
@@ -141,7 +122,27 @@ namespace FAD3
                     {
                         char[] NEWS = { 'N', 'E', 'W', 'S' };
                         string[] parts = o.Text.ToUpper().Split(new char[] { ' ', '\'', '\"', '°', });
-                        CardinalDirection = parts[0][0];
+                        var DirectionPart = 3;
+                        switch (_CoordinateFormat)
+                        {
+                            case global.CoordinateDisplayFormat.DegreeDecimal:
+                                DirectionPart = 2;
+                                break;
+
+                            case global.CoordinateDisplayFormat.DegreeMinute:
+                                DirectionPart = 3;
+                                break;
+
+                            case global.CoordinateDisplayFormat.DegreeMinuteSecond:
+                                DirectionPart = 4;
+                                break;
+
+                            case global.CoordinateDisplayFormat.UTM:
+                                break;
+                        }
+
+                        CardinalDirection = parts[DirectionPart][0];
+
                         if (Array.Exists(NEWS, element => element == CardinalDirection))
                         {
                             if (o.Name == "mtextLongitude")
@@ -151,8 +152,8 @@ namespace FAD3
                                 if (!e.Cancel)
                                 {
                                     //check the absolute value of the degree part
-                                    e.Cancel = Math.Abs(float.Parse(parts[1])) > 180;
-                                    IsLimit = float.Parse(parts[1]) == 180;
+                                    e.Cancel = Math.Abs(float.Parse(parts[0])) > 180;
+                                    IsLimit = float.Parse(parts[0]) == 180;
                                     msg = "Degree part cannot be more than 180";
                                     _IsEast = CardinalDirection == 'E';
                                 }
@@ -164,57 +165,57 @@ namespace FAD3
                                 if (!e.Cancel)
                                 {
                                     //check the absolute value of the degree part
-                                    e.Cancel = Math.Abs(float.Parse(parts[1])) > 90;
-                                    IsLimit = float.Parse(parts[1]) == 90;
+                                    e.Cancel = Math.Abs(float.Parse(parts[0])) > 90;
+                                    IsLimit = float.Parse(parts[0]) == 90;
                                     msg = "Degree part cannot be more than 90";
-                                    _IsEast = CardinalDirection == 'N';
+                                    _IsNorth = CardinalDirection == 'N';
                                 }
                             }
 
                             if (!e.Cancel)
                             {
-                                switch (_CoordFormat)
+                                switch (_CoordinateFormat)
                                 {
                                     case global.CoordinateDisplayFormat.DegreeDecimal:
                                         if (!e.Cancel && o.Name == "mtextLongitude")
                                         {
-                                            _LonDeg = float.Parse(parts[1]);
+                                            _LonDeg = float.Parse(parts[0]);
                                         }
                                         else if (!e.Cancel)
                                         {
-                                            _LatDeg = float.Parse(parts[1]);
+                                            _LatDeg = float.Parse(parts[0]);
                                         }
                                         break;
 
                                     case global.CoordinateDisplayFormat.DegreeMinute:
-                                        e.Cancel = IsLimit ? float.Parse(parts[2]) > 0 : float.Parse(parts[2]) >= 60;
+                                        e.Cancel = IsLimit ? float.Parse(parts[1]) > 0 : float.Parse(parts[1]) >= 60;
                                         msg = IsLimit ? "Minute part shoud be zero" : "Minute part should be less than 60";
                                         if (!e.Cancel && o.Name == "mtextLongitude")
                                         {
-                                            _LonDeg = float.Parse(parts[1]);
-                                            _LonMin = float.Parse(parts[2]);
+                                            _LonDeg = float.Parse(parts[0]);
+                                            _LonMin = float.Parse(parts[1]);
                                         }
                                         else if (!e.Cancel)
                                         {
-                                            _LatDeg = float.Parse(parts[1]);
-                                            _LatMin = float.Parse(parts[2]);
+                                            _LatDeg = float.Parse(parts[0]);
+                                            _LatMin = float.Parse(parts[1]);
                                         }
                                         break;
 
                                     case global.CoordinateDisplayFormat.DegreeMinuteSecond:
-                                        e.Cancel = IsLimit ? float.Parse(parts[3]) > 0 : float.Parse(parts[3]) >= 60;
+                                        e.Cancel = IsLimit ? float.Parse(parts[2]) > 0 : float.Parse(parts[2]) >= 60;
                                         msg = IsLimit ? "Second part should be zero" : "Second part should be less than 60";
                                         if (!e.Cancel && o.Name == "mtextLongitude")
                                         {
-                                            _LonDeg = float.Parse(parts[1]);
-                                            _LonMin = float.Parse(parts[2]);
-                                            _LonSec = float.Parse(parts[3]);
+                                            _LonDeg = float.Parse(parts[0]);
+                                            _LonMin = float.Parse(parts[1]);
+                                            _LonSec = float.Parse(parts[2]);
                                         }
                                         else if (!e.Cancel)
                                         {
-                                            _LatDeg = float.Parse(parts[1]);
-                                            _LatMin = float.Parse(parts[2]);
-                                            _LatSec = float.Parse(parts[3]);
+                                            _LatDeg = float.Parse(parts[0]);
+                                            _LatMin = float.Parse(parts[1]);
+                                            _LatSec = float.Parse(parts[2]);
                                         }
                                         break;
 
@@ -249,13 +250,9 @@ namespace FAD3
             }
         }
 
-        private void buttonOK_Click(object sender, EventArgs e)
+        private void CoordinateEntryForm_Shown(object sender, EventArgs e)
         {
-            if (mtextLatitude.Text != _YCoordinatePrompt && mtextLongitude.Text != _XCoordinatePrompt)
-            {
-                _Coordinate.SetDMS(_LatDeg, _LatMin, _LatSec, _IsNorth, _LonDeg, _LonMin, _LonSec, _IsEast);
-            }
-            Close();
+            mtextLatitude.Focus();
         }
     }
 }

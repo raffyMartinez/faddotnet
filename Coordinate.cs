@@ -259,19 +259,19 @@ namespace ISO_Classes
                 case "":
                 case "DMS":
                     this.GetDMS(out latDeg, out latMin, out latSec, out north, out lonDeg, out lonMin, out lonSec, out east);
-                    sb.AppendFormat(fi, "{0:0#}�{1:0#}'{2:0#.0}\"{3} ", latDeg, latMin, latSec, (north ? "N" : "S"));
-                    sb.AppendFormat(fi, "{0:0##}�{1:0#}'{2:0#.0}\"{3}", lonDeg, lonMin, lonSec, (east ? "E" : "W"));
+                    sb.AppendFormat(fi, "{0:0#}°{1:0#}'{2:0#.0}\"{3} ", latDeg, latMin, latSec, (north ? "N" : "S"));
+                    sb.AppendFormat(fi, "{0:0##}°{1:0#}'{2:0#.0}\"{3}", lonDeg, lonMin, lonSec, (east ? "E" : "W"));
                     break;
 
                 case "D":
-                    sb.AppendFormat(fi, "{0:0#.0000}�{1} ", Math.Abs(Latitude), (latitude > 0 ? "N" : "S"));
-                    sb.AppendFormat(fi, "{0:0##.0000}�{1}", Math.Abs(Longitude), (longitude > 0 ? "E" : "W"));
+                    sb.AppendFormat(fi, "{0:0#.0000}°{1} ", Math.Abs(Latitude), (latitude > 0 ? "N" : "S"));
+                    sb.AppendFormat(fi, "{0:0##.0000}°{1}", Math.Abs(Longitude), (longitude > 0 ? "E" : "W"));
                     break;
 
                 case "DM":
                     this.GetDM(out latDeg, out latMin, out north, out lonDeg, out lonMin, out east);
-                    sb.AppendFormat(fi, "{0:0#}�{1:0#.00}'{2} ", latDeg, latMin, (north ? "N" : "S"));
-                    sb.AppendFormat(fi, "{0:0##}�{1:0#.00}'{2}", lonDeg, lonMin, (east ? "E" : "W"));
+                    sb.AppendFormat(fi, "{0:0#}°{1:0#.00}'{2} ", latDeg, latMin, (north ? "N" : "S"));
+                    sb.AppendFormat(fi, "{0:0##}°{1:0#.00}'{2}", lonDeg, lonMin, (east ? "E" : "W"));
                     break;
 
                 case "ISO":

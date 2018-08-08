@@ -27,8 +27,8 @@ namespace FAD3
         private string _LandingSiteName = "";
         private double _xCoord = 0;
         private double _yCoord = 0;
-        private long _LandingSiteDataCountEx = 0;
         private Coordinate _Coordinate;
+        private bool _IsNew = false;
 
         public Coordinate Coordinate
         {
@@ -70,6 +70,12 @@ namespace FAD3
             //empty default constructor
         }
 
+        public void IsNew()
+        {
+            _Coordinate = new Coordinate();
+            _IsNew = true;
+        }
+
         public string LandingSiteName
         {
             get { return _LandingSiteName; }
@@ -108,7 +114,7 @@ namespace FAD3
         /// <param name="isNew"></param>
         /// <param name="LSData"></param>
         /// <returns></returns>
-        public static bool UpdateData(bool isNew, Dictionary<string, string> LSData)
+        public bool UpdateData(bool isNew, Dictionary<string, string> LSData)
         {
             bool Success = false;
             string updateQuery = "";
@@ -116,6 +122,14 @@ namespace FAD3
             {
                 try
                 {
+                    var xCoord = "null";
+                    var yCoord = "null";
+                    if (bool.Parse(LSData["HasCoordinate"]))
+                    {
+                        xCoord = _Coordinate.Longitude.ToString();
+                        yCoord = _Coordinate.Latitude.ToString();
+                    }
+
                     if (isNew)
                     {
                         updateQuery = $@"Insert into tblLandingSites
@@ -124,26 +138,28 @@ namespace FAD3
                             {{{LSData["LSGUID"]}}},
                             '{LSData["LSName"]}',
                             {LSData["MunNo"]},
-                            {LSData["cx"]},
-                            {LSData["cy"]})";
+                            {xCoord},
+                            {yCoord})";
                     }
                     else
                     {
                         updateQuery = $@"UPDATE tblLandingSites set
                             LSName = '{LSData["LSName"]}',
-                            cx = {LSData["cx"]},
-                            cy = {LSData["cy"]},
+                            cx = {xCoord},
+                            cy = {yCoord},
                             MunNo = {LSData["MunNo"]}
                             Where LSGUID= {{{LSData["LSGUID"]}}}";
                     }
-                    OleDbCommand update = new OleDbCommand(updateQuery, conn);
                     conn.Open();
-                    Success = (update.ExecuteNonQuery() > 0);
+                    using (OleDbCommand update = new OleDbCommand(updateQuery, conn))
+                    {
+                        Success = (update.ExecuteNonQuery() > 0);
+                    }
                     conn.Close();
                 }
                 catch (Exception ex)
                 {
-                    ErrorLogger.Log(ex);
+                    ErrorLogger.Log($"{ex.Message}\r\n{ex.Source}");
                 }
             }
 
@@ -153,7 +169,11 @@ namespace FAD3
         public string LandingSiteGUID
         {
             get { return _LandingSiteGUID; }
-            set { _LandingSiteGUID = value; }
+            set
+            {
+                _LandingSiteGUID = value;
+                _Coordinate = new Coordinate();
+            }
         }
 
         /// <summary>
@@ -242,11 +262,34 @@ namespace FAD3
                     {
                         DataRow dr = myDT.Rows[i];
                         myLSData.Add("LSName", dr["LSname"].ToString());
-                        myLSData.Add("cx", dr["cx"].ToString());
-                        myLSData.Add("cy", dr["cy"].ToString());
                         myLSData.Add("Municipality", dr["Municipality"].ToString());
                         myLSData.Add("ProvinceName", dr["ProvinceName"].ToString());
-                        _LandingSiteDataCountEx += _LandingSiteDataCountEx;
+                        myLSData.Add("CoordinateStringXY", $"{dr["cx"].ToString()},{dr["cy"].ToString()}");
+                        if (myLSData["CoordinateStringXY"].Length > 1)
+                        {
+                            _Coordinate.SetD(float.Parse(dr["cy"].ToString()), float.Parse(dr["cx"].ToString()));
+                            switch (global.CoordinateDisplay)
+                            {
+                                case global.CoordinateDisplayFormat.DegreeDecimal:
+                                    myLSData["CoordinateStringXY"] = Coordinate.ToString("D");
+                                    break;
+
+                                case global.CoordinateDisplayFormat.DegreeMinute:
+                                    myLSData["CoordinateStringXY"] = Coordinate.ToString("DM");
+                                    break;
+
+                                case global.CoordinateDisplayFormat.DegreeMinuteSecond:
+                                    myLSData["CoordinateStringXY"] = Coordinate.ToString("DMS");
+                                    break;
+
+                                case global.CoordinateDisplayFormat.UTM:
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            myLSData["CoordinateStringXY"] = "";
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -291,6 +334,7 @@ namespace FAD3
                     {
                         _yCoord = num;
                     }
+
                     for (int i = 0; i < myDT.Columns.Count; i++)
                     {
                         if (i == 0)
