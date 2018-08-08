@@ -8,7 +8,7 @@
  */
 namespace FAD3
 {
-	partial class frmLandingSite
+	partial class LandingSiteForm
 	{
 		/// <summary>
 		/// Designer variable used to keep track of non-visual components.

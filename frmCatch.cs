@@ -28,10 +28,10 @@ namespace FAD3
 		private double _CatchSampleWt = 0;
 		private double _TotalWtFromTotal = 0;
 		private bool _isNew = false;
-		private frmMain _ParentForm;
+		private MainForm _ParentForm;
 
 
-		public new frmMain ParentForm
+		public new MainForm ParentForm
 		{
 			set { _ParentForm = value; }
 			get { return _ParentForm; }

@@ -108,6 +108,12 @@
       <DependentUpon>CoordinateFormatSelectForm.cs</DependentUpon>
     </Compile>
     <Compile Include="DBCheck.cs" />
+    <Compile Include="EditEnumerator.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditEnumerator.Designer.cs">
+      <DependentUpon>EditEnumerator.cs</DependentUpon>
+    </Compile>
     <Compile Include="ErrorLogger.cs" />
     <Compile Include="extension.cs" />
     <Compile Include="FGExtentForm.cs">
@@ -154,6 +160,7 @@
     <Compile Include="frmAbout.Designer.cs">
       <DependentUpon>frmAbout.cs</DependentUpon>
     </Compile>
+    <Compile Include="SamplingEnumerators.cs" />
     <Compile Include="TargetAreaForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -166,11 +173,11 @@
     <Compile Include="frmCatch.Designer.cs">
       <DependentUpon>frmCatch.cs</DependentUpon>
     </Compile>
-    <Compile Include="frmEnumerator.cs">
+    <Compile Include="EnumeratorForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmEnumerator.Designer.cs">
-      <DependentUpon>frmEnumerator.cs</DependentUpon>
+    <Compile Include="EnumeratorForm.Designer.cs">
+      <DependentUpon>EnumeratorForm.cs</DependentUpon>
     </Compile>
     <Compile Include="frmEditGMS.cs">
       <SubType>Form</SubType>
@@ -178,17 +185,17 @@
     <Compile Include="frmEditGMS.Designer.cs">
       <DependentUpon>frmEditGMS.cs</DependentUpon>
     </Compile>
-    <Compile Include="frmLandingSite.cs">
+    <Compile Include="LandingSiteForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmLandingSite.Designer.cs">
-      <DependentUpon>frmLandingSite.cs</DependentUpon>
+    <Compile Include="LandingSiteForm.Designer.cs">
+      <DependentUpon>LandingSiteForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="frmMain.cs">
+    <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmMain.Designer.cs">
-      <DependentUpon>frmMain.cs</DependentUpon>
+    <Compile Include="MainForm.Designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
     <Compile Include="frmNewDB.cs">
       <SubType>Form</SubType>
@@ -294,17 +301,17 @@
     <EmbeddedResource Include="frmCatch.resx">
       <DependentUpon>frmCatch.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmEnumerator.resx">
-      <DependentUpon>frmEnumerator.cs</DependentUpon>
+    <EmbeddedResource Include="EnumeratorForm.resx">
+      <DependentUpon>EnumeratorForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmEditGMS.resx">
       <DependentUpon>frmEditGMS.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmLandingSite.resx">
-      <DependentUpon>frmLandingSite.cs</DependentUpon>
+    <EmbeddedResource Include="LandingSiteForm.resx">
+      <DependentUpon>LandingSiteForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmMain.resx">
-      <DependentUpon>frmMain.cs</DependentUpon>
+    <EmbeddedResource Include="MainForm.resx">
+      <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmNewDB.resx">
       <DependentUpon>frmNewDB.cs</DependentUpon>

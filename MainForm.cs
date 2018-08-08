@@ -24,7 +24,7 @@ namespace FAD3
     /// <summary>
     /// Description of frmMain.
     /// </summary>
-    public partial class frmMain : Form
+    public partial class MainForm : Form
     {
         private aoi _AOI = new aoi();
         private string _AOIGuid = "";
@@ -57,7 +57,7 @@ namespace FAD3
         private string _VesLength = "";
         private string _VesWidth = "";
 
-        public frmMain()
+        public MainForm()
         {
             //
             // The InitializeComponent() call is required for Windows Forms designer support.
@@ -84,6 +84,7 @@ namespace FAD3
                     _AOIGuid = value;
                     _AOI.AOIGUID = _AOIGuid;
                     FishingGrid.AOIGuid = _AOIGuid;
+                    SamplingEnumerators.AOIGuid = _AOIGuid;
                 }
             }
         }
@@ -322,21 +323,30 @@ namespace FAD3
         private void ConfigDropDownMenu(Control Source, ListViewHitTestInfo lvh)
         {
             menuDropDown.Items.Clear();
-            if (lvh.Item != null)
+
+            var tsi = menuDropDown.Items.Add("New sampling");
+            tsi.Name = "menuNewSampling";
+            tsi.Visible = lvMain.Tag.ToString() == "sampling";
+
+            if (lvh.Item == null)
+            {
+            }
+            else
             {
                 //Note: commented out because I can't make this work for now
 
-                //var tsi1 = menuDropDown.Items.Add("Detail of selected sampling");
-                //tsi1.Name = "menuSamplingDetail";
-                //_SamplingGUID = lvh.Item.Name;
+                var tsi1 = menuDropDown.Items.Add("Enumerator detail");
+                tsi1.Name = "menuEnumeratorDetail";
+                tsi1.Visible = lvh.Item.Tag != null && _TreeLevel == "aoi" && lvh.Item.Tag.ToString() == "enumerator";
 
-                //menuDropDown.Items.Add("-");
+                tsi1 = menuDropDown.Items.Add("Landing site detail");
+                tsi1.Name = "menuLandingSiteDetail";
+                tsi1.Visible = lvh.Item.Tag != null && _TreeLevel == "landing_site" && lvh.Item.Tag.ToString() == "landing_site";
+
+                tsi1 = menuDropDown.Items.Add("Delete sampling");
+                tsi1.Name = "menuDeleteSampling";
+                tsi1.Visible = lvMain.Tag.ToString() == "sampling";
             }
-            var tsi = menuDropDown.Items.Add("New sampling");
-            tsi.Name = "menuNewSampling";
-
-            tsi = menuDropDown.Items.Add("Delete sampling");
-            tsi.Name = "menuDeleteSampling";
         }
 
         private void ConfigDropDownMenu(Control Source)
@@ -810,7 +820,7 @@ namespace FAD3
             }
         }
 
-        private void menuDropDown_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        private void OnMenuDropDown_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
             var ItemName = e.ClickedItem.Name;
             e.ClickedItem.Owner.Hide();
@@ -822,7 +832,7 @@ namespace FAD3
                     break;
 
                 case "menuNewLandingSite":
-                    frmLandingSite fls = new frmLandingSite(_AOI, this, _ls, IsNew: true);
+                    LandingSiteForm fls = new LandingSiteForm(_AOI, this, _ls, IsNew: true);
                     fls.ShowDialog(this);
                     break;
 
@@ -848,7 +858,17 @@ namespace FAD3
                     }
                     break;
 
-                case "menuNewEnumerator":
+                //this will show a list of enumerators and their corresponding details
+                case "menuEnumerators":
+                    EnumeratorForm ef = new EnumeratorForm();
+                    ef.ShowDialog(this);
+                    break;
+
+                //this will show the samplings done by an enumerator
+                case "menuEnumeratorDetail":
+                    //pass the enumerator guid to the form's constructor
+                    EnumeratorForm ef1 = new EnumeratorForm(lvMain.SelectedItems[0].SubItems[1].Name);
+                    ef1.ShowDialog(this);
                     break;
 
                 case "menuSamplingDetail":
@@ -989,7 +1009,7 @@ namespace FAD3
                                     }
                                     else if (lvi.Name == "Enumerators")
                                     {
-                                        frmEnumerator frm = new frmEnumerator(lvi.Tag.ToString());
+                                        EnumeratorForm frm = new EnumeratorForm(lvi.Tag.ToString());
                                         frm.AOI = _AOI;
                                         frm.ParentForm = this;
                                         frm.Show(this);
@@ -1005,7 +1025,7 @@ namespace FAD3
                                 break;
 
                             case "landing_site":
-                                frmLandingSite fls = new frmLandingSite(_AOI, this, _ls);
+                                LandingSiteForm fls = new LandingSiteForm(_AOI, this, _ls);
                                 fls.Show();
                                 break;
 
@@ -1062,7 +1082,7 @@ namespace FAD3
                     if (lvMain.Tag.ToString() == "sampling" && lvh.Item != null) SamplingGUID = lvh.Item.Tag.ToString();
                     if (e.Button == MouseButtons.Right)
                     {
-                        if (_TreeLevel == "sampling")
+                        if (_TreeLevel == "sampling" || _TreeLevel == "aoi" || _TreeLevel == "landing_site")
                         {
                             Text = "x: " + _MouseX + " y: " + _MouseY;
                             ConfigDropDownMenu(lvMain, lvh);
@@ -1969,8 +1989,8 @@ namespace FAD3
                         }
                         lvi.Name = "Enumerators";
                         arr = item.Value.ToString().Split(',');
-                        lvi.SubItems.Add(item.Key + ": " + arr[1].ToString());
-                        lvi.Tag = arr[0].ToString();
+                        lvi.SubItems.Add(item.Key + ": " + arr[1].ToString()).Name = arr[0];
+                        lvi.Tag = "enumerator";
                         i++;
                     }
 
@@ -2014,12 +2034,16 @@ namespace FAD3
                     {
                         lvi = lvMain.Items.Add("name", "Name", null);
                         lvi.SubItems.Add(o["LSName"]);
+                        lvi.Tag = "landing_site";
                         lvi = lvMain.Items.Add("Municipality");
                         lvi.SubItems.Add(o["Municipality"]);
+                        lvi.Tag = "landing_site";
                         lvi = lvMain.Items.Add("Province");
                         lvi.SubItems.Add(o["ProvinceName"]);
+                        lvi.Tag = "landing_site";
                         lvi = lvMain.Items.Add("Coordinate");
                         lvi.SubItems.Add(o["CoordinateStringXY"]);
+                        lvi.Tag = "landing_site";
                     });
 
                     //add total number of sampling

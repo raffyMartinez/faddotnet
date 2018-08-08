@@ -21,7 +21,7 @@ namespace FAD3
         private aoi _AOI = new aoi();
         private bool _IsNew = false;
         private static TargetAreaForm _instance;
-        private frmMain _parent_form;
+        private MainForm _parent_form;
         private int _MouseX;
         private int _MouseY;
         private string _TargetAreaName;
@@ -43,13 +43,13 @@ namespace FAD3
             }
         }
 
-        public frmMain Parent_form
+        public MainForm Parent_form
         {
             get { return _parent_form; }
             set { _parent_form = value; }
         }
 
-        public static TargetAreaForm GetInstance(frmMain Parent, bool IsNew = false)
+        public static TargetAreaForm GetInstance(MainForm Parent, bool IsNew = false)
         {
             if (_instance == null) _instance = new TargetAreaForm(Parent, IsNew);
             return _instance;
@@ -70,7 +70,7 @@ namespace FAD3
             _IsNew = true;
         }
 
-        public TargetAreaForm(frmMain Parent, bool IsNew = false)
+        public TargetAreaForm(MainForm Parent, bool IsNew = false)
         {
             InitializeComponent();
             _IsNew = IsNew;

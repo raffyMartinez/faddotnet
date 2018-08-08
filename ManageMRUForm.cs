@@ -13,14 +13,14 @@ namespace FAD3
     public partial class ManageMRUForm : Form
     {
         private List<FileInfo> _FileList;
-        private frmMain _parent_form;
+        private MainForm _parent_form;
 
         public ManageMRUForm()
         {
             InitializeComponent();
         }
 
-        public frmMain Parent_form
+        public MainForm Parent_form
         {
             get { return _parent_form; }
             set

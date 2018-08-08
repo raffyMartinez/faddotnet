@@ -29,7 +29,7 @@ namespace FAD3
             global.TestRequiredFilesExists();
             try
             {
-                Application.Run(new frmMain());
+                Application.Run(new MainForm());
             }
             catch (ObjectDisposedException) { }
             //TODO: error when closing the file when file close on the menu bar is used 

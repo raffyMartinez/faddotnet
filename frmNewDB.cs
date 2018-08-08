@@ -16,7 +16,7 @@ namespace FAD3
     public partial class frmNewDB : Form
     {
         private string _newMDBFilename = "";
-        private frmMain _parentForm;
+        private MainForm _parentForm;
 
         
 
@@ -38,7 +38,7 @@ namespace FAD3
             this.Close();
         }
 
-        public new void ParentForm(frmMain f)
+        public new void ParentForm(MainForm f)
         {
             _parentForm = f;
         }

@@ -7,7 +7,7 @@ namespace FAD3
 {
     public partial class CoordinateEntryForm : Form
     {
-        private frmLandingSite _Parent_form;
+        private LandingSiteForm _Parent_form;
         private string _XCoordinatePrompt;
         private string _YCoordinatePrompt;
         private Coordinate _Coordinate;
@@ -31,7 +31,7 @@ namespace FAD3
             set { _Coordinate = value; }
         }
 
-        public CoordinateEntryForm(bool IsNew, frmLandingSite Parent, Coordinate coordinate)
+        public CoordinateEntryForm(bool IsNew, LandingSiteForm Parent, Coordinate coordinate)
         {
             InitializeComponent();
             _Parent_form = Parent;
@@ -253,6 +253,26 @@ namespace FAD3
         private void CoordinateEntryForm_Shown(object sender, EventArgs e)
         {
             mtextLatitude.Focus();
+        }
+
+        private void Onmtext_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Return)
+            {
+                switch (((MaskedTextBox)sender).Name)
+                {
+                    case "mtextLongitude":
+                        if (mtextLongitude.MaskCompleted)
+                            buttonOK.Focus();
+                        break;
+
+                    case "mtextLatitude":
+                        if (mtextLatitude.MaskCompleted)
+                            mtextLongitude.Focus();
+                        break;
+                }
+                e.Handled = e.SuppressKeyPress = true;
+            }
         }
     }
 }

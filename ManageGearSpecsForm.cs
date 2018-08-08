@@ -46,7 +46,7 @@ namespace FAD3
             {
                 o.View = View.Details;
                 var c = o.Columns.Add("Property");
-                c.Width = frmMain.TextWidth(c.Text, lvSpecs.Font);
+                c.Width = MainForm.TextWidth(c.Text, lvSpecs.Font);
                 o.Columns.Add("Type");
                 o.Columns.Add("Notes");
                 c = o.Columns.Add("DataStatus");

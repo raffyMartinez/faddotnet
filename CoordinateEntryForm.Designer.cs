@@ -61,6 +61,7 @@
             this.mtextLongitude.Size = new System.Drawing.Size(160, 22);
             this.mtextLongitude.TabIndex = 3;
             this.mtextLongitude.TextMaskFormat = System.Windows.Forms.MaskFormat.IncludePromptAndLiterals;
+            this.mtextLongitude.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Onmtext_KeyUp);
             this.mtextLongitude.Validating += new System.ComponentModel.CancelEventHandler(this.onCoordinate_Validating);
             // 
             // mtextLatitude
@@ -70,6 +71,7 @@
             this.mtextLatitude.Size = new System.Drawing.Size(160, 22);
             this.mtextLatitude.TabIndex = 4;
             this.mtextLatitude.TextMaskFormat = System.Windows.Forms.MaskFormat.IncludePromptAndLiterals;
+            this.mtextLatitude.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Onmtext_KeyUp);
             this.mtextLatitude.Validating += new System.ComponentModel.CancelEventHandler(this.onCoordinate_Validating);
             // 
             // buttonOK

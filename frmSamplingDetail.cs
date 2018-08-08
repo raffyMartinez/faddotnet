@@ -28,7 +28,7 @@ namespace FAD3
         private string _GearVarName = "";
         private string _GearVarGuid = "";
         private string _GearRefCode = "";
-        private frmMain _parent;
+        private MainForm _parent;
         private bool _isNew;
         private aoi _aoi;
         private TextBox _txtVesselDimension = new TextBox();
@@ -160,7 +160,7 @@ namespace FAD3
             set { _aoi = value; }
         }
 
-        public frmMain Parent_Form
+        public MainForm Parent_Form
         {
             get { return _parent; }
             set { _parent = value; }

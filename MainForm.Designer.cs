@@ -8,7 +8,7 @@
  */
 namespace FAD3
 {
-	partial class frmMain
+	partial class MainForm
 	{
 		/// <summary>
 		/// Designer variable used to keep track of non-visual components.
@@ -37,7 +37,7 @@ namespace FAD3
 		private void InitializeComponent()
 		{
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.treeMain = new System.Windows.Forms.TreeView();
             this.menuDropDown = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -139,7 +139,7 @@ namespace FAD3
             // 
             this.menuDropDown.Name = "menuDropDown";
             this.menuDropDown.Size = new System.Drawing.Size(61, 4);
-            this.menuDropDown.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.menuDropDown_ItemClicked);
+            this.menuDropDown.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnMenuDropDown_ItemClicked);
             // 
             // imageList1
             // 

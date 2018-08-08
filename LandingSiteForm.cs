@@ -1,4 +1,5 @@
 ﻿/*
+ *
  * Created by SharpDevelop.
  * User: Raffy
  * Date: 8/8/2016
@@ -16,17 +17,16 @@ namespace FAD3
     /// <summary>
     /// Description of frmLandingSite.
     /// </summary>
-    public partial class frmLandingSite : Form
+    public partial class LandingSiteForm : Form
     {
         private aoi _AOI;
         private bool _isNew = false;
         private landingsite _LandingSite;
         private string _LSGUID = "";
         private long _MunicipalityNumber;
-        private frmMain _ParentForm;
-        private Dictionary<long, string> Provinces = new Dictionary<long, string>();
+        private MainForm _ParentForm;
 
-        public frmLandingSite(aoi aoi, frmMain Parent, landingsite LandingSite, bool IsNew = false)
+        public LandingSiteForm(aoi aoi, MainForm Parent, landingsite LandingSite, bool IsNew = false)
         {
             //
             // The InitializeComponent() call is required for Windows Forms designer support.
@@ -40,9 +40,16 @@ namespace FAD3
             _ParentForm = Parent;
             _isNew = IsNew;
             _LandingSite = LandingSite;
-            if (_isNew) _LandingSite.IsNew();
-            Provinces = global.provinceDict;
-            comboProvince.DataSource = new BindingSource(Provinces, null);
+
+            Text = "Landing site";
+
+            if (_isNew)
+            {
+                Text = "New landing site";
+                _LandingSite.IsNew();
+            }
+
+            comboProvince.DataSource = new BindingSource(global.provinceDict, null);
             comboProvince.DisplayMember = "Value";
             comboProvince.ValueMember = "Key";
             comboProvince.AutoCompleteMode = AutoCompleteMode.Suggest;
@@ -91,7 +98,6 @@ namespace FAD3
         private void FrmLandingSiteLoad(object sender, EventArgs e)
         {
             textLandingSiteName.Focus();
-            Text = "New landing site";
             if (!_isNew && _LandingSite != null)
             {
                 Dictionary<string, string> myLSData = _LandingSite.LandingSiteDataEx();
