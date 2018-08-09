@@ -12,10 +12,10 @@ namespace FAD3
     public partial class GenerateRefNumberForm : Form
     {
 
-        frmSamplingDetail _Parent_Form;
+        SamplingForm _Parent_Form;
         string _NextRefCode = "";
 
-        public frmSamplingDetail Parent_Form
+        public SamplingForm Parent_Form
         {
             get { return _Parent_Form; }
             set { _Parent_Form = value; }

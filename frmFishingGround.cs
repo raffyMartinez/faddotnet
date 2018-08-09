@@ -17,7 +17,7 @@ namespace FAD3
         private List<string> _FishingGrounds;
         private ListViewItem _selectedItem;
 
-        public frmFishingGround(string AOIGuid, frmSamplingDetail Parent)
+        public frmFishingGround(string AOIGuid, SamplingForm Parent)
         {
             InitializeComponent();
             this.AOIGuid = AOIGuid;
@@ -30,9 +30,9 @@ namespace FAD3
             set { _FishingGrounds = value; }
         }
 
-        public frmSamplingDetail Parent_form { get; }
+        public SamplingForm Parent_form { get; }
 
-        public static frmFishingGround GetInstance(string AOIGuid, frmSamplingDetail Parent)
+        public static frmFishingGround GetInstance(string AOIGuid, SamplingForm Parent)
         {
             if (_instance == null) _instance = new frmFishingGround(AOIGuid, Parent);
             return _instance;

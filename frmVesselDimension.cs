@@ -11,14 +11,14 @@ namespace FAD3
 {
     public partial class frmVesselDimension : Form
     {
-        frmSamplingDetail _Parent = new frmSamplingDetail();
+        SamplingForm _Parent = new SamplingForm();
 
         public frmVesselDimension()
         {
             InitializeComponent();
         }
 
-        public frmSamplingDetail Parent_Form
+        public SamplingForm Parent_Form
         {
             get { return _Parent; }
             set { _Parent = value; }

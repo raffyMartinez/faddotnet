@@ -11,7 +11,7 @@ namespace FAD3
 {
     public partial class SampledGear_SpecsForm : Form
     {
-        public SampledGear_SpecsForm(string GearVarGuid, string GearVarName, frmSamplingDetail Parent_Form)
+        public SampledGear_SpecsForm(string GearVarGuid, string GearVarName, SamplingForm Parent_Form)
         {
             InitializeComponent();
             _GearVarGuid = GearVarGuid;
@@ -28,7 +28,7 @@ namespace FAD3
         private List<ManageGearSpecsClass.GearSpecification> _GearSpecs = new List<ManageGearSpecsClass.GearSpecification>();
         private bool IsNew = true;
         private bool _SampledGearSpecDataIsEdited = false;
-        private frmSamplingDetail _Parent_form;
+        private SamplingForm _Parent_form;
 
 
 
@@ -49,7 +49,7 @@ namespace FAD3
             }
         }
 
-        public static SampledGear_SpecsForm GetInstance(string GearVarGuid, string GearVarName, frmSamplingDetail Parent_Form)
+        public static SampledGear_SpecsForm GetInstance(string GearVarGuid, string GearVarName, SamplingForm Parent_Form)
         {
             if (_instance == null) _instance = new SampledGear_SpecsForm(GearVarGuid, GearVarName, Parent_Form);
             return _instance;
@@ -197,7 +197,7 @@ namespace FAD3
                          ManageGearSpecsClass.SampledGearSpecs.Keys.Contains(c.Name))
                     {
                         var spec = ManageGearSpecsClass.SampledGearSpecs[c.Name];
-                        c.Text = spec.SpecValue;
+                        c.Text = spec.SpecificationValue;
                         IsNew = false;
                     }
                 }
@@ -329,7 +329,7 @@ namespace FAD3
             {
                 foreach (KeyValuePair<string, ManageGearSpecsClass.SampledGearSpecData> kv in ManageGearSpecsClass.SampledGearSpecs)
                 {
-                    _SampledGearSpecDataIsEdited = panelUI.Controls[kv.Value.SpecGUID].Text != kv.Value.SpecValue;
+                    _SampledGearSpecDataIsEdited = panelUI.Controls[kv.Value.SpecificationGuid].Text != kv.Value.SpecificationValue;
                     if (_SampledGearSpecDataIsEdited) break;
                 }
             }
@@ -354,14 +354,14 @@ namespace FAD3
                     {
                         var arr = c.Tag.ToString().Split('|');
                         if (IsNew) spec.RowID = Guid.NewGuid().ToString();
-                        spec.SpecGUID = c.Name;
-                        spec.SpecValue = c.Text;
-                        spec.SpecName = ManageGearSpecsClass.SpecNameFromSpecGUID(spec.SpecGUID);
+                        spec.SpecificationGuid = c.Name;
+                        spec.SpecificationValue = c.Text;
+                        spec.SpecificationName = ManageGearSpecsClass.SpecNameFromSpecGUID(spec.SpecificationGuid);
                         var ds = global.fad3DataStatus.statusFromDB;
                         if (Enum.TryParse(arr[1], out ds)) spec.DataStatus = ds;
-                        spec.SamplingGUID = _SamplingGUID;
+                        spec.SamplingGuid = _SamplingGUID;
 
-                        ManageGearSpecsClass.SampledGearSpecs.Add(spec.SpecGUID, spec);
+                        ManageGearSpecsClass.SampledGearSpecs.Add(spec.SpecificationGuid, spec);
                     }
                 }
                 _Parent_form.SampledGearSpecIsEdited = true;

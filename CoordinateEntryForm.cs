@@ -7,7 +7,7 @@ namespace FAD3
 {
     public partial class CoordinateEntryForm : Form
     {
-        private LandingSiteForm _Parent_form;
+        private LandingSiteForm _ParentForm;
         private string _XCoordinatePrompt;
         private string _YCoordinatePrompt;
         private Coordinate _Coordinate;
@@ -31,11 +31,11 @@ namespace FAD3
             set { _Coordinate = value; }
         }
 
-        public CoordinateEntryForm(bool IsNew, LandingSiteForm Parent, Coordinate coordinate)
+        public CoordinateEntryForm(bool isNew, LandingSiteForm parent, Coordinate coordinate)
         {
             InitializeComponent();
-            _Parent_form = Parent;
-            _IsNew = IsNew;
+            _ParentForm = parent;
+            _IsNew = isNew;
             _Coordinate = coordinate;
 
             var format = "D";
@@ -84,7 +84,7 @@ namespace FAD3
             }
         }
 
-        private void Onbutton_Click(object sender, EventArgs e)
+        private void OnButton_Click(object sender, EventArgs e)
         {
             switch (((Button)sender).Name)
             {
@@ -92,7 +92,7 @@ namespace FAD3
                     if (mtextLatitude.Text != _YCoordinatePrompt && mtextLongitude.Text != _XCoordinatePrompt)
                     {
                         _Coordinate.SetDMS(_LatDeg, _LatMin, _LatSec, _IsNorth, _LonDeg, _LonMin, _LonSec, _IsEast);
-                        _Parent_form.RefreshCoordinate();
+                        _ParentForm.RefreshCoordinate();
                         Close();
                     }
                     else
@@ -109,11 +109,11 @@ namespace FAD3
             }
         }
 
-        private void onCoordinate_Validating(object sender, CancelEventArgs e)
+        private void OnCoordinate_Validating(object sender, CancelEventArgs e)
         {
-            var CardinalDirection = 'N';
+            var cardinalDirection = 'N';
             var msg = "";
-            var IsLimit = false;
+            var isLimit = false;
             ((MaskedTextBox)sender).With(o =>
             {
                 if (o.Text != _XCoordinatePrompt && o.Text != _YCoordinatePrompt)
@@ -122,53 +122,55 @@ namespace FAD3
                     {
                         char[] NEWS = { 'N', 'E', 'W', 'S' };
                         string[] parts = o.Text.ToUpper().Split(new char[] { ' ', '\'', '\"', '°', });
-                        var DirectionPart = 3;
+
+                        //indicates what part of the parts[] array is the NEWS direction indicator located
+                        var directionPart = 3;
                         switch (_CoordinateFormat)
                         {
                             case global.CoordinateDisplayFormat.DegreeDecimal:
-                                DirectionPart = 2;
+                                directionPart = 2;
                                 break;
 
                             case global.CoordinateDisplayFormat.DegreeMinute:
-                                DirectionPart = 3;
+                                directionPart = 3;
                                 break;
 
                             case global.CoordinateDisplayFormat.DegreeMinuteSecond:
-                                DirectionPart = 4;
+                                directionPart = 4;
                                 break;
 
                             case global.CoordinateDisplayFormat.UTM:
                                 break;
                         }
 
-                        CardinalDirection = parts[DirectionPart][0];
+                        cardinalDirection = parts[directionPart][0];
 
-                        if (Array.Exists(NEWS, element => element == CardinalDirection))
+                        if (Array.Exists(NEWS, element => element == cardinalDirection))
                         {
                             if (o.Name == "mtextLongitude")
                             {
-                                e.Cancel = CardinalDirection != 'E' && CardinalDirection != 'W';
+                                e.Cancel = cardinalDirection != 'E' && cardinalDirection != 'W';
                                 msg = "The only accepted letters are 'E' or 'W'";
                                 if (!e.Cancel)
                                 {
                                     //check the absolute value of the degree part
                                     e.Cancel = Math.Abs(float.Parse(parts[0])) > 180;
-                                    IsLimit = float.Parse(parts[0]) == 180;
+                                    isLimit = float.Parse(parts[0]) == 180;
                                     msg = "Degree part cannot be more than 180";
-                                    _IsEast = CardinalDirection == 'E';
+                                    _IsEast = cardinalDirection == 'E';
                                 }
                             }
                             else
                             {
-                                e.Cancel = CardinalDirection != 'N' && CardinalDirection != 'S';
+                                e.Cancel = cardinalDirection != 'N' && cardinalDirection != 'S';
                                 msg = "The only accepted letters are 'N' or 'S'";
                                 if (!e.Cancel)
                                 {
                                     //check the absolute value of the degree part
                                     e.Cancel = Math.Abs(float.Parse(parts[0])) > 90;
-                                    IsLimit = float.Parse(parts[0]) == 90;
+                                    isLimit = float.Parse(parts[0]) == 90;
                                     msg = "Degree part cannot be more than 90";
-                                    _IsNorth = CardinalDirection == 'N';
+                                    _IsNorth = cardinalDirection == 'N';
                                 }
                             }
 
@@ -188,8 +190,8 @@ namespace FAD3
                                         break;
 
                                     case global.CoordinateDisplayFormat.DegreeMinute:
-                                        e.Cancel = IsLimit ? float.Parse(parts[1]) > 0 : float.Parse(parts[1]) >= 60;
-                                        msg = IsLimit ? "Minute part shoud be zero" : "Minute part should be less than 60";
+                                        e.Cancel = isLimit ? float.Parse(parts[1]) > 0 : float.Parse(parts[1]) >= 60;
+                                        msg = isLimit ? "Minute part shoud be zero" : "Minute part should be less than 60";
                                         if (!e.Cancel && o.Name == "mtextLongitude")
                                         {
                                             _LonDeg = float.Parse(parts[0]);
@@ -203,8 +205,8 @@ namespace FAD3
                                         break;
 
                                     case global.CoordinateDisplayFormat.DegreeMinuteSecond:
-                                        e.Cancel = IsLimit ? float.Parse(parts[2]) > 0 : float.Parse(parts[2]) >= 60;
-                                        msg = IsLimit ? "Second part should be zero" : "Second part should be less than 60";
+                                        e.Cancel = isLimit ? float.Parse(parts[2]) > 0 : float.Parse(parts[2]) >= 60;
+                                        msg = isLimit ? "Second part should be zero" : "Second part should be less than 60";
                                         if (!e.Cancel && o.Name == "mtextLongitude")
                                         {
                                             _LonDeg = float.Parse(parts[0]);

@@ -114,6 +114,12 @@
     <Compile Include="EditEnumerator.Designer.cs">
       <DependentUpon>EditEnumerator.cs</DependentUpon>
     </Compile>
+    <Compile Include="EnumeratorEntryForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EnumeratorEntryForm.Designer.cs">
+      <DependentUpon>EnumeratorEntryForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="ErrorLogger.cs" />
     <Compile Include="extension.cs" />
     <Compile Include="FGExtentForm.cs">
@@ -203,11 +209,11 @@
     <Compile Include="frmNewDB.Designer.cs">
       <DependentUpon>frmNewDB.cs</DependentUpon>
     </Compile>
-    <Compile Include="frmSamplingDetail.cs">
+    <Compile Include="SamplingForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmSamplingDetail.Designer.cs">
-      <DependentUpon>frmSamplingDetail.cs</DependentUpon>
+    <Compile Include="SamplingForm.Designer.cs">
+      <DependentUpon>SamplingForm.cs</DependentUpon>
     </Compile>
     <Compile Include="frmVesselDimension.cs">
       <SubType>Form</SubType>
@@ -277,6 +283,9 @@
     <EmbeddedResource Include="CoordinateFormatSelectForm.resx">
       <DependentUpon>CoordinateFormatSelectForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="EnumeratorEntryForm.resx">
+      <DependentUpon>EnumeratorEntryForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FGExtentForm.resx">
       <DependentUpon>FGExtentForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -319,8 +328,8 @@
     <EmbeddedResource Include="frmRefNoRange.resx">
       <DependentUpon>frmRefNoRange.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmSamplingDetail.resx">
-      <DependentUpon>frmSamplingDetail.cs</DependentUpon>
+    <EmbeddedResource Include="SamplingForm.resx">
+      <DependentUpon>SamplingForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmVesselDimension.resx">
       <DependentUpon>frmVesselDimension.cs</DependentUpon>

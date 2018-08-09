@@ -20,7 +20,7 @@ namespace FAD3
         private string _TargetAreaGuid = "";
         private global.fad3GearEditAction _action;
 
-        private frmSamplingDetail _Parent;
+        private SamplingForm _Parent;
         private static frmGearUsage _instance;
 
         public static frmGearUsage GetInstance(string GearVarGuid = "", string TargetAreaGuid = "", string GearClassName = "")
@@ -53,7 +53,7 @@ namespace FAD3
             set { _GearClassName = value; }
         }
 
-        public frmSamplingDetail Parent_Form
+        public SamplingForm Parent_Form
         {
             get { return _Parent; }
             set { _Parent = value; }

@@ -90,11 +90,11 @@ namespace FAD3
         {
             private static global.fad3DataStatus _DataStatus;
             public global.fad3DataStatus DataStatus { get; set; }
-            public string SpecGUID { get; set; }
-            public string SpecName { get; set; }
-            public string SamplingGUID { get; set; }
+            public string SpecificationGuid { get; set; }
+            public string SpecificationName { get; set; }
+            public string SamplingGuid { get; set; }
             public string RowID { get; set; }
-            public string SpecValue { get; set; }
+            public string SpecificationValue { get; set; }
         }
 
         /// <summary>
@@ -144,8 +144,8 @@ namespace FAD3
             {
                 con.Open();
                 var sql = "";
-                var Success = false;
-                bool[] SaveSuccess = new bool[_SampledGearSpecs.Count];
+                var success = false;
+                bool[] saveSuccess = new bool[_SampledGearSpecs.Count];
                 var n = 0;
                 foreach (KeyValuePair<string, SampledGearSpecData> kv in _SampledGearSpecs)
                 {
@@ -155,15 +155,15 @@ namespace FAD3
                         sql = $@"Insert into tblSampledGearSpec (RowID, SamplingGUID, SpecID, [Value]) values (
                                 '{kv.Value.RowID}',
                                 {{{ _SamplingGuid}}},
-                                '{kv.Value.SpecGUID}',
-                                '{kv.Value.SpecValue}')";
+                                '{kv.Value.SpecificationGuid}',
+                                '{kv.Value.SpecificationValue}')";
                     }
                     else if (kv.Value.DataStatus == global.fad3DataStatus.statusEdited)
                     {
                         sql = $@"Update tblSampledGearSpec set
-                            [Value] = '{kv.Value.SpecValue}' where
-                            SamplingGUID = {{{kv.Value.SamplingGUID}}} and
-                            SpecID = {{{kv.Value.SpecGUID}}}";
+                            [Value] = '{kv.Value.SpecificationValue}' where
+                            SamplingGUID = {{{kv.Value.SamplingGuid}}} and
+                            SpecID = {{{kv.Value.SpecificationGuid}}}";
                     }
                     else if (kv.Value.DataStatus == global.fad3DataStatus.statusForDeletion)
                     {
@@ -173,10 +173,10 @@ namespace FAD3
                     if (sql.Length > 0)
                         using (OleDbCommand update = new OleDbCommand(sql, con))
                         {
-                            Success = (update.ExecuteNonQuery() > 0);
+                            success = (update.ExecuteNonQuery() > 0);
                             //TODO: what to do if Success=false?
 
-                            SaveSuccess[n] = Success;
+                            saveSuccess[n] = success;
                             sql = "";
                         }
                     n++;
@@ -184,9 +184,9 @@ namespace FAD3
 
                 //If all specs were successfully saved then set flag to false
                 _HasUnsavedSampledGearSpecEdits = false;
-                for (int i = 0; i < SaveSuccess.Length - 1; i++)
+                for (int i = 0; i < saveSuccess.Length - 1; i++)
                 {
-                    if (!SaveSuccess[i])
+                    if (!saveSuccess[i])
                     {
                         _HasUnsavedSampledGearSpecEdits = true;
                         break;
@@ -205,7 +205,7 @@ namespace FAD3
         /// <returns></returns>
         public static bool SampledGearHasSpecs(string SamplingGuid)
         {
-            var HasSpecs = false;
+            var hasSpecs = false;
             using (var con = new OleDbConnection(global.ConnectionString))
             {
                 var sql = $@"SELECT TOP 1 SamplingGUID FROM tblGearSpecs INNER JOIN tblSampledGearSpec ON
@@ -217,10 +217,10 @@ namespace FAD3
                     con.Open();
                     var adapter = new OleDbDataAdapter(sql, con);
                     adapter.Fill(dt);
-                    HasSpecs = dt.Rows.Count > 0;
+                    hasSpecs = dt.Rows.Count > 0;
                 }
             }
-            return HasSpecs;
+            return hasSpecs;
         }
 
         /// <summary>
@@ -248,13 +248,13 @@ namespace FAD3
                         var s = new SampledGearSpecData();
 
                         s.RowID = dr["RowID"].ToString();
-                        s.SpecValue = dr["Value"].ToString();
-                        s.SamplingGUID = _SamplingGuid;
-                        s.SpecGUID = dr["SpecID"].ToString();
-                        s.SpecName = dr["ElementName"].ToString();
+                        s.SpecificationValue = dr["Value"].ToString();
+                        s.SamplingGuid = _SamplingGuid;
+                        s.SpecificationGuid = dr["SpecID"].ToString();
+                        s.SpecificationName = dr["ElementName"].ToString();
                         s.DataStatus = global.fad3DataStatus.statusFromDB;
 
-                        _SampledGearSpecs.Add(s.SpecGUID, s);
+                        _SampledGearSpecs.Add(s.SpecificationGuid, s);
                     }
                     con.Close();
                 }
@@ -280,15 +280,15 @@ namespace FAD3
                     adapter.Fill(dt);
                     foreach (DataRow row in dt.Rows)
                     {
-                        var st = new GearSpecification();
-                        st.Property = row["ElementName"].ToString();
-                        st.Type = row["ElementType"].ToString();
-                        st.Notes = row["Description"].ToString();
-                        st.RowGuid = row["RowID"].ToString();
-                        st.DataStatus = global.fad3DataStatus.statusFromDB;
+                        var spec = new GearSpecification();
+                        spec.Property = row["ElementName"].ToString();
+                        spec.Type = row["ElementType"].ToString();
+                        spec.Notes = row["Description"].ToString();
+                        spec.RowGuid = row["RowID"].ToString();
+                        spec.DataStatus = global.fad3DataStatus.statusFromDB;
                         var seq = 0;
-                        if (int.TryParse(row["Sequence"].ToString(), out seq)) st.Sequence = seq;
-                        _GearSpecifications.Add(st);
+                        if (int.TryParse(row["Sequence"].ToString(), out seq)) spec.Sequence = seq;
+                        _GearSpecifications.Add(spec);
                     }
                 }
                 con.Close();
@@ -298,17 +298,17 @@ namespace FAD3
         /// <summary>
         /// Save a gear spec template of a gear variation
         /// </summary>
-        /// <param name="specs"></param>
+        /// <param name="specifications"></param>
         /// <returns></returns>
-        public static bool SaveGearSpecs(List<GearSpecification> specs)
+        public static bool SaveGearSpecs(List<GearSpecification> specifications)
         {
             var sql = "";
-            int Version = 2;
-            bool Success;
+            int version = 2;
+            bool success;
             using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
             {
                 conn.Open();
-                foreach (ManageGearSpecsClass.GearSpecification spec in specs)
+                foreach (ManageGearSpecsClass.GearSpecification spec in specifications)
                 {
                     if (spec.DataStatus == global.fad3DataStatus.statusEdited)
                     {
@@ -327,7 +327,7 @@ namespace FAD3
                               '{spec.Type}',
                               '{spec.Notes}',
                               {spec.Sequence},
-                              '{Version}',
+                              '{version}',
                               {{{Guid.NewGuid().ToString()}}},
                               {{{_GearVarGuid}}})";
                     }
@@ -339,7 +339,7 @@ namespace FAD3
                     if (sql.Length > 0)
                         using (OleDbCommand update = new OleDbCommand(sql, conn))
                         {
-                            Success = (update.ExecuteNonQuery() > 0);
+                            success = (update.ExecuteNonQuery() > 0);
                             //TODO: what to do if Success=false?
                             sql = "";
                         }
@@ -377,7 +377,7 @@ namespace FAD3
             var s = "";
             foreach (KeyValuePair<string, SampledGearSpecData> kv in _SampledGearSpecs)
             {
-                s += kv.Value.SpecName + ": " + kv.Value.SpecValue + "\r\n";
+                s += kv.Value.SpecificationName + ": " + kv.Value.SpecificationValue + "\r\n";
             }
             return s;
         }

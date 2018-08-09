@@ -186,7 +186,16 @@ namespace FAD3
             treeMain.SelectedNode = nd2[0];
             nd2[0].Expand();
 
-            _Sampling.SamplingGUID = SamplingIdentifiers["SamplingID"];
+            //_Sampling.SamplingGUID = SamplingIdentifiers["SamplingID"];
+            SamplingGUID = SamplingIdentifiers["SamplingID"];
+            if (lvMain.Items.ContainsKey(SamplingIdentifiers["SamplingID"]))
+            {
+                lvMain.Focus();
+                SetUPLV("samplingDetail");
+                ShowCatchDetailEx(_SamplingGUID);
+                //lvMain.Items[SamplingIdentifiers["SamplingID"]].Selected = true;
+                //lvMain.Items[SamplingIdentifiers["SamplingID"]].EnsureVisible();
+            }
         }
 
         public void NewDBFile(string filename)
@@ -277,7 +286,7 @@ namespace FAD3
 
         private void AppExit()
         {
-            this.Close();
+            Close();
         }
 
         private void ApplyListViewColumnWidth(string TreeLevel)
@@ -571,7 +580,7 @@ namespace FAD3
                                           (SELECT Count(SamplingGUID) AS n FROM tblCatchComp GROUP BY tblCatchComp.SamplingGUID HAVING
                                           tblCatchComp.SamplingGUID=[tblSampling.SamplingGUID]) AS [rows]
                                           FROM tblEnumerators RIGHT JOIN tblSampling ON tblEnumerators.EnumeratorID = tblSampling.Enumerator
-                                          WHERE tblSampling.SamplingDate >#{StartDate}# And tblSampling.SamplingDate <#{EndDate}# AND
+                                          WHERE tblSampling.SamplingDate >=#{StartDate}# And tblSampling.SamplingDate <#{EndDate}# AND
                                           tblSampling.LSGUID={{{LSGUID}}} AND tblSampling.GearVarGUID={{{GearGUID}}}
                                           ORDER BY tblSampling.DateEncoded";
 
@@ -860,15 +869,16 @@ namespace FAD3
 
                 //this will show a list of enumerators and their corresponding details
                 case "menuEnumerators":
-                    EnumeratorForm ef = new EnumeratorForm();
+                    EnumeratorForm ef = new EnumeratorForm(this);
                     ef.ShowDialog(this);
                     break;
 
                 //this will show the samplings done by an enumerator
                 case "menuEnumeratorDetail":
                     //pass the enumerator guid to the form's constructor
-                    EnumeratorForm ef1 = new EnumeratorForm(lvMain.SelectedItems[0].SubItems[1].Name);
-                    ef1.ShowDialog(this);
+                    EnumeratorForm ef1 = new EnumeratorForm(lvMain.SelectedItems[0].SubItems[1].Name, this);
+                    //ef1.ShowDialog(this);
+                    ef1.Show(this);
                     break;
 
                 case "menuSamplingDetail":
@@ -916,7 +926,7 @@ namespace FAD3
         private void NewSamplingForm()
         {
             ListViewNewSampling();
-            var f3 = new frmSamplingDetail
+            var f3 = new SamplingForm
             {
                 IsNew = true,
                 GearClassName = _GearClassName,
@@ -1009,9 +1019,8 @@ namespace FAD3
                                     }
                                     else if (lvi.Name == "Enumerators")
                                     {
-                                        EnumeratorForm frm = new EnumeratorForm(lvi.Tag.ToString());
+                                        EnumeratorForm frm = new EnumeratorForm(lvi.SubItems[1].Name, this);
                                         frm.AOI = _AOI;
-                                        frm.ParentForm = this;
                                         frm.Show(this);
                                     }
                                 }
@@ -2339,7 +2348,7 @@ namespace FAD3
 
         private void ShowSamplingDetailForm()
         {
-            frmSamplingDetail fs = new frmSamplingDetail();
+            SamplingForm fs = new SamplingForm();
             fs.SamplingGUID = _SamplingGUID;
             fs.ListViewSamplingDetail(lvMain);
             fs.AOI = _AOI;

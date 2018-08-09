@@ -62,7 +62,7 @@
             this.mtextLongitude.TabIndex = 3;
             this.mtextLongitude.TextMaskFormat = System.Windows.Forms.MaskFormat.IncludePromptAndLiterals;
             this.mtextLongitude.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Onmtext_KeyUp);
-            this.mtextLongitude.Validating += new System.ComponentModel.CancelEventHandler(this.onCoordinate_Validating);
+            this.mtextLongitude.Validating += new System.ComponentModel.CancelEventHandler(this.OnCoordinate_Validating);
             // 
             // mtextLatitude
             // 
@@ -72,7 +72,7 @@
             this.mtextLatitude.TabIndex = 4;
             this.mtextLatitude.TextMaskFormat = System.Windows.Forms.MaskFormat.IncludePromptAndLiterals;
             this.mtextLatitude.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Onmtext_KeyUp);
-            this.mtextLatitude.Validating += new System.ComponentModel.CancelEventHandler(this.onCoordinate_Validating);
+            this.mtextLatitude.Validating += new System.ComponentModel.CancelEventHandler(this.OnCoordinate_Validating);
             // 
             // buttonOK
             // 
@@ -82,7 +82,7 @@
             this.buttonOK.TabIndex = 5;
             this.buttonOK.Text = "OK";
             this.buttonOK.UseVisualStyleBackColor = true;
-            this.buttonOK.Click += new System.EventHandler(this.Onbutton_Click);
+            this.buttonOK.Click += new System.EventHandler(this.OnButton_Click);
             // 
             // buttonCancel
             // 
@@ -94,7 +94,7 @@
             this.buttonCancel.TabIndex = 6;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = true;
-            this.buttonCancel.Click += new System.EventHandler(this.Onbutton_Click);
+            this.buttonCancel.Click += new System.EventHandler(this.OnButton_Click);
             // 
             // CoordinateEntryForm
             // 

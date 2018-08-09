@@ -62,7 +62,7 @@ namespace FAD3
             this.txtHireDate.Name = "txtHireDate";
             this.txtHireDate.Size = new System.Drawing.Size(139, 22);
             this.txtHireDate.TabIndex = 1;
-            this.txtHireDate.Validating += new System.ComponentModel.CancelEventHandler(this.TextBox2Validating);
+            this.txtHireDate.Validating += new System.ComponentModel.CancelEventHandler(this.OnTextBoxValidating);
             // 
             // buttonOK
             // 
@@ -74,11 +74,11 @@ namespace FAD3
             this.buttonOK.TabIndex = 4;
             this.buttonOK.Text = "Ok";
             this.buttonOK.UseVisualStyleBackColor = true;
-            this.buttonOK.Click += new System.EventHandler(this.Button1Click);
+            this.buttonOK.Click += new System.EventHandler(this.OnButtonClick);
             // 
             // buttonCancel
             // 
-            this.buttonCancel.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.buttonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonCancel.Location = new System.Drawing.Point(738, 293);
             this.buttonCancel.Margin = new System.Windows.Forms.Padding(4);
             this.buttonCancel.Name = "buttonCancel";
@@ -86,7 +86,7 @@ namespace FAD3
             this.buttonCancel.TabIndex = 5;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = true;
-            this.buttonCancel.Click += new System.EventHandler(this.Button2Click);
+            this.buttonCancel.Click += new System.EventHandler(this.OnButtonClick);
             // 
             // lvEnumerators
             // 
@@ -100,8 +100,8 @@ namespace FAD3
             this.lvEnumerators.Size = new System.Drawing.Size(843, 159);
             this.lvEnumerators.TabIndex = 3;
             this.lvEnumerators.UseCompatibleStateImageBehavior = false;
-            this.lvEnumerators.DoubleClick += new System.EventHandler(this.listEnumeratorSampling_DoubleClick);
-            this.lvEnumerators.Leave += new System.EventHandler(this.ListEnumeratorSamplingLeave);
+            this.lvEnumerators.DoubleClick += new System.EventHandler(this.OnlistEnumeratorSampling_DoubleClick);
+            this.lvEnumerators.Leave += new System.EventHandler(this.OnListEnumeratorSamplingLeave);
             // 
             // labelEnumeratorName
             // 
@@ -123,7 +123,7 @@ namespace FAD3
             // 
             // chkActive
             // 
-            this.chkActive.Location = new System.Drawing.Point(639, 36);
+            this.chkActive.Location = new System.Drawing.Point(572, 38);
             this.chkActive.Margin = new System.Windows.Forms.Padding(4);
             this.chkActive.Name = "chkActive";
             this.chkActive.Size = new System.Drawing.Size(105, 23);
@@ -159,7 +159,8 @@ namespace FAD3
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "EnumeratorForm";
             this.Text = "frmEnumerator";
-            this.Load += new System.EventHandler(this.FrmEnumeratorLoad);
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.EnumeratorForm_FormClosed);
+            this.Load += new System.EventHandler(this.OnFormLoad);
             this.ResumeLayout(false);
             this.PerformLayout();
 

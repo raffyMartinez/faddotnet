@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace FAD3
 {
-    public partial class frmSamplingDetail : Form
+    public partial class SamplingForm : Form
     {
         private Dictionary<string, sampling.UserInterfaceStructure> _uis = new Dictionary<string, sampling.UserInterfaceStructure>();
         private sampling _sampling;
@@ -183,7 +183,7 @@ namespace FAD3
             _lv = lv;
         }
 
-        public frmSamplingDetail()
+        public SamplingForm()
         {
             InitializeComponent();
         }

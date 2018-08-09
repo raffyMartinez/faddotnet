@@ -1,6 +1,6 @@
 ﻿namespace FAD3
 {
-    partial class frmSamplingDetail
+    partial class SamplingForm
     {
         /// <summary>
         /// Required designer variable.
