@@ -1215,7 +1215,7 @@ namespace FAD3
                     break;
 
                 case "gear":
-                    frmGearUsage form = frmGearUsage.GetInstance();
+                    GearCodesUsageForm form = GearCodesUsageForm.GetInstance();
                     if (!form.Visible)
                     {
                         form.Show(this);

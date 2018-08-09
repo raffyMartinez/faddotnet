@@ -16,6 +16,13 @@ namespace FAD3
         private string _GearClassGuid = "";
         private List<string> _List = new List<string>();
         private List<string> comboList = new List<string>();
+        private GearCodesUsageForm _parentForm;
+
+        public GearCodesUsageForm parentForm
+        {
+            get { return _parentForm; }
+            set { _parentForm = value; }
+        }
 
         public List<string> InList
         {
@@ -41,9 +48,10 @@ namespace FAD3
             set { _action = value; }
         }
 
-        public frmGearEditor()
+        public frmGearEditor(GearCodesUsageForm parent)
         {
             InitializeComponent();
+            _parentForm = parent;
         }
 
         private void OnFormLoad(object sender, EventArgs e)
@@ -61,6 +69,7 @@ namespace FAD3
                                              "any of the names listed below";
                     comboBox.Visible = false;
                     break;
+
                 case global.fad3GearEditAction.addLocalName:
                     labelTitle.Text = "Add a gear local name";
                     labelDescription.Text = "Enter a gear local name but you cannot use " +
@@ -68,12 +77,13 @@ namespace FAD3
                     textBox.Visible = false;
                     x = buttonCancel.Location.X;
                     y = comboBox.Location.Y + comboBox.Size.Height + spacer;
-                    buttonCancel.Location = new Point(x,y);
+                    buttonCancel.Location = new Point(x, y);
                     x = buttonOk.Location.X;
                     buttonOk.Location = new Point(x, y);
                     listBox.Visible = false;
-                    this.Height = buttonCancel.Location.Y + buttonCancel.Height + spacer*2;
+                    this.Height = buttonCancel.Location.Y + buttonCancel.Height + spacer * 2;
                     break;
+
                 case global.fad3GearEditAction.addGearCode:
                     labelTitle.Text = "Add a gear code";
                     labelDescription.Text = "Enter a gear code name but you cannot use " +
@@ -84,6 +94,7 @@ namespace FAD3
                     comboBox.Visible = false;
                     checkBox.Visible = true;
                     break;
+
                 case global.fad3GearEditAction.addAOI:
                     labelTitle.Text = "Add a target area where used";
                     labelDescription.Text = "Enter a target area name but you cannot use " +
@@ -95,16 +106,14 @@ namespace FAD3
                     x = buttonOk.Location.X;
                     buttonOk.Location = new Point(x, y);
                     listBox.Visible = false;
-                    this.Height = buttonCancel.Location.Y + buttonCancel.Height + spacer*2;
+                    this.Height = buttonCancel.Location.Y + buttonCancel.Height + spacer * 2;
                     break;
-
             }
 
             FillList();
 
             if (comboBox.Visible)
                 comboBox.Select();
-
         }
 
         private void FillList()
@@ -119,6 +128,7 @@ namespace FAD3
                         listBox.Items.Add(item);
                     }
                     break;
+
                 case global.fad3GearEditAction.addGearCode:
                     foreach (var item in gear.GearCodesByClass(_GearClassGuid))
                     {
@@ -145,13 +155,13 @@ namespace FAD3
                         o.AutoCompleteSource = AutoCompleteSource.ListItems;
                     });
 
-
                     for (int i = 0; i < comboBox.Items.Count; i++)
                         comboList.Add(((KeyValuePair<string, string>)comboBox.Items[i]).Value);
 
                     break;
             }
         }
+
         private void Onbutton_Click(object sender, EventArgs e)
         {
             switch (((Button)sender).Name)
@@ -159,7 +169,30 @@ namespace FAD3
                 case "buttonCancel":
                     this.Close();
                     break;
-                case "buttonOK":
+
+                case "buttonOk":
+
+                    switch (_action)
+                    {
+                        case global.fad3GearEditAction.addGearVariation:
+                            _parentForm.UsageGearVariation(textBox.Text);
+                            break;
+
+                        case global.fad3GearEditAction.addGearCode:
+                            _parentForm.UsageGearCode(textBox.Text, checkBox.Checked);
+                            break;
+
+                        case global.fad3GearEditAction.addAOI:
+                            var AOIGuid = ((KeyValuePair<string, string>)comboBox.SelectedItem).Key;
+                            _parentForm.UsageTargetArea(AOIGuid, comboBox.Text);
+                            break;
+
+                        case global.fad3GearEditAction.addLocalName:
+                            var localNameGuid = ((KeyValuePair<string, string>)comboBox.SelectedItem).Key;
+                            _parentForm.UsageLocalName(localNameGuid, comboBox.Text);
+                            break;
+                    }
+                    Close();
                     break;
             }
         }
@@ -173,9 +206,9 @@ namespace FAD3
                 switch (_action)
                 {
                     case global.fad3GearEditAction.addGearVariation:
-                        if(s.Length>5)
+                        if (s.Length > 5)
                         {
-                            if (_List.Contains(s,StringComparer.OrdinalIgnoreCase))
+                            if (_List.Contains(s, StringComparer.OrdinalIgnoreCase))
                             {
                                 msg = "Gear variation name already in use. Select another name";
                             }
@@ -185,6 +218,7 @@ namespace FAD3
                             msg = "Gear variation name is too short. Use a name longer than 5 letters";
                         }
                         break;
+
                     case global.fad3GearEditAction.addGearCode:
                         try
                         {
@@ -198,7 +232,7 @@ namespace FAD3
                             }
                             else
                             {
-                                if(listBox.Items.Contains(labelCode.Text + s))
+                                if (listBox.Items.Contains(labelCode.Text + s))
                                 {
                                     msg = "Code already exists. Use another code";
                                 }
@@ -214,10 +248,10 @@ namespace FAD3
                 }
             }
 
-            if(msg.Length>0)
+            if (msg.Length > 0)
             {
                 e.Cancel = true;
-                MessageBox.Show(msg, "Validation error",MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                MessageBox.Show(msg, "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
 
@@ -239,7 +273,7 @@ namespace FAD3
             else
             {
                 if (_action == global.fad3GearEditAction.addLocalName)
-                { 
+                {
                     msg = s + " is not in the drop-down list\r\n" +
                           "Do you wish to add this as a new gear local name?";
 
@@ -268,7 +302,7 @@ namespace FAD3
             }
         }
 
-        void AddNewGearLocalName()
+        private void AddNewGearLocalName()
         {
             ;
         }

@@ -6,10 +6,11 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using MetaphoneCOM;
 
 namespace FAD3
 {
-    public partial class frmGearUsage : Form
+    public partial class GearCodesUsageForm : Form
     {
         private string _GearClassName = "";
         private string _GearClassGuid = "";
@@ -18,14 +19,17 @@ namespace FAD3
         private string _GearRefCode = "";
         private string _TargetAreaName = "";
         private string _TargetAreaGuid = "";
+        private string _TargetAreaUsageRow = "";
+        private string _LocalNameGuid = "";
+        private string _LocalName;
         private global.fad3GearEditAction _action;
 
         private SamplingForm _Parent;
-        private static frmGearUsage _instance;
+        private static GearCodesUsageForm _instance;
 
-        public static frmGearUsage GetInstance(string GearVarGuid = "", string TargetAreaGuid = "", string GearClassName = "")
+        public static GearCodesUsageForm GetInstance(string GearVarGuid = "", string TargetAreaGuid = "", string GearClassName = "")
         {
-            if (_instance == null) _instance = new frmGearUsage(GearVarGuid, TargetAreaGuid, GearClassName);
+            if (_instance == null) _instance = new GearCodesUsageForm(GearVarGuid, TargetAreaGuid, GearClassName);
             return _instance;
         }
 
@@ -59,7 +63,7 @@ namespace FAD3
             set { _Parent = value; }
         }
 
-        public frmGearUsage(string GearVarGuid = "", string TargetAreaGuid = "", string GearClassName = "")
+        public GearCodesUsageForm(string GearVarGuid = "", string TargetAreaGuid = "", string GearClassName = "")
         {
             InitializeComponent();
             _GearVarGuid = GearVarGuid;
@@ -189,7 +193,8 @@ namespace FAD3
                 var lvi = new ListViewItem
                 {
                     Name = i.Key,
-                    Text = i.Value
+                    Text = i.Value.LocalName,
+                    Tag = i.Value.RowNumber
                 };
                 listViewLocalNames.Items.Add(lvi);
             }
@@ -204,7 +209,8 @@ namespace FAD3
                 var lvi = new ListViewItem
                 {
                     Name = i.Key,
-                    Text = i.Value
+                    Text = i.Value.AOIName,
+                    Tag = i.Value.RowNumber
                 };
                 listViewWhereUsed.Items.Add(lvi);
             }
@@ -361,6 +367,7 @@ namespace FAD3
 
                 case "listViewWhereUsed":
                     _TargetAreaGuid = lvi.Name;
+                    _TargetAreaUsageRow = lvi.Tag.ToString();
                     FillLocalNames();
                     break;
             }
@@ -382,6 +389,7 @@ namespace FAD3
                     {
                         case "listViewCodes":
                             _TargetAreaGuid = "";
+                            _TargetAreaUsageRow = "";
                             break;
 
                         case "listViewWhereUsed":
@@ -459,6 +467,7 @@ namespace FAD3
         private void dropDownMenu_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
             var myList = new List<string>();
+            e.ClickedItem.Owner.Hide();
             switch (e.ClickedItem.Name)
             {
                 case "itemAddTargetArea":
@@ -484,6 +493,33 @@ namespace FAD3
                     break;
 
                 case "itemManageGearSpecs":
+                    //reserved
+                    break;
+
+                case "itemDeleteGearVariation":
+
+                    if (_GearVarGuid.Length > 0)
+                    {
+                        if (MessageBox.Show("Please confirm that you want to delete this variation",
+                                            "Confirmation needed", MessageBoxButtons.OKCancel,
+                                            MessageBoxIcon.Exclamation) == DialogResult.OK)
+                        {
+                            var result = gear.DeleteGearVariation(_GearVarGuid);
+                            if (!result.success)
+                            {
+                                var reason = result.reason;
+                                if (reason.Length == 0)
+                                    reason = $"Was not able to delete because the gear is used in {result.recordCount} samplings";
+
+                                MessageBox.Show(reason, "Confirmation", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            }
+                            else
+                            {
+                                //refresh the list of gear variations
+                                FillVariationsList();
+                            }
+                        }
+                    }
                     break;
             }
 
@@ -494,7 +530,7 @@ namespace FAD3
                 case "itemAddLocalName":
                 case "itemAddGearCode":
                     _GearClassGuid = ((KeyValuePair<string, string>)comboClass.SelectedItem).Key;
-                    frmGearEditor f = new frmGearEditor
+                    frmGearEditor f = new frmGearEditor(this)
                     {
                         GearClassGuid = _GearClassGuid,
                         GearVariationGuid = _GearVarGuid,
@@ -518,6 +554,91 @@ namespace FAD3
         private void OnFormClosed(object sender, FormClosedEventArgs e)
         {
             _instance = null;
+        }
+
+        public void UsageTargetArea(string targetAreaGuid, string targetAreaName)
+        {
+            _TargetAreaGuid = targetAreaGuid;
+            _TargetAreaName = targetAreaName;
+
+            if (_GearRefCode.Length > 0)
+            {
+                var result = gear.AddGearCodeUsageTargetArea(_GearRefCode, _TargetAreaGuid);
+                if (result.Success)
+                {
+                    var newLVI = listViewWhereUsed.Items.Add(_TargetAreaGuid, _TargetAreaName, null);
+                    newLVI.Tag = result.NewRow;
+                    _TargetAreaUsageRow = result.NewRow;
+                }
+            }
+        }
+
+        public void UsageLocalName(string localNameGuid, string localName)
+        {
+            _LocalNameGuid = localNameGuid;
+            _LocalName = localName;
+
+            if (_GearRefCode.Length > 0 && _TargetAreaGuid.Length > 0 && _LocalNameGuid.Length > 0)
+            {
+                var result = gear.AddUsageLocalName(_TargetAreaUsageRow, _LocalNameGuid);
+                if (result.Success)
+                {
+                    var newLVI = listViewLocalNames.Items.Add(_LocalNameGuid, _LocalName, null);
+                    newLVI.Tag = result.NewRow;
+                }
+            }
+        }
+
+        public void UsageGearCode(string gearCode, bool isVariation)
+        {
+            _GearRefCode = gearCode;
+            if (_GearVarGuid.Length > 0)
+            {
+                if (gear.AddGearVariationReferenceCode(_GearRefCode, _GearVarGuid, isVariation))
+                {
+                    var lvi = listViewCodes.Items.Add(_GearRefCode, _GearRefCode, null);
+                    lvi.SubItems.Add(isVariation.ToString());
+                }
+            }
+        }
+
+        public void UsageGearVariation(string gearVariationName)
+        {
+            _GearVarName = gearVariationName;
+            if (_GearClassGuid.Length > 0)
+            {
+                var dms = new DoubleMetaphoneShort();
+                dms.ComputeMetaphoneKeys(gearVariationName, out short key1, out short key2);
+                var similarNames = gear.GearSoundsLike(key1, key2);
+                var proceed = true;
+
+                var sb = new StringBuilder();
+                if (similarNames.Count > 0)
+                {
+                    sb.Capacity = similarNames.Count + 3;
+                    sb.Append("Selected gear has possible duplicates\r\n\r\n");
+                    sb.Append("Gear name\tMatch strength\r\n");
+                    foreach ((string gearName, string matchQuality) item in similarNames)
+                    {
+                        sb.Append($"{item.gearName}\t{item.matchQuality}\r\n");
+                    }
+                    sb.Append("\r\nPlease confirm if you still want to add a new gear");
+                }
+
+                proceed = (similarNames.Count == 0 ||
+                           MessageBox.Show(sb.ToString(), $"Possible duplicates for {gearVariationName}",
+                           MessageBoxButtons.OKCancel, MessageBoxIcon.Information) == DialogResult.OK);
+
+                if (proceed)
+                {
+                    var result = gear.AddGearVariation(_GearClassGuid, gearVariationName);
+                    if (result.success)
+                    {
+                        _GearVarGuid = result.newGuid;
+                        listViewVariations.Items.Add(_GearVarGuid, gearVariationName, null);
+                    }
+                }
+            }
         }
     }
 }

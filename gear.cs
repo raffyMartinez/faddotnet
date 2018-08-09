@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
 using System.Windows.Forms;
+using MetaphoneCOM;
 
 namespace FAD3
 {
@@ -287,16 +288,16 @@ namespace FAD3
             return myLetter;
         }
 
-        public static Dictionary<string, string> GearLocalName_TargetArea(string RefCode, string AOIGuid)
+        public static Dictionary<string, (string LocalName, string RowNumber)> GearLocalName_TargetArea(string RefCode, string AOIGuid)
         {
-            var myList = new Dictionary<string, string>();
+            var myList = new Dictionary<string, (string LocalName, string RowNumber)>();
             var dt = new DataTable();
             using (var conection = new OleDbConnection(global.ConnectionString))
             {
                 try
                 {
                     conection.Open();
-                    var query = $@"SELECT LocalNameGUID, LocalName FROM tblGearLocalNames INNER JOIN
+                    var query = $@"SELECT LocalNameGUID, LocalName, tblRefGearUsage_LocalName.RowNo FROM tblGearLocalNames INNER JOIN
                          (tblRefGearCodes_Usage INNER JOIN tblRefGearUsage_LocalName ON
                          tblRefGearCodes_Usage.RowNo = tblRefGearUsage_LocalName.GearUsageRow)
                          ON tblGearLocalNames.LocalNameGUID = tblRefGearUsage_LocalName.GearLocalName
@@ -308,7 +309,7 @@ namespace FAD3
                     for (int i = 0; i < dt.Rows.Count; i++)
                     {
                         DataRow dr = dt.Rows[i];
-                        myList.Add(dr["LocalNameGUID"].ToString(), dr["LocalName"].ToString());
+                        myList.Add(dr["LocalNameGUID"].ToString(), (dr["LocalName"].ToString(), dr["RowNo"].ToString()));
                     }
                 }
                 catch (Exception ex)
@@ -524,9 +525,210 @@ namespace FAD3
             return myMonths;
         }
 
-        public static Dictionary<string, string> TargetAreaUsed_RefCode(string RefCode)
+        public static (bool success, int recordCount, string reason) DeleteGearVariation(string gearVarGuid)
         {
-            var myList = new Dictionary<string, string>();
+            var recordCount = SamplingCountGearVariation(gearVarGuid);
+            var success = false;
+            var reason = "";
+            if (recordCount == 0)
+            {
+                using (var conn = new OleDbConnection(global.ConnectionString))
+                {
+                    conn.Open();
+                    var sql = $"Delete * from tblGearVariations WHERE GearVarGUID={{{gearVarGuid}}}";
+
+                    using (OleDbCommand deleteVariation = new OleDbCommand(sql, conn))
+                    {
+                        try
+                        {
+                            success = deleteVariation.ExecuteNonQuery() > 0;
+                        }
+                        catch (OleDbException ex)
+                        {
+                            if (DeleteVariationFromOtherTables(gearVarGuid))
+                                success = deleteVariation.ExecuteNonQuery() > 0;
+
+                            if (!success)
+                                reason = "There was a failure to delete";
+                        }
+                    }
+                }
+            }
+            return (success, recordCount, reason);
+        }
+
+        private static bool DeleteVariationFromOtherTables(string gearVariationGuid)
+        {
+            var success = false;
+            using (var conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                var sql = $"Delete * from tblGearSpecs where GearVarGuid = {{{gearVariationGuid}}}";
+
+                using (OleDbCommand deleteOther = new OleDbCommand(sql, conn))
+                {
+                    success = deleteOther.ExecuteNonQuery() > 0;
+                }
+            }
+            return success;
+        }
+
+        public static int SamplingCountGearVariation(string gearVarGuid)
+        {
+            int samplingCount = 0;
+            using (var conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                var sql = $"SELECT Count(GearVarGUID) AS n FROM tblSampling WHERE GearVarGUID={{{gearVarGuid}}}";
+
+                using (OleDbCommand getCount = new OleDbCommand(sql, conn))
+                {
+                    samplingCount = (int)getCount.ExecuteScalar();
+                }
+            }
+            return samplingCount;
+        }
+
+        /// <summary>
+        /// returns a list of gear variation with number of matches based on 2 keys
+        /// </summary>
+        /// <param name="gearVarGuid"></param>
+        /// <returns></returns>
+        public static List<(string name, string matchQuality)> GearSoundsLike(short key1, short key2)
+        {
+            var GearNameMatches = new List<(string name, string matchQuality)>();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    string query = $"SELECT Variation, MPH2 from tblGearVariations where MPH1 = {key1}";
+                    var myDT = new DataTable();
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(myDT);
+                    for (int i = 0; i < myDT.Rows.Count; i++)
+                    {
+                        DataRow dr = myDT.Rows[i];
+                        var matchQuality = key2 == short.Parse(dr["MPH2"].ToString()) ? "Very strong" : "Strong";
+                        GearNameMatches.Add((dr["Variation"].ToString(), matchQuality));
+                    }
+                }
+                catch (Exception ex) { ErrorLogger.Log(ex); }
+            }
+            return GearNameMatches;
+        }
+
+        /// <summary>
+        /// adds a new gear variation
+        /// Returns a tuple: newGuid - new gear variation guid
+        ///                  success - if the database update succeded
+        /// </summary>
+        /// <param name="gearClassGuid"></param>
+        /// <param name="gearVariationName"></param>
+        /// <returns></returns>
+        public static (bool success, string newGuid) AddGearVariation(string gearClassGuid, string gearVariationName)
+        {
+            var success = false;
+            var newGuid = Guid.NewGuid().ToString();
+
+            var parts = gearVariationName.Split(' ');
+            var Name2 = "";
+
+            for (int n = 0; n < parts.Length; n++)
+                Name2 += parts[n];
+
+            using (var conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                var dms = new DoubleMetaphoneShort();
+                dms.ComputeMetaphoneKeys(gearVariationName, out short key1, out short key2);
+                var sql = $@"Insert into tblGearVariations (Variation, Name2, GearVarGUID, GearClass, MPH1, MPH2)
+                         values('{gearVariationName}', '{Name2}', {{{newGuid}}}, {{{gearClassGuid}}}, {key1}, {key2})";
+
+                using (OleDbCommand update = new OleDbCommand(sql, conn))
+                {
+                    success = update.ExecuteNonQuery() > 0;
+                }
+            }
+
+            return (success, newGuid);
+        }
+
+        /// <summary>
+        /// Adds a new gear reference code and returns a boolean depending on how the update went
+        /// </summary>
+        /// <param name="referenceCode"></param>
+        /// <param name="gearVariationGuid"></param>
+        /// <param name="isVariation"></param>
+        /// <returns></returns>
+        public static bool AddGearVariationReferenceCode(string referenceCode, string gearVariationGuid, bool isVariation)
+        {
+            var success = false;
+            using (var conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                var sql = $@"Insert into tblRefGearCodes (RefGearCode, GearVar, SubVariation)
+                         values('{referenceCode}', {{{gearVariationGuid}}}, {isVariation})";
+                using (OleDbCommand update = new OleDbCommand(sql, conn))
+                {
+                    success = update.ExecuteNonQuery() > 0;
+                }
+            }
+            return success;
+        }
+
+        /// <summary>
+        /// updates local names of gear in a target area
+        /// Returns a tuple: NewRow - new row number in the database table
+        ///                  Success - if the database update succeded
+        /// </summary>
+        /// <param name="gearCode"></param>
+        /// <param name="targetAreaGuid"></param>
+        public static (string NewRow, bool Success) AddUsageLocalName(string targetAreaUsageGuid, string localNameGuid)
+        {
+            var success = false;
+            var newRow = Guid.NewGuid().ToString();
+            using (var conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+
+                var sql = $@"Insert into tblRefGearUsage_LocalName (GearUsageRow, GearLocalName, RowNo)
+                         values({{{targetAreaUsageGuid}}}, {{{localNameGuid}}}, {newRow})";
+                using (OleDbCommand update = new OleDbCommand(sql, conn))
+                {
+                    success = update.ExecuteNonQuery() > 0;
+                }
+            }
+            return (newRow, success);
+        }
+
+        /// <summary>
+        /// updates target areas where a gear variation code is used.
+        /// Returns a tuple: NewRow - new row number in the database table
+        ///                  Success - if the database update succeded
+        /// </summary>
+        /// <param name="gearCode"></param>
+        /// <param name="targetAreaGuid"></param>
+        public static (string NewRow, bool Success) AddGearCodeUsageTargetArea(string gearCode, string targetAreaGuid)
+        {
+            var newGuid = Guid.NewGuid().ToString();
+            var Success = false;
+            using (var conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                var sql = $@"Insert into tblRefGearCodes_Usage (RefGearCode, TargetAreaGUID, RowNo)
+                         values('{gearCode}', {{{targetAreaGuid}}}, {{{newGuid}}})";
+                using (OleDbCommand update = new OleDbCommand(sql, conn))
+                {
+                    Success = update.ExecuteNonQuery() > 0;
+                }
+            }
+            return (newGuid, Success);
+        }
+
+        public static Dictionary<string, (string AOIName, string RowNumber)> TargetAreaUsed_RefCode(string RefCode)
+        {
+            var myList = new Dictionary<string, (string AOIName, string RowNumber)>();
             var dt = new DataTable();
             var query = "";
             using (var conection = new OleDbConnection(global.ConnectionString))
@@ -534,7 +736,7 @@ namespace FAD3
                 try
                 {
                     conection.Open();
-                    query = $@"SELECT AOIName, AOIGuid FROM tblRefGearCodes_Usage INNER JOIN tblAOI ON
+                    query = $@"SELECT AOIName, AOIGuid, tblRefGearCodes_Usage.RowNo FROM tblRefGearCodes_Usage INNER JOIN tblAOI ON
                         tblRefGearCodes_Usage.TargetAreaGUID = tblAOI.AOIGuid WHERE
                         tblRefGearCodes_Usage.RefGearCode= '{RefCode}' order by AOIName";
 
@@ -543,7 +745,7 @@ namespace FAD3
                     for (int i = 0; i < dt.Rows.Count; i++)
                     {
                         DataRow dr = dt.Rows[i];
-                        myList.Add(dr["AOIGuid"].ToString(), dr["AOIName"].ToString());
+                        myList.Add(dr["AOIGuid"].ToString(), (dr["AOIName"].ToString(), dr["RowNo"].ToString()));
                     }
                 }
                 catch (Exception ex)

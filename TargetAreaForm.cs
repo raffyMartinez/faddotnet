@@ -393,7 +393,7 @@ namespace FAD3
                     switch (o.Name)
                     {
                         case "txtName":
-                            if (o.Text.Length < 4)
+                            if (_IsNew && o.Text.Length < 4)
                             {
                                 msg = "Target area name must be at least 5 letters long";
                                 e.Cancel = true;

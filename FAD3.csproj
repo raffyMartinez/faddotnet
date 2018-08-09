@@ -142,11 +142,11 @@
     <Compile Include="frmGearEditor.Designer.cs">
       <DependentUpon>frmGearEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="frmGearUsage.cs">
+    <Compile Include="GearCodesUsageForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmGearUsage.Designer.cs">
-      <DependentUpon>frmGearUsage.cs</DependentUpon>
+    <Compile Include="GearCodesUsageForm.Designer.cs">
+      <DependentUpon>GearCodesUsageForm.cs</DependentUpon>
     </Compile>
     <Compile Include="frmRefNoRange.cs">
       <SubType>Form</SubType>
@@ -295,8 +295,8 @@
     <EmbeddedResource Include="frmGearEditor.resx">
       <DependentUpon>frmGearEditor.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmGearUsage.resx">
-      <DependentUpon>frmGearUsage.cs</DependentUpon>
+    <EmbeddedResource Include="GearCodesUsageForm.resx">
+      <DependentUpon>GearCodesUsageForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmMap.resx">
       <DependentUpon>frmMap.cs</DependentUpon>
