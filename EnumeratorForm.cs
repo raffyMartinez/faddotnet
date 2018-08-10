@@ -49,7 +49,7 @@ namespace FAD3
             //
             _parentForm = Parent;
             _EnumeratorGuid = EnumeratorGuid;
-            SamplingEnumerators.EnumeratorGuid = _EnumeratorGuid;
+            Enumerators.EnumeratorGuid = _EnumeratorGuid;
             ConfigureListEnumeratorSamplings();
             Text = "Enumerator details";
             FormBorderStyle = FormBorderStyle.SizableToolWindow;
@@ -167,7 +167,7 @@ namespace FAD3
             buttonAdd.Click += OnButtonClick;
             buttonRemove.Click += OnButtonClick;
 
-            foreach (KeyValuePair<string, (string EnumeratorName, DateTime DateHired, bool IsActive, global.fad3DataStatus DataStatus)> kv in SamplingEnumerators.GetTargetAreaEnumerators())
+            foreach (KeyValuePair<string, (string EnumeratorName, DateTime DateHired, bool IsActive, global.fad3DataStatus DataStatus)> kv in Enumerators.GetTargetAreaEnumerators())
             {
                 var lvi = lvEnumerators.Items.Add(kv.Key, kv.Value.EnumeratorName, null);
                 lvi.Tag = kv.Value.DataStatus;
@@ -223,7 +223,7 @@ namespace FAD3
             if (!_IsNew)
             {
                 ReadData();
-                var EnumeratorSamplings = SamplingEnumerators.GetEnumeratorSamplings();
+                var EnumeratorSamplings = Enumerators.GetEnumeratorSamplings();
                 foreach (KeyValuePair<string,
                     (string RefNo, string LandingSite, string Gear, DateTime SamplingDate, double WtCatch, int Rows, string GUIDs)>
                     kv in EnumeratorSamplings)
@@ -296,7 +296,7 @@ namespace FAD3
                                 enumeratorsData.Add(item, ("", DateTime.Today, false, global.fad3DataStatus.statusForDeletion));
                             }
 
-                            if ((enumeratorsData.Count > 0 || _removedEnumerators.Count > 0) && SamplingEnumerators.SaveTargetAreaEnumerators(enumeratorsData))
+                            if ((enumeratorsData.Count > 0 || _removedEnumerators.Count > 0) && Enumerators.SaveTargetAreaEnumerators(enumeratorsData))
                             {
                                 Close();
 
@@ -341,7 +341,7 @@ namespace FAD3
 
                 case "buttonRemove":
                     var selectedEnumeratorGuid = lvEnumerators.SelectedItems[0].Name;
-                    var NumberOfSampling = SamplingEnumerators.NumberOfSamplingsOfEnumerator(selectedEnumeratorGuid);
+                    var NumberOfSampling = Enumerators.NumberOfSamplingsOfEnumerator(selectedEnumeratorGuid);
                     if (NumberOfSampling == 0)
                     {
                         if (MessageBox.Show("This enumerator was not able to do any sampling.\r\n" +

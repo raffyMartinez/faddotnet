@@ -6,19 +6,19 @@
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>AGaEARACQMAhMikwgAAgogIAAQIgAwgCCCMAAIMIAgA=</HashCode>
+      <HashCode>AGaEIRACQMAhMikwgAAgohIAAQIgAwgCCCMAAIMIAgA=</HashCode>
       <FileName>global.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="FAD3.aoi" Collapsed="true">
+  <Class Name="FAD3.aoi">
     <Position X="0.5" Y="1.25" Width="2.75" />
     <TypeIdentifier>
-      <HashCode>AoQAaiABUAgCAICEIAIAEALBAEAAAEIAAUAEAigBIAw=</HashCode>
+      <HashCode>AgQAaCABUAgCAIAEIAIAEALAAEAAAEIAAEAEAgAAAAQ=</HashCode>
       <FileName>AOI.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="FAD3.sampling">
-    <Position X="0.75" Y="2.25" Width="2.5" />
+  <Class Name="FAD3.sampling" Collapsed="true">
+    <Position X="2" Y="0.5" Width="2.5" />
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
@@ -61,11 +61,11 @@
       <FileName>Sampling.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="FAD3.frmSamplingDetail" Collapsed="true">
+  <Class Name="FAD3.SamplingForm" Collapsed="true">
     <Position X="7.75" Y="0.5" Width="2.5" />
     <TypeIdentifier>
       <HashCode>oTBQ4SNkUCQceICcwUCkBoESEGiCgAgGCEJAYAkIICg=</HashCode>
-      <FileName>frmSamplingDetail.cs</FileName>
+      <FileName>SamplingForm.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="FAD3.FishingGrid" Collapsed="true">
@@ -91,7 +91,7 @@
   <Class Name="FAD3.gear">
     <Position X="3.5" Y="2" Width="3.25" />
     <TypeIdentifier>
-      <HashCode>BqCAggAgJABSARoABoCQgAAAAAAAUCBEgAAgASIkAQg=</HashCode>
+      <HashCode>BqCBggAgJABSARoABoCQkAAAAIAAcChEgAAgASMkAQg=</HashCode>
       <FileName>gear.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -134,7 +134,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="ISO_Classes.Coordinate" Collapsed="true">
-    <Position X="5.25" Y="1.25" Width="2.25" />
+    <Position X="11.75" Y="1.75" Width="2.25" />
     <TypeIdentifier>
       <HashCode>AAAAQAAAAEAAQBAMgCAIAAEACAAAAIBAAABIBAAAAAI=</HashCode>
       <FileName>Coordinate.cs</FileName>
@@ -148,6 +148,13 @@
       <FileName>Coordinate.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="FAD3.Enumerators">
+    <Position X="11.25" Y="2.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAABCAAAGAAAgAAEAAAAAEAAAAIEABAAA=</HashCode>
+      <FileName>Enumerators.cs</FileName>
+    </TypeIdentifier>
   </Class>
   <Font Name="Segoe UI" Size="9" />
 </ClassDiagram>

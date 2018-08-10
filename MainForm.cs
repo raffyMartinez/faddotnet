@@ -84,7 +84,7 @@ namespace FAD3
                     _AOIGuid = value;
                     _AOI.AOIGUID = _AOIGuid;
                     FishingGrid.AOIGuid = _AOIGuid;
-                    SamplingEnumerators.AOIGuid = _AOIGuid;
+                    Enumerators.AOIGuid = _AOIGuid;
                 }
             }
         }
@@ -848,7 +848,7 @@ namespace FAD3
                 case "menuNewSampling":
                     if (FishingGrid.IsCompleteGrid25)
                     {
-                        if (aoi.AOIHaveEnumeratorsEx(_AOIGuid))
+                        if (Enumerators.AOIHaveEnumerators(_AOIGuid))
                             NewSamplingForm();
                         else
                         {
@@ -1233,7 +1233,7 @@ namespace FAD3
                     break;
 
                 case "map":
-                    frmMap fm = new frmMap();
+                    MapForm fm = new MapForm();
                     fm.Show(this);
                     break;
 
@@ -1252,116 +1252,72 @@ namespace FAD3
             SetupCatchListView(Show: false);
         }
 
-        /// <summary>
-        /// this will fill the tree with the nodes below the level of Landing site
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void OntreeMainAfterExpand(object sender, TreeViewEventArgs e)
         {
             if (e.Node.FirstNode.Text == "*dummy*")
             {
-                // we are in a landing site node then we will add gear used nodes
-                var myDT = new DataTable();
-                try
+                var myTag = (Tuple<string, string, string>)e.Node.Tag;
+                var list = global.TreeSubNodes(myTag.Item3, myTag.Item1, myTag.Item2);
+                if (list.Count > 0)
                 {
-                    using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
+                    if (myTag.Item3 == "landing_site")
                     {
-                        conection.Open();
-                        string lsguid = ((Tuple<string, string, string>)e.Node.Tag).Item1;
-
-                        var query = $@"SELECT DISTINCT tblGearClass.GearClassName, tblGearVariations.Variation, tblSampling.LSGUID,
-                                     tblGearVariations.GearVarGUID FROM tblGearClass INNER JOIN
-                                     (tblGearVariations INNER JOIN tblSampling ON tblGearVariations.GearVarGUID = tblSampling.GearVarGUID)
-                                     ON tblGearClass.GearClass = tblGearVariations.GearClass
-                                     WHERE tblSampling.LSGUID = {{{lsguid}}}
-                                     ORDER BY tblGearClass.GearClassName, tblGearVariations.Variation";
-
-                        var adapter = new OleDbDataAdapter(query, conection);
-                        adapter.Fill(myDT);
-                        if (myDT.Rows.Count > 0)
+                        for (int i = 0; i < list.Count; i++)
                         {
-                            for (int i = 0; i < myDT.Rows.Count; i++)
+                            TreeNode nd = e.Node; //represents the current node which is the landing site node
+                            TreeNode nd1 = new TreeNode();
+                            if (i == 0)
                             {
-                                DataRow dr = myDT.Rows[i];
-                                TreeNode nd = e.Node; //represents the current node which is the landing site node
-                                TreeNode nd1 = new TreeNode();
-                                if (i == 0)
-                                {
-                                    //if the node contains the dummy placeholder, rename it to the name of the gear
-                                    nd.FirstNode.Text = dr["Variation"].ToString();
-                                    nd1 = nd.FirstNode;
-                                }
-                                else
-                                {
-                                    //add a new gearvar node and name with the variation field in the query
-                                    nd1 = nd.Nodes.Add(dr["Variation"].ToString());
-                                }
-                                //add a dummy placeholder for a new gear node
-                                // this will be replaced by a sampling month-year node
-                                //later on
-                                nd1.Nodes.Add("**dummy*");
-                                nd1.Tag = Tuple.Create(dr["LSGUID"].ToString(), dr["GearVarGUID"].ToString(), "gear");
-                                nd1.Name = dr["LSGUID"].ToString() + "|" + dr["GearVarGUID"].ToString();
-                                nd1.ImageKey = gear.GearClassImageKeyFromGearClasName(dr["GearClassName"].ToString());
+                                //if the node contains the dummy placeholder, rename it to the name of the gear
+                                nd.FirstNode.Text = list[i].Variation;
+                                nd1 = nd.FirstNode;
                             }
-                        }
-                        else
-                        {
-                            e.Node.Nodes.Clear();
+                            else
+                            {
+                                //add a new gearvar node and name with the variation field in the query
+                                nd1 = nd.Nodes.Add(list[i].Variation);
+                            }
+                            //add a dummy placeholder for a new gear node
+                            // this will be replaced by a sampling month-year node
+                            //later on
+                            nd1.Nodes.Add("*dummy*");
+
+                            nd1.Tag = Tuple.Create(list[i].LandingSiteGuid, list[i].GearVariationGuid, "gear");
+                            nd1.Name = $"{list[i].LandingSiteGuid}|{list[i].GearVariationGuid}";
+                            nd1.ImageKey = gear.GearClassImageKeyFromGearClasName(list[1].GearClassName);
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    ErrorLogger.Log(ex);
-                }
-            }
-            else if (e.Node.FirstNode.Text == "**dummy*")
-            {
-                //we are in a gear variation node and then add month-year sampling nodes
-
-                var myDT = new DataTable();
-                try
-                {
-                    using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
+                    else if (myTag.Item3 == "gear")
                     {
-                        conection.Open();
-                        var myTag = (Tuple<string, string, string>)e.Node.Tag;
-                        var lsguid = myTag.Item1;
-                        var gearguid = myTag.Item2;
-                        var query = $@"SELECT Format([SamplingDate],'mmm-yyyy') AS sDate FROM tblSampling
-                                    GROUP BY Format([SamplingDate],'mmm-yyyy'), tblSampling.LSGUID, tblSampling.GearVarGUID,
-                                    Year([SamplingDate]), Month([SamplingDate])
-                                    HAVING LSGUID ={{{lsguid}}} AND GearVarGUID = {{{gearguid}}}
-                                    ORDER BY Year([SamplingDate]), Month([SamplingDate])";
-
-                        var adapter = new OleDbDataAdapter(query, conection);
-                        adapter.Fill(myDT);
-                        for (int i = 0; i < myDT.Rows.Count; i++)
+                        for (int i = 0; i < list.Count; i++)
                         {
-                            DataRow dr = myDT.Rows[i];
                             TreeNode nd1 = new TreeNode();
                             if (i == 0)
                             {
                                 //if node contains a dummy placeholder,
                                 //rename it to the sampling month-year field
-                                e.Node.FirstNode.Text = dr["sDate"].ToString();
+                                e.Node.FirstNode.Text = list[i].SamplingMonthYear;
                                 nd1 = e.Node.FirstNode;
                             }
                             else
                             {
-                                nd1 = e.Node.Nodes.Add(dr["sDate"].ToString());
+                                nd1 = e.Node.Nodes.Add(list[i].SamplingMonthYear);
                             }
-                            nd1.Tag = Tuple.Create(lsguid, gearguid, "sampling");
-                            nd1.Name = lsguid + "|" + gearguid + "|" + dr["sDate"];
+                            if (_LandingSiteGuid.Length == 0 && _GearVarGUID.Length == 0)
+                            {
+                                myTag = (Tuple<string, string, string>)e.Node.Tag;
+                                _LandingSiteGuid = myTag.Item1;
+                                _GearVarGUID = myTag.Item2;
+                            }
+                            nd1.Tag = Tuple.Create(_LandingSiteGuid, _GearVarGUID, "sampling");
+                            nd1.Name = $"{_LandingSiteGuid}|{_GearVarGUID}|{list[i].SamplingMonthYear}";
                             nd1.ImageKey = "MonthGear";
                         }
                     }
                 }
-                catch (Exception ex)
+                else
                 {
-                    ErrorLogger.Log(ex);
+                    e.Node.Nodes.Clear();
                 }
             }
         }
@@ -1463,75 +1419,43 @@ namespace FAD3
             lvi.SubItems.Add("");
         }
 
+        /// <summary>
+        /// populates main tree with target area and landing site nodes
+        /// </summary>
         private void PopulateTree()
         {
-            using (var myDataTable = new DataTable())
+            this.treeMain.Nodes.Clear();
+            TreeNode root = this.treeMain.Nodes.Add("Fisheries data");
+            root.Name = "root";
+            root.Tag = Tuple.Create("root", "", "root");
+            root.ImageKey = "db";
+            foreach (var item in global.TreeNodes())
             {
-                try
+                if (root.Nodes.ContainsKey(item.AOIGuid))
                 {
-                    using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
-                    {
-                        conection.Open();
-
-                        const string query =
-                            @"SELECT tblAOI.AOIGuid, tblAOI.AOIName, tblLandingSites.LSGUID, tblLandingSites.LSName
-                            FROM tblAOI LEFT JOIN tblLandingSites ON tblAOI.AOIGuid = tblLandingSites.AOIGuid
-                            ORDER BY tblAOI.AOIName, tblLandingSites.LSName";
-
-                        using (var adapter = new OleDbDataAdapter(query, conection))
-                            adapter.Fill(myDataTable);
-                    }
+                    TreeNode myNode = root.Nodes[item.AOIGuid];
+                    TreeNode myChild = new TreeNode(item.LandingSiteName);
+                    myNode.Nodes.Add(myChild);
+                    myChild.Name = item.LandingSiteGuid;
+                    myChild.Nodes.Add("*dummy*");
+                    myChild.Tag = Tuple.Create(item.LandingSiteGuid, "", "landing_site");
+                    myChild.ImageKey = "LandingSite";
                 }
-                catch (Exception ex)
+                else
                 {
-                    ErrorLogger.Log(ex);
+                    TreeNode myNode = new TreeNode(item.AOIName);
+                    myNode.Name = item.AOIGuid;
+                    root.Nodes.Add(myNode);
+                    myNode.Tag = Tuple.Create(item.AOIGuid, "", "aoi");
+                    myNode.ImageKey = "AOI";
+
+                    TreeNode myChild = new TreeNode(item.LandingSiteName);
+                    myNode.Nodes.Add(myChild);
+                    myChild.Nodes.Add("*dummy*");
+                    myChild.Tag = Tuple.Create(item.LandingSiteGuid, "", "landing_site");
+                    myChild.Name = item.LandingSiteGuid;
+                    myChild.ImageKey = "LandingSite";
                 }
-
-                this.treeMain.Nodes.Clear();
-                TreeNode root = this.treeMain.Nodes.Add("Fisheries Data");
-                root.Name = "root";
-                root.Tag = Tuple.Create("root", "", "root");
-                root.ImageKey = "db";
-                for (int i = 0; i < myDataTable.Rows.Count; i++)
-                {
-                    DataRow dr = myDataTable.Rows[i];
-                    bool Exists = root.Nodes.ContainsKey(dr["AOIGuid"].ToString());
-                    if (Exists)
-                    {
-                        TreeNode myNode = root.Nodes[dr["AOIGuid"].ToString()];
-                        TreeNode myChild = new TreeNode(dr["LSName"].ToString());
-                        myNode.Nodes.Add(myChild);
-                        myChild.Name = dr["LSGUID"].ToString();
-                        myChild.Nodes.Add("*dummy*");
-                        myChild.Tag = Tuple.Create(dr["LSGUID"].ToString(), "", "landing_site");
-                        myChild.ImageKey = "LandingSite";
-                    }
-                    else
-                    {
-                        TreeNode myNode = new TreeNode(dr["AOIName"].ToString());
-                        myNode.Name = dr["AOIGuid"].ToString();
-                        root.Nodes.Add(myNode);
-                        myNode.Tag = Tuple.Create(dr["AOIGuid"].ToString(), "", "aoi");
-                        myNode.ImageKey = "AOI";
-
-                        if (string.IsNullOrWhiteSpace(dr["LSName"].ToString()))
-                        {
-                            myNode.Nodes.Add("*dummy*");
-                        }
-                        else
-                        {
-                            TreeNode myChild = new TreeNode(dr["LSName"].ToString());
-                            myNode.Nodes.Add(myChild);
-                            myChild.Nodes.Add("*dummy*");
-                            myChild.Tag = Tuple.Create(dr["LSGUID"].ToString(), "", "landing_site");
-                            myChild.Name = dr["LSGUID"].ToString();
-                            myChild.ImageKey = "LandingSite";
-                        }
-                    }
-                }
-
-                root.Expand();
-                SetUPLV("root");
             }
         }
 
@@ -1990,7 +1914,7 @@ namespace FAD3
                     lvi = lvMain.Items.Add("");
                     lvi = lvMain.Items.Add("Enumerators");
                     i = 0;
-                    foreach (KeyValuePair<string, string> item in _AOI.EnumeratorsWithCount())
+                    foreach (KeyValuePair<string, string> item in Enumerators.EnumeratorsWithCount(_AOIGuid))
                     {
                         if (i > 0)
                         {
@@ -2007,7 +1931,7 @@ namespace FAD3
                     // so we just show a simple list
                     if (i == 0)
                     {
-                        foreach (KeyValuePair<string, string> item in aoi.AOIEnumeratorsList(_AOIGuid))
+                        foreach (KeyValuePair<string, string> item in Enumerators.AOIEnumeratorsList(_AOIGuid))
                         {
                             if (i > 0)
                             {

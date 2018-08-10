@@ -136,11 +136,11 @@
     <Compile Include="frmFishingGround.Designer.cs">
       <DependentUpon>frmFishingGround.cs</DependentUpon>
     </Compile>
-    <Compile Include="frmGearEditor.cs">
+    <Compile Include="GearEditoForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmGearEditor.Designer.cs">
-      <DependentUpon>frmGearEditor.cs</DependentUpon>
+    <Compile Include="GearEditoForm.Designer.cs">
+      <DependentUpon>GearEditoForm.cs</DependentUpon>
     </Compile>
     <Compile Include="GearCodesUsageForm.cs">
       <SubType>Form</SubType>
@@ -154,11 +154,11 @@
     <Compile Include="frmRefNoRange.Designer.cs">
       <DependentUpon>frmRefNoRange.cs</DependentUpon>
     </Compile>
-    <Compile Include="frmMap.cs">
+    <Compile Include="MapForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmMap.Designer.cs">
-      <DependentUpon>frmMap.cs</DependentUpon>
+    <Compile Include="MapForm.Designer.cs">
+      <DependentUpon>MapForm.cs</DependentUpon>
     </Compile>
     <Compile Include="frmAbout.cs">
       <SubType>Form</SubType>
@@ -166,7 +166,7 @@
     <Compile Include="frmAbout.Designer.cs">
       <DependentUpon>frmAbout.cs</DependentUpon>
     </Compile>
-    <Compile Include="SamplingEnumerators.cs" />
+    <Compile Include="Enumerators.cs" />
     <Compile Include="TargetAreaForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -222,11 +222,11 @@
       <DependentUpon>frmVesselDimension.cs</DependentUpon>
     </Compile>
     <Compile Include="gear.cs" />
-    <Compile Include="GenerateRefNumberForm.cs">
+    <Compile Include="ReferenceNumberForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GenerateRefNumberForm.Designer.cs">
-      <DependentUpon>GenerateRefNumberForm.cs</DependentUpon>
+    <Compile Include="ReferenceNumberForm.Designer.cs">
+      <DependentUpon>ReferenceNumberForm.cs</DependentUpon>
     </Compile>
     <Compile Include="global.cs" />
     <Compile Include="GMSDataEntryForm.cs">
@@ -292,14 +292,14 @@
     <EmbeddedResource Include="frmFishingGround.resx">
       <DependentUpon>frmFishingGround.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmGearEditor.resx">
-      <DependentUpon>frmGearEditor.cs</DependentUpon>
+    <EmbeddedResource Include="GearEditoForm.resx">
+      <DependentUpon>GearEditoForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GearCodesUsageForm.resx">
       <DependentUpon>GearCodesUsageForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmMap.resx">
-      <DependentUpon>frmMap.cs</DependentUpon>
+    <EmbeddedResource Include="MapForm.resx">
+      <DependentUpon>MapForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmAbout.resx">
       <DependentUpon>frmAbout.cs</DependentUpon>
@@ -334,8 +334,8 @@
     <EmbeddedResource Include="frmVesselDimension.resx">
       <DependentUpon>frmVesselDimension.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GenerateRefNumberForm.resx">
-      <DependentUpon>GenerateRefNumberForm.cs</DependentUpon>
+    <EmbeddedResource Include="ReferenceNumberForm.resx">
+      <DependentUpon>ReferenceNumberForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GMSDataEntryForm.resx">
       <DependentUpon>GMSDataEntryForm.cs</DependentUpon>

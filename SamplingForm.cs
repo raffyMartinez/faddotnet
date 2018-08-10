@@ -270,7 +270,7 @@ namespace FAD3
                     {
                         case "Enumerator":
                             //((ComboBox)ctl).DataSource = new BindingSource(_aoi.Enumerators, null);
-                            aoi.AOIEnumeratorsList(_AOIGuid, (ComboBox)ctl);
+                            Enumerators.AOIEnumeratorsList(_AOIGuid, (ComboBox)ctl);
                             break;
 
                         case "TargetArea":
@@ -769,7 +769,7 @@ namespace FAD3
                     {
                         var txt = (MaskedTextBox)panelUI.Controls["dtxtSamplingDate"];
                         ReferenceNumberManager.SetAOI_GearVariation(_AOIGuid, _GearVarGuid, DateTime.Parse(txt.Text));
-                        GenerateRefNumberForm grf = new GenerateRefNumberForm();
+                        ReferenceNumberForm grf = new ReferenceNumberForm();
                         grf.Parent_Form = this;
                         grf.ShowDialog(this);
                     }
@@ -1132,7 +1132,7 @@ namespace FAD3
                                     ChangeComboDataSource(targetCombo, comboItems);
 
                                     targetCombo = (ComboBox)panelUI.Controls["comboEnumerator"];
-                                    comboItems = aoi.AOIEnumeratorsList(key);
+                                    comboItems = Enumerators.AOIEnumeratorsList(key);
                                     ChangeComboDataSource(targetCombo, comboItems);
 
                                     targetCombo = (ComboBox)panelUI.Controls["comboFishingGear"];
@@ -1284,7 +1284,7 @@ namespace FAD3
                         {
                             case "TargetArea":
                                 key = ((KeyValuePair<string, string>)cbo.SelectedItem).Key;
-                                e.Cancel = !aoi.AOIHaveEnumeratorsEx(key);
+                                e.Cancel = !Enumerators.AOIHaveEnumerators(key);
                                 if (e.Cancel)
                                     msg = "Cannot use the selected target area because it does not have enumerators";
                                 else

@@ -9,9 +9,9 @@ using System.Windows.Forms;
 
 namespace FAD3
 {
-    public partial class frmMap : Form
+    public partial class MapForm : Form
     {
-        public frmMap()
+        public MapForm()
         {
             InitializeComponent();
         }

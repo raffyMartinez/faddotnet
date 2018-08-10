@@ -546,10 +546,20 @@ namespace FAD3
                         catch (OleDbException ex)
                         {
                             if (DeleteVariationFromOtherTables(gearVarGuid))
-                                success = deleteVariation.ExecuteNonQuery() > 0;
+                            {
+                                try
+                                {
+                                    success = deleteVariation.ExecuteNonQuery() > 0;
+                                }
+                                catch (OleDbException ex1)
+                                {
+                                    success = false;
+                                    reason = "Cannot delete this variation because it is used in other tables";
+                                }
+                            }
 
                             if (!success)
-                                reason = "There was a failure to delete";
+                                reason = "Cannot delete this variation because it is used in other tables";
                         }
                     }
                 }
@@ -693,7 +703,7 @@ namespace FAD3
                 conn.Open();
 
                 var sql = $@"Insert into tblRefGearUsage_LocalName (GearUsageRow, GearLocalName, RowNo)
-                         values({{{targetAreaUsageGuid}}}, {{{localNameGuid}}}, {newRow})";
+                         values({{{targetAreaUsageGuid}}}, {{{localNameGuid}}}, {{{newRow}}})";
                 using (OleDbCommand update = new OleDbCommand(sql, conn))
                 {
                     success = update.ExecuteNonQuery() > 0;
@@ -703,9 +713,60 @@ namespace FAD3
         }
 
         /// <summary>
+        /// deletes a local name used in a target area
+        /// Returns a boolean if the database row delete succeeded
+        /// </summary>
+        /// <param name="LocalNameUsageGuid"></param>
+        /// <returns></returns>
+        public static bool DeleteLocalNameUsage(string LocalNameUsageGuid)
+        {
+            var success = false;
+            using (var conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                var sql = $"Delete * from tblRefGearUsage_LocalName where RowNo = {{{LocalNameUsageGuid}}}";
+                using (OleDbCommand deleteRow = new OleDbCommand(sql, conn))
+                {
+                    success = deleteRow.ExecuteNonQuery() > 0;
+                }
+            }
+            return success;
+        }
+
+        /// <summary>
+        /// deletes a target area where a gear code is used
+        /// returns boolean if the database delete succeeded
+        /// </summary>
+        /// <param name="TargetAreaUsageGuid"></param>
+        /// <returns></returns>
+        public static (bool success, string message) DeleteTargetAreaUsage(string TargetAreaUsageGuid)
+        {
+            var success = false;
+            var message = "";
+            using (var conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                var sql = $"Delete * from tblRefGearCodes_Usage where RowNo = {{{TargetAreaUsageGuid}}}";
+                using (OleDbCommand update = new OleDbCommand(sql, conn))
+                {
+                    try
+                    {
+                        success = update.ExecuteNonQuery() > 0;
+                    }
+                    catch (OleDbException ex)
+                    {
+                        success = false;
+                        message = "Could not delete because this target area is used in other tables";
+                    }
+                }
+            }
+            return (success, message);
+        }
+
+        /// <summary>
         /// updates target areas where a gear variation code is used.
         /// Returns a tuple: NewRow - new row number in the database table
-        ///                  Success - if the database update succeded
+        ///                  Success - if the database update succeeded
         /// </summary>
         /// <param name="gearCode"></param>
         /// <param name="targetAreaGuid"></param>

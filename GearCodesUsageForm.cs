@@ -468,6 +468,7 @@ namespace FAD3
         {
             var myList = new List<string>();
             e.ClickedItem.Owner.Hide();
+            var RowNumberForDeletion = "";
             switch (e.ClickedItem.Name)
             {
                 case "itemAddTargetArea":
@@ -492,8 +493,44 @@ namespace FAD3
                     _action = global.fad3GearEditAction.addGearCode;
                     break;
 
+                case "itemDeleteGearCode":
+                    MessageBox.Show("Deleting a gear code is not enabled");
+                    break;
+
                 case "itemManageGearSpecs":
                     //reserved
+                    break;
+
+                case "itemDeleteTargetArea":
+                    RowNumberForDeletion = listViewWhereUsed.SelectedItems[0].Tag.ToString();
+                    if (MessageBox.Show("Please confirm that you want to delete this target area",
+                                        "Confirmation needed", MessageBoxButtons.OKCancel,
+                                        MessageBoxIcon.Exclamation) == DialogResult.OK)
+                    {
+                        var result = gear.DeleteTargetAreaUsage(RowNumberForDeletion);
+                        if (result.success)
+                        {
+                            listViewWhereUsed.Items.Remove(listViewWhereUsed.SelectedItems[0]);
+                        }
+                        else
+                        {
+                            MessageBox.Show(result.message, "Deletion status", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                    }
+                    break;
+                    break;
+
+                case "itemDeleteLocalName":
+                    RowNumberForDeletion = listViewLocalNames.SelectedItems[0].Tag.ToString();
+                    if (MessageBox.Show("Please confirm that you want to delete this local name",
+                                        "Confirmation needed", MessageBoxButtons.OKCancel,
+                                        MessageBoxIcon.Exclamation) == DialogResult.OK)
+                    {
+                        if (gear.DeleteLocalNameUsage(RowNumberForDeletion))
+                        {
+                            listViewLocalNames.Items.Remove(listViewLocalNames.SelectedItems[0]);
+                        }
+                    }
                     break;
 
                 case "itemDeleteGearVariation":
@@ -530,7 +567,7 @@ namespace FAD3
                 case "itemAddLocalName":
                 case "itemAddGearCode":
                     _GearClassGuid = ((KeyValuePair<string, string>)comboClass.SelectedItem).Key;
-                    frmGearEditor f = new frmGearEditor(this)
+                    GearEditoForm f = new GearEditoForm(this)
                     {
                         GearClassGuid = _GearClassGuid,
                         GearVariationGuid = _GearVarGuid,
@@ -561,7 +598,7 @@ namespace FAD3
             _TargetAreaGuid = targetAreaGuid;
             _TargetAreaName = targetAreaName;
 
-            if (_GearRefCode.Length > 0)
+            if (_GearRefCode.Length > 0 && _TargetAreaGuid.Length > 0)
             {
                 var result = gear.AddGearCodeUsageTargetArea(_GearRefCode, _TargetAreaGuid);
                 if (result.Success)
@@ -578,7 +615,7 @@ namespace FAD3
             _LocalNameGuid = localNameGuid;
             _LocalName = localName;
 
-            if (_GearRefCode.Length > 0 && _TargetAreaGuid.Length > 0 && _LocalNameGuid.Length > 0)
+            if (_GearRefCode.Length > 0 && _TargetAreaGuid.Length > 0 && _LocalNameGuid.Length > 0 && _TargetAreaUsageRow.Length > 0)
             {
                 var result = gear.AddUsageLocalName(_TargetAreaUsageRow, _LocalNameGuid);
                 if (result.Success)

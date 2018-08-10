@@ -1,6 +1,6 @@
 ﻿namespace FAD3
 {
-    partial class frmMap
+    partial class MapForm
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMap));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MapForm));
             this.xMap = new AxMapWinGIS.AxMap();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.tsButtonLayers = new System.Windows.Forms.ToolStripButton();

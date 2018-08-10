@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace FAD3
 {
-    public partial class GenerateRefNumberForm : Form
+    public partial class ReferenceNumberForm : Form
     {
 
         SamplingForm _Parent_Form;
@@ -21,7 +21,7 @@ namespace FAD3
             set { _Parent_Form = value; }
         }
 
-        public GenerateRefNumberForm()
+        public ReferenceNumberForm()
         {
             InitializeComponent();
         }

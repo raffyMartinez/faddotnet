@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace FAD3
 {
-    public partial class frmGearEditor : Form
+    public partial class GearEditoForm : Form
     {
         private global.fad3GearEditAction _action;
         private string _GearVariationGuid = "";
@@ -48,7 +48,7 @@ namespace FAD3
             set { _action = value; }
         }
 
-        public frmGearEditor(GearCodesUsageForm parent)
+        public GearEditoForm(GearCodesUsageForm parent)
         {
             InitializeComponent();
             _parentForm = parent;

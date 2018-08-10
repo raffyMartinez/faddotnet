@@ -56,6 +56,118 @@ namespace FAD3
             }
         }
 
+        public static List<(string GearClassName, string Variation, string LandingSiteGuid, string GearVariationGuid, string SamplingMonthYear)> TreeSubNodes(string treeLevel, string landingSiteGuid, string gearVariationGuid = "")
+        {
+            var list = new List<(string GearClassName, string Variation, string LandingSiteGuid, string GearVariationGuid, string SamplingMonthYear)>();
+            var query = "";
+            using (var dataTable = new DataTable())
+            {
+                try
+                {
+                    using (var conection = new OleDbConnection($"Provider=Microsoft.JET.OLEDB.4.0;data source={global.mdbPath}"))
+                    {
+                        conection.Open();
+
+                        if (treeLevel == "landing_site")
+                        {
+                            query = $@"SELECT DISTINCT tblGearClass.GearClassName, tblGearVariations.Variation, tblSampling.LSGUID,
+                                     tblGearVariations.GearVarGUID FROM tblGearClass INNER JOIN
+                                     (tblGearVariations INNER JOIN tblSampling ON tblGearVariations.GearVarGUID = tblSampling.GearVarGUID)
+                                     ON tblGearClass.GearClass = tblGearVariations.GearClass
+                                     WHERE tblSampling.LSGUID = {{{landingSiteGuid}}}
+                                     ORDER BY tblGearClass.GearClassName, tblGearVariations.Variation";
+                        }
+                        else if (treeLevel == "gear")
+                        {
+                            query = $@"SELECT Format([SamplingDate],'mmm-yyyy') AS sDate FROM tblSampling
+                                    GROUP BY Format([SamplingDate],'mmm-yyyy'), tblSampling.LSGUID, tblSampling.GearVarGUID,
+                                    Year([SamplingDate]), Month([SamplingDate])
+                                    HAVING LSGUID ={{{landingSiteGuid}}} AND GearVarGUID = {{{gearVariationGuid}}}
+                                    ORDER BY Year([SamplingDate]), Month([SamplingDate])";
+                        }
+
+                        using (var adapter = new OleDbDataAdapter(query, conection))
+                        {
+                            adapter.Fill(dataTable);
+                            for (int i = 0; i < dataTable.Rows.Count; i++)
+                            {
+                                DataRow dr = dataTable.Rows[i];
+                                if (treeLevel == "landing_site")
+                                {
+                                    list.Add(
+                                              (dr["GearClassName"].ToString(),
+                                               dr["Variation"].ToString(),
+                                               dr["LSGUID"].ToString(),
+                                               dr["GearVarGUID"].ToString(),
+                                               "")
+                                              );
+                                }
+                                else if (treeLevel == "gear")
+                                {
+                                    list.Add(
+                                              ("",
+                                               "",
+                                               "",
+                                               "",
+                                                dr["sDate"].ToString())
+                                              );
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ErrorLogger.Log(ex);
+                }
+                return list;
+            }
+        }
+
+        /// <summary>
+        /// returns a list that will fill a tree containing target areas and landing sites
+        /// </summary>
+        /// <returns></returns>
+        public static List<(string AOIGuid, string AOIName, string LandingSiteGuid, string LandingSiteName)> TreeNodes()
+        {
+            var list = new List<(string AOIGuid, string AOIName, string LandingSiteGuid, string LandingSiteName)>();
+            using (var dataTable = new DataTable())
+            {
+                try
+                {
+                    using (var conection = new OleDbConnection($"Provider=Microsoft.JET.OLEDB.4.0;data source={global.mdbPath}"))
+                    {
+                        conection.Open();
+
+                        const string query =
+                            @"SELECT tblAOI.AOIGuid, tblAOI.AOIName, tblLandingSites.LSGUID, tblLandingSites.LSName
+                            FROM tblAOI LEFT JOIN tblLandingSites ON tblAOI.AOIGuid = tblLandingSites.AOIGuid
+                            ORDER BY tblAOI.AOIName, tblLandingSites.LSName";
+
+                        using (var adapter = new OleDbDataAdapter(query, conection))
+                        {
+                            adapter.Fill(dataTable);
+                            for (int i = 0; i < dataTable.Rows.Count; i++)
+                            {
+                                DataRow dr = dataTable.Rows[i];
+                                list.Add(
+                                          (dr["AOIGuid"].ToString(),
+                                           dr["AOIName"].ToString(),
+                                           dr["LSGUID"].ToString(),
+                                           dr["LSName"].ToString())
+                                          );
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ErrorLogger.Log(ex);
+                }
+            }
+            return list;
+        }
+
         public static CoordinateDisplayFormat CoordinateDisplay
         {
             get { return _CoordDisplayFormat; }

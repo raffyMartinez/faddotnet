@@ -4,15 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Data;
 using System.Data.OleDb;
+using System.Windows.Forms;
 
 namespace FAD3
 {
-    public static class SamplingEnumerators
+    public static class Enumerators
     {
         private static string _AOIGuid;
         private static string _EnumeratorGuid;
 
-        static SamplingEnumerators()
+        static Enumerators()
         {
         }
 
@@ -149,6 +150,93 @@ namespace FAD3
                 }
             }
             return myRows;
+        }
+
+        static public bool AOIHaveEnumerators(string AOIGuid)
+        {
+            var HasEnumerator = false;
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    string query = $"SELECT TOP 1 EnumeratorID FROM tblEnumerators WHERE TargetArea ={{{AOIGuid}}}";
+                    var command = new OleDbCommand(query, conection);
+                    var reader = command.ExecuteReader();
+                    HasEnumerator = reader.HasRows;
+                }
+                catch (Exception ex)
+                {
+                    ErrorLogger.Log(ex);
+                }
+            }
+
+            return HasEnumerator;
+        }
+
+        static public Dictionary<string, string> AOIEnumeratorsList(string AOIGuid, ComboBox c = null)
+        {
+            Dictionary<string, string> myAOIEnumerators = new Dictionary<string, string>();
+            var myDT = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+
+                    string query = $@"Select EnumeratorID, EnumeratorName from tblEnumerators where TargetArea = {{{AOIGuid}}}
+                                      Order by EnumeratorName";
+                    using (var adapter = new OleDbDataAdapter(query, conection))
+                    {
+                        adapter.Fill(myDT);
+                        for (int i = 0; i < myDT.Rows.Count; i++)
+                        {
+                            DataRow dr = myDT.Rows[i];
+                            myAOIEnumerators.Add(dr["EnumeratorID"].ToString(), dr["EnumeratorName"].ToString());
+                            if (c != null)
+                            {
+                                c.Items.Add(new KeyValuePair<string, string>(dr["EnumeratorID"].ToString(), dr["EnumeratorName"].ToString()));
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ErrorLogger.Log(ex);
+                }
+            }
+
+            return myAOIEnumerators;
+        }
+
+        public static Dictionary<string, string> EnumeratorsWithCount(string AOIGuid)
+        {
+            Dictionary<string, string> myList = new Dictionary<string, string>();
+            var dt = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    string query = $@"SELECT EnumeratorID, EnumeratorName, Count(Enumerator) AS n
+                                      FROM tblEnumerators LEFT JOIN tblSampling ON tblEnumerators.EnumeratorID = tblSampling.Enumerator
+                                      GROUP BY tblEnumerators.EnumeratorID, tblEnumerators.EnumeratorName, tblEnumerators.TargetArea
+                                      HAVING tblEnumerators.TargetArea ={{{AOIGuid}}}";
+
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(dt);
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        DataRow dr = dt.Rows[i];
+                        myList.Add(dr["EnumeratorName"].ToString(), dr["EnumeratorID"].ToString() + "," + dr["n"].ToString());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ErrorLogger.Log(ex);
+                }
+            }
+            return myList;
         }
     }
 }
