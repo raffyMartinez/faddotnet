@@ -757,7 +757,7 @@ namespace FAD3
                     break;
 
                 case "btnVesselDimension":
-                    frmVesselDimension f = new frmVesselDimension();
+                    VesselDimensionForm f = new VesselDimensionForm();
                     if (_VesLength.Length > 0 && _VesHeight.Length > 0 && _VesWidth.Length > 0)
                         f.VesselDimension(_VesLength, _VesWidth, _VesHeight);
                     f.Parent_Form = this;
@@ -782,7 +782,7 @@ namespace FAD3
 
                 case "btnFishingGround":
                     PopulateFGList();
-                    frmFishingGround fg = new frmFishingGround(_AOIGuid, this);
+                    FishingGroundForm fg = new FishingGroundForm(_AOIGuid, this);
                     fg.FishingGrounds = _FishingGrounds;
                     fg.Show(this);
                     break;

@@ -56,7 +56,9 @@ namespace FAD3
             }
         }
 
-        public static List<(string GearClassName, string Variation, string LandingSiteGuid, string GearVariationGuid, string SamplingMonthYear)> TreeSubNodes(string treeLevel, string landingSiteGuid, string gearVariationGuid = "")
+        public static
+            List<(string GearClassName, string Variation, string LandingSiteGuid, string GearVariationGuid, string SamplingMonthYear)>
+            TreeSubNodes(string treeLevel, string landingSiteGuid, string gearVariationGuid = "")
         {
             var list = new List<(string GearClassName, string Variation, string LandingSiteGuid, string GearVariationGuid, string SamplingMonthYear)>();
             var query = "";
@@ -428,26 +430,6 @@ namespace FAD3
             LenghtWeightSex,
         }
 
-        public enum sex
-        {
-            Juvenile,
-            Male,
-            Female
-        }
-
-        public enum Taxa
-        {
-            To_be_determined,
-            Fish,
-            Shrimps,
-            Cephalopods,
-            Crabs,
-            Shells,
-            Lobsters,
-            Sea_cucumbers,
-            Sea_urchins,
-        }
-
         public enum CoordinateDisplayFormat
         {
             DegreeDecimal,
@@ -456,238 +438,15 @@ namespace FAD3
             UTM
         }
 
-        public enum FishCrabGMS
-        {
-            AllTaxaNotDetermined,
-            FishJuvenile = 1,
-            FishStg1Immature,
-            FishStg2Maturing,
-            FishStg3Mature,
-            FishStg4Gravid,
-            FishStg5Spent,
-            FemaleCrabImmature = 2,
-            FemaleCrabMature = 4,
-            FemaleCrabBerried,
-        }
-
         public static bool ShowErrorMessage
         {
             get { return _ShowErrorMessage; }
             set { _ShowErrorMessage = value; }
         }
 
-        public static Dictionary<FishCrabGMS, string> GMSStages(Taxa taxa, ref bool Success)
-        {
-            Success = false;
-            Dictionary<FishCrabGMS, string> myStages = new Dictionary<FishCrabGMS, string>();
-            switch (taxa)
-            {
-                case Taxa.Fish:
-                    myStages.Add(FishCrabGMS.AllTaxaNotDetermined, "Not determined");
-                    myStages.Add(FishCrabGMS.FishJuvenile, "Juvenile");
-                    myStages.Add(FishCrabGMS.FishStg1Immature, "Immature");
-                    myStages.Add(FishCrabGMS.FishStg2Maturing, "Maturing");
-                    myStages.Add(FishCrabGMS.FishStg3Mature, "Mature");
-                    myStages.Add(FishCrabGMS.FishStg4Gravid, "Gravid");
-                    myStages.Add(FishCrabGMS.FishStg5Spent, "Spent");
-                    Success = true;
-                    break;
-
-                case Taxa.Crabs:
-                    myStages.Add(FishCrabGMS.AllTaxaNotDetermined, "Not determined");
-                    myStages.Add(FishCrabGMS.FemaleCrabImmature, "Immature");
-                    myStages.Add(FishCrabGMS.FemaleCrabMature, "Mature");
-                    myStages.Add(FishCrabGMS.FemaleCrabBerried, "Berried");
-                    Success = true;
-                    break;
-
-                case Taxa.Lobsters:
-                case Taxa.Sea_cucumbers:
-                case Taxa.Sea_urchins:
-                case Taxa.Shells:
-                case Taxa.Shrimps:
-                case Taxa.To_be_determined:
-                    break;
-            }
-            return myStages;
-        }
-
         public static string AppPath
         {
             get { return _AppPath; }
-        }
-
-        public static string GMSStage(Taxa taxa, FishCrabGMS stage)
-        {
-            string gms_stage = "";
-            switch (taxa.ToString())
-            {
-                case "To_be_determined":
-                    break;
-
-                case "Fish":
-                    switch (stage)
-                    {
-                        case FishCrabGMS.AllTaxaNotDetermined:
-                            gms_stage = "Not determined";
-                            break;
-
-                        case FishCrabGMS.FishJuvenile:
-                            gms_stage = "Juvenile";
-                            break;
-
-                        case FishCrabGMS.FishStg1Immature:
-                            gms_stage = "Immature";
-                            break;
-
-                        case FishCrabGMS.FishStg2Maturing:
-                            gms_stage = "Maturing";
-                            break;
-
-                        case FishCrabGMS.FishStg3Mature:
-                            gms_stage = "Mature";
-                            break;
-
-                        case FishCrabGMS.FishStg4Gravid:
-                            gms_stage = "Gravid";
-                            break;
-
-                        case FishCrabGMS.FishStg5Spent:
-                            gms_stage = "Spent";
-                            break;
-                    }
-                    break;
-
-                case "Shrimps":
-                    break;
-
-                case "Cephalopods":
-                    break;
-
-                case "Crabs":
-                    switch (stage)
-                    {
-                        case FishCrabGMS.AllTaxaNotDetermined:
-                            gms_stage = "Not determined";
-                            break;
-
-                        case FishCrabGMS.FemaleCrabImmature:
-                            gms_stage = "Immature";
-                            break;
-
-                        case FishCrabGMS.FemaleCrabMature:
-                            gms_stage = "Mature";
-                            break;
-
-                        case FishCrabGMS.FemaleCrabBerried:
-                            gms_stage = "Berried";
-                            break;
-                    }
-                    break;
-
-                case "Shells":
-                    break;
-
-                case "Lobsters":
-                    break;
-
-                case "Sea_cucumbers":
-                    break;
-
-                case "Sea_urchins":
-                    break;
-            }
-            return gms_stage;
-        }
-
-        public static FishCrabGMS MaturityStageFromText(string stage, Taxa taxa)
-        {
-            FishCrabGMS myStage = FishCrabGMS.AllTaxaNotDetermined;
-            switch (taxa)
-            {
-                case Taxa.Fish:
-                    switch (stage)
-                    {
-                        case "Not determined":
-                            myStage = FishCrabGMS.AllTaxaNotDetermined;
-                            break;
-
-                        case "Juvenile":
-                            myStage = FishCrabGMS.FishJuvenile;
-                            break;
-
-                        case "Immature":
-                            myStage = FishCrabGMS.FishStg1Immature;
-                            break;
-
-                        case "Maturing":
-                            myStage = FishCrabGMS.FishStg2Maturing;
-                            break;
-
-                        case "Mature":
-                            myStage = FishCrabGMS.FishStg3Mature;
-                            break;
-
-                        case "Gravid":
-                            myStage = FishCrabGMS.FishStg4Gravid;
-                            break;
-
-                        case "Spent":
-                            myStage = FishCrabGMS.FishStg5Spent;
-                            break;
-                    }
-                    break;
-
-                case Taxa.Crabs:
-                    switch (stage)
-                    {
-                        case "Not determined":
-                            myStage = FishCrabGMS.AllTaxaNotDetermined;
-                            break;
-
-                        case "Immature":
-                            myStage = FishCrabGMS.FemaleCrabImmature;
-                            break;
-
-                        case "Mature":
-                            myStage = FishCrabGMS.FemaleCrabMature;
-                            break;
-
-                        case "Berried":
-                            myStage = FishCrabGMS.FemaleCrabBerried;
-                            break;
-                    }
-                    break;
-
-                default:
-                    myStage = FishCrabGMS.AllTaxaNotDetermined;
-                    break;
-            }
-
-            return myStage;
-        }
-
-        public static Taxa TaxaFromCatchNameGUID(string CatchNameGUID)
-        {
-            Taxa taxa = Taxa.To_be_determined;
-            var dt = new DataTable();
-            using (var conection = new OleDbConnection(_ConnectionString))
-            {
-                try
-                {
-                    conection.Open();
-                    string query = $"Select TaxaNo from tblAllSpecies where SpeciesGUID = {{{CatchNameGUID}}}";
-                    var adapter = new OleDbDataAdapter(query, conection);
-                    adapter.Fill(dt);
-                    DataRow dr = dt.Rows[0];
-                    taxa = (Taxa)int.Parse(dr["TaxaNo"].ToString());
-                }
-                catch (Exception ex)
-                {
-                    ErrorLogger.Log(ex);
-                }
-                return taxa;
-            }
         }
 
         /// <summary>

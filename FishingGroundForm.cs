@@ -9,15 +9,15 @@ using System.Windows.Forms;
 
 namespace FAD3
 {
-    public partial class frmFishingGround : Form
+    public partial class FishingGroundForm : Form
     {
-        private static frmFishingGround _instance;
+        private static FishingGroundForm _instance;
         private int _mouseX;
         private int _mouseY;
         private List<string> _FishingGrounds;
         private ListViewItem _selectedItem;
 
-        public frmFishingGround(string AOIGuid, SamplingForm Parent)
+        public FishingGroundForm(string AOIGuid, SamplingForm Parent)
         {
             InitializeComponent();
             this.AOIGuid = AOIGuid;
@@ -32,9 +32,9 @@ namespace FAD3
 
         public SamplingForm Parent_form { get; }
 
-        public static frmFishingGround GetInstance(string AOIGuid, SamplingForm Parent)
+        public static FishingGroundForm GetInstance(string AOIGuid, SamplingForm Parent)
         {
-            if (_instance == null) _instance = new frmFishingGround(AOIGuid, Parent);
+            if (_instance == null) _instance = new FishingGroundForm(AOIGuid, Parent);
             return _instance;
         }
 

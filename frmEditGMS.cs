@@ -14,10 +14,10 @@ namespace FAD3
         private string _CatchCompRowGUID;
         private bool _IsNew;
         private string _RowGUID;
-        private global.Taxa _taxa;
+        private GMSManager.Taxa _taxa;
         private string _CatchNameGUID;
         private string _CatchName;
-        private global.FishCrabGMS _stage = global.FishCrabGMS.AllTaxaNotDetermined;
+        private GMSManager.FishCrabGMS _stage = GMSManager.FishCrabGMS.AllTaxaNotDetermined;
 
         public string CatchName
         {
@@ -33,13 +33,14 @@ namespace FAD3
         {
             txtLen.Focus();
         }
-        public global.Taxa taxa
+
+        public GMSManager.Taxa taxa
         {
             set
             {
                 _taxa = value;
                 bool Success = false;
-                comboStage.DataSource = new BindingSource(global.GMSStages(_taxa,ref Success), null);
+                comboStage.DataSource = new BindingSource(GMSManager.GMSStages(_taxa, ref Success), null);
                 if (Success)
                 {
                     comboStage.ValueMember = "Key";
@@ -57,6 +58,7 @@ namespace FAD3
             }
             get { return _taxa; }
         }
+
         public string CatchNameGUID
         {
             get { return _CatchNameGUID; }
@@ -68,22 +70,21 @@ namespace FAD3
             _IsNew = true;
         }
 
-        public void GMSData(string RowGUID, double? length, double? weight, 
-                            global.sex sex, global.FishCrabGMS stage,
-                            double? gonadwt, global.Taxa taxa)
+        public void GMSData(string RowGUID, double? length, double? weight,
+                            GMSManager.sex sex, GMSManager.FishCrabGMS stage,
+                            double? gonadwt, GMSManager.Taxa taxa)
         {
             _RowGUID = RowGUID;
             txtLen.Text = length.ToString();
             txtWt.Text = weight.ToString();
             txtWtGonad.Text = gonadwt.ToString();
             _taxa = taxa;
-            string myStage = global.GMSStage(_taxa,stage);
+            string myStage = GMSManager.GMSStageToString(_taxa, stage);
             comboStage.Text = myStage;
             comboSex.Text = sex.ToString();
             _IsNew = false;
             Text = "Edit GMS data";
         }
-
 
         public string CatchCompRowGUID
         {
@@ -103,8 +104,7 @@ namespace FAD3
 
         private void frmEditGMS_Load(object sender, EventArgs e)
         {
-
-            comboSex.DataSource = Enum.GetValues(typeof(global.sex));
+            comboSex.DataSource = Enum.GetValues(typeof(GMSManager.sex));
             comboSex.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
             comboSex.AutoCompleteSource = AutoCompleteSource.ListItems;
         }
@@ -114,15 +114,14 @@ namespace FAD3
             double? len = txtLen.Text.Length > 0 ? double.Parse(txtLen.Text) : (double?)null;
             double? wt = txtWt.Text.Length > 0 ? double.Parse(txtWt.Text) : (double?)null;
             double? gonadwt = txtWtGonad.Text.Length > 0 ? double.Parse(txtWtGonad.Text) : (double?)null;
-            global.sex sex = (global.sex)Enum.Parse(typeof(global.sex), comboSex.Text);
-            global.FishCrabGMS stage = global.MaturityStageFromText(comboStage.Text,_taxa);
+            GMSManager.sex sex = (GMSManager.sex)Enum.Parse(typeof(GMSManager.sex), comboSex.Text);
+            GMSManager.FishCrabGMS stage = GMSManager.MaturityStageFromText(comboStage.Text, _taxa);
             if (_IsNew)
             {
                 _RowGUID = Guid.NewGuid().ToString();
             }
-            if (sampling.UpdateGMS(_IsNew, wt, len, sex, stage, gonadwt, _CatchCompRowGUID, _RowGUID))
+            if (GMSManager.UpdateGMS(_IsNew, wt, len, sex, stage, gonadwt, _CatchCompRowGUID, _RowGUID))
             {
-
                 if (chkContinue.Checked)
                 {
                     txtLen.Text = "";

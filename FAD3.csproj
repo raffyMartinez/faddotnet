@@ -122,19 +122,19 @@
     </Compile>
     <Compile Include="ErrorLogger.cs" />
     <Compile Include="extension.cs" />
-    <Compile Include="FGExtentForm.cs">
+    <Compile Include="FishingGroundDefinitionForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FGExtentForm.Designer.cs">
-      <DependentUpon>FGExtentForm.cs</DependentUpon>
+    <Compile Include="FishingGroundDefinitionForm.Designer.cs">
+      <DependentUpon>FishingGroundDefinitionForm.cs</DependentUpon>
     </Compile>
     <Compile Include="FishingGrid.cs" />
     <Compile Include="FishingVessel.cs" />
-    <Compile Include="frmFishingGround.cs">
+    <Compile Include="FishingGroundForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmFishingGround.Designer.cs">
-      <DependentUpon>frmFishingGround.cs</DependentUpon>
+    <Compile Include="FishingGroundForm.Designer.cs">
+      <DependentUpon>FishingGroundForm.cs</DependentUpon>
     </Compile>
     <Compile Include="GearEditoForm.cs">
       <SubType>Form</SubType>
@@ -154,17 +154,18 @@
     <Compile Include="frmRefNoRange.Designer.cs">
       <DependentUpon>frmRefNoRange.cs</DependentUpon>
     </Compile>
+    <Compile Include="GMSManager.cs" />
     <Compile Include="MapForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="MapForm.Designer.cs">
       <DependentUpon>MapForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="frmAbout.cs">
+    <Compile Include="AboutFadForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmAbout.Designer.cs">
-      <DependentUpon>frmAbout.cs</DependentUpon>
+    <Compile Include="AboutFadForm.Designer.cs">
+      <DependentUpon>AboutFadForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Enumerators.cs" />
     <Compile Include="TargetAreaForm.cs">
@@ -215,11 +216,11 @@
     <Compile Include="SamplingForm.Designer.cs">
       <DependentUpon>SamplingForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="frmVesselDimension.cs">
+    <Compile Include="VesselDimensionForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmVesselDimension.Designer.cs">
-      <DependentUpon>frmVesselDimension.cs</DependentUpon>
+    <Compile Include="VesselDimensionForm.Designer.cs">
+      <DependentUpon>VesselDimensionForm.cs</DependentUpon>
     </Compile>
     <Compile Include="gear.cs" />
     <Compile Include="ReferenceNumberForm.cs">
@@ -286,11 +287,11 @@
     <EmbeddedResource Include="EnumeratorEntryForm.resx">
       <DependentUpon>EnumeratorEntryForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="FGExtentForm.resx">
-      <DependentUpon>FGExtentForm.cs</DependentUpon>
+    <EmbeddedResource Include="FishingGroundDefinitionForm.resx">
+      <DependentUpon>FishingGroundDefinitionForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmFishingGround.resx">
-      <DependentUpon>frmFishingGround.cs</DependentUpon>
+    <EmbeddedResource Include="FishingGroundForm.resx">
+      <DependentUpon>FishingGroundForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GearEditoForm.resx">
       <DependentUpon>GearEditoForm.cs</DependentUpon>
@@ -301,8 +302,8 @@
     <EmbeddedResource Include="MapForm.resx">
       <DependentUpon>MapForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmAbout.resx">
-      <DependentUpon>frmAbout.cs</DependentUpon>
+    <EmbeddedResource Include="AboutFadForm.resx">
+      <DependentUpon>AboutFadForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="TargetAreaForm.resx">
       <DependentUpon>TargetAreaForm.cs</DependentUpon>
@@ -331,8 +332,8 @@
     <EmbeddedResource Include="SamplingForm.resx">
       <DependentUpon>SamplingForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmVesselDimension.resx">
-      <DependentUpon>frmVesselDimension.cs</DependentUpon>
+    <EmbeddedResource Include="VesselDimensionForm.resx">
+      <DependentUpon>VesselDimensionForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ReferenceNumberForm.resx">
       <DependentUpon>ReferenceNumberForm.cs</DependentUpon>

@@ -1,6 +1,6 @@
 ﻿namespace FAD3
 {
-    partial class frmVesselDimension
+    partial class VesselDimensionForm
     {
         /// <summary>
         /// Required designer variable.

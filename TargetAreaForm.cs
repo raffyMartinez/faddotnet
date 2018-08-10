@@ -344,16 +344,16 @@ namespace FAD3
 
         private void ShowGridMapForm(ListViewItem lvi = null)
         {
-            FGExtentForm fge;
+            FishingGroundDefinitionForm fge;
             if (lvi == null)
             {
-                fge = new FGExtentForm(this);
+                fge = new FishingGroundDefinitionForm(this);
                 fge.UTMZone = FishingGrid.ZoneFromZoneName(comboUTMZone.Text);
             }
             else
             {
                 var UTMZone = FishingGrid.ZoneFromZoneName(comboUTMZone.Text);
-                fge = new FGExtentForm(this, UTMZone, lvi.Text, lvi.SubItems[1].Text, lvi.SubItems[2].Text);
+                fge = new FishingGroundDefinitionForm(this, UTMZone, lvi.Text, lvi.SubItems[1].Text, lvi.SubItems[2].Text);
             }
             fge.ShowDialog(this);
         }

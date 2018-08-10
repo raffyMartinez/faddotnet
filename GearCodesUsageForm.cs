@@ -170,12 +170,17 @@ namespace FAD3
             }
 
             //fill this list view with the local names used in a target area
+
+            lv = listViewLocalNames;
+            ch = lv.Columns.Add("Local name");
             if (_TargetAreaGuid.Length > 0)
             {
-                lv = listViewLocalNames;
-                ch = lv.Columns.Add("Local name");
                 FillLocalNames();
-                ch.Width = (int)(lv.Width * WidthPercent);
+                ch.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+            }
+            else
+            {
+                ch.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
             }
         }
 

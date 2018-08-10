@@ -483,180 +483,55 @@ namespace FAD3
             }
         }
 
-        //        case "addEnumeratorToolStripMenuItem":
-        //            frmEnumerator f4 = new frmEnumerator();
-        //            f4.AOI = _AOI;
-        //            f4.AddNew();
-        //            f4.ShowDialog();
-        //            break;
-        //    }
-        //}
         /// <summary>
         /// Fills the listview with the samplings that took place in a month-year
         /// </summary>
         /// <param name="LSGUID"></param>
         /// <param name="GearGUID"></param>
         /// <param name="SamplingMonth"></param>
+        ///
         private void FillLVSamplingSummary(string LSGUID, string GearGUID, string SamplingMonth)
         {
             var CompleteGrid25 = FishingGrid.IsCompleteGrid25;
-            string[] arr = SamplingMonth.Split('-');
-            string MonthNumber = "1";
-            switch (arr[0])
+            foreach (var item in sampling.SamplingSummaryForMonth(LSGUID, GearGUID, SamplingMonth))
             {
-                case "Jan":
-                    MonthNumber = "1";
-                    break;
+                var row = lvMain.Items.Add(item.Key, item.Value.RefNo, null);                           //reference number
+                DateTime dt = (DateTime)item.Value.SamplingDate;
+                row.SubItems.Add(string.Format("{0:MMM-dd-yyyy}", dt));                                 //sampling date
+                row.SubItems.Add(item.Value.CatchRows.ToString());                                      //number of catch rows
+                row.SubItems.Add(item.Value.WtCatch != null ? item.Value.WtCatch.ToString() : "");      //wt of catch
+                var fishingGround = item.Value.FishingGround;                                           //fishing ground
+                row.SubItems.Add(fishingGround);
 
-                case "Feb":
-                    MonthNumber = "2";
-                    break;
-
-                case "Mar":
-                    MonthNumber = "3";
-                    break;
-
-                case "Apr":
-                    MonthNumber = "4";
-                    break;
-
-                case "May":
-                    MonthNumber = "5";
-                    break;
-
-                case "Jun":
-                    MonthNumber = "6";
-                    break;
-
-                case "Jul":
-                    MonthNumber = "7";
-                    break;
-
-                case "Aug":
-                    MonthNumber = "8";
-                    break;
-
-                case "Sep":
-                    MonthNumber = "9";
-                    break;
-
-                case "Oct":
-                    MonthNumber = "10";
-                    break;
-
-                case "Nov":
-                    MonthNumber = "11";
-                    break;
-
-                case "Dec":
-                    MonthNumber = "12";
-                    break;
-            }
-
-            string StartDate = MonthNumber + "/1/" + arr[1];
-            string EndDate = (Convert.ToInt32(MonthNumber) + 1).ToString();
-            if (arr[0] == "Dec")
-            {
-                string newYear = (Convert.ToInt32(arr[1]) + 1).ToString();
-                EndDate = "1/1/" + newYear;
-            }
-            else
-            {
-                EndDate += "/1/" + arr[1];
-            }
-
-            using (var myDT = new DataTable())
-            {
-                try
+                if (CompleteGrid25)                                                                     //position
                 {
-                    using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
+                    if (fishingGround.Length > 0)
                     {
-                        conection.Open();
-
-                        string query = $@"SELECT tblSampling.RefNo, tblSampling.SamplingDate, tblSampling.FishingGround, tblEnumerators.EnumeratorName,
-                                          tblSampling.Notes, tblSampling.WtCatch, tblSampling.SamplingGUID, tblSampling.IsGrid25FG, (SELECT TOP 1 'x' AS
-                                          HasSpec FROM tblGearSpecs INNER JOIN tblSampledGearSpec ON tblGearSpecs.RowID = tblSampledGearSpec.SpecID
-                                          WHERE tblGearSpecs.Version='2' AND tblSampledGearSpec.SamplingGUID=[tblSampling.SamplingGUID]) AS Specs,
-                                          (SELECT Count(SamplingGUID) AS n FROM tblCatchComp GROUP BY tblCatchComp.SamplingGUID HAVING
-                                          tblCatchComp.SamplingGUID=[tblSampling.SamplingGUID]) AS [rows]
-                                          FROM tblEnumerators RIGHT JOIN tblSampling ON tblEnumerators.EnumeratorID = tblSampling.Enumerator
-                                          WHERE tblSampling.SamplingDate >=#{StartDate}# And tblSampling.SamplingDate <#{EndDate}# AND
-                                          tblSampling.LSGUID={{{LSGUID}}} AND tblSampling.GearVarGUID={{{GearGUID}}}
-                                          ORDER BY tblSampling.DateEncoded";
-
-                        using (var adapter = new OleDbDataAdapter(query, conection))
-                        {
-                            adapter.Fill(myDT);
-                            ListViewItem lvi;
-                            for (int i = 0; i < myDT.Rows.Count; i++)
-                            {
-                                DataRow dr = myDT.Rows[i];
-                                ListViewItem row = new ListViewItem(dr["RefNo"].ToString());      //ref no
-                                DateTime dt = (DateTime)dr["SamplingDate"];
-                                row.SubItems.Add(string.Format("{0:MMM-dd-yyyy}", dt));     //sampling date
-                                row.SubItems.Add(dr["rows"].ToString());                    //number of catch rows
-                                row.SubItems.Add(dr["WtCatch"].ToString());                 //wt of catch
-                                var fishingGround = dr["FishingGround"].ToString();         //fishing ground
-                                row.SubItems.Add(fishingGround);
-
-                                if (CompleteGrid25)                                         //position
-                                {
-                                    if (fishingGround.Length > 0)
-                                    {
-                                        row.SubItems.Add(FishingGrid.Grid25_to_UTM(dr[2].ToString()));
-                                    }
-                                    else
-                                    {
-                                        row.SubItems.Add("");
-                                    }
-                                }
-                                else
-                                    row.SubItems.Add("");
-
-                                row.SubItems.Add(dr["EnumeratorName"].ToString());          //enumerator
-
-                                //gear specs
-                                //row.SubItems.Add(ManageGearSpecsClass.SampledGearHasSpecs(dr[6].ToString()) ? "x" : "");                                       //gear specs
-                                row.SubItems.Add(dr["Specs"].ToString());
-
-                                row.SubItems.Add(dr["Notes"].ToString());                   //notes
-
-                                lvi = this.lvMain.Items.Add(row);
-                                lvi.Tag = dr["SamplingGUID"].ToString();                    //sampling guid
-                                lvi.Name = dr["SamplingGUID"].ToString();
-                            }
-                        }
+                        row.SubItems.Add(FishingGrid.Grid25_to_UTM(fishingGround));
+                    }
+                    else
+                    {
+                        row.SubItems.Add("");
                     }
                 }
-                catch (Exception ex)
+                else
                 {
-                    ErrorLogger.Log(ex);
+                    row.SubItems.Add("");
                 }
+
+                row.SubItems.Add(item.Value.EnumeratorName);                                          //enumerator
+                row.SubItems.Add(item.Value.HasSpecs);                                                //gear specs
+                row.SubItems.Add(item.Value.Notes);                                                   //notes
+                row.Tag = item.Key;                                                                   //sampling guid
+                row.Name = item.Key;
             }
         }
 
-        //        case "addSamplingToolStripMenuItem":
-        //            if (_AOI.HaveEnumerators)
-        //            {
-        //                NewSamplingForm();
-        //            }
-        //            else
-        //            {
-        //                MessageBox.Show(@"You need to add enumerators first
-        //                                before you can add your first sampling", "Missing enumerators",
-        //                                MessageBoxButtons.OK, MessageBoxIcon.Information);
-        //            }
-        //            break;
         private void frmMain_Activated(object sender, EventArgs e)
         {
             CancelButton = buttonOK.Visible ? buttonOK : null;
         }
 
-        //        case "addLandingSiteToolStripMenuItem":
-        //            frmLandingSite f2 = new frmLandingSite(_AOI, this, IsNew: true);
-        //            f2.Text = "New landing site";
-        //            f2.ShowDialog(this);
-        //            break;
         private void frmMain_ResizeEnd(object sender, EventArgs e)
         {
             splitContainer1.Width = this.Width;
@@ -664,17 +539,6 @@ namespace FAD3
             lvMain.Height = splitContainer1.Panel2.Height;
         }
 
-        //private void contextMenuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
-        //{
-        //    ToolStripItem tsi = e.ClickedItem;
-        //    switch (tsi.Name)
-        //    {
-        //        case "addAOIToolStripMenuItem":
-        //            TargetAreaForm f1 = new TargetAreaForm(this, IsNew: true);
-        //            f1.AddNew();
-        //            f1.Text = "New AOI";
-        //            f1.ShowDialog(this);
-        //            break;
         private void FrmMainLoad(object sender, EventArgs e)
         {
             this.splitContainer1.Panel1MinSize = 200;
@@ -986,7 +850,13 @@ namespace FAD3
                     if (SetupLF_GMSListView(Show: true, Content: global.fad3CatchSubRow.GMS))
                     {
                         _CatchSubRow = global.fad3CatchSubRow.GMS;
-                        Show_LF_GMS_List(GetLVCatch().SelectedItems[0].Name);
+                        var catchListView = GetLVCatch();
+                        int? taxaNumber = null;
+                        if (int.TryParse(catchListView.SelectedItems[0].SubItems[7].Text, out int myInt))
+                        {
+                            taxaNumber = myInt;
+                        }
+                        Show_LF_GMS_List(catchListView.SelectedItems[0].Name, taxaNumber);
                     }
                     break;
             }
@@ -1112,7 +982,12 @@ namespace FAD3
                     {
                         if (lvh.Item != null)
                         {
-                            Show_LF_GMS_List(lvh.Item.Name);
+                            int? taxaNumber = null;
+                            if (int.TryParse(lvh.Item.SubItems[7].Text, out int myInt))
+                            {
+                                taxaNumber = myInt;
+                            }
+                            Show_LF_GMS_List(lvh.Item.Name, taxaNumber);
                         }
                     }
                     break;
@@ -1144,8 +1019,7 @@ namespace FAD3
             switch (tsi.Tag)
             {
                 case "new":
-                    frmNewDB f = new frmNewDB();
-                    f.ParentForm(this);
+                    frmNewDB f = new frmNewDB(this);
                     f.ShowDialog(this);
                     break;
 
@@ -1166,7 +1040,7 @@ namespace FAD3
             switch (tsi.Tag)
             {
                 case "about":
-                    frmAbout f = new frmAbout();
+                    AboutFadForm f = new AboutFadForm();
                     f.ShowDialog();
                     break;
 
@@ -1210,7 +1084,7 @@ namespace FAD3
             switch (tsi.Tag)
             {
                 case "about":
-                    frmAbout f = new frmAbout();
+                    AboutFadForm f = new AboutFadForm();
                     f.ShowDialog(this);
                     break;
 
@@ -1257,68 +1131,52 @@ namespace FAD3
             if (e.Node.FirstNode.Text == "*dummy*")
             {
                 var myTag = (Tuple<string, string, string>)e.Node.Tag;
-                var list = global.TreeSubNodes(myTag.Item3, myTag.Item1, myTag.Item2);
-                if (list.Count > 0)
+                //var list = global.TreeSubNodes(myTag.Item3, myTag.Item1, myTag.Item2);
+                int n = 0;
+                foreach (var item in global.TreeSubNodes(myTag.Item3, myTag.Item1, myTag.Item2))
                 {
+                    TreeNode nd1 = new TreeNode();
                     if (myTag.Item3 == "landing_site")
                     {
-                        for (int i = 0; i < list.Count; i++)
+                        if (n == 0)
                         {
-                            TreeNode nd = e.Node; //represents the current node which is the landing site node
-                            TreeNode nd1 = new TreeNode();
-                            if (i == 0)
-                            {
-                                //if the node contains the dummy placeholder, rename it to the name of the gear
-                                nd.FirstNode.Text = list[i].Variation;
-                                nd1 = nd.FirstNode;
-                            }
-                            else
-                            {
-                                //add a new gearvar node and name with the variation field in the query
-                                nd1 = nd.Nodes.Add(list[i].Variation);
-                            }
-                            //add a dummy placeholder for a new gear node
-                            // this will be replaced by a sampling month-year node
-                            //later on
-                            nd1.Nodes.Add("*dummy*");
-
-                            nd1.Tag = Tuple.Create(list[i].LandingSiteGuid, list[i].GearVariationGuid, "gear");
-                            nd1.Name = $"{list[i].LandingSiteGuid}|{list[i].GearVariationGuid}";
-                            nd1.ImageKey = gear.GearClassImageKeyFromGearClasName(list[1].GearClassName);
+                            nd1 = e.Node.FirstNode;
+                            nd1.Text = item.Variation;
                         }
+                        else
+                        {
+                            nd1 = e.Node.Nodes.Add(item.Variation);
+                        }
+                        nd1.Nodes.Add("*dummy*");
+
+                        nd1.Tag = Tuple.Create(item.LandingSiteGuid, item.GearVariationGuid, "gear");
+                        nd1.Name = $"{item.LandingSiteGuid}|{item.GearVariationGuid}";
+                        nd1.ImageKey = gear.GearClassImageKeyFromGearClasName(item.GearClassName);
                     }
                     else if (myTag.Item3 == "gear")
                     {
-                        for (int i = 0; i < list.Count; i++)
+                        if (n == 0)
                         {
-                            TreeNode nd1 = new TreeNode();
-                            if (i == 0)
-                            {
-                                //if node contains a dummy placeholder,
-                                //rename it to the sampling month-year field
-                                e.Node.FirstNode.Text = list[i].SamplingMonthYear;
-                                nd1 = e.Node.FirstNode;
-                            }
-                            else
-                            {
-                                nd1 = e.Node.Nodes.Add(list[i].SamplingMonthYear);
-                            }
-                            if (_LandingSiteGuid.Length == 0 && _GearVarGUID.Length == 0)
-                            {
-                                myTag = (Tuple<string, string, string>)e.Node.Tag;
-                                _LandingSiteGuid = myTag.Item1;
-                                _GearVarGUID = myTag.Item2;
-                            }
-                            nd1.Tag = Tuple.Create(_LandingSiteGuid, _GearVarGUID, "sampling");
-                            nd1.Name = $"{_LandingSiteGuid}|{_GearVarGUID}|{list[i].SamplingMonthYear}";
-                            nd1.ImageKey = "MonthGear";
+                            e.Node.FirstNode.Text = item.SamplingMonthYear;
+                            nd1 = e.Node.FirstNode;
                         }
+                        else
+                        {
+                            nd1 = e.Node.Nodes.Add(item.SamplingMonthYear);
+                        }
+                        if (_LandingSiteGuid.Length == 0 && _GearVarGUID.Length == 0)
+                        {
+                            myTag = (Tuple<string, string, string>)e.Node.Tag;
+                            _LandingSiteGuid = myTag.Item1;
+                            _GearVarGUID = myTag.Item2;
+                        }
+                        nd1.Tag = Tuple.Create(_LandingSiteGuid, _GearVarGUID, "sampling");
+                        nd1.Name = $"{_LandingSiteGuid}|{_GearVarGUID}|{item.SamplingMonthYear}";
+                        nd1.ImageKey = "MonthGear";
                     }
+                    n++;
                 }
-                else
-                {
-                    e.Node.Nodes.Clear();
-                }
+                if (n == 0) e.Node.Nodes.Clear();
             }
         }
 
@@ -2068,7 +1926,7 @@ namespace FAD3
             }
         }
 
-        private void Show_LF_GMS_List(string CatchRowGuid)
+        private void Show_LF_GMS_List(string CatchRowGuid, int? taxaNumber = null)
         {
             var lvc = GetLVLF_GMS();
             lvc.Items.Clear();
@@ -2090,15 +1948,21 @@ namespace FAD3
             }
             else if (_CatchSubRow == global.fad3CatchSubRow.GMS)
             {
-                foreach (KeyValuePair<string, sampling.GMSLine> kv in _Sampling.GMSData(CatchRowGuid))
+                foreach (KeyValuePair<string, GMSManager.GMSLine> kv in GMSManager.GMSData(CatchRowGuid))
                 {
+                    var myTaxaString = "";
+                    if (Enum.TryParse(taxaNumber.ToString(), out GMSManager.Taxa Mytaxa))
+                    {
+                        myTaxaString = GMSManager.GMSStageToString(Mytaxa, kv.Value.GMS);
+                    }
                     var lvi = new ListViewItem(new string[]
                     {
                                     n.ToString(),
                                     kv.Value.Length.ToString(),
                                     kv.Value.Weight.ToString(),
                                     kv.Value.Sex.ToString(),
-                                    kv.Value.GMS.ToString(),
+                                    //kv.Value.GMS.ToString(),
+                                    myTaxaString,
                                     kv.Value.GonadWeight.ToString()
                     });
                     lvi.Name = kv.Key;
@@ -2130,7 +1994,8 @@ namespace FAD3
                         kv.Value.CatchCount.ToString(),
                         kv.Value.CatchSubsampleWt.ToString(),
                         kv.Value.CatchSubsampleCount.ToString(),
-                        kv.Value.FromTotalCatch.ToString()
+                        kv.Value.FromTotalCatch.ToString(),
+                        kv.Value.TaxaNumber.ToString()
                     });
                     lvi.Name = kv.Key;
                     lv.Items.Add(lvi);

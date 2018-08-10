@@ -1,6 +1,6 @@
 ﻿namespace FAD3
 {
-    partial class frmAbout
+    partial class AboutFadForm
     {
         /// <summary>
         /// Required designer variable.
@@ -31,6 +31,7 @@
             this.button1 = new System.Windows.Forms.Button();
             this.labelApp = new System.Windows.Forms.Label();
             this.labelCredits = new System.Windows.Forms.Label();
+            this.labelNetFramework = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // button1
@@ -61,17 +62,26 @@
             this.labelCredits.TabIndex = 2;
             this.labelCredits.Text = "label1";
             // 
-            // frmAbout
+            // labelNetFramework
+            // 
+            this.labelNetFramework.Location = new System.Drawing.Point(3, 111);
+            this.labelNetFramework.Name = "labelNetFramework";
+            this.labelNetFramework.Size = new System.Drawing.Size(331, 21);
+            this.labelNetFramework.TabIndex = 3;
+            this.labelNetFramework.Text = "label1";
+            // 
+            // AboutFadForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.button1;
             this.ClientSize = new System.Drawing.Size(338, 235);
+            this.Controls.Add(this.labelNetFramework);
             this.Controls.Add(this.labelCredits);
             this.Controls.Add(this.labelApp);
             this.Controls.Add(this.button1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
-            this.Name = "frmAbout";
+            this.Name = "AboutFadForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "About FAD";
             this.Load += new System.EventHandler(this.frmAbout_Load);
@@ -85,5 +95,6 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label labelApp;
         private System.Windows.Forms.Label labelCredits;
+        private System.Windows.Forms.Label labelNetFramework;
     }
 }

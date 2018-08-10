@@ -9,9 +9,9 @@ using System.Windows.Forms;
 
 namespace FAD3
 {
-    public partial class frmAbout : Form
+    public partial class AboutFadForm : Form
     {
-        public frmAbout()
+        public AboutFadForm()
         {
             InitializeComponent();
         }
@@ -22,7 +22,7 @@ namespace FAD3
             FontFamily ff = new FontFamily("Microsoft Sans Serif");
             labelApp.Font = new Font(ff, 13F, FontStyle.Bold);
             labelApp.Size = new Size(this.Width, labelApp.Height);
-            labelApp.Location = new Point((this.Width-labelApp.Width)/2, 25);
+            labelApp.Location = new Point((this.Width - labelApp.Width) / 2, 25);
             labelApp.TextAlign = ContentAlignment.MiddleCenter;
 
             labelCredits.Text = "";
@@ -40,7 +40,13 @@ namespace FAD3
             labelCredits.Location = new Point((this.Width - labelCredits.Width) / 2, labelApp.Location.Y + (labelApp.Size.Height * 2));
             labelCredits.TextAlign = ContentAlignment.MiddleCenter;
 
-
+            labelNetFramework.With(o =>
+            {
+                o.Location = new Point(0, labelCredits.Top + labelCredits.Height + 10);
+                o.Text = $"Net framework: {Environment.Version}";
+                o.Font = new Font(ff, 10F, FontStyle.Regular);
+                o.TextAlign = ContentAlignment.MiddleCenter;
+            });
         }
     }
 }

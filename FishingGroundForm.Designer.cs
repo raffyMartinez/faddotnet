@@ -1,6 +1,6 @@
 ﻿namespace FAD3
 {
-    partial class frmFishingGround
+    partial class FishingGroundForm
     {
         /// <summary>
         /// Required designer variable.

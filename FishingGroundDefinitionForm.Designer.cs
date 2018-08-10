@@ -1,6 +1,6 @@
 ﻿namespace FAD3
 {
-    partial class FGExtentForm
+    partial class FishingGroundDefinitionForm
     {
         /// <summary>
         /// Required designer variable.

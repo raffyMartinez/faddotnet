@@ -9,11 +9,11 @@ using System.Windows.Forms;
 
 namespace FAD3
 {
-    public partial class frmVesselDimension : Form
+    public partial class VesselDimensionForm : Form
     {
         SamplingForm _Parent = new SamplingForm();
 
-        public frmVesselDimension()
+        public VesselDimensionForm()
         {
             InitializeComponent();
         }

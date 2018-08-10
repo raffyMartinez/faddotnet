@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Windows.Forms;
-using System.IO;
 using System.Data.Common;
 using System.Data.OleDb;
-
+using System.Drawing;
+using System.IO;
+using System.Windows.Forms;
 
 namespace FAD3
 {
@@ -18,78 +14,69 @@ namespace FAD3
         private string _newMDBFilename = "";
         private MainForm _parentForm;
 
-        
-
-        public frmNewDB()
+        public frmNewDB(MainForm parent)
         {
             InitializeComponent();
+            _parentForm = parent;
         }
-
 
         private void frmNewDB_Load(object sender, EventArgs e)
         {
             group2.Visible = false;
-            this.Size = new Size(355, 407);
+            Size = new Size(group1.Width + (group1.Left * 2), 407);
         }
 
-
-        private void button3_Click(object sender, EventArgs e)
+        private void Onbutton_Click(object sender, EventArgs e)
         {
-            this.Close();
-        }
-
-        public new void ParentForm(MainForm f)
-        {
-            _parentForm = f;
-        }
-
-        private void buttonFileName_Click(object sender, EventArgs e)
-        {
-            
-            SaveFileDialog sfd = new SaveFileDialog();
-            sfd.Title = "Provide filename of new database";
-            if (global.mdbPath.Length == 0)
+            switch (((Button)sender).Name)
             {
-                sfd.InitialDirectory = Path.GetDirectoryName(Application.ExecutablePath);
-            }
-            else
-            {
-                sfd.InitialDirectory = global.mdbPath;
-            }
-            //ofd.InitialDirectory = Path.GetDirectoryName(Application.ExecutablePath);
-            sfd.Filter = "Microsoft Access Data File (.mdb)|*.mdb";
-            sfd.ShowDialog();
-            _newMDBFilename = sfd.FileName;
-            if (_newMDBFilename.Length > 0)
-            {
-                group2.Visible = true;
-                group1.Visible = false;
-                group2.Location = group1.Location;
-                label2.Text = "Step 2";
-                checkAOI.Checked = true;
-                checkGearVar.Checked = true;
-                checkLandingSites.Checked = true;
-                checkLocalNames.Checked = true;
-                checkSciNames.Checked = true;
-                checkEnumerators.Checked = true;
-            }
-        }
+                case "buttonOK":
+                    if (_newMDBFilename.Length > 0)
+                    {
+                        File.Copy(global.mdbPath, _newMDBFilename);
+                        if (UpdateNewMDB())
+                        {
+                            _parentForm.MRUList.AddFile(_newMDBFilename);
+                            _parentForm.NewDBFile(_newMDBFilename);
+                            MessageBox.Show("New database is ready");
+                            this.Close();
+                        }
+                    }
+                    break;
 
-        private void buttonOk_Click(object sender, EventArgs e)
-        {
-            if (_newMDBFilename.Length > 0)
-            {
-                
-                File.Copy(global.mdbPath, _newMDBFilename);
-                if (UpdateNewMDB())
-                {
+                case "buttonCancel":
+                    Close();
+                    break;
 
-                    _parentForm.MRUList.AddFile(_newMDBFilename);
-                    _parentForm.NewDBFile(_newMDBFilename);
-                    MessageBox.Show("New database is ready");
-                    this.Close();
-                    
-                }
+                case "buttonFileName":
+                    SaveFileDialog sfd = new SaveFileDialog();
+                    sfd.Title = "Provide filename of new database";
+                    if (global.mdbPath.Length == 0)
+                    {
+                        sfd.InitialDirectory = Path.GetDirectoryName(Application.ExecutablePath);
+                    }
+                    else
+                    {
+                        sfd.InitialDirectory = global.mdbPath;
+                    }
+                    //ofd.InitialDirectory = Path.GetDirectoryName(Application.ExecutablePath);
+                    sfd.Filter = "Microsoft Access Data File (.mdb)|*.mdb";
+                    sfd.ShowDialog();
+                    _newMDBFilename = sfd.FileName;
+                    if (_newMDBFilename.Length > 0)
+                    {
+                        group2.Visible = true;
+                        group1.Visible = false;
+                        group2.Location = group1.Location;
+                        label2.Text = "Step 2";
+                        checkAOI.Checked = true;
+                        checkGearVar.Checked = true;
+                        checkLandingSites.Checked = true;
+                        checkLocalNames.Checked = true;
+                        checkSciNames.Checked = true;
+                        checkEnumerators.Checked = true;
+                    }
+                    break;
             }
         }
 
@@ -104,7 +91,8 @@ namespace FAD3
             string myConnString = "Provider=Microsoft.JET.OLEDB.4.0;data source=" + _newMDBFilename; ;
             using (OleDbConnection conn = new OleDbConnection(myConnString))
             {
-                foreach (string item in tableNames) { 
+                foreach (string item in tableNames)
+                {
                     ActionType = "None";
                     switch (item)
                     {
@@ -117,7 +105,7 @@ namespace FAD3
                         case "tblGearClass":
                         case "tblGearLocalNames":
                         case "tblTaxa":
-                           break;
+                            break;
 
                         case "tblGearVariations":
                             if (checkGearVar.Checked == false)
@@ -125,24 +113,28 @@ namespace FAD3
                                 ActionType = "DeleteTableContents";
                             }
                             break;
+
                         case "tblRefGearCodes":
                             if (checkGearVar.Checked == false)
                             {
                                 ActionType = "DeleteTableContents";
                             }
                             break;
+
                         case "tblRefGearCodes_Usage":
                             if (checkGearVar.Checked == false)
                             {
                                 ActionType = "DeleteTableContents";
                             }
                             break;
+
                         case "tblRefGearUsage_LocalName":
                             if (checkGearVar.Checked == false)
                             {
                                 ActionType = "DeleteTableContents";
                             }
                             break;
+
                         case "tblLandingSites":
                             if (checkLandingSites.Checked == false)
                             {
@@ -158,6 +150,7 @@ namespace FAD3
                                 ActionType = "DeleteTableContents";
                             }
                             break;
+
                         case "tblAOI":
                             if (checkAOI.Checked == false)
                             {
@@ -179,12 +172,14 @@ namespace FAD3
                                 ActionType = "DeleteTableContents";
                             }
                             break;
+
                         case "tblAOI_GearLocalNames":
                             if (checkAOI.Checked == false)
                             {
                                 ActionType = "DeleteTableContents";
                             }
                             break;
+
                         case "tblEnumerators":
                             if (checkEnumerators.Checked == false)
                             {
@@ -201,6 +196,7 @@ namespace FAD3
                                 ActionType = "DeleteTableContents";
                             }
                             break;
+
                         case "tblAOIGridSize":
                             if (checkAOI.Checked == false)
                             {
@@ -242,7 +238,6 @@ namespace FAD3
                             ActionType = "DeleteTable";
                             break;
 
-
                         case "tblCatchComp":
                         case "tblCatchDetail":
                         case "tblLF":
@@ -254,7 +249,7 @@ namespace FAD3
                             break;
                     }
 
-                    if (subTableList.Count>0)
+                    if (subTableList.Count > 0)
                     {
                         DeleteSubTables(subTableList);
                         subTableList.Clear();
@@ -262,12 +257,11 @@ namespace FAD3
 
                     if (ActionType == "DeleteTableContents")
                     {
-                        sql = "Delete * from " + item; 
+                        sql = "Delete * from " + item;
                     }
                     else if (ActionType == "DeleteTable")
                     {
                         sql = "DROP TABLE " + item;
-
                     }
 
                     if (ActionType != "None")
@@ -278,7 +272,6 @@ namespace FAD3
                             update.Connection = conn;
                             conn.Open();
                             update.ExecuteNonQuery();
-
                         }
                         catch (Exception ex)
                         {
@@ -290,11 +283,10 @@ namespace FAD3
                 }
             }
 
-
             return Success;
         }
 
-        private void DeleteSubTables(List<string>TableList)
+        private void DeleteSubTables(List<string> TableList)
         {
             OleDbCommand update = new OleDbCommand();
             string sql = "";
@@ -313,12 +305,12 @@ namespace FAD3
                         conn.Close();
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     ErrorLogger.Log(ex);
                 }
             }
-        } 
+        }
 
         private List<string> GetTableList()
         {
@@ -327,7 +319,7 @@ namespace FAD3
             DataTable userTables = null;
 
             using (DbConnection connection = factory.CreateConnection())
-            { 
+            {
                 try
                 {
                     // c:\test\test.mdb
@@ -343,7 +335,6 @@ namespace FAD3
 
                     for (int i = 0; i < userTables.Rows.Count; i++)
                         myList.Add(userTables.Rows[i][2].ToString());
-
                 }
                 catch (Exception ex)
                 {
@@ -355,7 +346,7 @@ namespace FAD3
 
         private void checkAOI_CheckedChanged(object sender, EventArgs e)
         {
-            if (checkAOI.Checked==false)
+            if (checkAOI.Checked == false)
             {
                 checkLandingSites.Checked = false;
                 checkEnumerators.Checked = false;

@@ -267,7 +267,7 @@ namespace FAD3
             {
                 if (_List.Contains(s, StringComparer.OrdinalIgnoreCase))
                 {
-                    msg = s + " already in use. Please use another";
+                    msg = s + " already in the list. Please use another";
                 }
             }
             else

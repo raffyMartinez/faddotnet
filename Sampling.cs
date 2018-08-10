@@ -96,6 +96,139 @@ namespace FAD3
             get { return _TotalWtOfFromTotal; }
         }
 
+        /// <summary>
+        /// returns a dictionary of 9 element tuples that will fill a list view with a sampling summary
+        /// </summary>
+        /// <param name="LSGUID"></param>
+        /// <param name="GearGUID"></param>
+        /// <param name="SamplingMonth"></param>
+        /// <returns></returns>
+        public static Dictionary<string, (string RefNo, DateTime SamplingDate, string FishingGround,
+                                string EnumeratorName, string Notes, double? WtCatch, bool IsGrid25FG,
+                                string HasSpecs, int CatchRows)> SamplingSummaryForMonth(string LSGUID, string GearGUID, string SamplingMonth)
+        {
+            var Samplings = new Dictionary<string, (string RefNo, DateTime SamplingDate, string FishingGround,
+                                string EnumeratorName, string Notes, double? WtCatch, bool IsGrid25FG,
+                                string HasSpecs, int CatchRows)>();
+            var CompleteGrid25 = FishingGrid.IsCompleteGrid25;
+            string[] arr = SamplingMonth.Split('-');
+            string MonthNumber = "1";
+            switch (arr[0])
+            {
+                case "Jan":
+                    MonthNumber = "1";
+                    break;
+
+                case "Feb":
+                    MonthNumber = "2";
+                    break;
+
+                case "Mar":
+                    MonthNumber = "3";
+                    break;
+
+                case "Apr":
+                    MonthNumber = "4";
+                    break;
+
+                case "May":
+                    MonthNumber = "5";
+                    break;
+
+                case "Jun":
+                    MonthNumber = "6";
+                    break;
+
+                case "Jul":
+                    MonthNumber = "7";
+                    break;
+
+                case "Aug":
+                    MonthNumber = "8";
+                    break;
+
+                case "Sep":
+                    MonthNumber = "9";
+                    break;
+
+                case "Oct":
+                    MonthNumber = "10";
+                    break;
+
+                case "Nov":
+                    MonthNumber = "11";
+                    break;
+
+                case "Dec":
+                    MonthNumber = "12";
+                    break;
+            }
+
+            string StartDate = MonthNumber + "/1/" + arr[1];
+            string EndDate = (Convert.ToInt32(MonthNumber) + 1).ToString();
+            if (arr[0] == "Dec")
+            {
+                string newYear = (Convert.ToInt32(arr[1]) + 1).ToString();
+                EndDate = "1/1/" + newYear;
+            }
+            else
+            {
+                EndDate += "/1/" + arr[1];
+            }
+
+            using (var myDT = new DataTable())
+            {
+                try
+                {
+                    using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
+                    {
+                        conection.Open();
+
+                        string query = $@"SELECT tblSampling.RefNo, tblSampling.SamplingDate, tblSampling.FishingGround, tblEnumerators.EnumeratorName,
+                                          tblSampling.Notes, tblSampling.WtCatch, tblSampling.SamplingGUID, tblSampling.IsGrid25FG, (SELECT TOP 1 'x' AS
+                                          HasSpec FROM tblGearSpecs INNER JOIN tblSampledGearSpec ON tblGearSpecs.RowID = tblSampledGearSpec.SpecID
+                                          WHERE tblGearSpecs.Version='2' AND tblSampledGearSpec.SamplingGUID=[tblSampling.SamplingGUID]) AS Specs,
+                                          (SELECT Count(SamplingGUID) AS n FROM tblCatchComp GROUP BY tblCatchComp.SamplingGUID HAVING
+                                          tblCatchComp.SamplingGUID=[tblSampling.SamplingGUID]) AS [rows]
+                                          FROM tblEnumerators RIGHT JOIN tblSampling ON tblEnumerators.EnumeratorID = tblSampling.Enumerator
+                                          WHERE tblSampling.SamplingDate >=#{StartDate}# And tblSampling.SamplingDate <#{EndDate}# AND
+                                          tblSampling.LSGUID={{{LSGUID}}} AND tblSampling.GearVarGUID={{{GearGUID}}}
+                                          ORDER BY tblSampling.DateEncoded";
+
+                        using (var adapter = new OleDbDataAdapter(query, conection))
+                        {
+                            adapter.Fill(myDT);
+                            foreach (DataRow dr in myDT.Rows)
+                            {
+                                double? wt = null;
+                                if (dr["WtCatch"].ToString().Length > 0)
+                                {
+                                    wt = double.Parse(dr["WtCatch"].ToString());
+                                }
+                                string specs = "x";
+                                if (dr["Specs"].ToString().Length == 0)
+                                {
+                                    specs = "";
+                                }
+                                int rows = 0;
+                                if (dr["rows"].ToString().Length > 0)
+                                {
+                                    rows = int.Parse(dr["rows"].ToString());
+                                }
+                                Samplings.Add(dr["SamplingGUID"].ToString(), (dr["RefNo"].ToString(), DateTime.Parse(dr["SamplingDate"].ToString()),
+                                dr["FishingGround"].ToString(), dr["EnumeratorName"].ToString(), dr["Notes"].ToString(), wt,
+                                bool.Parse(dr["IsGrid25FG"].ToString()), specs, rows));
+                            }
+                        }
+                    }
+                }
+                catch
+                {
+                }
+            }
+            return Samplings;
+        }
+
         public static bool DeleteCatchLine(string CatchLineGUID)
         {
             bool Success = false;
@@ -130,27 +263,6 @@ namespace FAD3
                         Success = (update.ExecuteNonQuery() > 0);
                         conn.Close();
                     }
-                }
-                catch (Exception ex)
-                {
-                    ErrorLogger.Log(ex);
-                }
-            }
-            return Success;
-        }
-
-        public static bool DeleteGMSLine(string RowGUID)
-        {
-            bool Success = false;
-            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
-            {
-                try
-                {
-                    string query = $"Delete * from tblGMS where RowGUID = {{{RowGUID}}}";
-                    OleDbCommand update = new OleDbCommand(query, conn);
-                    conn.Open();
-                    Success = (update.ExecuteNonQuery() > 0);
-                    conn.Close();
                 }
                 catch (Exception ex)
                 {
@@ -234,62 +346,6 @@ namespace FAD3
             }
 
             return Success;
-        }
-
-        public Dictionary<string, GMSLine> GMSData(string CatchCompRowNo)
-        {
-            Dictionary<string, GMSLine> mydata = new Dictionary<string, GMSLine>();
-            var dt = new DataTable();
-            using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
-            {
-                try
-                {
-                    conection.Open();
-
-                    string query = $@"SELECT tblGMS.RowGUID, tblGMS.Gonadwt, tblGMS.GMS, tblGMS.Sex, tblGMS.Wt, tblGMS.Len,
-                                   tblGMS.CatchCompRow, tblTaxa.TaxaNo, tblTaxa.Taxa FROM tblTaxa INNER JOIN
-                                   (tblAllSpecies INNER JOIN(tblCatchComp INNER JOIN tblGMS ON
-                                   tblCatchComp.RowGUID = tblGMS.CatchCompRow) ON
-                                   tblAllSpecies.SpeciesGUID = tblCatchComp.NameGUID)
-                                   ON tblTaxa.TaxaNo = tblAllSpecies.TaxaNo
-                                   WHERE tblGMS.CatchCompRow ={{{CatchCompRowNo}}}";
-
-                    var adapter = new OleDbDataAdapter(query, conection);
-                    adapter.Fill(dt);
-                    for (int i = 0; i < dt.Rows.Count; i++)
-                    {
-                        DataRow dr = dt.Rows[i];
-
-                        global.FishCrabGMS gms;
-                        Enum.TryParse(dr["GMS"].ToString(), out gms);
-                        global.sex sex;
-                        Enum.TryParse(dr["Sex"].ToString(), out sex);
-                        global.Taxa taxa;
-                        Enum.TryParse(dr["TaxaNo"].ToString(), out taxa);
-                        var myGMS = new GMSLine
-                        {
-                            TaxaName = dr["Taxa"].ToString(),
-                            Taxa = taxa,
-                            Sex = sex,
-                            GMS = gms,
-                            DataStatus = global.fad3DataStatus.statusFromDB
-                        };
-                        if (dr["Len"].ToString().Length > 0)
-                            myGMS.Length = double.Parse(dr["Len"].ToString());
-                        if (dr["Wt"].ToString().Length > 0)
-                            myGMS.Weight = double.Parse(dr["GonadWt"].ToString());
-                        if (dr["GonadWt"].ToString().Length > 0)
-                            myGMS.GonadWeight = double.Parse(dr["GonadWt"].ToString());
-
-                        mydata.Add(dr["RowGUID"].ToString(), myGMS);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    ErrorLogger.Log(ex);
-                }
-            }
-            return mydata;
         }
 
         /// <summary>
@@ -380,48 +436,6 @@ namespace FAD3
                     _uis.Add(uistruct.Key, uistruct);
                 }
             }
-        }
-
-        public static bool UpdateGMS(bool isNew, Double? wt, double? len, global.sex sex,
-                                             global.FishCrabGMS stage, double? gonadwt,
-                                             string CatchCompRow, string RowGUID)
-        {
-            bool Success = false;
-            string query = "";
-
-            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
-            {
-                try
-                {
-                    string slen = len == null ? "null" : len.ToString();
-                    string swt = wt == null ? "null" : wt.ToString();
-                    string sgonadwt = gonadwt == null ? "null" : gonadwt.ToString();
-
-                    if (isNew)
-                    {
-                        query = $@"Insert into tblGMS (Len, Wt, Sex, GMS, CatchCompRow, RowGUID, Gonadwt) values
-                                 ({slen} , {swt} , {(int)sex} , {(int)stage} , {{{CatchCompRow}}}, {{{RowGUID}}}, {sgonadwt})";
-                    }
-                    else
-                    {
-                        query = $@"Update tblGMS set Len= {slen},
-                                                  Wt= {swt},
-                                                  Sex= {(int)sex},
-                                                  GMS= {(int)stage},
-                                                  GonadWt= {sgonadwt}
-                                                  Where RowGUID = {{{RowGUID}}}";
-                    }
-                    OleDbCommand update = new OleDbCommand(query, conn);
-                    conn.Open();
-                    Success = (update.ExecuteNonQuery() > 0);
-                    conn.Close();
-                }
-                catch (Exception ex)
-                {
-                    ErrorLogger.Log(ex);
-                }
-            }
-            return Success;
         }
 
         /// <summary>
@@ -609,17 +623,26 @@ namespace FAD3
             DataTable dt = new DataTable();
             string CatchName = "";
             long? CatchCount = null;
+            int? TaxaNumber = null;
             using (var conection = new OleDbConnection(global.ConnectionString))
             {
                 try
                 {
                     conection.Open();
+                    //string query = $@"SELECT tblSampling.SamplingGUID, tblCatchDetail.CatchCompRow, tblCatchComp.NameGUID, temp_AllNames.Name1,
+                    //               temp_AllNames.Name2, tblSampling.WtCatch, tblSampling.WtSample, tblCatchDetail.Live, tblCatchDetail.wt,
+                    //               tblCatchDetail.ct, tblCatchDetail.swt, tblCatchDetail.sct, tblCatchDetail.FromTotal
+                    //               FROM(tblSampling INNER JOIN(tblCatchComp INNER JOIN temp_AllNames ON tblCatchComp.NameGUID = temp_AllNames.NameNo)
+                    //               ON tblSampling.SamplingGUID = tblCatchComp.SamplingGUID) INNER JOIN tblCatchDetail ON tblCatchComp.RowGUID =
+                    //               tblCatchDetail.CatchCompRow WHERE tblSampling.SamplingGUID = {{{_SamplingGUID}}} ORDER BY tblCatchComp.Sequence";
+
                     string query = $@"SELECT tblSampling.SamplingGUID, tblCatchDetail.CatchCompRow, tblCatchComp.NameGUID, temp_AllNames.Name1,
-                                   temp_AllNames.Name2, tblSampling.WtCatch, tblSampling.WtSample, tblCatchDetail.Live, tblCatchDetail.wt,
-                                   tblCatchDetail.ct, tblCatchDetail.swt, tblCatchDetail.sct, tblCatchDetail.FromTotal
-                                   FROM(tblSampling INNER JOIN(tblCatchComp INNER JOIN temp_AllNames ON tblCatchComp.NameGUID = temp_AllNames.NameNo)
-                                   ON tblSampling.SamplingGUID = tblCatchComp.SamplingGUID) INNER JOIN tblCatchDetail ON tblCatchComp.RowGUID =
-                                   tblCatchDetail.CatchCompRow WHERE tblSampling.SamplingGUID = {{{_SamplingGUID}}} ORDER BY tblCatchComp.Sequence";
+                                    temp_AllNames.Name2, tblSampling.WtCatch, tblSampling.WtSample, tblCatchDetail.Live, tblCatchDetail.wt,
+                                    tblCatchDetail.ct, tblCatchDetail.swt, tblCatchDetail.sct, tblCatchDetail.FromTotal, tblAllSpecies.TaxaNo
+                                    FROM ((tblSampling INNER JOIN (tblCatchComp INNER JOIN temp_AllNames ON tblCatchComp.NameGUID = temp_AllNames.NameNo)
+                                    ON tblSampling.SamplingGUID = tblCatchComp.SamplingGUID) INNER JOIN tblCatchDetail ON
+                                    tblCatchComp.RowGUID = tblCatchDetail.CatchCompRow) LEFT JOIN tblAllSpecies ON temp_AllNames.NameNo = tblAllSpecies.SpeciesGUID
+                                    WHERE tblSampling.SamplingGUID={{{_SamplingGUID}}} ORDER BY tblCatchComp.Sequence";
 
                     Debug.WriteLine(query);
                     var adapter = new OleDbDataAdapter(query, conection);
@@ -627,6 +650,7 @@ namespace FAD3
                     _TotalWtOfFromTotal = 0;
                     for (int i = 0; i < dt.Rows.Count; i++)
                     {
+                        TaxaNumber = null;
                         CatchCount = null;
                         DataRow dr = dt.Rows[i];
                         try { CatchName = dr["Name1"].ToString() + " " + dr["Name2"].ToString(); }
@@ -634,13 +658,31 @@ namespace FAD3
 
                         if (dr["ct"].ToString().Length > 0)
                         {
-                            try { CatchCount = int.Parse(dr["ct"].ToString()); }
-                            catch { CatchCount = null; }
+                            if (int.TryParse(dr["ct"].ToString(), out int myCount))
+                            {
+                                CatchCount = myCount;
+                            }
+                            else
+                            {
+                                CatchCount = null;
+                            }
+                        }
+
+                        if (dr["TaxaNo"].ToString().Length > 0)
+                        {
+                            if (int.TryParse(dr["TaxaNo"].ToString(), out int myTaxaNo))
+                            {
+                                TaxaNumber = myTaxaNo;
+                            }
+                            else
+                            {
+                                TaxaNumber = null;
+                            }
                         }
 
                         CatchLine myLine = new CatchLine(CatchName, dr["SamplingGUID"].ToString(),
                                         dr["CatchCompRow"].ToString(), dr["NameGUID"].ToString(),
-                                        Convert.ToDouble(dr["wt"]), CatchCount);
+                                        Convert.ToDouble(dr["wt"]), CatchCount, TaxaNumber);
 
                         myLine.CatchSubsampleWt = null;
                         myLine.CatchSubsampleCount = null;
@@ -1154,9 +1196,12 @@ namespace FAD3
 
             private Identification _NameType;
 
+            private int? _TaxaNumber;
+
             public CatchLine(string CatchName, string SamplingGUID,
                                           string CatchLineGUID, string CatchNameGUID,
-                                          double CatchWeight, long? CatchCount = null)
+                                          double CatchWeight, long? CatchCount = null,
+                                          int? TaxaNumber = null)
             {
                 _CatchName = CatchName;
                 _SamplingGUID = SamplingGUID;
@@ -1170,11 +1215,12 @@ namespace FAD3
                 _NameType = Identification.Scientific;
                 _LiveFish = false;
                 _CatchDetailRowGUID = "";
+                _TaxaNumber = TaxaNumber;
             }
 
             public CatchLine(string CatchName, string SamplingGUID,
                                           string CatchLineGUID, string CatchNameGUID,
-                                          double CatchWeight)
+                                          double CatchWeight, int? TaxaNumber = null)
             {
                 _CatchName = CatchName;
                 _SamplingGUID = SamplingGUID;
@@ -1188,6 +1234,7 @@ namespace FAD3
                 _NameType = Identification.Scientific;
                 _LiveFish = false;
                 _CatchDetailRowGUID = "";
+                _TaxaNumber = TaxaNumber;
             }
 
             /// <summary>
@@ -1231,6 +1278,12 @@ namespace FAD3
             {
                 get { return _CatchSubsampleCount; }
                 set { _CatchSubsampleCount = value; }
+            }
+
+            public int? TaxaNumber
+            {
+                get { return _TaxaNumber; }
+                set { _TaxaNumber = value; }
             }
 
             public double? CatchSubsampleWt
@@ -1371,19 +1424,6 @@ namespace FAD3
                 }
                 return Success;
             }
-        }
-
-        public struct GMSLine
-        {
-            public string CatchRowGUID { get; set; }
-            public global.FishCrabGMS GMS { get; set; }
-            public double? GonadWeight { get; set; }
-            public double? Length { get; set; }
-            public global.sex Sex { get; set; }
-            public global.Taxa Taxa { get; set; }
-            public string TaxaName { get; set; }
-            public double? Weight { get; set; }
-            public global.fad3DataStatus DataStatus { get; set; }
         }
 
         public struct LFLine

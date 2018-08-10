@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace FAD3
 {
-    public partial class FGExtentForm : Form
+    public partial class FishingGroundDefinitionForm : Form
     {
         private FishingGrid.fadUTMZone _UTMZone;
         private string _MapDescription;
@@ -23,13 +23,13 @@ namespace FAD3
             set { _UTMZone = value; }
         }
 
-        public FGExtentForm(TargetAreaForm Parent)
+        public FishingGroundDefinitionForm(TargetAreaForm Parent)
         {
             InitializeComponent();
             _Parent_form = Parent;
         }
 
-        public FGExtentForm(TargetAreaForm Parent, FishingGrid.fadUTMZone UTMZone, string MapDescription, string ULGrid, string LRGrid)
+        public FishingGroundDefinitionForm(TargetAreaForm Parent, FishingGrid.fadUTMZone UTMZone, string MapDescription, string ULGrid, string LRGrid)
         {
             InitializeComponent();
             _MapDescription = MapDescription;

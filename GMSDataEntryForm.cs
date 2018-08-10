@@ -53,7 +53,7 @@ namespace FAD3
             }
             else
             {
-                foreach (KeyValuePair<string, sampling.GMSLine> kv in _sampling.GMSData(_CatchRowGuid))
+                foreach (KeyValuePair<string, GMSManager.GMSLine> kv in GMSManager.GMSData(_CatchRowGuid))
                 {
                     //adds a new row with fields containing length and frequency
                     AddRow(kv.Value.Length, kv.Value.Weight, kv.Value.Sex, kv.Value.GMS, kv.Value.Taxa);
@@ -62,9 +62,9 @@ namespace FAD3
         }
 
         private void AddRow(double? Len = null, double? Wgt = null,
-                            global.sex Sex = global.sex.Female,
-                            global.FishCrabGMS GMS = global.FishCrabGMS.AllTaxaNotDetermined,
-                            global.Taxa taxa = global.Taxa.Fish)
+                            GMSManager.sex Sex = GMSManager.sex.Female,
+                            GMSManager.FishCrabGMS GMS = GMSManager.FishCrabGMS.AllTaxaNotDetermined,
+                            GMSManager.Taxa taxa = GMSManager.Taxa.Fish)
         {
             var x = 3;
             Label labelRow = new Label();
