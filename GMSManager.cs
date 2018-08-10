@@ -293,7 +293,7 @@ namespace FAD3
                         Enum.TryParse(dr["GMS"].ToString(), out gms);
                         GMSManager.sex sex;
                         Enum.TryParse(dr["Sex"].ToString(), out sex);
-                        GMSManager.Taxa taxa;
+                        GMSManager.Taxa taxa = Taxa.To_be_determined;
                         Enum.TryParse(dr["TaxaNo"].ToString(), out taxa);
                         var myGMS = new GMSLine
                         {

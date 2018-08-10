@@ -38,12 +38,12 @@
             // 
             this.panelUI.Location = new System.Drawing.Point(3, 52);
             this.panelUI.Name = "panelUI";
-            this.panelUI.Size = new System.Drawing.Size(777, 382);
+            this.panelUI.Size = new System.Drawing.Size(489, 382);
             this.panelUI.TabIndex = 0;
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(724, 449);
+            this.button1.Location = new System.Drawing.Point(444, 440);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(48, 26);
             this.button1.TabIndex = 1;
@@ -52,7 +52,7 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(656, 449);
+            this.button2.Location = new System.Drawing.Point(376, 440);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(62, 26);
             this.button2.TabIndex = 2;
@@ -72,14 +72,14 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(784, 485);
+            this.ClientSize = new System.Drawing.Size(498, 485);
             this.Controls.Add(this.labelTitle);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.panelUI);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "GMSDataEntryForm";
             this.Text = "GMSDataEntryForm";
             this.ResumeLayout(false);

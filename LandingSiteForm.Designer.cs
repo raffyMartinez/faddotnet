@@ -169,7 +169,7 @@ namespace FAD3
             this.Name = "frmLandingSite";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Landing site";
-            this.Load += new System.EventHandler(this.FrmLandingSiteLoad);
+            this.Load += new System.EventHandler(this.OnFormLoad);
             this.ResumeLayout(false);
             this.PerformLayout();
 

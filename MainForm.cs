@@ -56,6 +56,7 @@ namespace FAD3
         private string _VesHeight = "";
         private string _VesLength = "";
         private string _VesWidth = "";
+        private GMSManager.Taxa _taxa = GMSManager.Taxa.To_be_determined;
 
         public MainForm()
         {
@@ -851,12 +852,11 @@ namespace FAD3
                     {
                         _CatchSubRow = global.fad3CatchSubRow.GMS;
                         var catchListView = GetLVCatch();
-                        int? taxaNumber = null;
-                        if (int.TryParse(catchListView.SelectedItems[0].SubItems[7].Text, out int myInt))
+                        if (Enum.TryParse(catchListView.SelectedItems[0].SubItems[7].Text, out GMSManager.Taxa myTaxa))
                         {
-                            taxaNumber = myInt;
+                            _taxa = myTaxa;
                         }
-                        Show_LF_GMS_List(catchListView.SelectedItems[0].Name, taxaNumber);
+                        Show_LF_GMS_List(catchListView.SelectedItems[0].Name, _taxa);
                     }
                     break;
             }
@@ -982,12 +982,11 @@ namespace FAD3
                     {
                         if (lvh.Item != null)
                         {
-                            int? taxaNumber = null;
-                            if (int.TryParse(lvh.Item.SubItems[7].Text, out int myInt))
+                            if (Enum.TryParse(lvh.Item.SubItems[7].Text, out GMSManager.Taxa myTaxa))
                             {
-                                taxaNumber = myInt;
+                                _taxa = myTaxa;
                             }
-                            Show_LF_GMS_List(lvh.Item.Name, taxaNumber);
+                            Show_LF_GMS_List(lvh.Item.Name, _taxa);
                         }
                     }
                     break;
@@ -1926,7 +1925,7 @@ namespace FAD3
             }
         }
 
-        private void Show_LF_GMS_List(string CatchRowGuid, int? taxaNumber = null)
+        private void Show_LF_GMS_List(string CatchRowGuid, GMSManager.Taxa taxa = GMSManager.Taxa.To_be_determined)
         {
             var lvc = GetLVLF_GMS();
             lvc.Items.Clear();
@@ -1950,19 +1949,13 @@ namespace FAD3
             {
                 foreach (KeyValuePair<string, GMSManager.GMSLine> kv in GMSManager.GMSData(CatchRowGuid))
                 {
-                    var myTaxaString = "";
-                    if (Enum.TryParse(taxaNumber.ToString(), out GMSManager.Taxa Mytaxa))
-                    {
-                        myTaxaString = GMSManager.GMSStageToString(Mytaxa, kv.Value.GMS);
-                    }
                     var lvi = new ListViewItem(new string[]
                     {
                                     n.ToString(),
                                     kv.Value.Length.ToString(),
                                     kv.Value.Weight.ToString(),
                                     kv.Value.Sex.ToString(),
-                                    //kv.Value.GMS.ToString(),
-                                    myTaxaString,
+                                    GMSManager.GMSStageToString(taxa, kv.Value.GMS),
                                     kv.Value.GonadWeight.ToString()
                     });
                     lvi.Name = kv.Key;
@@ -2116,9 +2109,13 @@ namespace FAD3
         private void ShowGMSForm(bool isNew = false)
         {
             var lvCatch = GetLVCatch();
+            if (Enum.TryParse(lvCatch.SelectedItems[0].SubItems[7].Text, out GMSManager.Taxa myTaxa))
+            {
+                _taxa = myTaxa;
+            }
             GMSDataEntryForm fgms = new GMSDataEntryForm(isNew, _Sampling,
                                       lvCatch.SelectedItems[0].Name,
-                                      lvCatch.SelectedItems[0].SubItems[1].Text);
+                                      lvCatch.SelectedItems[0].SubItems[1].Text, _taxa);
             fgms.ShowDialog(this);
         }
 

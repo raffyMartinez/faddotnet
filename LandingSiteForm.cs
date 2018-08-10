@@ -90,12 +90,12 @@ namespace FAD3
             textCoord.Text = _LandingSite.Coordinate.ToString(format);
         }
 
-        private void frmLandingSite_Shown(object sender, EventArgs e)
+        private void OnFormShown(object sender, EventArgs e)
         {
             textLandingSiteName.Focus();
         }
 
-        private void FrmLandingSiteLoad(object sender, EventArgs e)
+        private void OnFormLoad(object sender, EventArgs e)
         {
             textLandingSiteName.Focus();
             if (!_isNew && _LandingSite != null)
