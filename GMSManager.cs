@@ -9,6 +9,13 @@ namespace FAD3
 {
     public static class GMSManager
     {
+        private static int _GMSMeasurementRows;
+
+        public static int GMSMeasurementRows
+        {
+            get { return _GMSMeasurementRows; }
+        }
+
         public enum Taxa
         {
             To_be_determined,
@@ -267,6 +274,7 @@ namespace FAD3
 
         public static Dictionary<string, GMSLine> GMSData(string CatchCompRowNo)
         {
+            _GMSMeasurementRows = 0;
             Dictionary<string, GMSLine> mydata = new Dictionary<string, GMSLine>();
             var dt = new DataTable();
             using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
@@ -311,6 +319,7 @@ namespace FAD3
                             myGMS.GonadWeight = double.Parse(dr["GonadWt"].ToString());
 
                         mydata.Add(dr["RowGUID"].ToString(), myGMS);
+                        _GMSMeasurementRows++;
                     }
                 }
                 catch (Exception ex)

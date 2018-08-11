@@ -129,9 +129,8 @@ namespace FAD3
         {
             string cw = "";
             int i = 0;
-            string subKey = "";
             string SaveContext = "";
-            subKey = "SOFTWARE\\FAD3\\ColWidth";
+            var subKey = "SOFTWARE\\FAD3\\ColWidth";
             ListView lv = (ListView)sender;
 
             foreach (var item in lv.Columns)
@@ -775,6 +774,18 @@ namespace FAD3
                     break;
 
                 case "menuNewGMSTable":
+                    var lvi = GetLVCatch().SelectedItems[0];
+                    var taxa = GMSManager.Taxa.To_be_determined;
+                    if (Enum.TryParse(lvi.SubItems[7].Text, out GMSManager.Taxa myTaxa))
+                    {
+                        taxa = myTaxa;
+                        ShowGMSForm(isNew: true);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Cannot edit gonad maturity because taxa is unknown",
+                            "Cannot edit GMS", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
                     ShowGMSForm(isNew: true);
                     break;
 
