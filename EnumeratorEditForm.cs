@@ -9,9 +9,9 @@ using System.Windows.Forms;
 
 namespace FAD3
 {
-    public partial class EditEnumerator : Form
+    public partial class EnumeratorEditForm : Form
     {
-        public EditEnumerator()
+        public EnumeratorEditForm()
         {
             InitializeComponent();
         }

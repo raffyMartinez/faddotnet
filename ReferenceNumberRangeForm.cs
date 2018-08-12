@@ -9,12 +9,12 @@ using System.Windows.Forms;
 
 namespace FAD3
 {
-    public partial class frmRefNoRange : Form
+    public partial class ReferenceNumberRangeForm : Form
     {
         private long _MinVal = 0;
         private long _MaxVal = 0;
 
-        public frmRefNoRange()
+        public ReferenceNumberRangeForm()
         {
             InitializeComponent();
         }

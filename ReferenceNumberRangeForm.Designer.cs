@@ -1,6 +1,6 @@
 ﻿namespace FAD3
 {
-    partial class frmRefNoRange
+    partial class ReferenceNumberRangeForm
     {
         /// <summary>
         /// Required designer variable.

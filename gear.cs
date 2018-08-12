@@ -82,7 +82,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    ErrorLogger.Log(ex);
+                    Logger.Log(ex);
                 }
             }
 
@@ -128,7 +128,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    ErrorLogger.Log(ex);
+                    Logger.Log(ex);
                 }
             }
 
@@ -153,7 +153,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    ErrorLogger.Log(ex);
+                    Logger.Log(ex);
                 }
                 return gearClass;
             }
@@ -177,7 +177,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    ErrorLogger.Log(ex);
+                    Logger.Log(ex);
                 }
                 return rv;
             }
@@ -237,7 +237,7 @@ namespace FAD3
                         myList.Add(dr["RefGearCode"].ToString());
                     }
                 }
-                catch (Exception ex) { ErrorLogger.Log(ex); }
+                catch (Exception ex) { Logger.Log(ex); }
             }
             return myList;
         }
@@ -263,7 +263,7 @@ namespace FAD3
                         myList.Add(dr["RefGearCode"].ToString());
                     }
                 }
-                catch (Exception ex) { ErrorLogger.Log(ex); }
+                catch (Exception ex) { Logger.Log(ex); }
             }
             return myList;
         }
@@ -283,7 +283,7 @@ namespace FAD3
                     DataRow dr = myDT.Rows[0];
                     myLetter = dr["GearLetter"].ToString();
                 }
-                catch (Exception ex) { ErrorLogger.Log(ex); }
+                catch (Exception ex) { Logger.Log(ex); }
             }
             return myLetter;
         }
@@ -314,7 +314,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    ErrorLogger.Log(ex);
+                    Logger.Log(ex);
                 }
             }
 
@@ -345,7 +345,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    ErrorLogger.Log(ex);
+                    Logger.Log(ex);
                 }
             }
 
@@ -447,7 +447,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    ErrorLogger.Log(ex);
+                    Logger.Log(ex);
                 }
             }
         }
@@ -485,7 +485,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    ErrorLogger.Log(ex);
+                    Logger.Log(ex);
                 }
             }
             return Success;
@@ -520,7 +520,7 @@ namespace FAD3
                         myMonths.Add(dr["sMonth"].ToString() + ": " + dr["n"].ToString());
                     }
                 }
-                catch (Exception ex) { ErrorLogger.Log(ex); }
+                catch (Exception ex) { Logger.Log(ex); }
             }
             return myMonths;
         }
@@ -623,7 +623,7 @@ namespace FAD3
                         GearNameMatches.Add((dr["Variation"].ToString(), matchQuality));
                     }
                 }
-                catch (Exception ex) { ErrorLogger.Log(ex); }
+                catch (Exception ex) { Logger.Log(ex); }
             }
             return GearNameMatches;
         }
@@ -811,7 +811,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    ErrorLogger.Log(ex);
+                    Logger.Log(ex);
                 }
             }
 
@@ -840,7 +840,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    ErrorLogger.Log(ex);
+                    Logger.Log(ex);
                 }
             }
         }
@@ -865,7 +865,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    ErrorLogger.Log(ex);
+                    Logger.Log(ex);
                 }
             }
         }
@@ -891,7 +891,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    ErrorLogger.Log(ex);
+                    Logger.Log(ex);
                 }
             }
         }
@@ -948,7 +948,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    ErrorLogger.Log(ex);
+                    Logger.Log(ex);
                 }
             }
         }
@@ -968,7 +968,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    ErrorLogger.Log(ex);
+                    Logger.Log(ex);
                 }
             }
             return Success;

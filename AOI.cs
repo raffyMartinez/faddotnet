@@ -96,7 +96,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    ErrorLogger.Log(ex);
+                    Logger.Log(ex);
                 }
                 return myList;
             }
@@ -122,7 +122,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    ErrorLogger.Log(ex);
+                    Logger.Log(ex);
                 }
                 return myName;
             }
@@ -152,7 +152,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    ErrorLogger.Log(ex);
+                    Logger.Log(ex);
                 }
 
                 return myList;
@@ -179,7 +179,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    ErrorLogger.Log(ex);
+                    Logger.Log(ex);
                 }
             }
         }
@@ -209,7 +209,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    ErrorLogger.Log(ex);
+                    Logger.Log(ex);
                 }
             }
 
@@ -241,7 +241,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    ErrorLogger.Log(ex);
+                    Logger.Log(ex);
                 }
             }
             return myCount;
@@ -268,7 +268,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    ErrorLogger.Log(ex);
+                    Logger.Log(ex);
                 }
             }
 
@@ -297,7 +297,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    ErrorLogger.Log(ex);
+                    Logger.Log(ex);
                 }
             }
 
@@ -324,7 +324,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    ErrorLogger.Log(ex);
+                    Logger.Log(ex);
                 }
             }
         }
@@ -371,7 +371,7 @@ namespace FAD3
                 catch (System.Data.OleDb.OleDbException ex) { }
                 catch (Exception ex)
                 {
-                    ErrorLogger.Log(ex);
+                    Logger.Log(ex);
                 }
             }
             return Success;
@@ -398,7 +398,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    ErrorLogger.Log(ex);
+                    Logger.Log(ex);
                 }
             }
             return myData;
@@ -432,7 +432,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    ErrorLogger.Log(ex);
+                    Logger.Log(ex);
                 }
             }
             return rv;
@@ -459,7 +459,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    ErrorLogger.Log(ex);
+                    Logger.Log(ex);
                 }
             }
             return myYears;
@@ -473,13 +473,15 @@ namespace FAD3
                 con.Open();
                 var sql = $"Select Letter from tblAOI where AOIGuid = {{{AOIGuid}}}";
 
-                using (var dt = new DataTable())
+                using (OleDbCommand getCode = new OleDbCommand(sql, con))
                 {
-                    var adapter = new OleDbDataAdapter(sql, con);
-                    adapter.Fill(dt);
-                    foreach (DataRow row in dt.Rows)
+                    try
                     {
-                        code = row["Letter"].ToString();
+                        code = (string)getCode.ExecuteScalar();
+                    }
+                    catch
+                    {
+                        code = "";
                     }
                 }
             }

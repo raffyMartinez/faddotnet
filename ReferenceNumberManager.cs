@@ -41,6 +41,13 @@ namespace FAD3
             get { return _FirstCode; }
         }
 
+        /// <summary>
+        /// prepares the target area and the gear variation to retrieve
+        /// appropriate AOI code and gear code can b
+        /// </summary>
+        /// <param name="AOIGuid"></param>
+        /// <param name="GearVariationGuid"></param>
+        /// <param name="SamplingDate"></param>
         public static void SetAOI_GearVariation(string AOIGuid, string GearVariationGuid, DateTime SamplingDate)
         {
             _AOIGuid = AOIGuid;
@@ -126,12 +133,18 @@ namespace FAD3
             using (var con = new OleDbConnection(global.ConnectionString))
             {
                 con.Open();
-                var sql = $"Select Counter from tblRefCodeCounter where GearRefCode = {{{_AOI_Year_GearCode}}}";
+                var sql = $"Select Counter from tblRefCodeCounter where GearRefCode = '{_AOI_Year_GearCode}'";
 
                 using (var dt = new DataTable())
                 {
                     var adapter = new OleDbDataAdapter(sql, con);
-                    adapter.Fill(dt);
+                    try
+                    {
+                        adapter.Fill(dt);
+                    }
+                    catch (Exception ex)
+                    {
+                    }
                     if (dt.Rows.Count > 0)
                     {
                         _counter = int.Parse(dt.Rows[0]["Counter"].ToString());
@@ -174,9 +187,9 @@ namespace FAD3
                 using (var con = new OleDbConnection(global.ConnectionString))
                 {
                     if (_Has_AOI_Year_GearCode)
-                        sql = $"Update tblRefCodeCounter set [Counter] = {_counter} where GearRefCode = {{{_AOI_Year_GearCode}}}";
+                        sql = $"Update tblRefCodeCounter set [Counter] = {_counter} where GearRefCode = '{_AOI_Year_GearCode}'";
                     else
-                        sql = "Insert into tblRefCodeCounter (GearRefCode, [Counter]) values {{{_AOI_Year_GearCode}}}, {_counter})";
+                        sql = $"Insert into tblRefCodeCounter (GearRefCode, [Counter]) values ('{_AOI_Year_GearCode}', {_counter})";
 
                     if (sql.Length > 0)
                         con.Open();

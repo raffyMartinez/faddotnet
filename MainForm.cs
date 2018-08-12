@@ -38,9 +38,6 @@ namespace FAD3
         private string _LandingSiteName = "";
         private landingsite _ls = new landingsite();
         private TreeNode _LSNode;
-        private string _MonthYear;
-        private string _MonthYearGearVar;
-        private string _MonthYearLandingSite;
         private int _MouseX = 0;
         private int _MouseY = 0;
         private mru _mrulist = new mru();
@@ -246,10 +243,7 @@ namespace FAD3
             ApplyListViewColumnWidth("samplingDetail");
             if (_newSamplingEntered)
             {
-                _MonthYear = SamplingDate.ToString("MMM-yyyy");
-                _MonthYearGearVar = GearVarGuid;
-                _MonthYearLandingSite = LandingSiteGuid;
-                RefreshTreeForNewSampling();
+                RefreshTreeForNewSampling(LandingSiteGuid, GearVarGuid, SamplingDate.ToString("MMM-yyyy"));
             }
             SetUPLV("samplingDetail");
             ShowCatchDetailEx(_SamplingGUID);
@@ -268,16 +262,17 @@ namespace FAD3
             }
         }
 
-        private void _mrulist_FileSelected(string filename)
+        private void OnMRUlist_FileSelected(string filename)
         {
             _TreeLevel = "root";
             if (!SetupTree(filename, FromMRU: true))
             {
                 _mrulist.RemoveFile(filename);
             }
+            treeMain.SelectedNode = treeMain.Nodes["root"].FirstNode;
         }
 
-        private void _mrulist_ManageMRU(object sender, EventArgs e)
+        private void OnMRUlist_ManageMRU(object sender, EventArgs e)
         {
             ManageMRUForm f = new ManageMRUForm();
             f.Parent_form = this;
@@ -308,7 +303,7 @@ namespace FAD3
             }
             catch (Exception ex)
             {
-                ErrorLogger.Log(ex);
+                Logger.Log(ex);
             }
         }
 
@@ -404,6 +399,13 @@ namespace FAD3
                     break;
 
                 case "lvCatch":
+                    tsi = menuDropDown.Items.Add("New catch composition");
+                    tsi.Name = "menuNewCatchComposition";
+                    tsi.Visible = ((ListView)Source).Items.Count == 0;
+
+                    tsi = menuDropDown.Items.Add("Edit catch composition");
+                    tsi.Name = "menuEditCatchComposition";
+                    tsi.Visible = ((ListView)Source).Items.Count > 0;
                     break;
 
                 case "lvLF_GMS":
@@ -557,8 +559,8 @@ namespace FAD3
                 _mrulist = new mru("FAD3", toolStripRecentlyOpened, 5);
 
                 //setup the event handlers for the mru
-                _mrulist.FileSelected += _mrulist_FileSelected;
-                _mrulist.ManageMRU += _mrulist_ManageMRU;
+                _mrulist.FileSelected += OnMRUlist_FileSelected;
+                _mrulist.ManageMRU += OnMRUlist_ManageMRU;
 
                 RegistryKey rk = Registry.CurrentUser.OpenSubKey("SOFTWARE\\FAD3");
                 try
@@ -576,7 +578,7 @@ namespace FAD3
                     }
                     else
                     {
-                        ErrorLogger.Log("MDB file saved in registry not found");
+                        Logger.Log("MDB file saved in registry not found");
                         lblErrorFormOpen.Visible = true;
                         lblTitle.Text = "";
                         lblErrorFormOpen.Text = @"Please locate the database file where fisheries data is saved.
@@ -586,7 +588,7 @@ namespace FAD3
                 }
                 catch
                 {
-                    ErrorLogger.Log("Registry entry for mdb path not found");
+                    Logger.Log("Registry entry for mdb path not found");
                     lblErrorFormOpen.Visible = true;
                     lblTitle.Text = "";
                     lblErrorFormOpen.Text = @"Please locate the database file where fisheries data is saved.
@@ -596,7 +598,7 @@ namespace FAD3
             }
             else
             {
-                ErrorLogger.Log("Not all required files found");
+                Logger.Log("Not all required files found");
                 lblErrorFormOpen.Visible = true;
                 lblTitle.Text = "";
                 lblErrorFormOpen.Text = "Some files needed by FAD3 to run were not found.\r\n";
@@ -773,24 +775,34 @@ namespace FAD3
                     ShowLFForm(IsNew: true);
                     break;
 
+                case "menuEditCatchComposition":
+                case "menuNewCatchComposition":
+
+                    CatchCompositionForm ccf = new CatchCompositionForm(ItemName == "menuNewCatchComposition", this, _SamplingGUID);
+                    ccf.ShowDialog(this);
+                    break;
+
                 case "menuNewGMSTable":
+                case "menuEditGMSTable":
+                    var Proceed = true;
                     var lvi = GetLVCatch().SelectedItems[0];
-                    var taxa = GMSManager.Taxa.To_be_determined;
-                    if (Enum.TryParse(lvi.SubItems[7].Text, out GMSManager.Taxa myTaxa))
+                    if (Enum.TryParse(lvi.SubItems[7].Text, out _taxa))
                     {
-                        taxa = myTaxa;
-                        ShowGMSForm(isNew: true);
+                        Proceed = _taxa != GMSManager.Taxa.To_be_determined;
+                    }
+                    else
+                    {
+                        Proceed = false;
+                    }
+                    if (Proceed)
+                    {
+                        ShowGMSForm(_taxa, isNew: ItemName == "menuNewGMSTable");
                     }
                     else
                     {
                         MessageBox.Show("Cannot edit gonad maturity because taxa is unknown",
                             "Cannot edit GMS", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
-                    ShowGMSForm(isNew: true);
-                    break;
-
-                case "menuEditGMSTable":
-                    ShowGMSForm();
                     break;
 
                 case "menuDeleteSampling":
@@ -988,6 +1000,7 @@ namespace FAD3
                     if (e.Button == MouseButtons.Right)
                     {
                         ConfigDropDownMenu(GetLVCatch());
+                        menuDropDown.Show(lv, new Point(_MouseX, _MouseY));
                     }
                     else
                     {
@@ -1005,7 +1018,6 @@ namespace FAD3
                 case "lvLF_GMS":
                     if (e.Button == MouseButtons.Right)
                     {
-                        Text = "x: " + _MouseX + " y: " + _MouseY;
                         ConfigDropDownMenu(lv);
                         menuDropDown.Show(lv, new Point(_MouseX, _MouseY));
                     }
@@ -1029,7 +1041,7 @@ namespace FAD3
             switch (tsi.Tag)
             {
                 case "new":
-                    frmNewDB f = new frmNewDB(this);
+                    CreateNewDatabaseForm f = new CreateNewDatabaseForm(this);
                     f.ShowDialog(this);
                     break;
 
@@ -1069,7 +1081,7 @@ namespace FAD3
                     break;
 
                 case "refNoRange":
-                    frmRefNoRange f = new frmRefNoRange();
+                    ReferenceNumberRangeForm f = new ReferenceNumberRangeForm();
                     f.ShowDialog();
                     break;
 
@@ -1148,6 +1160,7 @@ namespace FAD3
                     TreeNode nd1 = new TreeNode();
                     if (myTag.Item3 == "landing_site")
                     {
+                        _LandingSiteGuid = myTag.Item1;
                         if (n == 0)
                         {
                             nd1 = e.Node.FirstNode;
@@ -1165,6 +1178,8 @@ namespace FAD3
                     }
                     else if (myTag.Item3 == "gear")
                     {
+                        _LandingSiteGuid = myTag.Item1;
+                        _GearVarGUID = myTag.Item2;
                         if (n == 0)
                         {
                             e.Node.FirstNode.Text = item.SamplingMonthYear;
@@ -1274,7 +1289,7 @@ namespace FAD3
             }
             catch (Exception ex)
             {
-                ErrorLogger.Log(ex.Message);
+                Logger.Log(ex.Message);
             }
 
             e.Node.SelectedImageKey = e.Node.ImageKey;
@@ -1355,22 +1370,22 @@ namespace FAD3
         /// <summary>
         /// refreshes tree for any new sampling
         /// </summary>
-        private void RefreshTreeForNewSampling()
+        private void RefreshTreeForNewSampling(string LandingSiteGuid, string GearVarGuid, string MonthYear)
         {
             if (_newSamplingEntered)
             {
                 var LandingSiteNode = new TreeNode();
 
                 var gearNode = new TreeNode();
-                gearNode.Name = $"{_MonthYearLandingSite}|{_MonthYearGearVar}";
-                gearNode.Text = gear.GearVarNameFromGearGuid(_MonthYearGearVar);
-                gearNode.Tag = Tuple.Create(_MonthYearLandingSite, _MonthYearGearVar, "gear");
-                gearNode.ImageKey = gear.GearVarNodeImageKeyFromGearVar(_MonthYearGearVar);
+                gearNode.Name = $"{LandingSiteGuid}|{GearVarGuid}";
+                gearNode.Text = gear.GearVarNameFromGearGuid(GearVarGuid);
+                gearNode.Tag = Tuple.Create(LandingSiteGuid, GearVarGuid, "gear");
+                gearNode.ImageKey = gear.GearVarNodeImageKeyFromGearVar(GearVarGuid);
 
-                var node = new TreeNode(_MonthYear);
-                node.Name = $"{_MonthYearLandingSite}|{_MonthYearGearVar}|{_MonthYear}";
-                node.Tag = Tuple.Create(_MonthYearLandingSite, _MonthYearGearVar, "sampling");
-                node.ImageKey = "MonthGear";
+                var samplingMonthNode = new TreeNode(MonthYear);
+                samplingMonthNode.Name = $"{LandingSiteGuid}|{GearVarGuid}|{MonthYear}";
+                samplingMonthNode.Tag = Tuple.Create(LandingSiteGuid, GearVarGuid, "sampling");
+                samplingMonthNode.ImageKey = "MonthGear";
 
                 var myTag = (Tuple<string, string, string>)treeMain.SelectedNode.Tag;
                 var treeLevel = myTag.Item3;
@@ -1391,25 +1406,33 @@ namespace FAD3
                         break;
                 }
 
-                if (!LandingSiteNode.Nodes.ContainsKey(gearNode.Name))
+                try
                 {
-                    LandingSiteNode.Nodes.Add(gearNode);
-                    gearNode.Nodes.Add(node);
-                }
-                else
-                {
-                    gearNode = LandingSiteNode.Nodes[gearNode.Name];
-                    if (!gearNode.IsExpanded) gearNode.Expand();
-                    if (!gearNode.Nodes.ContainsKey(node.Name))
+                    if (!LandingSiteNode.Nodes.ContainsKey(gearNode.Name))
                     {
-                        gearNode.Nodes.Add(node);
+                        LandingSiteNode.Nodes.Add(gearNode);
+                        gearNode.Nodes.Add(samplingMonthNode);
                     }
                     else
                     {
-                        node = gearNode.Nodes[node.Name];
+                        gearNode = LandingSiteNode.Nodes[gearNode.Name];
+                        if (!gearNode.IsExpanded) gearNode.Expand();
+                        if (!gearNode.Nodes.ContainsKey(samplingMonthNode.Name))
+                        {
+                            gearNode.Nodes.Add(samplingMonthNode);
+                        }
+                        else
+                        {
+                            samplingMonthNode = gearNode.Nodes[samplingMonthNode.Name];
+                        }
                     }
                 }
-                treeMain.SelectedNode = node;
+                catch (Exception ex)
+                {
+                    Logger.Log("error in MainForm.RefreshTreeForNewSampling\r\n" +
+                                ex.Message);
+                }
+                treeMain.SelectedNode = samplingMonthNode;
             }
         }
 
@@ -1926,7 +1949,7 @@ namespace FAD3
             }
             else
             {
-                ErrorLogger.Log("MDB file saved in registry not found");
+                Logger.Log("MDB file saved in registry not found");
                 lblErrorFormOpen.Visible = true;
                 lblTitle.Text = "";
                 lblErrorFormOpen.Text = "Please locate the database file where fisheries data is saved.\r\n" +
@@ -1988,7 +2011,8 @@ namespace FAD3
                 ListView lv = GetLVCatch();
                 lv.Items.Clear();
                 int n = 1;
-                foreach (KeyValuePair<string, sampling.CatchLine> kv in _Sampling.CatchComp())
+                //foreach (KeyValuePair<string, sampling.CatchLine> kv in _Sampling.CatchComp())
+                foreach (KeyValuePair<string, CatchComposition.CatchLine> kv in CatchComposition.CatchComp(_SamplingGUID))
                 {
                     var lvi = new ListViewItem(new string[]
                     {
@@ -2117,17 +2141,16 @@ namespace FAD3
             SetupSamplingButtonFrame(true);
         }
 
-        private void ShowGMSForm(bool isNew = false)
+        private void ShowGMSForm(GMSManager.Taxa taxa, bool isNew = false)
         {
             var lvCatch = GetLVCatch();
-            if (Enum.TryParse(lvCatch.SelectedItems[0].SubItems[7].Text, out GMSManager.Taxa myTaxa))
+            if (taxa != GMSManager.Taxa.To_be_determined)
             {
-                _taxa = myTaxa;
+                GMSDataEntryForm fgms = new GMSDataEntryForm(isNew, _Sampling,
+                                          lvCatch.SelectedItems[0].Name,
+                                          lvCatch.SelectedItems[0].SubItems[1].Text, _taxa);
+                fgms.ShowDialog(this);
             }
-            GMSDataEntryForm fgms = new GMSDataEntryForm(isNew, _Sampling,
-                                      lvCatch.SelectedItems[0].Name,
-                                      lvCatch.SelectedItems[0].SubItems[1].Text, _taxa);
-            fgms.ShowDialog(this);
         }
 
         private void ShowLFForm(bool IsNew = false)

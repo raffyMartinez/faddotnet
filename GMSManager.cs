@@ -52,6 +52,7 @@ namespace FAD3
 
         public struct GMSLine
         {
+            public string RowGuid { get; set; }
             public string CatchRowGUID { get; set; }
             public GMSManager.FishCrabGMS GMS { get; set; }
             public double? GonadWeight { get; set; }
@@ -80,7 +81,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    ErrorLogger.Log(ex);
+                    Logger.Log(ex);
                 }
                 return taxa;
             }
@@ -303,14 +304,18 @@ namespace FAD3
                         Enum.TryParse(dr["Sex"].ToString(), out sex);
                         GMSManager.Taxa taxa = Taxa.To_be_determined;
                         Enum.TryParse(dr["TaxaNo"].ToString(), out taxa);
+
                         var myGMS = new GMSLine
                         {
                             TaxaName = dr["Taxa"].ToString(),
                             Taxa = taxa,
                             Sex = sex,
                             GMS = gms,
-                            DataStatus = global.fad3DataStatus.statusFromDB
+                            DataStatus = global.fad3DataStatus.statusFromDB,
+                            RowGuid = dr["RowGUID"].ToString(),
+                            CatchRowGUID = dr["CatchCompRow"].ToString()
                         };
+
                         if (dr["Len"].ToString().Length > 0)
                             myGMS.Length = double.Parse(dr["Len"].ToString());
                         if (dr["Wt"].ToString().Length > 0)
@@ -324,52 +329,58 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    ErrorLogger.Log(ex);
+                    Logger.Log(ex);
                 }
             }
             return mydata;
         }
 
-        public static bool UpdateGMS(bool isNew, Double? wt, double? len, GMSManager.sex sex,
-                                                    GMSManager.FishCrabGMS stage, double? gonadwt,
-                                                    string CatchCompRow, string RowGUID)
+        public static bool UpdateGMS(Dictionary<string, (string RowGuid, int Sequence, double length, double? weight,
+                                GMSManager.sex sex, GMSManager.FishCrabGMS gms, double? gonadWeight,
+                                string catchRowGuid, global.fad3DataStatus DataStatus)> gmsRows)
         {
-            bool Success = false;
-            string query = "";
-
-            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            var rows = gmsRows.Count;
+            var sql = "";
+            var n = 0;
+            if (rows > 0)
             {
-                try
+                using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
                 {
-                    string slen = len == null ? "null" : len.ToString();
-                    string swt = wt == null ? "null" : wt.ToString();
-                    string sgonadwt = gonadwt == null ? "null" : gonadwt.ToString();
-
-                    if (isNew)
-                    {
-                        query = $@"Insert into tblGMS (Len, Wt, Sex, GMS, CatchCompRow, RowGUID, Gonadwt) values
-                                 ({slen} , {swt} , {(int)sex} , {(int)stage} , {{{CatchCompRow}}}, {{{RowGUID}}}, {sgonadwt})";
-                    }
-                    else
-                    {
-                        query = $@"Update tblGMS set Len= {slen},
-                                                  Wt= {swt},
-                                                  Sex= {(int)sex},
-                                                  GMS= {(int)stage},
-                                                  GonadWt= {sgonadwt}
-                                                  Where RowGUID = {{{RowGUID}}}";
-                    }
-                    OleDbCommand update = new OleDbCommand(query, conn);
                     conn.Open();
-                    Success = (update.ExecuteNonQuery() > 0);
-                    conn.Close();
-                }
-                catch (Exception ex)
-                {
-                    ErrorLogger.Log(ex);
+                    foreach (var item in gmsRows)
+                    {
+                        switch (item.Value.DataStatus)
+                        {
+                            case global.fad3DataStatus.statusEdited:
+                                sql = $@"Update tblGMS set
+                                 Len = {item.Value.length},
+                                 Wt = {item.Value.weight},
+                                 Sex = {item.Value.sex},
+                                 GMS = {item.Value.gms},
+                                 Gonadwt = {item.Value.gonadWeight}
+                                 WHERE RowGuid = {{{item.Value.RowGuid}}}";
+                                break;
+
+                            case global.fad3DataStatus.statusNew:
+                                sql = $@"Insert into tblGMS (Len,Wt,Sex,GMS,GonadWt,CatchCompRow,RowGUID,Sequence) values (
+                                 {item.Value.length}, {item.Value.weight}, {item.Value.sex}, {item.Value.gms},
+                                 {item.Value.gonadWeight}, {{{item.Value.catchRowGuid}}}, {{{item.Value.RowGuid}}},
+                                 {item.Value.Sequence}";
+                                break;
+
+                            case global.fad3DataStatus.statusForDeletion:
+                                sql = $"Delete * from tblGMS where RowGUID = {{{item.Value.RowGuid}}}";
+                                break;
+                        }
+                    }
+
+                    using (OleDbCommand update = new OleDbCommand(sql, conn))
+                    {
+                        if (update.ExecuteNonQuery() > 0) n++;
+                    }
                 }
             }
-            return Success;
+            return n > 0;
         }
 
         public static bool DeleteGMSLine(string RowGUID)
@@ -387,7 +398,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    ErrorLogger.Log(ex);
+                    Logger.Log(ex);
                 }
             }
             return Success;

@@ -58,7 +58,7 @@
             // 
             this.panelUI.AutoScroll = true;
             this.panelUI.Controls.Add(this.panelOptions);
-            this.panelUI.Location = new System.Drawing.Point(3, 70);
+            this.panelUI.Location = new System.Drawing.Point(3, 79);
             this.panelUI.Name = "panelUI";
             this.panelUI.Size = new System.Drawing.Size(476, 364);
             this.panelUI.TabIndex = 0;
@@ -76,7 +76,7 @@
             this.panelOptions.Controls.Add(this.buttonOptionsOK);
             this.panelOptions.Location = new System.Drawing.Point(0, 3);
             this.panelOptions.Name = "panelOptions";
-            this.panelOptions.Size = new System.Drawing.Size(473, 358);
+            this.panelOptions.Size = new System.Drawing.Size(473, 361);
             this.panelOptions.TabIndex = 12;
             // 
             // chkGonadWt
@@ -166,7 +166,7 @@
             // 
             // buttonOK
             // 
-            this.buttonOK.Location = new System.Drawing.Point(470, 444);
+            this.buttonOK.Location = new System.Drawing.Point(470, 454);
             this.buttonOK.Name = "buttonOK";
             this.buttonOK.Size = new System.Drawing.Size(48, 26);
             this.buttonOK.TabIndex = 1;
@@ -178,7 +178,7 @@
             // 
             this.buttonCancel.CausesValidation = false;
             this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.buttonCancel.Location = new System.Drawing.Point(402, 444);
+            this.buttonCancel.Location = new System.Drawing.Point(402, 454);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(62, 26);
             this.buttonCancel.TabIndex = 2;
@@ -199,7 +199,7 @@
             // buttonAdd
             // 
             this.buttonAdd.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonAdd.Location = new System.Drawing.Point(485, 70);
+            this.buttonAdd.Location = new System.Drawing.Point(485, 79);
             this.buttonAdd.Name = "buttonAdd";
             this.buttonAdd.Size = new System.Drawing.Size(35, 26);
             this.buttonAdd.TabIndex = 2;
@@ -210,7 +210,7 @@
             // buttonRemove
             // 
             this.buttonRemove.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonRemove.Location = new System.Drawing.Point(485, 102);
+            this.buttonRemove.Location = new System.Drawing.Point(485, 111);
             this.buttonRemove.Name = "buttonRemove";
             this.buttonRemove.Size = new System.Drawing.Size(35, 26);
             this.buttonRemove.TabIndex = 3;
@@ -222,7 +222,7 @@
             // 
             this.labelCol1.AutoSize = true;
             this.labelCol1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelCol1.Location = new System.Drawing.Point(11, 36);
+            this.labelCol1.Location = new System.Drawing.Point(11, 45);
             this.labelCol1.Name = "labelCol1";
             this.labelCol1.Size = new System.Drawing.Size(35, 15);
             this.labelCol1.TabIndex = 4;
@@ -232,7 +232,7 @@
             // 
             this.labelCol2.AutoSize = true;
             this.labelCol2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelCol2.Location = new System.Drawing.Point(67, 36);
+            this.labelCol2.Location = new System.Drawing.Point(67, 45);
             this.labelCol2.Name = "labelCol2";
             this.labelCol2.Size = new System.Drawing.Size(51, 15);
             this.labelCol2.TabIndex = 5;
@@ -242,7 +242,7 @@
             // 
             this.labelCol3.AutoSize = true;
             this.labelCol3.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelCol3.Location = new System.Drawing.Point(117, 36);
+            this.labelCol3.Location = new System.Drawing.Point(117, 45);
             this.labelCol3.Name = "labelCol3";
             this.labelCol3.Size = new System.Drawing.Size(51, 15);
             this.labelCol3.TabIndex = 6;
@@ -252,7 +252,7 @@
             // 
             this.labelCol4.AutoSize = true;
             this.labelCol4.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelCol4.Location = new System.Drawing.Point(172, 36);
+            this.labelCol4.Location = new System.Drawing.Point(172, 45);
             this.labelCol4.Name = "labelCol4";
             this.labelCol4.Size = new System.Drawing.Size(31, 15);
             this.labelCol4.TabIndex = 7;
@@ -261,7 +261,7 @@
             // labelCol5
             // 
             this.labelCol5.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelCol5.Location = new System.Drawing.Point(225, 36);
+            this.labelCol5.Location = new System.Drawing.Point(225, 45);
             this.labelCol5.Name = "labelCol5";
             this.labelCol5.Size = new System.Drawing.Size(68, 39);
             this.labelCol5.TabIndex = 8;
@@ -270,7 +270,7 @@
             // labelCol6
             // 
             this.labelCol6.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelCol6.Location = new System.Drawing.Point(305, 36);
+            this.labelCol6.Location = new System.Drawing.Point(305, 45);
             this.labelCol6.Name = "labelCol6";
             this.labelCol6.Size = new System.Drawing.Size(65, 31);
             this.labelCol6.TabIndex = 9;
@@ -278,7 +278,7 @@
             // 
             // buttonOptions
             // 
-            this.buttonOptions.Location = new System.Drawing.Point(334, 444);
+            this.buttonOptions.Location = new System.Drawing.Point(334, 454);
             this.buttonOptions.Name = "buttonOptions";
             this.buttonOptions.Size = new System.Drawing.Size(62, 26);
             this.buttonOptions.TabIndex = 12;
@@ -291,7 +291,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCancel;
-            this.ClientSize = new System.Drawing.Size(528, 485);
+            this.ClientSize = new System.Drawing.Size(528, 490);
             this.Controls.Add(this.buttonOptions);
             this.Controls.Add(this.buttonRemove);
             this.Controls.Add(this.labelCol6);

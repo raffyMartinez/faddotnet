@@ -1,6 +1,6 @@
 ﻿namespace FAD3
 {
-    partial class frmNewDB
+    partial class CreateNewDatabaseForm
     {
         /// <summary>
         /// Required designer variable.

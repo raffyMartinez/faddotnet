@@ -15,6 +15,7 @@ using System.Data.OleDb;
 using System.Diagnostics;
 using System.Windows.Forms;
 using Microsoft.Win32;
+using System.Drawing;
 
 namespace FAD3
 {
@@ -39,6 +40,8 @@ namespace FAD3
         private static bool _InlandGridDBFileExists = true;
         private static bool _AllRequiredFilesExists = true;
         private static CoordinateDisplayFormat _CoordDisplayFormat = CoordinateDisplayFormat.DegreeDecimal;
+        private static Color _MissingFieldBackColor = global.MissingFieldBackColor;
+
         //private static string _MissingRequiredFiles;
 
         /// <summary>
@@ -54,6 +57,17 @@ namespace FAD3
 
                 return s;
             }
+        }
+
+        public static Color MissingFieldBackColor
+        {
+            get { return _MissingFieldBackColor; }
+        }
+
+        private static void GetAppPreferences()
+        {
+            //the values here should be from an external source to prevent hardcoding
+            _MissingFieldBackColor = Color.Orange;
         }
 
         public static
@@ -120,7 +134,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    ErrorLogger.Log(ex);
+                    Logger.Log(ex);
                 }
                 return list;
             }
@@ -164,7 +178,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    ErrorLogger.Log(ex);
+                    Logger.Log(ex);
                 }
             }
             return list;
@@ -222,6 +236,7 @@ namespace FAD3
         /// </summary>
         static global()
         {
+            GetAppPreferences();
             TestMPH();
             _AppPath = Application.StartupPath.ToString();
             _ConnectionStringTemplate = "Provider=Microsoft.JET.OLEDB.4.0;data source=" + _AppPath + "\\template.mdb";
@@ -471,7 +486,7 @@ namespace FAD3
                         _munDict.Add(Convert.ToInt32(dr["MunNo"]), dr["Municipality"].ToString());
                     }
                 }
-                catch (Exception ex) { ErrorLogger.Log(ex); }
+                catch (Exception ex) { Logger.Log(ex); }
             }
         }
 
@@ -526,7 +541,7 @@ namespace FAD3
                         }
                     }
                 }
-                catch (Exception ex) { ErrorLogger.Log(ex); }
+                catch (Exception ex) { Logger.Log(ex); }
             }
         }
 
@@ -559,7 +574,7 @@ namespace FAD3
                         _provinceDict.Add(Convert.ToInt32(dr[0]), dr[1].ToString());
                     }
                 }
-                catch (Exception ex) { ErrorLogger.Log(ex); }
+                catch (Exception ex) { Logger.Log(ex); }
             }
         }
 
@@ -615,7 +630,7 @@ namespace FAD3
             }
             catch (Exception ex)
             {
-                ErrorLogger.Log(ex);
+                Logger.Log(ex);
             }
         }
 

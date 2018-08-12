@@ -259,7 +259,7 @@ namespace FAD3
             }
             catch
             {
-                ErrorLogger.Log("Catch and effort column width not found in registry");
+                Logger.Log("Catch and effort column width not found in registry");
             }
         }
 
@@ -312,7 +312,7 @@ namespace FAD3
                                 else
                                 {
                                     //something went wrong
-                                    ErrorLogger.Log("Message = saving enumerator data was not completed\r\n" +
+                                    Logger.Log("Message = saving enumerator data was not completed\r\n" +
                                                     "Location = EnumeratorForm.cs.OnButtonClick");
                                 }
                             }
@@ -445,7 +445,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    ErrorLogger.Log(ex);
+                    Logger.Log(ex);
                 }
             }
         }

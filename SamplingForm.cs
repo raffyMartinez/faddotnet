@@ -41,7 +41,7 @@ namespace FAD3
         private string _TimePrompt = "";
         private DateTime _SamplingDate;
         private bool _SamplingDateSet = false;
-        private DateTime _DateSetHaul;
+        private DateTime _DateSetAdjust;
 
         private string _NewReferenceNumber = "";
 
@@ -573,10 +573,10 @@ namespace FAD3
                         var theSamplingDate = GetFieldText("SamplingDate");
                         if (DateTime.TryParse(theSamplingDate, out _SamplingDate))
                         {
-                            _DateSetHaul = _SamplingDate;
                             _SamplingDateSet = true;
                         }
                     }
+                    _DateSetAdjust = _SamplingDate;
                     break;
             }
         }
@@ -1057,26 +1057,36 @@ namespace FAD3
                 }
             }
 
+            TextBox catchWt = (TextBox)panelUI.Controls["textWeightOfCatch"];
+            TextBox fishingGround = (TextBox)panelUI.Controls["textFishingGround"];
+
             //Step 6. if catch weight is blank then confirm it
-            if (isValidated && GearDateTimeIsEmpty && panelUI.Controls["textWeightOfCatch"].Text.Length == 0)
+            if (isValidated && GearDateTimeIsEmpty && catchWt.Text.Length == 0)
             {
                 DialogResult dr = MessageBox.Show("Confirm that weight of catch is blank", "Please validate",
                                                    MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
                 isValidated = (dr == DialogResult.Yes);
+                if (!isValidated) catchWt.Focus();
             }
 
-            //if(isValidated)
-            //{
-            //    _AOIGuid = ((KeyValuePair<string, string>)((ComboBox)panelUI.Controls["comboTargetArea"]).SelectedItem).Key;
-            //    _LandingSiteGuid = ((KeyValuePair<string, string>)((ComboBox)panelUI.Controls["comboLandingSite"]).SelectedItem).Key;
-            //    _GearClassGuid = ((KeyValuePair<string, string>)((ComboBox)panelUI.Controls["comboGearClass"]).SelectedItem).Key;
-            //    _GearVarGuid = ((KeyValuePair<string, string>)((ComboBox)panelUI.Controls["comboFishingGear"]).SelectedItem).Key;
-            //}
+            //Step 7. If catch is not blank then confirm if fishing ground is blank
+            if (isValidated && catchWt.Text.Length > 0)
+            {
+                isValidated = fishingGround.Text.Length > 0;
+                if (!isValidated)
+                {
+                    DialogResult dr = MessageBox.Show("Confirm that fishing ground is blank", "Please validate",
+                                   MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
+                    isValidated = (dr == DialogResult.Yes);
+                    if (!isValidated) fishingGround.Focus();
+                }
+            }
 
             if (msg.Length > 0)
             {
                 MessageBox.Show(msg, "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
+
             return isValidated;
         }
 
@@ -1388,12 +1398,12 @@ namespace FAD3
                 {
                     if (e.KeyCode == Keys.OemMinus || e.KeyCode == Keys.Subtract)
                     {
-                        _DateSetHaul = _DateSetHaul.AddDays(-1);
+                        _DateSetAdjust = _DateSetAdjust.AddDays(-1);
                         Proceed = true;
                     }
                     else if (e.KeyCode == Keys.Oemplus || e.KeyCode == Keys.Add)
                     {
-                        _DateSetHaul = _DateSetHaul.AddDays(1);
+                        _DateSetAdjust = _DateSetAdjust.AddDays(1);
                         Proceed = true;
                     }
 
@@ -1403,7 +1413,7 @@ namespace FAD3
                         {
                             case "DateSet":
                             case "DateHauled":
-                                o.Text = _DateSetHaul.ToString("MMM-dd-yyyy");
+                                o.Text = _DateSetAdjust.ToString("MMM-dd-yyyy");
                                 break;
                         }
                     }

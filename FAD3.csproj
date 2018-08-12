@@ -94,6 +94,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AOI.cs" />
+    <Compile Include="CatchComposition.cs" />
+    <Compile Include="CatchCompositionForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CatchCompositionForm.Designer.cs">
+      <DependentUpon>CatchCompositionForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Coordinate.cs" />
     <Compile Include="CoordinateEntryForm.cs">
       <SubType>Form</SubType>
@@ -108,11 +115,11 @@
       <DependentUpon>CoordinateFormatSelectForm.cs</DependentUpon>
     </Compile>
     <Compile Include="DBCheck.cs" />
-    <Compile Include="EditEnumerator.cs">
+    <Compile Include="EnumeratorEditForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="EditEnumerator.Designer.cs">
-      <DependentUpon>EditEnumerator.cs</DependentUpon>
+    <Compile Include="EnumeratorEditForm.Designer.cs">
+      <DependentUpon>EnumeratorEditForm.cs</DependentUpon>
     </Compile>
     <Compile Include="EnumeratorEntryForm.cs">
       <SubType>Form</SubType>
@@ -120,7 +127,7 @@
     <Compile Include="EnumeratorEntryForm.Designer.cs">
       <DependentUpon>EnumeratorEntryForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="ErrorLogger.cs" />
+    <Compile Include="Logger.cs" />
     <Compile Include="extension.cs" />
     <Compile Include="FishingGroundDefinitionForm.cs">
       <SubType>Form</SubType>
@@ -148,11 +155,11 @@
     <Compile Include="GearCodesUsageForm.Designer.cs">
       <DependentUpon>GearCodesUsageForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="frmRefNoRange.cs">
+    <Compile Include="ReferenceNumberRangeForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmRefNoRange.Designer.cs">
-      <DependentUpon>frmRefNoRange.cs</DependentUpon>
+    <Compile Include="ReferenceNumberRangeForm.Designer.cs">
+      <DependentUpon>ReferenceNumberRangeForm.cs</DependentUpon>
     </Compile>
     <Compile Include="GMSManager.cs" />
     <Compile Include="MapForm.cs">
@@ -174,23 +181,11 @@
     <Compile Include="TargetAreaForm.Designer.cs">
       <DependentUpon>TargetAreaForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="frmCatch.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmCatch.Designer.cs">
-      <DependentUpon>frmCatch.cs</DependentUpon>
-    </Compile>
     <Compile Include="EnumeratorForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="EnumeratorForm.Designer.cs">
       <DependentUpon>EnumeratorForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="frmEditGMS.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmEditGMS.Designer.cs">
-      <DependentUpon>frmEditGMS.cs</DependentUpon>
     </Compile>
     <Compile Include="LandingSiteForm.cs">
       <SubType>Form</SubType>
@@ -204,11 +199,11 @@
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="frmNewDB.cs">
+    <Compile Include="CreateNewDatabaseForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmNewDB.Designer.cs">
-      <DependentUpon>frmNewDB.cs</DependentUpon>
+    <Compile Include="CreateNewDatabaseForm.Designer.cs">
+      <DependentUpon>CreateNewDatabaseForm.cs</DependentUpon>
     </Compile>
     <Compile Include="SamplingForm.cs">
       <SubType>Form</SubType>
@@ -278,6 +273,9 @@
     <Compile Include="UIRow.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="CatchCompositionForm.resx">
+      <DependentUpon>CatchCompositionForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="CoordinateEntryForm.resx">
       <DependentUpon>CoordinateEntryForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -308,14 +306,8 @@
     <EmbeddedResource Include="TargetAreaForm.resx">
       <DependentUpon>TargetAreaForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmCatch.resx">
-      <DependentUpon>frmCatch.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="EnumeratorForm.resx">
       <DependentUpon>EnumeratorForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmEditGMS.resx">
-      <DependentUpon>frmEditGMS.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="LandingSiteForm.resx">
       <DependentUpon>LandingSiteForm.cs</DependentUpon>
@@ -323,11 +315,11 @@
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmNewDB.resx">
-      <DependentUpon>frmNewDB.cs</DependentUpon>
+    <EmbeddedResource Include="CreateNewDatabaseForm.resx">
+      <DependentUpon>CreateNewDatabaseForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmRefNoRange.resx">
-      <DependentUpon>frmRefNoRange.cs</DependentUpon>
+    <EmbeddedResource Include="ReferenceNumberRangeForm.resx">
+      <DependentUpon>ReferenceNumberRangeForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="SamplingForm.resx">
       <DependentUpon>SamplingForm.cs</DependentUpon>

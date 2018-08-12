@@ -1,12 +1,8 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using Microsoft.Win32;
 
 namespace FAD3
 {
@@ -52,15 +48,15 @@ namespace FAD3
             if (_IsNew)
             {
                 //adds a new row of empty fields
-                AddRow();
+                AddRow(IsNew: true);
             }
             else
             {
                 foreach (KeyValuePair<string, GMSManager.GMSLine> kv in GMSManager.GMSData(_CatchRowGuid))
                 {
                     //adds a row with fields containing the GMS data
-                    AddRow(kv.Value.Length, kv.Value.Weight, kv.Value.Sex, kv.Value.GMS,
-                           kv.Value.Taxa, kv.Value.GonadWeight);
+                    AddRow(IsNew: false, kv.Value.Length, kv.Value.Weight, kv.Value.Sex, kv.Value.GMS,
+                           kv.Value.Taxa, kv.Value.GonadWeight, kv.Value.RowGuid);
                 }
             }
 
@@ -77,10 +73,11 @@ namespace FAD3
             }
         }
 
-        private void AddRow(double? Len = null, double? Wgt = null,
+        private void AddRow(bool IsNew, double? Len = null, double? Wgt = null,
                             GMSManager.sex Sex = GMSManager.sex.Female,
                             GMSManager.FishCrabGMS GMS = GMSManager.FishCrabGMS.AllTaxaNotDetermined,
-                            GMSManager.Taxa taxa = GMSManager.Taxa.Fish, double? GonadWt = null)
+                            GMSManager.Taxa taxa = GMSManager.Taxa.Fish, double? GonadWt = null,
+                            string RowGuid = "")
         {
             var x = 3;
             Label labelRow = new Label();
@@ -149,6 +146,9 @@ namespace FAD3
                 o.Text = _row.ToString();
                 o.Location = new Point(x, _y + _labelAdjust);
                 o.Width = 40;
+                o.Tag = global.fad3DataStatus.statusFromDB;
+                if (IsNew) o.Tag = global.fad3DataStatus.statusNew;
+                o.Name = "labelRow";
             });
 
             textLength.With(o =>
@@ -160,6 +160,10 @@ namespace FAD3
                 _ctlWidth = o.Width;
                 o.TextChanged += OnTextChanged;
                 o.GotFocus += OnTextFocus;
+
+                //this stores the GMS row RowGuid;
+                o.Tag = "";
+                if (!IsNew) o.Tag = RowGuid;
             });
 
             textWeight.With(o =>
@@ -227,6 +231,33 @@ namespace FAD3
             _row++;
         }
 
+        private void MarkRowAsEdited(TextBox Source)
+        {
+            foreach (Control c in panelUI.Controls)
+            {
+                if (c.Name == "labelRow"
+                    && c.Location.Y - _labelAdjust == Source.Location.Y
+                    && (global.fad3DataStatus)c.Tag == global.fad3DataStatus.statusFromDB)
+                {
+                    c.Tag = global.fad3DataStatus.statusEdited;
+                }
+            }
+        }
+
+        private Label getRowLabel(Point ControlLocation)
+        {
+            var myLabel = new Label();
+            foreach (Control c in panelUI.Controls)
+            {
+                if (c.Name == "labelRow" && c.Location.Y == ControlLocation.Y)
+                {
+                    myLabel = (Label)c;
+                    break;
+                }
+            }
+            return myLabel;
+        }
+
         private bool ValidateData()
         {
             bool notValid = false;
@@ -262,7 +293,7 @@ namespace FAD3
 
                         if (notValid)
                         {
-                            o.BackColor = Color.Orange;
+                            o.BackColor = global.MissingFieldBackColor;
                             notValidCount++;
                         }
                     });
@@ -284,7 +315,7 @@ namespace FAD3
                     if (ValidateData())
                     {
                         SaveOptionsToRegistry();
-                        Close();
+                        if (SaveGMS()) Close();
                     }
                     break;
 
@@ -301,18 +332,89 @@ namespace FAD3
                         || (chkGonadWt.Checked && _lastGonadWt.Text.Length == 0)
                         || (chkWeight.Checked && _LastWeight.Text.Length == 0))
                     {
+                        if (chkSex.Checked && _lastSex.Text.Length == 0) _lastSex.BackColor = global.MissingFieldBackColor;
+                        if (chkLenght.Checked && _lastLength.Text.Length == 0) _lastLength.BackColor = global.MissingFieldBackColor;
+                        if (chkGMS.Checked && _lastGMS.Text.Length == 0) _lastGMS.BackColor = global.MissingFieldBackColor;
+                        if (chkGonadWt.Checked && _lastGonadWt.Text.Length == 0) _lastGonadWt.BackColor = global.MissingFieldBackColor;
+                        if (chkWeight.Checked && _LastWeight.Text.Length == 0) _LastWeight.BackColor = global.MissingFieldBackColor;
+
                         MessageBox.Show("Please fill up the the data fields", "Validation error",
                                          MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     else
                     {
-                        AddRow();
+                        AddRow(IsNew: true);
                     }
                     break;
 
                 case "buttonRemove":
                     break;
             }
+        }
+
+        private bool SaveGMS()
+        {
+            var gmsRows = new Dictionary<string, (string RowGuid, int Sequence, double length, double? weight,
+                                GMSManager.sex sex, GMSManager.FishCrabGMS gms, double? gonadWeight,
+                                string catchRowGuid, global.fad3DataStatus DataStatus)>();
+            int n = 0;
+            foreach (Control c in panelUI.Controls)
+            {
+                if (c.GetType().Name == "Label")
+                {
+                    var myRow = GetRowValues((Label)c);
+                    var myDataStatus = (global.fad3DataStatus)Enum.Parse(typeof(global.fad3DataStatus), c.Tag.ToString());
+                    var myRowGuid = myRow.rowGuid;
+                    if (myDataStatus == global.fad3DataStatus.statusNew) myRowGuid = Guid.NewGuid().ToString();
+                    gmsRows.Add(myRowGuid, (myRowGuid, n, myRow.length, myRow.weight, myRow.sex, myRow.gms, myRow.gonadWeight, _CatchRowGuid, myDataStatus));
+                }
+                n++;
+            }
+            return GMSManager.UpdateGMS(gmsRows);
+        }
+
+        private (string rowGuid, int length, double? weight, GMSManager.sex sex, GMSManager.FishCrabGMS gms, double? gonadWeight) GetRowValues(Label Row)
+        {
+            int len = 0;
+            double? wgt = null;
+            GMSManager.sex sex = GMSManager.sex.Female;
+            GMSManager.FishCrabGMS gms = GMSManager.FishCrabGMS.AllTaxaNotDetermined;
+            double? gonadWt = null;
+            string rowGuid = "";
+            var txtBox = new TextBox();
+
+            foreach (Control c in panelUI.Controls)
+            {
+                if (c.GetType().Name == "TextBox" && c.Location.Y == Row.Location.Y - _labelAdjust)
+                {
+                    ((TextBox)c).With(o =>
+                    {
+                        switch (o.Name)
+                        {
+                            case "textLen":
+                                len = int.Parse(o.Text);
+                                rowGuid = o.Tag.ToString();
+                                break;
+
+                            case "textWgt":
+                                break;
+
+                            case "textSex":
+                                sex = (GMSManager.sex)Enum.Parse(typeof(GMSManager.sex), o.Text);
+                                break;
+
+                            case "textGMS":
+                                gms = GMSManager.MaturityStageFromText(o.Text, _taxa);
+                                break;
+
+                            case "textGonadWeight":
+                                if (o.Text.Length > 0) gonadWt = double.Parse(o.Text);
+                                break;
+                        }
+                    });
+                }
+            }
+            return (rowGuid, len, wgt, sex, gms, gonadWt);
         }
 
         private void ShowOptions(bool Visible)
@@ -357,6 +459,8 @@ namespace FAD3
             switch (((Button)sender).Name)
             {
                 case "buttonOptions":
+                    _cboGMS.Hide();
+                    _cboSex.Hide();
                     ShowOptions(true);
                     break;
 
@@ -449,6 +553,7 @@ namespace FAD3
         private void OnTextChanged(object sender, EventArgs e)
         {
             ((TextBox)sender).BackColor = SystemColors.Window;
+            MarkRowAsEdited((TextBox)sender);
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace FAD3
 {
-    partial class EditEnumerator
+    partial class EnumeratorEditForm
     {
         /// <summary>
         /// Required designer variable.

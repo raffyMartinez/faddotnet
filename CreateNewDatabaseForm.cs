@@ -9,12 +9,12 @@ using System.Windows.Forms;
 
 namespace FAD3
 {
-    public partial class frmNewDB : Form
+    public partial class CreateNewDatabaseForm : Form
     {
         private string _newMDBFilename = "";
         private MainForm _parentForm;
 
-        public frmNewDB(MainForm parent)
+        public CreateNewDatabaseForm(MainForm parent)
         {
             InitializeComponent();
             _parentForm = parent;
@@ -275,7 +275,7 @@ namespace FAD3
                         }
                         catch (Exception ex)
                         {
-                            ErrorLogger.Log(ex);
+                            Logger.Log(ex);
                         }
                         conn.Close();
                         Success = true;
@@ -307,7 +307,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    ErrorLogger.Log(ex);
+                    Logger.Log(ex);
                 }
             }
         }
@@ -338,7 +338,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    ErrorLogger.Log(ex);
+                    Logger.Log(ex);
                 }
             }
             return myList;

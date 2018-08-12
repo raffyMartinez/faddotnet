@@ -103,7 +103,7 @@ namespace FAD3
                     var command = new OleDbCommand(query, conection);
                     myCount = (int)command.ExecuteScalar();
                 }
-                catch (Exception ex) { ErrorLogger.Log(ex); }
+                catch (Exception ex) { Logger.Log(ex); }
             }
             return myCount;
         }
@@ -159,7 +159,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    ErrorLogger.Log($"{ex.Message}\r\n{ex.Source}");
+                    Logger.Log($"{ex.Message}\r\n{ex.Source}");
                 }
             }
 
@@ -200,7 +200,7 @@ namespace FAD3
                         myList.Add(dr[0].ToString() + ": " + dr[1].ToString());
                     }
                 }
-                catch (Exception ex) { ErrorLogger.Log(ex); }
+                catch (Exception ex) { Logger.Log(ex); }
             }
             return myList;
         }
@@ -232,7 +232,7 @@ namespace FAD3
                         _GearUsedCount++;
                     }
                 }
-                catch (Exception ex) { ErrorLogger.Log(ex); }
+                catch (Exception ex) { Logger.Log(ex); }
             }
             return myGears;
         }
@@ -294,7 +294,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    ErrorLogger.Log(ex);
+                    Logger.Log(ex);
                 }
             }
 
@@ -347,7 +347,7 @@ namespace FAD3
                         }
                     }
                 }
-                catch (Exception ex) { ErrorLogger.Log(ex); }
+                catch (Exception ex) { Logger.Log(ex); }
             }
             return rv;
         }

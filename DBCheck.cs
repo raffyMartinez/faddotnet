@@ -147,7 +147,7 @@ namespace FAD3
                         }
                         catch (Exception ex)
                         {
-                            ErrorLogger.Log($"{ex.Message}\r\n{ex.Source}");
+                            Logger.Log($"{ex.Message}\r\n{ex.Source}");
                         }
                     }
                     finally
