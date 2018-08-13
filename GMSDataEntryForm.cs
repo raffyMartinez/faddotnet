@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -28,6 +29,7 @@ namespace FAD3
         private ComboBox _cboSex = new ComboBox();
         private ComboBox _cboGMS = new ComboBox();
         private TextBox _CurrentTextBox;
+        private bool _ComboBoxesSet = false;
 
         public GMSDataEntryForm(bool IsNew, sampling sampling, string CatchRowGuid, string CatchName, GMSManager.Taxa taxa)
         {
@@ -88,8 +90,10 @@ namespace FAD3
             TextBox textSex = new TextBox();
 
             //we only add the comboboxes once
-            if (_row == 1)
+            if (_row == 1 && _ComboBoxesSet == false)
             {
+                _ComboBoxesSet = true;
+
                 _cboSex.With(o =>
                     {
                         o.Width = 120;
@@ -160,6 +164,7 @@ namespace FAD3
                 _ctlWidth = o.Width;
                 o.TextChanged += OnTextChanged;
                 o.GotFocus += OnTextFocus;
+                o.Validating += OnTextValidating;
 
                 //this stores the GMS row RowGuid;
                 o.Tag = "";
@@ -174,6 +179,7 @@ namespace FAD3
                 if (Wgt != null) o.Text = Wgt.ToString();
                 o.TextChanged += OnTextChanged;
                 o.GotFocus += OnTextFocus;
+                o.Validating += OnTextValidating;
             });
 
             textSex.With(o =>
@@ -185,6 +191,7 @@ namespace FAD3
                 o.Width += (int)(_ctlWidth * 0.5);
                 o.TextChanged += OnTextChanged;
                 o.GotFocus += OnTextFocus;
+                o.Validating += OnTextValidating;
             });
 
             textGMS.With(o =>
@@ -196,6 +203,7 @@ namespace FAD3
                 o.Text = GMSManager.GMSStageToString(taxa, GMS);
                 o.TextChanged += OnTextChanged;
                 o.GotFocus += OnTextFocus;
+                o.Validating += OnTextValidating;
             });
 
             textGonadWeight.With(o =>
@@ -206,6 +214,7 @@ namespace FAD3
                 if (GonadWt != null) o.Text = GonadWt.ToString();
                 o.TextChanged += OnTextChanged;
                 o.GotFocus += OnTextFocus;
+                o.Validating += OnTextValidating;
             });
 
             if (_row == 1)
@@ -554,6 +563,10 @@ namespace FAD3
         {
             ((TextBox)sender).BackColor = SystemColors.Window;
             MarkRowAsEdited((TextBox)sender);
+        }
+
+        private void OnTextValidating(object sender, CancelEventArgs e)
+        {
         }
     }
 }

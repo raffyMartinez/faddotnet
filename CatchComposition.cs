@@ -9,12 +9,18 @@ namespace FAD3
 {
     public static class CatchComposition
     {
+        private static int _CatchCompositionRows;
         private static string _SamplingGUID = "";
 
         private static double _TotalWtOfFromTotal = 0;
 
         static CatchComposition()
         {
+        }
+
+        public static int CatchCompositionRows
+        {
+            get { return _CatchCompositionRows; }
         }
 
         public static double TotalWtOfFromTotal
@@ -29,6 +35,7 @@ namespace FAD3
 
         public static Dictionary<string, CatchLine> CatchComp(string SamplingGUID)
         {
+            _CatchCompositionRows = 0;
             Dictionary<string, CatchLine> myCatch = new Dictionary<string, CatchLine>();
             DataTable dt = new DataTable();
             string CatchName = "";
@@ -41,14 +48,8 @@ namespace FAD3
                 try
                 {
                     conection.Open();
-                    //string query = $@"SELECT tblSampling.SamplingGUID, tblCatchDetail.CatchCompRow, tblCatchComp.NameGUID, temp_AllNames.Name1,
-                    //               temp_AllNames.Name2, tblSampling.WtCatch, tblSampling.WtSample, tblCatchDetail.Live, tblCatchDetail.wt,
-                    //               tblCatchDetail.ct, tblCatchDetail.swt, tblCatchDetail.sct, tblCatchDetail.FromTotal
-                    //               FROM(tblSampling INNER JOIN(tblCatchComp INNER JOIN temp_AllNames ON tblCatchComp.NameGUID = temp_AllNames.NameNo)
-                    //               ON tblSampling.SamplingGUID = tblCatchComp.SamplingGUID) INNER JOIN tblCatchDetail ON tblCatchComp.RowGUID =
-                    //               tblCatchDetail.CatchCompRow WHERE tblSampling.SamplingGUID = {{{_SamplingGUID}}} ORDER BY tblCatchComp.Sequence";
 
-                    string query = $@"SELECT tblSampling.SamplingGUID, tblCatchDetail.CatchCompRow, tblCatchComp.NameGUID, temp_AllNames.Name1,
+                    string query = $@"SELECT tblSampling.SamplingGUID, Identification, tblCatchDetail.CatchCompRow, tblCatchComp.NameGUID, temp_AllNames.Name1,
                                     temp_AllNames.Name2, tblSampling.WtCatch, tblSampling.WtSample, tblCatchDetail.Live, tblCatchDetail.wt,
                                     tblCatchDetail.ct, tblCatchDetail.swt, tblCatchDetail.sct, tblCatchDetail.FromTotal, tblAllSpecies.TaxaNo
                                     FROM ((tblSampling INNER JOIN (tblCatchComp INNER JOIN temp_AllNames ON tblCatchComp.NameGUID = temp_AllNames.NameNo)
@@ -59,6 +60,7 @@ namespace FAD3
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
                     _TotalWtOfFromTotal = 0;
+                    Identification IdType = Identification.Scientific;
                     for (int i = 0; i < dt.Rows.Count; i++)
                     {
                         TaxaNumber = null;
@@ -67,6 +69,7 @@ namespace FAD3
                         Name1 = dr["Name1"].ToString();
                         Name2 = dr["Name2"].ToString();
                         CatchName = $"{Name1} {Name2}";
+                        IdType = Identification.Scientific;
 
                         if (dr["ct"].ToString().Length > 0)
                         {
@@ -79,6 +82,8 @@ namespace FAD3
                                 CatchCount = null;
                             }
                         }
+
+                        if (dr["Identification"].ToString() == "Local names") IdType = Identification.LocalName;
 
                         if (dr["TaxaNo"].ToString().Length > 0)
                         {
@@ -98,6 +103,7 @@ namespace FAD3
 
                         myLine.CatchSubsampleWt = null;
                         myLine.CatchSubsampleCount = null;
+                        myLine.NameType = IdType;
 
                         if (dr["swt"] != DBNull.Value)
                         {
@@ -116,6 +122,7 @@ namespace FAD3
                         {
                             _TotalWtOfFromTotal += Convert.ToDouble(dr["wt"].ToString());
                         }
+                        _CatchCompositionRows++;
                     }
                 }
                 catch (Exception ex)
@@ -446,6 +453,26 @@ namespace FAD3
         {
             Scientific = 1,
             LocalName
+        }
+
+        public static Identification StringToIdentificationType(string IDType)
+        {
+            var myID = Identification.Scientific;
+            switch (IDType)
+            {
+                case "Local name":
+                    myID = Identification.LocalName;
+                    break;
+
+                case "Scientific name":
+                    myID = Identification.Scientific;
+                    break;
+
+                default:
+                    myID = Identification.Scientific;
+                    break;
+            }
+            return myID;
         }
 
         public static string IdentificationTypeToString(Identification IDType)

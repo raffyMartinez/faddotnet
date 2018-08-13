@@ -54,6 +54,7 @@ namespace FAD3
         private string _VesLength = "";
         private string _VesWidth = "";
         private GMSManager.Taxa _taxa = GMSManager.Taxa.To_be_determined;
+        private string _ReferenceNumber = "";
 
         public MainForm()
         {
@@ -778,7 +779,7 @@ namespace FAD3
                 case "menuEditCatchComposition":
                 case "menuNewCatchComposition":
 
-                    CatchCompositionForm ccf = new CatchCompositionForm(ItemName == "menuNewCatchComposition", this, _SamplingGUID);
+                    CatchCompositionForm ccf = new CatchCompositionForm(ItemName == "menuNewCatchComposition", this, _SamplingGUID, _ReferenceNumber);
                     ccf.ShowDialog(this);
                     break;
 
@@ -977,16 +978,20 @@ namespace FAD3
             ListView lv = (ListView)sender;
             _MouseX = e.Location.X;
             _MouseY = e.Location.Y;
+
             ListViewHitTestInfo lvh = lv.HitTest(_MouseX, _MouseY);
             switch (lv.Name)
             {
                 case "lvMain":
-                    if (lvMain.Tag.ToString() == "sampling" && lvh.Item != null) SamplingGUID = lvh.Item.Tag.ToString();
+                    if (lvMain.Tag.ToString() == "sampling" && lvh.Item != null)
+                    {
+                        SamplingGUID = lvh.Item.Tag.ToString();
+                        _ReferenceNumber = lvh.Item.Text;
+                    }
                     if (e.Button == MouseButtons.Right)
                     {
                         if (_TreeLevel == "sampling" || _TreeLevel == "aoi" || _TreeLevel == "landing_site")
                         {
-                            Text = "x: " + _MouseX + " y: " + _MouseY;
                             ConfigDropDownMenu(lvMain, lvh);
                         }
                         else
