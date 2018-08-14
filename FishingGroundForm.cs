@@ -16,12 +16,13 @@ namespace FAD3
         private int _mouseY;
         private List<string> _FishingGrounds;
         private ListViewItem _selectedItem;
+        private SamplingForm _parent_form;
 
         public FishingGroundForm(string AOIGuid, SamplingForm Parent)
         {
             InitializeComponent();
             this.AOIGuid = AOIGuid;
-            Parent_form = Parent;
+            _parent_form = Parent;
         }
 
         public List<string> FishingGrounds
@@ -30,7 +31,11 @@ namespace FAD3
             set { _FishingGrounds = value; }
         }
 
-        public SamplingForm Parent_form { get; }
+        public SamplingForm Parent_form
+        {
+            get { return _parent_form; }
+            set { _parent_form = value; }
+        }
 
         public static FishingGroundForm GetInstance(string AOIGuid, SamplingForm Parent)
         {
@@ -247,11 +252,16 @@ namespace FAD3
                         _FishingGrounds.Add(item.Text);
                     }
                     Parent_form.FishingGrounds = _FishingGrounds;
-                    this.Close();
+                    Close();
                     break;
 
                 case "buttonCancel":
-                    this.Close();
+                    Close();
+                    break;
+
+                case "buttonGrids":
+                    FishingGroundExtentsForm fgf = new FishingGroundExtentsForm(_parent_form.Parent_Form.AOIGUID);
+                    fgf.Show(this);
                     break;
             }
         }

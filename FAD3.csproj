@@ -127,6 +127,12 @@
     <Compile Include="EnumeratorEntryForm.Designer.cs">
       <DependentUpon>EnumeratorEntryForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="FishingGroundExtentsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FishingGroundExtentsForm.Designer.cs">
+      <DependentUpon>FishingGroundExtentsForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Logger.cs" />
     <Compile Include="extension.cs" />
     <Compile Include="FishingGroundDefinitionForm.cs">
@@ -287,6 +293,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FishingGroundDefinitionForm.resx">
       <DependentUpon>FishingGroundDefinitionForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FishingGroundExtentsForm.resx">
+      <DependentUpon>FishingGroundExtentsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FishingGroundForm.resx">
       <DependentUpon>FishingGroundForm.cs</DependentUpon>

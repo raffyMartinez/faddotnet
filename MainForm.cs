@@ -779,8 +779,7 @@ namespace FAD3
                 case "menuEditCatchComposition":
                 case "menuNewCatchComposition":
 
-                    CatchCompositionForm ccf = new CatchCompositionForm(ItemName == "menuNewCatchComposition", this, _SamplingGUID, _ReferenceNumber);
-                    ccf.ShowDialog(this);
+                    ShowCatchCompositionForm(ItemName == "menuNewCatchComposition");
                     break;
 
                 case "menuNewGMSTable":
@@ -810,6 +809,12 @@ namespace FAD3
                     DeleteSampling();
                     break;
             }
+        }
+
+        private void ShowCatchCompositionForm(bool IsNew = false)
+        {
+            CatchCompositionForm ccf = new CatchCompositionForm(IsNew, this, _SamplingGUID, _ReferenceNumber);
+            ccf.ShowDialog(this);
         }
 
         private void NewSamplingForm()
@@ -888,89 +893,92 @@ namespace FAD3
 
         private void OnListView_DoubleClick(object sender, EventArgs e)
         {
-            switch (((ListView)sender).Name)
+            ((ListView)sender).With(o =>
             {
-                case "lvMain":
-                    SetupCatchListView(Show: false);
-                    ListViewItem lvi = new ListViewItem();
-                    _topLVItemIndex = lvMain.TopItem.Index;
-                    foreach (var item in lvMain.SelectedItems)
-                    {
-                        lvi = (ListViewItem)item;
-                        string tag = lvMain.Tag.ToString();
-                        switch (tag)
+                switch (o.Name)
+                {
+                    case "lvMain":
+                        SetupCatchListView(Show: false);
+                        ListViewItem lvi = new ListViewItem();
+                        _topLVItemIndex = lvMain.TopItem.Index;
+                        foreach (var item in lvMain.SelectedItems)
                         {
-                            case "aoi":
-                                if (lvi.Tag != null)
-                                {
-                                    if (lvi.Tag.ToString() == "aoi_data")
+                            lvi = (ListViewItem)item;
+                            string tag = lvMain.Tag.ToString();
+                            switch (tag)
+                            {
+                                case "aoi":
+                                    if (lvi.Tag != null)
                                     {
-                                        var myTag = (Tuple<string, string, string>)treeMain.SelectedNode.Tag;
-                                        _AOI.AOIGUID = myTag.Item1;
-                                        TargetAreaForm f = new TargetAreaForm(this, IsNew: false);
-                                        f.Show();
-                                        f.AOI = _AOI;
+                                        if (lvi.Tag.ToString() == "aoi_data")
+                                        {
+                                            var myTag = (Tuple<string, string, string>)treeMain.SelectedNode.Tag;
+                                            _AOI.AOIGUID = myTag.Item1;
+                                            TargetAreaForm f = new TargetAreaForm(this, IsNew: false);
+                                            f.Show();
+                                            f.AOI = _AOI;
+                                        }
+                                        else if (lvi.Name == "Enumerators")
+                                        {
+                                            EnumeratorForm frm = new EnumeratorForm(lvi.SubItems[1].Name, this);
+                                            frm.AOI = _AOI;
+                                            frm.Show(this);
+                                        }
                                     }
-                                    else if (lvi.Name == "Enumerators")
+                                    break;
+
+                                case "database":
+                                    if (lvi.Text == "Database path")
                                     {
-                                        EnumeratorForm frm = new EnumeratorForm(lvi.SubItems[1].Name, this);
-                                        frm.AOI = _AOI;
-                                        frm.Show(this);
+                                        Process.Start(Path.GetDirectoryName(global.mdbPath));
                                     }
-                                }
-                                break;
+                                    break;
 
-                            case "database":
-                                if (lvi.Text == "Database path")
-                                {
-                                    Process.Start(Path.GetDirectoryName(global.mdbPath));
-                                }
-                                break;
+                                case "landing_site":
+                                    LandingSiteForm fls = new LandingSiteForm(_AOI, this, _ls);
+                                    fls.Show();
+                                    break;
 
-                            case "landing_site":
-                                LandingSiteForm fls = new LandingSiteForm(_AOI, this, _ls);
-                                fls.Show();
-                                break;
+                                case "gear":
+                                    break;
 
-                            case "gear":
-                                break;
+                                case "sampling":
+                                    SetUPLV("samplingDetail");
+                                    SamplingGUID = lvi.Tag.ToString();
+                                    ShowCatchDetailEx(_SamplingGUID);
+                                    lvi.BackColor = Color.Gainsboro;
+                                    break;
 
-                            case "sampling":
-                                SetUPLV("samplingDetail");
-                                SamplingGUID = lvi.Tag.ToString();
-                                ShowCatchDetailEx(_SamplingGUID);
-                                lvi.BackColor = Color.Gainsboro;
-                                break;
-
-                            case "samplingDetail":
-                                if (lvi.Name == "GearSpecs")
-                                {
-                                    var s = ManageGearSpecsClass.GetSampledSpecsEx(_SamplingGUID);
-                                    if (s.Length == 0)
-                                        MessageBox.Show("Gear specs not found",
-                                                        "Gear specifications",
-                                                        MessageBoxButtons.OK,
-                                                        MessageBoxIcon.Information);
+                                case "samplingDetail":
+                                    if (lvi.Name == "GearSpecs")
+                                    {
+                                        var s = ManageGearSpecsClass.GetSampledSpecsEx(_SamplingGUID);
+                                        if (s.Length == 0)
+                                            MessageBox.Show("Gear specs not found",
+                                                            "Gear specifications",
+                                                            MessageBoxButtons.OK,
+                                                            MessageBoxIcon.Information);
+                                        else
+                                        {
+                                            MessageBox.Show(s, "Gear specifications", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                        }
+                                    }
                                     else
-                                    {
-                                        MessageBox.Show(s, "Gear specifications", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                                    }
-                                }
-                                else
-                                    ShowSamplingDetailForm();
-                                break;
+                                        ShowSamplingDetailForm();
+                                    break;
+                            }
                         }
-                    }
-                    break;
+                        break;
 
-                case "lvCatch":
+                    case "lvCatch":
+                        ShowCatchCompositionForm();
+                        break;
 
-                    break;
-
-                case "lvLF_GMS":
-                    ShowLFForm();
-                    break;
-            }
+                    case "lvLF_GMS":
+                        ShowLFForm();
+                        break;
+                }
+            });
         }
 
         private void OnListView_MouseDown(object sender, MouseEventArgs e)

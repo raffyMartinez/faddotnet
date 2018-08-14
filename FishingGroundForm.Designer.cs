@@ -45,6 +45,7 @@
             this.tabText = new System.Windows.Forms.TabPage();
             this.buttonOK = new System.Windows.Forms.Button();
             this.buttonCancel = new System.Windows.Forms.Button();
+            this.buttonGrids = new System.Windows.Forms.Button();
             this.tabFG.SuspendLayout();
             this.tabGrid25.SuspendLayout();
             this.SuspendLayout();
@@ -225,19 +226,30 @@
             this.buttonCancel.UseVisualStyleBackColor = true;
             this.buttonCancel.Click += new System.EventHandler(this.Onbutton_Click);
             // 
-            // frmFishingGround
+            // buttonGrids
+            // 
+            this.buttonGrids.Location = new System.Drawing.Point(227, 237);
+            this.buttonGrids.Name = "buttonGrids";
+            this.buttonGrids.Size = new System.Drawing.Size(60, 25);
+            this.buttonGrids.TabIndex = 11;
+            this.buttonGrids.Text = "Grids";
+            this.buttonGrids.UseVisualStyleBackColor = true;
+            this.buttonGrids.Click += new System.EventHandler(this.Onbutton_Click);
+            // 
+            // FishingGroundForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCancel;
             this.ClientSize = new System.Drawing.Size(421, 274);
+            this.Controls.Add(this.buttonGrids);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.buttonOK);
             this.Controls.Add(this.tabFG);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Margin = new System.Windows.Forms.Padding(4);
-            this.Name = "frmFishingGround";
+            this.Name = "FishingGroundForm";
             this.Text = "Fishing ground";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnFormClosed);
             this.Load += new System.EventHandler(this.OnFormLoad);
@@ -267,5 +279,6 @@
         private System.Windows.Forms.TabPage tabText;
         private System.Windows.Forms.Button buttonOK;
         private System.Windows.Forms.Button buttonCancel;
+        private System.Windows.Forms.Button buttonGrids;
     }
 }

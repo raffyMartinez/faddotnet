@@ -28,9 +28,67 @@ namespace FAD3
             get { return _TotalWtOfFromTotal; }
         }
 
-        public static bool UpdateCatchComposition()
+        public static bool UpdateCatchComposition(Dictionary<string, (global.fad3DataStatus DataStatus, string RowGuid,
+            string NameGuid, CatchComposition.Identification IDType, string SamplingGuid, double CatchWeight, int? CatchCount,
+            double? SubWeight, double? SubCount, bool FromTotal, bool LiveFish)> CatchComposition)
+
         {
-            return true;
+            var sql = "";
+            var resultCount = 0;
+            using (var conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                foreach (var item in CatchComposition)
+                {
+                    var CatchCount = item.Value.CatchCount == null ? "null" : item.Value.CatchCount.ToString();
+                    var SubWeight = item.Value.SubWeight == null ? "null" : item.Value.SubWeight.ToString();
+                    var SubCount = item.Value.SubWeight == null ? "null" : item.Value.SubCount.ToString();
+
+                    if (item.Value.DataStatus == global.fad3DataStatus.statusNew)
+                    {
+                        sql = $@"Insert into tblCatchComp (NameGUID, NameType, RowGUID, SamplingGUID) values (
+                          {{{item.Value.NameGuid}}}, {(int)item.Value.IDType}, {{{item.Value.RowGuid}}}, {{{item.Value.SamplingGuid}}})";
+
+                        OleDbCommand update = new OleDbCommand(sql, conn);
+                        if (update.ExecuteNonQuery() > 0) resultCount++;
+
+                        sql = $@"Insert into tblCatchDetail (wt,ct,swt,sct,CatchCompRow,RowGUID,FromTotal,Live) values (
+                            {item.Value.CatchWeight}, {CatchCount}, {SubWeight}, {SubCount},
+                            {{{item.Value.RowGuid}}}, {{{Guid.NewGuid().ToString()}}},{item.Value.FromTotal}, {item.Value.LiveFish})";
+
+                        update = new OleDbCommand(sql, conn);
+                        if (update.ExecuteNonQuery() > 0) resultCount++;
+                    }
+                    else if (item.Value.DataStatus == global.fad3DataStatus.statusEdited)
+                    {
+                        sql = $@"Update tblCatchDetail set
+                            wt = {item.Value.CatchWeight},
+                            ct = {CatchCount},
+                            swt = {SubWeight},
+                            sct = {SubCount},
+                            FromTotal = {item.Value.FromTotal},
+                            Live = {item.Value.LiveFish}
+                            WHERE RowGUID = {{{item.Value.RowGuid}}}";
+
+                        OleDbCommand update = new OleDbCommand(sql, conn);
+                        if (update.ExecuteNonQuery() > 0) resultCount++;
+
+                        sql = $@"Update tblCatchComp set
+                            NameGUID = {{{item.Value.NameGuid}}},
+                            NameType = {(int)item.Value.IDType}
+                            WHERE RowGUID = {{{item.Value.RowGuid}}}";
+
+                        update = new OleDbCommand(sql, conn);
+                        if (update.ExecuteNonQuery() > 0) resultCount++;
+                    }
+                    else if (item.Value.DataStatus == global.fad3DataStatus.statusForDeletion)
+                    {
+                        sql = $"Delete * from tblCatchDetail WHERE CatchCompRow = {{{item.Value.RowGuid}}}";
+                        sql = $"Delete * from tbkCatchComp WHERE RowGUID = {{{item.Value.RowGuid}}}";
+                    }
+                }
+            }
+            return resultCount > 0;
         }
 
         public static Dictionary<string, CatchLine> CatchComp(string SamplingGUID)
@@ -51,7 +109,7 @@ namespace FAD3
 
                     string query = $@"SELECT tblSampling.SamplingGUID, Identification, tblCatchDetail.CatchCompRow, tblCatchComp.NameGUID, temp_AllNames.Name1,
                                     temp_AllNames.Name2, tblSampling.WtCatch, tblSampling.WtSample, tblCatchDetail.Live, tblCatchDetail.wt,
-                                    tblCatchDetail.ct, tblCatchDetail.swt, tblCatchDetail.sct, tblCatchDetail.FromTotal, tblAllSpecies.TaxaNo
+                                    tblCatchDetail.ct, tblCatchDetail.swt, tblCatchDetail.sct, tblCatchDetail.FromTotal, tblAllSpecies.TaxaNo, tblCatchDetail.RowGUID As CatchDetailRow
                                     FROM ((tblSampling INNER JOIN (tblCatchComp INNER JOIN temp_AllNames ON tblCatchComp.NameGUID = temp_AllNames.NameNo)
                                     ON tblSampling.SamplingGUID = tblCatchComp.SamplingGUID) INNER JOIN tblCatchDetail ON
                                     tblCatchComp.RowGUID = tblCatchDetail.CatchCompRow) LEFT JOIN tblAllSpecies ON temp_AllNames.NameNo = tblAllSpecies.SpeciesGUID
@@ -101,6 +159,7 @@ namespace FAD3
                                         dr["CatchCompRow"].ToString(), dr["NameGUID"].ToString(),
                                         Convert.ToDouble(dr["wt"]), CatchCount, TaxaNumber);
 
+                        myLine.CatchDetailRowGUID = dr["CatchDetailRow"].ToString();
                         myLine.CatchSubsampleWt = null;
                         myLine.CatchSubsampleCount = null;
                         myLine.NameType = IdType;

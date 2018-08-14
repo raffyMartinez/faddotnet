@@ -68,7 +68,7 @@ namespace FAD3
             string filepath = Path.GetDirectoryName(global.AppPath) + "\\error.log";
             using (StreamWriter writer = new StreamWriter(filepath, true))
             {
-                writer.WriteLine("Messagee: " + s + "<br/>" + "Date :" + DateTime.Now.ToString());
+                writer.WriteLine("Message: " + s + "<br/>" + "Date :" + DateTime.Now.ToString());
             }
         }
     }
