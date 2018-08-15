@@ -9,14 +9,11 @@ namespace FAD3
 {
     public static class CatchComposition
     {
+        private static CatchLineClass _catchLineClass = new CatchLineClass();
         private static int _CatchCompositionRows;
         private static string _SamplingGUID = "";
 
         private static double _TotalWtOfFromTotal = 0;
-
-        static CatchComposition()
-        {
-        }
 
         public static int CatchCompositionRows
         {
@@ -28,9 +25,7 @@ namespace FAD3
             get { return _TotalWtOfFromTotal; }
         }
 
-        public static bool UpdateCatchComposition(Dictionary<string, (global.fad3DataStatus DataStatus, string RowGuid,
-            string NameGuid, CatchComposition.Identification IDType, string SamplingGuid, double CatchWeight, int? CatchCount,
-            double? SubWeight, double? SubCount, bool FromTotal, bool LiveFish)> CatchComposition)
+        public static bool UpdateCatchComposition(Dictionary<int, CatchLineClass> CatchComposition)
 
         {
             var sql = "";
@@ -41,65 +36,65 @@ namespace FAD3
                 foreach (var item in CatchComposition)
                 {
                     var CatchCount = item.Value.CatchCount == null ? "null" : item.Value.CatchCount.ToString();
-                    var SubWeight = item.Value.SubWeight == null ? "null" : item.Value.SubWeight.ToString();
-                    var SubCount = item.Value.SubWeight == null ? "null" : item.Value.SubCount.ToString();
+                    var SubWeight = item.Value.CatchSubsampleWt == null ? "null" : item.Value.CatchSubsampleWt.ToString();
+                    var SubCount = item.Value.CatchSubsampleCount == null ? "null" : item.Value.CatchSubsampleCount.ToString();
 
-                    if (item.Value.DataStatus == global.fad3DataStatus.statusNew)
+                    if (item.Value.dataStatus == global.fad3DataStatus.statusNew)
                     {
                         sql = $@"Insert into tblCatchComp (NameGUID, NameType, RowGUID, SamplingGUID) values (
-                          {{{item.Value.NameGuid}}}, {(int)item.Value.IDType}, {{{item.Value.RowGuid}}}, {{{item.Value.SamplingGuid}}})";
+                          {{{item.Value.CatchNameGUID}}}, {(int)item.Value.NameType}, {{{item.Value.CatchCompGUID}}}, {{{item.Value.SamplingGUID}}})";
 
                         OleDbCommand update = new OleDbCommand(sql, conn);
                         if (update.ExecuteNonQuery() > 0) resultCount++;
 
                         sql = $@"Insert into tblCatchDetail (wt,ct,swt,sct,CatchCompRow,RowGUID,FromTotal,Live) values (
                             {item.Value.CatchWeight}, {CatchCount}, {SubWeight}, {SubCount},
-                            {{{item.Value.RowGuid}}}, {{{Guid.NewGuid().ToString()}}},{item.Value.FromTotal}, {item.Value.LiveFish})";
+                            {{{item.Value.CatchCompGUID}}}, {{{Guid.NewGuid().ToString()}}},{item.Value.FromTotalCatch}, {item.Value.LiveFish})";
 
                         update = new OleDbCommand(sql, conn);
                         if (update.ExecuteNonQuery() > 0) resultCount++;
                     }
-                    else if (item.Value.DataStatus == global.fad3DataStatus.statusEdited)
+                    else if (item.Value.dataStatus == global.fad3DataStatus.statusEdited)
                     {
                         sql = $@"Update tblCatchDetail set
                             wt = {item.Value.CatchWeight},
                             ct = {CatchCount},
                             swt = {SubWeight},
                             sct = {SubCount},
-                            FromTotal = {item.Value.FromTotal},
+                            FromTotal = {item.Value.FromTotalCatch},
                             Live = {item.Value.LiveFish}
-                            WHERE RowGUID = {{{item.Value.RowGuid}}}";
+                            WHERE RowGUID = {{{item.Value.CatchDetailRowGUID}}}";
 
                         OleDbCommand update = new OleDbCommand(sql, conn);
                         if (update.ExecuteNonQuery() > 0) resultCount++;
 
                         sql = $@"Update tblCatchComp set
-                            NameGUID = {{{item.Value.NameGuid}}},
-                            NameType = {(int)item.Value.IDType}
-                            WHERE RowGUID = {{{item.Value.RowGuid}}}";
+                            NameGUID = {{{item.Value.CatchNameGUID}}},
+                            NameType = {(int)item.Value.NameType}
+                            WHERE RowGUID = {{{item.Value.CatchCompGUID}}}";
 
                         update = new OleDbCommand(sql, conn);
                         if (update.ExecuteNonQuery() > 0) resultCount++;
                     }
-                    else if (item.Value.DataStatus == global.fad3DataStatus.statusForDeletion)
+                    else if (item.Value.dataStatus == global.fad3DataStatus.statusForDeletion)
                     {
-                        sql = $"Delete * from tblCatchDetail WHERE CatchCompRow = {{{item.Value.RowGuid}}}";
-                        sql = $"Delete * from tbkCatchComp WHERE RowGUID = {{{item.Value.RowGuid}}}";
+                        sql = $"Delete * from tblCatchDetail WHERE CatchCompRow = {{{item.Value.CatchCompGUID}}}";
+                        sql = $"Delete * from tbkCatchComp WHERE RowGUID = {{{item.Value.SamplingGUID}}}";
                     }
                 }
             }
             return resultCount > 0;
         }
 
-        public static Dictionary<string, CatchLine> CatchComp(string SamplingGUID)
+        public static Dictionary<string, CatchLineClass> CatchComp(string SamplingGUID)
         {
             _CatchCompositionRows = 0;
-            Dictionary<string, CatchLine> myCatch = new Dictionary<string, CatchLine>();
+            Dictionary<string, CatchLineClass> myCatch = new Dictionary<string, CatchLineClass>();
             DataTable dt = new DataTable();
             string CatchName = "";
             string Name1 = "";
             string Name2 = "";
-            long? CatchCount = null;
+            int? CatchCount = null;
             int? TaxaNumber = null;
             using (var conection = new OleDbConnection(global.ConnectionString))
             {
@@ -155,7 +150,8 @@ namespace FAD3
                             }
                         }
 
-                        CatchLine myLine = new CatchLine(Name1, Name2, CatchName, dr["SamplingGUID"].ToString(),
+                        //defines a catch line
+                        CatchLineClass myLine = new CatchLineClass(Name1, Name2, CatchName, dr["SamplingGUID"].ToString(),
                                         dr["CatchCompRow"].ToString(), dr["NameGUID"].ToString(),
                                         Convert.ToDouble(dr["wt"]), CatchCount, TaxaNumber);
 
@@ -163,6 +159,7 @@ namespace FAD3
                         myLine.CatchSubsampleWt = null;
                         myLine.CatchSubsampleCount = null;
                         myLine.NameType = IdType;
+                        myLine.dataStatus = global.fad3DataStatus.statusFromDB;
 
                         if (dr["swt"] != DBNull.Value)
                         {
@@ -175,6 +172,8 @@ namespace FAD3
                         }
 
                         myLine.FromTotalCatch = bool.Parse(dr["FromTotal"].ToString());
+
+                        //add the catch composition row to the dictionary
                         myCatch.Add(dr["CatchCompRow"].ToString(), myLine);
 
                         if (dr["FromTotal"].ToString() == "True")
@@ -239,273 +238,6 @@ namespace FAD3
                 }
             }
             return myRow;
-        }
-
-        public struct CatchLine
-        {
-            private readonly string _CatchLineGUID;
-
-            private readonly string _CatchName;
-
-            private readonly string _Name1;
-            private readonly string _Name2;
-
-            private readonly string _CatchNameGIUD;
-
-            private readonly double _CatchWeight;
-
-            private readonly string _SamplingGUID;
-
-            private long? _CatchCount;
-
-            private string _CatchDetailRowGUID;
-
-            private long? _CatchSubsampleCount;
-
-            private double? _CatchSubsampleWt;
-
-            private bool _FromTotalCatch;
-
-            private bool _LiveFish;
-
-            private Identification _NameType;
-
-            private int? _TaxaNumber;
-
-            public CatchLine(string Name1, string Name2, string CatchName, string SamplingGUID,
-                                          string CatchLineGUID, string CatchNameGUID,
-                                          double CatchWeight, long? CatchCount = null,
-                                          int? TaxaNumber = null)
-            {
-                _Name1 = Name1;
-                _Name2 = Name2;
-                _CatchName = CatchName;
-                _SamplingGUID = SamplingGUID;
-                _CatchLineGUID = CatchLineGUID;
-                _CatchNameGIUD = CatchNameGUID;
-                _CatchWeight = CatchWeight;
-                _CatchCount = CatchCount;
-                _CatchSubsampleWt = 0;
-                _CatchSubsampleCount = 0;
-                _FromTotalCatch = false;
-                _NameType = Identification.Scientific;
-                _LiveFish = false;
-                _CatchDetailRowGUID = "";
-                _TaxaNumber = TaxaNumber;
-            }
-
-            /// <summary>
-            /// A structure representing an individual catch which includes catch wt, count, subsample wt and count,
-            /// the guid of the parent sampling (SamplingGUID) and the guid of the individual catch.
-            /// </summary>
-            public CatchLine(string Name1, string Name2, string CatchName, string SamplingGUID,
-                                          string CatchLineGUID, string CatchNameGUID,
-                                          double CatchWeight, int? TaxaNumber = null)
-            {
-                _Name1 = Name1;
-                _Name2 = Name2;
-                _CatchName = CatchName;
-                _SamplingGUID = SamplingGUID;
-                _CatchLineGUID = CatchLineGUID;
-                _CatchNameGIUD = CatchNameGUID;
-                _CatchWeight = CatchWeight;
-                _CatchCount = null;
-                _CatchSubsampleWt = 0;
-                _CatchSubsampleCount = 0;
-                _FromTotalCatch = false;
-                _NameType = Identification.Scientific;
-                _LiveFish = false;
-                _CatchDetailRowGUID = "";
-                _TaxaNumber = TaxaNumber;
-            }
-
-            public long? CatchCount
-            {
-                set { _CatchCount = value; }
-                get { return _CatchCount; }
-            }
-
-            public string CatchDetailRowGUID
-            {
-                get { return _CatchDetailRowGUID; }
-                set { _CatchDetailRowGUID = value; }
-            }
-
-            public string CatchLineGUID
-            {
-                get { return _CatchLineGUID; }
-            }
-
-            public string CatchName
-            {
-                get { return _CatchName; }
-            }
-
-            public string Name1
-            {
-                get { return _Name1; }
-            }
-
-            public string Name2
-            {
-                get { return _Name2; }
-            }
-
-            public string CatchNameGUID
-            {
-                get { return _CatchNameGIUD; }
-            }
-
-            public long? CatchSubsampleCount
-            {
-                get { return _CatchSubsampleCount; }
-                set { _CatchSubsampleCount = value; }
-            }
-
-            public int? TaxaNumber
-            {
-                get { return _TaxaNumber; }
-                set { _TaxaNumber = value; }
-            }
-
-            public double? CatchSubsampleWt
-            {
-                get { return _CatchSubsampleWt; }
-                set { _CatchSubsampleWt = value; }
-            }
-
-            public double CatchWeight
-            {
-                get { return _CatchWeight; }
-            }
-
-            public bool FromTotalCatch
-            {
-                get { return _FromTotalCatch; }
-                set { _FromTotalCatch = value; }
-            }
-
-            public bool LiveFish
-            {
-                get { return _LiveFish; }
-                set { _LiveFish = value; }
-            }
-
-            public Identification NameType
-            {
-                get { return _NameType; }
-                set { _NameType = value; }
-            }
-
-            public string SamplingGUID
-            {
-                get { return _SamplingGUID; }
-            }
-
-            public bool Save(bool isNew)
-            {
-                //string RowGUID = "";
-                bool Success = false;
-                string updateQuery = "";
-                using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
-                {
-                    try
-                    {
-                        if (isNew)
-                        {
-                            //RowGUID = Guid.NewGuid().ToString();
-                            updateQuery = $@"Insert into tblCatchComp (NameGUID, NameType,RowGUID,SamplingGUID) values (
-                                          {{{ _CatchNameGIUD}}}, {Convert.ToInt16(_NameType)}, {{{_CatchLineGUID}}}, {{{_SamplingGUID}}})";
-                        }
-                        else
-                        {
-                            if (SaveCatchDetail(isNew, "", _CatchDetailRowGUID))
-                            {
-                                updateQuery = $@"Update tblCatchComp set
-                                    NameGUID = {{{_CatchNameGIUD}}},
-                                    NameType = {Convert.ToInt16(_NameType)}
-                                    WHERE RowGUID = {{{_CatchLineGUID}}}";
-                            }
-                        }
-                        OleDbCommand update = new OleDbCommand(updateQuery, conn);
-                        conn.Open();
-                        Success = (update.ExecuteNonQuery() > 0);
-                        conn.Close();
-                        if (Success)
-                        {
-                            if (isNew)
-                            {
-                                Success = SaveCatchDetail(isNew, _CatchLineGUID);
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Log(ex);
-                    }
-                }
-                return Success;
-            }
-
-            private bool SaveCatchDetail(bool isNew, string CatchCompRow = "", string CatchDetailRowGUID = "")
-            {
-                bool Success = false;
-                string updateQuery = "";
-                string RowGUID = "";
-                using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
-                {
-                    try
-                    {
-                        if (isNew)
-                        {
-                            RowGUID = Guid.NewGuid().ToString();
-
-                            if (_CatchCount == null)
-                            {
-                                updateQuery = $@"Insert into tblCatchDetail (wt,swt,sct,CatchCompRow,RowGUID,FromTotal,Live) values (
-                                               {_CatchWeight}, {_CatchSubsampleWt}, {_CatchSubsampleCount}, {{{CatchCompRow}}}, {{{RowGUID}}},
-                                               {_FromTotalCatch}, {_LiveFish})";
-                            }
-                            else
-                            {
-                                updateQuery = $@"Insert into tblCatchDetail (wt,ct,swt,sct,CatchCompRow,RowGUID,FromTotal,Live) values (
-                                               {_CatchWeight}, {(long)_CatchCount},  {_CatchSubsampleWt}, {_CatchSubsampleCount},
-                                               {{{CatchCompRow}}}, {{{RowGUID}}}, {_FromTotalCatch}, {_LiveFish})";
-                            }
-                        }
-                        else
-                        {
-                            if (_CatchCount == null)
-                            {
-                                updateQuery = $@"Update tblCatchDetail set
-                                           wt = {CatchWeight}, swt= {_CatchSubsampleWt},
-                                           sct = {_CatchSubsampleCount}, FromTotal = {_FromTotalCatch},
-                                           Live = {_LiveFish} Where RowGUID = {{{CatchDetailRowGUID}}}";
-                            }
-                            else
-                            {
-                                updateQuery = $@"Update tblCatchDetail set
-                                           wt = {_CatchWeight},
-                                           ct = {_CatchCount},
-                                           swt = {_CatchSubsampleWt},
-                                           sct = {_CatchSubsampleCount},
-                                           FromTotal = {_FromTotalCatch},
-                                           Live = {_LiveFish}
-                                           Where RowGUID = {{{CatchDetailRowGUID}}}";
-                            }
-                        }
-                        OleDbCommand update = new OleDbCommand(updateQuery, conn);
-                        conn.Open();
-                        Success = (update.ExecuteNonQuery() > 0);
-                        conn.Close();
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Log(ex);
-                    }
-                }
-                return Success;
-            }
         }
 
         public enum Identification

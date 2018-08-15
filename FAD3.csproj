@@ -101,6 +101,7 @@
     <Compile Include="CatchCompositionForm.Designer.cs">
       <DependentUpon>CatchCompositionForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="CatchLineClass.cs" />
     <Compile Include="Coordinate.cs" />
     <Compile Include="CoordinateEntryForm.cs">
       <SubType>Form</SubType>

@@ -2025,7 +2025,7 @@ namespace FAD3
                 lv.Items.Clear();
                 int n = 1;
                 //foreach (KeyValuePair<string, sampling.CatchLine> kv in _Sampling.CatchComp())
-                foreach (KeyValuePair<string, CatchComposition.CatchLine> kv in CatchComposition.CatchComp(_SamplingGUID))
+                foreach (KeyValuePair<string, CatchLineClass> kv in CatchComposition.CatchComp(_SamplingGUID))
                 {
                     var lvi = new ListViewItem(new string[]
                     {
