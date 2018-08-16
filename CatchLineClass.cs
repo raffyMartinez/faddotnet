@@ -12,8 +12,19 @@ namespace FAD3
         public string Name1 { get; set; }
         public string Name2 { get; set; }
         public string CatchNameGUID { get; set; }
-        public global.fad3DataStatus dataStatus { get; set; }
-        public double CatchWeight { get; set; }
+
+        public global.fad3DataStatus dataStatus
+        {
+            get;
+            set;
+        }
+
+        public double CatchWeight
+        {
+            get;
+            set;
+        }
+
         public string SamplingGUID { get; set; }
         public int? CatchCount { get; set; }
         public string CatchDetailRowGUID { get; set; }

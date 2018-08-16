@@ -68,6 +68,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <LangVersion>7.2</LangVersion>
+    <CodeAnalysisRuleSet>BasicCorrectnessRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <LangVersion>7.2</LangVersion>

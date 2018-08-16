@@ -1345,12 +1345,20 @@ namespace FAD3
                     myNode.Tag = Tuple.Create(item.AOIGuid, "", "aoi");
                     myNode.ImageKey = "AOI";
 
-                    TreeNode myChild = new TreeNode(item.LandingSiteName);
-                    myNode.Nodes.Add(myChild);
-                    myChild.Nodes.Add("*dummy*");
-                    myChild.Tag = Tuple.Create(item.LandingSiteGuid, "", "landing_site");
-                    myChild.Name = item.LandingSiteGuid;
-                    myChild.ImageKey = "LandingSite";
+                    if (item.LandingSiteName.Length > 0)
+                    {
+                        TreeNode myChild = new TreeNode(item.LandingSiteName);
+                        myNode.Nodes.Add(myChild);
+                        myChild.Nodes.Add("*dummy*");
+                        myChild.Tag = Tuple.Create(item.LandingSiteGuid, "", "landing_site");
+                        myChild.Name = item.LandingSiteGuid;
+                        myChild.ImageKey = "LandingSite";
+                    }
+                    else
+                    {
+                        TreeNode myChild = new TreeNode("*dummy*");
+                        myNode.Nodes.Add(myChild);
+                    }
                 }
             }
         }

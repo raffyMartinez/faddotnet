@@ -59,6 +59,16 @@ namespace FAD3
             }
         }
 
+        public static Color ConflictColor1
+        {
+            get { return Color.Yellow; }
+        }
+
+        public static Color ConflictColor2
+        {
+            get { return Color.Gold; }
+        }
+
         public static Color MissingFieldBackColor
         {
             get { return _MissingFieldBackColor; }

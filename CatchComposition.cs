@@ -9,9 +9,7 @@ namespace FAD3
 {
     public static class CatchComposition
     {
-        private static CatchLineClass _catchLineClass = new CatchLineClass();
         private static int _CatchCompositionRows;
-        private static string _SamplingGUID = "";
 
         private static double _TotalWtOfFromTotal = 0;
 
@@ -153,13 +151,14 @@ namespace FAD3
                         //defines a catch line
                         CatchLineClass myLine = new CatchLineClass(Name1, Name2, CatchName, dr["SamplingGUID"].ToString(),
                                         dr["CatchCompRow"].ToString(), dr["NameGUID"].ToString(),
-                                        Convert.ToDouble(dr["wt"]), CatchCount, TaxaNumber);
-
-                        myLine.CatchDetailRowGUID = dr["CatchDetailRow"].ToString();
-                        myLine.CatchSubsampleWt = null;
-                        myLine.CatchSubsampleCount = null;
-                        myLine.NameType = IdType;
-                        myLine.dataStatus = global.fad3DataStatus.statusFromDB;
+                                        Convert.ToDouble(dr["wt"]), CatchCount, TaxaNumber)
+                        {
+                            CatchDetailRowGUID = dr["CatchDetailRow"].ToString(),
+                            CatchSubsampleWt = null,
+                            CatchSubsampleCount = null,
+                            NameType = IdType,
+                            dataStatus = global.fad3DataStatus.statusFromDB
+                        };
 
                         if (dr["swt"] != DBNull.Value)
                         {

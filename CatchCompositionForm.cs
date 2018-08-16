@@ -34,6 +34,7 @@ namespace FAD3
         private string _SamplingGuid;
         private int _spacer = 3;
         private int _y = 0;
+        private int _ScrollAmount = 0;
 
         public CatchCompositionForm(bool IsNew, MainForm parent, string SamplingGuid, string ReferenceNumber)
         {
@@ -149,12 +150,14 @@ namespace FAD3
                 panelUI.Controls.Add(_comboSpecies);
                 panelUI.Controls.Add(_comboLocalName);
             }
+
             if (IsNew)
                 _CatchCompositionData.Add(_y, new CatchLineClass());
             else
                 _CatchCompositionData.Add(_y, CatchLine);
 
             _CatchCompositionData[_y].SamplingGUID = _SamplingGuid;
+            Logger.Log($"row {_row} added at y:{_y}");
 
             labelRow.With(o =>
             {
@@ -186,11 +189,12 @@ namespace FAD3
                 {
                     var newGUID = Guid.NewGuid().ToString();
                     CurrentIDType = CatchComposition.Identification.Scientific;
-                    _CatchCompositionData[o.Location.Y].dataStatus = global.fad3DataStatus.statusNew;
-                    _CatchCompositionData[o.Location.Y].NameType = CurrentIDType;
-                    _CatchCompositionData[o.Location.Y].CatchCompGUID = newGUID;
+                    _CatchCompositionData[o.Location.Y + _ScrollAmount].dataStatus = global.fad3DataStatus.statusNew;
+                    _CatchCompositionData[o.Location.Y + _ScrollAmount].NameType = CurrentIDType;
+                    _CatchCompositionData[o.Location.Y + _ScrollAmount].CatchCompGUID = newGUID;
                 }
                 o.Text = CatchComposition.IdentificationTypeToString(CurrentIDType);
+                o.Tag = o.Text;
             });
 
             textName1.With(o =>
@@ -208,6 +212,7 @@ namespace FAD3
                 if (!IsNew)
                 {
                     o.Text = CatchLine.Name1;
+                    o.Tag = o.Text;
                 }
             });
 
@@ -223,7 +228,11 @@ namespace FAD3
                 o.TextChanged += OnTextBoxChanged;
                 o.KeyPress += OnTextBoxKeyPress;
                 o.DoubleClick += OnTextBoxDoubleClick;
-                if (!IsNew) o.Text = CatchLine.Name2;
+                if (!IsNew)
+                {
+                    o.Text = CatchLine.Name2;
+                    o.Tag = o.Text;
+                }
             });
 
             textWt.With(o =>
@@ -236,7 +245,11 @@ namespace FAD3
                 o.GotFocus += OnTextBoxGotFocus;
                 o.Validating += OnTextBoxValidating; ;
                 o.TextChanged += OnTextBoxChanged;
-                if (!IsNew) o.Text = o.Text = CatchLine.CatchWeight.ToString();
+                if (!IsNew)
+                {
+                    o.Text = o.Text = CatchLine.CatchWeight.ToString();
+                    o.Tag = o.Text;
+                }
             });
 
             textCount.With(o =>
@@ -249,7 +262,11 @@ namespace FAD3
                 o.GotFocus += OnTextBoxGotFocus;
                 o.Validating += OnTextBoxValidating; ;
                 o.TextChanged += OnTextBoxChanged;
-                if (!IsNew) o.Text = o.Text = CatchLine.CatchCount.ToString();
+                if (!IsNew)
+                {
+                    o.Text = o.Text = CatchLine.CatchCount.ToString();
+                    o.Tag = o.Text;
+                }
             });
 
             textSubWt.With(o =>
@@ -262,7 +279,11 @@ namespace FAD3
                 o.GotFocus += OnTextBoxGotFocus;
                 o.Validating += OnTextBoxValidating; ;
                 o.TextChanged += OnTextBoxChanged;
-                if (!IsNew) o.Text = CatchLine.CatchSubsampleWt.ToString();
+                if (!IsNew)
+                {
+                    o.Text = CatchLine.CatchSubsampleWt.ToString();
+                    o.Tag = o.Text;
+                }
             });
 
             textSubCount.With(o =>
@@ -275,7 +296,11 @@ namespace FAD3
                 o.GotFocus += OnTextBoxGotFocus;
                 o.Validating += OnTextBoxValidating; ;
                 o.TextChanged += OnTextBoxChanged;
-                if (!IsNew) o.Text = CatchLine.CatchSubsampleCount.ToString();
+                if (!IsNew)
+                {
+                    o.Text = CatchLine.CatchSubsampleCount.ToString();
+                    o.Tag = o.Text;
+                }
             });
 
             chkFromTotal.With(o =>
@@ -286,7 +311,10 @@ namespace FAD3
                 o.Font = Font;
                 o.Text = "";
                 o.CheckStateChanged += OnCheckBoxCheckStateChanged;
-                if (!IsNew) o.Checked = CatchLine.FromTotalCatch;
+                if (!IsNew)
+                {
+                    o.Checked = CatchLine.FromTotalCatch;
+                }
             });
 
             chkLiveFish.With(o =>
@@ -358,53 +386,56 @@ namespace FAD3
         {
         }
 
-        private void cboEditor_LostFocus(object sender, EventArgs e)
-        {
-            if (_cboEditor.Name == "cboIdentificationType")
-            {
-                CurrentIDType = CatchComposition.StringToIdentificationType(_cboEditor.Text);
-                _CatchCompositionData[_cboEditor.Location.Y].NameType = CurrentIDType;
-                ResetRowColor(_cboEditor);
-            }
-
-            var ev = new CancelEventArgs();
-            Logger.Log("cboEditor_LostFocus");
-            cboEditor_Validating(_cboEditor, ev);
-            if (ev.Cancel == false)
-            {
-                _currentTextBox.Text = _cboEditor.Text;
-            }
-        }
-
         private void cboEditor_Validating(object sender, CancelEventArgs e)
         {
             ((ComboBox)sender).With(o =>
             {
-                var s = o.Text;
-                if (s.Length > 0)
+                _CatchCompositionData[o.Location.Y + _ScrollAmount].With(ccd =>
                 {
-                    switch (o.Name)
+                    var s = o.Text;
+                    if (s.Length > 0)
                     {
-                        case "cboIdentificationType":
-                            break;
+                        switch (o.Name)
+                        {
+                            case "cboIdentificationType":
+                                CurrentIDType = CatchComposition.StringToIdentificationType(_cboEditor.Text);
+                                ccd.NameType = CurrentIDType;
+                                ResetRowColor(_cboEditor);
+                                break;
 
-                        case "cboGenus":
-                            if (o.Text != _currentGenus)
-                            {
-                                FillSpeciesComboBox(o.Text);
-                                _currentGenus = o.Text;
-                            }
-                            break;
+                            case "cboGenus":
+                                if (o.Text != _currentGenus)
+                                {
+                                    ccd.Name1 = o.Text;
+                                    _currentGenus = o.Text;
+                                }
+                                break;
 
-                        case "cboSpecies":
-                        case "cboLocalName":
-                            _CatchCompositionData[o.Location.Y].CatchNameGUID = ((KeyValuePair<string, string>)o.SelectedItem).Key;
-                            _CatchCompositionData[o.Location.Y].Name1 = GetTextBoxAtRow(o.Location.Y, "txtName1").Text;
-                            _CatchCompositionData[o.Location.Y].Name2 = GetTextBoxAtRow(o.Location.Y, "txtName2").Text;
-                            break;
+                            case "cboSpecies":
+                            case "cboLocalName":
+                                ccd.CatchNameGUID = ((KeyValuePair<string, string>)o.SelectedItem).Key;
+                                ccd.Name1 = GetTextBoxAtRow(o.Location.Y, "txtName1").Text;
+                                ccd.Name2 = GetTextBoxAtRow(o.Location.Y, "txtName2").Text;
+                                break;
+                        }
                     }
-                }
+                    else
+                    {
+                        switch (o.Name)
+                        {
+                            case "cboSpecies":
+                                ccd.Name2 = "";
+                                break;
+
+                            case "cboGenus":
+                            case "cboLocalName":
+                                ccd.Name1 = "";
+                                break;
+                        }
+                    }
+                });
             });
+            _currentTextBox.Text = _cboEditor.Text;
             e.Cancel = false;
         }
 
@@ -472,15 +503,15 @@ namespace FAD3
         /// <summary>
         /// fills up the species combo box depending on the selected genus
         /// </summary>
-        private void FillSpeciesComboBox(string Genus)
+        private void FillSpeciesComboBox()
         {
-            names.Genus = Genus;
+            //names.Genus = Genus;
             _comboSpecies.Items.Clear();
             foreach (var item in names.speciesList)
             {
                 _comboSpecies.Items.Add(item);
             }
-            Logger.Log($"*** using {Genus} filled up species combo box***");
+            //Logger.Log($"*** using {Genus} filled up species combo box***");
         }
 
         private CheckBox GetCheckBoxAtRow(Label row, string checkBoxName)
@@ -642,10 +673,77 @@ namespace FAD3
             _comboIdentificationType.Hide();
             _comboSpecies.Hide();
             _comboLocalName.Hide();
+            _cboEditor.Hide();
+        }
+
+        private void ClearMissingMarkers()
+        {
+            foreach (Control c in panelUI.Controls)
+                if (c.GetType().Name == "TextBox") c.BackColor = SystemColors.Window;
+        }
+
+        private (bool Cancel, string Message) RowIsValid()
+        {
+            var Cancel = false;
+            var msg = "";
+            SetIDType(_lastIdentification);
+            if (CurrentIDType == CatchComposition.Identification.Scientific)
+            {
+                Cancel = _lastIdentification.Text.Length == 0 || _lastName1.Text.Length == 0
+                    || _lastName2.Text.Length == 0 || _lastWeight.Text.Length == 0;
+            }
+            else
+            {
+                Cancel = _lastIdentification.Text.Length == 0 || _lastName1.Text.Length == 0
+                    || _lastWeight.Text.Length == 0;
+            }
+
+            if (Cancel)
+            {
+                _lastIdentification.BackColor = _lastIdentification.Text.Length == 0 ? global.MissingFieldBackColor : SystemColors.Window;
+                _lastName1.BackColor = _lastName1.Text.Length == 0 ? global.MissingFieldBackColor : SystemColors.Window;
+                _lastWeight.BackColor = _lastWeight.Text.Length == 0 ? global.MissingFieldBackColor : SystemColors.Window;
+
+                if (CurrentIDType == CatchComposition.Identification.Scientific)
+                {
+                    _lastName2.BackColor = _lastName2.Text.Length == 0 ? global.MissingFieldBackColor : SystemColors.Window;
+                }
+
+                msg = "The required fields should be filled up (Orange code)";
+            }
+
+            _lastCount.BackColor = SystemColors.Window;
+            _lastSubCount.BackColor = SystemColors.Window;
+            _lastSubWeight.BackColor = SystemColors.Window;
+
+            _CatchCompositionData[_lastIdentification.Location.Y + _ScrollAmount].With(ccd =>
+          {
+              Cancel = ccd.CatchCount == null && ccd.CatchSubsampleWt == null && ccd.CatchSubsampleCount == null;
+              if (Cancel)
+              {
+                  _lastCount.BackColor = global.ConflictColor1;
+                  msg += "\r\nCatch count is missing (Yellow code)";
+              }
+              else
+              {
+                  Cancel = ccd.CatchCount == null && (ccd.CatchSubsampleCount == null || ccd.CatchSubsampleWt == null);
+                  if (Cancel)
+                  {
+                      _lastSubCount.BackColor = _lastSubCount.Text.Length == 0 ? global.ConflictColor1 : SystemColors.Window;
+                      _lastSubWeight.BackColor = _lastSubWeight.Text.Length == 0 ? global.ConflictColor1 : SystemColors.Window;
+
+                      msg += "\r\nSubsample weight and count is required when there is no catch count (Yellow code)";
+                  }
+              }
+          });
+
+            return (Cancel, msg);
         }
 
         private void OnButtonClick(object sender, EventArgs e)
         {
+            HideCBOs();
+            ClearMissingMarkers();
             switch (((Button)sender).Name)
             {
                 case "buttonOK":
@@ -668,66 +766,12 @@ namespace FAD3
                     break;
 
                 case "buttonAdd":
-                    var ShowMissing = false;
-                    SetIDType(_lastIdentification);
-                    _lastIdentification.BackColor = SystemColors.Window;
-                    _lastName1.BackColor = SystemColors.Window;
-                    _lastName2.BackColor = SystemColors.Window;
-                    _lastWeight.BackColor = SystemColors.Window;
+                    var result = RowIsValid();
 
-                    if (CurrentIDType == CatchComposition.Identification.Scientific)
-                    {
-                        if (_lastIdentification.Text.Length == 0 || _lastName1.Text.Length == 0
-                            || _lastName2.Text.Length == 0 || _lastWeight.Text.Length == 0)
-                        {
-                            ShowMissing = true;
-                        }
-                        else
-                        {
-                            AddNewRow();
-                        }
-                    }
+                    if (result.Cancel)
+                        MessageBox.Show(result.Message, "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     else
-                    {
-                        if (_lastIdentification.Text.Length == 0 || _lastName1.Text.Length == 0
-                            || _lastWeight.Text.Length == 0)
-                        {
-                            ShowMissing = true;
-                        }
-                        else
-                        {
-                            AddNewRow();
-                        }
-                    }
-
-                    if (ShowMissing)
-                    {
-                        _lastIdentification.BackColor = global.MissingFieldBackColor;
-                        _lastName1.BackColor = global.MissingFieldBackColor;
-                        _lastWeight.BackColor = global.MissingFieldBackColor;
-                        if (CurrentIDType == CatchComposition.Identification.Scientific)
-                            _lastName2.BackColor = global.MissingFieldBackColor;
-
-                        if (_lastIdentification.Text.Length == 0)
-                        {
-                            _lastIdentification.Focus();
-                        }
-                        else if (_lastName1.Text.Length == 0)
-                        {
-                            _lastName1.Focus();
-                        }
-                        else if (CurrentIDType == CatchComposition.Identification.Scientific && _lastName2.Text.Length == 0)
-                        {
-                            _lastName2.Focus();
-                        }
-                        else
-                        {
-                            _lastWeight.Focus();
-                        }
-
-                        MessageBox.Show("The required fields should be filled up", "Validation error",
-                                         MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
+                        AddNewRow();
 
                     break;
 
@@ -743,9 +787,9 @@ namespace FAD3
                 SetRowStatusToEdited(o);
 
                 if (o.Name == "chkFromTotal")
-                    _CatchCompositionData[o.Location.Y].FromTotalCatch = o.Checked;
+                    _CatchCompositionData[o.Location.Y + _ScrollAmount].FromTotalCatch = o.Checked;
                 else
-                    _CatchCompositionData[o.Location.Y].LiveFish = o.Checked;
+                    _CatchCompositionData[o.Location.Y + _ScrollAmount].LiveFish = o.Checked;
             });
         }
 
@@ -792,8 +836,14 @@ namespace FAD3
             }
         }
 
+        private void OnPanelMouseWheel(object sender, MouseEventArgs e)
+        {
+            _ScrollAmount = panelUI.VerticalScroll.Value;
+        }
+
         private void OnForm_Load(object sender, EventArgs e)
         {
+            panelUI.MouseWheel += OnPanelMouseWheel;
             labelTitle.Text = $"Catch composition of {_ReferenceNumber}";
             if (_IsNew)
             {
@@ -811,15 +861,16 @@ namespace FAD3
 
         private void OnTextBoxChanged(object sender, EventArgs e)
         {
-            ((TextBox)sender).With(o =>
-            {
-                SetRowStatusToEdited(o);
+            ((TextBox)sender).BackColor = SystemColors.Window;
+            //((TextBox)sender).With(o =>
+            //{
+            //    SetRowStatusToEdited(o);
 
-                if (o.Name == "txtIdentificationType")
-                    ResetRowColor(o);
-                else
-                    o.BackColor = SystemColors.Window;
-            });
+            //    if (o.Name == "txtIdentificationType")
+            //        ResetRowColor(o);
+            //    else
+            //        o.BackColor = SystemColors.Window;
+            //});
         }
 
         private void OnTextBoxDoubleClick(object sender, EventArgs e)
@@ -834,15 +885,8 @@ namespace FAD3
                 SetIDType(o);
                 if (o.Name == "txtName2" && _CurrentIDType == CatchComposition.Identification.Scientific)
                 {
-                    _comboSpecies.Items.Clear();
-                    if (_CatchCompositionData[o.Location.Y].Name1 != _currentGenus)
-                    {
-                        names.Genus = _CatchCompositionData[o.Location.Y].Name1;
-                        foreach (var item in names.speciesList)
-                        {
-                            _comboSpecies.Items.Add(item);
-                        }
-                    }
+                    names.Genus = _CatchCompositionData[o.Location.Y + _ScrollAmount].Name1;
+                    FillSpeciesComboBox();
                 }
             });
             HideCBOs();
@@ -856,92 +900,145 @@ namespace FAD3
         private void OnTextBoxValidating(object sender, CancelEventArgs e)
         {
             var msg = "";
+
             ((TextBox)sender).With(o =>
             {
-                var s = o.Text;
-
-                if (s.Length == 0)
+                if (o.Text != (o.Tag == null ? "" : o.Text))
                 {
-                    _CatchCompositionData[o.Location.Y].CatchSubsampleWt = null;
-                    _CatchCompositionData[o.Location.Y].CatchCount = null;
-                    _CatchCompositionData[o.Location.Y].CatchSubsampleCount = null;
+                    o.Tag = o.Text;
+                    SetRowStatusToEdited(o);
+
+                    if (o.Name == "txtIdentificationType")
+                        ResetRowColor(o);
+                    else
+                        o.BackColor = SystemColors.Window;
                 }
-                else if (s.Length > 0)
-                {
-                    switch (o.Name)
-                    {
-                        case "txtIdentificationType":
-                            break;
 
-                        case "txtName1":
-                            break;
+                _CatchCompositionData[o.Location.Y + _ScrollAmount].With(ccd =>
+                  {
+                      var s = o.Text;
 
-                        case "txtName2":
-                            if (CurrentIDType == CatchComposition.Identification.LocalName && o.Text.Length > 0)
-                            {
-                                msg = "This field should be blank";
-                            }
+                      if (s.Length == 0)
+                      {
+                          switch (o.Name)
+                          {
+                              case "txtName1":
+                                  ccd.Name1 = "";
+                                  break;
 
-                            break;
+                              case "txtName2":
+                                  ccd.Name2 = "";
+                                  break;
 
-                        case "txtWt":
-                        case "txtSubWt":
-                            if (double.TryParse(s, out double myWeight))
-                            {
-                                if (myWeight > 0)
-                                {
-                                    if (o.Name == "txtWt")
-                                        _CatchCompositionData[o.Location.Y].CatchWeight = myWeight;
-                                    else
-                                    {
-                                        _CatchCompositionData[o.Location.Y].CatchSubsampleWt = myWeight;
-                                    }
-                                }
-                                else
-                                {
-                                    msg = "Expected weight is a number greater than zero";
-                                }
-                            }
-                            else
-                            {
-                                msg = "Expected weight is a number greater than zero";
-                            }
-                            break;
+                              case "txtWt":
+                                  ccd.CatchWeight = 0;
+                                  break;
 
-                        case "txtCount":
-                        case "txtSubCount":
-                            if (int.TryParse(s, out int myCount))
-                            {
-                                if (myCount > 0)
-                                {
-                                    if (myCount.ToString() != s)
-                                    {
-                                        msg = "Expected count is a whole number greater than zero";
-                                    }
-                                    else
-                                    {
-                                        if (o.Name == "txtCount")
-                                        {
-                                            _CatchCompositionData[o.Location.Y].CatchCount = myCount;
-                                        }
-                                        else
-                                        {
-                                            _CatchCompositionData[o.Location.Y].CatchSubsampleCount = myCount;
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    msg = "Expected count is a whole number greater than zero";
-                                }
-                            }
-                            else
-                            {
-                                msg = "Expected count is a whole number greater than zero";
-                            }
-                            break;
-                    }
-                }
+                              case "txtSubWt":
+                                  ccd.CatchSubsampleWt = null;
+                                  break;
+
+                              case "txtCount":
+                                  ccd.CatchCount = null;
+                                  break;
+
+                              case "txtSubCount":
+                                  ccd.CatchSubsampleCount = null;
+                                  break;
+                          }
+                      }
+                      else if (s.Length > 0)
+                      {
+                          switch (o.Name)
+                          {
+                              case "txtIdentificationType":
+                                  break;
+
+                              case "txtName1":
+                                  break;
+
+                              case "txtName2":
+                                  if (CurrentIDType == CatchComposition.Identification.LocalName && o.Text.Length > 0)
+                                  {
+                                      msg = "This field should be blank";
+                                  }
+                                  break;
+
+                              case "txtWt":
+                              case "txtSubWt":
+                                  if (double.TryParse(s, out double myWeight))
+                                  {
+                                      if (myWeight > 0)
+                                      {
+                                          if (o.Name == "txtWt")
+                                              ccd.CatchWeight = myWeight;
+                                          else
+                                          {
+                                              if (myWeight < ccd.CatchWeight && ccd.CatchCount == null)
+                                              {
+                                                  ccd.CatchSubsampleWt = myWeight;
+                                              }
+                                              else
+                                              {
+                                                  msg = "A subsample is valid only if it is less than catch weight\n\r" +
+                                                        "and there is no catch count";
+                                              }
+                                          }
+                                      }
+                                      else
+                                      {
+                                          msg = "Expected weight is a number greater than zero";
+                                      }
+                                  }
+                                  else
+                                  {
+                                      msg = "Expected weight is a number greater than zero";
+                                  }
+                                  break;
+
+                              case "txtCount":
+                              case "txtSubCount":
+                                  if (int.TryParse(s, out int myCount))
+                                  {
+                                      if (myCount > 0)
+                                      {
+                                          if (myCount.ToString() != s)
+                                          {
+                                              msg = "Expected count is a whole number greater than zero";
+                                          }
+                                          else
+                                          {
+                                              if (o.Name == "txtCount")
+                                              {
+                                                  if (ccd.CatchSubsampleWt == null)
+                                                      ccd.CatchCount = myCount;
+                                                  else
+                                                      msg = "Catch count is only valid if there is no subsample weight";
+                                              }
+                                              else
+                                              {
+                                                  if (ccd.CatchWeight > 0 && ccd.CatchSubsampleWt != null)
+                                                      ccd.CatchSubsampleCount = myCount;
+                                                  else
+                                                  {
+                                                      msg = "Please enter values for weight and subsample weight";
+                                                  }
+                                              }
+                                          }
+                                      }
+                                      else
+                                      {
+                                          msg = "Expected count is a whole number greater than zero";
+                                      }
+                                  }
+                                  else
+                                  {
+                                      msg = "Expected count is a whole number greater than zero";
+                                  }
+                                  break;
+                          }
+                      }
+                  });
             });
 
             if (msg.Length > 0)
@@ -974,96 +1071,160 @@ namespace FAD3
             }
         }
 
-        private bool RowHasRequired(TextBox source)
+        private void MarkMissingFields(List<string> MissingFields, int LocationY)
         {
-            var hasRequired = false;
-            var requiredCount = 0;
+            foreach (var item in MissingFields)
+            {
+                foreach (Control c in panelUI.Controls)
+                {
+                    if (c.Name == item && c.Location.Y == LocationY)
+                    {
+                        c.BackColor = global.MissingFieldBackColor;
+                        break;
+                    }
+                }
+            }
+        }
+
+        private bool RowHasRequired(int LocationY)
+        {
+            var MissingFields = new List<string>();
+            var HasRequirements = true;
+            _CatchCompositionData[LocationY + _ScrollAmount].With(ccd =>
+          {
+              if (ccd.NameType == CatchComposition.Identification.Scientific)
+              {
+                  HasRequirements = ccd.Name1 != null && ccd.Name2 != null && ccd.CatchWeight > 0;
+                  if (!HasRequirements)
+                  {
+                      if (ccd.Name1 == null || ccd.Name1.Length == 0) MissingFields.Add("txtName1");
+                      if (ccd.Name2 == null || ccd.Name2.Length == 0) MissingFields.Add("txtName2");
+                      if (ccd.CatchWeight == 0) MissingFields.Add("txtWt");
+                  }
+              }
+              else
+              {
+                  HasRequirements = ccd.Name1.Length > 0 && ccd.CatchWeight > 0;
+                  if (!HasRequirements)
+                  {
+                      if (ccd.Name1.Length == 0) MissingFields.Add("txtName1");
+                      if (ccd.CatchWeight == 0) MissingFields.Add("txtWt");
+                  }
+              }
+
+              if (ccd.CatchCount == null && ccd.CatchSubsampleCount == null && ccd.CatchSubsampleWt == null)
+              {
+                  MissingFields.Add("txtCount");
+              }
+              else if (ccd.CatchCount == null)
+              {
+                  if (ccd.CatchSubsampleCount == null) MissingFields.Add("txtSubCount");
+                  if (ccd.CatchSubsampleWt == null) MissingFields.Add("txtSubWt");
+              }
+              //}
+          });
+            MarkMissingFields(MissingFields, LocationY);
+            return HasRequirements;
+        }
+
+        private bool RowHasRequired1(int LocationY)
+        {
+            var HasRequirements = true;
+            var counter = 0;
+            List<TextBox> fields = new List<TextBox>();
             foreach (Control c in panelUI.Controls)
             {
-                if (c.GetType().Name == "TextBox" && c.Location.Y == source.Location.Y)
+                if (c.Location.Y == LocationY && (c.Name == "txtIdentificationType"
+                                               || c.Name == "txtName1"
+                                               || c.Name == "txtName2"
+                                               || c.Name == "txtWt"))
+
                 {
-                    if (CurrentIDType == CatchComposition.Identification.Scientific)
+                    if (c.Text.Length == 0)
                     {
-                        if ((c.Name == "txtIdentificationType" || c.Name == "txtName1"
-                            || c.Name == "txtName2" || c.Name == "txtWt")
-                            && c.Text.Length > 0)
+                        if (CurrentIDType == CatchComposition.Identification.Scientific)
                         {
-                            ++requiredCount;
-                            if (requiredCount == 4)
+                            fields.Add((TextBox)c);
+                            HasRequirements = false;
+                            if (counter > 3)
                             {
-                                hasRequired = true;
                                 break;
                             }
                         }
                         else
                         {
-                            if (c.Name == "txtIdentificationType" || c.Name == "txtName1"
-                            || c.Name == "txtName2" || c.Name == "txtWt")
-                                c.BackColor = global.MissingFieldBackColor;
-                            //if (requiredCount < 4) break;
+                            if (c.Name != "txtName2")
+                            {
+                                fields.Add((TextBox)c);
+                                HasRequirements = false;
+                                if (counter > 2)
+                                {
+                                    break;
+                                }
+                            }
                         }
                     }
                     else
                     {
-                        if ((c.Name == "txtIdentificationType" || c.Name == "txtName1"
-                             || c.Name == "txtWt") && c.Text.Length > 0)
+                        if (CurrentIDType == CatchComposition.Identification.Scientific)
                         {
-                            ++requiredCount;
-                            if (requiredCount == 3)
+                            if (counter == 4)
                             {
-                                hasRequired = true;
                                 break;
                             }
                         }
                         else
                         {
-                            if (c.Name == "txtIdentificationType" || c.Name == "txtName1" || c.Name == "txtWt")
-                                c.BackColor = global.MissingFieldBackColor;
+                            if (counter == 3)
+                            {
+                                break;
+                            }
                         }
                     }
+                    ++counter;
                 }
             }
-            return hasRequired;
+
+            return HasRequirements;
         }
 
         private void SetEditorEvents()
         {
             _cboEditor.KeyDown += cboEditor_KeyDown;
             _cboEditor.KeyPress += cboEditor_KeyPress;
-            _cboEditor.LostFocus += cboEditor_LostFocus;
             _cboEditor.Validating += cboEditor_Validating;
         }
 
         private void SetIDType(TextBox source)
         {
-            CurrentIDType = _CatchCompositionData[source.Location.Y].NameType;
+            CurrentIDType = _CatchCompositionData[source.Location.Y + _ScrollAmount].NameType;
         }
 
         private void SetRowStatusToEdited(Control source)
         {
-            if (_CatchCompositionData[source.Location.Y].dataStatus != global.fad3DataStatus.statusNew)
+            if (_CatchCompositionData[source.Location.Y + _ScrollAmount].dataStatus != global.fad3DataStatus.statusNew)
             {
-                _CatchCompositionData[source.Location.Y].dataStatus = global.fad3DataStatus.statusEdited;
+                _CatchCompositionData[source.Location.Y + _ScrollAmount].dataStatus = global.fad3DataStatus.statusEdited;
             }
         }
 
         private bool ValidateForm()
         {
             var IsValidated = true;
-            foreach (Control c in panelUI.Controls)
+
+            foreach (var item in _CatchCompositionData)
             {
-                if (c.Name == "txtIdentificationType")
+                if (!RowHasRequired(item.Key))
                 {
-                    SetIDType((TextBox)c);
-                    if (!RowHasRequired((TextBox)c))
-                    {
-                        IsValidated = false;
-                        break;
-                    }
-                    //break;
+                    IsValidated = false;
                 }
             }
             return IsValidated;
+        }
+
+        private void OnpanelUI_Scroll(object sender, ScrollEventArgs e)
+        {
+            _ScrollAmount = e.NewValue;
         }
     }
 }
