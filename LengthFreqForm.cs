@@ -23,14 +23,16 @@ namespace FAD3
         private bool _UniqueLenghtClasses = false;
         private List<double> _LengthClasses = new List<double>();
         private double _OldLength;
+        private MainForm _parent_form;
 
-        public LengthFreqForm(bool IsNew, sampling sampling, string CatchRowGuid, string CatchName)
+        public LengthFreqForm(bool IsNew, sampling sampling, string CatchRowGuid, string CatchName, MainForm Parent)
         {
             InitializeComponent();
             _CatchRowGuid = CatchRowGuid;
             _CatchName = CatchName;
             _sampling = sampling;
             _IsNew = IsNew;
+            _parent_form = Parent;
             labelTitle.Text = $"Length-frequency table for {CatchName}";
             if (IsNew)
             {
@@ -163,7 +165,11 @@ namespace FAD3
 
                     if (ValidationPassed)
                     {
-                        if (SaveLFData()) Close();
+                        if (SaveLFData())
+                        {
+                            Close();
+                            _parent_form.RefreshLF_GMS();
+                        }
                     }
                     else
                     {

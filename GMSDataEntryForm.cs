@@ -33,8 +33,9 @@ namespace FAD3
         private GMSManager.Taxa _taxa = GMSManager.Taxa.To_be_determined;
         private bool _UpdateSequence = false;
         private int _y = 5;
+        private MainForm _parent_form;
 
-        public GMSDataEntryForm(bool IsNew, sampling sampling, string CatchRowGuid, string CatchName, GMSManager.Taxa taxa)
+        public GMSDataEntryForm(bool IsNew, sampling sampling, string CatchRowGuid, string CatchName, GMSManager.Taxa taxa, MainForm Parent)
         {
             InitializeComponent();
             _CatchRowGuid = CatchRowGuid;
@@ -42,6 +43,7 @@ namespace FAD3
             _sampling = sampling;
             _IsNew = IsNew;
             _taxa = taxa;
+            _parent_form = Parent;
         }
 
         //private void AddRow(bool IsNew, double? Len = null, double? Wgt = null,
@@ -435,7 +437,11 @@ namespace FAD3
                     if (ValidateData())
                     {
                         SaveOptionsToRegistry();
-                        if (SaveGMS()) Close();
+                        if (SaveGMS())
+                        {
+                            Close();
+                            _parent_form.RefreshLF_GMS();
+                        }
                     }
                     break;
 

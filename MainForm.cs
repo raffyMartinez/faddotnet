@@ -975,7 +975,10 @@ namespace FAD3
                         break;
 
                     case "lvLF_GMS":
-                        ShowLFForm();
+                        if (_CatchSubRow == global.fad3CatchSubRow.LF)
+                            ShowLFForm();
+                        else if (_CatchSubRow == global.fad3CatchSubRow.GMS)
+                            ShowGMSForm(_taxa);
                         break;
                 }
             });
@@ -1980,6 +1983,11 @@ namespace FAD3
             }
         }
 
+        public void RefreshLF_GMS()
+        {
+            Show_LF_GMS_List(GetLVCatch().SelectedItems[0].Name, _taxa);
+        }
+
         private void Show_LF_GMS_List(string CatchRowGuid, GMSManager.Taxa taxa = GMSManager.Taxa.To_be_determined)
         {
             var lvc = GetLVLF_GMS();
@@ -2174,7 +2182,7 @@ namespace FAD3
             {
                 GMSDataEntryForm fgms = new GMSDataEntryForm(isNew, _Sampling,
                                           lvCatch.SelectedItems[0].Name,
-                                          lvCatch.SelectedItems[0].SubItems[1].Text, _taxa);
+                                          lvCatch.SelectedItems[0].SubItems[1].Text, _taxa, this);
                 fgms.ShowDialog(this);
             }
         }
@@ -2186,7 +2194,7 @@ namespace FAD3
 
             lff = new LengthFreqForm(IsNew, _Sampling,
                                       lvCatch.SelectedItems[0].Name,
-                                      lvCatch.SelectedItems[0].SubItems[1].Text);
+                                      lvCatch.SelectedItems[0].SubItems[1].Text, this);
 
             lff.ShowDialog(this);
             Show_LF_GMS_List(lvCatch.SelectedItems[0].Name);
