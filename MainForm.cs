@@ -2002,7 +2002,7 @@ namespace FAD3
             }
             else if (_CatchSubRow == global.fad3CatchSubRow.GMS)
             {
-                foreach (KeyValuePair<string, GMSManager.GMSLine> kv in GMSManager.GMSData(CatchRowGuid))
+                foreach (KeyValuePair<string, GMSLineClass> kv in GMSManager.RetrieveGMSData(CatchRowGuid))
                 {
                     var lvi = new ListViewItem(new string[]
                     {
@@ -2025,6 +2025,11 @@ namespace FAD3
             }
         }
 
+        public void RefreshCatchComposition()
+        {
+            ShowCatchComposition(_SamplingGUID);
+        }
+
         private void ShowCatchComposition(string SamplingGuid)
         {
             if (_subListExisting)
@@ -2033,7 +2038,7 @@ namespace FAD3
                 lv.Items.Clear();
                 int n = 1;
                 //foreach (KeyValuePair<string, sampling.CatchLine> kv in _Sampling.CatchComp())
-                foreach (KeyValuePair<string, CatchLineClass> kv in CatchComposition.CatchComp(_SamplingGUID))
+                foreach (KeyValuePair<string, CatchLineClass> kv in CatchComposition.RetrieveCatchComposition(_SamplingGUID))
                 {
                     var lvi = new ListViewItem(new string[]
                     {

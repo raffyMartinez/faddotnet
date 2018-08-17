@@ -304,15 +304,20 @@ namespace FAD3
                 }
 
                 //we delete the children catch composition data
+                query = $"Delete * from tblCatchComp WHERE tblCatchComp.SamplingGUID = {{{samplingGUID}}}";
+                using (OleDbCommand update = new OleDbCommand(query, conection))
+                {
+                    update.ExecuteNonQuery();
+                }
 
-                query = $@"Delete * from tblCatchComp WHERE tblCatchComp.SamplingGUID = {{{samplingGUID}}}";
+                //we delete the gear specs of the sampling
+                query = $"Delete * from tblSampledGearSpec where SamplingGUID = {{{samplingGUID}}}";
                 using (OleDbCommand update = new OleDbCommand(query, conection))
                 {
                     update.ExecuteNonQuery();
                 }
 
                 //now we delete the parent catch and effort data
-
                 query = $"Delete * from tblSampling where SamplingGUID = {{{samplingGUID}}}";
                 using (OleDbCommand update = new OleDbCommand(query, conection))
                 {

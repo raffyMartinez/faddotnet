@@ -34,16 +34,19 @@ namespace FAD3
         public bool LiveFish { get; set; }
         public CatchComposition.Identification NameType { get; set; }
         public int? TaxaNumber { get; set; }
+        public int Sequence { get; set; }
 
-        public CatchLineClass()
+        public CatchLineClass(string inSamplingGUID)
         {
+            SamplingGUID = inSamplingGUID;
         }
 
-        public CatchLineClass(string inName1, string inName2, string inCatchName, string inSamplingGUID,
+        public CatchLineClass(int inSequence, string inName1, string inName2, string inCatchName, string inSamplingGUID,
                               string inCatchCompGUID, string inCatchNameGUID,
                               double inCatchWeight, int? inCatchCount = null,
                               int? inTaxaNumber = null)
         {
+            Sequence = inSequence;
             Name1 = inName1;
             Name2 = inName2;
             CatchName = inCatchName;
@@ -62,10 +65,11 @@ namespace FAD3
             dataStatus = global.fad3DataStatus.statusFromDB;
         }
 
-        public CatchLineClass(string inName1, string inName2, string inCatchName, string inSamplingGUID,
+        public CatchLineClass(int inSequence, string inName1, string inName2, string inCatchName, string inSamplingGUID,
                               string inCatchLineGUID, string inCatchNameGUID,
                               double inCatchWeight, int? inTaxaNumber = null)
         {
+            Sequence = inSequence;
             Name1 = inName1;
             Name2 = inName2;
             CatchName = inCatchName;

@@ -54,7 +54,7 @@
             this.panelUI.Name = "panelUI";
             this.panelUI.Size = new System.Drawing.Size(795, 347);
             this.panelUI.TabIndex = 0;
-            this.panelUI.Scroll += new System.Windows.Forms.ScrollEventHandler(this.OnpanelUI_Scroll);
+            this.panelUI.Scroll += new System.Windows.Forms.ScrollEventHandler(this.OnPanelUI_Scroll);
             // 
             // buttonOK
             // 

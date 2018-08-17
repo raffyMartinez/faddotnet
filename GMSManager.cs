@@ -50,7 +50,7 @@ namespace FAD3
             Female
         }
 
-        public struct GMSLine
+        public struct GMSLine1
         {
             public string RowGuid { get; set; }
             public string CatchRowGUID { get; set; }
@@ -123,7 +123,7 @@ namespace FAD3
             return myStages;
         }
 
-        public static FishCrabGMS MaturityStageFromText(string stage, Taxa taxa)
+        public static FishCrabGMS GMSStageFromString(string stage, Taxa taxa)
         {
             FishCrabGMS myStage = FishCrabGMS.AllTaxaNotDetermined;
             switch (taxa)
@@ -273,10 +273,10 @@ namespace FAD3
             return gms_stage;
         }
 
-        public static Dictionary<string, GMSLine> GMSData(string CatchCompRowNo)
+        public static Dictionary<string, GMSLineClass> RetrieveGMSData(string CatchCompRowNo)
         {
             _GMSMeasurementRows = 0;
-            Dictionary<string, GMSLine> mydata = new Dictionary<string, GMSLine>();
+            Dictionary<string, GMSLineClass> mydata = new Dictionary<string, GMSLineClass>();
             var dt = new DataTable();
             using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
             {
@@ -285,12 +285,12 @@ namespace FAD3
                     conection.Open();
 
                     string query = $@"SELECT tblGMS.RowGUID, tblGMS.Gonadwt, tblGMS.GMS, tblGMS.Sex, tblGMS.Wt, tblGMS.Len,
-                                   tblGMS.CatchCompRow, tblTaxa.TaxaNo, tblTaxa.Taxa FROM tblTaxa INNER JOIN
+                                   tblGMS.CatchCompRow, tblGMS.Sequence, tblTaxa.TaxaNo, tblTaxa.Taxa FROM tblTaxa INNER JOIN
                                    (tblAllSpecies INNER JOIN(tblCatchComp INNER JOIN tblGMS ON
                                    tblCatchComp.RowGUID = tblGMS.CatchCompRow) ON
                                    tblAllSpecies.SpeciesGUID = tblCatchComp.NameGUID)
                                    ON tblTaxa.TaxaNo = tblAllSpecies.TaxaNo
-                                   WHERE tblGMS.CatchCompRow ={{{CatchCompRowNo}}}";
+                                   WHERE tblGMS.CatchCompRow ={{{CatchCompRowNo}}} ORDER By tblGMS.Sequence";
 
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
@@ -304,24 +304,23 @@ namespace FAD3
                         Enum.TryParse(dr["Sex"].ToString(), out sex);
                         GMSManager.Taxa taxa = Taxa.To_be_determined;
                         Enum.TryParse(dr["TaxaNo"].ToString(), out taxa);
-
-                        var myGMS = new GMSLine
-                        {
-                            TaxaName = dr["Taxa"].ToString(),
-                            Taxa = taxa,
-                            Sex = sex,
-                            GMS = gms,
-                            DataStatus = global.fad3DataStatus.statusFromDB,
-                            RowGuid = dr["RowGUID"].ToString(),
-                            CatchRowGUID = dr["CatchCompRow"].ToString()
-                        };
+                        double? Length = null;
+                        double? Weight = null;
+                        double? GonadWeight = null;
+                        int Sequence = 0;
 
                         if (dr["Len"].ToString().Length > 0)
-                            myGMS.Length = double.Parse(dr["Len"].ToString());
+                            Length = double.Parse(dr["Len"].ToString());
                         if (dr["Wt"].ToString().Length > 0)
-                            myGMS.Weight = double.Parse(dr["GonadWt"].ToString());
+                            Weight = double.Parse(dr["GonadWt"].ToString());
                         if (dr["GonadWt"].ToString().Length > 0)
-                            myGMS.GonadWeight = double.Parse(dr["GonadWt"].ToString());
+                            GonadWeight = double.Parse(dr["GonadWt"].ToString());
+                        if (dr["Sequence"].ToString().Length > 0)
+                            Sequence = int.Parse(dr["Sequence"].ToString());
+
+                        GMSLineClass myGMS = new GMSLineClass(dr["CatchCompRow"].ToString(), dr["RowGUID"].ToString(),
+                                    Length, Weight, GonadWeight, sex, gms, dr["Taxa"].ToString(), taxa,
+                                    global.fad3DataStatus.statusFromDB, Sequence);
 
                         mydata.Add(dr["RowGUID"].ToString(), myGMS);
                         _GMSMeasurementRows++;
@@ -335,9 +334,7 @@ namespace FAD3
             return mydata;
         }
 
-        public static bool UpdateGMS(Dictionary<string, (string RowGuid, int Sequence, double length, double? weight,
-                                GMSManager.sex sex, GMSManager.FishCrabGMS gms, double? gonadWeight,
-                                string catchRowGuid, global.fad3DataStatus DataStatus)> gmsRows)
+        public static bool UpdateGMSData(Dictionary<int, GMSLineClass> gmsRows)
         {
             var rows = gmsRows.Count;
             var sql = "";
@@ -349,59 +346,55 @@ namespace FAD3
                     conn.Open();
                     foreach (var item in gmsRows)
                     {
+                        var Weight = item.Value.Weight == null ? "null" : item.Value.Weight.ToString();
+                        var GonadWeight = item.Value.GonadWeight == null ? "null" : item.Value.GonadWeight.ToString();
+                        var Length = item.Value.Length == null ? "null" : item.Value.Length.ToString();
+
                         switch (item.Value.DataStatus)
                         {
                             case global.fad3DataStatus.statusEdited:
                                 sql = $@"Update tblGMS set
-                                 Len = {item.Value.length},
-                                 Wt = {item.Value.weight},
-                                 Sex = {item.Value.sex},
-                                 GMS = {item.Value.gms},
-                                 Gonadwt = {item.Value.gonadWeight}
+                                 Len = {Length},
+                                 Wt = {Weight},
+                                 Sex = {(int)item.Value.Sex},
+                                 GMS = {(int)item.Value.GMS},
+                                 Gonadwt = {GonadWeight}
                                  WHERE RowGuid = {{{item.Value.RowGuid}}}";
+
+                                using (OleDbCommand update = new OleDbCommand(sql, conn))
+                                {
+                                    if (update.ExecuteNonQuery() > 0) n++;
+                                }
+
                                 break;
 
                             case global.fad3DataStatus.statusNew:
                                 sql = $@"Insert into tblGMS (Len,Wt,Sex,GMS,GonadWt,CatchCompRow,RowGUID,Sequence) values (
-                                 {item.Value.length}, {item.Value.weight}, {item.Value.sex}, {item.Value.gms},
-                                 {item.Value.gonadWeight}, {{{item.Value.catchRowGuid}}}, {{{item.Value.RowGuid}}},
-                                 {item.Value.Sequence}";
+                                 {Length}, {Weight}, {(int)item.Value.Sex}, {(int)item.Value.GMS},
+                                 {GonadWeight}, {{{item.Value.CatchRowGUID}}}, {{{item.Value.RowGuid}}},
+                                 {item.Value.Sequence})";
+
+                                using (OleDbCommand update = new OleDbCommand(sql, conn))
+                                {
+                                    if (update.ExecuteNonQuery() > 0) n++;
+                                }
+
                                 break;
 
                             case global.fad3DataStatus.statusForDeletion:
                                 sql = $"Delete * from tblGMS where RowGUID = {{{item.Value.RowGuid}}}";
+
+                                using (OleDbCommand update = new OleDbCommand(sql, conn))
+                                {
+                                    if (update.ExecuteNonQuery() > 0) n++;
+                                }
+
                                 break;
                         }
-                    }
-
-                    using (OleDbCommand update = new OleDbCommand(sql, conn))
-                    {
-                        if (update.ExecuteNonQuery() > 0) n++;
                     }
                 }
             }
             return n > 0;
-        }
-
-        public static bool DeleteGMSLine(string RowGUID)
-        {
-            bool Success = false;
-            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
-            {
-                try
-                {
-                    string query = $"Delete * from tblGMS where RowGUID = {{{RowGUID}}}";
-                    OleDbCommand update = new OleDbCommand(query, conn);
-                    conn.Open();
-                    Success = (update.ExecuteNonQuery() > 0);
-                    conn.Close();
-                }
-                catch (Exception ex)
-                {
-                    Logger.Log(ex);
-                }
-            }
-            return Success;
         }
     }
 }

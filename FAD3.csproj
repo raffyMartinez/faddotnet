@@ -135,6 +135,7 @@
     <Compile Include="FishingGroundExtentsForm.Designer.cs">
       <DependentUpon>FishingGroundExtentsForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="GMSLineClass.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="extension.cs" />
     <Compile Include="FishingGroundDefinitionForm.cs">

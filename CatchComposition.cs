@@ -28,6 +28,9 @@ namespace FAD3
         {
             var sql = "";
             var resultCount = 0;
+            var InsertCount = 0;
+            var UpdateCount = 0;
+            var DeleteCount = 0;
             using (var conn = new OleDbConnection(global.ConnectionString))
             {
                 conn.Open();
@@ -39,8 +42,10 @@ namespace FAD3
 
                     if (item.Value.dataStatus == global.fad3DataStatus.statusNew)
                     {
-                        sql = $@"Insert into tblCatchComp (NameGUID, NameType, RowGUID, SamplingGUID) values (
-                          {{{item.Value.CatchNameGUID}}}, {(int)item.Value.NameType}, {{{item.Value.CatchCompGUID}}}, {{{item.Value.SamplingGUID}}})";
+                        InsertCount++;
+                        sql = $@"Insert into tblCatchComp (NameGUID, NameType, RowGUID, SamplingGUID, Sequence) values (
+                          {{{item.Value.CatchNameGUID}}}, {(int)item.Value.NameType}, {{{item.Value.CatchCompGUID}}},
+                          {{{item.Value.SamplingGUID}}}, {item.Value.Sequence})";
 
                         OleDbCommand update = new OleDbCommand(sql, conn);
                         if (update.ExecuteNonQuery() > 0) resultCount++;
@@ -54,6 +59,7 @@ namespace FAD3
                     }
                     else if (item.Value.dataStatus == global.fad3DataStatus.statusEdited)
                     {
+                        UpdateCount++;
                         sql = $@"Update tblCatchDetail set
                             wt = {item.Value.CatchWeight},
                             ct = {CatchCount},
@@ -76,15 +82,19 @@ namespace FAD3
                     }
                     else if (item.Value.dataStatus == global.fad3DataStatus.statusForDeletion)
                     {
+                        DeleteCount++;
                         sql = $"Delete * from tblCatchDetail WHERE CatchCompRow = {{{item.Value.CatchCompGUID}}}";
                         sql = $"Delete * from tbkCatchComp WHERE RowGUID = {{{item.Value.SamplingGUID}}}";
                     }
                 }
             }
-            return resultCount > 0;
+            if ((InsertCount + UpdateCount) > 0)
+                return resultCount > 0;
+            else
+                return resultCount == (InsertCount + UpdateCount);
         }
 
-        public static Dictionary<string, CatchLineClass> CatchComp(string SamplingGUID)
+        public static Dictionary<string, CatchLineClass> RetrieveCatchComposition(string SamplingGUID)
         {
             _CatchCompositionRows = 0;
             Dictionary<string, CatchLineClass> myCatch = new Dictionary<string, CatchLineClass>();
@@ -101,7 +111,7 @@ namespace FAD3
                     conection.Open();
 
                     string query = $@"SELECT tblSampling.SamplingGUID, Identification, tblCatchDetail.CatchCompRow, tblCatchComp.NameGUID, temp_AllNames.Name1,
-                                    temp_AllNames.Name2, tblSampling.WtCatch, tblSampling.WtSample, tblCatchDetail.Live, tblCatchDetail.wt,
+                                    temp_AllNames.Name2, tblSampling.WtCatch, tblSampling.WtSample, tblCatchDetail.Live, tblCatchDetail.wt, tblCatchComp.Sequence,
                                     tblCatchDetail.ct, tblCatchDetail.swt, tblCatchDetail.sct, tblCatchDetail.FromTotal, tblAllSpecies.TaxaNo, tblCatchDetail.RowGUID As CatchDetailRow
                                     FROM ((tblSampling INNER JOIN (tblCatchComp INNER JOIN temp_AllNames ON tblCatchComp.NameGUID = temp_AllNames.NameNo)
                                     ON tblSampling.SamplingGUID = tblCatchComp.SamplingGUID) INNER JOIN tblCatchDetail ON
@@ -149,7 +159,11 @@ namespace FAD3
                         }
 
                         //defines a catch line
-                        CatchLineClass myLine = new CatchLineClass(Name1, Name2, CatchName, dr["SamplingGUID"].ToString(),
+                        var Sequence = 0;
+                        if (int.TryParse(dr["Sequence"].ToString(), out int v))
+                            Sequence = v;
+
+                        CatchLineClass myLine = new CatchLineClass(Sequence, Name1, Name2, CatchName, dr["SamplingGUID"].ToString(),
                                         dr["CatchCompRow"].ToString(), dr["NameGUID"].ToString(),
                                         Convert.ToDouble(dr["wt"]), CatchCount, TaxaNumber)
                         {

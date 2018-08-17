@@ -62,6 +62,7 @@
             this.panelUI.Name = "panelUI";
             this.panelUI.Size = new System.Drawing.Size(476, 364);
             this.panelUI.TabIndex = 0;
+            this.panelUI.Scroll += new System.Windows.Forms.ScrollEventHandler(this.panelUI_Scroll);
             // 
             // panelOptions
             // 
@@ -307,10 +308,12 @@
             this.Controls.Add(this.panelUI);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.KeyPreview = true;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "GMSDataEntryForm";
             this.Text = "GMSDataEntryForm";
             this.Load += new System.EventHandler(this.OnGMSDataEntryForm_Load);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnGMSDataEntryForm_KeyDown);
             this.panelUI.ResumeLayout(false);
             this.panelOptions.ResumeLayout(false);
             this.panelOptions.PerformLayout();
