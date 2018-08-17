@@ -35,6 +35,7 @@ namespace FAD3
         private int _ScrollAmount = 0;
         private int _spacer = 3;
         private int _y = 0;
+        private string _NewGenus = "";
 
         public CatchCompositionForm(bool IsNew, MainForm parent, string SamplingGuid, string ReferenceNumber)
         {
@@ -429,6 +430,7 @@ namespace FAD3
 
         private void OncboEditor_Validating(object sender, CancelEventArgs e)
         {
+            _NewGenus = "";
             ((ComboBox)sender).With(o =>
             {
                 _CatchCompositionData[o.Location.Y + _ScrollAmount].With(ccd =>
@@ -445,18 +447,82 @@ namespace FAD3
                                 break;
 
                             case "cboGenus":
-                                if (o.Text != _currentGenus)
+                                if (o.FindString(o.Text) > -1)
                                 {
-                                    ccd.Name1 = o.Text;
-                                    _currentGenus = o.Text;
+                                    if (o.Text != _currentGenus)
+                                    {
+                                        ccd.Name1 = o.Text;
+                                        _currentGenus = o.Text;
+                                    }
+                                }
+                                else
+                                {
+                                    DialogResult dr = MessageBox.Show($"{o.Text} is a new genus\r\nWould you like to create a new species using the new genus?",
+                                                                      "Item not in list", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
+                                    if (dr == DialogResult.Yes)
+                                    {
+                                        _NewGenus = o.Text;
+                                    }
+                                    else
+                                    {
+                                        o.Text = "";
+                                        _currentTextBox.Text = "";
+                                        _currentTextBox.Focus();
+                                        e.Cancel = true;
+                                    }
                                 }
                                 break;
 
                             case "cboSpecies":
                             case "cboLocalName":
-                                ccd.CatchNameGUID = ((KeyValuePair<string, string>)o.SelectedItem).Key;
-                                ccd.Name1 = GetTextBoxAtRow(o.Location.Y, "txtName1").Text;
-                                ccd.Name2 = GetTextBoxAtRow(o.Location.Y, "txtName2").Text;
+                                if (o.FindString(o.Text) > -1)
+                                {
+                                    ccd.CatchNameGUID = ((KeyValuePair<string, string>)o.SelectedItem).Key;
+                                    ccd.Name1 = GetTextBoxAtRow(o.Location.Y, "txtName1").Text;
+                                    ccd.Name2 = GetTextBoxAtRow(o.Location.Y, "txtName2").Text;
+                                }
+                                else
+                                {
+                                    //text not in list
+                                    var msg = "";
+                                    if (o.Name == "cboSpecies")
+                                    {
+                                        msg = $"{_currentGenus} {o.Text} is not in the list of species\r\nWould you like to add a new species?";
+                                    }
+                                    else
+                                    {
+                                        msg = $"{o.Text} is not in the list of local names\r\nWould you like to add a new local name?";
+                                    }
+                                    if (_NewGenus.Length == 0 && msg.Length > 0)
+                                    {
+                                        DialogResult dr = MessageBox.Show(msg, "Item not in list", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
+                                        if (dr == DialogResult.Yes)
+                                        {
+                                            if (o.Name == "cboSpecies")
+                                            {
+                                                SpeciesNameForm snf = new SpeciesNameForm(_currentGenus, o.Text);
+                                                snf.ShowDialog(this);
+                                            }
+                                            else
+                                            {
+                                                //add new local name here
+                                            }
+                                            _NewGenus = "";
+                                        }
+                                        else
+                                        {
+                                            o.Text = "";
+                                            _currentTextBox.Text = "";
+                                            e.Cancel = true;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        //add new genus and species here
+                                        SpeciesNameForm snf = new SpeciesNameForm(_NewGenus, o.Text);
+                                        snf.ShowDialog(this);
+                                    }
+                                }
                                 break;
                         }
                     }
@@ -476,12 +542,11 @@ namespace FAD3
                     }
                 });
             });
-            if (_currentTextBox.Text != _cboEditor.Text)
+            if (!e.Cancel && _currentTextBox.Text != _cboEditor.Text)
             {
-                _currentTextBox.Text = _cboEditor.Text;
+                _currentTextBox.Text = _cboEditor.Text.Trim();
                 SetRowStatusToEdited(_currentTextBox);
             }
-            e.Cancel = false;
         }
 
         /// <summary>
@@ -497,9 +562,9 @@ namespace FAD3
         {
             _currentTextBox = txt;
             bool Proceed = true;
-            //rowIDType(txt);
-            _cboEditor = null;
             var s = txt.Text;
+            _cboEditor = null;
+
             switch (txt.Name)
             {
                 case "txtIdentificationType":
@@ -548,23 +613,32 @@ namespace FAD3
                     {
                         if (txt.Name == "txtIdentificationType")
                         {
-                            var IdType = (KeyValuePair<CatchComposition.Identification, string>)_cboEditor.Items[itemIndex];
-                            _cboEditor.Text = CatchComposition.IdentificationTypeToString(IdType.Key);
+                            var kv = (KeyValuePair<CatchComposition.Identification, string>)_cboEditor.Items[itemIndex];
+                            _cboEditor.Text = CatchComposition.IdentificationTypeToString(kv.Key);
+                        }
+                        else if (txt.Name == "txtName2")
+                        {
+                            var kv = (KeyValuePair<string, string>)_cboEditor.Items[itemIndex];
+                            _cboEditor.Text = kv.Value;
+                        }
+                        else if (txt.Name == "txtName1" && _cboEditor.Name == "cboLocalName")
+                        {
+                            var kv = (KeyValuePair<string, string>)_cboEditor.Items[itemIndex];
+                            _cboEditor.Text = kv.Value;
                         }
                         else
                         {
                             _cboEditor.Text = _cboEditor.Items[itemIndex].ToString();
-                            _cboEditor.SelectionStart = 0;
-                            _cboEditor.SelectionLength = s.Length;
                         }
                     }
                 }
-
-                if (key > 32)
+                else if (s.Length > 0)
                 {
-                    _cboEditor.Text = key.ToString();
-                    _cboEditor.SelectionStart = 1;
+                    _cboEditor.Text = s;
                 }
+
+                _cboEditor.SelectionStart = 1;
+                _cboEditor.SelectionLength = _cboEditor.Text.Length;
 
                 SetEditorEvents();
             }

@@ -184,6 +184,12 @@
       <DependentUpon>AboutFadForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Enumerators.cs" />
+    <Compile Include="SpeciesNameForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SpeciesNameForm.Designer.cs">
+      <DependentUpon>SpeciesNameForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="TargetAreaForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -314,6 +320,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="AboutFadForm.resx">
       <DependentUpon>AboutFadForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SpeciesNameForm.resx">
+      <DependentUpon>SpeciesNameForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="TargetAreaForm.resx">
       <DependentUpon>TargetAreaForm.cs</DependentUpon>

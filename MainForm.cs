@@ -265,6 +265,11 @@ namespace FAD3
 
         private void OnMRUlist_FileSelected(string filename)
         {
+            if (_subListExisting)
+            {
+                SetupCatchListView(Show: false);
+            }
+
             _TreeLevel = "root";
             if (!SetupTree(filename, FromMRU: true))
             {
@@ -1945,7 +1950,7 @@ namespace FAD3
             panelSamplingButtons.Visible = Visible;
             if (Visible)
             {
-                this.panelSamplingButtons.Location = new Point(lvMain.Width - panelSamplingButtons.Width - 10, lvMain.Top + 50);
+                this.panelSamplingButtons.Location = new Point(lvMain.Width - panelSamplingButtons.Width - 30, lvMain.Top + 50);
             }
             CancelButton = buttonOK.Visible ? buttonOK : null;
         }

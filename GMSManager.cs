@@ -64,6 +64,76 @@ namespace FAD3
             public global.fad3DataStatus DataStatus { get; set; }
         }
 
+        public static Dictionary<int, string> RetrieveTaxaDictionary()
+        {
+            var taxaDictionary = new Dictionary<int, string>();
+            using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
+            {
+                conection.Open();
+
+                const string query = "Select TaxaNo, Taxa from tblTaxa order by Taxa";
+
+                var adapter = new OleDbDataAdapter(query, conection);
+                var dt = new DataTable();
+                adapter.Fill(dt);
+                foreach (DataRow dr in dt.Rows)
+                {
+                    taxaDictionary.Add(dr.Field<int>("TaxaNo"), dr.Field<string>("Taxa"));
+                }
+            }
+
+            return taxaDictionary;
+        }
+
+        public static string TaxaNameFromTaxa(Taxa taxa)
+        {
+            var taxaName = "";
+            switch (taxa)
+            {
+                case Taxa.To_be_determined:
+                    taxaName = "To be determined";
+                    break;
+
+                case Taxa.Cephalopods:
+                    taxaName = "Cephalopods";
+                    break;
+
+                case Taxa.Crabs:
+                    taxaName = "Crabs";
+                    break;
+
+                case Taxa.Fish:
+                    taxaName = "Fish";
+                    break;
+
+                case Taxa.Lobsters:
+                    taxaName = "Lobsters";
+                    break;
+
+                case Taxa.Sea_cucumbers:
+                    taxaName = "Sea cucumbers";
+                    break;
+
+                case Taxa.Sea_urchins:
+                    taxaName = "Sea urchins";
+                    break;
+
+                case Taxa.Shells:
+                    taxaName = "Shells";
+                    break;
+
+                case Taxa.Shrimps:
+                    taxaName = "Shrimps";
+                    break;
+
+                default:
+                    taxaName = "To be determined";
+                    break;
+            }
+
+            return taxaName;
+        }
+
         public static Taxa TaxaFromCatchNameGUID(string CatchNameGUID)
         {
             Taxa taxa = Taxa.To_be_determined;

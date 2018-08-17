@@ -45,6 +45,46 @@ namespace FAD3
             get { return _SciNamesCount; }
         }
 
+        public static (bool isFound, bool inFishbase, int? fishBaseNo, string notes,
+            short? genusKey1, short? genusKey2, short? speciesKey1, short? speciesKey2, GMSManager.Taxa taxa)
+            RetrieveSpeciesData(string speciesGuid)
+        {
+            var sql = $"Select * from tblAllSpecies where SpeciesGUID = {{{speciesGuid}}}";
+            var isFound = false;
+            var inFishbase = false;
+            int? fishBaseNo = null;
+            var notes = "";
+            short? genusKey1 = null;
+            short? genusKey2 = null;
+            short? speciesKey1 = null;
+            short? speciesKey2 = null;
+            GMSManager.Taxa taxa = GMSManager.Taxa.Fish;
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                conection.Open();
+                var adapter = new OleDbDataAdapter(sql, conection);
+                DataTable dt = new DataTable();
+                adapter.Fill(dt);
+                if (dt.Rows.Count > 0)
+                {
+                    DataRow dr = dt.Rows[0];
+                    isFound = true;
+                    inFishbase = (bool)dr["ListedFB"];
+
+                    if (inFishbase)
+                        fishBaseNo = int.Parse(dr["FBSpNo"].ToString());
+
+                    notes = dr["Notes"].ToString();
+                    genusKey1 = (short)dr["MPHG1"];
+                    genusKey2 = (short)dr["MPHG2"];
+                    speciesKey1 = (short)dr["MPHS1"];
+                    speciesKey2 = (short)dr["MPHS2"];
+                    Enum.TryParse(dr["TaxaNo"].ToString(), out taxa);
+                }
+                return (isFound, inFishbase, fishBaseNo, notes, genusKey1, genusKey2, speciesKey1, speciesKey2, taxa);
+            }
+        }
+
         private static void GetSpecies()
         {
             DataTable dt = new DataTable();

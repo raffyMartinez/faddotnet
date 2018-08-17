@@ -195,18 +195,18 @@ namespace FAD3
             this.panelSamplingButtons.Controls.Add(this.buttonMap);
             this.panelSamplingButtons.Controls.Add(this.buttonCatch);
             this.panelSamplingButtons.Controls.Add(this.buttonOK);
-            this.panelSamplingButtons.Location = new System.Drawing.Point(575, 28);
+            this.panelSamplingButtons.Location = new System.Drawing.Point(587, 28);
             this.panelSamplingButtons.Name = "panelSamplingButtons";
-            this.panelSamplingButtons.Size = new System.Drawing.Size(107, 133);
+            this.panelSamplingButtons.Size = new System.Drawing.Size(70, 133);
             this.panelSamplingButtons.TabIndex = 5;
             this.panelSamplingButtons.Visible = false;
             // 
             // buttonMap
             // 
             this.buttonMap.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonMap.Location = new System.Drawing.Point(20, 88);
+            this.buttonMap.Location = new System.Drawing.Point(7, 87);
             this.buttonMap.Name = "buttonMap";
-            this.buttonMap.Size = new System.Drawing.Size(69, 30);
+            this.buttonMap.Size = new System.Drawing.Size(57, 30);
             this.buttonMap.TabIndex = 2;
             this.buttonMap.Text = "Map";
             this.buttonMap.UseVisualStyleBackColor = true;
@@ -215,9 +215,9 @@ namespace FAD3
             // buttonCatch
             // 
             this.buttonCatch.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonCatch.Location = new System.Drawing.Point(20, 52);
+            this.buttonCatch.Location = new System.Drawing.Point(7, 51);
             this.buttonCatch.Name = "buttonCatch";
-            this.buttonCatch.Size = new System.Drawing.Size(69, 30);
+            this.buttonCatch.Size = new System.Drawing.Size(57, 30);
             this.buttonCatch.TabIndex = 1;
             this.buttonCatch.Text = "Catch";
             this.buttonCatch.UseVisualStyleBackColor = true;
@@ -226,9 +226,9 @@ namespace FAD3
             // buttonOK
             // 
             this.buttonOK.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonOK.Location = new System.Drawing.Point(20, 16);
+            this.buttonOK.Location = new System.Drawing.Point(7, 15);
             this.buttonOK.Name = "buttonOK";
-            this.buttonOK.Size = new System.Drawing.Size(69, 30);
+            this.buttonOK.Size = new System.Drawing.Size(57, 30);
             this.buttonOK.TabIndex = 0;
             this.buttonOK.Text = "OK";
             this.buttonOK.UseVisualStyleBackColor = true;
@@ -564,7 +564,7 @@ namespace FAD3
             this.tbButtonExit.Text = "toolStripButton6";
             this.tbButtonExit.ToolTipText = "Exit";
             // 
-            // frmMain
+            // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -576,7 +576,7 @@ namespace FAD3
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
             this.MainMenuStrip = this.menuMenuBar;
-            this.Name = "frmMain";
+            this.Name = "MainForm";
             this.Text = "Fisheries Assessment Database";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Activated += new System.EventHandler(this.frmMain_Activated);

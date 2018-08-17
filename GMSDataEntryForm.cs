@@ -153,6 +153,7 @@ namespace FAD3
                 o.TextChanged += OnTextChanged;
                 o.GotFocus += OnTextFocus;
                 o.Validating += OnTextValidating;
+                o.DoubleClick += OnTextBoxDoubleClick;
                 o.Tag = "";
                 if (!IsNew)
                 {
@@ -170,6 +171,7 @@ namespace FAD3
                 o.GotFocus += OnTextFocus;
                 o.Validating += OnTextValidating;
                 o.KeyPress += OnTextBoxKeyPress;
+                o.DoubleClick += OnTextBoxDoubleClick;
                 if (!IsNew)
                 {
                     if (_GMSData[_y].Weight != null) o.Text = _GMSData[_y].Weight.ToString();
@@ -187,6 +189,7 @@ namespace FAD3
                 o.GotFocus += OnTextFocus;
                 o.Validating += OnTextValidating;
                 o.KeyPress += OnTextBoxKeyPress;
+                o.DoubleClick += OnTextBoxDoubleClick;
                 if (!IsNew)
                 {
                     o.Text = _GMSData[_y].Sex.ToString();
@@ -204,6 +207,7 @@ namespace FAD3
                 o.GotFocus += OnTextFocus;
                 o.Validating += OnTextValidating;
                 o.KeyPress += OnTextBoxKeyPress;
+                o.DoubleClick += OnTextBoxDoubleClick;
                 if (!IsNew)
                 {
                     o.Text = GMSManager.GMSStageToString(_GMSData[_y].Taxa, _GMSData[_y].GMS);
@@ -220,6 +224,7 @@ namespace FAD3
                 o.GotFocus += OnTextFocus;
                 o.Validating += OnTextValidating;
                 o.KeyPress += OnTextBoxKeyPress;
+                o.DoubleClick += OnTextBoxDoubleClick;
                 if (!IsNew)
                 {
                     if (_GMSData[_y].GonadWeight != null) o.Text = _GMSData[_y].GonadWeight.ToString();
@@ -293,15 +298,15 @@ namespace FAD3
                         }
                     }
 
-                    //_cboEditor.SelectionStart = 0;
-                    //_cboEditor.SelectionLength = s.Length;
+                    _cboEditor.Text = key.ToString();
+                }
+                else if (s.Length > 0)
+                {
+                    _cboEditor.Text = s;
                 }
 
-                if (key > 32)
-                {
-                    _cboEditor.Text = key.ToString();
-                    _cboEditor.SelectionStart = 1;
-                }
+                //_cboEditor.SelectionStart = 0;
+                //_cboEditor.SelectionLength = _cboEditor.Text.Length;
 
                 SetEditorEvents();
             }
@@ -545,22 +550,6 @@ namespace FAD3
             }
         }
 
-        private void OnCombo_Keydown(object sender, KeyEventArgs e)
-        {
-            //if (e.KeyCode == Keys.Return)
-            //{
-            //    GetTextBox((ComboBox)sender, GetNext: true).Focus();
-            //}
-            //else if (e.KeyCode == Keys.Escape)
-            //{
-            //    ((ComboBox)sender).Hide();
-            //}
-        }
-
-        private void OnComboValidated(object sender, EventArgs e)
-        {
-        }
-
         private void OnGMSDataEntryForm_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Return && e.Shift)
@@ -617,6 +606,11 @@ namespace FAD3
         private void OnTextBoxKeyPress(object sender, KeyPressEventArgs e)
         {
             ControlToFocus((TextBox)sender, e.KeyChar);
+        }
+
+        private void OnTextBoxDoubleClick(object sender, EventArgs e)
+        {
+            ControlToFocus((TextBox)sender);
         }
 
         private void OnTextChanged(object sender, EventArgs e)
