@@ -45,6 +45,76 @@ namespace FAD3
             get { return _SciNamesCount; }
         }
 
+        public static bool UpdateSpeciesData()
+        {
+            return true;
+        }
+
+        public static (bool inFishBase, int? fishBaseSpeciesNo) NameInFishBaseEx(string genus, string species)
+        {
+            var inFishBase = false;
+            int? speciesNumber = null;
+            var sql = $"Select SpecCode from FBSpecies where Genus = '{genus.Trim()}' AND Species = '{species.Trim()}'";
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                var adapter = new OleDbDataAdapter(sql, conn);
+                DataTable dt = new DataTable();
+                adapter.Fill(dt);
+                if (dt.Rows.Count > 0)
+                {
+                    DataRow dr = dt.Rows[0];
+                    inFishBase = true;
+                    speciesNumber = (int)dr["SpecCode"];
+                }
+            }
+            return (inFishBase, speciesNumber);
+        }
+
+        public static bool NameInFishBase(string genus, string species)
+        {
+            var inFishBase = false;
+            var sql = $"Select ListedFB from tblAllSpecies where Genus = {genus} AND species = {species}";
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                using (OleDbCommand inFB = new OleDbCommand(sql, conn))
+                {
+                    inFishBase = (bool)inFB.ExecuteScalar();
+                }
+            }
+            return inFishBase;
+        }
+
+        public static List<(string fullName, string genus, string species)> RetrieveSpeciesWithSimilarMetaPhone(short genusKey1, short genusKey2, short speciesKey1, short speciesKey2)
+        {
+            var list = new List<(string fullName, string genus, string species)>();
+            var sql = $"Select Genus, species from tblAllSpecies where MPHG1 = {genusKey1} AND MPHG2 = {genusKey2} AND MPHS1 = {speciesKey1} AND MPHS2 = {speciesKey2}";
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                conection.Open();
+                var adapter = new OleDbDataAdapter(sql, conection);
+                DataTable dt = new DataTable();
+                adapter.Fill(dt);
+                if (dt.Rows.Count == 0)
+                {
+                    sql = $"Select Genus, species from tblAllSpecies where MPHG1 = {genusKey1} AND MPHS1 = {speciesKey1}";
+                    adapter = new OleDbDataAdapter(sql, conection);
+                    dt = new DataTable();
+                    adapter.Fill(dt);
+                }
+
+                foreach (DataRow dr in dt.Rows)
+                {
+                    var genus = dr["Genus"].ToString();
+                    var species = dr["species"].ToString();
+                    var fullName = $"{genus} {species}";
+                    list.Add((fullName, genus, species));
+                }
+            }
+            return list;
+        }
+
         public static (bool isFound, bool inFishbase, int? fishBaseNo, string notes,
             short? genusKey1, short? genusKey2, short? speciesKey1, short? speciesKey2, GMSManager.Taxa taxa)
             RetrieveSpeciesData(string speciesGuid)

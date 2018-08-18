@@ -430,7 +430,14 @@ namespace FAD3
 
         private void OncboEditor_Validating(object sender, CancelEventArgs e)
         {
-            _NewGenus = "";
+            //remove the validating event to prevent multiple validatings
+            _cboEditor.Validating -= OncboEditor_Validating;
+
+            //if true we change the currenttextbox text to the editor combobox text
+            //this is made false when we process a new name so the combobox text
+            //could be out of context already
+            var CompareNameChanges = true;
+
             ((ComboBox)sender).With(o =>
             {
                 _CatchCompositionData[o.Location.Y + _ScrollAmount].With(ccd =>
@@ -447,21 +454,33 @@ namespace FAD3
                                 break;
 
                             case "cboGenus":
+                                _NewGenus = "";
+
+                                //search for the combobox text in the combobox items
                                 if (o.FindString(o.Text) > -1)
                                 {
-                                    if (o.Text != _currentGenus)
-                                    {
-                                        ccd.Name1 = o.Text;
-                                        _currentGenus = o.Text;
-                                    }
+                                    //text is found in the items
+                                    //if (o.Text != _currentGenus)
+                                    //{
+                                    ccd.Name1 = o.Text;
+                                    _currentGenus = o.Text;
+                                    //}
                                 }
                                 else
                                 {
-                                    DialogResult dr = MessageBox.Show($"{o.Text} is a new genus\r\nWould you like to create a new species using the new genus?",
+                                    //text is not found in the items
+                                    DialogResult dr = MessageBox.Show($"{o.Text} is a new genus\r\nWould you like to create a new species based on the new genus?",
                                                                       "Item not in list", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
                                     if (dr == DialogResult.Yes)
                                     {
                                         _NewGenus = o.Text;
+                                        _currentTextBox.Text = _NewGenus;
+                                        _currentGenus = _NewGenus;
+
+                                        CompareNameChanges = false;
+
+                                        //empty the current row's name2 field
+                                        GetTextBox(null, _currentTextBox, true).Text = "";
                                     }
                                     else
                                     {
@@ -475,13 +494,29 @@ namespace FAD3
 
                             case "cboSpecies":
                             case "cboLocalName":
-                                if (o.FindString(o.Text) > -1)
+                                //search the text in the comboboox items
+                                var itemPosition = o.FindString(o.Text);
+                                var isInList = itemPosition > -1;
+
+                                if (isInList)
                                 {
-                                    ccd.CatchNameGUID = ((KeyValuePair<string, string>)o.SelectedItem).Key;
-                                    ccd.Name1 = GetTextBoxAtRow(o.Location.Y, "txtName1").Text;
-                                    ccd.Name2 = GetTextBoxAtRow(o.Location.Y, "txtName2").Text;
+                                    try
+                                    {
+                                        if (o.SelectedItem == null)
+                                            o.SelectedItem = itemPosition;
+
+                                        //we have to test if the found test matches any of the keys
+                                        ccd.CatchNameGUID = ((KeyValuePair<string, string>)o.SelectedItem).Key;
+                                        ccd.Name1 = GetTextBoxAtRow(o.Location.Y, "txtName1").Text;
+                                        ccd.Name2 = GetTextBoxAtRow(o.Location.Y, "txtName2").Text;
+                                    }
+                                    catch
+                                    {
+                                        isInList = false;
+                                    }
                                 }
-                                else
+
+                                if (!isInList)
                                 {
                                     //text not in list
                                     var msg = "";
@@ -493,21 +528,23 @@ namespace FAD3
                                     {
                                         msg = $"{o.Text} is not in the list of local names\r\nWould you like to add a new local name?";
                                     }
+
                                     if (_NewGenus.Length == 0 && msg.Length > 0)
                                     {
                                         DialogResult dr = MessageBox.Show(msg, "Item not in list", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
                                         if (dr == DialogResult.Yes)
                                         {
+                                            CompareNameChanges = false;
                                             if (o.Name == "cboSpecies")
                                             {
-                                                SpeciesNameForm snf = new SpeciesNameForm(_currentGenus, o.Text);
+                                                _currentTextBox.Text = _cboEditor.Text.Trim();
+                                                SpeciesNameForm snf = new SpeciesNameForm(_currentGenus, o.Text, this);
                                                 snf.ShowDialog(this);
                                             }
                                             else
                                             {
                                                 //add new local name here
                                             }
-                                            _NewGenus = "";
                                         }
                                         else
                                         {
@@ -519,7 +556,11 @@ namespace FAD3
                                     else
                                     {
                                         //add new genus and species here
-                                        SpeciesNameForm snf = new SpeciesNameForm(_NewGenus, o.Text);
+
+                                        CompareNameChanges = false;
+
+                                        _currentTextBox.Text = _cboEditor.Text.Trim();
+                                        SpeciesNameForm snf = new SpeciesNameForm(_NewGenus, o.Text, this);
                                         snf.ShowDialog(this);
                                     }
                                 }
@@ -528,6 +569,7 @@ namespace FAD3
                     }
                     else
                     {
+                        //combobox text is empty
                         switch (o.Name)
                         {
                             case "cboSpecies":
@@ -542,11 +584,50 @@ namespace FAD3
                     }
                 });
             });
-            if (!e.Cancel && _currentTextBox.Text != _cboEditor.Text)
+
+            if (!e.Cancel && _currentTextBox.Text != _cboEditor.Text && CompareNameChanges)
             {
                 _currentTextBox.Text = _cboEditor.Text.Trim();
                 SetRowStatusToEdited(_currentTextBox);
             }
+        }
+
+        public void NewName(bool Accepted, string acceptedGenus = "", string acceptedSpecies = "")
+        {
+            if (!Accepted)
+            {
+                //get the current row name1 and name2 textboxes
+                var txtGenus = GetTextBox(fromComboBox: null, fromTextBox: _currentTextBox, GetNext: false, GetPrevious: true);
+                var txtSpecies = GetTextBox(fromComboBox: null, fromTextBox: _currentTextBox);
+
+                if (_NewGenus.Length > 0)
+                {
+                    txtSpecies.Text = "";
+                    txtGenus.Text = "";
+                    _cboEditor.Text = "";
+                }
+                else
+                {
+                    if (acceptedGenus.Length > 0 && acceptedSpecies.Length > 0)
+                    {
+                        txtGenus.Text = acceptedGenus;
+                        txtSpecies.Text = acceptedSpecies;
+                        _cboEditor.Text = acceptedSpecies;
+                    }
+                    else
+                    {
+                        txtSpecies.Text = "";
+                    }
+                }
+            }
+            else
+            {
+                if (_NewGenus.Length > 0)
+                {
+                    _comboGenus.Items.Add(_NewGenus);
+                }
+            }
+            _NewGenus = "";
         }
 
         /// <summary>
@@ -717,7 +798,7 @@ namespace FAD3
             return chk;
         }
 
-        private TextBox GetTextBox(ComboBox fromComboBox = null, TextBox fromTextBox = null, bool GetNext = false)
+        private TextBox GetTextBox(ComboBox fromComboBox = null, TextBox fromTextBox = null, bool GetNext = false, bool GetPrevious = false)
         {
             var myTextBox = new TextBox();
             var myTextBoxName = "";
@@ -737,12 +818,24 @@ namespace FAD3
 
                         myTextBoxName = "txtName1";
                         if (GetNext) myTextBoxName = "txtName2";
+                        if (GetPrevious) myTextBoxName = "txtName1";
                         break;
 
                     case "cboSpecies":
                     case "cboLocalName":
-                        myTextBoxName = "txtName2";
+
+                        if (_cboEditor.Name == "cboSpecies")
+                        {
+                            myTextBoxName = "txtName2";
+                            if (GetPrevious) myTextBoxName = "txtName1";
+                        }
+                        else
+                        {
+                            myTextBoxName = "txtName1";
+                            if (GetPrevious) myTextBoxName = "txtName1";
+                        }
                         if (GetNext) myTextBoxName = "txtWt";
+
                         break;
                 }
             }
@@ -754,10 +847,27 @@ namespace FAD3
 
                 switch (myTextBoxName)
                 {
+                    case "txtName1":
+                        if (GetNext)
+                        {
+                            myTextBoxName = "txtName2";
+                        }
+
+                        if (GetPrevious)
+                        {
+                            myTextBoxName = "txtName1";
+                        }
+                        break;
+
                     case "txtName2":
                         if (GetNext)
                         {
                             myTextBoxName = "txtWt";
+                        }
+
+                        if (GetPrevious)
+                        {
+                            myTextBoxName = "txtName1";
                         }
                         break;
 
@@ -766,6 +876,11 @@ namespace FAD3
                         {
                             myTextBoxName = "txtCount";
                         }
+
+                        if (GetPrevious)
+                        {
+                            myTextBoxName = "txtName2";
+                        }
                         break;
 
                     case "txtCount":
@@ -773,12 +888,34 @@ namespace FAD3
                         {
                             myTextBoxName = "txtSubWt";
                         }
+
+                        if (GetPrevious)
+                        {
+                            myTextBoxName = "txtWt";
+                        }
                         break;
 
                     case "txtSubWt":
                         if (GetNext)
                         {
                             myTextBoxName = "txtSubCount";
+                        }
+
+                        if (GetPrevious)
+                        {
+                            myTextBoxName = "txtCount";
+                        }
+                        break;
+
+                    case "txtSubCount":
+                        if (GetNext)
+                        {
+                            myTextBoxName = "txtSubCount";
+                        }
+
+                        if (GetPrevious)
+                        {
+                            myTextBoxName = "txtCount";
                         }
                         break;
                 }
@@ -975,8 +1112,16 @@ namespace FAD3
                 SetIDType(o);
                 if (o.Name == "txtName2" && _CurrentIDType == CatchComposition.Identification.Scientific)
                 {
-                    names.Genus = _CatchCompositionData[o.Location.Y + _ScrollAmount].Name1;
-                    FillSpeciesComboBox();
+                    if (_NewGenus.Length == 0)
+                    {
+                        names.Genus = _CatchCompositionData[o.Location.Y + _ScrollAmount].Name1;
+                        FillSpeciesComboBox();
+                    }
+                    else
+                    {
+                        _comboSpecies.Items.Clear();
+                        _comboSpecies.Text = "";
+                    }
                 }
             });
             HideCBOs();
