@@ -30,12 +30,12 @@ namespace FAD3
         private sampling _sampling;
         private int _ScrollAmount = 0;
         private int _spacer = 3;
-        private GMSManager.Taxa _taxa = GMSManager.Taxa.To_be_determined;
+        private CatchName.Taxa _taxa = CatchName.Taxa.To_be_determined;
         private bool _UpdateSequence = false;
         private int _y = 5;
         private MainForm _parent_form;
 
-        public GMSDataEntryForm(bool IsNew, sampling sampling, string CatchRowGuid, string CatchName, GMSManager.Taxa taxa, MainForm Parent)
+        public GMSDataEntryForm(bool IsNew, sampling sampling, string CatchRowGuid, string CatchName, CatchName.Taxa taxa, MainForm Parent)
         {
             InitializeComponent();
             _CatchRowGuid = CatchRowGuid;
@@ -49,7 +49,7 @@ namespace FAD3
         //private void AddRow(bool IsNew, double? Len = null, double? Wgt = null,
         //                    GMSManager.sex Sex = GMSManager.sex.Female,
         //                    GMSManager.FishCrabGMS GMS = GMSManager.FishCrabGMS.AllTaxaNotDetermined,
-        //                    GMSManager.Taxa taxa = GMSManager.Taxa.Fish, double? GonadWt = null,
+        //                    CatchName.Taxa taxa = CatchName.Taxa.Fish, double? GonadWt = null,
         //                    string RowGuid = "")
         private void AddRow(bool IsNew, GMSLineClass gmsLine = null)
         {
@@ -91,8 +91,6 @@ namespace FAD3
                     o.DropDownStyle = ComboBoxStyle.DropDownList;
                     o.AutoCompleteSource = AutoCompleteSource.ListItems;
                     o.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-                    //o.Validated += OnComboValidated;
-                    //o.KeyDown += OnCombo_Keydown;
                     var hasGMSStage = false;
                     var gmsDict = GMSManager.GMSStages(_taxa, ref hasGMSStage);
                     if (hasGMSStage)

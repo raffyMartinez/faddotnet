@@ -40,6 +40,10 @@
             this.txtNotes = new System.Windows.Forms.TextBox();
             this.buttonCancel = new System.Windows.Forms.Button();
             this.buttonOK = new System.Windows.Forms.Button();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.labelRecordCount = new System.Windows.Forms.Label();
+            this.buttonEdit = new System.Windows.Forms.Button();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // labelGenus
@@ -75,6 +79,7 @@
             this.txtGenus.Name = "txtGenus";
             this.txtGenus.Size = new System.Drawing.Size(172, 22);
             this.txtGenus.TabIndex = 3;
+            this.txtGenus.Validating += new System.ComponentModel.CancelEventHandler(this.OnTextBoxes_Validating);
             // 
             // txtSpecies
             // 
@@ -82,6 +87,7 @@
             this.txtSpecies.Name = "txtSpecies";
             this.txtSpecies.Size = new System.Drawing.Size(172, 22);
             this.txtSpecies.TabIndex = 4;
+            this.txtSpecies.Validating += new System.ComponentModel.CancelEventHandler(this.OnTextBoxes_Validating);
             // 
             // cboTaxa
             // 
@@ -90,6 +96,7 @@
             this.cboTaxa.Name = "cboTaxa";
             this.cboTaxa.Size = new System.Drawing.Size(172, 24);
             this.cboTaxa.TabIndex = 5;
+            this.cboTaxa.Validating += new System.ComponentModel.CancelEventHandler(this.OncboTaxa_Validating);
             // 
             // label4
             // 
@@ -124,13 +131,14 @@
             this.txtNotes.Name = "txtNotes";
             this.txtNotes.Size = new System.Drawing.Size(172, 71);
             this.txtNotes.TabIndex = 9;
+            this.txtNotes.Validating += new System.ComponentModel.CancelEventHandler(this.OnTextBoxes_Validating);
             // 
             // buttonCancel
             // 
             this.buttonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonCancel.CausesValidation = false;
             this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.buttonCancel.Location = new System.Drawing.Point(121, 287);
+            this.buttonCancel.Location = new System.Drawing.Point(121, 385);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(64, 26);
             this.buttonCancel.TabIndex = 12;
@@ -141,7 +149,7 @@
             // buttonOK
             // 
             this.buttonOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonOK.Location = new System.Drawing.Point(191, 287);
+            this.buttonOK.Location = new System.Drawing.Point(191, 385);
             this.buttonOK.Name = "buttonOK";
             this.buttonOK.Size = new System.Drawing.Size(64, 26);
             this.buttonOK.TabIndex = 13;
@@ -149,13 +157,45 @@
             this.buttonOK.UseVisualStyleBackColor = true;
             this.buttonOK.Click += new System.EventHandler(this.Onbutton_Click);
             // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.buttonEdit);
+            this.groupBox1.Controls.Add(this.labelRecordCount);
+            this.groupBox1.Location = new System.Drawing.Point(83, 272);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(172, 97);
+            this.groupBox1.TabIndex = 14;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Records";
+            // 
+            // labelRecordCount
+            // 
+            this.labelRecordCount.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelRecordCount.Location = new System.Drawing.Point(9, 23);
+            this.labelRecordCount.Name = "labelRecordCount";
+            this.labelRecordCount.Size = new System.Drawing.Size(157, 24);
+            this.labelRecordCount.TabIndex = 15;
+            this.labelRecordCount.Text = "0000";
+            this.labelRecordCount.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // buttonEdit
+            // 
+            this.buttonEdit.Location = new System.Drawing.Point(55, 54);
+            this.buttonEdit.Name = "buttonEdit";
+            this.buttonEdit.Size = new System.Drawing.Size(64, 26);
+            this.buttonEdit.TabIndex = 16;
+            this.buttonEdit.Text = "Edit";
+            this.buttonEdit.UseVisualStyleBackColor = true;
+            this.buttonEdit.Click += new System.EventHandler(this.Onbutton_Click);
+            // 
             // SpeciesNameForm
             // 
             this.AcceptButton = this.buttonOK;
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCancel;
-            this.ClientSize = new System.Drawing.Size(267, 325);
+            this.ClientSize = new System.Drawing.Size(267, 417);
+            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.buttonOK);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.txtNotes);
@@ -174,6 +214,7 @@
             this.Name = "SpeciesNameForm";
             this.Text = "Species name";
             this.Load += new System.EventHandler(this.SpeciesNameForm_Load);
+            this.groupBox1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -193,5 +234,8 @@
         private System.Windows.Forms.TextBox txtNotes;
         private System.Windows.Forms.Button buttonCancel;
         private System.Windows.Forms.Button buttonOK;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.Button buttonEdit;
+        private System.Windows.Forms.Label labelRecordCount;
     }
 }

@@ -94,6 +94,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AllSpeciesForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AllSpeciesForm.Designer.cs">
+      <DependentUpon>AllSpeciesForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="AOI.cs" />
     <Compile Include="CatchComposition.cs" />
     <Compile Include="CatchCompositionForm.cs">
@@ -102,7 +108,8 @@
     <Compile Include="CatchCompositionForm.Designer.cs">
       <DependentUpon>CatchCompositionForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="CatchLineClass.cs" />
+    <Compile Include="CatchLine.cs" />
+    <Compile Include="CatchName.cs" />
     <Compile Include="Coordinate.cs" />
     <Compile Include="CoordinateEntryForm.cs">
       <SubType>Form</SubType>
@@ -288,6 +295,9 @@
     <Compile Include="UIRow.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="AllSpeciesForm.resx">
+      <DependentUpon>AllSpeciesForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="CatchCompositionForm.resx">
       <DependentUpon>CatchCompositionForm.cs</DependentUpon>
     </EmbeddedResource>

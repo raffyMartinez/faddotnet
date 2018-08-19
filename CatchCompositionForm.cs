@@ -8,9 +8,9 @@ namespace FAD3
 {
     public partial class CatchCompositionForm : Form
     {
-        private Dictionary<int, CatchLineClass> _CatchCompositionData = new Dictionary<int, CatchLineClass>();
+        private Dictionary<int, CatchLine> _CatchCompositionData = new Dictionary<int, CatchLine>();
         private ComboBox _cboEditor = new ComboBox();
-        private bool _ComboBoxesSet = false;
+        private bool _comboBoxesSet = false;
         private ComboBox _comboGenus = new ComboBox();
         private ComboBox _comboIdentificationType = new ComboBox();
         private ComboBox _comboLocalName = new ComboBox();
@@ -20,7 +20,7 @@ namespace FAD3
         private string _currentGenus = "";
         private CatchComposition.Identification _CurrentIDType;
         private TextBox _currentTextBox;
-        private bool _IsNew;
+        private bool _isNew;
         private TextBox _lastCount;
         private TextBox _lastIdentification;
         private TextBox _lastName1;
@@ -29,21 +29,21 @@ namespace FAD3
         private TextBox _lastSubWeight;
         private TextBox _lastWeight;
         private MainForm _parentForm;
-        private string _ReferenceNumber;
+        private string _referenceNumber;
         private int _row = 1;
-        private string _SamplingGuid;
-        private int _ScrollAmount = 0;
+        private string _samplingGuid;
+        private int _scrollAmount = 0;
         private int _spacer = 3;
         private int _y = 0;
-        private string _NewGenus = "";
+        private string _newGenus = "";
 
-        public CatchCompositionForm(bool IsNew, MainForm parent, string SamplingGuid, string ReferenceNumber)
+        public CatchCompositionForm(bool IsNew, MainForm parent, string samplingGuid, string referenceNumber)
         {
             InitializeComponent();
             _parentForm = parent;
-            _SamplingGuid = SamplingGuid;
-            _IsNew = IsNew;
-            _ReferenceNumber = ReferenceNumber;
+            _samplingGuid = samplingGuid;
+            _isNew = IsNew;
+            _referenceNumber = referenceNumber;
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace FAD3
         /// </summary>
         private void AddNewRow()
         {
-            AddRow(IsNew: true);
+            AddRow(isNew: true);
             _lastIdentification.Focus();
         }
 
@@ -68,9 +68,9 @@ namespace FAD3
         /// adds a row of fields with data from the database
         /// Controls are dynamically generated
         /// </summary>
-        /// <param name="IsNew"></param>
-        /// <param name="CatchLine - a set of rows of catch composition data from the database"></param>
-        private void AddRow(bool IsNew, CatchLineClass CatchLine = null)
+        /// <param name="isNew"></param>
+        /// <param name="catchLine - a set of rows of catch composition data from the database"></param>
+        private void AddRow(bool isNew, CatchLine catchLine = null)
         {
             int x = 3;
 
@@ -86,9 +86,9 @@ namespace FAD3
             CheckBox chkLiveFish = new CheckBox();
 
             //adds the combo boxes only once to the panel
-            if (!_ComboBoxesSet)
+            if (!_comboBoxesSet)
             {
-                _ComboBoxesSet = true;
+                _comboBoxesSet = true;
 
                 //combo box to specify type of identification for a catch
                 //values are scientific and local name
@@ -174,13 +174,13 @@ namespace FAD3
 
             //adds the catch composition data from the database to the form level catch composition dictionary
             //the key (_y) is the Y coordinate of each row.
-            if (IsNew)
+            if (isNew)
             {
-                _CatchCompositionData.Add(_y, new CatchLineClass(_SamplingGuid));
+                _CatchCompositionData.Add(_y, new CatchLine(_samplingGuid));
                 _CatchCompositionData[_y].Sequence = _row;
             }
             else
-                _CatchCompositionData.Add(_y, CatchLine);
+                _CatchCompositionData.Add(_y, catchLine);
 
             //configure column 1 - the row label
             labelRow.With(o =>
@@ -206,9 +206,9 @@ namespace FAD3
                 o.KeyPress += OnTextBoxKeyPress;
                 o.DoubleClick += OnTextBoxDoubleClick;
 
-                if (!IsNew)
+                if (!isNew)
                 {
-                    CurrentIDType = CatchLine.NameType;
+                    CurrentIDType = catchLine.NameType;
                 }
                 else
                 {
@@ -217,9 +217,9 @@ namespace FAD3
 
                     //_ScrollAmount is how much the vertical scrollbar moves. The scrollbar is visible if the number of rows
                     //exceed the height of the panel
-                    _CatchCompositionData[o.Location.Y + _ScrollAmount].dataStatus = global.fad3DataStatus.statusNew;
-                    _CatchCompositionData[o.Location.Y + _ScrollAmount].NameType = CurrentIDType;
-                    _CatchCompositionData[o.Location.Y + _ScrollAmount].CatchCompGUID = newGUID;
+                    _CatchCompositionData[o.Location.Y + _scrollAmount].dataStatus = global.fad3DataStatus.statusNew;
+                    _CatchCompositionData[o.Location.Y + _scrollAmount].NameType = CurrentIDType;
+                    _CatchCompositionData[o.Location.Y + _scrollAmount].CatchCompGUID = newGUID;
                 }
                 o.Text = CatchComposition.IdentificationTypeToString(CurrentIDType);
                 o.Tag = o.Text;
@@ -238,9 +238,9 @@ namespace FAD3
                 o.TextChanged += OnTextBoxChanged;
                 o.KeyPress += OnTextBoxKeyPress;
                 o.DoubleClick += OnTextBoxDoubleClick;
-                if (!IsNew)
+                if (!isNew)
                 {
-                    o.Text = CatchLine.Name1;
+                    o.Text = catchLine.Name1;
                     o.Tag = o.Text;
                 }
             });
@@ -258,9 +258,9 @@ namespace FAD3
                 o.TextChanged += OnTextBoxChanged;
                 o.KeyPress += OnTextBoxKeyPress;
                 o.DoubleClick += OnTextBoxDoubleClick;
-                if (!IsNew)
+                if (!isNew)
                 {
-                    o.Text = CatchLine.Name2;
+                    o.Text = catchLine.Name2;
                     o.Tag = o.Text;
                 }
             });
@@ -276,9 +276,9 @@ namespace FAD3
                 o.GotFocus += OnTextBoxGotFocus;
                 o.Validating += OnTextBoxValidating; ;
                 o.TextChanged += OnTextBoxChanged;
-                if (!IsNew)
+                if (!isNew)
                 {
-                    o.Text = o.Text = CatchLine.CatchWeight.ToString();
+                    o.Text = o.Text = catchLine.CatchWeight.ToString();
                     o.Tag = o.Text;
                 }
             });
@@ -295,9 +295,9 @@ namespace FAD3
                 o.GotFocus += OnTextBoxGotFocus;
                 o.Validating += OnTextBoxValidating; ;
                 o.TextChanged += OnTextBoxChanged;
-                if (!IsNew)
+                if (!isNew)
                 {
-                    o.Text = o.Text = CatchLine.CatchCount.ToString();
+                    o.Text = o.Text = catchLine.CatchCount.ToString();
                     o.Tag = o.Text;
                 }
             });
@@ -314,9 +314,9 @@ namespace FAD3
                 o.GotFocus += OnTextBoxGotFocus;
                 o.Validating += OnTextBoxValidating; ;
                 o.TextChanged += OnTextBoxChanged;
-                if (!IsNew)
+                if (!isNew)
                 {
-                    o.Text = CatchLine.CatchSubsampleWt.ToString();
+                    o.Text = catchLine.CatchSubsampleWt.ToString();
                     o.Tag = o.Text;
                 }
             });
@@ -333,9 +333,9 @@ namespace FAD3
                 o.GotFocus += OnTextBoxGotFocus;
                 o.Validating += OnTextBoxValidating; ;
                 o.TextChanged += OnTextBoxChanged;
-                if (!IsNew)
+                if (!isNew)
                 {
-                    o.Text = CatchLine.CatchSubsampleCount.ToString();
+                    o.Text = catchLine.CatchSubsampleCount.ToString();
                     o.Tag = o.Text;
                 }
             });
@@ -349,9 +349,9 @@ namespace FAD3
                 o.Font = Font;
                 o.Text = "";
                 o.CheckStateChanged += OnCheckBoxCheckStateChanged;
-                if (!IsNew)
+                if (!isNew)
                 {
-                    o.Checked = CatchLine.FromTotalCatch;
+                    o.Checked = catchLine.FromTotalCatch;
                 }
             });
 
@@ -364,7 +364,7 @@ namespace FAD3
                 o.Font = Font;
                 o.Text = "";
                 o.CheckStateChanged += OnCheckBoxCheckStateChanged;
-                if (!IsNew) o.Checked = CatchLine.LiveFish;
+                if (!isNew) o.Checked = catchLine.LiveFish;
             });
 
             //adds all the fields to the panel
@@ -397,7 +397,7 @@ namespace FAD3
             }
 
             //assigns all new fields to a variable
-            if (_IsNew || _row >= CatchComposition.CatchCompositionRows)
+            if (_isNew || _row >= CatchComposition.CatchCompositionRows)
             {
                 _lastIdentification = textIdentificationType;
                 _lastName1 = textName1;
@@ -434,13 +434,13 @@ namespace FAD3
             _cboEditor.Validating -= OncboEditor_Validating;
 
             //if true we change the currenttextbox text to the editor combobox text
-            //this is made false when we process a new name so the combobox text
+            //this is made false when we process a not-in-list combo text because combo contents
             //could be out of context already
             var CompareNameChanges = true;
 
             ((ComboBox)sender).With(o =>
             {
-                _CatchCompositionData[o.Location.Y + _ScrollAmount].With(ccd =>
+                _CatchCompositionData[o.Location.Y + _scrollAmount].With(ccd =>
                 {
                     var s = o.Text;
                     if (s.Length > 0)
@@ -454,7 +454,7 @@ namespace FAD3
                                 break;
 
                             case "cboGenus":
-                                _NewGenus = "";
+                                _newGenus = "";
 
                                 //search for the combobox text in the combobox items
                                 if (o.FindString(o.Text) > -1)
@@ -473,9 +473,9 @@ namespace FAD3
                                                                       "Item not in list", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
                                     if (dr == DialogResult.Yes)
                                     {
-                                        _NewGenus = o.Text;
-                                        _currentTextBox.Text = _NewGenus;
-                                        _currentGenus = _NewGenus;
+                                        _newGenus = o.Text;
+                                        _currentTextBox.Text = _newGenus;
+                                        _currentGenus = _newGenus;
 
                                         CompareNameChanges = false;
 
@@ -529,7 +529,7 @@ namespace FAD3
                                         msg = $"{o.Text} is not in the list of local names\r\nWould you like to add a new local name?";
                                     }
 
-                                    if (_NewGenus.Length == 0 && msg.Length > 0)
+                                    if (_newGenus.Length == 0 && msg.Length > 0)
                                     {
                                         DialogResult dr = MessageBox.Show(msg, "Item not in list", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
                                         if (dr == DialogResult.Yes)
@@ -560,7 +560,7 @@ namespace FAD3
                                         CompareNameChanges = false;
 
                                         _currentTextBox.Text = _cboEditor.Text.Trim();
-                                        SpeciesNameForm snf = new SpeciesNameForm(_NewGenus, o.Text, this);
+                                        SpeciesNameForm snf = new SpeciesNameForm(_newGenus, o.Text, this);
                                         snf.ShowDialog(this);
                                     }
                                 }
@@ -592,7 +592,7 @@ namespace FAD3
             }
         }
 
-        public void NewName(bool Accepted, string acceptedGenus = "", string acceptedSpecies = "")
+        public void NewName(bool Accepted, string acceptedGenus = "", string acceptedSpecies = "", string acceptedNewGuid = "")
         {
             if (!Accepted)
             {
@@ -600,7 +600,7 @@ namespace FAD3
                 var txtGenus = GetTextBox(fromComboBox: null, fromTextBox: _currentTextBox, GetNext: false, GetPrevious: true);
                 var txtSpecies = GetTextBox(fromComboBox: null, fromTextBox: _currentTextBox);
 
-                if (_NewGenus.Length > 0)
+                if (_newGenus.Length > 0)
                 {
                     txtSpecies.Text = "";
                     txtGenus.Text = "";
@@ -613,6 +613,10 @@ namespace FAD3
                         txtGenus.Text = acceptedGenus;
                         txtSpecies.Text = acceptedSpecies;
                         _cboEditor.Text = acceptedSpecies;
+                        if (acceptedNewGuid.Length > 0)
+                        {
+                            _cboEditor.Items.Add(new KeyValuePair<string, string>(acceptedNewGuid, acceptedSpecies));
+                        }
                     }
                     else
                     {
@@ -622,12 +626,15 @@ namespace FAD3
             }
             else
             {
-                if (_NewGenus.Length > 0)
+                if (_newGenus.Length > 0)
                 {
-                    _comboGenus.Items.Add(_NewGenus);
+                    _comboGenus.Items.Add(_newGenus);
+                    //var item = new KeyValuePair<string, string>(acceptedNewGuid, acceptedSpecies);
+                    //_comboSpecies.Items.Add(item);
+                    //_cboEditor.Items.Add(item);
                 }
             }
-            _NewGenus = "";
+            _newGenus = "";
         }
 
         /// <summary>
@@ -1018,9 +1025,9 @@ namespace FAD3
                 SetRowStatusToEdited(o);
 
                 if (o.Name == "chkFromTotal")
-                    _CatchCompositionData[o.Location.Y + _ScrollAmount].FromTotalCatch = o.Checked;
+                    _CatchCompositionData[o.Location.Y + _scrollAmount].FromTotalCatch = o.Checked;
                 else
-                    _CatchCompositionData[o.Location.Y + _ScrollAmount].LiveFish = o.Checked;
+                    _CatchCompositionData[o.Location.Y + _scrollAmount].LiveFish = o.Checked;
             });
         }
 
@@ -1070,29 +1077,29 @@ namespace FAD3
         private void OnForm_Load(object sender, EventArgs e)
         {
             panelUI.MouseWheel += OnPanelMouseWheel;
-            labelTitle.Text = $"Catch composition of {_ReferenceNumber}";
-            if (_IsNew)
+            labelTitle.Text = $"Catch composition of {_referenceNumber}";
+            if (_isNew)
             {
-                labelTitle.Text = $"New catch composition of {_ReferenceNumber}";
+                labelTitle.Text = $"New catch composition of {_referenceNumber}";
                 AddNewRow();
             }
             else
             {
-                foreach (var item in CatchComposition.RetrieveCatchComposition(_SamplingGuid))
+                foreach (var item in CatchComposition.RetrieveCatchComposition(_samplingGuid))
                 {
-                    AddRow(IsNew: false, item.Value);
+                    AddRow(isNew: false, item.Value);
                 }
             }
         }
 
         private void OnPanelMouseWheel(object sender, MouseEventArgs e)
         {
-            _ScrollAmount = panelUI.VerticalScroll.Value;
+            _scrollAmount = panelUI.VerticalScroll.Value;
         }
 
         private void OnPanelUI_Scroll(object sender, ScrollEventArgs e)
         {
-            _ScrollAmount = e.NewValue;
+            _scrollAmount = e.NewValue;
         }
 
         private void OnTextBoxChanged(object sender, EventArgs e)
@@ -1112,9 +1119,9 @@ namespace FAD3
                 SetIDType(o);
                 if (o.Name == "txtName2" && _CurrentIDType == CatchComposition.Identification.Scientific)
                 {
-                    if (_NewGenus.Length == 0)
+                    if (_newGenus.Length == 0)
                     {
-                        names.Genus = _CatchCompositionData[o.Location.Y + _ScrollAmount].Name1;
+                        names.Genus = _CatchCompositionData[o.Location.Y + _scrollAmount].Name1;
                         FillSpeciesComboBox();
                     }
                     else
@@ -1149,7 +1156,7 @@ namespace FAD3
                         o.BackColor = SystemColors.Window;
                 }
 
-                _CatchCompositionData[o.Location.Y + _ScrollAmount].With(ccd =>
+                _CatchCompositionData[o.Location.Y + _scrollAmount].With(ccd =>
                   {
                       var s = o.Text;
 
@@ -1310,7 +1317,7 @@ namespace FAD3
         {
             var MissingFields = new List<string>();
             var HasRequirements = true;
-            _CatchCompositionData[LocationY + _ScrollAmount].With(ccd =>
+            _CatchCompositionData[LocationY + _scrollAmount].With(ccd =>
             {
                 if (ccd.NameType == CatchComposition.Identification.Scientific)
                 {
@@ -1395,7 +1402,7 @@ namespace FAD3
             _lastSubCount.BackColor = SystemColors.Window;
             _lastSubWeight.BackColor = SystemColors.Window;
 
-            _CatchCompositionData[_lastIdentification.Location.Y + _ScrollAmount].With(ccd =>
+            _CatchCompositionData[_lastIdentification.Location.Y + _scrollAmount].With(ccd =>
           {
               Cancel = ccd.CatchCount == null && ccd.CatchSubsampleWt == null && ccd.CatchSubsampleCount == null;
               if (Cancel)
@@ -1428,14 +1435,14 @@ namespace FAD3
 
         private void SetIDType(TextBox source)
         {
-            CurrentIDType = _CatchCompositionData[source.Location.Y + _ScrollAmount].NameType;
+            CurrentIDType = _CatchCompositionData[source.Location.Y + _scrollAmount].NameType;
         }
 
         private void SetRowStatusToEdited(Control source)
         {
-            if (_CatchCompositionData[source.Location.Y + _ScrollAmount].dataStatus != global.fad3DataStatus.statusNew)
+            if (_CatchCompositionData[source.Location.Y + _scrollAmount].dataStatus != global.fad3DataStatus.statusNew)
             {
-                _CatchCompositionData[source.Location.Y + _ScrollAmount].dataStatus = global.fad3DataStatus.statusEdited;
+                _CatchCompositionData[source.Location.Y + _scrollAmount].dataStatus = global.fad3DataStatus.statusEdited;
             }
         }
 

@@ -53,8 +53,11 @@ namespace FAD3
         private string _VesHeight = "";
         private string _VesLength = "";
         private string _VesWidth = "";
-        private GMSManager.Taxa _taxa = GMSManager.Taxa.To_be_determined;
+        private CatchName.Taxa _taxa = CatchName.Taxa.To_be_determined;
         private string _ReferenceNumber = "";
+
+        private ListView lvCatch;
+        private ListView lvLF_GMS;
 
         public MainForm()
         {
@@ -640,22 +643,6 @@ namespace FAD3
             }
         }
 
-        private ListView GetLVCatch()
-        {
-            if (_subListExisting)
-                return (ListView)splitContainer1.Panel2.Controls["lvCatch"];
-            else
-                return null;
-        }
-
-        private ListView GetLVLF_GMS()
-        {
-            if (_subListExisting)
-                return (ListView)splitContainer1.Panel2.Controls["lvLF_GMS"];
-            else
-                return null;
-        }
-
         /// <summary>
         /// shows the sampling detail listview but without any text on the sub-items
         /// </summary>
@@ -790,10 +777,10 @@ namespace FAD3
                 case "menuNewGMSTable":
                 case "menuEditGMSTable":
                     var Proceed = true;
-                    var lvi = GetLVCatch().SelectedItems[0];
+                    var lvi = lvCatch.SelectedItems[0];
                     if (Enum.TryParse(lvi.SubItems[7].Text, out _taxa))
                     {
-                        Proceed = _taxa != GMSManager.Taxa.To_be_determined;
+                        Proceed = _taxa != CatchName.Taxa.To_be_determined;
                     }
                     else
                     {
@@ -862,7 +849,6 @@ namespace FAD3
                     break;
 
                 case "btnSubClose":
-                    var lvLF_GMS = GetLVLF_GMS();
                     if (lvLF_GMS.Visible)
                     {
                         lvLF_GMS.Visible = false;
@@ -877,7 +863,7 @@ namespace FAD3
                     if (SetupLF_GMSListView(Show: true, Content: global.fad3CatchSubRow.LF))
                     {
                         _CatchSubRow = global.fad3CatchSubRow.LF;
-                        Show_LF_GMS_List(GetLVCatch().SelectedItems[0].Name);
+                        Show_LF_GMS_List(lvCatch.SelectedItems[0].Name);
                     }
                     break;
 
@@ -885,12 +871,11 @@ namespace FAD3
                     if (SetupLF_GMSListView(Show: true, Content: global.fad3CatchSubRow.GMS))
                     {
                         _CatchSubRow = global.fad3CatchSubRow.GMS;
-                        var catchListView = GetLVCatch();
-                        if (Enum.TryParse(catchListView.SelectedItems[0].SubItems[7].Text, out GMSManager.Taxa myTaxa))
+                        if (Enum.TryParse(lvCatch.SelectedItems[0].SubItems[7].Text, out CatchName.Taxa myTaxa))
                         {
                             _taxa = myTaxa;
                         }
-                        Show_LF_GMS_List(catchListView.SelectedItems[0].Name, _taxa);
+                        Show_LF_GMS_List(lvCatch.SelectedItems[0].Name, _taxa);
                     }
                     break;
             }
@@ -1020,14 +1005,14 @@ namespace FAD3
                 case "lvCatch":
                     if (e.Button == MouseButtons.Right)
                     {
-                        ConfigDropDownMenu(GetLVCatch());
+                        ConfigDropDownMenu(lvCatch);
                         menuDropDown.Show(lv, new Point(_MouseX, _MouseY));
                     }
                     else
                     {
                         if (lvh.Item != null)
                         {
-                            if (Enum.TryParse(lvh.Item.SubItems[7].Text, out GMSManager.Taxa myTaxa))
+                            if (Enum.TryParse(lvh.Item.SubItems[7].Text, out CatchName.Taxa myTaxa))
                             {
                                 _taxa = myTaxa;
                             }
@@ -1144,9 +1129,12 @@ namespace FAD3
                     break;
 
                 case "fish":
+                    AllSpeciesForm asf = new AllSpeciesForm(parent: this);
+                    asf.ShowDialog(this);
                     break;
 
                 case "report":
+
                     break;
 
                 case "map":
@@ -1495,7 +1483,7 @@ namespace FAD3
                 else
                 {
                     _subListExisting = true;
-                    ListView lvCatch = new ListView();
+                    lvCatch = new ListView();
                     splitContainer1.Panel2.Controls.Add(lvCatch);
                     lvCatch.With(o =>
                     {
@@ -1523,7 +1511,7 @@ namespace FAD3
                         o.HideSelection = false;
                     });
 
-                    ListView lvLF_GMS = new ListView();
+                    lvLF_GMS = new ListView();
                     splitContainer1.Panel2.Controls.Add(lvLF_GMS);
                     lvLF_GMS.With(o =>
                     {
@@ -1626,44 +1614,44 @@ namespace FAD3
             var Proceed = false;
             if (_subListExisting)
             {
-                var lv = (ListView)splitContainer1.Panel2.Controls["lvLF_GMS"];
-                var lvCatch = (ListView)splitContainer1.Panel2.Controls["lvCatch"];
+                //var lv = (ListView)splitContainer1.Panel2.Controls["lvLF_GMS"];
+                //var lvCatch = (ListView)splitContainer1.Panel2.Controls["lvCatch"];
 
-                lv.Items.Clear();
-                lv.Columns.Clear();
+                lvLF_GMS.Items.Clear();
+                lvLF_GMS.Columns.Clear();
                 {
                     if (Show && lvCatch.Items.Count > 0)
                     {
-                        lv.Visible = true;
-                        lv.Left = lvCatch.Columns["NameOfCatch"].Width + lvCatch.Columns["Row"].Width +
+                        lvLF_GMS.Visible = true;
+                        lvLF_GMS.Left = lvCatch.Columns["NameOfCatch"].Width + lvCatch.Columns["Row"].Width +
                                   lvCatch.Columns["Weight"].Width + lvCatch.Columns["Count"].Width;
 
-                        lv.Width = lvCatch.Columns["SubWt"].Width + lvCatch.Columns["SubCt"].Width +
+                        lvLF_GMS.Width = lvCatch.Columns["SubWt"].Width + lvCatch.Columns["SubCt"].Width +
                                    lvCatch.Columns["FromTotal"].Width + lvCatch.Columns["CompWt"].Width +
                                    lvCatch.Columns["CompCt"].Width + lvCatch.Columns["spacer"].Width + 3;
 
                         if (Content == global.fad3CatchSubRow.LF)
                         {
-                            lv.Columns.Add("Row");
-                            lv.Columns.Add("Length");
-                            lv.Columns.Add("Frequency");
-                            lv.Columns.Add("");
+                            lvLF_GMS.Columns.Add("Row");
+                            lvLF_GMS.Columns.Add("Length");
+                            lvLF_GMS.Columns.Add("Frequency");
+                            lvLF_GMS.Columns.Add("");
                         }
                         else if (Content == global.fad3CatchSubRow.GMS)
                         {
-                            lv.Columns.Add("Row");
-                            lv.Columns.Add("Length");
-                            lv.Columns.Add("Weight");
-                            lv.Columns.Add("Sex");
-                            lv.Columns.Add("GMS");
-                            lv.Columns.Add("Gonad wt");
-                            lv.Columns.Add("");
+                            lvLF_GMS.Columns.Add("Row");
+                            lvLF_GMS.Columns.Add("Length");
+                            lvLF_GMS.Columns.Add("Weight");
+                            lvLF_GMS.Columns.Add("Sex");
+                            lvLF_GMS.Columns.Add("GMS");
+                            lvLF_GMS.Columns.Add("Gonad wt");
+                            lvLF_GMS.Columns.Add("");
                         }
                         Proceed = true;
                     }
                     else
                     {
-                        lv.Visible = false;
+                        lvLF_GMS.Visible = false;
                         MessageBox.Show("Catch composition is empty", "Validation error",
                                          MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
@@ -1990,13 +1978,12 @@ namespace FAD3
 
         public void RefreshLF_GMS()
         {
-            Show_LF_GMS_List(GetLVCatch().SelectedItems[0].Name, _taxa);
+            Show_LF_GMS_List(lvCatch.SelectedItems[0].Name, _taxa);
         }
 
-        private void Show_LF_GMS_List(string CatchRowGuid, GMSManager.Taxa taxa = GMSManager.Taxa.To_be_determined)
+        private void Show_LF_GMS_List(string CatchRowGuid, CatchName.Taxa taxa = CatchName.Taxa.To_be_determined)
         {
-            var lvc = GetLVLF_GMS();
-            lvc.Items.Clear();
+            lvLF_GMS.Items.Clear();
             int n = 1;
             if (_CatchSubRow == global.fad3CatchSubRow.LF)
             {
@@ -2009,7 +1996,7 @@ namespace FAD3
                                     kv.Value.Freq.ToString()
                     });
                     lvi.Name = kv.Key;
-                    lvc.Items.Add(lvi);
+                    lvLF_GMS.Items.Add(lvi);
                     n++;
                 }
             }
@@ -2027,12 +2014,12 @@ namespace FAD3
                                     kv.Value.GonadWeight.ToString()
                     });
                     lvi.Name = kv.Key;
-                    lvc.Items.Add(lvi);
+                    lvLF_GMS.Items.Add(lvi);
                     n++;
                 }
             }
 
-            foreach (ColumnHeader c in lvc.Columns)
+            foreach (ColumnHeader c in lvLF_GMS.Columns)
             {
                 c.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
             }
@@ -2047,11 +2034,10 @@ namespace FAD3
         {
             if (_subListExisting)
             {
-                ListView lv = GetLVCatch();
-                lv.Items.Clear();
+                lvCatch.Items.Clear();
                 int n = 1;
                 //foreach (KeyValuePair<string, sampling.CatchLine> kv in _Sampling.CatchComp())
-                foreach (KeyValuePair<string, CatchLineClass> kv in CatchComposition.RetrieveCatchComposition(_SamplingGUID))
+                foreach (KeyValuePair<string, CatchLine> kv in CatchComposition.RetrieveCatchComposition(_SamplingGUID))
                 {
                     var lvi = new ListViewItem(new string[]
                     {
@@ -2065,14 +2051,14 @@ namespace FAD3
                         kv.Value.TaxaNumber.ToString()
                     });
                     lvi.Name = kv.Key;
-                    lv.Items.Add(lvi);
+                    lvCatch.Items.Add(lvi);
                     n++;
                 }
 
-                if (lv.Items.Count > 0)
-                    lv.Items[0].Selected = true;
+                if (lvCatch.Items.Count > 0)
+                    lvCatch.Items[0].Selected = true;
 
-                foreach (ColumnHeader c in lv.Columns)
+                foreach (ColumnHeader c in lvCatch.Columns)
                 {
                     switch (c.Text)
                     {
@@ -2088,7 +2074,7 @@ namespace FAD3
                             break;
 
                         case "Name of catch":
-                            if (lv.Items.Count > 0)
+                            if (lvCatch.Items.Count > 0)
                                 c.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
                             else
                                 c.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
@@ -2180,10 +2166,9 @@ namespace FAD3
             SetupSamplingButtonFrame(true);
         }
 
-        private void ShowGMSForm(GMSManager.Taxa taxa, bool isNew = false)
+        private void ShowGMSForm(CatchName.Taxa taxa, bool isNew = false)
         {
-            var lvCatch = GetLVCatch();
-            if (taxa != GMSManager.Taxa.To_be_determined)
+            if (taxa != CatchName.Taxa.To_be_determined)
             {
                 GMSDataEntryForm fgms = new GMSDataEntryForm(isNew, _Sampling,
                                           lvCatch.SelectedItems[0].Name,
@@ -2194,7 +2179,6 @@ namespace FAD3
 
         private void ShowLFForm(bool IsNew = false)
         {
-            var lvCatch = GetLVCatch();
             LengthFreqForm lff;
 
             lff = new LengthFreqForm(IsNew, _Sampling,

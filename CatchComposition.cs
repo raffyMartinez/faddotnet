@@ -23,7 +23,7 @@ namespace FAD3
             get { return _TotalWtOfFromTotal; }
         }
 
-        public static bool UpdateCatchComposition(Dictionary<int, CatchLineClass> CatchComposition)
+        public static bool UpdateCatchComposition(Dictionary<int, CatchLine> CatchComposition)
 
         {
             var sql = "";
@@ -94,10 +94,10 @@ namespace FAD3
                 return resultCount == (InsertCount + UpdateCount);
         }
 
-        public static Dictionary<string, CatchLineClass> RetrieveCatchComposition(string SamplingGUID)
+        public static Dictionary<string, CatchLine> RetrieveCatchComposition(string SamplingGUID)
         {
             _CatchCompositionRows = 0;
-            Dictionary<string, CatchLineClass> myCatch = new Dictionary<string, CatchLineClass>();
+            Dictionary<string, CatchLine> myCatch = new Dictionary<string, CatchLine>();
             DataTable dt = new DataTable();
             string CatchName = "";
             string Name1 = "";
@@ -124,8 +124,6 @@ namespace FAD3
                     Identification IdType = Identification.Scientific;
                     for (int i = 0; i < dt.Rows.Count; i++)
                     {
-                        TaxaNumber = null;
-                        CatchCount = null;
                         DataRow dr = dt.Rows[i];
                         Name1 = dr["Name1"].ToString();
                         Name2 = dr["Name2"].ToString();
@@ -163,7 +161,7 @@ namespace FAD3
                         if (int.TryParse(dr["Sequence"].ToString(), out int v))
                             Sequence = v;
 
-                        CatchLineClass myLine = new CatchLineClass(Sequence, Name1, Name2, CatchName, dr["SamplingGUID"].ToString(),
+                        CatchLine myLine = new CatchLine(Sequence, Name1, Name2, CatchName, dr["SamplingGUID"].ToString(),
                                         dr["CatchCompRow"].ToString(), dr["NameGUID"].ToString(),
                                         Convert.ToDouble(dr["wt"]), CatchCount, TaxaNumber)
                         {

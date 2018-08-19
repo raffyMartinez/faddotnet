@@ -45,9 +45,141 @@ namespace FAD3
             get { return _SciNamesCount; }
         }
 
-        public static bool UpdateSpeciesData()
+        public static int CatchCompositionRecordCount(string nameGuid)
         {
-            return true;
+            var sql = $"SELECT Count(NameType) AS n FROM tblCatchComp WHERE NameGUID={{{nameGuid}}}";
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                using (OleDbCommand getCount = new OleDbCommand(sql, conn))
+                {
+                    return (int)getCount.ExecuteScalar();
+                }
+            }
+        }
+
+        public static bool UpdateSpeciesData(global.fad3DataStatus dataStatus, string nameGuid, string genus, string species, CatchName.Taxa taxa,
+                              short genusMPH1, short genusMPH2, short speciesMPH1, short speciesMPH2, bool inFishbase, int? fishBaseSpeciesNo, string notes)
+        {
+            var sql = "";
+            var Success = false;
+            var fbNo = fishBaseSpeciesNo == null ? "null" : fishBaseSpeciesNo.ToString();
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                if (dataStatus == global.fad3DataStatus.statusNew)
+                {
+                    sql = $@"Insert into tblAllSpecies
+                           (Genus, species, ListedFB, FBSpNo, Notes, TaxaNo, SpeciesGUID,
+                            MPHG1, MPHG2, MPHS1, MPHS2) values (
+                            '{genus}', '{species}', {inFishbase}, {fbNo}, '{notes}', {(int)taxa}, {nameGuid},
+                             {genusMPH1}, {genusMPH2}, {speciesMPH1}, {speciesMPH2})";
+
+                    using (OleDbCommand update = new OleDbCommand(sql, conn))
+                    {
+                        Success = update.ExecuteNonQuery() > 0;
+                    }
+                }
+                else if (dataStatus == global.fad3DataStatus.statusEdited)
+                {
+                    sql = $@"Update tblAllSpecies set
+                         Genus = '{genus}',
+                         species = '{species}',
+                         ListedFB = {inFishbase},
+                         FBSpNo = {fishBaseSpeciesNo},
+                         Notes = '{notes}',
+                         TaxaNo = {(int)taxa},
+                         MPHG1 - {genusMPH1},
+                         MPHG2 - {genusMPH2},
+                         MPHS1 - {speciesMPH1},
+                         MPHS2 - {speciesMPH2}
+                         WHERE SpeciesGUID = {{{nameGuid}}}";
+
+                    using (OleDbCommand update = new OleDbCommand(sql, conn))
+                    {
+                        Success = update.ExecuteNonQuery() > 0;
+                    }
+                }
+                else if (dataStatus == global.fad3DataStatus.statusForDeletion)
+                {
+                    sql = $"Delete * from tblAllSpecies where SpeciesGUID = {{{nameGuid}}}";
+                    using (OleDbCommand update = new OleDbCommand(sql, conn))
+                    {
+                        Success = update.ExecuteNonQuery() > 0;
+                    }
+                }
+            }
+            return Success;
+        }
+
+        public static Dictionary<string, CatchName> RetrieveScientificNames(Dictionary<string, string> filters = null, bool selectOnlyWithRecords = false)
+        {
+            var catchNames = new Dictionary<string, CatchName>();
+            var filter = "";
+            if (filters != null)
+            {
+                foreach (var item in filters)
+                {
+                    if (filter.Length == 0)
+                        filter += item.Value;
+                    else
+                        filter += $" and {item.Value}";
+                }
+            }
+
+            if (selectOnlyWithRecords)
+            {
+                const string filter2 = " (SELECT Count(NameGUID) AS n FROM tblCatchComp GROUP BY NameGUID HAVING NameGUID = [main.SpeciesGUID])>0 ";
+                if (filter.Length == 0)
+                    filter = filter2;
+                else
+                    filter += $" and {filter2}";
+            }
+
+            if (filter.Length > 0) filter = $" WHERE {filter}";
+
+            string sql = $"SELECT *, (SELECT Count(NameGUID) AS n FROM tblCatchComp GROUP BY NameGUID HAVING NameGUID = [main.SpeciesGUID]) AS n FROM tblAllSpecies AS main {filter} Order by Genus, species;";
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                var adapter = new OleDbDataAdapter(sql, conn);
+                DataTable dt = new DataTable();
+                adapter.Fill(dt);
+                foreach (DataRow dr in dt.Rows)
+                {
+                    var taxa = (CatchName.Taxa)Enum.Parse(typeof(CatchName.Taxa), dr["TaxaNo"].ToString());
+                    var speciesGuid = dr["SpeciesGUID"].ToString();
+                    int? fbSpNo = null;
+                    if (int.TryParse(dr["FBSpNo"].ToString(), out int spNo))
+                        fbSpNo = spNo;
+
+                    int catchCompositionRecordCount = 0;
+
+                    if (dr["n"].ToString().Length > 0)
+                        catchCompositionRecordCount = (int)dr["n"];
+
+                    try
+                    {
+                        if (dr["MPHG1"].ToString().Length > 0)
+                        {
+                            catchNames.Add(speciesGuid, new CatchName(speciesGuid, dr["Genus"].ToString(), dr["species"].ToString(),
+                                taxa, (bool)dr["ListedFB"], fbSpNo, dr["Notes"].ToString(), catchCompositionRecordCount,
+                                (short)dr["MPHG1"], (short)dr["MPHG2"], (short)dr["MPHS1"], (short)dr["MPHS2"]));
+                        }
+                        else
+                        {
+                            catchNames.Add(speciesGuid, new CatchName(speciesGuid, dr["Genus"].ToString(), dr["species"].ToString(),
+                                taxa, (bool)dr["ListedFB"], fbSpNo, dr["Notes"].ToString(), catchCompositionRecordCount));
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log(ex.Message);
+                    }
+                }
+            }
+
+            return catchNames;
         }
 
         public static (bool inFishBase, int? fishBaseSpeciesNo) NameInFishBaseEx(string genus, string species)
@@ -116,7 +248,7 @@ namespace FAD3
         }
 
         public static (bool isFound, bool inFishbase, int? fishBaseNo, string notes,
-            short? genusKey1, short? genusKey2, short? speciesKey1, short? speciesKey2, GMSManager.Taxa taxa)
+            short? genusKey1, short? genusKey2, short? speciesKey1, short? speciesKey2, CatchName.Taxa taxa)
             RetrieveSpeciesData(string speciesGuid)
         {
             var sql = $"Select * from tblAllSpecies where SpeciesGUID = {{{speciesGuid}}}";
@@ -128,7 +260,7 @@ namespace FAD3
             short? genusKey2 = null;
             short? speciesKey1 = null;
             short? speciesKey2 = null;
-            GMSManager.Taxa taxa = GMSManager.Taxa.Fish;
+            CatchName.Taxa taxa = CatchName.Taxa.Fish;
             using (var conection = new OleDbConnection(global.ConnectionString))
             {
                 conection.Open();

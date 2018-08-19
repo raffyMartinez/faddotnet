@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Data;
 using System.Data.OleDb;
 
@@ -14,19 +12,6 @@ namespace FAD3
         public static int GMSMeasurementRows
         {
             get { return _GMSMeasurementRows; }
-        }
-
-        public enum Taxa
-        {
-            To_be_determined,
-            Fish,
-            Shrimps,
-            Cephalopods,
-            Crabs,
-            Shells,
-            Lobsters,
-            Sea_cucumbers,
-            Sea_urchins,
         }
 
         public enum FishCrabGMS
@@ -50,120 +35,13 @@ namespace FAD3
             Female
         }
 
-        public struct GMSLine1
-        {
-            public string RowGuid { get; set; }
-            public string CatchRowGUID { get; set; }
-            public GMSManager.FishCrabGMS GMS { get; set; }
-            public double? GonadWeight { get; set; }
-            public double? Length { get; set; }
-            public GMSManager.sex Sex { get; set; }
-            public GMSManager.Taxa Taxa { get; set; }
-            public string TaxaName { get; set; }
-            public double? Weight { get; set; }
-            public global.fad3DataStatus DataStatus { get; set; }
-        }
-
-        public static Dictionary<int, string> RetrieveTaxaDictionary()
-        {
-            var taxaDictionary = new Dictionary<int, string>();
-            using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
-            {
-                conection.Open();
-
-                const string query = "Select TaxaNo, Taxa from tblTaxa order by Taxa";
-
-                var adapter = new OleDbDataAdapter(query, conection);
-                var dt = new DataTable();
-                adapter.Fill(dt);
-                foreach (DataRow dr in dt.Rows)
-                {
-                    taxaDictionary.Add(dr.Field<int>("TaxaNo"), dr.Field<string>("Taxa"));
-                }
-            }
-
-            return taxaDictionary;
-        }
-
-        public static string TaxaNameFromTaxa(Taxa taxa)
-        {
-            var taxaName = "";
-            switch (taxa)
-            {
-                case Taxa.To_be_determined:
-                    taxaName = "To be determined";
-                    break;
-
-                case Taxa.Cephalopods:
-                    taxaName = "Cephalopods";
-                    break;
-
-                case Taxa.Crabs:
-                    taxaName = "Crabs";
-                    break;
-
-                case Taxa.Fish:
-                    taxaName = "Fish";
-                    break;
-
-                case Taxa.Lobsters:
-                    taxaName = "Lobsters";
-                    break;
-
-                case Taxa.Sea_cucumbers:
-                    taxaName = "Sea cucumbers";
-                    break;
-
-                case Taxa.Sea_urchins:
-                    taxaName = "Sea urchins";
-                    break;
-
-                case Taxa.Shells:
-                    taxaName = "Shells";
-                    break;
-
-                case Taxa.Shrimps:
-                    taxaName = "Shrimps";
-                    break;
-
-                default:
-                    taxaName = "To be determined";
-                    break;
-            }
-
-            return taxaName;
-        }
-
-        public static Taxa TaxaFromCatchNameGUID(string CatchNameGUID)
-        {
-            Taxa taxa = Taxa.To_be_determined;
-            var dt = new DataTable();
-            using (var conection = new OleDbConnection(global.ConnectionString))
-            {
-                try
-                {
-                    conection.Open();
-                    string query = $"Select TaxaNo from tblAllSpecies where SpeciesGUID = {{{CatchNameGUID}}}";
-                    var adapter = new OleDbDataAdapter(query, conection);
-                    adapter.Fill(dt);
-                    DataRow dr = dt.Rows[0];
-                    taxa = (Taxa)int.Parse(dr["TaxaNo"].ToString());
-                }
-                catch (Exception ex)
-                {
-                    Logger.Log(ex);
-                }
-                return taxa;
-            }
-        }
-
-        public static Dictionary<FishCrabGMS, string> GMSStages(Taxa taxa, ref bool Success)
+        public static Dictionary<FishCrabGMS, string> GMSStages(CatchName.Taxa taxa, ref bool Success)
         {
             Success = false;
             Dictionary<FishCrabGMS, string> myStages = new Dictionary<FishCrabGMS, string>();
             switch (taxa)
             {
-                case Taxa.Fish:
+                case CatchName.Taxa.Fish:
                     myStages.Add(FishCrabGMS.AllTaxaNotDetermined, "Not determined");
                     myStages.Add(FishCrabGMS.FishJuvenile, "Juvenile");
                     myStages.Add(FishCrabGMS.FishStg1Immature, "Immature");
@@ -174,7 +52,7 @@ namespace FAD3
                     Success = true;
                     break;
 
-                case Taxa.Crabs:
+                case CatchName.Taxa.Crabs:
                     myStages.Add(FishCrabGMS.AllTaxaNotDetermined, "Not determined");
                     myStages.Add(FishCrabGMS.FemaleCrabImmature, "Immature");
                     myStages.Add(FishCrabGMS.FemaleCrabMature, "Mature");
@@ -182,23 +60,23 @@ namespace FAD3
                     Success = true;
                     break;
 
-                case Taxa.Lobsters:
-                case Taxa.Sea_cucumbers:
-                case Taxa.Sea_urchins:
-                case Taxa.Shells:
-                case Taxa.Shrimps:
-                case Taxa.To_be_determined:
+                case CatchName.Taxa.Lobsters:
+                case CatchName.Taxa.Sea_cucumbers:
+                case CatchName.Taxa.Sea_urchins:
+                case CatchName.Taxa.Shells:
+                case CatchName.Taxa.Shrimps:
+                case CatchName.Taxa.To_be_determined:
                     break;
             }
             return myStages;
         }
 
-        public static FishCrabGMS GMSStageFromString(string stage, Taxa taxa)
+        public static FishCrabGMS GMSStageFromString(string stage, CatchName.Taxa taxa)
         {
             FishCrabGMS myStage = FishCrabGMS.AllTaxaNotDetermined;
             switch (taxa)
             {
-                case Taxa.Fish:
+                case CatchName.Taxa.Fish:
                     switch (stage)
                     {
                         case "Not determined":
@@ -231,7 +109,7 @@ namespace FAD3
                     }
                     break;
 
-                case Taxa.Crabs:
+                case CatchName.Taxa.Crabs:
                     switch (stage)
                     {
                         case "Not determined":
@@ -260,7 +138,7 @@ namespace FAD3
             return myStage;
         }
 
-        public static string GMSStageToString(Taxa taxa, FishCrabGMS stage)
+        public static string GMSStageToString(CatchName.Taxa taxa, FishCrabGMS stage)
         {
             string gms_stage = "";
             switch (taxa.ToString())
@@ -372,7 +250,7 @@ namespace FAD3
                         Enum.TryParse(dr["GMS"].ToString(), out gms);
                         GMSManager.sex sex;
                         Enum.TryParse(dr["Sex"].ToString(), out sex);
-                        GMSManager.Taxa taxa = Taxa.To_be_determined;
+                        CatchName.Taxa taxa = CatchName.Taxa.To_be_determined;
                         Enum.TryParse(dr["TaxaNo"].ToString(), out taxa);
                         double? Length = null;
                         double? Weight = null;

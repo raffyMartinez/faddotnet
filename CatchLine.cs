@@ -5,7 +5,7 @@ using System.Text;
 
 namespace FAD3
 {
-    public class CatchLineClass
+    public class CatchLine
     {
         public string CatchCompGUID { get; set; }
         public string CatchName { get; set; }
@@ -36,12 +36,12 @@ namespace FAD3
         public int? TaxaNumber { get; set; }
         public int Sequence { get; set; }
 
-        public CatchLineClass(string inSamplingGUID)
+        public CatchLine(string inSamplingGUID)
         {
             SamplingGUID = inSamplingGUID;
         }
 
-        public CatchLineClass(int inSequence, string inName1, string inName2, string inCatchName, string inSamplingGUID,
+        public CatchLine(int inSequence, string inName1, string inName2, string inCatchName, string inSamplingGUID,
                               string inCatchCompGUID, string inCatchNameGUID,
                               double inCatchWeight, int? inCatchCount = null,
                               int? inTaxaNumber = null)
@@ -65,7 +65,7 @@ namespace FAD3
             dataStatus = global.fad3DataStatus.statusFromDB;
         }
 
-        public CatchLineClass(int inSequence, string inName1, string inName2, string inCatchName, string inSamplingGUID,
+        public CatchLine(int inSequence, string inName1, string inName2, string inCatchName, string inSamplingGUID,
                               string inCatchLineGUID, string inCatchNameGUID,
                               double inCatchWeight, int? inTaxaNumber = null)
         {

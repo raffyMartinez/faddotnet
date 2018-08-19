@@ -13,7 +13,7 @@ namespace FAD3
         public double? GonadWeight { get; set; }
         public double? Length { get; set; }
         public GMSManager.sex Sex { get; set; }
-        public GMSManager.Taxa Taxa { get; set; }
+        public CatchName.Taxa Taxa { get; set; }
         public string TaxaName { get; set; }
         public double? Weight { get; set; }
         public global.fad3DataStatus DataStatus { get; set; }
@@ -27,7 +27,7 @@ namespace FAD3
 
         public GMSLineClass(string inCatchRowGuid, string inRowGuid, double? inLength, double? inWeight,
                             double? inGonadWeight, GMSManager.sex inSex, GMSManager.FishCrabGMS inGMS, string inTaxaName,
-                            GMSManager.Taxa inTaxa, global.fad3DataStatus inDataStatus, int inSequence)
+                            CatchName.Taxa inTaxa, global.fad3DataStatus inDataStatus, int inSequence)
         {
             RowGuid = inRowGuid;
             CatchRowGUID = inCatchRowGuid;

@@ -38,7 +38,7 @@
       </Enum>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>AGaEIRACQMAhMikwgAAgohIAAQIgAwAGACMAAIMKAgA=</HashCode>
+      <HashCode>AGaEIRACQMAhMikwgAAgohIAAQIgAwAGACMABIMKAgA=</HashCode>
       <FileName>global.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -160,7 +160,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="FAD3.mru">
-    <Position X="15.75" Y="3" Width="2.25" />
+    <Position X="16.75" Y="3" Width="2.25" />
     <NestedTypes>
       <Delegate Name="FAD3.mru.FileSelectedEventHandler" Collapsed="true">
         <TypeIdentifier>
@@ -179,7 +179,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="FAD3.ManageGearSpecsClass">
-    <Position X="10.25" Y="13.25" Width="3" />
+    <Position X="10.25" Y="17.75" Width="3" />
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
@@ -201,9 +201,9 @@
     </TypeIdentifier>
   </Class>
   <Class Name="FAD3.names">
-    <Position X="10.5" Y="7.75" Width="2.5" />
+    <Position X="10.75" Y="10" Width="2.5" />
     <TypeIdentifier>
-      <HashCode>IAAQAAQACEAAAFACgACggAAAAAAIAAAAAEACAQAAQFA=</HashCode>
+      <HashCode>NAAQAAQACEBAAlACgACggAAAQABIAAAAAEACAQAAQVA=</HashCode>
       <FileName>names.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -241,7 +241,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="FAD3.Enumerators">
-    <Position X="11.75" Y="3.25" Width="2.25" />
+    <Position X="14.25" Y="3.5" Width="2.25" />
     <TypeIdentifier>
       <HashCode>AIAAAAAAAAAAABCAAAGAAAgAAEAAAAAEAAAAIEABAAA=</HashCode>
       <FileName>Enumerators.cs</FileName>
@@ -253,11 +253,6 @@
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
     <NestedTypes>
-      <Enum Name="FAD3.GMSManager.Taxa" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>GMSManager.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Enum>
       <Enum Name="FAD3.GMSManager.FishCrabGMS" Collapsed="true">
         <TypeIdentifier>
           <NewMemberFileName>GMSManager.cs</NewMemberFileName>
@@ -268,14 +263,9 @@
           <NewMemberFileName>GMSManager.cs</NewMemberFileName>
         </TypeIdentifier>
       </Enum>
-      <Struct Name="FAD3.GMSManager.GMSLine" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>GMSManager.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Struct>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>QAAABAAAAAAAAAAAIAAgAAAARAAAEAgACAAAAAAAAAA=</HashCode>
+      <HashCode>AAAABAAAAAQAAAAAIAAAAAAAQAAAAAgAAAAAAAAAUAA=</HashCode>
       <FileName>GMSManager.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -292,15 +282,32 @@
       </Enum>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>UAAEAAAAAAAAAAAAgAAAAAAABAAAAACAIEBCAAQAAAQ=</HashCode>
+      <HashCode>UAAEAAAAAAAAAAAAgAAAAAAAAAAAAACAIABAAAQABAQ=</HashCode>
       <FileName>CatchComposition.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="FAD3.CatchLineClass">
+  <Class Name="FAD3.CatchLine">
     <Position X="7" Y="8.5" Width="3" />
     <TypeIdentifier>
-      <HashCode>AAAAIAAAAAAQAIAAAAgAAAAAgAAAAAAIgICAiIAggAg=</HashCode>
-      <FileName>CatchLineClass.cs</FileName>
+      <HashCode>AAAAIAAAAAAQAIAAAAgAAAAAgAAAAAAIgICAiIEggAg=</HashCode>
+      <FileName>CatchLine.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FAD3.CatchName">
+    <Position X="10.5" Y="2" Width="2" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Enum Name="FAD3.CatchName.Taxa" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>CatchName.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>ABBkQAAAADAAGAAAAgAggAABAAACAAAAAAAAARAABAA=</HashCode>
+      <FileName>CatchName.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Font Name="Segoe UI" Size="9" />
