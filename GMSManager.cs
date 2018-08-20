@@ -282,7 +282,7 @@ namespace FAD3
             return mydata;
         }
 
-        public static bool UpdateGMSData(Dictionary<int, GMSLineClass> gmsRows)
+        public static bool UpdateGMSData(Dictionary<string, GMSLineClass> gmsRows)
         {
             var rows = gmsRows.Count;
             var sql = "";

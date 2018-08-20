@@ -22,8 +22,7 @@ namespace FAD3
 
         private void AllSpeciesForm_Load(object sender, EventArgs e)
         {
-            //listBoxFilter.SelectionMode = SelectionMode.MultiSimple;
-            var n = 0;
+            Text = "List of all species in catch composition of sampled landings";
             foreach (var item in CatchName.RetrieveTaxaDictionary())
             {
                 listBoxFilter.Items.Add(item.Value);
@@ -40,6 +39,7 @@ namespace FAD3
                     o.Columns.Add("In FishBase");
                     o.Columns.Add("Records");
                     o.Columns.Add("Notes");
+                    o.HideSelection = false;
                 });
             FillListNames();
         }
@@ -72,6 +72,11 @@ namespace FAD3
                         break;
                 }
             }
+        }
+
+        private void OnButtonOK_Click(object sender, EventArgs e)
+        {
+            Close();
         }
 
         private void OnButton_Click(object sender, EventArgs e)
@@ -122,16 +127,13 @@ namespace FAD3
                 case "buttonReset":
                     break;
 
-                case "buttonOK":
-                    Close();
-                    break;
-
                 case "buttonEdit":
-
+                    ShowNameDetail();
                     break;
 
                 case "buttonAdd":
-
+                    SpeciesNameForm snf = new SpeciesNameForm(this);
+                    snf.ShowDialog(this);
                     break;
 
                 case "buttonSearch":
@@ -140,18 +142,26 @@ namespace FAD3
             }
         }
 
+        private void ShowNameDetail()
+        {
+            if (lvNames.SelectedItems.Count > 0)
+            {
+                lvNames.SelectedItems[0].With(o =>
+                {
+                    var genus = o.SubItems[1].Text;
+                    var species = o.SubItems[2].Text;
+                    var taxaName = o.SubItems[3].Text;
+                    var nameGuid = o.Name;
+
+                    SpeciesNameForm snf = new SpeciesNameForm(genus, species, nameGuid, taxaName, this);
+                    snf.ShowDialog(this);
+                });
+            }
+        }
+
         private void OnlvNames_DoubleClick(object sender, EventArgs e)
         {
-            lvNames.SelectedItems[0].With(o =>
-            {
-                var genus = o.SubItems[1].Text;
-                var species = o.SubItems[2].Text;
-                var taxaName = o.SubItems[3].Text;
-                var nameGuid = o.Name;
-
-                SpeciesNameForm snf = new SpeciesNameForm(genus, species, nameGuid, taxaName, this);
-                snf.ShowDialog(this);
-            });
+            ShowNameDetail();
         }
     }
 }

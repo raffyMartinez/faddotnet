@@ -41,8 +41,8 @@
             this.buttonCancel = new System.Windows.Forms.Button();
             this.buttonOK = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.labelRecordCount = new System.Windows.Forms.Label();
             this.buttonEdit = new System.Windows.Forms.Button();
+            this.labelRecordCount = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -109,6 +109,7 @@
             // chkInFishbase
             // 
             this.chkInFishbase.AutoSize = true;
+            this.chkInFishbase.Enabled = false;
             this.chkInFishbase.Location = new System.Drawing.Point(90, 141);
             this.chkInFishbase.Name = "chkInFishbase";
             this.chkInFishbase.Size = new System.Drawing.Size(15, 14);
@@ -168,16 +169,6 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Records";
             // 
-            // labelRecordCount
-            // 
-            this.labelRecordCount.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelRecordCount.Location = new System.Drawing.Point(9, 23);
-            this.labelRecordCount.Name = "labelRecordCount";
-            this.labelRecordCount.Size = new System.Drawing.Size(157, 24);
-            this.labelRecordCount.TabIndex = 15;
-            this.labelRecordCount.Text = "0000";
-            this.labelRecordCount.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
             // buttonEdit
             // 
             this.buttonEdit.Location = new System.Drawing.Point(55, 54);
@@ -187,6 +178,16 @@
             this.buttonEdit.Text = "Edit";
             this.buttonEdit.UseVisualStyleBackColor = true;
             this.buttonEdit.Click += new System.EventHandler(this.Onbutton_Click);
+            // 
+            // labelRecordCount
+            // 
+            this.labelRecordCount.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelRecordCount.Location = new System.Drawing.Point(9, 23);
+            this.labelRecordCount.Name = "labelRecordCount";
+            this.labelRecordCount.Size = new System.Drawing.Size(157, 24);
+            this.labelRecordCount.TabIndex = 15;
+            this.labelRecordCount.Text = "0000";
+            this.labelRecordCount.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // SpeciesNameForm
             // 

@@ -94,6 +94,7 @@ namespace FAD3
             }
             else
             {
+                labelRecordCount.Text = "0";
                 _nameGuid = Guid.NewGuid().ToString();
                 var speciesFishBaseData = names.NameInFishBaseEx(_genus, _species);
                 _inFishBase = chkInFishbase.Checked = speciesFishBaseData.inFishBase;
@@ -232,10 +233,21 @@ namespace FAD3
                     }
                     else
                     {
+                        var metaPhone = new DoubleMetaphoneShort();
                         if (o.Name == "txtGenus")
+                        {
                             _genus = o.Text;
+                            metaPhone.ComputeMetaphoneKeys(_genus, out short k1, out short k2);
+                            _genusMPH1 = k1;
+                            _genusMPH2 = k2;
+                        }
                         else
+                        {
                             _species = o.Text;
+                            metaPhone.ComputeMetaphoneKeys(_species, out short k1, out short k2);
+                            _speciesMPH1 = k1;
+                            _speciesMPH2 = k2;
+                        }
                     }
                     break;
 

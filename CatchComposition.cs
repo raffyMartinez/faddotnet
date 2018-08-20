@@ -23,7 +23,7 @@ namespace FAD3
             get { return _TotalWtOfFromTotal; }
         }
 
-        public static bool UpdateCatchComposition(Dictionary<int, CatchLine> CatchComposition)
+        public static bool UpdateCatchComposition(Dictionary<string, CatchLine> CatchComposition)
 
         {
             var sql = "";
@@ -110,13 +110,20 @@ namespace FAD3
                 {
                     conection.Open();
 
-                    string query = $@"SELECT tblSampling.SamplingGUID, Identification, tblCatchDetail.CatchCompRow, tblCatchComp.NameGUID, temp_AllNames.Name1,
-                                    temp_AllNames.Name2, tblSampling.WtCatch, tblSampling.WtSample, tblCatchDetail.Live, tblCatchDetail.wt, tblCatchComp.Sequence,
-                                    tblCatchDetail.ct, tblCatchDetail.swt, tblCatchDetail.sct, tblCatchDetail.FromTotal, tblAllSpecies.TaxaNo, tblCatchDetail.RowGUID As CatchDetailRow
-                                    FROM ((tblSampling INNER JOIN (tblCatchComp INNER JOIN temp_AllNames ON tblCatchComp.NameGUID = temp_AllNames.NameNo)
-                                    ON tblSampling.SamplingGUID = tblCatchComp.SamplingGUID) INNER JOIN tblCatchDetail ON
-                                    tblCatchComp.RowGUID = tblCatchDetail.CatchCompRow) LEFT JOIN tblAllSpecies ON temp_AllNames.NameNo = tblAllSpecies.SpeciesGUID
-                                    WHERE tblSampling.SamplingGUID={{{SamplingGUID}}} ORDER BY tblCatchComp.Sequence";
+                    //string query = $@"SELECT tblSampling.SamplingGUID, Identification, tblCatchComp.RowGUID, tblCatchComp.NameGUID, temp_AllNames.Name1,
+                    //                temp_AllNames.Name2, tblSampling.WtCatch, tblSampling.WtSample, tblCatchDetail.Live, tblCatchDetail.wt, tblCatchComp.Sequence,
+                    //                tblCatchDetail.ct, tblCatchDetail.swt, tblCatchDetail.sct, tblCatchDetail.FromTotal, tblAllSpecies.TaxaNo, tblCatchDetail.RowGUID As CatchDetailRow
+                    //                FROM ((tblSampling INNER JOIN (tblCatchComp INNER JOIN temp_AllNames ON tblCatchComp.NameGUID = temp_AllNames.NameNo)
+                    //                ON tblSampling.SamplingGUID = tblCatchComp.SamplingGUID) INNER JOIN tblCatchDetail ON
+                    //                tblCatchComp.RowGUID = tblCatchDetail.CatchCompRow) LEFT JOIN tblAllSpecies ON temp_AllNames.NameNo = tblAllSpecies.SpeciesGUID
+                    //                WHERE tblSampling.SamplingGUID={{{SamplingGUID}}} ORDER BY tblCatchComp.Sequence";
+
+                    var query = $@"SELECT tblCatchComp.SamplingGUID, tblCatchComp.RowGUID, tblCatchComp.NameGUID, temp_AllNames.Name1, temp_AllNames.Name2, tblAllSpecies.TaxaNo,
+                                temp_AllNames.Identification, tblCatchComp.Sequence, tblCatchComp.LFInterval, tblCatchDetail.RowGUID AS CatchDetailRow, tblCatchDetail.wt, tblCatchDetail.ct,
+                                tblCatchDetail.swt, tblCatchDetail.sct, tblCatchDetail.FromTotal, tblCatchDetail.Live, tblCatchDetail.Notes FROM tblAllSpecies RIGHT JOIN
+                                (temp_AllNames INNER JOIN (tblCatchComp INNER JOIN tblCatchDetail ON tblCatchComp.RowGUID = tblCatchDetail.CatchCompRow)
+                                ON temp_AllNames.NameNo = tblCatchComp.NameGUID) ON tblAllSpecies.SpeciesGUID = tblCatchComp.NameGUID WHERE tblCatchComp.SamplingGUID={{{SamplingGUID}}}
+                                ORDER BY tblCatchComp.Sequence";
 
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
@@ -129,6 +136,7 @@ namespace FAD3
                         Name2 = dr["Name2"].ToString();
                         CatchName = $"{Name1} {Name2}";
                         IdType = Identification.Scientific;
+                        if (dr["Identification"].ToString() == "Local names") IdType = Identification.LocalName;
 
                         if (dr["ct"].ToString().Length > 0)
                         {
@@ -141,8 +149,6 @@ namespace FAD3
                                 CatchCount = null;
                             }
                         }
-
-                        if (dr["Identification"].ToString() == "Local names") IdType = Identification.LocalName;
 
                         if (dr["TaxaNo"].ToString().Length > 0)
                         {
@@ -162,7 +168,7 @@ namespace FAD3
                             Sequence = v;
 
                         CatchLine myLine = new CatchLine(Sequence, Name1, Name2, CatchName, dr["SamplingGUID"].ToString(),
-                                        dr["CatchCompRow"].ToString(), dr["NameGUID"].ToString(),
+                                        dr["RowGUID"].ToString(), dr["NameGUID"].ToString(),
                                         Convert.ToDouble(dr["wt"]), CatchCount, TaxaNumber)
                         {
                             CatchDetailRowGUID = dr["CatchDetailRow"].ToString(),
@@ -185,7 +191,7 @@ namespace FAD3
                         myLine.FromTotalCatch = bool.Parse(dr["FromTotal"].ToString());
 
                         //add the catch composition row to the dictionary
-                        myCatch.Add(dr["CatchCompRow"].ToString(), myLine);
+                        myCatch.Add(dr["RowGUID"].ToString(), myLine);
 
                         if (dr["FromTotal"].ToString() == "True")
                         {

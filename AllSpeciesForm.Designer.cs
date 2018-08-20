@@ -31,16 +31,16 @@
             this.lvNames = new System.Windows.Forms.ListView();
             this.buttonOK = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
-            this.buttonAdd = new System.Windows.Forms.Button();
-            this.buttonEdit = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.chkShowWithRecords = new System.Windows.Forms.CheckBox();
+            this.buttonReset = new System.Windows.Forms.Button();
+            this.buttonApply = new System.Windows.Forms.Button();
             this.listBoxFilter = new System.Windows.Forms.CheckedListBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.txtSearch = new System.Windows.Forms.TextBox();
-            this.buttonApply = new System.Windows.Forms.Button();
-            this.buttonReset = new System.Windows.Forms.Button();
-            this.chkShowWithRecords = new System.Windows.Forms.CheckBox();
+            this.buttonAdd = new System.Windows.Forms.Button();
+            this.buttonEdit = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -62,7 +62,7 @@
             this.buttonOK.TabIndex = 1;
             this.buttonOK.Text = "OK";
             this.buttonOK.UseVisualStyleBackColor = true;
-            this.buttonOK.Click += new System.EventHandler(this.OnButton_Click);
+            this.buttonOK.Click += new System.EventHandler(this.OnButtonOK_Click);
             // 
             // label2
             // 
@@ -72,28 +72,6 @@
             this.label2.Size = new System.Drawing.Size(137, 16);
             this.label2.TabIndex = 4;
             this.label2.Text = "List of species names";
-            // 
-            // buttonAdd
-            // 
-            this.buttonAdd.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.buttonAdd.Location = new System.Drawing.Point(42, 388);
-            this.buttonAdd.Name = "buttonAdd";
-            this.buttonAdd.Size = new System.Drawing.Size(62, 26);
-            this.buttonAdd.TabIndex = 6;
-            this.buttonAdd.Text = "Add";
-            this.buttonAdd.UseVisualStyleBackColor = true;
-            this.buttonAdd.Click += new System.EventHandler(this.OnButton_Click);
-            // 
-            // buttonEdit
-            // 
-            this.buttonEdit.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.buttonEdit.Location = new System.Drawing.Point(110, 388);
-            this.buttonEdit.Name = "buttonEdit";
-            this.buttonEdit.Size = new System.Drawing.Size(62, 26);
-            this.buttonEdit.TabIndex = 7;
-            this.buttonEdit.Text = "Edit";
-            this.buttonEdit.UseVisualStyleBackColor = true;
-            this.buttonEdit.Click += new System.EventHandler(this.OnButton_Click);
             // 
             // groupBox1
             // 
@@ -110,6 +88,35 @@
             this.groupBox1.TabIndex = 14;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Filter";
+            // 
+            // chkShowWithRecords
+            // 
+            this.chkShowWithRecords.Location = new System.Drawing.Point(12, 256);
+            this.chkShowWithRecords.Name = "chkShowWithRecords";
+            this.chkShowWithRecords.Size = new System.Drawing.Size(175, 42);
+            this.chkShowWithRecords.TabIndex = 20;
+            this.chkShowWithRecords.Text = "Show only those with records in the database";
+            this.chkShowWithRecords.UseVisualStyleBackColor = true;
+            // 
+            // buttonReset
+            // 
+            this.buttonReset.Location = new System.Drawing.Point(63, 302);
+            this.buttonReset.Name = "buttonReset";
+            this.buttonReset.Size = new System.Drawing.Size(57, 26);
+            this.buttonReset.TabIndex = 19;
+            this.buttonReset.Text = "Reset";
+            this.buttonReset.UseVisualStyleBackColor = true;
+            this.buttonReset.Click += new System.EventHandler(this.OnButton_Click);
+            // 
+            // buttonApply
+            // 
+            this.buttonApply.Location = new System.Drawing.Point(126, 303);
+            this.buttonApply.Name = "buttonApply";
+            this.buttonApply.Size = new System.Drawing.Size(57, 26);
+            this.buttonApply.TabIndex = 18;
+            this.buttonApply.Text = "Apply";
+            this.buttonApply.UseVisualStyleBackColor = true;
+            this.buttonApply.Click += new System.EventHandler(this.OnButton_Click);
             // 
             // listBoxFilter
             // 
@@ -145,35 +152,25 @@
             this.txtSearch.Size = new System.Drawing.Size(174, 22);
             this.txtSearch.TabIndex = 14;
             // 
-            // buttonApply
+            // buttonAdd
             // 
-            this.buttonApply.Location = new System.Drawing.Point(126, 303);
-            this.buttonApply.Name = "buttonApply";
-            this.buttonApply.Size = new System.Drawing.Size(57, 26);
-            this.buttonApply.TabIndex = 18;
-            this.buttonApply.Text = "Apply";
-            this.buttonApply.UseVisualStyleBackColor = true;
-            this.buttonApply.Click += new System.EventHandler(this.OnButton_Click);
+            this.buttonAdd.Location = new System.Drawing.Point(106, 383);
+            this.buttonAdd.Name = "buttonAdd";
+            this.buttonAdd.Size = new System.Drawing.Size(57, 26);
+            this.buttonAdd.TabIndex = 20;
+            this.buttonAdd.Text = "Add";
+            this.buttonAdd.UseVisualStyleBackColor = true;
+            this.buttonAdd.Click += new System.EventHandler(this.OnButton_Click);
             // 
-            // buttonReset
+            // buttonEdit
             // 
-            this.buttonReset.Location = new System.Drawing.Point(63, 302);
-            this.buttonReset.Name = "buttonReset";
-            this.buttonReset.Size = new System.Drawing.Size(57, 26);
-            this.buttonReset.TabIndex = 19;
-            this.buttonReset.Text = "Reset";
-            this.buttonReset.UseVisualStyleBackColor = true;
-            this.buttonReset.Click += new System.EventHandler(this.OnButton_Click);
-            // 
-            // chkShowWithRecords
-            // 
-            this.chkShowWithRecords.Location = new System.Drawing.Point(12, 256);
-            this.chkShowWithRecords.Name = "chkShowWithRecords";
-            this.chkShowWithRecords.Size = new System.Drawing.Size(175, 42);
-            this.chkShowWithRecords.TabIndex = 20;
-            this.chkShowWithRecords.Text = "Show only those with records in the database";
-            this.chkShowWithRecords.UseVisualStyleBackColor = true;
-            
+            this.buttonEdit.Location = new System.Drawing.Point(43, 383);
+            this.buttonEdit.Name = "buttonEdit";
+            this.buttonEdit.Size = new System.Drawing.Size(57, 26);
+            this.buttonEdit.TabIndex = 21;
+            this.buttonEdit.Text = "Edit";
+            this.buttonEdit.UseVisualStyleBackColor = true;
+            this.buttonEdit.Click += new System.EventHandler(this.OnButton_Click);
             // 
             // AllSpeciesForm
             // 
@@ -181,9 +178,9 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonOK;
             this.ClientSize = new System.Drawing.Size(916, 436);
-            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.buttonEdit);
             this.Controls.Add(this.buttonAdd);
+            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.buttonOK);
             this.Controls.Add(this.lvNames);
@@ -205,8 +202,6 @@
         private System.Windows.Forms.ListView lvNames;
         private System.Windows.Forms.Button buttonOK;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Button buttonAdd;
-        private System.Windows.Forms.Button buttonEdit;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.CheckedListBox listBoxFilter;
         private System.Windows.Forms.Label label3;
@@ -215,5 +210,7 @@
         private System.Windows.Forms.Button buttonReset;
         private System.Windows.Forms.Button buttonApply;
         private System.Windows.Forms.CheckBox chkShowWithRecords;
+        private System.Windows.Forms.Button buttonAdd;
+        private System.Windows.Forms.Button buttonEdit;
     }
 }
