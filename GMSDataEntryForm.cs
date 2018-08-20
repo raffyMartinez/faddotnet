@@ -66,7 +66,7 @@ namespace FAD3
 
         private void AddRow(bool IsNew, string key = "", GMSLineClass gmsLine = null)
         {
-            const int x = 3;
+            const int x = 0;
             int yPos = _y - Math.Abs(panelUI.AutoScrollPosition.Y);
 
             Label labelRow = new Label();
@@ -626,7 +626,9 @@ namespace FAD3
                         break;
                 }
 
-                if (o.Text != _currentTextContents)
+                //mark the row as edited if resulting edits did not produce
+                //validation errors and text content is not the same
+                if (o.Text != _currentTextContents && !e.Cancel)
                 {
                     _currentTextContents = o.Text;
                     SetRowStatusToEdited(o);

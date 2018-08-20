@@ -48,6 +48,11 @@ namespace FAD3
         private string _currentRow = "";
         private string _currentTextContents = "";
         private bool _errorValidating = false;
+        private double _weightOfCatch;
+        private double _sumOfWeight;
+        private double? _weightOfSample;
+
+        private string _emptySumOfWeightsLabel;
 
         /// <summary>
         /// Form constructor
@@ -56,13 +61,15 @@ namespace FAD3
         /// <param name="parent"></param>
         /// <param name="samplingGuid"></param>
         /// <param name="referenceNumber"></param>
-        public CatchCompositionForm(bool IsNew, MainForm parent, string samplingGuid, string referenceNumber)
+        public CatchCompositionForm(bool IsNew, MainForm parent, string samplingGuid, string referenceNumber, double weightOfCatch, double? weightOfSample)
         {
             InitializeComponent();
             _parentForm = parent;
             _samplingGuid = samplingGuid;
             _isNew = IsNew;
             _referenceNumber = referenceNumber;
+            _weightOfCatch = weightOfCatch;
+            _weightOfSample = weightOfSample;
         }
 
         /// <summary>
@@ -276,7 +283,8 @@ namespace FAD3
                 o.Tag = key;
                 if (!isNew)
                 {
-                    o.Text = o.Text = catchLine.CatchWeight.ToString();
+                    o.Text = catchLine.CatchWeight.ToString();
+                    _sumOfWeight += double.Parse(o.Text);
                 }
                 SetTextBoxEvents(o);
             });
@@ -293,7 +301,7 @@ namespace FAD3
                 o.Tag = key;
                 if (!isNew)
                 {
-                    o.Text = o.Text = catchLine.CatchCount.ToString();
+                    o.Text = catchLine.CatchCount.ToString();
                 }
                 SetTextBoxEvents(o);
             });
@@ -1072,6 +1080,7 @@ namespace FAD3
 
         private void OnForm_Load(object sender, EventArgs e)
         {
+            _emptySumOfWeightsLabel = labelSumOfWeight.Text;
             labelTitle.Text = $"Catch composition of {_referenceNumber}";
             if (_isNew)
             {
@@ -1085,6 +1094,17 @@ namespace FAD3
                 {
                     AddRow(isNew: false, item.Key, item.Value);
                 }
+                labelSumOfWeight.Text += $" {_sumOfWeight.ToString("0.000")}";
+                if (_sumOfWeight > _weightOfCatch)
+                {
+                    labelSumOfWeight.ForeColor = Color.Red;
+                }
+            }
+
+            labelWtCatch.Text += $" {_weightOfCatch.ToString("0.000")}";
+            if (_weightOfSample != null)
+            {
+                labelWtSample.Text += $" {((double)_weightOfSample).ToString("0.000")}";
             }
         }
 
@@ -1135,6 +1155,25 @@ namespace FAD3
             }
         }
 
+        private void ComputeSumOfWeights()
+        {
+            var weight = 0D;
+            foreach (var item in _CatchCompositionData)
+            {
+                if (item.Value.dataStatus != global.fad3DataStatus.statusForDeletion) weight += item.Value.CatchWeight;
+            }
+            labelSumOfWeight.Text = $"{_emptySumOfWeightsLabel} {weight}";
+
+            if (weight > _weightOfCatch)
+            {
+                labelSumOfWeight.ForeColor = Color.Red;
+            }
+            else
+            {
+                labelSumOfWeight.ForeColor = SystemColors.WindowText;
+            }
+        }
+
         private void OnTextBoxValidating(object sender, CancelEventArgs e)
         {
             var msg = "";
@@ -1160,6 +1199,7 @@ namespace FAD3
 
                               case "txtWt":
                                   ccd.CatchWeight = 0;
+                                  ComputeSumOfWeights();
                                   break;
 
                               case "txtSubWt":
@@ -1199,7 +1239,10 @@ namespace FAD3
                                       if (myWeight > 0)
                                       {
                                           if (o.Name == "txtWt")
+                                          {
                                               ccd.CatchWeight = myWeight;
+                                              ComputeSumOfWeights();
+                                          }
                                           else
                                           {
                                               if (myWeight < ccd.CatchWeight && ccd.CatchCount == null)
@@ -1268,6 +1311,8 @@ namespace FAD3
                       }
                   });
 
+                //mark the current row as edited if there are no
+                //messages and the text content is different
                 if (msg.Length == 0)
                 {
                     if (o.Text != _currentTextContents)

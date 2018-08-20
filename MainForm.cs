@@ -46,6 +46,8 @@ namespace FAD3
         private sampling _Sampling = new sampling();
         private string _SamplingGUID = "";
         private string _SamplingMonth = "";
+        private double _weightOfCatch;
+        private double? _weightOfSample;
         private int _statusPanelWidth = 200;
         private bool _subListExisting = false;
         private int _topLVItemIndex = 0;
@@ -805,7 +807,7 @@ namespace FAD3
 
         private void ShowCatchCompositionForm(bool IsNew = false)
         {
-            CatchCompositionForm ccf = new CatchCompositionForm(IsNew, this, _SamplingGUID, _ReferenceNumber);
+            CatchCompositionForm ccf = new CatchCompositionForm(IsNew, this, _SamplingGUID, _ReferenceNumber, _weightOfCatch, _weightOfSample);
             ccf.ShowDialog(this);
         }
 
@@ -2143,6 +2145,20 @@ namespace FAD3
                             break;
 
                         case "spacer":
+                            break;
+
+                        case "WeightOfSample":
+                            _weightOfSample = null;
+                            if (double.TryParse(effortData[lvi.Name], out double sampleWt))
+                            {
+                                _weightOfSample = sampleWt;
+                            }
+                            lvi.SubItems[1].Text = _weightOfSample == null ? "" : _weightOfSample.ToString();
+                            break;
+
+                        case "WeightOfCatch":
+                            _weightOfCatch = double.Parse(effortData[lvi.Name]);
+                            lvi.SubItems[1].Text = _weightOfCatch.ToString();
                             break;
 
                         default:

@@ -45,6 +45,9 @@
             this.labelCol7 = new System.Windows.Forms.Label();
             this.labelSubSample = new System.Windows.Forms.Label();
             this.labelTitle = new System.Windows.Forms.Label();
+            this.labelWtCatch = new System.Windows.Forms.Label();
+            this.labelSumOfWeight = new System.Windows.Forms.Label();
+            this.labelWtSample = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // panelUI
@@ -219,12 +222,42 @@
             this.labelTitle.TabIndex = 21;
             this.labelTitle.Text = "label1";
             // 
+            // labelWtCatch
+            // 
+            this.labelWtCatch.AutoSize = true;
+            this.labelWtCatch.Location = new System.Drawing.Point(12, 443);
+            this.labelWtCatch.Name = "labelWtCatch";
+            this.labelWtCatch.Size = new System.Drawing.Size(102, 16);
+            this.labelWtCatch.TabIndex = 22;
+            this.labelWtCatch.Text = "Weight of catch:";
+            // 
+            // labelSumOfWeight
+            // 
+            this.labelSumOfWeight.AutoSize = true;
+            this.labelSumOfWeight.Location = new System.Drawing.Point(445, 443);
+            this.labelSumOfWeight.Name = "labelSumOfWeight";
+            this.labelSumOfWeight.Size = new System.Drawing.Size(93, 16);
+            this.labelSumOfWeight.TabIndex = 23;
+            this.labelSumOfWeight.Text = "Sum of weight:";
+            // 
+            // labelWtSample
+            // 
+            this.labelWtSample.AutoSize = true;
+            this.labelWtSample.Location = new System.Drawing.Point(218, 443);
+            this.labelWtSample.Name = "labelWtSample";
+            this.labelWtSample.Size = new System.Drawing.Size(115, 16);
+            this.labelWtSample.TabIndex = 24;
+            this.labelWtSample.Text = "Weight of sample:";
+            // 
             // CatchCompositionForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCancel;
-            this.ClientSize = new System.Drawing.Size(845, 475);
+            this.ClientSize = new System.Drawing.Size(845, 485);
+            this.Controls.Add(this.labelWtSample);
+            this.Controls.Add(this.labelSumOfWeight);
+            this.Controls.Add(this.labelWtCatch);
             this.Controls.Add(this.labelTitle);
             this.Controls.Add(this.labelSubSample);
             this.Controls.Add(this.labelCol10);
@@ -274,5 +307,8 @@
         private System.Windows.Forms.Label labelCol7;
         private System.Windows.Forms.Label labelSubSample;
         private System.Windows.Forms.Label labelTitle;
+        private System.Windows.Forms.Label labelWtCatch;
+        private System.Windows.Forms.Label labelSumOfWeight;
+        private System.Windows.Forms.Label labelWtSample;
     }
 }

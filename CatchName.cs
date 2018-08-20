@@ -184,6 +184,12 @@ namespace FAD3
             return taxaName;
         }
 
+        //this is a simplistic list of taxonomic categories
+        //exists because it is needed for gonad maturity categories
+        //and gonad maturity stages varies by taxonomies.
+        //
+        //No new categories should be added to the database if it is
+        //not included in this enumeration
         public enum Taxa
         {
             To_be_determined,
