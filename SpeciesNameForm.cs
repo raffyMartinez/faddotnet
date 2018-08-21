@@ -13,8 +13,8 @@ namespace FAD3
     public partial class SpeciesNameForm : Form
     {
         private string _nameGuid = "";
-        private string _species;
-        private string _genus;
+        private string _species = "";
+        private string _genus = "";
         private string _taxaName;
         private CatchName.Taxa _taxa = CatchName.Taxa.To_be_determined;
         private global.fad3DataStatus _dataStatus = global.fad3DataStatus.statusFromDB;
@@ -87,6 +87,7 @@ namespace FAD3
                 _speciesMPH2 = speciesData.speciesKey2 ?? default;
                 _catchCompositionRecordCount = names.CatchCompositionRecordCount(_nameGuid);
                 labelRecordCount.Text = _catchCompositionRecordCount.ToString();
+
                 if (_catchCompositionRecordCount == 0)
                 {
                     buttonEdit.Text = "Delete";
@@ -96,53 +97,60 @@ namespace FAD3
             {
                 labelRecordCount.Text = "0";
                 _nameGuid = Guid.NewGuid().ToString();
-                var speciesFishBaseData = names.NameInFishBaseEx(_genus, _species);
-                _inFishBase = chkInFishbase.Checked = speciesFishBaseData.inFishBase;
-                _fishBaseSpeciesNumber = speciesFishBaseData.fishBaseSpeciesNo;
-                if (chkInFishbase.Checked) cboTaxa.Text = "Fish";
 
-                var metaPhone = new DoubleMetaphoneShort();
-                metaPhone.ComputeMetaphoneKeys(_genus, out short k1, out short k2);
-                _genusMPH1 = k1;
-                _genusMPH2 = k2;
-
-                metaPhone.ComputeMetaphoneKeys(_species, out k1, out k2);
-                _speciesMPH1 = k1;
-                _speciesMPH2 = k2;
-
-                var SimilarSoundingList = names.RetrieveSpeciesWithSimilarMetaPhone(_genusMPH1, _genusMPH2, _speciesMPH1, _speciesMPH2);
-                if (SimilarSoundingList.Count > 0)
+                if (_genus.Length > 0 && _species.Length > 0)
                 {
-                    Width = (int)(Width * 2);
-                    ListView lvSimilarNames = new ListView
-                    {
-                        Name = "lvSimilarNames",
-                        Top = txtSpecies.Top,
-                        Left = txtGenus.Left + txtGenus.Width + 20,
-                        Height = (txtNotes.Top + txtNotes.Height) - txtSpecies.Top,
-                        View = View.List,
-                    };
-                    lvSimilarNames.Width = Width - (lvSimilarNames.Left + 20);
-                    lvSimilarNames.DoubleClick += OnListViewDoubleClick;
+                    var speciesFishBaseData = names.NameInFishBaseEx(_genus, _species);
+                    _inFishBase = chkInFishbase.Checked = speciesFishBaseData.inFishBase;
+                    _fishBaseSpeciesNumber = speciesFishBaseData.fishBaseSpeciesNo;
 
-                    Label labelSimilar = new Label
-                    {
-                        Left = lvSimilarNames.Left,
-                        Top = labelGenus.Top,
-                        Text = "Similar sounding names",
-                        AutoSize = false,
-                        Width = lvSimilarNames.Width
-                    };
+                    if (chkInFishbase.Checked) cboTaxa.Text = "Fish";
 
-                    Controls.Add(lvSimilarNames);
-                    Controls.Add(labelSimilar);
+                    var metaPhone = new DoubleMetaphoneShort();
+                    metaPhone.ComputeMetaphoneKeys(_genus, out short k1, out short k2);
+                    _genusMPH1 = k1;
+                    _genusMPH2 = k2;
 
-                    foreach (var item in SimilarSoundingList)
+                    metaPhone.ComputeMetaphoneKeys(_species, out k1, out k2);
+                    _speciesMPH1 = k1;
+                    _speciesMPH2 = k2;
+
+                    var SimilarSoundingList = names.RetrieveSpeciesWithSimilarMetaPhone(_genusMPH1, _genusMPH2, _speciesMPH1, _speciesMPH2);
+                    if (SimilarSoundingList.Count > 0)
                     {
-                        var lvi = new ListViewItem(new string[] { item.fullName, item.genus, item.species });
-                        lvSimilarNames.Items.Add(lvi);
+                        Width = (int)(Width * 2);
+                        ListView lvSimilarNames = new ListView
+                        {
+                            Name = "lvSimilarNames",
+                            Top = txtSpecies.Top,
+                            Left = txtGenus.Left + txtGenus.Width + 20,
+                            Height = (txtNotes.Top + txtNotes.Height) - txtSpecies.Top,
+                            View = View.List,
+                        };
+                        lvSimilarNames.Width = Width - (lvSimilarNames.Left + 20);
+                        lvSimilarNames.DoubleClick += OnListViewDoubleClick;
+
+                        Label labelSimilar = new Label
+                        {
+                            Left = lvSimilarNames.Left,
+                            Top = labelGenus.Top,
+                            Text = "Similar sounding names",
+                            AutoSize = false,
+                            Width = lvSimilarNames.Width
+                        };
+
+                        Controls.Add(lvSimilarNames);
+                        Controls.Add(labelSimilar);
+
+                        foreach (var item in SimilarSoundingList)
+                        {
+                            var lvi = new ListViewItem(new string[] { item.fullName, item.genus, item.species });
+                            lvSimilarNames.Items.Add(lvi);
+                        }
                     }
                 }
+
+                buttonEdit.Enabled = false;
             }
         }
 

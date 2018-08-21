@@ -14,6 +14,11 @@ namespace FAD3
         private MainForm _parent;
         private Dictionary<string, string> _filters = new Dictionary<string, string>();
 
+        public MainForm parentForm
+        {
+            get { return _parent; }
+        }
+
         public AllSpeciesForm(MainForm parent)
         {
             InitializeComponent();
@@ -22,6 +27,7 @@ namespace FAD3
 
         private void AllSpeciesForm_Load(object sender, EventArgs e)
         {
+            dropDownMenu.ItemClicked += OnDropDownMenuItemClicked;
             Text = "List of all species in catch composition of sampled landings";
             foreach (var item in CatchName.RetrieveTaxaDictionary())
             {
@@ -42,6 +48,28 @@ namespace FAD3
                     o.HideSelection = false;
                 });
             FillListNames();
+        }
+
+        private void OnDropDownMenuItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+            e.ClickedItem.Owner.Hide();
+            switch (e.ClickedItem.Name)
+            {
+                case "menuViewSamplings":
+                    var catchName = $"{lvNames.SelectedItems[0].SubItems[1].Text} {lvNames.SelectedItems[0].SubItems[2].Text}";
+                    SpeciesSamplingsForm ssf = new SpeciesSamplingsForm(lvNames.SelectedItems[0].Name, catchName, this);
+                    ssf.Show(this);
+                    break;
+
+                case "menuAddNewName":
+                    SpeciesNameForm snf = new SpeciesNameForm(this);
+                    snf.ShowDialog(this);
+                    break;
+
+                case "menuEditName":
+                    ShowNameDetail();
+                    break;
+            }
         }
 
         private void FillListNames(Dictionary<string, string> filters = null, bool OnlyWithRecords = false)
@@ -162,6 +190,22 @@ namespace FAD3
         private void OnlvNames_DoubleClick(object sender, EventArgs e)
         {
             ShowNameDetail();
+        }
+
+        private void lvNames_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                dropDownMenu.Items.Clear();
+                var item = dropDownMenu.Items.Add("View samplings");
+                item.Name = "menuViewSamplings";
+
+                item = dropDownMenu.Items.Add("Add new catch name");
+                item.Name = "menuAddNewName";
+
+                item = dropDownMenu.Items.Add("Edit catch name");
+                item.Name = "menuEditName";
+            }
         }
     }
 }

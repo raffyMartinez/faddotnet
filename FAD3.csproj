@@ -197,6 +197,12 @@
     <Compile Include="SpeciesNameForm.Designer.cs">
       <DependentUpon>SpeciesNameForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="SpeciesSamplingsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SpeciesSamplingsForm.Designer.cs">
+      <DependentUpon>SpeciesSamplingsForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="TargetAreaForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -333,6 +339,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="SpeciesNameForm.resx">
       <DependentUpon>SpeciesNameForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SpeciesSamplingsForm.resx">
+      <DependentUpon>SpeciesSamplingsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="TargetAreaForm.resx">
       <DependentUpon>TargetAreaForm.cs</DependentUpon>

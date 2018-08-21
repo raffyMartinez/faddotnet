@@ -73,6 +73,11 @@ namespace FAD3
             //
         }
 
+        public ImageList treeImages
+        {
+            get { return imageList16; }
+        }
+
         public aoi AOI
         {
             get { return _AOI; }

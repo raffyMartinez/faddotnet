@@ -41,7 +41,7 @@ namespace FAD3
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.treeMain = new System.Windows.Forms.TreeView();
             this.menuDropDown = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.imageList1 = new System.Windows.Forms.ImageList(this.components);
+            this.imageList16 = new System.Windows.Forms.ImageList(this.components);
             this.labelErrorDetail = new System.Windows.Forms.Label();
             this.lblErrorFormOpen = new System.Windows.Forms.Label();
             this.lblTitle = new System.Windows.Forms.Label();
@@ -124,7 +124,7 @@ namespace FAD3
             this.treeMain.ContextMenuStrip = this.menuDropDown;
             this.treeMain.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.treeMain.ImageIndex = 0;
-            this.treeMain.ImageList = this.imageList1;
+            this.treeMain.ImageList = this.imageList16;
             this.treeMain.Location = new System.Drawing.Point(3, 3);
             this.treeMain.Name = "treeMain";
             this.treeMain.RightToLeftLayout = true;
@@ -141,21 +141,21 @@ namespace FAD3
             this.menuDropDown.Size = new System.Drawing.Size(61, 4);
             this.menuDropDown.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnMenuDropDown_ItemClicked);
             // 
-            // imageList1
+            // imageList16
             // 
-            this.imageList1.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList1.ImageStream")));
-            this.imageList1.TransparentColor = System.Drawing.Color.Transparent;
-            this.imageList1.Images.SetKeyName(0, "AOI");
-            this.imageList1.Images.SetKeyName(1, "LandingSite");
-            this.imageList1.Images.SetKeyName(2, "MonthGear");
-            this.imageList1.Images.SetKeyName(3, "jigs");
-            this.imageList1.Images.SetKeyName(4, "others");
-            this.imageList1.Images.SetKeyName(5, "lines");
-            this.imageList1.Images.SetKeyName(6, "nets");
-            this.imageList1.Images.SetKeyName(7, "impound");
-            this.imageList1.Images.SetKeyName(8, "seines");
-            this.imageList1.Images.SetKeyName(9, "traps");
-            this.imageList1.Images.SetKeyName(10, "db");
+            this.imageList16.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList16.ImageStream")));
+            this.imageList16.TransparentColor = System.Drawing.Color.Transparent;
+            this.imageList16.Images.SetKeyName(0, "AOI");
+            this.imageList16.Images.SetKeyName(1, "LandingSite");
+            this.imageList16.Images.SetKeyName(2, "MonthGear");
+            this.imageList16.Images.SetKeyName(3, "jigs");
+            this.imageList16.Images.SetKeyName(4, "others");
+            this.imageList16.Images.SetKeyName(5, "lines");
+            this.imageList16.Images.SetKeyName(6, "nets");
+            this.imageList16.Images.SetKeyName(7, "impound");
+            this.imageList16.Images.SetKeyName(8, "seines");
+            this.imageList16.Images.SetKeyName(9, "traps");
+            this.imageList16.Images.SetKeyName(10, "db");
             // 
             // labelErrorDetail
             // 
@@ -613,7 +613,7 @@ namespace FAD3
 		private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.ToolStripMenuItem toolStripRecentlyOpened;
         private System.Windows.Forms.ToolStripMenuItem testToolStripRecentOpenedList;
-        private System.Windows.Forms.ImageList imageList1;
+        private System.Windows.Forms.ImageList imageList16;
         private System.Windows.Forms.ToolStrip tsToolbar;
         private System.Windows.Forms.ToolStripButton tbButtonAbout;
         private System.Windows.Forms.ToolStripButton tbButtonGears;

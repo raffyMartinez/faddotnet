@@ -536,24 +536,7 @@ namespace FAD3
                     }
                     PropertyValue.Add("HasLiveFish", HasLiveFish);
 
-                    switch (dr["VesType"].ToString())
-                    {
-                        case "1":
-                            VesType = "Motorized";
-                            break;
-
-                        case "2":
-                            VesType = "Non-Motorized";
-                            break;
-
-                        case "3":
-                            VesType = "No vessel used";
-                            break;
-
-                        case "4":
-                            VesType = "Not provided";
-                            break;
-                    }
+                    VesType = FishingVessel.VesselTypeFromVesselTypeNumber((int)dr["VesType"]);
                     PropertyValue.Add("TypeOfVesselUsed", VesType);
 
                     PropertyValue.Add("Engine", dr["Engine"].ToString());
@@ -565,6 +548,7 @@ namespace FAD3
 
                     string VesDimension = "(LxWxH): " + dr["len"].ToString() + " x " + dr["wdt"].ToString() + " x " + dr["hgt"].ToString();
                     PropertyValue.Add("VesselDimension", VesDimension);
+
                     PropertyValue.Add("Notes", dr["Notes"].ToString());
 
                     //the following are class properties that can be accessed by property get

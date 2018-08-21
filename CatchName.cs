@@ -86,6 +86,51 @@ namespace FAD3
             return taxaDictionary;
         }
 
+        /// <summary>
+        /// Retrieves samplings where a species is part of the catch
+        /// </summary>
+        /// <param name="catchGuid" - the GUID of the selected species></param>
+        /// <returns></returns>
+        public static List<(string samplingGuid, string targetArea, string landingSite, string GearClass, string gear,
+                            string referenceNumber, DateTime? samplingDate, string fishingGround, Double? catchWeight,
+                            string EnumeratorName, string VesselType)>
+                            RetrieveSamplingsFromCatchName(string catchGuid)
+        {
+            var items = new List<(string samplingGuid, string targetArea, string landingSite, string GearClass, string gear,
+                            string referenceNumber, DateTime? samplingDate, string fishingGround, Double? catchWeight,
+                            string EnumeratorName, string VesselType)>();
+
+            var sql = $@"SELECT DISTINCT tblSampling.SamplingGUID, tblAOI.AOIName, tblLandingSites.LSName, tblGearClass.GearClassName,
+                        tblGearVariations.Variation, tblSampling.RefNo, tblSampling.SamplingDate, tblSampling.FishingGround,
+                        tblSampling.WtCatch, tblSampling.VesType, tblEnumerators.EnumeratorName FROM tblEnumerators RIGHT JOIN
+                        ((tblAOI INNER JOIN tblLandingSites ON tblAOI.AOIGuid = tblLandingSites.AOIGuid) INNER JOIN
+                        ((tblGearClass INNER JOIN tblGearVariations ON tblGearClass.GearClass = tblGearVariations.GearClass)
+                        INNER JOIN (tblSampling INNER JOIN tblCatchComp ON tblSampling.SamplingGUID = tblCatchComp.SamplingGUID)
+                        ON tblGearVariations.GearVarGUID = tblSampling.GearVarGUID) ON tblLandingSites.LSGUID = tblSampling.LSGUID)
+                        ON tblEnumerators.EnumeratorID = tblSampling.Enumerator WHERE tblCatchComp.NameGUID= {{{catchGuid}}}
+                        ORDER BY tblAOI.AOIName, tblLandingSites.LSName, tblGearClass.GearClassName, tblGearVariations.Variation, tblSampling.RefNo";
+
+            using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
+            {
+                conection.Open();
+                var adapter = new OleDbDataAdapter(sql, conection);
+                var dt = new DataTable();
+                adapter.Fill(dt);
+                foreach (DataRow dr in dt.Rows)
+                {
+                    DateTime? samplingDate = dr["SamplingDate"].ToString().Length == 0 ? default : (DateTime)dr["SamplingDate"];
+                    double? catchWt = dr["WtCatch"].ToString().Length == 0 ? default : (double)dr["WtCatch"];
+                    var vesselType = FishingVessel.VesselTypeFromVesselTypeNumber((int)dr["VesType"]);
+
+                    items.Add((dr["SamplingGUID"].ToString(), dr["AOIName"].ToString(), dr["LSName"].ToString(), dr["GearClassName"].ToString(),
+                              dr["Variation"].ToString(), dr["RefNo"].ToString(), samplingDate, dr["FishingGround"].ToString(), catchWt,
+                              dr["EnumeratorName"].ToString(), vesselType));
+                }
+            }
+
+            return items;
+        }
+
         public static Taxa TaxaFromTaxaName(string taxaName)
         {
             var taxa = Taxa.To_be_determined;
@@ -185,7 +230,7 @@ namespace FAD3
         }
 
         //this is a simplistic list of taxonomic categories
-        //exists because it is needed for gonad maturity categories
+        //This list exists because it is needed for gonad maturity categories
         //and gonad maturity stages varies by taxonomies.
         //
         //No new categories should be added to the database if it is

@@ -41,5 +41,29 @@ namespace FAD3
             dbData.Close();
             dbData = null;
         }
+
+        public static string VesselTypeFromVesselTypeNumber(int typeNumber)
+        {
+            string VesType = "";
+            switch (typeNumber)
+            {
+                case 1:
+                    VesType = "Motorized";
+                    break;
+
+                case 2:
+                    VesType = "Non-Motorized";
+                    break;
+
+                case 3:
+                    VesType = "No vessel used";
+                    break;
+
+                default:
+                    VesType = "Not provided";
+                    break;
+            }
+            return VesType;
+        }
     }
 }

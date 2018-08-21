@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.lvNames = new System.Windows.Forms.ListView();
             this.buttonOK = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
@@ -41,17 +42,20 @@
             this.txtSearch = new System.Windows.Forms.TextBox();
             this.buttonAdd = new System.Windows.Forms.Button();
             this.buttonEdit = new System.Windows.Forms.Button();
+            this.dropDownMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // lvNames
             // 
+            this.lvNames.ContextMenuStrip = this.dropDownMenu;
             this.lvNames.Location = new System.Drawing.Point(211, 33);
             this.lvNames.Name = "lvNames";
             this.lvNames.Size = new System.Drawing.Size(696, 361);
             this.lvNames.TabIndex = 0;
             this.lvNames.UseCompatibleStateImageBehavior = false;
             this.lvNames.DoubleClick += new System.EventHandler(this.OnlvNames_DoubleClick);
+            this.lvNames.MouseDown += new System.Windows.Forms.MouseEventHandler(this.lvNames_MouseDown);
             // 
             // buttonOK
             // 
@@ -172,6 +176,11 @@
             this.buttonEdit.UseVisualStyleBackColor = true;
             this.buttonEdit.Click += new System.EventHandler(this.OnButton_Click);
             // 
+            // dropDownMenu
+            // 
+            this.dropDownMenu.Name = "dropDownMenu";
+            this.dropDownMenu.Size = new System.Drawing.Size(61, 4);
+            // 
             // AllSpeciesForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -212,5 +221,6 @@
         private System.Windows.Forms.CheckBox chkShowWithRecords;
         private System.Windows.Forms.Button buttonAdd;
         private System.Windows.Forms.Button buttonEdit;
+        private System.Windows.Forms.ContextMenuStrip dropDownMenu;
     }
 }
