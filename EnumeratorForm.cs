@@ -23,21 +23,44 @@ namespace FAD3
     public partial class EnumeratorForm : Form
     {
         private aoi _AOI = new aoi();
-        private string _EnumeratorGuid = "";
+        private string _enumeratorGuid = "";
+        private string _enumeratorName = "";
         private bool _IsNew = false;
         private MainForm _parentForm;
         private List<string> _removedEnumerators = new List<string>();
+        private static EnumeratorForm _instance;
+
+        private Dictionary<string, (string targetAreaName, string refNo, string landingSite, string gearClassName, string gear,
+                                DateTime samplingDate, string fishingGround, string vesselType, double wtCatch, int rows, string GUIDs)> _samplings;
+
+        public static EnumeratorForm GetInstance(MainForm Parent)
+        {
+            if (_instance == null) _instance = new EnumeratorForm(Parent);
+            return _instance;
+        }
+
+        public void SetParentAndEnumerator(string enumeratorGuid, MainForm Parent)
+        {
+            _parentForm = Parent;
+            _enumeratorGuid = enumeratorGuid;
+            Enumerators.EnumeratorGuid = _enumeratorGuid;
+            ConfigureListEnumeratorSamplings();
+        }
+
+        public static EnumeratorForm GetInstance(string enumeratorGuid, MainForm Parent)
+        {
+            if (_instance == null) _instance = new EnumeratorForm(enumeratorGuid, Parent);
+            return _instance;
+        }
 
         public EnumeratorForm(MainForm Parent)
         {
             //default conructor
             InitializeComponent();
             _parentForm = Parent;
-            ConfigureListEnumerators();
-            Text = "Landing site enumerators";
         }
 
-        public EnumeratorForm(string EnumeratorGuid, MainForm Parent)
+        public EnumeratorForm(string enumeratorGuid, MainForm Parent)
         {
             //
             // The InitializeComponent() call is required for Windows Forms designer support.
@@ -48,11 +71,26 @@ namespace FAD3
             // TODO: Add constructor code after the InitializeComponent() call.
             //
             _parentForm = Parent;
-            _EnumeratorGuid = EnumeratorGuid;
-            Enumerators.EnumeratorGuid = _EnumeratorGuid;
-            ConfigureListEnumeratorSamplings();
-            Text = "Enumerator details";
-            FormBorderStyle = FormBorderStyle.SizableToolWindow;
+            _enumeratorGuid = enumeratorGuid;
+        }
+
+        private void OnFormLoad(object sender, EventArgs e)
+        {
+            if (_enumeratorGuid.Length > 0)
+            {
+                global.LoadFormSettings(this);
+                Enumerators.EnumeratorGuid = _enumeratorGuid;
+                ConfigureListEnumeratorSamplings();
+                Text = "Enumerator details";
+                FormBorderStyle = FormBorderStyle.Sizable;
+            }
+            else
+            {
+                panelTop.Hide();
+                tree.Hide();
+                ConfigureListEnumerators();
+                Text = "Landing site enumerators";
+            }
         }
 
         public void EditedEnumerator(string enumeratorGuid, string enumeratorName, DateTime dateHired, bool isActive, global.fad3DataStatus dataStatus)
@@ -126,8 +164,8 @@ namespace FAD3
 
             lvEnumerators.With(o =>
             {
-                o.Width = Width - 75;
-                o.Location = new Point(10, 40);
+                o.Width = Width - 60;
+                o.Location = new Point(0, 10);
                 o.View = View.Details;
                 o.FullRowSelect = true;
                 o.Columns.Add("Enumerator name");
@@ -211,62 +249,175 @@ namespace FAD3
             {
                 o.View = View.Details;
                 o.FullRowSelect = true;
-                o.Columns.Add("Reference no.");
-                o.Columns.Add("Landing site");
-                o.Columns.Add("Gear used");
-                o.Columns.Add("Date sampled");
-                o.Columns.Add("Catch weight");
-                o.Columns.Add("Catch rows");
+                o.Columns.Add("Target area name");
+                o.Columns.Add("Landing site name");
+                o.Columns.Add("Type of gear used");
+                o.Columns.Add("Month sampled");
+                o.Columns.Add("Sampling reference number");
+                o.Columns.Add("Fishing ground");
+                o.Columns.Add("Sampling date");
+                o.Columns.Add("Weight of catch");
+                o.Columns.Add("Type of vessel used");
+                o.Columns.Add("Rows");
+
+                foreach (ColumnHeader c in o.Columns)
+                {
+                    c.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
+                }
+
                 o.HideSelection = false;
+                o.Location = new Point(tree.Width, tree.Top);
+                o.Width = Width - tree.Width;
             });
 
             if (!_IsNew)
             {
                 ReadData();
-                var EnumeratorSamplings = Enumerators.GetEnumeratorSamplings();
-                foreach (KeyValuePair<string,
-                    (string RefNo, string LandingSite, string Gear, DateTime SamplingDate, double WtCatch, int Rows, string GUIDs)>
-                    kv in EnumeratorSamplings)
-                {
-                    var lvi = lvEnumerators.Items.Add(kv.Key, kv.Value.RefNo, null);
-                    lvi.Tag = kv.Value.GUIDs;
-                    lvi.SubItems.Add(kv.Value.LandingSite);
-                    lvi.SubItems.Add(kv.Value.Gear);
-                    lvi.SubItems.Add(kv.Value.SamplingDate.ToString("MMM-dd-yyyy"));
-                    lvi.SubItems.Add(kv.Value.WtCatch.ToString());
-                    lvi.SubItems.Add(kv.Value.Rows.ToString());
-                }
+                _samplings = Enumerators.GetEnumeratorSamplings();
+                ConfigureTree();
+                PopulateList(tree.Nodes["root"]);
                 Text = "Enumerator data and sampling list";
             }
+        }
 
-            foreach (ColumnHeader c in lvEnumerators.Columns)
-            {
-                c.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
-            }
+        private void tree_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            lvEnumerators.Items.Clear();
+            e.Node.SelectedImageKey = e.Node.ImageKey;
+            PopulateList(e.Node);
+        }
 
-            RegistryKey rk = Registry.CurrentUser.OpenSubKey("SOFTWARE\\FAD3\\ColWidth");
-            try
+        private void PopulateList(TreeNode node)
+        {
+            lvEnumerators.Items.Clear();
+            node.With(nd =>
             {
-                string rv = rk.GetValue(global.lvContext.EnumeratorSampling.ToString(), "NULL").ToString();
-                string[] arr = rv.Split(',');
-                int i = 0;
-                foreach (var item in lvEnumerators.Columns)
+                bool Proceed = false;
+
+                foreach (var item in _samplings)
                 {
-                    ColumnHeader ch = (ColumnHeader)item;
-                    ch.Width = Convert.ToInt32(arr[i]);
-                    i++;
+                    switch (nd.Tag.ToString())
+                    {
+                        case "db":
+                            Proceed = true;
+
+                            break;
+
+                        case "aoi":
+                            Proceed = item.Value.targetAreaName == nd.Text;
+
+                            break;
+
+                        case "landingSite":
+                            Proceed = item.Value.targetAreaName == nd.Parent.Text
+                                && item.Value.landingSite == nd.Text;
+
+                            break;
+
+                        case "gear":
+                            Proceed = item.Value.targetAreaName == nd.Parent.Parent.Text
+                                 && item.Value.landingSite == nd.Parent.Text
+                                 && item.Value.gear == nd.Text;
+
+                            break;
+
+                        case "samplingMonth":
+                            Proceed = item.Value.targetAreaName == nd.Parent.Parent.Parent.Text
+                                && item.Value.landingSite == nd.Parent.Parent.Text
+                                && item.Value.gear == nd.Parent.Text
+                                && string.Format("{0:MMM-yyyy}", item.Value.samplingDate) == nd.Text;
+
+                            break;
+                    }
+
+                    if (Proceed)
+                    {
+                        var lvi = new ListViewItem(new string[] { item.Value.targetAreaName, item.Value.landingSite, item.Value.gear, string.Format("{0:MMM-yyyy}",
+                            item.Value.samplingDate), item.Value.refNo, item.Value.fishingGround, string.Format("{0:MMM-dd-yyyy}", item.Value.samplingDate),
+                            item.Value.wtCatch.ToString(), item.Value.vesselType, item.Value.rows.ToString() });
+
+                        lvi.Name = item.Key;
+                        lvi.Tag = item.Value.GUIDs;
+                        lvEnumerators.Items.Add(lvi);
+                    }
                 }
-            }
-            catch
+            });
+        }
+
+        private void ConfigureTree()
+        {
+            tree.Nodes.Clear();
+            tree.ImageList = _parentForm.treeImages;
+            var node = tree.Nodes.Add("root", _enumeratorName, "db");
+            node.Tag = "db";
+            var nodeTargetArea = new TreeNode();
+            var nodeLandingSite = new TreeNode();
+            var nodeGear = new TreeNode();
+            var nodeMonth = new TreeNode();
+            var samplingMonth = "";
+            var imageKey = "";
+            foreach (var item in _samplings)
             {
-                Logger.Log("Catch and effort column width not found in registry");
+                if (node.Nodes.ContainsKey(item.Value.targetAreaName))
+                {
+                    nodeTargetArea = node.Nodes[item.Value.targetAreaName];
+                    if (nodeTargetArea.Nodes.ContainsKey(item.Value.landingSite))
+                    {
+                        nodeLandingSite = nodeTargetArea.Nodes[item.Value.landingSite];
+                        if (nodeLandingSite.Nodes.ContainsKey(item.Value.gear))
+                        {
+                            nodeGear = nodeLandingSite.Nodes[item.Value.gear];
+                            samplingMonth = string.Format("{0:MMM-yyyy}", item.Value.samplingDate);
+                            if (!nodeGear.Nodes.ContainsKey(samplingMonth))
+                            {
+                                nodeMonth = nodeGear.Nodes.Add(samplingMonth, samplingMonth, "MonthGear");
+                                nodeMonth.Tag = "samplingMonth";
+                            }
+                        }
+                        else
+                        {
+                            imageKey = gear.GearClassImageKeyFromGearClasName(item.Value.gearClassName);
+                            nodeGear = nodeLandingSite.Nodes.Add(item.Value.gear, item.Value.gear, imageKey);
+                            nodeGear.Tag = "gear";
+                            samplingMonth = string.Format("{0:MMM-yyyy}", item.Value.samplingDate);
+                            nodeMonth = nodeGear.Nodes.Add(samplingMonth, samplingMonth, "MonthGear");
+                            nodeMonth.Tag = "samplingMonth";
+                        }
+                    }
+                    else
+                    {
+                        nodeLandingSite = nodeTargetArea.Nodes.Add(item.Value.landingSite, item.Value.landingSite, "LandingSite");
+                        nodeLandingSite.Tag = "landingSite";
+                        imageKey = gear.GearClassImageKeyFromGearClasName(item.Value.gearClassName);
+                        nodeGear = nodeLandingSite.Nodes.Add(item.Value.gear, item.Value.gear, imageKey);
+                        nodeGear.Tag = "gear";
+                        samplingMonth = string.Format("{0:MMM-yyyy}", item.Value.samplingDate);
+                        nodeMonth = nodeGear.Nodes.Add(samplingMonth, samplingMonth, "MonthGear");
+                        nodeMonth.Tag = "samplingMonth";
+                    }
+                }
+                else
+                {
+                    nodeTargetArea = node.Nodes.Add(item.Value.targetAreaName, item.Value.targetAreaName, "AOI");
+                    nodeTargetArea.Tag = "aoi";
+                    nodeLandingSite = nodeTargetArea.Nodes.Add(item.Value.landingSite, item.Value.landingSite, "LandingSite");
+                    nodeLandingSite.Tag = "landingSite";
+                    imageKey = gear.GearClassImageKeyFromGearClasName(item.Value.gearClassName);
+                    nodeGear = nodeLandingSite.Nodes.Add(item.Value.gear, item.Value.gear, imageKey);
+                    nodeGear.Tag = "gear";
+                    samplingMonth = string.Format("{0:MMM-yyyy}", item.Value.samplingDate);
+                    nodeMonth = nodeGear.Nodes.Add(samplingMonth, samplingMonth, "MonthGear");
+                    nodeMonth.Tag = "samplingMonth";
+                }
             }
         }
 
         private void EnumeratorForm_FormClosed(object sender, FormClosedEventArgs e)
         {
-            if (_EnumeratorGuid.Length > 0)
+            if (_enumeratorGuid.Length > 0)
                 global.SaveFormSettings(this);
+
+            _instance = null;
         }
 
         private void OnButtonClick(object sender, EventArgs e)
@@ -274,7 +425,7 @@ namespace FAD3
             switch (((Button)sender).Name)
             {
                 case "buttonOK":
-                    if (_EnumeratorGuid.Length == 0)
+                    if (_enumeratorGuid.Length == 0)
                     {
                         if (lvEnumerators.Items.Count > 0 || _removedEnumerators.Count > 0)
                         {
@@ -371,15 +522,9 @@ namespace FAD3
             }
         }
 
-        private void OnFormLoad(object sender, EventArgs e)
-        {
-            if (_EnumeratorGuid.Length > 0)
-                global.LoadFormSettings(this);
-        }
-
         private void OnlistEnumeratorSampling_DoubleClick(object sender, EventArgs e)
         {
-            if (_EnumeratorGuid.Length > 0)
+            if (_enumeratorGuid.Length > 0)
             {
                 lvEnumerators.SelectedItems[0].With(o =>
                 {
@@ -431,13 +576,14 @@ namespace FAD3
                 try
                 {
                     conection.Open();
-                    string query = "Select * from tblEnumerators where EnumeratorID =\"" + _EnumeratorGuid + "\"";
+                    string query = "Select * from tblEnumerators where EnumeratorID =\"" + _enumeratorGuid + "\"";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
                     if (dt.Rows.Count > 0)
                     {
                         DataRow dr = dt.Rows[0];
-                        txtName.Text = dr["EnumeratorName"].ToString();
+                        _enumeratorName = dr["EnumeratorName"].ToString();
+                        txtName.Text = _enumeratorName;
                         DateTime dtm = (DateTime)dr["HireDate"];
                         txtHireDate.Text = string.Format("{0:MMM-dd-yyyy}", dtm);
                         chkActive.Checked = Convert.ToBoolean(dr["Active"]);

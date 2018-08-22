@@ -343,6 +343,7 @@ namespace FAD3
 
                 case "listViewVariations":
                     _GearVarGuid = lvi.Name;
+                    _GearVarName = lvi.Text;
 
                     listViewCodes.Items.Clear();
                     listViewWhereUsed.Items.Clear();
@@ -429,6 +430,10 @@ namespace FAD3
                         break;
 
                     case "listViewVariations":
+                        tsi = dropDownMenu.Items.Add("Samplings using this gear");
+                        tsi.Name = "itemGearSamplings";
+                        tsi.Enabled = info.Item != null;
+
                         tsi = dropDownMenu.Items.Add("Add a gear variation");
                         tsi.Name = "itemAddGearVariation";
 
@@ -476,6 +481,20 @@ namespace FAD3
             var RowNumberForDeletion = "";
             switch (e.ClickedItem.Name)
             {
+                case "itemGearSamplings":
+
+                    var ef = GearSpeciesSamplingsForm.GetInstance(_GearVarGuid, _GearVarName, this);
+                    if (!ef.Visible)
+                    {
+                        ef.Show(this);
+                    }
+                    else
+                    {
+                        ef.BringToFront();
+                        ef.setItemGuid_Name_Parent(_GearVarGuid, _GearVarName, this);
+                    }
+                    break;
+
                 case "itemAddTargetArea":
                     _action = global.fad3GearEditAction.addAOI;
                     myList = listViewWhereUsed.Items.Cast<ListViewItem>()

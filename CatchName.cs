@@ -91,19 +91,19 @@ namespace FAD3
         /// </summary>
         /// <param name="catchGuid" - the GUID of the selected species></param>
         /// <returns></returns>
-        public static List<(string samplingGuid, string targetArea, string landingSite, string GearClass, string gear,
-                            string referenceNumber, DateTime? samplingDate, string fishingGround, Double? catchWeight,
-                            string EnumeratorName, string VesselType)>
-                            RetrieveSamplingsFromCatchName(string catchGuid)
+        ///
+        public static
+        Dictionary<string, (string targetAreaName, string refNo, string landingSite, string gearClassName, string gear,
+                        DateTime samplingDate, string fishingGround, string vesselType, double wtCatch, string GUIDs, string enumeratorName)>
+                        RetrieveSamplingsFromCatchName(string catchGuid)
         {
-            var items = new List<(string samplingGuid, string targetArea, string landingSite, string GearClass, string gear,
-                            string referenceNumber, DateTime? samplingDate, string fishingGround, Double? catchWeight,
-                            string EnumeratorName, string VesselType)>();
+            var items = new Dictionary<string, (string targetAreaName, string refNo, string landingSite, string gearClassName, string gear,
+                        DateTime samplingDate, string fishingGround, string vesselType, double wtCatch, string GUIDs, string enumeratorName)>();
 
             var sql = $@"SELECT DISTINCT tblSampling.SamplingGUID, tblAOI.AOIName, tblLandingSites.LSName, tblGearClass.GearClassName,
                         tblGearVariations.Variation, tblSampling.RefNo, tblSampling.SamplingDate, tblSampling.FishingGround,
-                        tblSampling.WtCatch, tblSampling.VesType, tblEnumerators.EnumeratorName FROM tblEnumerators RIGHT JOIN
-                        ((tblAOI INNER JOIN tblLandingSites ON tblAOI.AOIGuid = tblLandingSites.AOIGuid) INNER JOIN
+                        tblSampling.WtCatch, tblSampling.VesType, tblEnumerators.EnumeratorName,tblSampling.GearVarGUID, tblSampling.LSGUID
+                        FROM tblEnumerators RIGHT JOIN ((tblAOI INNER JOIN tblLandingSites ON tblAOI.AOIGuid = tblLandingSites.AOIGuid) INNER JOIN
                         ((tblGearClass INNER JOIN tblGearVariations ON tblGearClass.GearClass = tblGearVariations.GearClass)
                         INNER JOIN (tblSampling INNER JOIN tblCatchComp ON tblSampling.SamplingGUID = tblCatchComp.SamplingGUID)
                         ON tblGearVariations.GearVarGUID = tblSampling.GearVarGUID) ON tblLandingSites.LSGUID = tblSampling.LSGUID)
@@ -118,13 +118,15 @@ namespace FAD3
                 adapter.Fill(dt);
                 foreach (DataRow dr in dt.Rows)
                 {
-                    DateTime? samplingDate = dr["SamplingDate"].ToString().Length == 0 ? default : (DateTime)dr["SamplingDate"];
-                    double? catchWt = dr["WtCatch"].ToString().Length == 0 ? default : (double)dr["WtCatch"];
+                    DateTime samplingDate = dr["SamplingDate"].ToString().Length == 0 ? default : (DateTime)dr["SamplingDate"];
+                    double catchWt = dr["WtCatch"].ToString().Length == 0 ? default : (double)dr["WtCatch"];
                     var vesselType = FishingVessel.VesselTypeFromVesselTypeNumber((int)dr["VesType"]);
+                    var guids = dr["LSGUID"].ToString() + "|" + dr["GearVarGUID"].ToString();
+                    var samplingGuid = dr["SamplingGUID"].ToString();
 
-                    items.Add((dr["SamplingGUID"].ToString(), dr["AOIName"].ToString(), dr["LSName"].ToString(), dr["GearClassName"].ToString(),
-                              dr["Variation"].ToString(), dr["RefNo"].ToString(), samplingDate, dr["FishingGround"].ToString(), catchWt,
-                              dr["EnumeratorName"].ToString(), vesselType));
+                    items.Add(samplingGuid, (dr["AOIName"].ToString(), dr["RefNo"].ToString(), dr["LSName"].ToString(),
+                         dr["GearClassName"].ToString(), dr["Variation"].ToString(), samplingDate, dr["FishingGround"].ToString(),
+                         vesselType, catchWt, guids, dr["EnumeratorName"].ToString()));
                 }
             }
 

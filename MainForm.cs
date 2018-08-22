@@ -557,7 +557,7 @@ namespace FAD3
             lvMain.Height = splitContainer1.Panel2.Height;
         }
 
-        private void FrmMainLoad(object sender, EventArgs e)
+        private void OnMainForm_Load(object sender, EventArgs e)
         {
             this.splitContainer1.Panel1MinSize = 200;
             this.splitContainer1.Panel2MinSize = this.Width - (this.splitContainer1.Panel1MinSize + 100);
@@ -635,6 +635,7 @@ namespace FAD3
 
             ConfigDropDownMenu(treeMain);
             SetupSamplingButtonFrame(false);
+            global.mainForm = this;
         }
 
         private void generateGridMapToolStripMenuItem_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
@@ -735,16 +736,29 @@ namespace FAD3
 
                 //this will show a list of enumerators and their corresponding details
                 case "menuEnumerators":
-                    EnumeratorForm ef = new EnumeratorForm(this);
-                    ef.ShowDialog(this);
+                    EnumeratorForm ef = EnumeratorForm.GetInstance(this);
+                    if (!ef.Visible)
+                    {
+                        ef.Show(this);
+                    }
+                    else
+                    {
+                        ef.BringToFront();
+                    }
                     break;
 
                 //this will show the samplings done by an enumerator
                 case "menuEnumeratorDetail":
-                    //pass the enumerator guid to the form's constructor
-                    EnumeratorForm ef1 = new EnumeratorForm(lvMain.SelectedItems[0].SubItems[1].Name, this);
-                    //ef1.ShowDialog(this);
-                    ef1.Show(this);
+                    ef = EnumeratorForm.GetInstance(lvMain.SelectedItems[0].SubItems[1].Name, this);
+                    if (!ef.Visible)
+                    {
+                        ef.Show(this);
+                    }
+                    else
+                    {
+                        ef.BringToFront();
+                        ef.SetParentAndEnumerator(lvMain.SelectedItems[0].SubItems[1].Name, this);
+                    }
                     break;
 
                 case "menuSamplingDetail":
@@ -917,9 +931,16 @@ namespace FAD3
                                         }
                                         else if (lvi.Name == "Enumerators")
                                         {
-                                            EnumeratorForm frm = new EnumeratorForm(lvi.SubItems[1].Name, this);
-                                            frm.AOI = _AOI;
-                                            frm.Show(this);
+                                            var ef = EnumeratorForm.GetInstance(lvMain.SelectedItems[0].SubItems[1].Name, this);
+                                            if (!ef.Visible)
+                                            {
+                                                ef.Show(this);
+                                            }
+                                            else
+                                            {
+                                                ef.BringToFront();
+                                                ef.SetParentAndEnumerator(lvMain.SelectedItems[0].SubItems[1].Name, this);
+                                            }
                                         }
                                     }
                                     break;

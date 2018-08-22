@@ -113,24 +113,27 @@ namespace FAD3
         }
 
         public static
-            Dictionary<string, (string RefNo, string LandingSite, string Gear, DateTime SamplingDate, double WtCatch, int Rows, string GUIDs)>
+            Dictionary<string, (string targetAreaName, string refNo, string landingSite, string gearClassName, string gear,
+                                DateTime samplingDate, string fishingGround, string vesselType, double wtCatch, int rows, string GUIDs)>
             GetEnumeratorSamplings()
         {
-            var myRows = new Dictionary<string, (string RefNo, string LandingSite, string Gear, DateTime SamplingDate, double WtCatch, int Rows, string GUIDs)>();
+            var myRows = new Dictionary<string, (string targetAreaName, string refNo, string landingSite, string gearClassName, string gear,
+                                                 DateTime samplingDate, string fishingGround, string vesselType, double wtCatch, int rows, string GUIDs)>();
 
             using (var conection = new OleDbConnection(global.ConnectionString))
             {
                 conection.Open();
-                string query = $@"SELECT SamplingDate, tblSampling.SamplingGUID,  tblSampling.GearVarGUID, tblSampling.LSGUID,
-                               tblSampling.RefNo, tblLandingSites.LSName,
-                               tblGearVariations.Variation, tblSampling.WtCatch, Count(tblCatchComp.RowGUID) AS n
-                               FROM tblLandingSites INNER JOIN (tblGearVariations INNER JOIN(tblSampling LEFT
-                               JOIN tblCatchComp ON tblSampling.SamplingGUID = tblCatchComp.SamplingGUID) ON
-                               tblGearVariations.GearVarGUID = tblSampling.GearVarGUID) ON tblLandingSites.LSGUID = tblSampling.LSGUID
-                               WHERE tblSampling.Enumerator = {{{_EnumeratorGuid}}}
-                               GROUP BY tblSampling.SamplingDate, tblSampling.SamplingGUID, tblSampling.GearVarGUID, tblSampling.LSGUID,
-                               tblSampling.RefNo, tblLandingSites.LSName,
-                               tblGearVariations.Variation, tblSampling.WtCatch ORDER BY tblSampling.SamplingDate";
+                string query = $@"SELECT tblSampling.SamplingGUID, tblAOI.AOIName, tblLandingSites.LSName, tblSampling.LSGUID,
+                                tblGearClass.GearClassName, tblGearVariations.Variation, tblSampling.GearVarGUID, tblSampling.SamplingDate,
+                                tblSampling.RefNo, tblSampling.FishingGround, tblSampling.WtCatch, tblSampling.VesType,
+                                Count(tblCatchComp.RowGUID) AS n FROM tblGearClass INNER JOIN (tblAOI INNER JOIN (tblLandingSites INNER JOIN
+                                (tblGearVariations INNER JOIN (tblSampling LEFT JOIN tblCatchComp ON tblSampling.SamplingGUID = tblCatchComp.SamplingGUID)
+                                ON tblGearVariations.GearVarGUID = tblSampling.GearVarGUID) ON tblLandingSites.LSGUID = tblSampling.LSGUID)
+                                ON tblAOI.AOIGuid = tblLandingSites.AOIGuid) ON tblGearClass.GearClass = tblGearVariations.GearClass
+                                WHERE tblSampling.Enumerator={{{_EnumeratorGuid}}} GROUP BY tblSampling.SamplingGUID, tblAOI.AOIName,
+                                tblLandingSites.LSName, tblSampling.LSGUID, tblGearClass.GearClassName, tblGearVariations.Variation,
+                                tblSampling.GearVarGUID, tblSampling.SamplingDate, tblSampling.RefNo, tblSampling.FishingGround, tblSampling.WtCatch,
+                                tblSampling.VesType ORDER BY tblSampling.SamplingDate";
 
                 DataTable dt = new DataTable();
                 var adapter = new OleDbDataAdapter(query, conection);
@@ -138,15 +141,20 @@ namespace FAD3
                 for (int i = 0; i < dt.Rows.Count; i++)
                 {
                     DataRow dr = dt.Rows[i];
+                    var rowSamplingGuid = dr["SamplingGUID"].ToString();
+                    var rowtargetAreaName = dr["AOIName"].ToString();
                     var rowRefNo = dr["RefNo"].ToString();
                     var rowLandingSite = dr["LSName"].ToString();
+                    var rowGearClass = dr["GearClassName"].ToString();
                     var rowGear = dr["Variation"].ToString();
                     var rowSamplingDate = (DateTime)dr["SamplingDate"];
+                    var rowFishingGround = dr["FishingGround"].ToString();
+                    var rowVesselType = FishingVessel.VesselTypeFromVesselTypeNumber((int)dr["VesType"]);
                     var rowWtCatch = double.Parse(dr["WtCatch"].ToString());
                     var rowRows = int.Parse(dr["n"].ToString());
                     var rowGUIDs = $"{dr["LSGUID"].ToString()}|{dr["GearVarGUID"].ToString()}";
 
-                    myRows.Add(dr["SamplingGUID"].ToString(), (rowRefNo, rowLandingSite, rowGear, rowSamplingDate, rowWtCatch, rowRows, rowGUIDs));
+                    myRows.Add(rowSamplingGuid, (rowtargetAreaName, rowRefNo, rowLandingSite, rowGearClass, rowGear, rowSamplingDate, rowFishingGround, rowVesselType, rowWtCatch, rowRows, rowGUIDs));
                 }
             }
             return myRows;

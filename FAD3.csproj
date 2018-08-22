@@ -124,12 +124,6 @@
       <DependentUpon>CoordinateFormatSelectForm.cs</DependentUpon>
     </Compile>
     <Compile Include="DBCheck.cs" />
-    <Compile Include="EnumeratorEditForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="EnumeratorEditForm.Designer.cs">
-      <DependentUpon>EnumeratorEditForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="EnumeratorEntryForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -197,11 +191,11 @@
     <Compile Include="SpeciesNameForm.Designer.cs">
       <DependentUpon>SpeciesNameForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="SpeciesSamplingsForm.cs">
+    <Compile Include="GearSpeciesSamplingsForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="SpeciesSamplingsForm.Designer.cs">
-      <DependentUpon>SpeciesSamplingsForm.cs</DependentUpon>
+    <Compile Include="GearSpeciesSamplingsForm.Designer.cs">
+      <DependentUpon>GearSpeciesSamplingsForm.cs</DependentUpon>
     </Compile>
     <Compile Include="TargetAreaForm.cs">
       <SubType>Form</SubType>
@@ -340,8 +334,8 @@
     <EmbeddedResource Include="SpeciesNameForm.resx">
       <DependentUpon>SpeciesNameForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="SpeciesSamplingsForm.resx">
-      <DependentUpon>SpeciesSamplingsForm.cs</DependentUpon>
+    <EmbeddedResource Include="GearSpeciesSamplingsForm.resx">
+      <DependentUpon>GearSpeciesSamplingsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="TargetAreaForm.resx">
       <DependentUpon>TargetAreaForm.cs</DependentUpon>

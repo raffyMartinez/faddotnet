@@ -59,6 +59,8 @@ namespace FAD3
             }
         }
 
+        public static MainForm mainForm { get; set; }
+
         public static Color ConflictColor1
         {
             get { return Color.Yellow; }

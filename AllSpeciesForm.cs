@@ -57,8 +57,17 @@ namespace FAD3
             {
                 case "menuViewSamplings":
                     var catchName = $"{lvNames.SelectedItems[0].SubItems[1].Text} {lvNames.SelectedItems[0].SubItems[2].Text}";
-                    SpeciesSamplingsForm ssf = new SpeciesSamplingsForm(lvNames.SelectedItems[0].Name, catchName, this);
-                    ssf.Show(this);
+                    var ef = GearSpeciesSamplingsForm.GetInstance(lvNames.SelectedItems[0].Name, catchName, this);
+                    if (!ef.Visible)
+                    {
+                        ef.Show(this);
+                    }
+                    else
+                    {
+                        ef.BringToFront();
+                        ef.setItemGuid_Name_Parent(lvNames.SelectedItems[0].Name, catchName, this);
+                    }
+
                     break;
 
                 case "menuAddNewName":
