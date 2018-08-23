@@ -33,10 +33,10 @@
             this.buttonCancel = new System.Windows.Forms.Button();
             this.group1 = new System.Windows.Forms.GroupBox();
             this.buttonFileName = new System.Windows.Forms.Button();
-            this.label3 = new System.Windows.Forms.Label();
             this.group2 = new System.Windows.Forms.GroupBox();
+            this.checkGearLocalNames = new System.Windows.Forms.CheckBox();
             this.checkEnumerators = new System.Windows.Forms.CheckBox();
-            this.checkLocalNames = new System.Windows.Forms.CheckBox();
+            this.checkFishLocalNames = new System.Windows.Forms.CheckBox();
             this.checkSciNames = new System.Windows.Forms.CheckBox();
             this.checkGearVar = new System.Windows.Forms.CheckBox();
             this.checkLandingSites = new System.Windows.Forms.CheckBox();
@@ -62,7 +62,7 @@
             this.buttonOk.Location = new System.Drawing.Point(343, 410);
             this.buttonOk.Margin = new System.Windows.Forms.Padding(4);
             this.buttonOk.Name = "buttonOk";
-            this.buttonOk.Size = new System.Drawing.Size(75, 34);
+            this.buttonOk.Size = new System.Drawing.Size(75, 30);
             this.buttonOk.TabIndex = 2;
             this.buttonOk.Text = "Ok";
             this.buttonOk.UseVisualStyleBackColor = true;
@@ -73,7 +73,7 @@
             this.buttonCancel.Location = new System.Drawing.Point(260, 410);
             this.buttonCancel.Margin = new System.Windows.Forms.Padding(4);
             this.buttonCancel.Name = "buttonCancel";
-            this.buttonCancel.Size = new System.Drawing.Size(75, 34);
+            this.buttonCancel.Size = new System.Drawing.Size(75, 30);
             this.buttonCancel.TabIndex = 3;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = true;
@@ -82,7 +82,6 @@
             // group1
             // 
             this.group1.Controls.Add(this.buttonFileName);
-            this.group1.Controls.Add(this.label3);
             this.group1.Location = new System.Drawing.Point(7, 62);
             this.group1.Margin = new System.Windows.Forms.Padding(4);
             this.group1.Name = "group1";
@@ -97,26 +96,17 @@
             this.buttonFileName.Location = new System.Drawing.Point(155, 153);
             this.buttonFileName.Margin = new System.Windows.Forms.Padding(4);
             this.buttonFileName.Name = "buttonFileName";
-            this.buttonFileName.Size = new System.Drawing.Size(132, 36);
+            this.buttonFileName.Size = new System.Drawing.Size(122, 30);
             this.buttonFileName.TabIndex = 1;
             this.buttonFileName.Text = "Provide file name";
             this.buttonFileName.UseVisualStyleBackColor = true;
             this.buttonFileName.Click += new System.EventHandler(this.Onbutton_Click);
             // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(157, 114);
-            this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(123, 16);
-            this.label3.TabIndex = 0;
-            this.label3.Text = "Provide a file name";
-            // 
             // group2
             // 
+            this.group2.Controls.Add(this.checkGearLocalNames);
             this.group2.Controls.Add(this.checkEnumerators);
-            this.group2.Controls.Add(this.checkLocalNames);
+            this.group2.Controls.Add(this.checkFishLocalNames);
             this.group2.Controls.Add(this.checkSciNames);
             this.group2.Controls.Add(this.checkGearVar);
             this.group2.Controls.Add(this.checkLandingSites);
@@ -130,10 +120,21 @@
             this.group2.TabStop = false;
             this.group2.Text = "Select data to retain";
             // 
+            // checkGearLocalNames
+            // 
+            this.checkGearLocalNames.AutoSize = true;
+            this.checkGearLocalNames.Location = new System.Drawing.Point(33, 115);
+            this.checkGearLocalNames.Margin = new System.Windows.Forms.Padding(4);
+            this.checkGearLocalNames.Name = "checkGearLocalNames";
+            this.checkGearLocalNames.Size = new System.Drawing.Size(197, 20);
+            this.checkGearLocalNames.TabIndex = 6;
+            this.checkGearLocalNames.Text = "Local names of fishing gears";
+            this.checkGearLocalNames.UseVisualStyleBackColor = true;
+            // 
             // checkEnumerators
             // 
             this.checkEnumerators.AutoSize = true;
-            this.checkEnumerators.Location = new System.Drawing.Point(56, 190);
+            this.checkEnumerators.Location = new System.Drawing.Point(33, 199);
             this.checkEnumerators.Margin = new System.Windows.Forms.Padding(4);
             this.checkEnumerators.Name = "checkEnumerators";
             this.checkEnumerators.Size = new System.Drawing.Size(103, 20);
@@ -141,32 +142,32 @@
             this.checkEnumerators.Text = "Enumerators";
             this.checkEnumerators.UseVisualStyleBackColor = true;
             // 
-            // checkLocalNames
+            // checkFishLocalNames
             // 
-            this.checkLocalNames.AutoSize = true;
-            this.checkLocalNames.Location = new System.Drawing.Point(56, 161);
-            this.checkLocalNames.Margin = new System.Windows.Forms.Padding(4);
-            this.checkLocalNames.Name = "checkLocalNames";
-            this.checkLocalNames.Size = new System.Drawing.Size(104, 20);
-            this.checkLocalNames.TabIndex = 4;
-            this.checkLocalNames.Text = "Local names";
-            this.checkLocalNames.UseVisualStyleBackColor = true;
+            this.checkFishLocalNames.AutoSize = true;
+            this.checkFishLocalNames.Location = new System.Drawing.Point(33, 171);
+            this.checkFishLocalNames.Margin = new System.Windows.Forms.Padding(4);
+            this.checkFishLocalNames.Name = "checkFishLocalNames";
+            this.checkFishLocalNames.Size = new System.Drawing.Size(141, 20);
+            this.checkFishLocalNames.TabIndex = 4;
+            this.checkFishLocalNames.Text = "Local names of fish";
+            this.checkFishLocalNames.UseVisualStyleBackColor = true;
             // 
             // checkSciNames
             // 
             this.checkSciNames.AutoSize = true;
-            this.checkSciNames.Location = new System.Drawing.Point(56, 133);
+            this.checkSciNames.Location = new System.Drawing.Point(33, 143);
             this.checkSciNames.Margin = new System.Windows.Forms.Padding(4);
             this.checkSciNames.Name = "checkSciNames";
-            this.checkSciNames.Size = new System.Drawing.Size(124, 20);
+            this.checkSciNames.Size = new System.Drawing.Size(161, 20);
             this.checkSciNames.TabIndex = 3;
-            this.checkSciNames.Text = "Scientific names";
+            this.checkSciNames.Text = "Scientific names of fish";
             this.checkSciNames.UseVisualStyleBackColor = true;
             // 
             // checkGearVar
             // 
             this.checkGearVar.AutoSize = true;
-            this.checkGearVar.Location = new System.Drawing.Point(56, 105);
+            this.checkGearVar.Location = new System.Drawing.Point(33, 87);
             this.checkGearVar.Margin = new System.Windows.Forms.Padding(4);
             this.checkGearVar.Name = "checkGearVar";
             this.checkGearVar.Size = new System.Drawing.Size(118, 20);
@@ -177,7 +178,7 @@
             // checkLandingSites
             // 
             this.checkLandingSites.AutoSize = true;
-            this.checkLandingSites.Location = new System.Drawing.Point(56, 76);
+            this.checkLandingSites.Location = new System.Drawing.Point(33, 58);
             this.checkLandingSites.Margin = new System.Windows.Forms.Padding(4);
             this.checkLandingSites.Name = "checkLandingSites";
             this.checkLandingSites.Size = new System.Drawing.Size(106, 20);
@@ -188,16 +189,16 @@
             // checkAOI
             // 
             this.checkAOI.AutoSize = true;
-            this.checkAOI.Location = new System.Drawing.Point(56, 48);
+            this.checkAOI.Location = new System.Drawing.Point(33, 30);
             this.checkAOI.Margin = new System.Windows.Forms.Padding(4);
             this.checkAOI.Name = "checkAOI";
-            this.checkAOI.Size = new System.Drawing.Size(156, 20);
+            this.checkAOI.Size = new System.Drawing.Size(105, 20);
             this.checkAOI.TabIndex = 0;
-            this.checkAOI.Text = "Areas of interest (AOI)";
+            this.checkAOI.Text = "Target areas";
             this.checkAOI.UseVisualStyleBackColor = true;
             this.checkAOI.CheckedChanged += new System.EventHandler(this.checkAOI_CheckedChanged);
             // 
-            // frmNewDB
+            // CreateNewDatabaseForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -210,11 +211,10 @@
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Margin = new System.Windows.Forms.Padding(4);
-            this.Name = "frmNewDB";
+            this.Name = "CreateNewDatabaseForm";
             this.Text = "Make a new database ";
             this.Load += new System.EventHandler(this.frmNewDB_Load);
             this.group1.ResumeLayout(false);
-            this.group1.PerformLayout();
             this.group2.ResumeLayout(false);
             this.group2.PerformLayout();
             this.ResumeLayout(false);
@@ -228,13 +228,13 @@
         private System.Windows.Forms.Button buttonCancel;
         private System.Windows.Forms.GroupBox group1;
         private System.Windows.Forms.Button buttonFileName;
-        private System.Windows.Forms.Label label3;
         private System.Windows.Forms.GroupBox group2;
-        private System.Windows.Forms.CheckBox checkLocalNames;
+        private System.Windows.Forms.CheckBox checkFishLocalNames;
         private System.Windows.Forms.CheckBox checkSciNames;
         private System.Windows.Forms.CheckBox checkGearVar;
         private System.Windows.Forms.CheckBox checkLandingSites;
         private System.Windows.Forms.CheckBox checkAOI;
         private System.Windows.Forms.CheckBox checkEnumerators;
+        private System.Windows.Forms.CheckBox checkGearLocalNames;
     }
 }

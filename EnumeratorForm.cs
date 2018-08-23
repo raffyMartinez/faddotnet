@@ -26,41 +26,38 @@ namespace FAD3
         private string _enumeratorGuid = "";
         private string _enumeratorName = "";
         private bool _IsNew = false;
-        private MainForm _parentForm;
         private List<string> _removedEnumerators = new List<string>();
         private static EnumeratorForm _instance;
 
         private Dictionary<string, (string targetAreaName, string refNo, string landingSite, string gearClassName, string gear,
                                 DateTime samplingDate, string fishingGround, string vesselType, double wtCatch, int rows, string GUIDs)> _samplings;
 
-        public static EnumeratorForm GetInstance(MainForm Parent)
+        public static EnumeratorForm GetInstance()
         {
-            if (_instance == null) _instance = new EnumeratorForm(Parent);
+            if (_instance == null) _instance = new EnumeratorForm();
             return _instance;
         }
 
-        public void SetParentAndEnumerator(string enumeratorGuid, MainForm Parent)
+        public void SetParent(string enumeratorGuid)
         {
-            _parentForm = Parent;
             _enumeratorGuid = enumeratorGuid;
             Enumerators.EnumeratorGuid = _enumeratorGuid;
             ConfigureListEnumeratorSamplings();
         }
 
-        public static EnumeratorForm GetInstance(string enumeratorGuid, MainForm Parent)
+        public static EnumeratorForm GetInstance(string enumeratorGuid)
         {
-            if (_instance == null) _instance = new EnumeratorForm(enumeratorGuid, Parent);
+            if (_instance == null) _instance = new EnumeratorForm(enumeratorGuid);
             return _instance;
         }
 
-        public EnumeratorForm(MainForm Parent)
+        public EnumeratorForm()
         {
             //default conructor
             InitializeComponent();
-            _parentForm = Parent;
         }
 
-        public EnumeratorForm(string enumeratorGuid, MainForm Parent)
+        public EnumeratorForm(string enumeratorGuid)
         {
             //
             // The InitializeComponent() call is required for Windows Forms designer support.
@@ -70,7 +67,6 @@ namespace FAD3
             //
             // TODO: Add constructor code after the InitializeComponent() call.
             //
-            _parentForm = Parent;
             _enumeratorGuid = enumeratorGuid;
         }
 
@@ -152,7 +148,7 @@ namespace FAD3
 
         private void ConfigureListEnumerators()
         {
-            labelListView.Visible = false;
+            labelSamplings.Visible = false;
             labelHireDate.Visible = false;
             labelEnumeratorName.Visible = false;
 
@@ -237,7 +233,7 @@ namespace FAD3
         {
             buttonCancel.Visible = false;
 
-            labelListView.Visible = true;
+            labelSamplings.Visible = true;
             labelHireDate.Visible = true;
             labelEnumeratorName.Visible = true;
 
@@ -342,12 +338,13 @@ namespace FAD3
                     }
                 }
             });
+            labelSamplings.Text = $"Samplings enumerated:{lvEnumerators.Items.Count}";
         }
 
         private void ConfigureTree()
         {
             tree.Nodes.Clear();
-            tree.ImageList = _parentForm.treeImages;
+            tree.ImageList = global.mainForm.treeImages;
             var node = tree.Nodes.Add("root", _enumeratorName, "db");
             node.Tag = "db";
             var nodeTargetArea = new TreeNode();
@@ -452,7 +449,7 @@ namespace FAD3
                                 Close();
 
                                 //then we refresh mainform to reflect any changes
-                                _parentForm.RefreshLV("aoi");
+                                global.mainForm.RefreshLV("aoi");
                             }
                             else
                             {
@@ -534,7 +531,7 @@ namespace FAD3
                     mySampling.Add("LSGUID", arr[0]);
                     mySampling.Add("GearID", arr[1]);
                     mySampling.Add("SamplingDate", o.SubItems[3].Text);
-                    _parentForm.EnumeratorSelectedSampling(mySampling);
+                    global.mainForm.EnumeratorSelectedSampling(mySampling);
                 });
             }
             else

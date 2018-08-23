@@ -34,6 +34,7 @@ namespace FAD3
         private static bool _ShowErrorMessage = false;
         private static bool _HasMPH = false;
         private static bool _MapIsOpen;
+        private static string _templateMDBFile = "";
         private static readonly string _ConnectionStringTemplate = "";
         private static bool _TemplateFileExists = true;
         private static bool _UITemplateFileExists = true;
@@ -57,6 +58,11 @@ namespace FAD3
 
                 return s;
             }
+        }
+
+        public static string TemplateMDBFile
+        {
+            get { return _templateMDBFile; }
         }
 
         public static MainForm mainForm { get; set; }
@@ -251,6 +257,7 @@ namespace FAD3
             GetAppPreferences();
             TestMPH();
             _AppPath = Application.StartupPath.ToString();
+            _templateMDBFile = ApplicationPath + "\\template.mdb";
             _ConnectionStringTemplate = "Provider=Microsoft.JET.OLEDB.4.0;data source=" + _AppPath + "\\template.mdb";
             ReferenceNumberManager.ReadRefNoRange();
             GetCoordinateDisplayFormat();
@@ -262,7 +269,7 @@ namespace FAD3
         public static void TestRequiredFilesExists()
         {
             _UITemplateFileExists = File.Exists(ApplicationPath + "\\UITable.xml");
-            _TemplateFileExists = File.Exists(ApplicationPath + "\\template.mdb");
+            _TemplateFileExists = File.Exists(_templateMDBFile);
             _InlandGridDBFileExists = File.Exists(ApplicationPath + "\\grid25inland.mdb");
             _AllRequiredFilesExists = _UITemplateFileExists && _TemplateFileExists && _InlandGridDBFileExists;
         }

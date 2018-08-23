@@ -736,7 +736,7 @@ namespace FAD3
 
                 //this will show a list of enumerators and their corresponding details
                 case "menuEnumerators":
-                    EnumeratorForm ef = EnumeratorForm.GetInstance(this);
+                    EnumeratorForm ef = EnumeratorForm.GetInstance();
                     if (!ef.Visible)
                     {
                         ef.Show(this);
@@ -749,7 +749,7 @@ namespace FAD3
 
                 //this will show the samplings done by an enumerator
                 case "menuEnumeratorDetail":
-                    ef = EnumeratorForm.GetInstance(lvMain.SelectedItems[0].SubItems[1].Name, this);
+                    ef = EnumeratorForm.GetInstance(lvMain.SelectedItems[0].SubItems[1].Name);
                     if (!ef.Visible)
                     {
                         ef.Show(this);
@@ -757,7 +757,7 @@ namespace FAD3
                     else
                     {
                         ef.BringToFront();
-                        ef.SetParentAndEnumerator(lvMain.SelectedItems[0].SubItems[1].Name, this);
+                        ef.SetParent(lvMain.SelectedItems[0].SubItems[1].Name);
                     }
                     break;
 
@@ -931,7 +931,7 @@ namespace FAD3
                                         }
                                         else if (lvi.Name == "Enumerators")
                                         {
-                                            var ef = EnumeratorForm.GetInstance(lvMain.SelectedItems[0].SubItems[1].Name, this);
+                                            var ef = EnumeratorForm.GetInstance(lvMain.SelectedItems[0].SubItems[1].Name);
                                             if (!ef.Visible)
                                             {
                                                 ef.Show(this);
@@ -939,7 +939,7 @@ namespace FAD3
                                             else
                                             {
                                                 ef.BringToFront();
-                                                ef.SetParentAndEnumerator(lvMain.SelectedItems[0].SubItems[1].Name, this);
+                                                ef.SetParent(lvMain.SelectedItems[0].SubItems[1].Name);
                                             }
                                         }
                                     }

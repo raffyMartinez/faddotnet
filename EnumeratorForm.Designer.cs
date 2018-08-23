@@ -39,7 +39,7 @@ namespace FAD3
             this.buttonOK = new System.Windows.Forms.Button();
             this.buttonCancel = new System.Windows.Forms.Button();
             this.lvEnumerators = new System.Windows.Forms.ListView();
-            this.labelListView = new System.Windows.Forms.Label();
+            this.labelSamplings = new System.Windows.Forms.Label();
             this.tree = new System.Windows.Forms.TreeView();
             this.panelTop = new System.Windows.Forms.Panel();
             this.chkActive = new System.Windows.Forms.CheckBox();
@@ -89,14 +89,14 @@ namespace FAD3
             this.lvEnumerators.DoubleClick += new System.EventHandler(this.OnlistEnumeratorSampling_DoubleClick);
             this.lvEnumerators.Leave += new System.EventHandler(this.OnListEnumeratorSamplingLeave);
             // 
-            // labelListView
+            // labelSamplings
             // 
-            this.labelListView.Location = new System.Drawing.Point(4, 62);
-            this.labelListView.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.labelListView.Name = "labelListView";
-            this.labelListView.Size = new System.Drawing.Size(251, 18);
-            this.labelListView.TabIndex = 9;
-            this.labelListView.Text = "Samplings enumerated";
+            this.labelSamplings.Location = new System.Drawing.Point(4, 62);
+            this.labelSamplings.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelSamplings.Name = "labelSamplings";
+            this.labelSamplings.Size = new System.Drawing.Size(251, 18);
+            this.labelSamplings.TabIndex = 9;
+            this.labelSamplings.Text = "Samplings enumerated";
             // 
             // tree
             // 
@@ -112,7 +112,7 @@ namespace FAD3
             // 
             this.panelTop.Controls.Add(this.chkActive);
             this.panelTop.Controls.Add(this.labelHireDate);
-            this.panelTop.Controls.Add(this.labelListView);
+            this.panelTop.Controls.Add(this.labelSamplings);
             this.panelTop.Controls.Add(this.labelEnumeratorName);
             this.panelTop.Controls.Add(this.txtHireDate);
             this.panelTop.Controls.Add(this.txtName);
@@ -188,7 +188,7 @@ namespace FAD3
             this.ResumeLayout(false);
 
 		}
-		private System.Windows.Forms.Label labelListView;
+		private System.Windows.Forms.Label labelSamplings;
 		private System.Windows.Forms.ListView lvEnumerators;
 		private System.Windows.Forms.Button buttonCancel;
 		private System.Windows.Forms.Button buttonOK;

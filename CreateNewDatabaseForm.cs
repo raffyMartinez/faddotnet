@@ -6,13 +6,15 @@ using System.Data.OleDb;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
+using dao;
 
 namespace FAD3
 {
     public partial class CreateNewDatabaseForm : Form
     {
-        private string _newMDBFilename = "";
+        private string _newMDBFile = "";
         private MainForm _parentForm;
+        private List<string> _requiredTables = new List<string>();
 
         public CreateNewDatabaseForm(MainForm parent)
         {
@@ -23,21 +25,21 @@ namespace FAD3
         private void frmNewDB_Load(object sender, EventArgs e)
         {
             group2.Visible = false;
-            Size = new Size(group1.Width + (group1.Left * 2), 407);
+            Size = new Size(group1.Width + (group1.Left * 2), Height);
         }
 
         private void Onbutton_Click(object sender, EventArgs e)
         {
             switch (((Button)sender).Name)
             {
-                case "buttonOK":
-                    if (_newMDBFilename.Length > 0)
+                case "buttonOk":
+                    if (_newMDBFile.Length > 0)
                     {
-                        File.Copy(global.mdbPath, _newMDBFilename);
+                        File.Copy(global.TemplateMDBFile, _newMDBFile);
                         if (UpdateNewMDB())
                         {
-                            _parentForm.MRUList.AddFile(_newMDBFilename);
-                            _parentForm.NewDBFile(_newMDBFilename);
+                            _parentForm.MRUList.AddFile(_newMDBFile);
+                            _parentForm.NewDBFile(_newMDBFile);
                             MessageBox.Show("New database is ready");
                             this.Close();
                         }
@@ -46,6 +48,9 @@ namespace FAD3
 
                 case "buttonCancel":
                     Close();
+                    break;
+
+                case "buttonSelectOK":
                     break;
 
                 case "buttonFileName":
@@ -62,19 +67,28 @@ namespace FAD3
                     //ofd.InitialDirectory = Path.GetDirectoryName(Application.ExecutablePath);
                     sfd.Filter = "Microsoft Access Data File (.mdb)|*.mdb";
                     sfd.ShowDialog();
-                    _newMDBFilename = sfd.FileName;
-                    if (_newMDBFilename.Length > 0)
+                    _newMDBFile = sfd.FileName;
+
+                    if (_newMDBFile.Length > 0)
                     {
                         group2.Visible = true;
                         group1.Visible = false;
                         group2.Location = group1.Location;
                         label2.Text = "Step 2";
+
                         checkAOI.Checked = true;
-                        checkGearVar.Checked = true;
                         checkLandingSites.Checked = true;
-                        checkLocalNames.Checked = true;
+                        checkGearVar.Checked = true;
+                        checkGearLocalNames.Checked = true;
                         checkSciNames.Checked = true;
+                        checkFishLocalNames.Checked = true;
                         checkEnumerators.Checked = true;
+
+                        _requiredTables.Add("FBSpecies");
+                        _requiredTables.Add("Provinces");
+                        _requiredTables.Add("Municipalities");
+                        _requiredTables.Add("tblGearClass");
+                        _requiredTables.Add("tblTaxa");
                     }
                     break;
             }
@@ -82,266 +96,106 @@ namespace FAD3
 
         private bool UpdateNewMDB()
         {
-            List<string> tableNames = GetTableList();
-            List<string> subTableList = new List<string>();
-            bool Success = false;
-            string ActionType = "";
-            string sql = "";
-            OleDbCommand update = new OleDbCommand();
-            string myConnString = "Provider=Microsoft.JET.OLEDB.4.0;data source=" + _newMDBFilename; ;
-            using (OleDbConnection conn = new OleDbConnection(myConnString))
+            var dbe = new DBEngine();
+            var dbData = dbe.OpenDatabase(global.mdbPath);
+            var dbTemplate = dbe.OpenDatabase(global.TemplateMDBFile);
+            var sql = "";
+            var qd = new dao.QueryDef();
+            foreach (var item in _requiredTables)
             {
-                foreach (string item in tableNames)
+                sql = $"Insert Into {item} In '{_newMDBFile}' Select * from {item}";
+                // MessageBox.Show(sql);
+                qd = dbData.CreateQueryDef("", sql);
+                qd.Execute();
+
+                //qd.Close();
+                //qd = null;
+            }
+
+            if (checkAOI.Checked)
+            {
+                sql = $"Insert Into tblAOI In '{_newMDBFile}' Select * from tblAOI";
+                qd = dbData.CreateQueryDef("", sql);
+                qd.Execute();
+
+                sql = $"Insert Into tblAdditionalAOIExtent In '{_newMDBFile}' Select * from tblAdditionalAOIExtent";
+                qd = dbData.CreateQueryDef("", sql);
+                qd.Execute();
+            }
+
+            if (checkAOI.Checked && checkLandingSites.Checked)
+            {
+                sql = $"Insert Into tblLandingSites In '{_newMDBFile}' Select * from tblLandingSites";
+                qd = dbData.CreateQueryDef("", sql);
+                qd.Execute();
+            }
+
+            if (checkGearLocalNames.Checked)
+            {
+                sql = $"Insert Into tblGearLocalNames In '{_newMDBFile}' Select * from tblGearLocalNames";
+                qd = dbData.CreateQueryDef("", sql);
+                qd.Execute();
+            }
+
+            if (checkGearVar.Checked)
+            {
+                sql = $"Insert Into tblGearVariations In '{_newMDBFile}' Select * from tblGearVariations";
+                qd = dbData.CreateQueryDef("", sql);
+                qd.Execute();
+
+                sql = $"Insert Into tblRefGearCodes In '{_newMDBFile}' Select * from tblRefGearCodes";
+                qd = dbData.CreateQueryDef("", sql);
+                qd.Execute();
+
+                sql = $"Insert Into tblGearSpecs In '{_newMDBFile}' Select * from tblGearSpecs where Version = '2'";
+                qd = dbData.CreateQueryDef("", sql);
+                qd.Execute();
+
+                if (checkAOI.Checked)
                 {
-                    ActionType = "None";
-                    switch (item)
+                    sql = $"Insert Into tblRefGearCodes_Usage In '{_newMDBFile}' Select * from tblRefGearCodes_Usage";
+                    qd = dbData.CreateQueryDef("", sql);
+                    qd.Execute();
+
+                    if (checkGearLocalNames.Checked)
                     {
-                        case "Barangay":
-                        case "FBSPecies":
-                        case "Municipalities":
-                        case "Provinces":
-                        case "tblAllSpecies":
-                        case "tblBaseLocalNames":
-                        case "tblGearClass":
-                        case "tblGearLocalNames":
-                        case "tblTaxa":
-                            break;
-
-                        case "tblGearVariations":
-                            if (checkGearVar.Checked == false)
-                            {
-                                ActionType = "DeleteTableContents";
-                            }
-                            break;
-
-                        case "tblRefGearCodes":
-                            if (checkGearVar.Checked == false)
-                            {
-                                ActionType = "DeleteTableContents";
-                            }
-                            break;
-
-                        case "tblRefGearCodes_Usage":
-                            if (checkGearVar.Checked == false)
-                            {
-                                ActionType = "DeleteTableContents";
-                            }
-                            break;
-
-                        case "tblRefGearUsage_LocalName":
-                            if (checkGearVar.Checked == false)
-                            {
-                                ActionType = "DeleteTableContents";
-                            }
-                            break;
-
-                        case "tblLandingSites":
-                            if (checkLandingSites.Checked == false)
-                            {
-                                subTableList.Add("tblGrid");
-                                subTableList.Add("tblGMS");
-                                subTableList.Add("tblLF");
-                                subTableList.Add("tblSampledGearSpec");
-                                subTableList.Add("tblSampledGearSpec2");
-                                subTableList.Add("tblCatchDetail");
-                                subTableList.Add("tblCatchComp");
-                                subTableList.Add("tblSampling");
-                                subTableList.Add("tblLandingSiteEnumerators");
-                                ActionType = "DeleteTableContents";
-                            }
-                            break;
-
-                        case "tblAOI":
-                            if (checkAOI.Checked == false)
-                            {
-                                subTableList.Add("tblGrid");
-                                subTableList.Add("tblGMS");
-                                subTableList.Add("tblLF");
-                                subTableList.Add("tblSampledGearSpec");
-                                subTableList.Add("tblSampledGearSpec2");
-                                subTableList.Add("tblCatchDetail");
-                                subTableList.Add("tblCatchComp");
-                                subTableList.Add("tblSampling");
-                                subTableList.Add("tblLandingSiteEnumerators");
-                                subTableList.Add("tblEnumeratorRating");
-                                subTableList.Add("tblEnumerators");
-                                subTableList.Add("tblLandingSites");
-                                subTableList.Add("tblTFStations");
-                                subTableList.Add("tblAOI_GearLocalNames");
-                                subTableList.Add("tblAOIGridSize");
-                                ActionType = "DeleteTableContents";
-                            }
-                            break;
-
-                        case "tblAOI_GearLocalNames":
-                            if (checkAOI.Checked == false)
-                            {
-                                ActionType = "DeleteTableContents";
-                            }
-                            break;
-
-                        case "tblEnumerators":
-                            if (checkEnumerators.Checked == false)
-                            {
-                                subTableList.Add("tblGrid");
-                                subTableList.Add("tblGMS");
-                                subTableList.Add("tblLF");
-                                subTableList.Add("tblSampledGearSpec");
-                                subTableList.Add("tblSampledGearSpec2");
-                                subTableList.Add("tblCatchDetail");
-                                subTableList.Add("tblCatchComp");
-                                subTableList.Add("tblSampling");
-                                subTableList.Add("tblLandingSiteEnumerators");
-                                subTableList.Add("tblEnumeratorRating");
-                                ActionType = "DeleteTableContents";
-                            }
-                            break;
-
-                        case "tblAOIGridSize":
-                            if (checkAOI.Checked == false)
-                            {
-                                ActionType = "DeleteTableContents";
-                            }
-                            break;
-
-                        case "tblTFStations":
-                        case "tblTransactions":
-                        case "tblCategories":
-                        case "tblDescriptors":
-                        case "tblEditingNotes":
-                        case "tblEnumeratorRating":
-                        case "tblRefCodeCounter":
-                        case "tblGridCell":
-                        case "tblLandingSiteEnumerators":
-                        case "LNVars":
-                        case "tblLocalNamesByTA":
-                        case "tblMonthNames":
-                            ActionType = "DeleteTableContents";
-                            break;
-
-                        case "tblSampling":
-                            subTableList.Add("tblGrid");
-                            subTableList.Add("tblGMS");
-                            subTableList.Add("tblLF");
-                            subTableList.Add("tblSampledGearSpec");
-                            subTableList.Add("tblSampledGearSpec2");
-                            subTableList.Add("tblCatchDetail");
-                            subTableList.Add("tblCatchComp");
-                            ActionType = "DeleteTableContents";
-                            break;
-
-                        case "Analysis":
-                        case "temp_ComputedWt":
-                        case "temp_PrecalcWt":
-                        case "temp_toc":
-                        case "temp_toc_TF":
-                            ActionType = "DeleteTable";
-                            break;
-
-                        case "tblCatchComp":
-                        case "tblCatchDetail":
-                        case "tblLF":
-                        case "tblGMS":
-                        case "tblGrid":
-                        case "tblSampledGearSpec":
-                        case "tblSampledGearSpec2":
-                        default:
-                            break;
-                    }
-
-                    if (subTableList.Count > 0)
-                    {
-                        DeleteSubTables(subTableList);
-                        subTableList.Clear();
-                    }
-
-                    if (ActionType == "DeleteTableContents")
-                    {
-                        sql = "Delete * from " + item;
-                    }
-                    else if (ActionType == "DeleteTable")
-                    {
-                        sql = "DROP TABLE " + item;
-                    }
-
-                    if (ActionType != "None")
-                    {
-                        try
-                        {
-                            update.CommandText = sql;
-                            update.Connection = conn;
-                            conn.Open();
-                            update.ExecuteNonQuery();
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.Log(ex);
-                        }
-                        conn.Close();
-                        Success = true;
+                        sql = $"Insert Into tblRefGearUsage_LocalName In '{_newMDBFile}' Select * from tblRefGearUsage_LocalName";
+                        qd = dbData.CreateQueryDef("", sql);
+                        qd.Execute();
                     }
                 }
             }
 
-            return Success;
-        }
-
-        private void DeleteSubTables(List<string> TableList)
-        {
-            OleDbCommand update = new OleDbCommand();
-            string sql = "";
-            string myConnString = "Provider=Microsoft.JET.OLEDB.4.0;data source=" + _newMDBFilename; ;
-            using (OleDbConnection conn = new OleDbConnection(myConnString))
+            if (checkSciNames.Checked)
             {
-                try
-                {
-                    foreach (string item in TableList)
-                    {
-                        sql = "Delete * from " + item;
-                        update.CommandText = sql;
-                        update.Connection = conn;
-                        conn.Open();
-                        update.ExecuteNonQuery();
-                        conn.Close();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Logger.Log(ex);
-                }
+                sql = $"Insert Into tblAllSpecies In '{_newMDBFile}' Select * from tblAllSpecies";
+                qd = dbData.CreateQueryDef("", sql);
+                qd.Execute();
             }
-        }
 
-        private List<string> GetTableList()
-        {
-            List<string> myList = new List<string>();
-            DbProviderFactory factory = DbProviderFactories.GetFactory("System.Data.OleDb");
-            DataTable userTables = null;
-
-            using (DbConnection connection = factory.CreateConnection())
+            if (checkFishLocalNames.Checked)
             {
-                try
-                {
-                    // c:\test\test.mdb
-                    connection.ConnectionString = global.ConnectionString;
-                    // We only want user tables, not system tables
-                    string[] restrictions = new string[4];
-                    restrictions[3] = "Table";
-
-                    connection.Open();
-
-                    // Get list of user tables
-                    userTables = connection.GetSchema("Tables", restrictions);
-
-                    for (int i = 0; i < userTables.Rows.Count; i++)
-                        myList.Add(userTables.Rows[i][2].ToString());
-                }
-                catch (Exception ex)
-                {
-                    Logger.Log(ex);
-                }
+                sql = $"Insert Into tblBaseLocalNames In '{_newMDBFile}' Select * from tblBaseLocalNames";
+                qd = dbData.CreateQueryDef("", sql);
+                qd.Execute();
             }
-            return myList;
+
+            if (checkAOI.Checked && checkEnumerators.Checked)
+            {
+                sql = $"Insert Into tblEnumerators In '{_newMDBFile}' Select * from tblEnumerators";
+                qd = dbData.CreateQueryDef("", sql);
+                qd.Execute();
+            }
+
+            qd.Close();
+            qd = null;
+
+            dbData.Close();
+            dbTemplate.Close();
+            dbData = null;
+            dbTemplate = null;
+
+            return true;
         }
 
         private void checkAOI_CheckedChanged(object sender, EventArgs e)
