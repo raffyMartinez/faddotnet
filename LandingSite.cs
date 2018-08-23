@@ -228,7 +228,7 @@ namespace FAD3
                     for (int i = 0; i < myDT.Rows.Count; i++)
                     {
                         DataRow dr = myDT.Rows[i];
-                        myGears.Add(dr[0].ToString(), dr[1].ToString() + ": " + dr[3].ToString());
+                        myGears.Add(dr["GearVarGUID"].ToString(), $"{dr["Variation"].ToString()}: {dr["n"].ToString()}");
                         _GearUsedCount++;
                     }
                 }

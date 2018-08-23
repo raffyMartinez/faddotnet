@@ -263,7 +263,7 @@ namespace FAD3
                     for (int i = 0; i < dt.Rows.Count; i++)
                     {
                         DataRow dr = dt.Rows[i];
-                        myDict.Add(dr["AOIGuid"].ToString(), dr["AOIName"].ToString() + ": " + dr["n"].ToString());
+                        myDict.Add(dr["AOIGuid"].ToString(), $"{dr["AOIName"].ToString()}: {dr["n"].ToString()}");
                     }
                 }
                 catch (Exception ex)
@@ -275,24 +275,24 @@ namespace FAD3
             return myDict;
         }
 
-        public List<string> ListLandingSiteWithSamplingCount()
+        public Dictionary<string, string> ListLandingSiteWithSamplingCount()
         {
-            List<string> myLandingSiteList = new List<string>();
+            Dictionary<string, string> myLandingSites = new Dictionary<string, string>();
             DataTable dt = new DataTable();
             using (var conection = new OleDbConnection(global.ConnectionString))
             {
                 try
                 {
                     conection.Open();
-                    string query = $@"SELECT tblLandingSites.LSName, Count(tblSampling.SamplingGUID) AS n
+                    string query = $@"SELECT tblLandingSites.LSGUID, tblLandingSites.LSName, Count(tblSampling.SamplingGUID) AS n
                                    FROM tblLandingSites LEFT JOIN tblSampling ON tblLandingSites.LSGUID = tblSampling.LSGUID
-                                   WHERE tblLandingSites.AOIGuid = {{{_AOIGUID}}} GROUP BY tblLandingSites.LSName";
+                                   WHERE tblLandingSites.AOIGuid = {{{_AOIGUID}}} GROUP BY tblLandingSites.LSGUID, tblLandingSites.LSName";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
                     for (int i = 0; i < dt.Rows.Count; i++)
                     {
                         DataRow dr = dt.Rows[i];
-                        myLandingSiteList.Add(dr["LSName"].ToString() + ": " + dr["n"].ToString());
+                        myLandingSites.Add(dr["LSGUID"].ToString(), dr["LSName"].ToString() + ": " + dr["n"].ToString());
                     }
                 }
                 catch (Exception ex)
@@ -301,7 +301,7 @@ namespace FAD3
                 }
             }
 
-            return myLandingSiteList;
+            return myLandingSites;
         }
 
         private void getLandingSites()

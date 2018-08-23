@@ -541,19 +541,19 @@ namespace FAD3
         /// </summary>
         /// <param name="LandingSiteGUID"></param>
         /// <returns></returns>
-        public static List<string> MonthsSampledByGear(string LandingSiteGUID)
+        public static Dictionary<string, string> MonthsSampledByGear(string LandingSiteGUID)
         {
-            List<string> myMonths = new List<string>();
+            Dictionary<string, string> myMonths = new Dictionary<string, string>();
             var myDT = new DataTable();
             using (var conection = new OleDbConnection(global.ConnectionString))
             {
                 try
                 {
                     conection.Open();
-                    string query = $@"SELECT Format([SamplingDate],'mmm-yyyy') AS sMonth, Count(SamplingGUID) AS n
-                                      FROM tblSampling GROUP BY Format([SamplingDate],'mmm-yyyy'), LSGUID,
-                                      GearVarGUID, Year([SamplingDate]), Month([SamplingDate])
-                                      HAVING LSGUID={{{LandingSiteGUID}}} AND GearVarGUID={{{_GearVarGUID}}}
+                    string query = $@"SELECT Format([SamplingDate],'mmm-yyyy') AS sMonth, Count(tblSampling.SamplingGUID) AS n,
+                                      tblSampling.LSGUID, tblSampling.GearVarGUID FROM tblSampling GROUP BY Format([SamplingDate],'mmm-yyyy'),
+                                      tblSampling.LSGUID, tblSampling.GearVarGUID, Year([SamplingDate]), Month([SamplingDate])
+                                      HAVING tblSampling.[LSGUID]={{{LandingSiteGUID}}} AND tblSampling.[GearVarGUID]={{{_GearVarGUID}}}
                                       ORDER BY Year([SamplingDate]), Month([SamplingDate])";
 
                     //Debug.WriteLine (query);
@@ -562,7 +562,10 @@ namespace FAD3
                     for (int i = 0; i < myDT.Rows.Count; i++)
                     {
                         DataRow dr = myDT.Rows[i];
-                        myMonths.Add(dr["sMonth"].ToString() + ": " + dr["n"].ToString());
+                        var lsGUID = dr["LSGUID"].ToString();
+                        var gearGUID = dr["GearVarGUID"].ToString();
+                        var month = dr["sMonth"].ToString();
+                        myMonths.Add($"{lsGUID}|{gearGUID}|{month}", dr["sMonth"].ToString() + ": " + dr["n"].ToString());
                     }
                 }
                 catch (Exception ex) { Logger.Log(ex); }

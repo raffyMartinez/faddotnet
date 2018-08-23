@@ -910,18 +910,26 @@ namespace FAD3
                 {
                     case "lvMain":
                         SetupCatchListView(Show: false);
-                        ListViewItem lvi = new ListViewItem();
                         _topLVItemIndex = lvMain.TopItem.Index;
-                        foreach (var item in lvMain.SelectedItems)
+                        foreach (ListViewItem item in lvMain.SelectedItems)
                         {
-                            lvi = (ListViewItem)item;
                             string tag = lvMain.Tag.ToString();
                             switch (tag)
                             {
-                                case "aoi":
-                                    if (lvi.Tag != null)
+                                case "root":
+                                    if (item.Tag != null && item.Tag.ToString() == "targetArea")
                                     {
-                                        if (lvi.Tag.ToString() == "aoi_data")
+                                        var nd = treeMain.Nodes["root"].Nodes[item.Name];
+                                        treeMain.SelectedNode = nd;
+                                        nd.Expand();
+                                    }
+
+                                    break;
+
+                                case "aoi":
+                                    if (item.Tag != null)
+                                    {
+                                        if (item.Tag.ToString() == "aoi_data")
                                         {
                                             var myTag = (Tuple<string, string, string>)treeMain.SelectedNode.Tag;
                                             _AOI.AOIGUID = myTag.Item1;
@@ -929,7 +937,7 @@ namespace FAD3
                                             f.Show();
                                             f.AOI = _AOI;
                                         }
-                                        else if (lvi.Name == "Enumerators")
+                                        else if (item.Name == "Enumerators")
                                         {
                                             var ef = EnumeratorForm.GetInstance(lvMain.SelectedItems[0].SubItems[1].Name);
                                             if (!ef.Visible)
@@ -942,33 +950,58 @@ namespace FAD3
                                                 ef.SetParent(lvMain.SelectedItems[0].SubItems[1].Name);
                                             }
                                         }
+                                        else if (item.Tag.ToString() == "landingSite")
+                                        {
+                                            var nd = treeMain.SelectedNode.Nodes[item.Name];
+                                            treeMain.SelectedNode = nd;
+                                            nd.Expand();
+                                        }
                                     }
                                     break;
 
                                 case "database":
-                                    if (lvi.Text == "Database path")
+                                    if (item.Text == "Database path")
                                     {
                                         Process.Start(Path.GetDirectoryName(global.mdbPath));
                                     }
                                     break;
 
                                 case "landing_site":
-                                    LandingSiteForm fls = new LandingSiteForm(_AOI, this, _ls);
-                                    fls.Show();
+                                    if (item.Tag != null)
+                                    {
+                                        if (item.Tag.ToString() == "gearSampled")
+                                        {
+                                            var nd = treeMain.SelectedNode.Nodes[$"{_LandingSiteGuid}|{item.Name}"];
+                                            treeMain.SelectedNode = nd;
+                                            nd.Expand();
+                                        }
+                                        else if (item.Tag.ToString() == "landing_site")
+                                        {
+                                            LandingSiteForm fls = new LandingSiteForm(_AOI, this, _ls);
+                                            fls.Show();
+                                        }
+                                    }
+
                                     break;
 
                                 case "gear":
+                                    if (item.Tag != null && item.Tag.ToString() == "monthSampled")
+                                    {
+                                        var nd = treeMain.SelectedNode.Nodes[item.Name];
+                                        treeMain.SelectedNode = nd;
+                                        nd.Expand();
+                                    }
                                     break;
 
                                 case "sampling":
                                     SetUPLV("samplingDetail");
-                                    SamplingGUID = lvi.Tag.ToString();
+                                    SamplingGUID = item.Tag.ToString();
                                     ShowCatchDetailEx(_SamplingGUID);
-                                    lvi.BackColor = Color.Gainsboro;
+                                    item.BackColor = Color.Gainsboro;
                                     break;
 
                                 case "samplingDetail":
-                                    if (lvi.Name == "GearSpecs")
+                                    if (item.Name == "GearSpecs")
                                     {
                                         var s = ManageGearSpecsClass.GetSampledSpecsEx(_SamplingGUID);
                                         if (s.Length == 0)
@@ -1761,17 +1794,22 @@ namespace FAD3
                     break;
 
                 case "gear":
-                    lvi = lvMain.Items.Add("Months sampled");
                     var myTag = (Tuple<string, string, string>)treeMain.SelectedNode.Tag;
                     gear.GearVarGUID = myTag.Item2;
                     var n = 0;
-                    foreach (string item in gear.MonthsSampledByGear(myTag.Item1))
+                    lvi = lvMain.Items.Add("Months sampled");
+                    foreach (var item in gear.MonthsSampledByGear(myTag.Item1))
                     {
                         if (n > 0)
                         {
-                            lvi = lvMain.Items.Add("");
+                            lvi = lvMain.Items.Add(item.Key, "", null);
                         }
-                        lvi.SubItems.Add(item);
+                        else
+                        {
+                            lvi.Name = item.Key;
+                        }
+                        lvi.SubItems.Add(item.Value);
+                        lvi.Tag = "monthSampled";
                         n++;
                     }
                     break;
@@ -1779,6 +1817,7 @@ namespace FAD3
                 case "root":
                     lvi = lvMain.Items.Add("Database path");
                     lvi.SubItems.Add(global.mdbPath);
+                    lvi.Tag = "databasePath";
 
                     //add sampled years with count for entire database
                     lvi = lvMain.Items.Add("");
@@ -1797,13 +1836,19 @@ namespace FAD3
                     lvi = lvMain.Items.Add("");
                     lvi = lvMain.Items.Add("AOI");
                     i = 0;
+
                     foreach (KeyValuePair<string, string> kv in _AOI.AOIWithSamplingCount())
                     {
                         if (i > 0)
                         {
-                            lvi = lvMain.Items.Add("");
+                            lvi = lvMain.Items.Add(kv.Key, "", null);
+                        }
+                        else
+                        {
+                            lvi.Name = kv.Key;
                         }
                         lvi.SubItems.Add(kv.Value);
+                        lvi.Tag = "targetArea";
                         i++;
                     }
                     break;
@@ -1884,13 +1929,18 @@ namespace FAD3
                     lvMain.Items.Add("");
                     lvi = lvMain.Items.Add("Landing sites");
                     i = 0;
-                    foreach (string item in _AOI.ListLandingSiteWithSamplingCount())
+                    foreach (var item in _AOI.ListLandingSiteWithSamplingCount())
                     {
                         if (i > 0)
                         {
-                            lvi = lvMain.Items.Add("");
+                            lvi = lvMain.Items.Add(item.Key, "", null);
                         }
-                        lvi.SubItems.Add(item);
+                        else
+                        {
+                            lvi.Name = item.Key;
+                        }
+                        lvi.SubItems.Add(item.Value);
+                        lvi.Tag = "landingSite";
                         i++;
                     }
                     break;
@@ -1930,9 +1980,13 @@ namespace FAD3
                     {
                         if (n > 0)
                         {
-                            lvi = lvMain.Items.Add("");
+                            lvi = lvMain.Items.Add(item.Key, "", null);
                         }
-                        lvi.Tag = item.Key;
+                        else
+                        {
+                            lvi.Name = item.Key;
+                        }
+                        lvi.Tag = "gearSampled";
                         lvi.SubItems.Add(item.Value);
                         n++;
                     }
