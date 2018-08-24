@@ -29,25 +29,25 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MapForm));
-            this.xMap = new AxMapWinGIS.AxMap();
+            this.axMap = new AxMapWinGIS.AxMap();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.tsButtonLayers = new System.Windows.Forms.ToolStripButton();
             this.tsButtonLayerAdd = new System.Windows.Forms.ToolStripButton();
-            ((System.ComponentModel.ISupportInitialize)(this.xMap)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.axMap)).BeginInit();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
-            // xMap
+            // axMap
             // 
-            this.xMap.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.axMap.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.xMap.Enabled = true;
-            this.xMap.Location = new System.Drawing.Point(0, 28);
-            this.xMap.Name = "xMap";
-            this.xMap.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("xMap.OcxState")));
-            this.xMap.Size = new System.Drawing.Size(629, 297);
-            this.xMap.TabIndex = 0;
+            this.axMap.Enabled = true;
+            this.axMap.Location = new System.Drawing.Point(0, 28);
+            this.axMap.Name = "axMap";
+            this.axMap.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("axMap.OcxState")));
+            this.axMap.Size = new System.Drawing.Size(629, 297);
+            this.axMap.TabIndex = 0;
             // 
             // toolStrip1
             // 
@@ -79,18 +79,18 @@
             this.tsButtonLayerAdd.Size = new System.Drawing.Size(23, 22);
             this.tsButtonLayerAdd.Text = "toolStripButton2";
             // 
-            // frmMap
+            // MapForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(629, 327);
             this.Controls.Add(this.toolStrip1);
-            this.Controls.Add(this.xMap);
-            this.Name = "frmMap";
+            this.Controls.Add(this.axMap);
+            this.Name = "MapForm";
             this.Text = "Form1";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.frmMap_FormClosed);
             this.Load += new System.EventHandler(this.frmMap_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.xMap)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.axMap)).EndInit();
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             this.ResumeLayout(false);
@@ -100,7 +100,7 @@
 
         #endregion
 
-        private AxMapWinGIS.AxMap xMap;
+        private AxMapWinGIS.AxMap axMap;
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripButton tsButtonLayers;
         private System.Windows.Forms.ToolStripButton tsButtonLayerAdd;

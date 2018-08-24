@@ -248,6 +248,7 @@ namespace FAD3
             this.lvMain.TabIndex = 3;
             this.lvMain.UseCompatibleStateImageBehavior = false;
             this.lvMain.View = System.Windows.Forms.View.Details;
+            this.lvMain.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.OnlistView_ColumnClick);
             this.lvMain.DoubleClick += new System.EventHandler(this.OnListView_DoubleClick);
             this.lvMain.Leave += new System.EventHandler(this.OnListViewLeave);
             this.lvMain.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnListView_MouseDown);
@@ -371,7 +372,7 @@ namespace FAD3
             this.generateGridMapToolStripMenuItem.Name = "generateGridMapToolStripMenuItem";
             this.generateGridMapToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
             this.generateGridMapToolStripMenuItem.Text = "Generate grid map";
-            this.generateGridMapToolStripMenuItem.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.generateGridMapToolStripMenuItem_DropDownItemClicked);
+            this.generateGridMapToolStripMenuItem.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OngenerateGridMapToolStripMenuItem_DropDownItemClicked);
             // 
             // uTMZone50ToolStripMenuItem
             // 

@@ -32,8 +32,9 @@ namespace FAD3
         private static string _ConnectionString = "";
         private static string _AppPath = "";
         private static bool _ShowErrorMessage = false;
-        private static bool _HasMPH = false;
-        private static bool _MapIsOpen;
+        private static bool _hasMPH = false;
+        private static bool _mapIsOpen;
+        private static MapForm _mapForm;
         private static string _templateMDBFile = "";
         private static readonly string _ConnectionStringTemplate = "";
         private static bool _TemplateFileExists = true;
@@ -58,6 +59,21 @@ namespace FAD3
 
                 return s;
             }
+        }
+
+        public static MapForm MappingForm
+        {
+            get { return _mapForm; }
+            set
+            {
+                _mapForm = value;
+                _mapIsOpen = _mapForm != null;
+            }
+        }
+
+        public static bool MapIsOpen
+        {
+            get { return _mapIsOpen; }
         }
 
         public static string TemplateMDBFile
@@ -409,7 +425,7 @@ namespace FAD3
 
         public static bool HasMPH
         {
-            get { return _HasMPH; }
+            get { return _hasMPH; }
         }
 
         private static void TestMPH()
@@ -418,7 +434,7 @@ namespace FAD3
             short k2 = 0;
             MetaphoneCOM.DoubleMetaphoneShort mph = new MetaphoneCOM.DoubleMetaphoneShort();
             mph.ComputeMetaphoneKeys("test", out k1, out k2);
-            _HasMPH = k1 > 0;
+            _hasMPH = k1 > 0;
         }
 
         public enum fad3CatchSubRow
@@ -651,12 +667,6 @@ namespace FAD3
             {
                 Logger.Log(ex);
             }
-        }
-
-        public static bool MapIsOpen
-        {
-            get { return _MapIsOpen; }
-            set { _MapIsOpen = value; }
         }
     }
 }

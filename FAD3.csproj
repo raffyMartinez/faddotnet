@@ -137,6 +137,7 @@
       <DependentUpon>FishingGroundExtentsForm.cs</DependentUpon>
     </Compile>
     <Compile Include="GMSLineClass.cs" />
+    <Compile Include="Grid25MapHelper.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="extension.cs" />
     <Compile Include="FishingGroundDefinitionForm.cs">

@@ -10,6 +10,7 @@
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Collections;
 using System.Data;
 using System.Data.OleDb;
 using System.Diagnostics;
@@ -60,6 +61,9 @@ namespace FAD3
 
         private ListView lvCatch;
         private ListView lvLF_GMS;
+
+        //for column sort
+        private int _sortColumn = -1;
 
         public MainForm()
         {
@@ -176,6 +180,93 @@ namespace FAD3
                 Font = f
             };
             return l.Width;
+        }
+
+        // Implements the manual sorting of items by columns.
+        private class ListViewItemComparer : IComparer
+        {
+            private int col;
+            private SortOrder order;
+
+            public ListViewItemComparer()
+            {
+                col = 0;
+                order = SortOrder.Ascending;
+            }
+
+            public ListViewItemComparer(int column, SortOrder order)
+            {
+                col = column;
+                this.order = order;
+            }
+
+            public int Compare(object x, object y)
+            {
+                int returnVal = 0;
+
+                // Determine whether the type being compared is a date type.
+                try
+                {
+                    // Parse the two objects passed as a parameter as a DateTime.
+                    DateTime firstDate = DateTime.Parse(((ListViewItem)x).SubItems[col].Text);
+                    DateTime secondDate = DateTime.Parse(((ListViewItem)y).SubItems[col].Text);
+                    // Compare the two dates.
+                    returnVal = DateTime.Compare(firstDate, secondDate);
+                }
+                // If neither compared object has a valid date format, compare
+                // first as a number, if not then compare as a string.
+                catch
+                {
+                    try
+                    {
+                        //returnVal = 0;
+                        //test if we can compare as numeric values
+                        double firstValue = double.Parse(((ListViewItem)x).SubItems[col].Text);
+                        double secondValue = double.Parse(((ListViewItem)y).SubItems[col].Text);
+
+                        returnVal = firstValue.CompareTo(secondValue);
+                    }
+                    catch
+                    {
+                        // Compare the two items as a string.
+                        returnVal = String.Compare(((ListViewItem)x).SubItems[col].Text, ((ListViewItem)y).SubItems[col].Text);
+                    }
+                }
+                // Determine whether the sort order is descending.
+                if (order == SortOrder.Descending)
+                {
+                    // Invert the value returned by String.Compare.
+                    returnVal *= -1;
+                }
+                return returnVal;
+            }
+        }
+
+        private void OnlistView_ColumnClick(object sender, ColumnClickEventArgs e)
+        {
+            //var currentListView = (ListView)sender;
+
+            //// Determine whether the column is the same as the last column clicked.
+            //if (e.Column != _sortColumn)
+            //{
+            //    // Set the sort column to the new column.
+            //    _sortColumn = e.Column;
+            //    // Set the sort order to ascending by default.
+            //    currentListView.Sorting = SortOrder.Ascending;
+            //}
+            //else
+            //{
+            //    // Determine what the last sort order was and change it.
+            //    if (currentListView.Sorting == SortOrder.Ascending)
+            //        currentListView.Sorting = SortOrder.Descending;
+            //    else
+            //        currentListView.Sorting = SortOrder.Ascending;
+            //}
+
+            //// Call the sort method to manually sort.
+            ////currentListView.Sort();
+            //// Set the ListViewItemSorter property to a new ListViewItemComparer object.
+            //currentListView.ListViewItemSorter = new ListViewItemComparer(e.Column, currentListView.Sorting);
         }
 
         public void EnumeratorSelectedSampling(Dictionary<string, string> SamplingIdentifiers)
@@ -638,16 +729,20 @@ namespace FAD3
             global.mainForm = this;
         }
 
-        private void generateGridMapToolStripMenuItem_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        private void OngenerateGridMapToolStripMenuItem_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
-            ToolStripItem tsi = e.ClickedItem;
-            switch (tsi.Tag)
+            e.ClickedItem.Owner.Hide();
+            var mf = MapForm.GetInstance();
+            if (!mf.Visible)
             {
-                case "zone50":
-                    break;
-
-                case "zone51":
-                    break;
+                mf.Show(this);
+                ToolStripItem tsi = e.ClickedItem;
+                global.MappingForm.grid25MapHelper(tsi.Tag.ToString());
+            }
+            else
+            {
+                global.MappingForm.ClearSelected();
+                mf.BringToFront();
             }
         }
 
@@ -1199,8 +1294,16 @@ namespace FAD3
                     break;
 
                 case "map":
-                    MapForm fm = new MapForm();
-                    fm.Show(this);
+                    var mf = MapForm.GetInstance();
+                    if (!mf.Visible)
+                    {
+                        mf.Show(this);
+                    }
+                    else
+                    {
+                        mf.BringToFront();
+                        mf.Focus();
+                    }
                     break;
 
                 case "exit":
