@@ -31,6 +31,11 @@ namespace FAD3
             _SubGridStyleList.Add("9");
         }
 
+        public static int MajorGridSizeMeters
+        {
+            get { return _grid25.MajorGridSizeMeters; }
+        }
+
         public static fadSubgridSyle SubGridStyle
         {
             get { return _SubGridStyle; }

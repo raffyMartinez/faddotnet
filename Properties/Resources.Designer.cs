@@ -133,6 +133,16 @@ namespace FAD3.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap gridCursor {
+            get {
+                object obj = ResourceManager.GetObject("gridCursor", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap help_browser {
             get {
                 object obj = ResourceManager.GetObject("help_browser", resourceCulture);
@@ -146,6 +156,16 @@ namespace FAD3.Properties {
         internal static System.Drawing.Bitmap History_16x {
             get {
                 object obj = ResourceManager.GetObject("History_16x", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap im_clear {
+            get {
+                object obj = ResourceManager.GetObject("im_clear", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

@@ -729,19 +729,29 @@ namespace FAD3
             global.mainForm = this;
         }
 
-        private void OngenerateGridMapToolStripMenuItem_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        private void OnGenerateGridMapToolStripMenuItem_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
             e.ClickedItem.Owner.Hide();
-            var mf = MapForm.GetInstance();
+            var mf = MapForm.GetInstance(this);
             if (!mf.Visible)
             {
                 mf.Show(this);
                 ToolStripItem tsi = e.ClickedItem;
-                global.MappingForm.grid25MapHelper(tsi.Tag.ToString());
+                switch (tsi.Tag.ToString())
+                {
+                    case "zone50":
+                        global.MappingForm.createGrid25MajorGrid(FishingGrid.fadUTMZone.utmZone50N);
+                        break;
+
+                    case "zone51":
+                        global.MappingForm.createGrid25MajorGrid(FishingGrid.fadUTMZone.utmZone51N);
+                        break;
+                }
+                Grid25GenerateForm ggf = new Grid25GenerateForm(global.MappingForm);
+                ggf.Show(global.MappingForm);
             }
             else
             {
-                global.MappingForm.ClearSelected();
                 mf.BringToFront();
             }
         }
@@ -1294,7 +1304,7 @@ namespace FAD3
                     break;
 
                 case "map":
-                    var mf = MapForm.GetInstance();
+                    var mf = MapForm.GetInstance(this);
                     if (!mf.Visible)
                     {
                         mf.Show(this);

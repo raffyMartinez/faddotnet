@@ -38,7 +38,7 @@
       </Enum>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>AGaEIRACQMAhMikwgAAgohIAAQIgAwAGACMABIMKAgA=</HashCode>
+      <HashCode>AGaFIRACQMIhMikwggAgohMIAQIgAwAOACMABIMKAgA=</HashCode>
       <FileName>global.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -79,7 +79,7 @@
   <Class Name="FAD3.SamplingForm">
     <Position X="14.25" Y="12.5" Width="2.5" />
     <TypeIdentifier>
-      <HashCode>oTBQ4SNkUGQceICcwUCkBoESEGiCgAgGCEJAYAkIIAg=</HashCode>
+      <HashCode>cCgQpSNkWCAYeJCMwUCEBgUSGGiDgAAGAEJgYIkAYAg=</HashCode>
       <FileName>SamplingForm.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -155,7 +155,7 @@
   <Class Name="FAD3.gear">
     <Position X="6.75" Y="20.25" Width="3.25" />
     <TypeIdentifier>
-      <HashCode>BqCBggAgJABSARoABoCQkAAAAIAAcChEwAQgASMkAQg=</HashCode>
+      <HashCode>BqCBggAgJAFSARoABoCQkAAAAIAAcChEwAQgASMkAQg=</HashCode>
       <FileName>gear.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -203,7 +203,7 @@
   <Class Name="FAD3.names">
     <Position X="10.75" Y="10" Width="2.5" />
     <TypeIdentifier>
-      <HashCode>NAAQAAQACEBAAlACgACggAAAQABIAAAAAEACAQAAQVA=</HashCode>
+      <HashCode>NAAQAAQACEBAAlACgACggAAAAAhIAAAAAEACAQAAQVA=</HashCode>
       <FileName>names.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -225,7 +225,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="ISO_Classes.Coordinate">
-    <Position X="19.25" Y="2.5" Width="2.25" />
+    <Position X="20.25" Y="2.5" Width="2.25" />
     <TypeIdentifier>
       <HashCode>AAAAQAAAAEAAQBAMgCAIAAEACAAAAIBAAABIBAAAAAI=</HashCode>
       <FileName>Coordinate.cs</FileName>
@@ -306,9 +306,17 @@
       </Enum>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>ABBkQAAAADAAGAAAAgAggAABAAACAAAAAAAAARAABAA=</HashCode>
+      <HashCode>ABBkUAABADQAGAAAAgAggAABAAACAAAAAAAAARAABAA=</HashCode>
       <FileName>CatchName.cs</FileName>
     </TypeIdentifier>
+  </Class>
+  <Class Name="FAD3.Grid25MajorGrid">
+    <Position X="21.25" Y="8.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAABgAAAACBEAEAAAIAAAQAAABAQEQCAAABBgIASAAQ=</HashCode>
+      <FileName>Grid25MajorGrid.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
   </Class>
   <Font Name="Segoe UI" Size="9" />
 </ClassDiagram>

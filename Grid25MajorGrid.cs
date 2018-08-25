@@ -1,44 +1,77 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using AxMapWinGIS;
+﻿using AxMapWinGIS;
 using MapWinGIS;
+using System;
+using System.Collections.Generic;
 
 namespace FAD3
 {
-    public class Grid25MapHelper : IDisposable
+    /// <summary>
+    /// 1. creates major grids.
+    /// 2. manages selection, deselection and coloring of major grids
+    /// 3. makes available a List<int> of selected grids
+    /// </summary>
+    public class Grid25MajorGrid : IDisposable
     {
-        private string _utmZone;
+        private static FishingGrid.fadUTMZone _utmZone = FishingGrid.fadUTMZone.utmZone_Undefined;
         private AxMap _axMap;
         private tkWgs84Projection _Grid25Geoprojection;
         private const int GRIDSIZE = 50000;
         private const int CURSORWIDTH = 5;
-        private Shapefile _grid25Grid = null;
+        private Shapefile _shapefileMajorGrid = null;
         private bool _disposed = false;
         private bool _selectionFromSelectBox = false;
         private int[] _selectedShapeIndexes;
         private List<int> _selectedShapeGridNumbers = new List<int>();
 
+        /// <summary>
+        /// returns the projection of the map control
+        /// </summary>
         public tkWgs84Projection Grid25Geoprojection
         {
             get { return _Grid25Geoprojection; }
         }
 
+        public FishingGrid.fadUTMZone UTMZone
+        {
+            get { return _utmZone; }
+            set
+            {
+                _utmZone = value;
+                switch (_utmZone)
+                {
+                    case FishingGrid.fadUTMZone.utmZone50N:
+                        _Grid25Geoprojection = tkWgs84Projection.Wgs84_UTM_zone_50N;
+                        break;
+
+                    case FishingGrid.fadUTMZone.utmZone51N:
+                        _Grid25Geoprojection = tkWgs84Projection.Wgs84_UTM_zone_51N;
+                        break;
+                }
+
+                GenerateMajorGrids();
+            }
+        }
+
+        /// <summary>
+        /// makes available List<int> containing shape index of selected grids
+        /// </summary>
         public List<int> SelectedShapeGridNumbers
         {
             get { return _selectedShapeGridNumbers; }
         }
 
+        /// <summary>
+        /// clears the grid of any selected (red-colored) cells
+        /// </summary>
         public void ClearSelectedGrids()
         {
-            var ifldToGrid = _grid25Grid.FieldIndexByName["toGrid"];
+            var ifldToGrid = _shapefileMajorGrid.FieldIndexByName["toGrid"];
             foreach (var item in _selectedShapeGridNumbers)
             {
-                _grid25Grid.EditCellValue(ifldToGrid, item, "");
+                _shapefileMajorGrid.EditCellValue(ifldToGrid, item, "");
             }
             _selectedShapeGridNumbers.Clear();
-            _grid25Grid.Categories.ApplyExpression(0);
+            _shapefileMajorGrid.Categories.ApplyExpression(0);
             _axMap.Redraw();
         }
 
@@ -54,16 +87,22 @@ namespace FAD3
             {
                 if (disposing)
                 {
+                    _selectedShapeGridNumbers.Clear();
+                    _selectedShapeGridNumbers = null;
                 }
-                _grid25Grid.Close();
+                _shapefileMajorGrid.Close();
+                _shapefileMajorGrid = null;
                 _axMap = null;
                 _disposed = true;
             }
         }
 
+        /// <summary>
+        /// returns the grid25 major grid shapefile
+        /// </summary>
         public Shapefile Grid25Grid
         {
-            get { return _grid25Grid; }
+            get { return _shapefileMajorGrid; }
         }
 
         /// <summary>
@@ -71,9 +110,8 @@ namespace FAD3
         /// </summary>
         /// <param name="mapControl"></param>
         /// <param name="utmZone"></param>
-        public Grid25MapHelper(AxMap mapControl, string utmZone)
+        public Grid25MajorGrid(AxMap mapControl)
         {
-            _utmZone = utmZone;
             _axMap = mapControl;
 
             _axMap.SendMouseUp = true;
@@ -81,23 +119,11 @@ namespace FAD3
             _axMap.SendSelectBoxFinal = true;
 
             _axMap.MouseUpEvent += OnMapMouseUp;
-            _axMap.MouseDownEvent += OmMapMouseDown;
+            _axMap.MouseDownEvent += OnMapMouseDown;
             _axMap.SelectBoxFinal += OnMapSelectBoxFinal;
             _axMap.DblClick += OnMapDoubleClick;
             _axMap.CursorMode = tkCursorMode.cmSelection;
-
-            switch (_utmZone)
-            {
-                case "zone50":
-                    _Grid25Geoprojection = tkWgs84Projection.Wgs84_UTM_zone_50N;
-                    break;
-
-                case "zone51":
-                    _Grid25Geoprojection = tkWgs84Projection.Wgs84_UTM_zone_51N;
-                    break;
-            }
-
-            GenerateMajorGrids();
+            _utmZone = FishingGrid.fadUTMZone.utmZone51N;
         }
 
         /// <summary>
@@ -111,9 +137,9 @@ namespace FAD3
             var isTouching = false;
             var cellValue = "";
             var proceed = true;
-            if (_grid25Grid.NumSelected == 1)
+            if (_shapefileMajorGrid.NumSelected == 1)
             {
-                var ifldToGrid = _grid25Grid.FieldIndexByName["toGrid"];
+                var ifldToGrid = _shapefileMajorGrid.FieldIndexByName["toGrid"];
 
                 if (_selectedShapeGridNumbers.Contains(_selectedShapeIndexes[0]))
                 {
@@ -126,13 +152,13 @@ namespace FAD3
                     //test whether a new selected grid touches those previously selected
                     foreach (var item in _selectedShapeGridNumbers)
                     {
-                        isTouching = _grid25Grid.Shape[item].Touches(_grid25Grid.Shape[_selectedShapeIndexes[0]]);
+                        isTouching = _shapefileMajorGrid.Shape[item].Touches(_shapefileMajorGrid.Shape[_selectedShapeIndexes[0]]);
                         if (isTouching) break;
                     }
 
                     //if List<>int_selectedShapeGridNumbers is empty or
                     //a new selected grid touches previously selected grid,
-                    //then it is added to the selection (red colored)
+                    //then toGrid column content is changed from "" to "T"
                     if (_selectedShapeGridNumbers.Count == 0 || isTouching)
                     {
                         cellValue = "T";
@@ -145,18 +171,18 @@ namespace FAD3
                 }
 
                 //categorize grids to change fill color
-                if (proceed && _grid25Grid.EditCellValue(ifldToGrid, _selectedShapeIndexes[0], cellValue))
+                if (proceed && _shapefileMajorGrid.EditCellValue(ifldToGrid, _selectedShapeIndexes[0], cellValue))
                 {
                     //shapes with cellvalue of "T", upon categorizing will have a light red fill color
                     //otherwise it will have no fill color
-                    _grid25Grid.Categories.ApplyExpression(0);
-                    _grid25Grid.SelectNone();
+                    _shapefileMajorGrid.Categories.ApplyExpression(0);
+                    _shapefileMajorGrid.SelectNone();
                     _axMap.Redraw();
                 }
             }
         }
 
-        private void OmMapMouseDown(object sender, _DMapEvents_MouseDownEvent e)
+        private void OnMapMouseDown(object sender, _DMapEvents_MouseDownEvent e)
         {
             _selectionFromSelectBox = false;
         }
@@ -180,7 +206,7 @@ namespace FAD3
             ext.SetBounds(extL, extB, 0, extR, extT, 0);
 
             //pass the extent to SelectGrids function
-            //FromSelectionBox is true because dragged a selection box
+            //FromSelectionBox is true because we dragged a selection box
             SelectGrids(ext, SelectionFromSelectBox: true);
         }
 
@@ -192,12 +218,12 @@ namespace FAD3
         /// <param name="SelectionFromSelectBox"></param>
         private void SelectGrids(Extents ext, bool SelectionFromSelectBox = false)
         {
-            var ifldToGrid = _grid25Grid.FieldIndexByName["toGrid"];
+            var ifldToGrid = _shapefileMajorGrid.FieldIndexByName["toGrid"];
             _selectionFromSelectBox = SelectionFromSelectBox;
 
             //selects the grid using the extent
             object selectionResult = new object();
-            if (_grid25Grid.SelectShapes(ext, 0, SelectMode.INTERSECTION, ref selectionResult))
+            if (_shapefileMajorGrid.SelectShapes(ext, 0, SelectMode.INTERSECTION, ref selectionResult))
             {
                 _selectedShapeIndexes = (int[])selectionResult;
 
@@ -210,19 +236,19 @@ namespace FAD3
                         if (_selectedShapeGridNumbers.Count > 0)
                         {
                             foreach (var item in _selectedShapeGridNumbers)
-                                _grid25Grid.EditCellValue(ifldToGrid, item, "");
+                                _shapefileMajorGrid.EditCellValue(ifldToGrid, item, "");
                         }
                         _selectedShapeGridNumbers.Clear();
 
                         //adds selected shapes to a List<int> and sets toGrid column to "T"
                         for (int n = 0; n < _selectedShapeIndexes.Length; n++)
                         {
-                            _grid25Grid.EditCellValue(ifldToGrid, _selectedShapeIndexes[n], "T");
+                            _shapefileMajorGrid.EditCellValue(ifldToGrid, _selectedShapeIndexes[n], "T");
                             _selectedShapeGridNumbers.Add(_selectedShapeIndexes[n]);
                         }
 
                         //categorizes grid and makes those with "T" in toGrid column  have a light red fill color
-                        _grid25Grid.Categories.ApplyExpression(0);
+                        _shapefileMajorGrid.Categories.ApplyExpression(0);
                     }
 
                     //if the selection was made by clicking on a grid
@@ -230,12 +256,12 @@ namespace FAD3
                     {
                         //sets the color of the selected grid
                         Grid25Grid.SelectNone();
-                        _grid25Grid.ShapeSelected[_selectedShapeIndexes[0]] = true;
-                        _grid25Grid.SelectionAppearance = tkSelectionAppearance.saDrawingOptions;
-                        _grid25Grid.SelectionDrawingOptions.FillColor = new Utils().ColorByName(tkMapColor.Yellow);
-                        _grid25Grid.SelectionDrawingOptions.FillTransparency = 75;
-                        _grid25Grid.SelectionDrawingOptions.LineColor = new Utils().ColorByName(tkMapColor.Red);
-                        _grid25Grid.SelectionDrawingOptions.LineWidth = 2;
+                        _shapefileMajorGrid.ShapeSelected[_selectedShapeIndexes[0]] = true;
+                        _shapefileMajorGrid.SelectionAppearance = tkSelectionAppearance.saDrawingOptions;
+                        _shapefileMajorGrid.SelectionDrawingOptions.FillColor = new Utils().ColorByName(tkMapColor.Yellow);
+                        _shapefileMajorGrid.SelectionDrawingOptions.FillTransparency = 75;
+                        _shapefileMajorGrid.SelectionDrawingOptions.LineColor = new Utils().ColorByName(tkMapColor.Red);
+                        _shapefileMajorGrid.SelectionDrawingOptions.LineWidth = 2;
                     }
                     _axMap.Redraw();
                 }
@@ -362,7 +388,7 @@ namespace FAD3
 
             if (sf.NumShapes > 0)
             {
-                _grid25Grid = sf;
+                _shapefileMajorGrid = sf;
                 ConfigureGridAppearance();
             }
         }
@@ -372,7 +398,7 @@ namespace FAD3
         /// </summary>
         private void ConfigureGridAppearance()
         {
-            _grid25Grid.With(sf =>
+            _shapefileMajorGrid.With(sf =>
             {
                 //appearance for unselected grids
                 sf.DefaultDrawingOptions.FillVisible = false;

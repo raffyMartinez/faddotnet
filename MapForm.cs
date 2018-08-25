@@ -1,43 +1,58 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
+﻿using MapWinGIS;
+using System;
 using System.Windows.Forms;
-using AxMapWinGIS;
-using MapWinGIS;
 
 namespace FAD3
 {
     public partial class MapForm : Form
     {
         private static MapForm _instance;
-        private Grid25MapHelper _grid25MapHelper;
+        private Grid25MajorGrid _grid25MajorGrid;
+        private Grid25MinorGrid _grid25MinorGrid;
+        private Form _parentForm;
 
-        public static MapForm GetInstance()
+        public static MapForm GetInstance(Form parentForm)
         {
-            if (_instance == null) _instance = new MapForm();
+            if (_instance == null) _instance = new MapForm(parentForm);
             return _instance;
         }
 
-        public void grid25MapHelper(string UTMZone)
+        private void CleanUp()
         {
-            _grid25MapHelper = new Grid25MapHelper(axMap, UTMZone);
-            if (_grid25MapHelper.Grid25Grid != null)
-            {
-                axMap.GeoProjection.SetWgs84Projection(_grid25MapHelper.Grid25Geoprojection);
-                axMap.MapUnits = tkUnitsOfMeasure.umMeters;
-                axMap.AddLayer(_grid25MapHelper.Grid25Grid, true);
-
-                axMap.Refresh();
-            }
+            _grid25MajorGrid.Dispose();
+            _grid25MajorGrid = null;
+            _grid25MinorGrid.Dispose();
+            _grid25MinorGrid = null;
         }
 
-        public MapForm()
+        public Grid25MinorGrid grid25MinorGrid
+        {
+            get { return _grid25MinorGrid; }
+        }
+
+        public Grid25MajorGrid grid25MajorGrid
+        {
+            get { return _grid25MajorGrid; }
+        }
+
+        public void createGrid25MajorGrid(FishingGrid.fadUTMZone UTMZone)
+        {
+            _grid25MajorGrid = new Grid25MajorGrid(axMap);
+            _grid25MajorGrid.UTMZone = UTMZone;
+
+            axMap.GeoProjection.SetWgs84Projection(_grid25MajorGrid.Grid25Geoprojection);
+            axMap.MapUnits = tkUnitsOfMeasure.umMeters;
+            axMap.AddLayer(_grid25MajorGrid.Grid25Grid, true);
+
+            _grid25MinorGrid = new Grid25MinorGrid(axMap, _grid25MajorGrid.Grid25Geoprojection, _grid25MajorGrid);
+
+            axMap.Refresh();
+        }
+
+        public MapForm(Form parentForm)
         {
             InitializeComponent();
+            _parentForm = parentForm;
         }
 
         private void frmMap_Load(object sender, EventArgs e)
@@ -48,11 +63,7 @@ namespace FAD3
         private void frmMap_FormClosed(object sender, FormClosedEventArgs e)
         {
             global.MappingForm = null;
-            if (_grid25MapHelper != null)
-            {
-                _grid25MapHelper.Dispose();
-                _grid25MapHelper = null;
-            }
+            CleanUp();
             _instance = null;
         }
 

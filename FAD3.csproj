@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
   <PropertyGroup>
     <ProjectGuid>{244B71F0-A919-46E9-B27F-3352D54DCD78}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -8,7 +8,8 @@
     <RootNamespace>FAD3</RootNamespace>
     <AssemblyName>FAD3</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>c:\deploy\fad\</PublishUrl>
@@ -69,11 +70,15 @@
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <LangVersion>7.2</LangVersion>
     <CodeAnalysisRuleSet>BasicCorrectnessRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <LangVersion>7.2</LangVersion>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="Microsoft.VisualBasic.PowerPacks, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -82,9 +87,10 @@
     <Reference Include="System.Data.DataSetExtensions">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>packages\System.ValueTuple.4.5.0\lib\portable-net40+sl4+win8+wp8\System.ValueTuple.dll</HintPath>
+      <HintPath>packages\System.ValueTuple.4.5.0\lib\net461\System.ValueTuple.dll</HintPath>
     </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Forms.DataVisualization" />
@@ -137,7 +143,14 @@
       <DependentUpon>FishingGroundExtentsForm.cs</DependentUpon>
     </Compile>
     <Compile Include="GMSLineClass.cs" />
-    <Compile Include="Grid25MapHelper.cs" />
+    <Compile Include="Grid25GenerateForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Grid25GenerateForm.Designer.cs">
+      <DependentUpon>Grid25GenerateForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Grid25MajorGrid.cs" />
+    <Compile Include="Grid25MinorGrid.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="extension.cs" />
     <Compile Include="FishingGroundDefinitionForm.cs">
@@ -326,6 +339,9 @@
     <EmbeddedResource Include="GearCodesUsageForm.resx">
       <DependentUpon>GearCodesUsageForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Grid25GenerateForm.resx">
+      <DependentUpon>Grid25GenerateForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MapForm.resx">
       <DependentUpon>MapForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -457,6 +473,8 @@
     <Content Include="Icon1.ico" />
     <None Include="Resources\help-browser.png" />
     <Content Include="resource raw\UITable.xml" />
+    <None Include="Resources\gridCursor.bmp" />
+    <None Include="Resources\im_clear.bmp" />
     <Content Include="Resources\internet-web-browser.png" />
     <None Include="Resources\system-file-manager.png" />
     <None Include="Resources\layerAdd.bmp" />

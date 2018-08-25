@@ -372,7 +372,7 @@ namespace FAD3
             this.generateGridMapToolStripMenuItem.Name = "generateGridMapToolStripMenuItem";
             this.generateGridMapToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
             this.generateGridMapToolStripMenuItem.Text = "Generate grid map";
-            this.generateGridMapToolStripMenuItem.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OngenerateGridMapToolStripMenuItem_DropDownItemClicked);
+            this.generateGridMapToolStripMenuItem.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnGenerateGridMapToolStripMenuItem_DropDownItemClicked);
             // 
             // uTMZone50ToolStripMenuItem
             // 
