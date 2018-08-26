@@ -126,7 +126,7 @@
       </Struct>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>CBIBAAAQQZLCEABCIAyAIZAQAFCQACAIIAAFoIAGQaA=</HashCode>
+      <HashCode>CBIBAAAQQZLCEABCIAyAIZAQAFSQACAIIAAFoIAGQaA=</HashCode>
       <FileName>FishingGrid.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -313,8 +313,16 @@
   <Class Name="FAD3.Grid25MajorGrid">
     <Position X="21.25" Y="8.75" Width="2.25" />
     <TypeIdentifier>
-      <HashCode>AAABgAAAACBEAEAAAIAAAQAAABAQEQCAAABBgIASAAQ=</HashCode>
+      <HashCode>AAABwAAAACBEAEAAAIABAQAAABAQEQCIAABBgJASAAQ=</HashCode>
       <FileName>Grid25MajorGrid.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="FAD3.Grid25MinorGrid">
+    <Position X="23.75" Y="8.75" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAFAAAAACAkAEAAAAAAAQAAAAAAAAAAAAABAAgCggA=</HashCode>
+      <FileName>Grid25MinorGrid.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>

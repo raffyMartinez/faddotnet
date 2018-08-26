@@ -8,7 +8,6 @@ namespace FAD3
     {
         private static MapForm _instance;
         private Grid25MajorGrid _grid25MajorGrid;
-        private Grid25MinorGrid _grid25MinorGrid;
         private Form _parentForm;
 
         public static MapForm GetInstance(Form parentForm)
@@ -21,13 +20,6 @@ namespace FAD3
         {
             _grid25MajorGrid.Dispose();
             _grid25MajorGrid = null;
-            _grid25MinorGrid.Dispose();
-            _grid25MinorGrid = null;
-        }
-
-        public Grid25MinorGrid grid25MinorGrid
-        {
-            get { return _grid25MinorGrid; }
         }
 
         public Grid25MajorGrid grid25MajorGrid
@@ -44,8 +36,6 @@ namespace FAD3
             axMap.MapUnits = tkUnitsOfMeasure.umMeters;
             axMap.AddLayer(_grid25MajorGrid.Grid25Grid, true);
 
-            _grid25MinorGrid = new Grid25MinorGrid(axMap, _grid25MajorGrid.Grid25Geoprojection, _grid25MajorGrid);
-
             axMap.Refresh();
         }
 
@@ -58,13 +48,16 @@ namespace FAD3
         private void frmMap_Load(object sender, EventArgs e)
         {
             global.MappingForm = this;
+            global.LoadFormSettings(this);
         }
 
         private void frmMap_FormClosed(object sender, FormClosedEventArgs e)
         {
             global.MappingForm = null;
             CleanUp();
+
             _instance = null;
+            global.SaveFormSettings(this);
         }
 
         private void toolStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)

@@ -151,6 +151,7 @@
     </Compile>
     <Compile Include="Grid25MajorGrid.cs" />
     <Compile Include="Grid25MinorGrid.cs" />
+    <Compile Include="Grid25MinorGridLabels.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="extension.cs" />
     <Compile Include="FishingGroundDefinitionForm.cs">

@@ -57,11 +57,11 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.shapeContainer1 = new Microsoft.VisualBasic.PowerPacks.ShapeContainer();
-            this.shapeMinorGridLabelColor = new Microsoft.VisualBasic.PowerPacks.RectangleShape();
-            this.shapeMajorGridLabelColor = new Microsoft.VisualBasic.PowerPacks.RectangleShape();
-            this.shapeBorderColor = new Microsoft.VisualBasic.PowerPacks.RectangleShape();
-            this.shapeMajorGridLineColor = new Microsoft.VisualBasic.PowerPacks.RectangleShape();
             this.shapeMinorGridLineColor = new Microsoft.VisualBasic.PowerPacks.RectangleShape();
+            this.shapeMajorGridLineColor = new Microsoft.VisualBasic.PowerPacks.RectangleShape();
+            this.shapeBorderColor = new Microsoft.VisualBasic.PowerPacks.RectangleShape();
+            this.shapeMajorGridLabelColor = new Microsoft.VisualBasic.PowerPacks.RectangleShape();
+            this.shapeMinorGridLabelColor = new Microsoft.VisualBasic.PowerPacks.RectangleShape();
             this.buttonClose = new System.Windows.Forms.Button();
             this.imList = new System.Windows.Forms.ImageList(this.components);
             this.buttonClear = new System.Windows.Forms.Button();
@@ -330,23 +330,11 @@
             this.shapeContainer1.TabIndex = 25;
             this.shapeContainer1.TabStop = false;
             // 
-            // shapeMinorGridLabelColor
+            // shapeMinorGridLineColor
             // 
-            this.shapeMinorGridLabelColor.Location = new System.Drawing.Point(228, 116);
-            this.shapeMinorGridLabelColor.Name = "shapeMinorGridLabelColor";
-            this.shapeMinorGridLabelColor.Size = new System.Drawing.Size(31, 24);
-            // 
-            // shapeMajorGridLabelColor
-            // 
-            this.shapeMajorGridLabelColor.Location = new System.Drawing.Point(228, 158);
-            this.shapeMajorGridLabelColor.Name = "shapeMajorGridLabelColor";
-            this.shapeMajorGridLabelColor.Size = new System.Drawing.Size(31, 24);
-            // 
-            // shapeBorderColor
-            // 
-            this.shapeBorderColor.Location = new System.Drawing.Point(228, 202);
-            this.shapeBorderColor.Name = "shapeBorderColor";
-            this.shapeBorderColor.Size = new System.Drawing.Size(31, 24);
+            this.shapeMinorGridLineColor.Location = new System.Drawing.Point(228, 287);
+            this.shapeMinorGridLineColor.Name = "shapeMinorGridLineColor";
+            this.shapeMinorGridLineColor.Size = new System.Drawing.Size(31, 24);
             // 
             // shapeMajorGridLineColor
             // 
@@ -354,11 +342,23 @@
             this.shapeMajorGridLineColor.Name = "shapeMajorGridLineColor";
             this.shapeMajorGridLineColor.Size = new System.Drawing.Size(31, 24);
             // 
-            // shapeMinorGridLineColor
+            // shapeBorderColor
             // 
-            this.shapeMinorGridLineColor.Location = new System.Drawing.Point(228, 287);
-            this.shapeMinorGridLineColor.Name = "shapeMinorGridLineColor";
-            this.shapeMinorGridLineColor.Size = new System.Drawing.Size(31, 24);
+            this.shapeBorderColor.Location = new System.Drawing.Point(228, 202);
+            this.shapeBorderColor.Name = "shapeBorderColor";
+            this.shapeBorderColor.Size = new System.Drawing.Size(31, 24);
+            // 
+            // shapeMajorGridLabelColor
+            // 
+            this.shapeMajorGridLabelColor.Location = new System.Drawing.Point(228, 158);
+            this.shapeMajorGridLabelColor.Name = "shapeMajorGridLabelColor";
+            this.shapeMajorGridLabelColor.Size = new System.Drawing.Size(31, 24);
+            // 
+            // shapeMinorGridLabelColor
+            // 
+            this.shapeMinorGridLabelColor.Location = new System.Drawing.Point(228, 116);
+            this.shapeMinorGridLabelColor.Name = "shapeMinorGridLabelColor";
+            this.shapeMinorGridLabelColor.Size = new System.Drawing.Size(31, 24);
             // 
             // buttonClose
             // 
@@ -374,29 +374,27 @@
             // 
             this.imList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imList.ImageStream")));
             this.imList.TransparentColor = System.Drawing.Color.White;
-            this.imList.Images.SetKeyName(0, "gridCursor.bmp");
-            this.imList.Images.SetKeyName(1, "im_clear.bmp");
+            this.imList.Images.SetKeyName(0, "gridCursor");
+            this.imList.Images.SetKeyName(1, "clearSelection");
             // 
             // buttonClear
             // 
-            this.buttonClear.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonClear.ImageIndex = 1;
             this.buttonClear.ImageList = this.imList;
-            this.buttonClear.Location = new System.Drawing.Point(204, 50);
+            this.buttonClear.Location = new System.Drawing.Point(203, 50);
             this.buttonClear.Name = "buttonClear";
-            this.buttonClear.Size = new System.Drawing.Size(30, 24);
+            this.buttonClear.Size = new System.Drawing.Size(24, 24);
             this.buttonClear.TabIndex = 3;
             this.buttonClear.UseVisualStyleBackColor = true;
             this.buttonClear.Click += new System.EventHandler(this.OnButtons_Click);
             // 
             // buttonGrid
             // 
-            this.buttonGrid.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonGrid.ImageIndex = 0;
             this.buttonGrid.ImageList = this.imList;
-            this.buttonGrid.Location = new System.Drawing.Point(168, 50);
+            this.buttonGrid.Location = new System.Drawing.Point(177, 50);
             this.buttonGrid.Name = "buttonGrid";
-            this.buttonGrid.Size = new System.Drawing.Size(30, 24);
+            this.buttonGrid.Size = new System.Drawing.Size(24, 24);
             this.buttonGrid.TabIndex = 2;
             this.buttonGrid.UseVisualStyleBackColor = true;
             this.buttonGrid.Click += new System.EventHandler(this.OnButtons_Click);
@@ -418,6 +416,7 @@
             this.Name = "Grid25GenerateForm";
             this.Text = "Grid25GenerateForm";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Grid25GenerateForm_FormClosed);
+            this.Load += new System.EventHandler(this.Grid25GenerateForm_Load);
             this.groupLabels.ResumeLayout(false);
             this.groupLabels.PerformLayout();
             this.ResumeLayout(false);

@@ -15,6 +15,7 @@ namespace FAD3
         private bool _formCloseDone = false;
         private MapForm _parentForm;
         private Grid25MajorGrid _grid25MajorGrid;
+        private bool _definingMinorGrids = false;
 
         public static Grid25GenerateForm GetInstance(MapForm parent)
         {
@@ -34,14 +35,32 @@ namespace FAD3
             switch (((Button)sender).Name)
             {
                 case "buttonGrid":
-                    if (_grid25MajorGrid.SelectedShapeGridNumbers.Count > 0
-                        && txtMinorGridLabelDistance.Text.Length > 0
+                    _definingMinorGrids = false;
+                    if (txtMinorGridLabelDistance.Text.Length > 0
                         && txtMinorGridLabelSize.Text.Length > 0)
                     {
+                        var listSidesToLabel = new List<string>();
+                        if (chkLeft.Checked) listSidesToLabel.Add("left");
+                        if (chkTop.Checked) listSidesToLabel.Add("top");
+                        if (chkRight.Checked) listSidesToLabel.Add("right");
+                        if (chkBottom.Checked) listSidesToLabel.Add("bottom");
+                        if (listSidesToLabel.Count == 0) listSidesToLabel.Add("none");
+
+                        //pass label size, label distance, and icon hanlde to majorgrid
+                        if (_grid25MajorGrid.DefineMinorGrid(int.Parse(txtMinorGridLabelDistance.Text),
+                            int.Parse(txtMinorGridLabelSize.Text), listSidesToLabel, (int)((Bitmap)imList.Images["gridCursor"]).GetHicon()))
+                        {
+                            _definingMinorGrids = true;
+                        }
+                        else
+                        {
+                            MessageBox.Show("No selection in major grid", "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
                     }
                     else
                     {
-                        MessageBox.Show("No selection in major grid", "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBox.Show("Provide minor grid label distance and minor grid label size", "Validation error",
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     break;
 
@@ -64,6 +83,18 @@ namespace FAD3
             }
             _parentForm = null;
             _instance = null;
+            global.SaveFormSettings(this);
+        }
+
+        private void Grid25GenerateForm_Load(object sender, EventArgs e)
+        {
+            txtMinorGridLabelDistance.Text = "1000";
+            txtMinorGridLabelSize.Text = "8";
+            chkLeft.Checked = true;
+            chkTop.Checked = true;
+            chkRight.Checked = true;
+            chkBottom.Checked = true;
+            global.LoadFormSettings(this, true);
         }
     }
 }

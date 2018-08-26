@@ -36,6 +36,11 @@ namespace FAD3
             get { return _grid25.MajorGridSizeMeters; }
         }
 
+        public static int MinorGridSizeMeters
+        {
+            get { return _grid25.MinorGridCellSizeMeters; }
+        }
+
         public static fadSubgridSyle SubGridStyle
         {
             get { return _SubGridStyle; }
@@ -317,23 +322,22 @@ namespace FAD3
             _grid25.UTMZone = Zone;
             switch (_grid25.UTMZone)
             {
-                case fadUTMZone.utmZone51N:
-                    _grid25.MajorGridXOrigin = -500000;
-                    _grid25.MajorGridYOrigin = 350000;
-                    _grid25.MajorGridColumns = 30;
-                    _grid25.MaxGridNumber = 1230;
-                    _grid25.CellSize = 2000;
-                    break;
-
                 case fadUTMZone.utmZone50N:
                     _grid25.MajorGridXOrigin = 300000;
                     _grid25.MajorGridYOrigin = 800000;
                     _grid25.MajorGridColumns = 15;
                     _grid25.MaxGridNumber = 270;
-                    _grid25.CellSize = 2000;
+                    break;
+
+                case fadUTMZone.utmZone51N:
+                    _grid25.MajorGridXOrigin = -500000;
+                    _grid25.MajorGridYOrigin = 350000;
+                    _grid25.MajorGridColumns = 30;
+                    _grid25.MaxGridNumber = 1230;
                     break;
             }
             _grid25.MajorGridSizeMeters = 50000;
+            _grid25.MinorGridCellSizeMeters = 2000;
         }
 
         /// <summary>
@@ -783,7 +787,7 @@ namespace FAD3
         public struct Grid25Struct
         {
             private static List<string> _GridSet;
-            public int CellSize { get; set; }
+            public int MinorGridCellSizeMeters { get; set; }
             public fadUTMZone UTMZone { get; set; }
             public int MajorGridColumns { get; set; }
             public int MaxGridNumber { get; set; }
