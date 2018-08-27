@@ -16,6 +16,7 @@ namespace FAD3
         private MapForm _parentForm;
         private Grid25MajorGrid _grid25MajorGrid;
         private bool _definingMinorGrids = false;
+        private Dictionary<string, uint> labelAndGridProperties = new Dictionary<string, uint>();
 
         public static Grid25GenerateForm GetInstance(MapForm parent)
         {
@@ -28,6 +29,29 @@ namespace FAD3
             InitializeComponent();
             _parentForm = parent;
             _grid25MajorGrid = parent.grid25MajorGrid;
+        }
+
+        private uint ColorToUInt(Color c)
+        {
+            return (uint)(((c.A << 24) | (c.R << 16) | (c.G << 8) | c.B) & 0xffffffffL);
+        }
+
+        private void SetupDictionary()
+        {
+            labelAndGridProperties.Clear();
+            labelAndGridProperties.Add("minorGridLabelDistance", uint.Parse(txtMinorGridLabelDistance.Text));
+            labelAndGridProperties.Add("minorGridLabelSize", uint.Parse(txtMinorGridLabelSize.Text));
+            labelAndGridProperties.Add("majorGridLabelSize", uint.Parse(txtMajorGridLabelSize.Text));
+            labelAndGridProperties.Add("borderThickness", uint.Parse(txtBorderThickness.Text));
+            labelAndGridProperties.Add("majorGridThickness", uint.Parse(txtMajorGridThickness.Text));
+            labelAndGridProperties.Add("minorGridThickness", uint.Parse(txtMinorGridThickness.Text));
+            labelAndGridProperties.Add("minorGridLabelColor", ColorToUInt(shapeMinorGridLabelColor.BackColor));
+            labelAndGridProperties.Add("majorGridLabelColor", ColorToUInt(shapeMajorGridLabelColor.BackColor));
+            labelAndGridProperties.Add("borderColor", ColorToUInt(shapeBorderColor.BackColor));
+            labelAndGridProperties.Add("majorGridLineColor", ColorToUInt(shapeMajorGridLineColor.BackColor));
+            labelAndGridProperties.Add("minorGridLineColor", ColorToUInt(shapeMinorGridLineColor.BackColor));
+            labelAndGridProperties.Add("minorGridLabelFontBold", (uint)(chkBold.Checked ? 1 : 0));
+            labelAndGridProperties.Add("minorGridLabelWrapped", (uint)(chkWrapLabels.Checked ? 1 : 0));
         }
 
         private void OnButtons_Click(object sender, EventArgs e)
@@ -46,10 +70,13 @@ namespace FAD3
                         if (chkBottom.Checked) listSidesToLabel.Add("bottom");
                         if (listSidesToLabel.Count == 0) listSidesToLabel.Add("none");
 
-                        //pass label size, label distance, and icon hanlde to majorgrid
+                        SetupDictionary();
+
                         if (_grid25MajorGrid.DefineMinorGrid(int.Parse(txtMinorGridLabelDistance.Text),
                             int.Parse(txtMinorGridLabelSize.Text), listSidesToLabel, (int)((Bitmap)imList.Images["gridCursor"]).GetHicon()))
                         {
+                            _grid25MajorGrid.LabelAndGridProperties = labelAndGridProperties;
+
                             _definingMinorGrids = true;
                         }
                         else
@@ -90,6 +117,10 @@ namespace FAD3
         {
             txtMinorGridLabelDistance.Text = "1000";
             txtMinorGridLabelSize.Text = "8";
+            txtMajorGridLabelSize.Text = "12";
+            txtBorderThickness.Text = "2";
+            txtMajorGridThickness.Text = "2";
+            txtMinorGridThickness.Text = "1";
             chkLeft.Checked = true;
             chkTop.Checked = true;
             chkRight.Checked = true;

@@ -332,30 +332,38 @@
             // 
             // shapeMinorGridLineColor
             // 
+            this.shapeMinorGridLineColor.FillStyle = Microsoft.VisualBasic.PowerPacks.FillStyle.Solid;
             this.shapeMinorGridLineColor.Location = new System.Drawing.Point(228, 287);
             this.shapeMinorGridLineColor.Name = "shapeMinorGridLineColor";
             this.shapeMinorGridLineColor.Size = new System.Drawing.Size(31, 24);
             // 
             // shapeMajorGridLineColor
             // 
+            this.shapeMajorGridLineColor.FillColor = System.Drawing.Color.Red;
+            this.shapeMajorGridLineColor.FillStyle = Microsoft.VisualBasic.PowerPacks.FillStyle.Solid;
             this.shapeMajorGridLineColor.Location = new System.Drawing.Point(228, 244);
             this.shapeMajorGridLineColor.Name = "shapeMajorGridLineColor";
             this.shapeMajorGridLineColor.Size = new System.Drawing.Size(31, 24);
             // 
             // shapeBorderColor
             // 
+            this.shapeBorderColor.FillStyle = Microsoft.VisualBasic.PowerPacks.FillStyle.Solid;
             this.shapeBorderColor.Location = new System.Drawing.Point(228, 202);
             this.shapeBorderColor.Name = "shapeBorderColor";
             this.shapeBorderColor.Size = new System.Drawing.Size(31, 24);
             // 
             // shapeMajorGridLabelColor
             // 
+            this.shapeMajorGridLabelColor.FillColor = System.Drawing.Color.Red;
+            this.shapeMajorGridLabelColor.FillStyle = Microsoft.VisualBasic.PowerPacks.FillStyle.Solid;
             this.shapeMajorGridLabelColor.Location = new System.Drawing.Point(228, 158);
             this.shapeMajorGridLabelColor.Name = "shapeMajorGridLabelColor";
             this.shapeMajorGridLabelColor.Size = new System.Drawing.Size(31, 24);
             // 
             // shapeMinorGridLabelColor
             // 
+            this.shapeMinorGridLabelColor.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.shapeMinorGridLabelColor.FillStyle = Microsoft.VisualBasic.PowerPacks.FillStyle.Solid;
             this.shapeMinorGridLabelColor.Location = new System.Drawing.Point(228, 116);
             this.shapeMinorGridLabelColor.Name = "shapeMinorGridLabelColor";
             this.shapeMinorGridLabelColor.Size = new System.Drawing.Size(31, 24);

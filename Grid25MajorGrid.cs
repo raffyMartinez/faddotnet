@@ -13,25 +13,41 @@ namespace FAD3
     /// </summary>
     public class Grid25MajorGrid : IDisposable
     {
-        private static FishingGrid.fadUTMZone _utmZone = FishingGrid.fadUTMZone.utmZone_Undefined;
+        private static FishingGrid.fadUTMZone _utmZone =
+                FishingGrid.fadUTMZone.utmZone_Undefined;
         private AxMap _axMap;
         private tkWgs84Projection _Grid25Geoprojection;
         private const int GRIDSIZE = 50000;
         private const int CURSORWIDTH = 5;
-        private Shapefile _shapefileMajorGrid;
-        private Shapefile _shapefileMajorGridIntersect;
-        private Shapefile _shapefileBoundingRectangle;
+        private Grid25MinorGrid _grid25MinorGrid;                               //helper class for managing minor grids
+        private Grid25LabelManager _grid25LabelManager;                         //helper class for managing labels
+        private Shapefile _shapefileMajorGrid;                                  //shapefile of major grids
+        private Shapefile _shapefileMajorGridIntersect;                         //shapefile of major grid intersected with extent of minor grids
+        private Shapefile _shapefileBoundingRectangle;                          //shapefile of MBR of fishing grid
         private bool _disposed = false;
         private bool _selectionFromSelectBox = false;
-        private int[] _selectedShapeIndexes;
-        private List<int> _listSelectedShapeGridNumbers = new List<int>();
-        private List<string> _listSidesToLabel;
+        private int[] _selectedShapeIndexes;                                    //holds the indexes of selected shapes
+        private List<int> _listSelectedShapeGridNumbers = new List<int>();      //list major grid numbers
+        private List<string> _listSidesToLabel;                                 //list of sides to be labelled
         private Extents _selectedShapesExtent = new Extents();
         private bool _inDefineMinorGrid;
-        private Grid25MinorGrid _grid25MinorGrid;
-        private Grid25MinorGridLabels _grid25MinorGridLabels;
         private int _minorGridLabelDistance;
         private int _minorGridLabelSize;
+        private Dictionary<string, uint> _gridAndLabelProperties;
+        private MapLayers _mapLayers;
+        private List<int> _listGridLayers = new List<int>();                        //list containing layer handle of grid layers
+
+        public MapLayers mapLayers
+        {
+            get { return _mapLayers; }
+            set { _mapLayers = value; }
+        }
+
+        public Dictionary<string, uint> LabelAndGridProperties
+        {
+            get { return _gridAndLabelProperties; }
+            set { _gridAndLabelProperties = value; }
+        }
 
         /// <summary>
         /// returns the projection of the map control
@@ -117,19 +133,21 @@ namespace FAD3
             _inDefineMinorGrid = false;
             _axMap.MapCursor = tkCursor.crsrMapDefault;
 
-            if (_grid25MinorGrid != null && _grid25MinorGrid.MinorGridLinesShapeFile != null)
-                _grid25MinorGrid.MinorGridLinesShapeFile.EditClear();
+            foreach (var hLyr in _listGridLayers)
+            {
+                switch (_axMap.get_LayerName(hLyr))
+                {
+                    case "Labels":
+                        _grid25LabelManager.ClearLabels();
+                        break;
 
-            if (_grid25MinorGridLabels != null)
-                _grid25MinorGridLabels.ClearLabels();
-
-            if (_shapefileBoundingRectangle != null)
-                _shapefileBoundingRectangle.EditClear();
-
-            if (_shapefileMajorGridIntersect != null)
-                _shapefileMajorGridIntersect.EditClear();
-
-            _axMap.Redraw();
+                    default:
+                        _axMap.get_Shapefile(hLyr).EditClear();
+                        break;
+                }
+                _mapLayers.RemoveLayer(hLyr);
+            }
+            _listGridLayers.Clear();
         }
 
         public void Dispose()
@@ -160,6 +178,11 @@ namespace FAD3
         public Shapefile Grid25Grid
         {
             get { return _shapefileMajorGrid; }
+        }
+
+        public Grid25LabelManager grid25LabelManager
+        {
+            get { return _grid25LabelManager; }
         }
 
         public Grid25MinorGrid minorGrids
@@ -280,18 +303,19 @@ namespace FAD3
                 if (_grid25MinorGrid.DefineMinorGrids(_selectedShapesExtent, selectionBoxExtent))
                 {
                     var minorGridExtent = _grid25MinorGrid.MinorGridLinesShapeFile.Extents;
+
                     //get the intersection of the selectionBox and the selected major grids
-                    if (MajorGridsIntersectMinorGridExtent(_grid25MinorGrid.MinorGridLinesShapeFile.Extents))
+                    if (MajorGridsIntersectMinorGridExtent(minorGridExtent))
                     {
                         if (DefineBoundingRectangle(minorGridExtent))
                         {
                             //we add minorgrid row and column labels
-                            _grid25MinorGridLabels = new Grid25MinorGridLabels(minorGridExtent, _listSidesToLabel, _axMap.GeoProjection,
-                                                                               _minorGridLabelDistance, _minorGridLabelSize);
+                            _grid25LabelManager = new Grid25LabelManager(minorGridExtent, _listSidesToLabel,
+                                                                         _axMap.GeoProjection, _gridAndLabelProperties);
 
-                            _axMap.AddLayer(_grid25MinorGrid.MinorGridLinesShapeFile, true);
-                            _axMap.AddLayer(_grid25MinorGridLabels.Grid25Labels, true);
-                            _axMap.Redraw();
+                            _listGridLayers.Add(_mapLayers.AddLayer(_grid25MinorGrid.MinorGridLinesShapeFile, "Minor grid", true, true));
+                            _listGridLayers.Add(_mapLayers.AddLayer(_grid25LabelManager.Grid25Labels, "Labels", true, true));
+                            _listGridLayers.Add(_mapLayers.AddLayer(_shapefileMajorGridIntersect, "Major grid", true, true));
                         }
                     }
                 }

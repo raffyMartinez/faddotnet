@@ -6,10 +6,10 @@ using MapWinGIS;
 
 namespace FAD3
 {
-    public class Grid25MinorGridLabels
+    public class Grid25LabelManager
     {
         private Shapefile _shapeFileGrid25Labels;
-        private int _labelSize;
+        private Dictionary<string, uint> _labelPropertiesDictionary;
 
         public Shapefile Grid25Labels
         {
@@ -22,10 +22,13 @@ namespace FAD3
             _shapeFileGrid25Labels.EditClear();
         }
 
-        public Grid25MinorGridLabels(Extents extentToLabel, List<string> SidesToLabel, GeoProjection geoProjection, int labelDistance, int labelSize)
+        public Grid25LabelManager(Extents extentToLabel, List<string> SidesToLabel,
+                                    GeoProjection geoProjection, Dictionary<string, uint> labelProperties)
         {
-            _labelSize = labelSize;
+            _labelPropertiesDictionary = labelProperties;
+            var labelDistance = (int)_labelPropertiesDictionary["minorGridLabelDistance"];
             _shapeFileGrid25Labels = new Shapefile();
+
             if (_shapeFileGrid25Labels.CreateNewWithShapeID("", ShpfileType.SHP_POINT))
             {
                 _shapeFileGrid25Labels.EditAddField("Location", FieldType.STRING_FIELD, 1, 2);
@@ -74,7 +77,7 @@ namespace FAD3
             var ifldLabel = _shapeFileGrid25Labels.FieldIndexByName["Label"];
             var labelDistance = distance;
 
-            SetupLabelProperties(_labelSize);
+            SetupLabelProperties();
 
             switch (position)
             {
@@ -180,7 +183,7 @@ namespace FAD3
             }
         }
 
-        public void SetupLabelProperties(int fontSize = -1)
+        public void SetupLabelProperties()
         {
             _shapeFileGrid25Labels.DefaultDrawingOptions.FillVisible = false;
             _shapeFileGrid25Labels.DefaultDrawingOptions.LineColor = new Utils().ColorByName(tkMapColor.White);
@@ -207,22 +210,39 @@ namespace FAD3
                 {
                     switch (c.Name)
                     {
+                        //Minor grid labels
                         case "T":
                         case "L":
                         case "B":
                         case "R":
                         case "C":
                             c.Expression = $@"[Location] =  ""{c.Name}""";
-
+                            c.FontSize = (int)_labelPropertiesDictionary["minorGridLabelSize"];
+                            c.FontColor = _labelPropertiesDictionary["minorGridLabelColor"];
+                            c.FontBold = _labelPropertiesDictionary["minorGridLabelFontBold"] == 1;
                             break;
 
+                        //Major grid labels
                         case "MG":
+                            c.Expression = $@"[Location] =  ""MG""";
+                            c.FontSize = (int)_labelPropertiesDictionary["majorGridLabelSize"];
+                            c.FontBold = true;
+                            c.FontColor = (uint)_labelPropertiesDictionary["majorGridLabelColor"];
                             break;
 
+                        //Map title label
                         case "MT":
+                            c.Expression = $@"[Location] =  ""MT""";
+                            c.FontSize = 15;
+                            c.FontBold = true;
+                            c.Alignment = tkLabelAlignment.laCenterRight;
                             break;
 
+                        //Map zone label
                         case "MZ":
+                            c.Expression = $@"[Location] =  ""MZ""";
+                            c.FontSize = 12;
+                            c.Alignment = tkLabelAlignment.laCenterRight;
                             break;
                     }
                 });

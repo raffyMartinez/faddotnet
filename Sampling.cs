@@ -719,7 +719,7 @@ namespace FAD3
                     UIRowFromXML row = new UIRowFromXML();
                     foreach (XmlNode c in n)
                     {
-                        ; string val = c.Name;
+                        string val = c.Name;
                         switch (val)
                         {
                             case "Required":

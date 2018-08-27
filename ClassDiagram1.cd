@@ -126,7 +126,7 @@
       </Struct>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>CBIBAAAQQZLCEABCIAyAIZAQAFSQACAIIAAFoIAGQaA=</HashCode>
+      <HashCode>CBIBAAAQQZLCEABCIAyEIZAQAFSQACAIIAAFoIAGQaA=</HashCode>
       <FileName>FishingGrid.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -313,7 +313,7 @@
   <Class Name="FAD3.Grid25MajorGrid">
     <Position X="21.25" Y="8.75" Width="2.25" />
     <TypeIdentifier>
-      <HashCode>AAABwAAAACBEAEAAAIABAQAAABAQEQCIAABBgJASAAQ=</HashCode>
+      <HashCode>gABBwAAACCBEAEAAJIABQwAAARBQERCIAAgBgJASAAQ=</HashCode>
       <FileName>Grid25MajorGrid.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -321,10 +321,17 @@
   <Class Name="FAD3.Grid25MinorGrid">
     <Position X="23.75" Y="8.75" Width="2.5" />
     <TypeIdentifier>
-      <HashCode>AAAFAAAAACAkAEAAAAAAAQAAAAAAAAAAAAABAAgCggA=</HashCode>
+      <HashCode>IAChAAAAgCAEAAAQAAAEEAAAAAAQAABBAAgAAQAAgAA=</HashCode>
       <FileName>Grid25MinorGrid.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="FAD3.Grid25LabelManager">
+    <Position X="26.5" Y="8.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAAACAEAAEAAAAAAAAAAAAAAAACIAAAAAAAA=</HashCode>
+      <FileName>Grid25LabelManager.cs</FileName>
+    </TypeIdentifier>
   </Class>
   <Font Name="Segoe UI" Size="9" />
 </ClassDiagram>

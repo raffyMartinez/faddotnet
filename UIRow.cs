@@ -7,15 +7,15 @@ namespace FAD3
 {
     public class UIRowFromXML : EventArgs
     {
-        string _rowLabel;
-        string _key;
-        string _buttonText;
-        int _height;
-        string _dataType;
-        sampling.UserInterfaceStructure.UIControlType _controlType;
-        bool _readOnly;
-        string _ToolTip;
-        bool _Required;
+        private string _rowLabel;
+        private string _key;
+        private string _buttonText;
+        private int _height;
+        private string _dataType;
+        private sampling.UserInterfaceStructure.UIControlType _controlType;
+        private bool _readOnly;
+        private string _ToolTip;
+        private bool _Required;
 
         public UIRowFromXML()
         {
@@ -36,7 +36,6 @@ namespace FAD3
             _readOnly = ReadOnly;
             _ToolTip = ToolTip;
             _Required = Required;
-
         }
 
         public bool Required
@@ -56,25 +55,29 @@ namespace FAD3
             get { return _readOnly; }
             set { _readOnly = value; }
         }
+
         public string DataType
         {
             get { return _dataType; }
             set { _dataType = value; }
         }
+
         public int Height
         {
             get { return _height; }
             set { _height = value; }
         }
+
         public string RowLabel
         {
             get { return _rowLabel; }
             set { _rowLabel = value; }
         }
+
         public string Key
         {
             get { return _key; }
-            set { _key = value;  }
+            set { _key = value; }
         }
 
         public string ButtonText
