@@ -13,14 +13,40 @@ namespace FAD3
     {
         private MapLayers _mapLayers;
         private static MapLayersForm _instance;
+        private MapForm _parentForm;
 
-        public MapLayersForm(MapLayers mapLayers)
+        public MapLayers mapLayers
+        {
+            get { return _mapLayers; }
+        }
+
+        public MapLayersForm(MapLayers mapLayers, MapForm parent)
         {
             InitializeComponent();
+            _parentForm = parent;
             _mapLayers = mapLayers;
             _mapLayers.LayerPropertyRead += OnLayerPropertyRead;
             _mapLayers.LayerDeleted += OnLayerDeleted;
             layerGrid.CellClick += OnCellClick;
+            layerGrid.CellDoubleClick += OnCellDoubleClick;
+        }
+
+        private void OnCellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            //we only respond to double-click on the name column
+            if (e.ColumnIndex == 1)
+            {
+                var hLyr = (int)layerGrid[0, e.RowIndex].Tag;
+                var lpf = LayerPropertyForm.GetInstance(this, hLyr);
+                if (!lpf.Visible)
+                {
+                    lpf.Show(this);
+                }
+                else
+                {
+                    lpf.BringToFront();
+                }
+            }
         }
 
         private void OnLayerDeleted(MapLayers s, LayerProperty e)
@@ -43,9 +69,9 @@ namespace FAD3
             }
         }
 
-        public static MapLayersForm GetInstance(MapLayers mapLayers)
+        public static MapLayersForm GetInstance(MapLayers mapLayers, MapForm parent)
         {
-            if (_instance == null) _instance = new MapLayersForm(mapLayers);
+            if (_instance == null) _instance = new MapLayersForm(mapLayers, parent);
             return _instance;
         }
 

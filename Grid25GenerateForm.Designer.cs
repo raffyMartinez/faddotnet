@@ -66,12 +66,13 @@
             this.imList = new System.Windows.Forms.ImageList(this.components);
             this.buttonClear = new System.Windows.Forms.Button();
             this.buttonGrid = new System.Windows.Forms.Button();
+            this.buttonLabel = new System.Windows.Forms.Button();
             this.groupLabels.SuspendLayout();
             this.SuspendLayout();
             // 
             // txtMapTitle
             // 
-            this.txtMapTitle.Location = new System.Drawing.Point(8, 90);
+            this.txtMapTitle.Location = new System.Drawing.Point(5, 66);
             this.txtMapTitle.Margin = new System.Windows.Forms.Padding(4);
             this.txtMapTitle.Name = "txtMapTitle";
             this.txtMapTitle.Size = new System.Drawing.Size(279, 22);
@@ -80,7 +81,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(7, 70);
+            this.label1.Location = new System.Drawing.Point(4, 46);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(58, 16);
             this.label1.TabIndex = 1;
@@ -88,6 +89,7 @@
             // 
             // groupLabels
             // 
+            this.groupLabels.Controls.Add(this.buttonLabel);
             this.groupLabels.Controls.Add(this.label12);
             this.groupLabels.Controls.Add(this.label11);
             this.groupLabels.Controls.Add(this.label10);
@@ -112,9 +114,9 @@
             this.groupLabels.Controls.Add(this.label3);
             this.groupLabels.Controls.Add(this.label2);
             this.groupLabels.Controls.Add(this.shapeContainer1);
-            this.groupLabels.Location = new System.Drawing.Point(8, 119);
+            this.groupLabels.Location = new System.Drawing.Point(5, 95);
             this.groupLabels.Name = "groupLabels";
-            this.groupLabels.Size = new System.Drawing.Size(276, 352);
+            this.groupLabels.Size = new System.Drawing.Size(276, 375);
             this.groupLabels.TabIndex = 4;
             this.groupLabels.TabStop = false;
             this.groupLabels.Text = "Labels";
@@ -326,7 +328,7 @@
             this.shapeBorderColor,
             this.shapeMajorGridLabelColor,
             this.shapeMinorGridLabelColor});
-            this.shapeContainer1.Size = new System.Drawing.Size(270, 331);
+            this.shapeContainer1.Size = new System.Drawing.Size(270, 354);
             this.shapeContainer1.TabIndex = 25;
             this.shapeContainer1.TabStop = false;
             // 
@@ -384,12 +386,13 @@
             this.imList.TransparentColor = System.Drawing.Color.White;
             this.imList.Images.SetKeyName(0, "gridCursor");
             this.imList.Images.SetKeyName(1, "clearSelection");
+            this.imList.Images.SetKeyName(2, "label");
             // 
             // buttonClear
             // 
             this.buttonClear.ImageIndex = 1;
             this.buttonClear.ImageList = this.imList;
-            this.buttonClear.Location = new System.Drawing.Point(203, 50);
+            this.buttonClear.Location = new System.Drawing.Point(288, 139);
             this.buttonClear.Name = "buttonClear";
             this.buttonClear.Size = new System.Drawing.Size(24, 24);
             this.buttonClear.TabIndex = 3;
@@ -400,18 +403,29 @@
             // 
             this.buttonGrid.ImageIndex = 0;
             this.buttonGrid.ImageList = this.imList;
-            this.buttonGrid.Location = new System.Drawing.Point(177, 50);
+            this.buttonGrid.Location = new System.Drawing.Point(287, 109);
             this.buttonGrid.Name = "buttonGrid";
             this.buttonGrid.Size = new System.Drawing.Size(24, 24);
             this.buttonGrid.TabIndex = 2;
             this.buttonGrid.UseVisualStyleBackColor = true;
             this.buttonGrid.Click += new System.EventHandler(this.OnButtons_Click);
             // 
+            // buttonLabel
+            // 
+            this.buttonLabel.ImageKey = "label";
+            this.buttonLabel.ImageList = this.imList;
+            this.buttonLabel.Location = new System.Drawing.Point(239, 345);
+            this.buttonLabel.Name = "buttonLabel";
+            this.buttonLabel.Size = new System.Drawing.Size(24, 24);
+            this.buttonLabel.TabIndex = 26;
+            this.buttonLabel.UseVisualStyleBackColor = true;
+            this.buttonLabel.Click += new System.EventHandler(this.OnButtons_Click);
+            // 
             // Grid25GenerateForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(293, 527);
+            this.ClientSize = new System.Drawing.Size(322, 527);
             this.Controls.Add(this.buttonClose);
             this.Controls.Add(this.groupLabels);
             this.Controls.Add(this.buttonClear);
@@ -470,5 +484,6 @@
         private Microsoft.VisualBasic.PowerPacks.RectangleShape shapeMajorGridLabelColor;
         private System.Windows.Forms.Button buttonClose;
         private System.Windows.Forms.ImageList imList;
+        private System.Windows.Forms.Button buttonLabel;
     }
 }

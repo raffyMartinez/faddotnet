@@ -152,6 +152,12 @@
     <Compile Include="Grid25MajorGrid.cs" />
     <Compile Include="Grid25MinorGrid.cs" />
     <Compile Include="Grid25LabelManager.cs" />
+    <Compile Include="LayerPropertyForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LayerPropertyForm.Designer.cs">
+      <DependentUpon>LayerPropertyForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Logger.cs" />
     <Compile Include="extension.cs" />
     <Compile Include="FishingGroundDefinitionForm.cs">
@@ -180,6 +186,7 @@
     <Compile Include="GearCodesUsageForm.Designer.cs">
       <DependentUpon>GearCodesUsageForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="MapLayer.cs" />
     <Compile Include="MapLayers.cs" />
     <Compile Include="MapLayersForm.cs">
       <SubType>Form</SubType>
@@ -350,6 +357,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Grid25GenerateForm.resx">
       <DependentUpon>Grid25GenerateForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LayerPropertyForm.resx">
+      <DependentUpon>LayerPropertyForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MapForm.resx">
       <DependentUpon>MapForm.cs</DependentUpon>

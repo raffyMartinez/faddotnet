@@ -56,6 +56,7 @@
             this.Layer,
             this.Symbol});
             this.layerGrid.Cursor = System.Windows.Forms.Cursors.Default;
+            this.layerGrid.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
             this.layerGrid.Location = new System.Drawing.Point(0, 37);
             this.layerGrid.Name = "layerGrid";
             this.layerGrid.RowHeadersVisible = false;

@@ -8,181 +8,338 @@ namespace FAD3
 {
     public class Grid25LabelManager
     {
-        private Shapefile _shapeFileGrid25Labels;
-        private Dictionary<string, uint> _labelPropertiesDictionary;
+        private Shapefile _shapeFileGrid25Labels = new Shapefile();                 //the point shapefile that holds one label
+        private Dictionary<string, uint> _labelPropertiesDictionary;                //reference to a dictionary that holds grid and label properties
+        private int _cellSize = FishingGrid.Grid25.MinorGridCellSizeMeters;         //refers to the cell size of the minor grid
+        private int _mgSize = FishingGrid.Grid25.MajorGridSizeMeters;               //refers to the cell size of a major grid
+        private bool _wrappedLabels;                                                //if labels are wrapped if the minor grid is not a 4 sided polygon
+        private int _iFldLocation;                                                  //refers to the table field for Location
+        private int _iFLdLabel;                                                     //refers to the table field for Label
+        public string MapTitle { get; set; }                                        //refers to the map title
 
+        //returns the shapefile containing point labels
         public Shapefile Grid25Labels
         {
             get { return _shapeFileGrid25Labels; }
         }
 
+        //removes all points from the shapefile and clears labels
         public void ClearLabels()
         {
             _shapeFileGrid25Labels.Labels.Clear();
             _shapeFileGrid25Labels.EditClear();
         }
 
-        public Grid25LabelManager(Extents extentToLabel, List<string> SidesToLabel,
-                                    GeoProjection geoProjection, Dictionary<string, uint> labelProperties)
+        /// <summary>
+        /// Extracts the lines that make up the label path.
+        /// A direction variable stores the direction of a line.
+        /// </summary>
+        /// <param name="shapePathSource"></param>
+        private void GetLines(Shape shapePathSource)
+        {
+            for (int n = 0; n < shapePathSource.numPoints; n++)
+            {
+                var pt1 = shapePathSource.Point[n];
+                var pt2 = shapePathSource.Point[n + 1];
+                if (pt2 != null)
+                {
+                    var shp = new Shape();
+                    if (shp.Create(ShpfileType.SHP_POLYLINE))
+                    {
+                        var direction = "";
+                        shp.InsertPoint(pt1, 0);
+                        shp.InsertPoint(pt2, 1);
+
+                        if (pt1.x < pt2.x)
+                            direction = "right";
+                        if (pt1.x > pt2.x)
+                            direction = "left";
+
+                        if (pt1.y > pt2.y)
+                            direction = "down";
+
+                        if (pt1.y < pt2.y)
+                            direction = "up";
+
+                        shp.Key = direction;
+                    }
+
+                    PrepareLabelPath(shp);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Adds the labels of the major grids that form part of the fishing ground map
+        /// </summary>
+        /// <param name="labels"></param>
+        public void AddMajorGridLabels(List<(int GridNo, double x, double y)> labels)
+        {
+            foreach (var item in labels)
+            {
+                var shp = new Shape();
+                if (shp.Create(ShpfileType.SHP_POINT))
+                {
+                    {
+                        if (shp.AddPoint(item.x, item.y) >= 0)
+                        {
+                            var iShp = _shapeFileGrid25Labels.EditAddShape(shp);
+                            if (iShp >= 0)
+                            {
+                                _shapeFileGrid25Labels.EditCellValue(_iFldLocation, iShp, "MG");
+                                _shapeFileGrid25Labels.EditCellValue(_iFLdLabel, iShp, item.GridNo);
+                                _shapeFileGrid25Labels.Labels.AddLabel(item.GridNo.ToString(), shp.Point[0].x, shp.Point[0].y, 0, 4);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Places map title and footer
+        /// </summary>
+        /// <param name="minorGridExtent"></param>
+        private void SetMapTitle(Extents minorGridExtent)
+        {
+            //set up map title
+            var shp = new Shape();
+            if (shp.Create(ShpfileType.SHP_POINT))
+            {
+                if (shp.AddPoint(minorGridExtent.xMin, minorGridExtent.yMax + 5000) >= 0)
+                {
+                    var iShp = _shapeFileGrid25Labels.EditAddShape(shp);
+                    if (iShp >= 0)
+                    {
+                        if (MapTitle.Length == 0)
+                        {
+                            MapTitle = "New fishing ground map";
+                        }
+                        _shapeFileGrid25Labels.EditCellValue(_iFldLocation, iShp, "MT");
+                        _shapeFileGrid25Labels.EditCellValue(_iFLdLabel, iShp, MapTitle);
+                        _shapeFileGrid25Labels.Labels.AddLabel(MapTitle, shp.Point[0].x, shp.Point[0].y, 0, 5);
+                    }
+                }
+            }
+
+            //setup UTM zone footer
+            shp = new Shape();
+            if (shp.Create(ShpfileType.SHP_POINT))
+            {
+                if (shp.AddPoint(minorGridExtent.xMin, minorGridExtent.yMin - 3000) >= 0)
+                {
+                    var iShp = _shapeFileGrid25Labels.EditAddShape(shp);
+                    if (iShp >= 0)
+                    {
+                        _shapeFileGrid25Labels.EditCellValue(_iFldLocation, iShp, "MZ");
+                        var arr = _shapeFileGrid25Labels.GeoProjection.ProjectionName.Split(' ');
+                        var zone = $"Zone: {arr[5]}";
+                        _shapeFileGrid25Labels.EditCellValue(_iFLdLabel, iShp, zone);
+                        _shapeFileGrid25Labels.Labels.AddLabel(zone, shp.Point[0].x, shp.Point[0].y, 0, 6);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Class constructor and receives the shapefile path where the labels will follow.
+        /// The shapefile path is a 0 distance buffer of the minor grids and may not be a 4 sided polygon
+        /// </summary>
+        /// <param name="sfLabelPath"></param>
+        /// <param name="labelProperties"></param>
+        public Grid25LabelManager(Shapefile sfLabelPath, Dictionary<string, uint> labelProperties, string mapTitle)
         {
             _labelPropertiesDictionary = labelProperties;
-            var labelDistance = (int)_labelPropertiesDictionary["minorGridLabelDistance"];
-            _shapeFileGrid25Labels = new Shapefile();
+            MapTitle = mapTitle;
 
             if (_shapeFileGrid25Labels.CreateNewWithShapeID("", ShpfileType.SHP_POINT))
             {
                 _shapeFileGrid25Labels.EditAddField("Location", FieldType.STRING_FIELD, 1, 2);
                 _shapeFileGrid25Labels.EditAddField("Label", FieldType.STRING_FIELD, 1, 4);
-                _shapeFileGrid25Labels.GeoProjection = geoProjection;
-            }
+                _shapeFileGrid25Labels.GeoProjection = sfLabelPath.GeoProjection;
 
-            var originX = (int)extentToLabel.xMin;
-            var originY = (int)extentToLabel.yMin;
-            var width = (int)Math.Abs((extentToLabel.xMax - extentToLabel.xMin));
-            var height = (int)Math.Abs((extentToLabel.yMax - extentToLabel.yMin));
-            var cols = width / FishingGrid.MinorGridSizeMeters;
-            var rows = height / FishingGrid.MinorGridSizeMeters;
-
-            int categoryIndex = 0;
-            foreach (var position in SidesToLabel)
-            {
-                switch (position)
+                _wrappedLabels = _labelPropertiesDictionary["minorGridLabelWrapped"] == 1;
+                if (_wrappedLabels)
                 {
-                    case "top":
-                        categoryIndex = 0;
-                        SetupLabels(position, originX, originY, cols, rows, labelDistance, height, 0, categoryIndex);
-                        break;
-
-                    case "right":
-                        categoryIndex = 1;
-                        SetupLabels(position, originX, originY, cols, rows, labelDistance, 0, width, categoryIndex);
-                        break;
-
-                    case "bottom":
-                        categoryIndex = 2;
-                        SetupLabels(position, originX, originY, cols, rows, labelDistance, 0, 0, categoryIndex);
-                        break;
-
-                    case "left":
-                        categoryIndex = 3;
-                        SetupLabels(position, originX, originY, cols, rows, labelDistance, 0, 0, categoryIndex);
-                        break;
+                    for (int shp = 0; shp < sfLabelPath.NumShapes; shp++)
+                    {
+                        GetLines(sfLabelPath.Shape[shp]);
+                    }
                 }
+                else
+                {
+                    GetLines(sfLabelPath.Extents.ToShape());
+                }
+
+                SetMapTitle(sfLabelPath.Extents);
             }
         }
 
-        private void SetupLabels(string position, int originX, int originY, int columns, int rows, int distance = 1000, int height = 0, int width = 0, int CategoryIndex = 0)
+        /// <summary>
+        /// receives individual line segments and calculates start points and location of label points
+        /// </summary>
+        /// <param name="shapePath"></param>
+        private void PrepareLabelPath(Shape shapePath)
+        {
+            var key = shapePath.Key;
+            var startNode = 0;
+            var offset = 0;
+            var segments = 0;
+            var labelDistance = (int)_labelPropertiesDictionary["minorGridLabelDistance"];
+            var labelY = 0;
+            var labelX = 0;
+            var pt0 = shapePath.Point[0];
+            var pt1 = shapePath.Point[1];
+            var position = "";
+            var categoryIndex = 0;
+            switch (key)
+            {
+                case "right":
+                case "left":
+                    segments = Math.Abs((int)pt0.x - (int)pt1.x) / _cellSize;
+                    if (pt0.x.CompareTo(pt1.x) < 0)
+                    {
+                        startNode = ((int)(pt0.x / _mgSize)) * _mgSize;
+                        offset = (int)pt0.x - startNode;
+                    }
+                    else
+                    {
+                        startNode = ((int)(pt1.x / _mgSize)) * _mgSize;
+                        offset = (int)pt1.x - startNode;
+                    }
+
+                    labelY = (int)pt0.y + labelDistance;
+                    position = "top";
+                    categoryIndex = 0;
+                    if (key == "left")
+                    {
+                        categoryIndex = 2;
+                        position = "bottom";
+                        labelY = (int)pt0.y - labelDistance;
+                    }
+                    PlaceLabels(segments, "horizontal", offset, 0, labelY, startNode, position, categoryIndex);
+                    break;
+
+                case "up":
+                case "down":
+                    segments = Math.Abs((int)pt0.y - (int)pt1.y) / _cellSize;
+                    if (pt0.y.CompareTo(pt1.y) < 0)
+                    {
+                        startNode = ((int)(pt0.y / _mgSize)) * _mgSize;
+                        offset = (int)pt0.y - startNode;
+                    }
+                    else
+                    {
+                        startNode = ((int)(pt1.y / _mgSize)) * _mgSize;
+                        offset = (int)pt1.y - startNode;
+                    }
+
+                    labelX = (int)pt0.x + labelDistance;
+                    categoryIndex = 1;
+                    position = "right";
+                    if (key == "up")
+                    {
+                        categoryIndex = 3;
+                        position = "left";
+                        labelX = (int)pt0.x - labelDistance;
+                    }
+
+                    SetupLabelProperties();
+
+                    PlaceLabels(segments, "vertical", offset, labelX, 0, startNode, position, categoryIndex);
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Creates point shapefiles and labels
+        /// </summary>
+        /// <param name="segments"></param>
+        /// <param name="orientation"></param>
+        /// <param name="offset"></param>
+        /// <param name="labelX"></param>
+        /// <param name="labelY"></param>
+        /// <param name="startNode"></param>
+        /// <param name="position"></param>
+        /// <param name="categoryIndex"></param>
+        private void PlaceLabels(int segments, string orientation, int offset, int labelX, int labelY, int startNode, string position, int categoryIndex)
         {
             var ifldLocation = _shapeFileGrid25Labels.FieldIndexByName["Location"];
             var ifldLabel = _shapeFileGrid25Labels.FieldIndexByName["Label"];
-            var labelDistance = distance;
+            var labelValue = "";
+            var labelNode = 0;
+            int offsetSegments = offset / _cellSize;
+            var labelDistance = 0;
+            var start = 0;
+            int y = 0;
 
-            SetupLabelProperties();
-
-            switch (position)
+            start = offsetSegments;
+            for (int n = offsetSegments; n < segments + offsetSegments; n++)
             {
-                case "left":
-                case "right":
-                    var baseY = originY / FishingGrid.MajorGridSizeMeters;
-                    baseY *= FishingGrid.MajorGridSizeMeters;
-
-                    if (baseY == originY)
+                Point pt = new Point();
+                if (_wrappedLabels)
+                {
+                    if (y > 24) y = 0;
+                }
+                else
+                {
+                    if (labelNode == 1 || labelNode == 'Y')
                     {
-                        baseY = 25;
+                        y = 0;
+                        start = 0;
+                    }
+                }
+                if (orientation == "vertical")
+                {
+                    if (position == "left")
+                    {
+                        pt.x = labelX - labelDistance;
                     }
                     else
                     {
-                        baseY = 25 - (originY - baseY) / FishingGrid.MinorGridSizeMeters;
+                        pt.x = labelX + labelDistance;
                     }
 
-                    for (int n = 0; n < rows; n++)
+                    pt.y = startNode + (n * _cellSize) + _cellSize / 2;
+                    labelNode = 25 - start - y;
+                    labelValue = labelNode.ToString();
+                }
+                else
+                {
+                    if (position == "top")
                     {
-                        labelDistance = Math.Abs(labelDistance);
-                        Point pt = new Point();
-                        if (position == "left")
-                        {
-                            labelDistance *= -1;
-                            pt.x = originX + labelDistance;
-                        }
-                        else if (position == "right")
-                        {
-                            pt.x = originX + labelDistance + width;
-                        }
-
-                        pt.y = originY + (n * FishingGrid.MinorGridSizeMeters) + (FishingGrid.MinorGridSizeMeters / 2);
-
-                        var shp = new Shape();
-                        if (shp.Create(ShpfileType.SHP_POINT))
-                        {
-                            if (shp.InsertPoint(pt, 0))
-                            {
-                                var iShp = _shapeFileGrid25Labels.EditAddShape(shp);
-                                if (iShp >= 0)
-                                {
-                                    _shapeFileGrid25Labels.EditCellValue(ifldLabel, iShp, baseY);
-                                    _shapeFileGrid25Labels.EditCellValue(ifldLocation, iShp, position.Substring(0, 1).ToUpper());
-                                    _shapeFileGrid25Labels.Labels.AddLabel(baseY.ToString(), pt.x, pt.y, 0, CategoryIndex);
-                                }
-                            }
-                        }
-                        baseY--;
-                        if (baseY == 0) baseY = 25;
-                    }
-
-                    break;
-
-                case "top":
-                case "bottom":
-                    var baseX = originX / FishingGrid.MajorGridSizeMeters;
-                    baseX *= FishingGrid.MajorGridSizeMeters;
-
-                    if (baseX == originX)
-                    {
-                        baseX = 0;
+                        pt.y = labelY + labelDistance;
                     }
                     else
                     {
-                        baseX = 25 - (25 - (originX - baseX) / FishingGrid.MinorGridSizeMeters);
+                        pt.y = labelY - labelDistance;
                     }
+                    pt.x = startNode + (n * _cellSize) + _cellSize / 2;
+                    labelNode = 'A' + start + y;
+                    labelValue = ((char)labelNode).ToString();
+                }
 
-                    for (int n = 0; n < columns; n++)
+                Shape shp = new Shape();
+                if (shp.Create(ShpfileType.SHP_POINT))
+                {
+                    if (shp.InsertPoint(pt, 0))
                     {
-                        labelDistance = Math.Abs(labelDistance);
-                        Point pt = new Point();
-                        if (position == "top")
+                        var iShp = _shapeFileGrid25Labels.EditAddShape(shp);
+                        if (iShp >= 0)
                         {
-                            pt.y = originY + labelDistance + height;
+                            _shapeFileGrid25Labels.EditCellValue(ifldLabel, iShp, labelValue);
+                            _shapeFileGrid25Labels.EditCellValue(ifldLocation, iShp, position.Substring(0, 1).ToUpper());
+                            _shapeFileGrid25Labels.Labels.AddLabel(labelValue, pt.x, pt.y, 0, categoryIndex);
                         }
-                        else if (position == "bottom")
-                        {
-                            labelDistance *= -1;
-                            pt.y = originY + labelDistance + height;
-                        }
-
-                        pt.x = originX + (n * FishingGrid.MinorGridSizeMeters) + (FishingGrid.MinorGridSizeMeters / 2);
-
-                        var shp = new Shape();
-                        if (shp.Create(ShpfileType.SHP_POINT))
-                        {
-                            if (shp.InsertPoint(pt, 0))
-                            {
-                                var iShp = _shapeFileGrid25Labels.EditAddShape(shp);
-                                if (iShp >= 0)
-                                {
-                                    _shapeFileGrid25Labels.EditCellValue(ifldLabel, iShp, (char)('A' + baseX));
-                                    _shapeFileGrid25Labels.EditCellValue(ifldLocation, iShp, position.Substring(0, 1).ToUpper());
-                                    _shapeFileGrid25Labels.Labels.AddLabel(((char)('A' + baseX)).ToString(), pt.x, pt.y, 0, CategoryIndex);
-                                }
-                            }
-                        }
-                        baseX++;
-                        if (baseX == 25) baseX = 0;
                     }
-
-                    break;
+                }
+                y++;
             }
         }
 
+        /// <summary>
+        /// Sets the appearance of labels and label categories
+        /// </summary>
         public void SetupLabelProperties()
         {
             _shapeFileGrid25Labels.DefaultDrawingOptions.FillVisible = false;

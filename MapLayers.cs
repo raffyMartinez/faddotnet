@@ -10,12 +10,7 @@ namespace FAD3
     public class MapLayers
     {
         private AxMap _axmap;
-        private Dictionary<int, (string layerName, bool layerVisible, bool shownInLayer)> _layerPropertiesDictionary = new Dictionary<int, (string layerName, bool layerVisible, bool shownInLayer)>();
-
-        public AxMap MapControl
-        {
-            get { return _axmap; }
-        }
+        private Dictionary<int, MapLayer> _layerPropertiesDictionary = new Dictionary<int, MapLayer>();
 
         public delegate void LayerPropertyReadHandler(MapLayers s, LayerProperty e);
 
@@ -24,6 +19,21 @@ namespace FAD3
         public delegate void LayerDeletedHandler(MapLayers s, LayerProperty e);
 
         public event LayerDeletedHandler LayerDeleted;
+
+        public AxMap MapControl
+        {
+            get { return _axmap; }
+        }
+
+        public Dictionary<int, MapLayer> LayerDictionary
+        {
+            get { return _layerPropertiesDictionary; }
+        }
+
+        public MapLayer get_MapLayer(int layerHandle)
+        {
+            return _layerPropertiesDictionary[layerHandle];
+        }
 
         public MapLayers(AxMap mapControl)
         {
@@ -37,7 +47,7 @@ namespace FAD3
             {
                 if (LayerPropertyRead != null)
                 {
-                    LayerProperty lp = new LayerProperty(item.Key, item.Value.layerName, item.Value.layerVisible, item.Value.shownInLayer);
+                    LayerProperty lp = new LayerProperty(item.Key, item.Value.Name, item.Value.Visible, item.Value.VisibleInLayersUI);
                     LayerPropertyRead(this, lp);
                 }
             }
@@ -47,21 +57,21 @@ namespace FAD3
         {
             _layerPropertiesDictionary.Remove(layerHandle);
             _axmap.RemoveLayer(layerHandle);
-            LayerProperty lp = new LayerProperty(layerHandle, layerDeleted: true);
-            LayerDeleted(this, lp);
+            if (LayerDeleted != null)
+            {
+                LayerProperty lp = new LayerProperty(layerHandle, layerDeleted: true);
+                LayerDeleted(this, lp);
+            }
         }
 
         public void EditLayer(int layerHandle, string layerName, bool visible, bool isShown = true)
         {
             if (_layerPropertiesDictionary.ContainsKey(layerHandle))
             {
-                _layerPropertiesDictionary.Remove(layerHandle);
-            }
-            _layerPropertiesDictionary.Add(layerHandle, (layerName, visible, isShown));
-
-            if (LayerPropertyRead != null)
-            {
-                LayerProperty lp = new LayerProperty(layerHandle, layerName, visible, isShown);
+                var ly = _layerPropertiesDictionary[layerHandle];
+                ly.Name = layerName;
+                ly.Visible = visible;
+                ly.VisibleInLayersUI = isShown;
             }
 
             _axmap.set_LayerName(layerHandle, layerName);
@@ -72,15 +82,22 @@ namespace FAD3
         public int AddLayer(object layer, string layerName, bool visible, bool showInLayerUI)
         {
             int h = 0;
-            switch (layer.GetType().Name)
+            var layerType = layer.GetType().Name;
+            var geoProjectionName = "";
+            switch (layerType)
             {
                 case "ShapefileClass":
                     h = _axmap.AddLayer((Shapefile)layer, visible);
+                    geoProjectionName = ((Shapefile)layer).GeoProjection.Name;
                     break;
             }
 
             _axmap.set_LayerName(h, layerName);
-            _layerPropertiesDictionary.Add(h, (layerName, visible, showInLayerUI));
+            var mapLayer = new MapLayer(h, layerName, visible, showInLayerUI);
+            mapLayer.LayerType = layerType;
+            mapLayer.FileName = _axmap.get_LayerFilename(h);
+            mapLayer.GeoProjectionName = geoProjectionName;
+            _layerPropertiesDictionary.Add(h, mapLayer);
             _axmap.Redraw();
 
             if (LayerPropertyRead != null)

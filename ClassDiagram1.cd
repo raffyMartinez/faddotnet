@@ -313,7 +313,7 @@
   <Class Name="FAD3.Grid25MajorGrid">
     <Position X="21.25" Y="8.75" Width="2.25" />
     <TypeIdentifier>
-      <HashCode>gABBwAAACCBEAEAAJIABQwAAARBQERCIAAgBgJASAAQ=</HashCode>
+      <HashCode>gABDwAAACCBEAEAAJJEBQwAAARAQERCIAAglkJASAAQ=</HashCode>
       <FileName>Grid25MajorGrid.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -321,7 +321,7 @@
   <Class Name="FAD3.Grid25MinorGrid">
     <Position X="23.75" Y="8.75" Width="2.5" />
     <TypeIdentifier>
-      <HashCode>IAChAAAAgCAEAAAQAAAEEAAAAAAQAABBAAgAAQAAgAA=</HashCode>
+      <HashCode>IAChAAAAgCAEAAAQAAAEEAAAAAEQAABBAAgAAQAAgAA=</HashCode>
       <FileName>Grid25MinorGrid.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -329,8 +329,34 @@
   <Class Name="FAD3.Grid25LabelManager">
     <Position X="26.5" Y="8.75" Width="2.25" />
     <TypeIdentifier>
-      <HashCode>AAAEAAAAAAACAEAAEAAAAAAAAAAAAAAAACIAAAAAAAA=</HashCode>
+      <HashCode>AIAEAAAAIQQCAEAAEAESAAAgCAAAIAAAAAIAAAAAAAA=</HashCode>
       <FileName>Grid25LabelManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FAD3.MapLayer">
+    <Position X="29" Y="9" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQgAAEAAAIIAAAQCABAAAA=</HashCode>
+      <FileName>MapLayer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FAD3.MapLayers">
+    <Position X="31.75" Y="9" Width="2.25" />
+    <NestedTypes>
+      <Delegate Name="FAD3.MapLayers.LayerPropertyReadHandler" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>MapLayers.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+      <Delegate Name="FAD3.MapLayers.LayerDeletedHandler" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>MapLayers.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAQAAgAAAFAAAAAAABAAAAAAQAAAAABwAgAAAAAAQA=</HashCode>
+      <FileName>MapLayers.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Font Name="Segoe UI" Size="9" />

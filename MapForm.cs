@@ -73,7 +73,7 @@ namespace FAD3
             switch (tsi.Name)
             {
                 case "tsButtonLayers":
-                    var mlf = MapLayersForm.GetInstance(_mapLayers);
+                    var mlf = MapLayersForm.GetInstance(_mapLayers, this);
                     if (!mlf.Visible)
                     {
                         mlf.Show(this);

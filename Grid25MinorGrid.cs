@@ -10,10 +10,10 @@ namespace FAD3
     public class Grid25MinorGrid : IDisposable
     {
         private bool _disposed = false;
-        private Shapefile _shapefileMinorGridLines = null;                 //shapefile of the minor grid lines which are composed of
-                                                                           //vertical and horizontal lines crisscrossing to form a grid
+        private Shapefile _shapefileMinorGridLines = null;                  //shapefile of the minor grid lines which are composed of
+                                                                            //vertical and horizontal lines crisscrossing to form a grid
 
-        private AxMap _axMap;
+        private AxMap _axMap;                                               //holds a reference to the map control in the map form
 
         private bool _isIntersect;                                          //if the MBR is an intersection of the selected
                                                                             //major grid and the selection box
@@ -27,40 +27,58 @@ namespace FAD3
         private int _minorGridColumns;                                      //number of minor grid columns
         private const int CELLSIDE = 2000;                                  //length of one side of a minor grid
 
-        //public Grid25MinorGrid(AxMap mapControl, tkWgs84Projection grid25Geoprojection, Grid25MajorGrid grid25MajorGrid)
+        /// <summary>
+        /// Passes a map control reference.
+        /// </summary>
+        /// <param name="mapControl"></param>
         public Grid25MinorGrid(AxMap mapControl)
         {
             _axMap = mapControl;
         }
 
+        /// <summary>
+        /// Returns the minor grid shapefile.
+        /// </summary>
         public Shapefile MinorGridLinesShapeFile
         {
             get { return _shapefileMinorGridLines; }
         }
 
-        public bool DefineMinorGrids(Extents selectedShapesExtent, Extents selectionBoxExtent)
+        /// <summary>
+        /// Public entry point to start creating minor grids. It also sets the extents of the minor grid.
+        /// </summary>
+        /// <param name="selectedMajorGridShapesExtent"></param>
+        /// <param name="selectionBoxExtent"></param>
+        /// <returns></returns>
+        public bool DefineMinorGrids(Extents selectedMajorGridShapesExtent, Extents selectionBoxExtent)
         {
             var success = false;
             var mbrExtentIsMaxExtent = false;
-            if (selectionBoxExtent.ToShape().Contains(selectedShapesExtent.ToShape()))
+            if (selectionBoxExtent.ToShape().Contains(selectedMajorGridShapesExtent.ToShape()))
             {
-                _minorGridExtents = selectedShapesExtent;
+                //minor grid extent is the extent of the selected major grid shapes
+                _minorGridExtents = selectedMajorGridShapesExtent;
                 mbrExtentIsMaxExtent = true;
             }
-            else if (selectedShapesExtent.ToShape().Contains(selectionBoxExtent.ToShape()))
+            else if (selectedMajorGridShapesExtent.ToShape().Contains(selectionBoxExtent.ToShape()))
             {
+                //minor grid extent is the extent of the selection box
                 _minorGridExtents = selectionBoxExtent;
             }
-            else if (selectionBoxExtent.ToShape().Intersects(selectedShapesExtent.ToShape()))
+            else if (selectionBoxExtent.ToShape().Intersects(selectedMajorGridShapesExtent.ToShape()))
             {
                 var results = new object();
-                if (selectionBoxExtent.ToShape().GetIntersection(selectedShapesExtent.ToShape(), ref results))
+                if (selectionBoxExtent.ToShape().GetIntersection(selectedMajorGridShapesExtent.ToShape(), ref results))
                 {
+                    //convets results object to an array of shapes that is a product of the intersection
                     object[] shapeArray = results as object[];
                     if (shapeArray != null)
                     {
                         Shape[] shapes = shapeArray.OfType<Shape>().ToArray();
+
+                        //minor grid extent is the intersection of the selected major grids and the selection box
                         _minorGridExtents = shapes[0].Extents;
+
                         _isIntersect = true;
                     }
                 }
@@ -76,11 +94,23 @@ namespace FAD3
                 success = ConstructMinorGridLines(extentIsMaxExtent: mbrExtentIsMaxExtent);
             }
 
+            //success means that a valid extent was created
             return success;
         }
 
         /// <summary>
-        /// constructs the minor grid lines
+        /// Clips the rectangular shaped minor grid lines to the selected major grids whose shape may not be a 4 sided polygon
+        /// </summary>
+        /// <param name="clippingShapefile"></param>
+        /// <returns></returns>
+        public bool ClipMinorGrid(Shapefile clippingShapefile)
+        {
+            _shapefileMinorGridLines = clippingShapefile.GetIntersection(false, _shapefileMinorGridLines, false, ShpfileType.SHP_POLYLINE);
+            return _shapefileMinorGridLines.NumShapes > 0;
+        }
+
+        /// <summary>
+        /// Constructs the minor grid lines. This yields a rectangular grid of lines which may be clipped later on.
         /// </summary>
         /// <param name="extentIsMaxExtent"></param>
         private bool ConstructMinorGridLines(bool extentIsMaxExtent)
@@ -140,6 +170,7 @@ namespace FAD3
 
                             var shpIndex = _shapefileMinorGridLines.EditAddShape(shp);
                             _shapefileMinorGridLines.EditCellValue(iFldDirection, shpIndex, "R");
+                            _shapefileMinorGridLines.EditCellValue(ifldBoundary, shpIndex, "F");
 
                             if (ptY % FishingGrid.MajorGridSizeMeters == 0)
                                 _shapefileMinorGridLines.EditCellValue(ifldLineType, shpIndex, "MG");
@@ -168,6 +199,7 @@ namespace FAD3
 
                             var shpIndex = _shapefileMinorGridLines.EditAddShape(shp);
                             _shapefileMinorGridLines.EditCellValue(iFldDirection, shpIndex, "C");
+                            _shapefileMinorGridLines.EditCellValue(ifldBoundary, shpIndex, "F");
 
                             if (ptX % FishingGrid.MajorGridSizeMeters == 0)
                                 _shapefileMinorGridLines.EditCellValue(ifldLineType, shpIndex, "MG");
