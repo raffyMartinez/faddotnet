@@ -236,6 +236,8 @@ namespace FAD3
                 {
                     _shapefileMinorGridLines.Close();
                     _shapefileMinorGridLines = null;
+                    _minorGridExtents = null;
+                    _axMap = null;
                 }
                 //_grid25MajorGrid = null;
                 _disposed = true;

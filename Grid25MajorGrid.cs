@@ -186,7 +186,6 @@ namespace FAD3
                 _mapLayers.RemoveLayer(hLyr);
             }
             _listGridLayers.Clear();
-            _axMap.MapCursor = tkCursor.crsrMapDefault;
             _axMap.Redraw();
         }
 
@@ -208,6 +207,7 @@ namespace FAD3
                 }
                 _selectedMajorGridShapesExtent = _shapefileMajorGrid.BufferByDistance(0, 0, true, true).Extents;
                 _shapefileMajorGrid.SelectNone();
+                _axMap.CursorMode = tkCursorMode.cmSelection;
                 _axMap.MapCursor = tkCursor.crsrUserDefined;
                 _axMap.UDCursorHandle = IconHandle;
                 _axMap.Redraw();
@@ -237,10 +237,44 @@ namespace FAD3
                 if (disposing)
                 {
                     _listSelectedShapeGridNumbers.Clear();
+                    _listGridLayers.Clear();
+                    _listIntersectedMajorGrids.Clear();
+                    _listIntersectedMajorGrids = null;
+                    _listGridLayers = null;
                     _listSelectedShapeGridNumbers = null;
+                    _gridAndLabelProperties = null;
                 }
+                _grid25MinorGrid.Dispose();
+                _grid25MinorGrid = null;
+                if (_grid25LabelManager != null)
+                {
+                    _grid25LabelManager.Dispose();
+                    _grid25LabelManager = null;
+                }
+
+                _selectedMajorGridShapesExtent = null;
+
                 _shapefileMajorGrid.Close();
                 _shapefileMajorGrid = null;
+
+                if (_shapefileBoundingRectangle != null)
+                {
+                    _shapefileBoundingRectangle.Close();
+                    _shapefileBoundingRectangle = null;
+                }
+
+                if (_shapefileMajorGridIntersect != null)
+                {
+                    _shapefileMajorGridIntersect.Close();
+                    _shapefileMajorGridIntersect = null;
+                }
+
+                if (_shapeFileSelectedMajorGridBuffer != null)
+                {
+                    _shapeFileSelectedMajorGridBuffer.Close();
+                    _shapeFileSelectedMajorGridBuffer = null;
+                }
+
                 _axMap = null;
                 _disposed = true;
             }
@@ -293,7 +327,7 @@ namespace FAD3
                 _shapefileBoundingRectangle.EditAddField("MapTitle", FieldType.STRING_FIELD, 1, 255);
                 _shapefileBoundingRectangle.EditAddShape(minorGridExtent.ToShape());
                 _shapefileBoundingRectangle.DefaultDrawingOptions.LineWidth = _gridAndLabelProperties["majorGridThickness"];
-                _shapefileBoundingRectangle.DefaultDrawingOptions.LineColor = _gridAndLabelProperties["majorGridLabelColor"];
+                _shapefileBoundingRectangle.DefaultDrawingOptions.LineColor = _gridAndLabelProperties["borderColor"];
                 _shapefileBoundingRectangle.DefaultDrawingOptions.FillVisible = false;
 
                 var shp = new Shape();
@@ -487,7 +521,7 @@ namespace FAD3
         /// <param name="e"></param>
         private void OnMapDoubleClick(object sender, EventArgs e)
         {
-            if (!_inDefineMinorGrid)
+            if (!_inDefineMinorGrid && _axMap.CursorMode == tkCursorMode.cmSelection)
             {
                 var isTouching = false;
                 var cellValue = "";
@@ -534,7 +568,21 @@ namespace FAD3
                     }
                 }
                 _shapefileMajorGrid.SelectNone();
+                _axMap.Redraw();
             }
+        }
+
+        /// <summary>
+        /// Relabels the grid and allows changing of grid and label properties
+        /// </summary>
+        /// <param name="mapTitle"></param>
+        /// <param name="gridAndLabelProperties"></param>
+        public void RedoLabels(string mapTitle, Dictionary<string, uint> gridAndLabelProperties)
+        {
+            _grid25LabelManager.LabelGrid(_shapeFileSelectedMajorGridBuffer, gridAndLabelProperties, mapTitle);
+            _grid25LabelManager.AddMajorGridLabels(_listIntersectedMajorGrids);
+            _grid25LabelManager.Grid25Labels.Labels.ApplyCategories();
+            _axMap.Redraw();
         }
 
         private void OnMapMouseDown(object sender, _DMapEvents_MouseDownEvent e)
@@ -550,7 +598,7 @@ namespace FAD3
         private void OnMapMouseUp(object sender, _DMapEvents_MouseUpEvent e)
         {
             //we only proceed if a drag-select was not done
-            if (!_selectionFromSelectBox)
+            if (!_selectionFromSelectBox && _axMap.CursorMode == tkCursorMode.cmSelection)
             {
                 var extL = 0D;
                 var extR = 0D;
@@ -610,15 +658,19 @@ namespace FAD3
                             {
                                 if (DefineBoundingRectangle(minorGridExtent))
                                 {
-                                    _grid25LabelManager = new Grid25LabelManager(_shapeFileSelectedMajorGridBuffer, _gridAndLabelProperties, _mapTitle);
-                                    _grid25LabelManager.AddMajorGridLabels(_listIntersectedMajorGrids);
-                                    _grid25LabelManager.Grid25Labels.Labels.ApplyCategories();
+                                    _grid25LabelManager = new Grid25LabelManager(_axMap.GeoProjection);
 
-                                    //we add the layers using the maplayer class, then we add the layer handles to listGridLayers
-                                    _listGridLayers.Add(_mapLayers.AddLayer(_grid25MinorGrid.MinorGridLinesShapeFile, "Minor grid", true, true));
-                                    _listGridLayers.Add(_mapLayers.AddLayer(_grid25LabelManager.Grid25Labels, "Labels", true, true));
-                                    _listGridLayers.Add(_mapLayers.AddLayer(_shapefileMajorGridIntersect, "Major grid", true, true));
-                                    _listGridLayers.Add(_mapLayers.AddLayer(_shapefileBoundingRectangle, "MBR", true, true));
+                                    if (_grid25LabelManager.LabelGrid(_shapeFileSelectedMajorGridBuffer, _gridAndLabelProperties, _mapTitle))
+                                    {
+                                        _grid25LabelManager.AddMajorGridLabels(_listIntersectedMajorGrids);
+                                        _grid25LabelManager.Grid25Labels.Labels.ApplyCategories();
+
+                                        //we add the layers using the maplayer class, then we add the layer handles to listGridLayers
+                                        _listGridLayers.Add(_mapLayers.AddLayer(_grid25MinorGrid.MinorGridLinesShapeFile, "Minor grid", true, true));
+                                        _listGridLayers.Add(_mapLayers.AddLayer(_grid25LabelManager.Grid25Labels, "Labels", true, true));
+                                        _listGridLayers.Add(_mapLayers.AddLayer(_shapefileMajorGridIntersect, "Major grid", true, true));
+                                        _listGridLayers.Add(_mapLayers.AddLayer(_shapefileBoundingRectangle, "MBR", true, true));
+                                    }
                                     _axMap.MapCursor = tkCursor.crsrMapDefault;
                                 }
                             }

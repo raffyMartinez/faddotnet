@@ -64,7 +64,15 @@ namespace FAD3
         {
             if (e.ShowInLayerUI)
             {
-                layerGrid.Rows.Insert(0, new object[] { e.LayerVisible, e.LayerName, null });
+                PictureBox pic = new PictureBox
+                {
+                    Height = layerGrid.RowTemplate.Height,
+                    Width = layerGrid.Columns[2].Width,
+                    Visible = false
+                };
+
+                _mapLayers.layerSymbol(e.LayerHandle, pic);
+                layerGrid.Rows.Insert(0, new object[] { e.LayerVisible, e.LayerName, pic.Image });
                 layerGrid[0, 0].Tag = e.LayerHandle;
             }
         }

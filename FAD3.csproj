@@ -215,6 +215,7 @@
       <DependentUpon>AboutFadForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Enumerators.cs" />
+    <Compile Include="SaveMapImage.cs" />
     <Compile Include="SpeciesNameForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -493,10 +494,22 @@
   <ItemGroup>
     <Content Include="Fatcow-Farm-Fresh-Book-key.ico" />
     <Content Include="Icon1.ico" />
+    <None Include="Resources\ruler.bmp" />
+    <None Include="Resources\pan.bmp" />
+    <None Include="Resources\zoomSelection.bmp" />
+    <None Include="Resources\zoomEntire.bmp" />
+    <None Include="Resources\zoom+.bmp" />
+    <None Include="Resources\zoom-.bmp" />
+    <None Include="Resources\ruler2.bmp" />
     <None Include="Resources\help-browser.png" />
     <Content Include="resource raw\UITable.xml" />
     <None Include="Resources\gridCursor.bmp" />
     <None Include="Resources\im_clear.bmp" />
+    <None Include="Resources\attrib.bmp" />
+    <None Include="Resources\fitScreen.bmp" />
+    <None Include="Resources\imZoomPrev.bmp" />
+    <None Include="Resources\arrow.bmp" />
+    <None Include="Resources\arrow32.bmp" />
     <Content Include="Resources\internet-web-browser.png" />
     <None Include="Resources\system-file-manager.png" />
     <None Include="Resources\layerAdd.bmp" />

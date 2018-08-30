@@ -1,6 +1,7 @@
 ﻿using MapWinGIS;
 using System;
 using System.Windows.Forms;
+using System.Drawing;
 
 namespace FAD3
 {
@@ -41,8 +42,6 @@ namespace FAD3
             axMap.MapUnits = tkUnitsOfMeasure.umMeters;
 
             _mapLayers.AddLayer(grid25MajorGrid.Grid25Grid, "Grid25", true, true);
-
-            axMap.Refresh();
         }
 
         public MapForm(Form parentForm)
@@ -53,9 +52,18 @@ namespace FAD3
 
         private void frmMap_Load(object sender, EventArgs e)
         {
+            Text = "Map";
             global.MappingForm = this;
             global.LoadFormSettings(this);
             _mapLayers = new MapLayers(axMap);
+            SetCursorToSelect();
+        }
+
+        public void SetCursorToSelect()
+        {
+            axMap.MapCursor = tkCursor.crsrUserDefined;
+            axMap.UDCursorHandle = (int)((Bitmap)ilCursors.Images["arrow32"]).GetHicon();
+            axMap.CursorMode = tkCursorMode.cmSelection;
         }
 
         private void frmMap_FormClosed(object sender, FormClosedEventArgs e)
@@ -85,7 +93,37 @@ namespace FAD3
                     }
                     break;
 
+                case "tsButtonMeasure":
+                    axMap.CursorMode = tkCursorMode.cmMeasure;
+                    axMap.MapCursor = tkCursor.crsrMapDefault;
+                    break;
+
+                case "tsButtonBlackArrow":
+                    SetCursorToSelect();
+                    break;
+
                 case "tsButtonLayerAdd":
+                    break;
+
+                case "tsButtonZoomOut":
+                    axMap.MapCursor = tkCursor.crsrUserDefined;
+                    axMap.UDCursorHandle = (int)((Bitmap)e.ClickedItem.Image).GetHicon();
+                    axMap.CursorMode = tkCursorMode.cmZoomOut;
+                    break;
+
+                case "tsButtonZoomIn":
+                    axMap.MapCursor = tkCursor.crsrUserDefined;
+                    axMap.UDCursorHandle = (int)((Bitmap)e.ClickedItem.Image).GetHicon();
+                    axMap.CursorMode = tkCursorMode.cmZoomIn;
+                    break;
+
+                case "tsButtonPan":
+                    axMap.MapCursor = tkCursor.crsrUserDefined;
+                    axMap.UDCursorHandle = (int)((Bitmap)e.ClickedItem.Image).GetHicon();
+                    axMap.CursorMode = tkCursorMode.cmPan;
+
+                    //axMap.UDCursorHandle = (int)((Bitmap)imList.Images["gridCursor"]).GetHicon();
+
                     break;
             }
         }

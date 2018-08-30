@@ -6,7 +6,7 @@ using MapWinGIS;
 
 namespace FAD3
 {
-    public class Grid25LabelManager
+    public class Grid25LabelManager : IDisposable
     {
         private Shapefile _shapeFileGrid25Labels = new Shapefile();                 //the point shapefile that holds one label
         private Dictionary<string, uint> _labelPropertiesDictionary;                //reference to a dictionary that holds grid and label properties
@@ -16,18 +16,55 @@ namespace FAD3
         private int _iFldLocation;                                                  //refers to the table field for Location
         private int _iFLdLabel;                                                     //refers to the table field for Label
         public string MapTitle { get; set; }                                        //refers to the map title
+        public bool _disposed;
+        private int _labelDistance;
 
-        //returns the shapefile containing point labels
+        /// <summary>
+        /// returns the shapefile containing point labels
+        /// </summary>
         public Shapefile Grid25Labels
         {
             get { return _shapeFileGrid25Labels; }
         }
 
-        //removes all points from the shapefile and clears labels
+        /// <summary>
+        /// removes all points from the shapefile and clears labels
+        /// </summary>
         public void ClearLabels()
         {
             _shapeFileGrid25Labels.Labels.Clear();
             _shapeFileGrid25Labels.EditClear();
+        }
+
+        public bool LabelGrid(Shapefile sfLabelPath, Dictionary<string, uint> labelProperties, string mapTitle)
+        {
+            bool success = false;
+            if (_shapeFileGrid25Labels != null)
+            {
+                _labelPropertiesDictionary = labelProperties;
+                MapTitle = mapTitle;
+
+                ClearLabels();
+
+                _wrappedLabels = _labelPropertiesDictionary["minorGridLabelWrapped"] == 1;
+                _labelDistance = (int)_labelPropertiesDictionary["minorGridLabelDistance"];
+                if (_wrappedLabels)
+                {
+                    for (int shp = 0; shp < sfLabelPath.NumShapes; shp++)
+                    {
+                        GetLines(sfLabelPath.Shape[shp]);
+                    }
+                }
+                else
+                {
+                    GetLines(sfLabelPath.Extents.ToShape());
+                }
+
+                SetMapTitle(sfLabelPath.Extents);
+                success = _shapeFileGrid25Labels.NumShapes > 0;
+            }
+
+            return success;
         }
 
         /// <summary>
@@ -52,6 +89,7 @@ namespace FAD3
 
                         if (pt1.x < pt2.x)
                             direction = "right";
+
                         if (pt1.x > pt2.x)
                             direction = "left";
 
@@ -70,113 +108,7 @@ namespace FAD3
         }
 
         /// <summary>
-        /// Adds the labels of the major grids that form part of the fishing ground map
-        /// </summary>
-        /// <param name="labels"></param>
-        public void AddMajorGridLabels(List<(int GridNo, double x, double y)> labels)
-        {
-            foreach (var item in labels)
-            {
-                var shp = new Shape();
-                if (shp.Create(ShpfileType.SHP_POINT))
-                {
-                    {
-                        if (shp.AddPoint(item.x, item.y) >= 0)
-                        {
-                            var iShp = _shapeFileGrid25Labels.EditAddShape(shp);
-                            if (iShp >= 0)
-                            {
-                                _shapeFileGrid25Labels.EditCellValue(_iFldLocation, iShp, "MG");
-                                _shapeFileGrid25Labels.EditCellValue(_iFLdLabel, iShp, item.GridNo);
-                                _shapeFileGrid25Labels.Labels.AddLabel(item.GridNo.ToString(), shp.Point[0].x, shp.Point[0].y, 0, 4);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Places map title and footer
-        /// </summary>
-        /// <param name="minorGridExtent"></param>
-        private void SetMapTitle(Extents minorGridExtent)
-        {
-            //set up map title
-            var shp = new Shape();
-            if (shp.Create(ShpfileType.SHP_POINT))
-            {
-                if (shp.AddPoint(minorGridExtent.xMin, minorGridExtent.yMax + 5000) >= 0)
-                {
-                    var iShp = _shapeFileGrid25Labels.EditAddShape(shp);
-                    if (iShp >= 0)
-                    {
-                        if (MapTitle.Length == 0)
-                        {
-                            MapTitle = "New fishing ground map";
-                        }
-                        _shapeFileGrid25Labels.EditCellValue(_iFldLocation, iShp, "MT");
-                        _shapeFileGrid25Labels.EditCellValue(_iFLdLabel, iShp, MapTitle);
-                        _shapeFileGrid25Labels.Labels.AddLabel(MapTitle, shp.Point[0].x, shp.Point[0].y, 0, 5);
-                    }
-                }
-            }
-
-            //setup UTM zone footer
-            shp = new Shape();
-            if (shp.Create(ShpfileType.SHP_POINT))
-            {
-                if (shp.AddPoint(minorGridExtent.xMin, minorGridExtent.yMin - 3000) >= 0)
-                {
-                    var iShp = _shapeFileGrid25Labels.EditAddShape(shp);
-                    if (iShp >= 0)
-                    {
-                        _shapeFileGrid25Labels.EditCellValue(_iFldLocation, iShp, "MZ");
-                        var arr = _shapeFileGrid25Labels.GeoProjection.ProjectionName.Split(' ');
-                        var zone = $"Zone: {arr[5]}";
-                        _shapeFileGrid25Labels.EditCellValue(_iFLdLabel, iShp, zone);
-                        _shapeFileGrid25Labels.Labels.AddLabel(zone, shp.Point[0].x, shp.Point[0].y, 0, 6);
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Class constructor and receives the shapefile path where the labels will follow.
-        /// The shapefile path is a 0 distance buffer of the minor grids and may not be a 4 sided polygon
-        /// </summary>
-        /// <param name="sfLabelPath"></param>
-        /// <param name="labelProperties"></param>
-        public Grid25LabelManager(Shapefile sfLabelPath, Dictionary<string, uint> labelProperties, string mapTitle)
-        {
-            _labelPropertiesDictionary = labelProperties;
-            MapTitle = mapTitle;
-
-            if (_shapeFileGrid25Labels.CreateNewWithShapeID("", ShpfileType.SHP_POINT))
-            {
-                _shapeFileGrid25Labels.EditAddField("Location", FieldType.STRING_FIELD, 1, 2);
-                _shapeFileGrid25Labels.EditAddField("Label", FieldType.STRING_FIELD, 1, 4);
-                _shapeFileGrid25Labels.GeoProjection = sfLabelPath.GeoProjection;
-
-                _wrappedLabels = _labelPropertiesDictionary["minorGridLabelWrapped"] == 1;
-                if (_wrappedLabels)
-                {
-                    for (int shp = 0; shp < sfLabelPath.NumShapes; shp++)
-                    {
-                        GetLines(sfLabelPath.Shape[shp]);
-                    }
-                }
-                else
-                {
-                    GetLines(sfLabelPath.Extents.ToShape());
-                }
-
-                SetMapTitle(sfLabelPath.Extents);
-            }
-        }
-
-        /// <summary>
-        /// receives individual line segments and calculates start points and location of label points
+        /// Receives individual line segments and calculates start points and location of label points
         /// </summary>
         /// <param name="shapePath"></param>
         private void PrepareLabelPath(Shape shapePath)
@@ -185,7 +117,6 @@ namespace FAD3
             var startNode = 0;
             var offset = 0;
             var segments = 0;
-            var labelDistance = (int)_labelPropertiesDictionary["minorGridLabelDistance"];
             var labelY = 0;
             var labelX = 0;
             var pt0 = shapePath.Point[0];
@@ -208,14 +139,14 @@ namespace FAD3
                         offset = (int)pt1.x - startNode;
                     }
 
-                    labelY = (int)pt0.y + labelDistance;
+                    labelY = (int)pt0.y + _labelDistance;
                     position = "top";
                     categoryIndex = 0;
                     if (key == "left")
                     {
                         categoryIndex = 2;
                         position = "bottom";
-                        labelY = (int)pt0.y - labelDistance;
+                        labelY = (int)pt0.y - _labelDistance;
                     }
                     PlaceLabels(segments, "horizontal", offset, 0, labelY, startNode, position, categoryIndex);
                     break;
@@ -234,14 +165,14 @@ namespace FAD3
                         offset = (int)pt1.y - startNode;
                     }
 
-                    labelX = (int)pt0.x + labelDistance;
+                    labelX = (int)pt0.x + _labelDistance;
                     categoryIndex = 1;
                     position = "right";
                     if (key == "up")
                     {
                         categoryIndex = 3;
                         position = "left";
-                        labelX = (int)pt0.x - labelDistance;
+                        labelX = (int)pt0.x - _labelDistance;
                     }
 
                     SetupLabelProperties();
@@ -334,6 +265,117 @@ namespace FAD3
                     }
                 }
                 y++;
+            }
+        }
+
+        /// <summary>
+        /// Adds the labels of the major grids that form part of the fishing ground map
+        /// </summary>
+        /// <param name="labels"></param>
+        public void AddMajorGridLabels(List<(int GridNo, double x, double y)> labels)
+        {
+            foreach (var item in labels)
+            {
+                var shp = new Shape();
+                if (shp.Create(ShpfileType.SHP_POINT))
+                {
+                    {
+                        if (shp.AddPoint(item.x, item.y) >= 0)
+                        {
+                            var iShp = _shapeFileGrid25Labels.EditAddShape(shp);
+                            if (iShp >= 0)
+                            {
+                                _shapeFileGrid25Labels.EditCellValue(_iFldLocation, iShp, "MG");
+                                _shapeFileGrid25Labels.EditCellValue(_iFLdLabel, iShp, item.GridNo);
+                                _shapeFileGrid25Labels.Labels.AddLabel(item.GridNo.ToString(), shp.Point[0].x, shp.Point[0].y, 0, 4);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Places map title and footer
+        /// </summary>
+        /// <param name="minorGridExtent"></param>
+        private void SetMapTitle(Extents minorGridExtent)
+        {
+            //set up map title
+            var shp = new Shape();
+            if (shp.Create(ShpfileType.SHP_POINT))
+            {
+                if (shp.AddPoint(minorGridExtent.xMin, minorGridExtent.yMax + 4000 + _labelDistance) >= 0)
+                {
+                    var iShp = _shapeFileGrid25Labels.EditAddShape(shp);
+                    if (iShp >= 0)
+                    {
+                        if (MapTitle.Length == 0)
+                        {
+                            MapTitle = "New fishing ground map";
+                        }
+                        _shapeFileGrid25Labels.EditCellValue(_iFldLocation, iShp, "MT");
+                        _shapeFileGrid25Labels.EditCellValue(_iFLdLabel, iShp, MapTitle);
+                        _shapeFileGrid25Labels.Labels.AddLabel(MapTitle, shp.Point[0].x, shp.Point[0].y, 0, 5);
+                    }
+                }
+            }
+
+            //setup UTM zone footer
+            shp = new Shape();
+            if (shp.Create(ShpfileType.SHP_POINT))
+            {
+                if (shp.AddPoint(minorGridExtent.xMin, minorGridExtent.yMin - 3000 - _labelDistance) >= 0)
+                {
+                    var iShp = _shapeFileGrid25Labels.EditAddShape(shp);
+                    if (iShp >= 0)
+                    {
+                        _shapeFileGrid25Labels.EditCellValue(_iFldLocation, iShp, "MZ");
+                        var arr = _shapeFileGrid25Labels.GeoProjection.ProjectionName.Split(' ');
+                        var zone = $"Zone: {arr[5]}";
+                        _shapeFileGrid25Labels.EditCellValue(_iFLdLabel, iShp, zone);
+                        _shapeFileGrid25Labels.Labels.AddLabel(zone, shp.Point[0].x, shp.Point[0].y, 0, 6);
+                    }
+                }
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    _labelPropertiesDictionary = null;
+                }
+                if (_shapeFileGrid25Labels != null)
+                {
+                    _shapeFileGrid25Labels.Close();
+                    _shapeFileGrid25Labels = null;
+                }
+                _disposed = true;
+            }
+        }
+
+        /// <summary>
+        /// Class constructor and receives the shapefile path where the labels will follow.
+        /// The shapefile path is a 0 distance buffer of the minor grids and may not be a 4 sided polygon
+        /// </summary>
+        /// <param name="sfLabelPath"></param>
+        /// <param name="labelProperties"></param>
+        public Grid25LabelManager(GeoProjection geoProjection)
+        {
+            if (_shapeFileGrid25Labels.CreateNewWithShapeID("", ShpfileType.SHP_POINT))
+            {
+                _shapeFileGrid25Labels.EditAddField("Location", FieldType.STRING_FIELD, 1, 2);
+                _shapeFileGrid25Labels.EditAddField("Label", FieldType.STRING_FIELD, 1, 4);
+                _shapeFileGrid25Labels.GeoProjection = geoProjection;
             }
         }
 

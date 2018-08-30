@@ -65,7 +65,7 @@ namespace FAD3
                     if (_grid25MajorGrid.grid25LabelManager != null && _grid25MajorGrid.grid25LabelManager.Grid25Labels.NumShapes > 0)
                     {
                         SetupDictionary();
-                        _grid25MajorGrid.LabelAndGridProperties = _labelAndGridProperties;
+                        _grid25MajorGrid.RedoLabels(txtMapTitle.Text, _labelAndGridProperties);
                     }
                     break;
 
@@ -95,6 +95,7 @@ namespace FAD3
 
                 case "buttonClear":
                     _grid25MajorGrid.ClearSelectedGrids();
+                    _parentForm.SetCursorToSelect();
                     break;
 
                 case "buttonClose":
@@ -112,6 +113,8 @@ namespace FAD3
             }
             _parentForm = null;
             _instance = null;
+            _labelAndGridProperties.Clear();
+
             global.SaveFormSettings(this);
         }
 
