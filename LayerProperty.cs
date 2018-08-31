@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Drawing;
 
 namespace FAD3
 {
@@ -13,6 +14,7 @@ namespace FAD3
         public bool LayerVisible { get; }
         public bool LayerDeleted { get; }
         public string LayerType { get; }
+        public Bitmap ImageThumb { get; set; }
 
         public LayerProperty(int layerHandle, string layerName, bool layerVIsible, bool showInLayerUI, string layerType)
         {

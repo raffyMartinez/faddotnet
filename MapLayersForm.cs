@@ -159,9 +159,23 @@ namespace FAD3
                     Width = layerGrid.Columns[2].Width,
                     Visible = false
                 };
-
-                _mapLayers.layerSymbol(e.LayerHandle, pic, e.LayerType);
-                layerGrid.Rows.Insert(0, new object[] { e.LayerVisible, e.LayerName, pic.Image });
+                if (e.LayerType == "ShapefileClass")
+                {
+                    _mapLayers.layerSymbol(e.LayerHandle, pic, e.LayerType);
+                    layerGrid.Rows.Insert(0, new object[] { e.LayerVisible, e.LayerName, pic.Image });
+                }
+                else
+                {
+                    if (e.ImageThumb != null)
+                    {
+                        layerGrid.Rows.Insert(0, new object[] { e.LayerVisible, e.LayerName, e.ImageThumb });
+                    }
+                    else
+                    {
+                        _mapLayers.layerSymbol(e.LayerHandle, pic, e.LayerType);
+                        layerGrid.Rows.Insert(0, new object[] { e.LayerVisible, e.LayerName, pic.Image });
+                    }
+                }
                 layerGrid[0, 0].Tag = e.LayerHandle;
                 MarkCurrentLayerName(0);
             }
@@ -176,7 +190,9 @@ namespace FAD3
         private void OnMapLayersForm_Load(object sender, EventArgs e)
         {
             global.LoadFormSettings(this);
+            _mapLayers.PictureBoxRectangle(layerGrid.Columns[2].Width, layerGrid.RowTemplate.Height);
             _mapLayers.ReadLayers();
+
             layerGrid.DefaultCellStyle.SelectionBackColor = SystemColors.Window;
             layerGrid.DefaultCellStyle.SelectionForeColor = SystemColors.WindowText;
         }

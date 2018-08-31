@@ -13,6 +13,8 @@ namespace FAD3
     {
         public bool _disposed;
         private AxMap _axmap;
+        private int _picWidth;
+        private int _picHeight;
         private Dictionary<int, MapLayer> _layerPropertiesDictionary = new Dictionary<int, MapLayer>();
 
         public delegate void LayerPropertyReadHandler(MapLayers s, LayerProperty e);
@@ -28,9 +30,17 @@ namespace FAD3
             get { return _axmap; }
         }
 
+        /// <summary>
+        /// sets the legend image in the layers form
+        /// </summary>
+        /// <param name="layerHandle"></param>
+        /// <param name="pic"></param>
+        /// <param name="layerType"></param>
         public void layerSymbol(int layerHandle, System.Windows.Forms.PictureBox pic, string layerType)
         {
             if (pic.Image != null) pic.Image.Dispose();
+            int w = 0;
+            int h = 0;
             Rectangle rect = pic.ClientRectangle;
             Bitmap bmp = new Bitmap(rect.Width, rect.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             Graphics g = Graphics.FromImage(bmp);
@@ -45,12 +55,12 @@ namespace FAD3
                         switch (shp.ShapefileType)
                         {
                             case ShpfileType.SHP_POINT:
-                                shp.DefaultDrawingOptions.DrawPoint(ptr, 0.0f, 0.0f, rect.Width, rect.Height);
+                                shp.DefaultDrawingOptions.DrawPoint(ptr, (rect.Width / 5) * 2, rect.Height / 2, 0, 0);
                                 break;
 
                             case ShpfileType.SHP_POLYGON:
-                                int w = rect.Width / 4;
-                                int h = (rect.Height / 4) * 3;
+                                w = rect.Width / 4;
+                                h = (rect.Height / 4) * 3;
                                 shp.DefaultDrawingOptions.DrawRectangle(ptr, rect.Width / 3, rect.Height / 4, w, h, shp.DefaultDrawingOptions.LineVisible, rect.Width, rect.Height);
                                 break;
 
@@ -66,7 +76,42 @@ namespace FAD3
                     });
 
                     break;
+
+                case "ImageClass":
+                    if (_layerPropertiesDictionary[layerHandle].ImageThumbnail == null)
+                    {
+                        rect = pic.ClientRectangle;
+                        w = rect.Width / 4;
+                        h = (rect.Height / 4) * 3;
+                        string filename = _axmap.get_Image(layerHandle).Filename;
+                        bmp = new Bitmap(w, h);
+                        g = Graphics.FromImage(bmp);
+                        g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                        g.FillRectangle(Brushes.White, 0, 0, w, h);
+                        g.DrawImage(new Bitmap(filename), 0, 0, w, h);
+                        pic.Image = bmp;
+                        _layerPropertiesDictionary[layerHandle].ImageThumbnail = bmp;
+                    }
+
+                    break;
             }
+        }
+
+        /// <summary>
+        /// sets the image preview thumbnail of an image layertype. This method is only called if the layers form is already open
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <returns></returns>
+        private Bitmap GetImageThumbnail(string filename)
+        {
+            int w = _picWidth / 4;
+            int h = (_picHeight / 4) * 3;
+            Bitmap bmp = new Bitmap(w, h);
+            Graphics g = Graphics.FromImage(bmp);
+            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+            g.FillRectangle(Brushes.White, 0, 0, w, h);
+            g.DrawImage(new Bitmap(filename), 0, 0, w, h);
+            return bmp;
         }
 
         public Dictionary<int, MapLayer> LayerDictionary
@@ -95,6 +140,21 @@ namespace FAD3
             return layerMoved;
         }
 
+        /// <summary>
+        /// sets the class variable that represents the layers form legend picturebox
+        /// </summary>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        public void PictureBoxRectangle(int width, int height)
+        {
+            _picHeight = height;
+            _picWidth = width;
+        }
+
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="mapControl"></param>
         public MapLayers(AxMap mapControl)
         {
             _axmap = mapControl;
@@ -102,6 +162,11 @@ namespace FAD3
             _axmap.ProjectionMismatch += OnProjectionMismatch;
         }
 
+        /// <summary>
+        /// reprojects a mismatched layer to the map's projection
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnProjectionMismatch(object sender, _DMapEvents_ProjectionMismatchEvent e)
         {
             e.reproject = tkMwBoolean.blnTrue;
@@ -126,6 +191,9 @@ namespace FAD3
             }
         }
 
+        /// <summary>
+        /// gets the layer in the map and retrieves the corresponding layer item in the dictionary. Fires an event after a layer item is read
+        /// </summary>
         public void ReadLayers()
         {
             for (int n = 0; n < _axmap.NumLayers; n++)
@@ -133,20 +201,31 @@ namespace FAD3
                 var h = _axmap.get_LayerHandle(n);
                 if (_layerPropertiesDictionary[h].VisibleInLayersUI)
                 {
+                    //if there is a listener to the event
                     if (LayerPropertyRead != null)
                     {
+                        //get the corresponding layer item in the dictionary
                         var item = _layerPropertiesDictionary[h];
+
+                        //fill up the event argument class with the layer item
                         LayerProperty lp = new LayerProperty(item.Handle, item.Name, item.Visible, item.VisibleInLayersUI, item.LayerType);
+                        if (item.ImageThumbnail != null) lp.ImageThumb = item.ImageThumbnail;
                         LayerPropertyRead(this, lp);
                     }
                 }
             }
         }
 
+        /// <summary>
+        /// removes a layer
+        /// </summary>
+        /// <param name="layerHandle"></param>
         public void RemoveLayer(int layerHandle)
         {
             _layerPropertiesDictionary.Remove(layerHandle);
             _axmap.RemoveLayer(layerHandle);
+
+            //fire the layer deleted event
             if (LayerDeleted != null)
             {
                 LayerProperty lp = new LayerProperty(layerHandle, layerDeleted: true);
@@ -154,6 +233,13 @@ namespace FAD3
             }
         }
 
+        /// <summary>
+        /// handles editing of layer name and layer visibility
+        /// </summary>
+        /// <param name="layerHandle"></param>
+        /// <param name="layerName"></param>
+        /// <param name="visible"></param>
+        /// <param name="isShown"></param>
         public void EditLayer(int layerHandle, string layerName, bool visible, bool isShown = true)
         {
             if (_layerPropertiesDictionary.ContainsKey(layerHandle))
@@ -169,6 +255,11 @@ namespace FAD3
             _axmap.Redraw();
         }
 
+        /// <summary>
+        /// handles the opening of map layer files
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
         public (bool success, string errMsg) FileOpenHandler(string fileName)
         {
             var success = false;
@@ -236,6 +327,7 @@ namespace FAD3
             mapLayer.FileName = _axmap.get_LayerFilename(layerHandle);
             mapLayer.GeoProjectionName = gp.Name;
             mapLayer.LayerPosition = _axmap.get_LayerPosition(layerHandle);
+
             _layerPropertiesDictionary.Add(layerHandle, mapLayer);
             _axmap.Redraw();
             return mapLayer;
@@ -273,6 +365,12 @@ namespace FAD3
                 if (LayerPropertyRead != null)
                 {
                     LayerProperty lp = new LayerProperty(h, layerName, true, true, mapLayer.LayerType);
+                    if (_picHeight > 0 && _picWidth > 0)
+                    {
+                        Bitmap bmp = GetImageThumbnail(image.Filename);
+                        mapLayer.ImageThumbnail = bmp;
+                        lp.ImageThumb = bmp;
+                    }
                     LayerPropertyRead(this, lp);
                 }
             }

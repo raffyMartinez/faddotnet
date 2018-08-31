@@ -33,6 +33,8 @@
             this.txtMapTitle = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.groupLabels = new System.Windows.Forms.GroupBox();
+            this.buttonLabel = new System.Windows.Forms.Button();
+            this.imList = new System.Windows.Forms.ImageList(this.components);
             this.label12 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
@@ -63,10 +65,8 @@
             this.shapeMajorGridLabelColor = new Microsoft.VisualBasic.PowerPacks.RectangleShape();
             this.shapeMinorGridLabelColor = new Microsoft.VisualBasic.PowerPacks.RectangleShape();
             this.buttonClose = new System.Windows.Forms.Button();
-            this.imList = new System.Windows.Forms.ImageList(this.components);
             this.buttonClear = new System.Windows.Forms.Button();
             this.buttonGrid = new System.Windows.Forms.Button();
-            this.buttonLabel = new System.Windows.Forms.Button();
             this.groupLabels.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -120,6 +120,25 @@
             this.groupLabels.TabIndex = 4;
             this.groupLabels.TabStop = false;
             this.groupLabels.Text = "Labels";
+            // 
+            // buttonLabel
+            // 
+            this.buttonLabel.ImageKey = "label";
+            this.buttonLabel.ImageList = this.imList;
+            this.buttonLabel.Location = new System.Drawing.Point(239, 345);
+            this.buttonLabel.Name = "buttonLabel";
+            this.buttonLabel.Size = new System.Drawing.Size(24, 24);
+            this.buttonLabel.TabIndex = 26;
+            this.buttonLabel.UseVisualStyleBackColor = true;
+            this.buttonLabel.Click += new System.EventHandler(this.OnButtons_Click);
+            // 
+            // imList
+            // 
+            this.imList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imList.ImageStream")));
+            this.imList.TransparentColor = System.Drawing.Color.White;
+            this.imList.Images.SetKeyName(0, "gridCursor");
+            this.imList.Images.SetKeyName(1, "clearSelection");
+            this.imList.Images.SetKeyName(2, "label");
             // 
             // label12
             // 
@@ -335,40 +354,45 @@
             // shapeMinorGridLineColor
             // 
             this.shapeMinorGridLineColor.FillStyle = Microsoft.VisualBasic.PowerPacks.FillStyle.Solid;
-            this.shapeMinorGridLineColor.Location = new System.Drawing.Point(228, 287);
+            this.shapeMinorGridLineColor.Location = new System.Drawing.Point(229, 292);
             this.shapeMinorGridLineColor.Name = "shapeMinorGridLineColor";
-            this.shapeMinorGridLineColor.Size = new System.Drawing.Size(31, 24);
+            this.shapeMinorGridLineColor.Size = new System.Drawing.Size(23, 18);
+            this.shapeMinorGridLineColor.DoubleClick += new System.EventHandler(this.shapeColor_DoubleClick);
             // 
             // shapeMajorGridLineColor
             // 
             this.shapeMajorGridLineColor.FillColor = System.Drawing.Color.Red;
             this.shapeMajorGridLineColor.FillStyle = Microsoft.VisualBasic.PowerPacks.FillStyle.Solid;
-            this.shapeMajorGridLineColor.Location = new System.Drawing.Point(228, 244);
+            this.shapeMajorGridLineColor.Location = new System.Drawing.Point(229, 248);
             this.shapeMajorGridLineColor.Name = "shapeMajorGridLineColor";
-            this.shapeMajorGridLineColor.Size = new System.Drawing.Size(31, 24);
+            this.shapeMajorGridLineColor.Size = new System.Drawing.Size(23, 18);
+            this.shapeMajorGridLineColor.DoubleClick += new System.EventHandler(this.shapeColor_DoubleClick);
             // 
             // shapeBorderColor
             // 
             this.shapeBorderColor.FillStyle = Microsoft.VisualBasic.PowerPacks.FillStyle.Solid;
-            this.shapeBorderColor.Location = new System.Drawing.Point(228, 202);
+            this.shapeBorderColor.Location = new System.Drawing.Point(229, 204);
             this.shapeBorderColor.Name = "shapeBorderColor";
-            this.shapeBorderColor.Size = new System.Drawing.Size(31, 24);
+            this.shapeBorderColor.Size = new System.Drawing.Size(23, 18);
+            this.shapeBorderColor.DoubleClick += new System.EventHandler(this.shapeColor_DoubleClick);
             // 
             // shapeMajorGridLabelColor
             // 
             this.shapeMajorGridLabelColor.FillColor = System.Drawing.Color.Red;
             this.shapeMajorGridLabelColor.FillStyle = Microsoft.VisualBasic.PowerPacks.FillStyle.Solid;
-            this.shapeMajorGridLabelColor.Location = new System.Drawing.Point(228, 158);
+            this.shapeMajorGridLabelColor.Location = new System.Drawing.Point(229, 159);
             this.shapeMajorGridLabelColor.Name = "shapeMajorGridLabelColor";
-            this.shapeMajorGridLabelColor.Size = new System.Drawing.Size(31, 24);
+            this.shapeMajorGridLabelColor.Size = new System.Drawing.Size(23, 18);
+            this.shapeMajorGridLabelColor.DoubleClick += new System.EventHandler(this.shapeColor_DoubleClick);
             // 
             // shapeMinorGridLabelColor
             // 
             this.shapeMinorGridLabelColor.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.shapeMinorGridLabelColor.FillStyle = Microsoft.VisualBasic.PowerPacks.FillStyle.Solid;
-            this.shapeMinorGridLabelColor.Location = new System.Drawing.Point(228, 116);
+            this.shapeMinorGridLabelColor.Location = new System.Drawing.Point(229, 118);
             this.shapeMinorGridLabelColor.Name = "shapeMinorGridLabelColor";
-            this.shapeMinorGridLabelColor.Size = new System.Drawing.Size(31, 24);
+            this.shapeMinorGridLabelColor.Size = new System.Drawing.Size(23, 18);
+            this.shapeMinorGridLabelColor.DoubleClick += new System.EventHandler(this.shapeColor_DoubleClick);
             // 
             // buttonClose
             // 
@@ -379,14 +403,6 @@
             this.buttonClose.Text = "Close";
             this.buttonClose.UseVisualStyleBackColor = true;
             this.buttonClose.Click += new System.EventHandler(this.OnButtons_Click);
-            // 
-            // imList
-            // 
-            this.imList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imList.ImageStream")));
-            this.imList.TransparentColor = System.Drawing.Color.White;
-            this.imList.Images.SetKeyName(0, "gridCursor");
-            this.imList.Images.SetKeyName(1, "clearSelection");
-            this.imList.Images.SetKeyName(2, "label");
             // 
             // buttonClear
             // 
@@ -410,17 +426,6 @@
             this.buttonGrid.UseVisualStyleBackColor = true;
             this.buttonGrid.Click += new System.EventHandler(this.OnButtons_Click);
             // 
-            // buttonLabel
-            // 
-            this.buttonLabel.ImageKey = "label";
-            this.buttonLabel.ImageList = this.imList;
-            this.buttonLabel.Location = new System.Drawing.Point(239, 345);
-            this.buttonLabel.Name = "buttonLabel";
-            this.buttonLabel.Size = new System.Drawing.Size(24, 24);
-            this.buttonLabel.TabIndex = 26;
-            this.buttonLabel.UseVisualStyleBackColor = true;
-            this.buttonLabel.Click += new System.EventHandler(this.OnButtons_Click);
-            // 
             // Grid25GenerateForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -436,7 +441,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Grid25GenerateForm";
-            this.Text = "Grid25GenerateForm";
+            this.Text = "Grid 25";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Grid25GenerateForm_FormClosed);
             this.Load += new System.EventHandler(this.Grid25GenerateForm_Load);
             this.groupLabels.ResumeLayout(false);

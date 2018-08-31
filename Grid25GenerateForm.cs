@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Microsoft.VisualBasic.PowerPacks;
 
 namespace FAD3
 {
@@ -131,6 +132,19 @@ namespace FAD3
             chkRight.Checked = true;
             chkBottom.Checked = true;
             global.LoadFormSettings(this, true);
+        }
+
+        private void shapeColor_DoubleClick(object sender, EventArgs e)
+        {
+            var cd = new ColorDialog
+            {
+                AllowFullOpen = true,
+                AnyColor = true,
+                FullOpen = true,
+                SolidColorOnly = true,
+            };
+            cd.ShowDialog();
+            ((RectangleShape)sender).FillColor = cd.Color;
         }
     }
 }
