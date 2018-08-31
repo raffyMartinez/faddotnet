@@ -264,6 +264,7 @@
     <Compile Include="SamplingForm.Designer.cs">
       <DependentUpon>SamplingForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="ToolStripEx.cs" />
     <Compile Include="VesselDimensionForm.cs">
       <SubType>Form</SubType>
     </Compile>

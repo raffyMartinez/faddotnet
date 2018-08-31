@@ -14,6 +14,7 @@ namespace FAD3
         public int Handle { get; set; }
         public string FileName { get; set; }
         public string GeoProjectionName { get; set; }
+        public int LayerPosition { get; set; }
 
         public string LayerType
         {

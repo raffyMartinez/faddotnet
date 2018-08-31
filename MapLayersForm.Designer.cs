@@ -38,6 +38,7 @@
             // 
             // layerGrid
             // 
+            this.layerGrid.AllowDrop = true;
             this.layerGrid.AllowUserToAddRows = false;
             this.layerGrid.AllowUserToDeleteRows = false;
             this.layerGrid.AllowUserToOrderColumns = true;
@@ -60,7 +61,7 @@
             this.layerGrid.Location = new System.Drawing.Point(0, 37);
             this.layerGrid.Name = "layerGrid";
             this.layerGrid.RowHeadersVisible = false;
-            this.layerGrid.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.layerGrid.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
             this.layerGrid.Size = new System.Drawing.Size(331, 281);
             this.layerGrid.TabIndex = 0;
             // 

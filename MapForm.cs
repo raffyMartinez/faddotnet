@@ -75,8 +75,39 @@ namespace FAD3
             global.SaveFormSettings(this);
         }
 
+        private void OpenFileDialog()
+        {
+            string filename = "";
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Title = "Open a GIS layer";
+            ofd.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+
+            var initialDirectory = RegistryTools.GetSetting("FAD3", "LastOpenedLayerDirectory", "");
+            if (initialDirectory.ToString().Length > 0)
+            {
+                ofd.InitialDirectory = initialDirectory.ToString();
+            }
+
+            ofd.Filter = "ESRI Shapefile (shp)|*.shp|" +
+                           "KML files (kml)|*.kml|" +
+                           "Georeferenced raster files (jpg, tiff,bmp)|*.jpg;*.tif;*.tiff;*.bmp|" +
+                           "Other files |*.*)";
+            ofd.FilterIndex = 1;
+            ofd.ShowDialog();
+            filename = ofd.FileName;
+            if (filename != "")
+            {
+                var result = _mapLayers.FileOpenHandler(filename);
+                if (!result.success)
+                {
+                    MessageBox.Show(result.errMsg, "Error in opening file", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+        }
+
         private void OnToolbarClicked(object sender, ToolStripItemClickedEventArgs e)
         {
+            axMap.UDCursorHandle = -1;
             ToolStripItem tsi = e.ClickedItem;
             switch (tsi.Name)
             {
@@ -93,22 +124,11 @@ namespace FAD3
                     }
                     break;
 
-                case "tsButtonMeasure":
-                    axMap.CursorMode = tkCursorMode.cmMeasure;
-                    axMap.MapCursor = tkCursor.crsrMapDefault;
-                    break;
-
-                case "tsButtonBlackArrow":
-                    SetCursorToSelect();
-                    break;
-
                 case "tsButtonLayerAdd":
+                    OpenFileDialog();
                     break;
 
-                case "tsButtonZoomOut":
-                    axMap.MapCursor = tkCursor.crsrUserDefined;
-                    axMap.UDCursorHandle = (int)((Bitmap)e.ClickedItem.Image).GetHicon();
-                    axMap.CursorMode = tkCursorMode.cmZoomOut;
+                case "tsButtonAttributes":
                     break;
 
                 case "tsButtonZoomIn":
@@ -117,15 +137,42 @@ namespace FAD3
                     axMap.CursorMode = tkCursorMode.cmZoomIn;
                     break;
 
+                case "tsButtonZoomOut":
+                    axMap.MapCursor = tkCursor.crsrUserDefined;
+                    axMap.UDCursorHandle = (int)((Bitmap)e.ClickedItem.Image).GetHicon();
+                    axMap.CursorMode = tkCursorMode.cmZoomOut;
+                    break;
+
+                case "tsButtonZoomAll":
+                    axMap.ZoomToMaxExtents();
+                    break;
+
+                case "tsButtonFitMap":
+                    break;
+
+                case "tsButtonZoomPrevious":
+                    axMap.ZoomToPrev();
+                    break;
+
                 case "tsButtonPan":
                     axMap.MapCursor = tkCursor.crsrUserDefined;
                     axMap.UDCursorHandle = (int)((Bitmap)e.ClickedItem.Image).GetHicon();
                     axMap.CursorMode = tkCursorMode.cmPan;
+                    break;
 
-                    //axMap.UDCursorHandle = (int)((Bitmap)imList.Images["gridCursor"]).GetHicon();
+                case "tsButtonBlackArrow":
+                    SetCursorToSelect();
+                    break;
 
+                case "tsButtonMeasure":
+                    axMap.CursorMode = tkCursorMode.cmMeasure;
+                    axMap.MapCursor = tkCursor.crsrMapDefault;
                     break;
             }
+        }
+
+        private void axMap_MouseDownEvent(object sender, AxMapWinGIS._DMapEvents_MouseDownEvent e)
+        {
         }
     }
 }

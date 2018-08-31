@@ -12,13 +12,15 @@ namespace FAD3
         public bool ShowInLayerUI { get; }
         public bool LayerVisible { get; }
         public bool LayerDeleted { get; }
+        public string LayerType { get; }
 
-        public LayerProperty(int layerHandle, string layerName, bool layerVIsible, bool showInLayerUI)
+        public LayerProperty(int layerHandle, string layerName, bool layerVIsible, bool showInLayerUI, string layerType)
         {
             LayerHandle = layerHandle;
             LayerName = layerName;
             LayerVisible = layerVIsible;
             ShowInLayerUI = showInLayerUI;
+            LayerType = layerType;
         }
 
         public LayerProperty(int layerHandle, bool layerDeleted)

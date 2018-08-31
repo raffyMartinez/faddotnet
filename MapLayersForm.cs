@@ -15,6 +15,91 @@ namespace FAD3
         private static MapLayersForm _instance;
         private MapForm _parentForm;
 
+        private Rectangle _dragBoxFromMouseDown;
+        private int _rowIndexFromMouseDown;
+        private int _rowIndexOfItemUnderMouseToDrop;
+
+        private void OnLayerGrid_MouseMove(object sender, MouseEventArgs e)
+        {
+            if ((e.Button & MouseButtons.Left) == MouseButtons.Left)
+            {
+                // If the mouse moves outside the rectangle, start the drag.
+                if (_dragBoxFromMouseDown != Rectangle.Empty &&
+                !_dragBoxFromMouseDown.Contains(e.X, e.Y))
+                {
+                    // Proceed with the drag and drop, passing in the list item.
+                    DragDropEffects dropEffect = layerGrid.DoDragDrop(
+                          layerGrid.Rows[_rowIndexFromMouseDown],
+                          DragDropEffects.Move);
+                }
+            }
+        }
+
+        private void OnLayerGrid_MouseDown(object sender, MouseEventArgs e)
+        {
+            // Get the index of the item the mouse is below.
+            _rowIndexFromMouseDown = layerGrid.HitTest(e.X, e.Y).RowIndex;
+
+            if (_rowIndexFromMouseDown != -1)
+            {
+                // Remember the point where the mouse down occurred.
+                // The DragSize indicates the size that the mouse can move
+                // before a drag event should be started.
+                Size dragSize = SystemInformation.DragSize;
+
+                // Create a rectangle using the DragSize, with the mouse position being
+                // at the center of the rectangle.
+                _dragBoxFromMouseDown = new Rectangle(
+                          new Point(
+                            e.X - (dragSize.Width / 2),
+                            e.Y - (dragSize.Height / 2)),
+                      dragSize);
+            }
+            else
+                // Reset the rectangle if the mouse is not over an item in the ListBox.
+                _dragBoxFromMouseDown = Rectangle.Empty;
+        }
+
+        private void OnLayerGrid_DragOver(object sender, DragEventArgs e)
+        {
+            e.Effect = DragDropEffects.Move;
+        }
+
+        private void OnLayerGrid_DragDrop(object sender, DragEventArgs e)
+        {
+            int layerHandle = 0;
+
+            // The mouse locations are relative to the screen, so they must be
+            // converted to client coordinates.
+            Point clientPoint = layerGrid.PointToClient(new Point(e.X, e.Y));
+
+            // Get the row index of the item the mouse is below.
+            _rowIndexOfItemUnderMouseToDrop = layerGrid.HitTest(clientPoint.X, clientPoint.Y).RowIndex;
+
+            if (_rowIndexOfItemUnderMouseToDrop < 0)
+                e.Effect = DragDropEffects.None;
+            else
+            {
+                // If the drag operation was a move then remove and insert the row.
+                if (e.Effect == DragDropEffects.Move)
+                {
+                    DataGridViewRow rowToMove = e.Data.GetData(typeof(DataGridViewRow)) as DataGridViewRow;
+                    layerGrid.Rows.RemoveAt(_rowIndexFromMouseDown);
+                    layerGrid.Rows.Insert(_rowIndexOfItemUnderMouseToDrop, rowToMove);
+
+                    for (int row = 0; row < layerGrid.RowCount; row++)
+                    {
+                        if (row > 0)
+                        {
+                            layerHandle = (int)layerGrid[0, row].Tag;
+                            var pos = _mapLayers.get_LayerPosition(layerHandle);
+                            _mapLayers.MoveLayerBottom(pos);
+                        }
+                    }
+                }
+            }
+        }
+
         public MapLayers mapLayers
         {
             get { return _mapLayers; }
@@ -29,6 +114,10 @@ namespace FAD3
             _mapLayers.LayerDeleted += OnLayerDeleted;
             layerGrid.CellClick += OnCellClick;
             layerGrid.CellDoubleClick += OnCellDoubleClick;
+            layerGrid.DragDrop += OnLayerGrid_DragDrop;
+            layerGrid.DragOver += OnLayerGrid_DragOver;
+            layerGrid.MouseDown += OnLayerGrid_MouseDown;
+            layerGrid.MouseMove += OnLayerGrid_MouseMove;
         }
 
         private void OnCellDoubleClick(object sender, DataGridViewCellEventArgs e)
@@ -60,7 +149,7 @@ namespace FAD3
             }
         }
 
-        private void OnLayerPropertyRead(MapLayers s, LayerProperty e)
+        private void OnLayerPropertyRead(MapLayers layer, LayerProperty e)
         {
             if (e.ShowInLayerUI)
             {
@@ -71,9 +160,10 @@ namespace FAD3
                     Visible = false
                 };
 
-                _mapLayers.layerSymbol(e.LayerHandle, pic);
+                _mapLayers.layerSymbol(e.LayerHandle, pic, e.LayerType);
                 layerGrid.Rows.Insert(0, new object[] { e.LayerVisible, e.LayerName, pic.Image });
                 layerGrid[0, 0].Tag = e.LayerHandle;
+                MarkCurrentLayerName(0);
             }
         }
 
@@ -87,6 +177,8 @@ namespace FAD3
         {
             global.LoadFormSettings(this);
             _mapLayers.ReadLayers();
+            layerGrid.DefaultCellStyle.SelectionBackColor = SystemColors.Window;
+            layerGrid.DefaultCellStyle.SelectionForeColor = SystemColors.WindowText;
         }
 
         private void MapLayersForm_FormClosed(object sender, FormClosedEventArgs e)
@@ -124,6 +216,19 @@ namespace FAD3
                 var layerName = layerGrid[e.ColumnIndex + 1, e.RowIndex].Value.ToString();
                 _mapLayers.EditLayer(h, layerName, !isVisible);
             }
+            if (e.ColumnIndex == 1)
+            {
+                MarkCurrentLayerName(e.RowIndex);
+            }
+        }
+
+        private void MarkCurrentLayerName(int currentRow)
+        {
+            foreach (DataGridViewRow row in layerGrid.Rows)
+            {
+                row.Cells[1].Style.Font = new Font(Font.FontFamily.Name, Font.Size, FontStyle.Regular);
+            }
+            layerGrid[1, currentRow].Style.Font = new Font(Font.FontFamily.Name, Font.Size, FontStyle.Bold);
         }
     }
 }

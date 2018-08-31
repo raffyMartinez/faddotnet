@@ -59,9 +59,11 @@
             this.axMap.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("axMap.OcxState")));
             this.axMap.Size = new System.Drawing.Size(629, 297);
             this.axMap.TabIndex = 0;
+            this.axMap.MouseDownEvent += new AxMapWinGIS._DMapEvents_MouseDownEventHandler(this.axMap_MouseDownEvent);
             // 
             // toolstripToolBar
             // 
+            this.toolstripToolBar.CanOverflow = false;
             this.toolstripToolBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tsButtonLayers,
             this.tsButtonLayerAdd,

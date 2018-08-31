@@ -40,7 +40,7 @@ namespace FAD3
         private Shapefile _shapefileMajorGrid;                                  //shapefile of the entire grid25 major grids
         private Shapefile _shapefileMajorGridIntersect;                         //shapefile of major grid intersected with extent of minor grids
         private Shapefile _shapeFileSelectedMajorGridBuffer;                    //a shapefile that holds a convex hull of the selected major grids
-
+        private int _hCursorDefineGrid;
         private string _mapTitle;                                                //title of the fishing ground grid map
 
         /// <summary>
@@ -59,6 +59,7 @@ namespace FAD3
             _axMap.MouseUpEvent += OnMapMouseUp;
             _axMap.MouseDownEvent += OnMapMouseDown;
             _axMap.SelectBoxFinal += OnMapSelectBoxFinal;
+
             _axMap.DblClick += OnMapDoubleClick;
             _axMap.CursorMode = tkCursorMode.cmSelection;
             _utmZone = FishingGrid.fadUTMZone.utmZone51N;
@@ -190,13 +191,14 @@ namespace FAD3
         }
 
         /// <summary>
-        /// returns true if there is a major grid selection
-        /// calculates extent of the selected major grids
+        /// Returns true if there is a major grid selection.
+        /// This will calculate extent of the selected major grids
         /// </summary>
-        /// <param name="IconHandle - the int handle of icon"></param>
+        /// <param name="iconHandle - the int handle of icon"></param>
         /// <returns></returns>
-        public bool DefineMinorGrid(int IconHandle)
+        public bool DefineMinorGrid(int iconHandle)
         {
+            _hCursorDefineGrid = iconHandle;
             _inDefineMinorGrid = _listSelectedShapeGridNumbers.Count > 0;
             if (_inDefineMinorGrid)
             {
@@ -209,7 +211,7 @@ namespace FAD3
                 _shapefileMajorGrid.SelectNone();
                 _axMap.CursorMode = tkCursorMode.cmSelection;
                 _axMap.MapCursor = tkCursor.crsrUserDefined;
-                _axMap.UDCursorHandle = IconHandle;
+                _axMap.UDCursorHandle = _hCursorDefineGrid;
                 _axMap.Redraw();
             }
             return _inDefineMinorGrid;
@@ -636,7 +638,7 @@ namespace FAD3
             _axMap.PixelToProj(e.right, e.bottom, ref extR, ref extB);
             selectionBoxExtent.SetBounds(extL, extB, 0, extR, extT, 0);
 
-            if (_inDefineMinorGrid)
+            if (_inDefineMinorGrid && _axMap.UDCursorHandle==_hCursorDefineGrid)
             {
                 //This is where the actual work of constructing the grid map takes place
 
