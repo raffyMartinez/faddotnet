@@ -11,9 +11,9 @@ namespace FAD3
 {
     public partial class MapLayersForm : Form
     {
-        private MapLayers _mapLayers;
+        private MapLayersHandler _mapLayers;
         private static MapLayersForm _instance;
-        private MapForm _parentForm;
+        private MapperForm _parentForm;
 
         private Rectangle _dragBoxFromMouseDown;
         private int _rowIndexFromMouseDown;
@@ -100,12 +100,12 @@ namespace FAD3
             }
         }
 
-        public MapLayers mapLayers
+        public MapLayersHandler mapLayers
         {
             get { return _mapLayers; }
         }
 
-        public MapLayersForm(MapLayers mapLayers, MapForm parent)
+        public MapLayersForm(MapLayersHandler mapLayers, MapperForm parent)
         {
             InitializeComponent();
             _parentForm = parent;
@@ -138,7 +138,7 @@ namespace FAD3
             }
         }
 
-        private void OnLayerDeleted(MapLayers s, LayerProperty e)
+        private void OnLayerDeleted(MapLayersHandler s, LayerProperty e)
         {
             for (int n = 0; n < layerGrid.Rows.Count; n++)
             {
@@ -149,7 +149,7 @@ namespace FAD3
             }
         }
 
-        private void OnLayerPropertyRead(MapLayers layer, LayerProperty e)
+        private void OnLayerPropertyRead(MapLayersHandler layer, LayerProperty e)
         {
             if (e.ShowInLayerUI)
             {
@@ -159,29 +159,14 @@ namespace FAD3
                     Width = layerGrid.Columns[2].Width,
                     Visible = false
                 };
-                if (e.LayerType == "ShapefileClass")
-                {
-                    _mapLayers.layerSymbol(e.LayerHandle, pic, e.LayerType);
-                    layerGrid.Rows.Insert(0, new object[] { e.LayerVisible, e.LayerName, pic.Image });
-                }
-                else
-                {
-                    if (e.ImageThumb != null)
-                    {
-                        layerGrid.Rows.Insert(0, new object[] { e.LayerVisible, e.LayerName, e.ImageThumb });
-                    }
-                    else
-                    {
-                        _mapLayers.layerSymbol(e.LayerHandle, pic, e.LayerType);
-                        layerGrid.Rows.Insert(0, new object[] { e.LayerVisible, e.LayerName, pic.Image });
-                    }
-                }
+                _mapLayers.LayerSymbol(e.LayerHandle, pic, e.LayerType);
+                layerGrid.Rows.Insert(0, new object[] { e.LayerVisible, e.LayerName, pic.Image });
                 layerGrid[0, 0].Tag = e.LayerHandle;
                 MarkCurrentLayerName(0);
             }
         }
 
-        public static MapLayersForm GetInstance(MapLayers mapLayers, MapForm parent)
+        public static MapLayersForm GetInstance(MapLayersHandler mapLayers, MapperForm parent)
         {
             if (_instance == null) _instance = new MapLayersForm(mapLayers, parent);
             return _instance;
@@ -190,7 +175,6 @@ namespace FAD3
         private void OnMapLayersForm_Load(object sender, EventArgs e)
         {
             global.LoadFormSettings(this);
-            _mapLayers.PictureBoxRectangle(layerGrid.Columns[2].Width, layerGrid.RowTemplate.Height);
             _mapLayers.ReadLayers();
 
             layerGrid.DefaultCellStyle.SelectionBackColor = SystemColors.Window;
@@ -235,9 +219,14 @@ namespace FAD3
             if (e.ColumnIndex == 1)
             {
                 MarkCurrentLayerName(e.RowIndex);
+                _mapLayers.set_MapLayer((int)layerGrid[0, e.RowIndex].Tag);
             }
         }
 
+        /// <summary>
+        /// makes the layer name on the clicked row bold and makes the rest of the names not bold
+        /// </summary>
+        /// <param name="currentRow"></param>
         private void MarkCurrentLayerName(int currentRow)
         {
             foreach (DataGridViewRow row in layerGrid.Rows)

@@ -34,7 +34,7 @@ namespace FAD3
         private static bool _ShowErrorMessage = false;
         private static bool _hasMPH = false;
         private static bool _mapIsOpen;
-        private static MapForm _mapForm;
+        private static MapperForm _mapForm;
         private static string _templateMDBFile = "";
         private static readonly string _ConnectionStringTemplate = "";
         private static bool _TemplateFileExists = true;
@@ -61,7 +61,7 @@ namespace FAD3
             }
         }
 
-        public static MapForm MappingForm
+        public static MapperForm MappingForm
         {
             get { return _mapForm; }
             set

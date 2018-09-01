@@ -650,9 +650,9 @@ namespace FAD3
 
         private void OnMainForm_Load(object sender, EventArgs e)
         {
-            this.splitContainer1.Panel1MinSize = 200;
-            this.splitContainer1.Panel2MinSize = this.Width - (this.splitContainer1.Panel1MinSize + 100);
-            this.splitContainer1.SplitterWidth = 3;
+            splitContainer1.Panel1MinSize = 200;
+            splitContainer1.Panel2MinSize = this.Width - (this.splitContainer1.Panel1MinSize + 100);
+            splitContainer1.SplitterWidth = 3;
 
             if (global.AllRequiredFilesExists)
             {
@@ -732,7 +732,7 @@ namespace FAD3
         private void OnGenerateGridMapToolStripMenuItem_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
             e.ClickedItem.Owner.Hide();
-            var mf = MapForm.GetInstance(this);
+            var mf = MapperForm.GetInstance(this);
             if (!mf.Visible)
             {
                 mf.Show(this);
@@ -1304,7 +1304,7 @@ namespace FAD3
                     break;
 
                 case "map":
-                    var mf = MapForm.GetInstance(this);
+                    var mf = MapperForm.GetInstance(this);
                     if (!mf.Visible)
                     {
                         mf.Show(this);

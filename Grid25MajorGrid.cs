@@ -32,7 +32,7 @@ namespace FAD3
         private List<(int GridNo, double x, double y)>
             _listIntersectedMajorGrids = new List<(int, double, double)>();     //list of sides to be labelled
 
-        private MapLayers _mapLayers;                                           //reference to the map layers class
+        private MapLayersHandler _mapLayers;                                    //reference to the map layers class
         private int[] _selectedShapeIndexes;                                    //holds the indexes of selected shapes
         private Extents _selectedMajorGridShapesExtent = new Extents();         //extent of the selected major grid
 
@@ -42,6 +42,7 @@ namespace FAD3
         private Shapefile _shapeFileSelectedMajorGridBuffer;                    //a shapefile that holds a convex hull of the selected major grids
         private int _hCursorDefineGrid;
         private string _mapTitle;                                                //title of the fishing ground grid map
+        private MapLayer _currentMapLayer;
 
         /// <summary>
         /// Constructor and sets default behaviour and WGS UTM projection of map control
@@ -112,10 +113,19 @@ namespace FAD3
         /// <summary>
         /// References the collection of map layers
         /// </summary>
-        public MapLayers mapLayers
+        public MapLayersHandler mapLayers
         {
             get { return _mapLayers; }
-            set { _mapLayers = value; }
+            set
+            {
+                _mapLayers = value;
+                _mapLayers.CurrentLayer += OnCurrentLayer;
+            }
+        }
+
+        private void OnCurrentLayer(MapLayersHandler s, LayerProperty e)
+        {
+            _currentMapLayer = _mapLayers.get_MapLayer(e.LayerHandle);
         }
 
         /// <summary>
@@ -638,7 +648,7 @@ namespace FAD3
             _axMap.PixelToProj(e.right, e.bottom, ref extR, ref extB);
             selectionBoxExtent.SetBounds(extL, extB, 0, extR, extT, 0);
 
-            if (_inDefineMinorGrid && _axMap.UDCursorHandle==_hCursorDefineGrid)
+            if (_inDefineMinorGrid && _axMap.UDCursorHandle == _hCursorDefineGrid)
             {
                 //This is where the actual work of constructing the grid map takes place
 

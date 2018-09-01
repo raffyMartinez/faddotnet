@@ -1,20 +1,27 @@
-﻿using MapWinGIS;
-using System;
-using System.Windows.Forms;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
 using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Windows.Forms;
+using MapWinGIS;
 
 namespace FAD3
 {
-    public partial class MapForm : Form
+    public partial class MapperForm : Form
     {
-        private static MapForm _instance;
-        private Grid25MajorGrid _grid25MajorGrid;
-        private MapLayers _mapLayers;
+        private static MapperForm _instance;
+        private Grid25MajorGrid _grid25MajorGrid;                                   //handles grid25 fishing ground grid maps
+        private MapInterActionHandler _mapInterActionHandler;                       //handles interaction with the map control
+        private MapLayersHandler _mapLayersHandler;                                 //handles map layers
         private Form _parentForm;
+        private MapLayer _currentMapLayer;
 
-        public static MapForm GetInstance(Form parentForm)
+        public static MapperForm GetInstance(Form parentForm)
         {
-            if (_instance == null) _instance = new MapForm(parentForm);
+            if (_instance == null) _instance = new MapperForm(parentForm);
             return _instance;
         }
 
@@ -32,31 +39,42 @@ namespace FAD3
             get { return _grid25MajorGrid; }
         }
 
+        public MapLayersHandler OnCurrentLayer { get; private set; }
+
         public void createGrid25MajorGrid(FishingGrid.fadUTMZone UTMZone)
         {
+            _mapInterActionHandler.EnableMapInteraction = false;
             _grid25MajorGrid = new Grid25MajorGrid(axMap);
             _grid25MajorGrid.UTMZone = UTMZone;
-            _grid25MajorGrid.mapLayers = _mapLayers;
+            _grid25MajorGrid.mapLayers = _mapLayersHandler;
 
             axMap.GeoProjection.SetWgs84Projection(_grid25MajorGrid.Grid25Geoprojection);
             axMap.MapUnits = tkUnitsOfMeasure.umMeters;
 
-            _mapLayers.AddLayer(grid25MajorGrid.Grid25Grid, "Grid25", true, true);
+            _mapLayersHandler.AddLayer(grid25MajorGrid.Grid25Grid, "Grid25", true, true);
         }
 
-        public MapForm(Form parentForm)
+        public MapperForm(Form parentForm)
         {
             InitializeComponent();
             _parentForm = parentForm;
         }
 
-        private void frmMap_Load(object sender, EventArgs e)
+        private void OnMapperForm_Load(object sender, EventArgs e)
         {
+            toolstripToolBar.ClickThrough = true;
             Text = "Map";
-            //global.MappingForm = this;
-            //global.LoadFormSettings(this);
-            _mapLayers = new MapLayers(axMap);
+            global.MappingForm = this;
+            global.LoadFormSettings(this);
+            _mapLayersHandler = new MapLayersHandler(axMap);
+            _mapLayersHandler.CurrentLayer += OnCurrentMapLayer;
+            _mapInterActionHandler = new MapInterActionHandler(axMap, _mapLayersHandler);
             SetCursorToSelect();
+        }
+
+        private void OnCurrentMapLayer(MapLayersHandler s, LayerProperty e)
+        {
+            _currentMapLayer = _mapLayersHandler.get_MapLayer(e.LayerHandle);
         }
 
         public void SetCursorToSelect()
@@ -66,7 +84,7 @@ namespace FAD3
             axMap.CursorMode = tkCursorMode.cmSelection;
         }
 
-        private void frmMap_FormClosed(object sender, FormClosedEventArgs e)
+        private void OnMapperForm_Closed(object sender, FormClosedEventArgs e)
         {
             global.MappingForm = null;
             CleanUp();
@@ -97,7 +115,7 @@ namespace FAD3
             filename = ofd.FileName;
             if (filename != "")
             {
-                var result = _mapLayers.FileOpenHandler(filename);
+                var result = _mapLayersHandler.FileOpenHandler(filename);
                 if (!result.success)
                 {
                     MessageBox.Show(result.errMsg, "Error in opening file", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -112,16 +130,16 @@ namespace FAD3
             switch (tsi.Name)
             {
                 case "tsButtonLayers":
-                    //var mlf = MapLayersForm.GetInstance(_mapLayers, this);
-                    //if (!mlf.Visible)
-                    //{
-                    //    mlf.Show(this);
-                    //}
-                    //else
-                    //{
-                    //    mlf.BringToFront();
-                    //    mlf.Focus();
-                    //}
+                    var mlf = MapLayersForm.GetInstance(_mapLayersHandler, this);
+                    if (!mlf.Visible)
+                    {
+                        mlf.Show(this);
+                    }
+                    else
+                    {
+                        mlf.BringToFront();
+                        mlf.Focus();
+                    }
                     break;
 
                 case "tsButtonLayerAdd":

@@ -14,17 +14,17 @@ namespace FAD3
     {
         private static Grid25GenerateForm _instance;
         private bool _formCloseDone = false;
-        private MapForm _parentForm;
+        private MapperForm _parentForm;
         private Grid25MajorGrid _grid25MajorGrid;
         private Dictionary<string, uint> _labelAndGridProperties = new Dictionary<string, uint>();
 
-        public static Grid25GenerateForm GetInstance(MapForm parent)
+        public static Grid25GenerateForm GetInstance(MapperForm parent)
         {
             if (_instance == null) _instance = new Grid25GenerateForm(parent);
             return _instance;
         }
 
-        public Grid25GenerateForm(MapForm parent)
+        public Grid25GenerateForm(MapperForm parent)
         {
             InitializeComponent();
             _parentForm = parent;

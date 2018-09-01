@@ -9,21 +9,23 @@ using System.Drawing;
 
 namespace FAD3
 {
-    public class MapLayers : IDisposable
+    public class MapLayersHandler : IDisposable
     {
         public bool _disposed;
         private AxMap _axmap;
-        private int _picWidth;
-        private int _picHeight;
         private Dictionary<int, MapLayer> _layerPropertiesDictionary = new Dictionary<int, MapLayer>();
 
-        public delegate void LayerPropertyReadHandler(MapLayers s, LayerProperty e);
+        public delegate void LayerPropertyReadHandler(MapLayersHandler s, LayerProperty e);
 
         public event LayerPropertyReadHandler LayerPropertyRead;
 
-        public delegate void LayerDeletedHandler(MapLayers s, LayerProperty e);
+        public delegate void LayerDeletedHandler(MapLayersHandler s, LayerProperty e);
 
         public event LayerDeletedHandler LayerDeleted;
+
+        public delegate void CurrentLayerHandler(MapLayersHandler s, LayerProperty e);
+
+        public event CurrentLayerHandler CurrentLayer;
 
         public AxMap MapControl
         {
@@ -36,12 +38,13 @@ namespace FAD3
         /// <param name="layerHandle"></param>
         /// <param name="pic"></param>
         /// <param name="layerType"></param>
-        public void layerSymbol(int layerHandle, System.Windows.Forms.PictureBox pic, string layerType)
+        public void LayerSymbol(int layerHandle, System.Windows.Forms.PictureBox pic, string layerType)
         {
             if (pic.Image != null) pic.Image.Dispose();
-            int w = 0;
-            int h = 0;
             Rectangle rect = pic.ClientRectangle;
+            int w = rect.Width / 4;
+            int h = (rect.Height / 4) * 3;
+
             Bitmap bmp = new Bitmap(rect.Width, rect.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             Graphics g = Graphics.FromImage(bmp);
             IntPtr ptr = g.GetHdc();
@@ -59,16 +62,11 @@ namespace FAD3
                                 break;
 
                             case ShpfileType.SHP_POLYGON:
-                                w = rect.Width / 4;
-                                h = (rect.Height / 4) * 3;
                                 shp.DefaultDrawingOptions.DrawRectangle(ptr, rect.Width / 3, rect.Height / 4, w, h, shp.DefaultDrawingOptions.LineVisible, rect.Width, rect.Height);
                                 break;
 
                             case ShpfileType.SHP_POLYLINE:
-                                w = rect.Width / 4;
-                                h = (rect.Height / 4) * 3;
                                 shp.DefaultDrawingOptions.DrawLine(ptr, rect.Width / 3, rect.Height / 4, w, h, true, rect.Width, rect.Height);
-                                //shp.DefaultDrawingOptions.DrawLine(ptr, 0, rect.Height / 2, rect.Width, rect.Height, true, 0, 0);
                                 break;
                         }
                         g.ReleaseHdc(ptr);
@@ -80,43 +78,39 @@ namespace FAD3
                 case "ImageClass":
                     if (_layerPropertiesDictionary[layerHandle].ImageThumbnail == null)
                     {
-                        rect = pic.ClientRectangle;
-                        w = rect.Width / 4;
-                        h = (rect.Height / 4) * 3;
                         string filename = _axmap.get_Image(layerHandle).Filename;
                         bmp = new Bitmap(w, h);
                         g = Graphics.FromImage(bmp);
                         g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                        g.FillRectangle(Brushes.White, 0, 0, w, h);
+                        g.FillRectangle(Brushes.White, (rect.Width / 5) * 1, rect.Height / 4, w, h);
                         g.DrawImage(new Bitmap(filename), 0, 0, w, h);
                         pic.Image = bmp;
                         _layerPropertiesDictionary[layerHandle].ImageThumbnail = bmp;
                     }
-
+                    else
+                    {
+                        pic.Image = _layerPropertiesDictionary[layerHandle].ImageThumbnail;
+                    }
                     break;
             }
-        }
-
-        /// <summary>
-        /// sets the image preview thumbnail of an image layertype. This method is only called if the layers form is already open
-        /// </summary>
-        /// <param name="filename"></param>
-        /// <returns></returns>
-        private Bitmap GetImageThumbnail(string filename)
-        {
-            int w = _picWidth / 4;
-            int h = (_picHeight / 4) * 3;
-            Bitmap bmp = new Bitmap(w, h);
-            Graphics g = Graphics.FromImage(bmp);
-            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-            g.FillRectangle(Brushes.White, 0, 0, w, h);
-            g.DrawImage(new Bitmap(filename), 0, 0, w, h);
-            return bmp;
         }
 
         public Dictionary<int, MapLayer> LayerDictionary
         {
             get { return _layerPropertiesDictionary; }
+        }
+
+        public void set_MapLayer(int layerHandle)
+        {
+            if (CurrentLayer != null)
+            {
+                //get the corresponding layer item in the dictionary
+                var item = _layerPropertiesDictionary[layerHandle];
+
+                //fill up the event argument class with the layer item
+                LayerProperty lp = new LayerProperty(item.Handle, item.Name, item.Visible, item.VisibleInLayersUI, item.LayerType);
+                CurrentLayer(this, lp);
+            }
         }
 
         public MapLayer get_MapLayer(int layerHandle)
@@ -141,21 +135,10 @@ namespace FAD3
         }
 
         /// <summary>
-        /// sets the class variable that represents the layers form legend picturebox
-        /// </summary>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        public void PictureBoxRectangle(int width, int height)
-        {
-            _picHeight = height;
-            _picWidth = width;
-        }
-
-        /// <summary>
         /// constructor
         /// </summary>
         /// <param name="mapControl"></param>
-        public MapLayers(AxMap mapControl)
+        public MapLayersHandler(AxMap mapControl)
         {
             _axmap = mapControl;
             _axmap.LayerAdded += OnMapLayerAdded;
@@ -209,7 +192,6 @@ namespace FAD3
 
                         //fill up the event argument class with the layer item
                         LayerProperty lp = new LayerProperty(item.Handle, item.Name, item.Visible, item.VisibleInLayersUI, item.LayerType);
-                        if (item.ImageThumbnail != null) lp.ImageThumb = item.ImageThumbnail;
                         LayerPropertyRead(this, lp);
                     }
                 }
@@ -319,6 +301,16 @@ namespace FAD3
             return (success, errMsg);
         }
 
+        /// <summary>
+        /// sets up a layer and adds it to the layers dictionary
+        /// </summary>
+        /// <param name="layerHandle"></param>
+        /// <param name="layerName"></param>
+        /// <param name="Visible"></param>
+        /// <param name="ShowInLayerUI"></param>
+        /// <param name="gp"></param>
+        /// <param name="layerType"></param>
+        /// <returns></returns>
         private MapLayer SetMapLayer(int layerHandle, string layerName, bool Visible,
                                 bool ShowInLayerUI, GeoProjection gp, string layerType = "ShapefileClass")
         {
@@ -330,9 +322,15 @@ namespace FAD3
 
             _layerPropertiesDictionary.Add(layerHandle, mapLayer);
             _axmap.Redraw();
+            set_MapLayer(layerHandle);
             return mapLayer;
         }
 
+        /// <summary>
+        /// handles a shapefile added to the map using file open dialog
+        /// </summary>
+        /// <param name="sf"></param>
+        /// <returns></returns>
         public int AddLayer(Shapefile sf)
         {
             var h = _axmap.AddLayer(sf, true);
@@ -352,6 +350,11 @@ namespace FAD3
             return h;
         }
 
+        /// <summary>
+        /// handles an image added to the map using file open dialog
+        /// </summary>
+        /// <param name="image"></param>
+        /// <returns></returns>
         public int AddLayer(MapWinGIS.Image image)
         {
             var h = _axmap.AddLayer(image, true);
@@ -365,18 +368,20 @@ namespace FAD3
                 if (LayerPropertyRead != null)
                 {
                     LayerProperty lp = new LayerProperty(h, layerName, true, true, mapLayer.LayerType);
-                    if (_picHeight > 0 && _picWidth > 0)
-                    {
-                        Bitmap bmp = GetImageThumbnail(image.Filename);
-                        mapLayer.ImageThumbnail = bmp;
-                        lp.ImageThumb = bmp;
-                    }
                     LayerPropertyRead(this, lp);
                 }
             }
             return h;
         }
 
+        /// <summary>
+        /// handles dynmically created shapefiles added to the map
+        /// </summary>
+        /// <param name="layer"></param>
+        /// <param name="layerName"></param>
+        /// <param name="visible"></param>
+        /// <param name="showInLayerUI"></param>
+        /// <returns></returns>
         public int AddLayer(object layer, string layerName, bool visible, bool showInLayerUI)
         {
             int h = 0;

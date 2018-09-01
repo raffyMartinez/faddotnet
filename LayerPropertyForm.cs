@@ -19,7 +19,7 @@ namespace FAD3
         private string _layerType;
         private Shapefile _shapefileLayer;
         private string _layerName;
-        private MapLayers _mapLayers;
+        private MapLayersHandler _mapLayers;
 
         public LayerPropertyForm(MapLayersForm parent, int layerHandle)
         {
