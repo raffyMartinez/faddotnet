@@ -217,6 +217,12 @@
     </Compile>
     <Compile Include="Enumerators.cs" />
     <Compile Include="SaveMapImage.cs" />
+    <Compile Include="ShapefileAttributesForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ShapefileAttributesForm.Designer.cs">
+      <DependentUpon>ShapefileAttributesForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="SpeciesNameForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -373,6 +379,9 @@
     <EmbeddedResource Include="MapperForm.resx">
       <DependentUpon>MapperForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="ShapefileAttributesForm.resx">
+      <DependentUpon>ShapefileAttributesForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="SpeciesNameForm.resx">
       <DependentUpon>SpeciesNameForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -512,6 +521,8 @@
     <None Include="Resources\imZoomPrev.bmp" />
     <None Include="Resources\arrow.bmp" />
     <None Include="Resources\arrow32.bmp" />
+    <None Include="Resources\clear_all_selection.bmp" />
+    <Content Include="Resources\clear_selection.bmp" />
     <Content Include="Resources\internet-web-browser.png" />
     <None Include="Resources\system-file-manager.png" />
     <None Include="Resources\layerAdd.bmp" />

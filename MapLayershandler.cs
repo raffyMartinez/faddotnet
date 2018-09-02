@@ -6,6 +6,7 @@ using System.Text;
 using AxMapWinGIS;
 using MapWinGIS;
 using System.Drawing;
+using System.Reflection;
 
 namespace FAD3
 {
@@ -14,6 +15,7 @@ namespace FAD3
         public bool _disposed;
         private AxMap _axmap;
         private Dictionary<int, MapLayer> _layerPropertiesDictionary = new Dictionary<int, MapLayer>();
+        private MapLayer _currentMapLayer;
 
         public delegate void LayerPropertyReadHandler(MapLayersHandler s, LayerProperty e);
 
@@ -100,15 +102,31 @@ namespace FAD3
             get { return _layerPropertiesDictionary; }
         }
 
+        public void ClearAllSelections()
+        {
+            foreach (var item in _layerPropertiesDictionary)
+            {
+                if (item.Value.LayerType == "ShapefileClass")
+                {
+                    _axmap.get_Shapefile(item.Key).SelectNone();
+                }
+            }
+            _axmap.Redraw();
+        }
+
+        public MapLayer CurrentMapLayer
+        {
+            get { return _currentMapLayer; }
+        }
+
         public void set_MapLayer(int layerHandle)
         {
+            _currentMapLayer = _layerPropertiesDictionary[layerHandle];
+            //if there are listeners to the event
             if (CurrentLayer != null)
             {
-                //get the corresponding layer item in the dictionary
-                var item = _layerPropertiesDictionary[layerHandle];
-
                 //fill up the event argument class with the layer item
-                LayerProperty lp = new LayerProperty(item.Handle, item.Name, item.Visible, item.VisibleInLayersUI, item.LayerType);
+                LayerProperty lp = new LayerProperty(_currentMapLayer.Handle, _currentMapLayer.Name, _currentMapLayer.Visible, _currentMapLayer.VisibleInLayersUI, _currentMapLayer.LayerType);
                 CurrentLayer(this, lp);
             }
         }
@@ -167,6 +185,10 @@ namespace FAD3
             {
                 if (disposing)
                 {
+                    foreach (var item in _layerPropertiesDictionary)
+                    {
+                        item.Value.Dispose();
+                    }
                     _layerPropertiesDictionary = null;
                 }
                 _axmap = null;
@@ -195,6 +217,19 @@ namespace FAD3
                         LayerPropertyRead(this, lp);
                     }
                 }
+            }
+        }
+
+        public void ClearSelection(int handle)
+        {
+            try
+            {
+                _axmap.get_Shapefile(handle).SelectNone();
+                _axmap.Redraw();
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message, this.GetType().Name, MethodBase.GetCurrentMethod().Name);
             }
         }
 
@@ -319,6 +354,7 @@ namespace FAD3
             mapLayer.FileName = _axmap.get_LayerFilename(layerHandle);
             mapLayer.GeoProjectionName = gp.Name;
             mapLayer.LayerPosition = _axmap.get_LayerPosition(layerHandle);
+            mapLayer.LayerObject = _axmap.get_GetObject(layerHandle);
 
             _layerPropertiesDictionary.Add(layerHandle, mapLayer);
             _axmap.Redraw();

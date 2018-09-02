@@ -6,7 +6,7 @@ using System.Drawing;
 
 namespace FAD3
 {
-    public class MapLayer
+    public class MapLayer : IDisposable
     {
         public string Name { get; set; }
         public bool Visible { get; set; }
@@ -17,6 +17,8 @@ namespace FAD3
         public int LayerPosition { get; set; }
         public Bitmap ImageThumbnail { get; set; }
         public string LayerType { get; set; }
+        public object LayerObject { get; set; }
+        private bool _disposed;
 
         public MapLayer(int handle, string name, bool visible, bool visibleInLayersUI)
         {
@@ -24,6 +26,29 @@ namespace FAD3
             Name = name;
             Visible = visible;
             VisibleInLayersUI = visibleInLayersUI;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                }
+                if (ImageThumbnail != null)
+                {
+                    ImageThumbnail.Dispose();
+                }
+                ImageThumbnail = null;
+                LayerObject = null;
+                _disposed = true;
+            }
         }
     }
 }

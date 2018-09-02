@@ -19,6 +19,11 @@ namespace FAD3
         private Form _parentForm;
         private MapLayer _currentMapLayer;
 
+        public MapInterActionHandler MapInterActionHandler
+        {
+            get { return _mapInterActionHandler; }
+        }
+
         public static MapperForm GetInstance(Form parentForm)
         {
             if (_instance == null) _instance = new MapperForm(parentForm);
@@ -31,7 +36,15 @@ namespace FAD3
             {
                 _grid25MajorGrid.Dispose();
                 _grid25MajorGrid = null;
+
+                _mapLayersHandler.Dispose();
+                _mapInterActionHandler.Dispose();
             }
+        }
+
+        public MapLayer CurrentMapLayer
+        {
+            get { return _currentMapLayer; }
         }
 
         public Grid25MajorGrid grid25MajorGrid
@@ -39,15 +52,12 @@ namespace FAD3
             get { return _grid25MajorGrid; }
         }
 
-        public MapLayersHandler OnCurrentLayer { get; private set; }
-
         public void createGrid25MajorGrid(FishingGrid.fadUTMZone UTMZone)
         {
-            _mapInterActionHandler.EnableMapInteraction = false;
             _grid25MajorGrid = new Grid25MajorGrid(axMap);
             _grid25MajorGrid.UTMZone = UTMZone;
-            _grid25MajorGrid.mapLayers = _mapLayersHandler;
-
+            _grid25MajorGrid.MapLayers = _mapLayersHandler;
+            _grid25MajorGrid.MapInterActionHandler = _mapInterActionHandler;
             axMap.GeoProjection.SetWgs84Projection(_grid25MajorGrid.Grid25Geoprojection);
             axMap.MapUnits = tkUnitsOfMeasure.umMeters;
 
@@ -96,10 +106,11 @@ namespace FAD3
         private void OpenFileDialog()
         {
             string filename = "";
-            OpenFileDialog ofd = new OpenFileDialog();
-            ofd.Title = "Open a GIS layer";
-            ofd.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-
+            OpenFileDialog ofd = new OpenFileDialog
+            {
+                Title = "Open a GIS layer",
+                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+            };
             var initialDirectory = RegistryTools.GetSetting("FAD3", "LastOpenedLayerDirectory", "");
             if (initialDirectory.ToString().Length > 0)
             {
@@ -115,10 +126,10 @@ namespace FAD3
             filename = ofd.FileName;
             if (filename != "")
             {
-                var result = _mapLayersHandler.FileOpenHandler(filename);
-                if (!result.success)
+                var (success, errMsg) = _mapLayersHandler.FileOpenHandler(filename);
+                if (!success)
                 {
-                    MessageBox.Show(result.errMsg, "Error in opening file", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show(errMsg, "Error in opening file", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
         }
@@ -147,6 +158,15 @@ namespace FAD3
                     break;
 
                 case "tsButtonAttributes":
+                    var sfa = ShapefileAttributesForm.GetInstance(this, _mapInterActionHandler);
+                    if (!sfa.Visible)
+                    {
+                        sfa.Show(this);
+                    }
+                    else
+                    {
+                        sfa.BringToFront();
+                    }
                     break;
 
                 case "tsButtonZoomIn":
@@ -185,6 +205,17 @@ namespace FAD3
                 case "tsButtonMeasure":
                     axMap.CursorMode = tkCursorMode.cmMeasure;
                     axMap.MapCursor = tkCursor.crsrMapDefault;
+                    break;
+
+                case "tsButtonClearSelection":
+                    if (_currentMapLayer != null && _currentMapLayer.LayerType == "ShapefileClass")
+                    {
+                        _mapLayersHandler.ClearSelection(_currentMapLayer.Handle);
+                    }
+                    break;
+
+                case "tsButtonClearAllSelection":
+                    _mapLayersHandler.ClearAllSelections();
                     break;
             }
         }

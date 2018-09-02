@@ -32,6 +32,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MapperForm));
             this.axMap = new AxMapWinGIS.AxMap();
             this.ilCursors = new System.Windows.Forms.ImageList(this.components);
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolstripToolBar = new ToolStripExtensions.ToolStripEx();
             this.tsButtonLayers = new System.Windows.Forms.ToolStripButton();
             this.tsButtonLayerAdd = new System.Windows.Forms.ToolStripButton();
@@ -44,7 +45,9 @@
             this.tsButtonPan = new System.Windows.Forms.ToolStripButton();
             this.tsButtonBlackArrow = new System.Windows.Forms.ToolStripButton();
             this.tsButtonMeasure = new System.Windows.Forms.ToolStripButton();
-            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.tsButtonClearSelection = new System.Windows.Forms.ToolStripButton();
+            this.tsButtonClearAllSelection = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             ((System.ComponentModel.ISupportInitialize)(this.axMap)).BeginInit();
             this.toolstripToolBar.SuspendLayout();
             this.SuspendLayout();
@@ -56,7 +59,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.axMap.Enabled = true;
             this.axMap.Location = new System.Drawing.Point(0, 28);
-            this.axMap.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.axMap.Margin = new System.Windows.Forms.Padding(4);
             this.axMap.Name = "axMap";
             this.axMap.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("axMap.OcxState")));
             this.axMap.Size = new System.Drawing.Size(1067, 243);
@@ -67,6 +70,15 @@
             this.ilCursors.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("ilCursors.ImageStream")));
             this.ilCursors.TransparentColor = System.Drawing.Color.White;
             this.ilCursors.Images.SetKeyName(0, "arrow32");
+            // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Location = new System.Drawing.Point(0, 275);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Padding = new System.Windows.Forms.Padding(1, 0, 19, 0);
+            this.statusStrip1.Size = new System.Drawing.Size(1067, 22);
+            this.statusStrip1.TabIndex = 2;
+            this.statusStrip1.Text = "statusStrip1";
             // 
             // toolstripToolBar
             // 
@@ -82,7 +94,10 @@
             this.tsButtonZoomPrevious,
             this.tsButtonPan,
             this.tsButtonBlackArrow,
-            this.tsButtonMeasure});
+            this.tsButtonMeasure,
+            this.toolStripSeparator1,
+            this.tsButtonClearSelection,
+            this.tsButtonClearAllSelection});
             this.toolstripToolBar.Location = new System.Drawing.Point(0, 0);
             this.toolstripToolBar.Name = "toolstripToolBar";
             this.toolstripToolBar.Size = new System.Drawing.Size(1067, 25);
@@ -201,14 +216,30 @@
             this.tsButtonMeasure.Text = "toolStripButton11";
             this.tsButtonMeasure.ToolTipText = "Measure";
             // 
-            // statusStrip1
+            // tsButtonClearSelection
             // 
-            this.statusStrip1.Location = new System.Drawing.Point(0, 275);
-            this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Padding = new System.Windows.Forms.Padding(1, 0, 19, 0);
-            this.statusStrip1.Size = new System.Drawing.Size(1067, 22);
-            this.statusStrip1.TabIndex = 2;
-            this.statusStrip1.Text = "statusStrip1";
+            this.tsButtonClearSelection.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsButtonClearSelection.Image = global::FAD3.Properties.Resources.clear_selection;
+            this.tsButtonClearSelection.ImageTransparentColor = System.Drawing.Color.White;
+            this.tsButtonClearSelection.Name = "tsButtonClearSelection";
+            this.tsButtonClearSelection.Size = new System.Drawing.Size(23, 22);
+            this.tsButtonClearSelection.Text = "toolStripButton1";
+            this.tsButtonClearSelection.ToolTipText = "Clear selection";
+            // 
+            // tsButtonClearAllSelection
+            // 
+            this.tsButtonClearAllSelection.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsButtonClearAllSelection.Image = global::FAD3.Properties.Resources.clear_all_selection;
+            this.tsButtonClearAllSelection.ImageTransparentColor = System.Drawing.Color.White;
+            this.tsButtonClearAllSelection.Name = "tsButtonClearAllSelection";
+            this.tsButtonClearAllSelection.Size = new System.Drawing.Size(23, 22);
+            this.tsButtonClearAllSelection.Text = "toolStripButton1";
+            this.tsButtonClearAllSelection.ToolTipText = "Clears selection from all layers";
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
             // 
             // MapperForm
             // 
@@ -219,7 +250,7 @@
             this.Controls.Add(this.toolstripToolBar);
             this.Controls.Add(this.axMap);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "MapperForm";
             this.Text = "MapperForm";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnMapperForm_Closed);
@@ -249,5 +280,8 @@
         private System.Windows.Forms.ToolStripButton tsButtonBlackArrow;
         private System.Windows.Forms.ToolStripButton tsButtonMeasure;
         private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripButton tsButtonClearSelection;
+        private System.Windows.Forms.ToolStripButton tsButtonClearAllSelection;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
     }
 }

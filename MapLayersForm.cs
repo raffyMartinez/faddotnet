@@ -11,7 +11,7 @@ namespace FAD3
 {
     public partial class MapLayersForm : Form
     {
-        private MapLayersHandler _mapLayers;
+        private MapLayersHandler _mapLayersHandler;
         private static MapLayersForm _instance;
         private MapperForm _parentForm;
 
@@ -77,7 +77,9 @@ namespace FAD3
             _rowIndexOfItemUnderMouseToDrop = layerGrid.HitTest(clientPoint.X, clientPoint.Y).RowIndex;
 
             if (_rowIndexOfItemUnderMouseToDrop < 0)
+            {
                 e.Effect = DragDropEffects.None;
+            }
             else
             {
                 // If the drag operation was a move then remove and insert the row.
@@ -92,26 +94,26 @@ namespace FAD3
                         if (row > 0)
                         {
                             layerHandle = (int)layerGrid[0, row].Tag;
-                            var pos = _mapLayers.get_LayerPosition(layerHandle);
-                            _mapLayers.MoveLayerBottom(pos);
+                            var pos = _mapLayersHandler.get_LayerPosition(layerHandle);
+                            _mapLayersHandler.MoveLayerBottom(pos);
                         }
                     }
                 }
             }
         }
 
-        public MapLayersHandler mapLayers
+        public MapLayersHandler MapLayers
         {
-            get { return _mapLayers; }
+            get { return _mapLayersHandler; }
         }
 
         public MapLayersForm(MapLayersHandler mapLayers, MapperForm parent)
         {
             InitializeComponent();
             _parentForm = parent;
-            _mapLayers = mapLayers;
-            _mapLayers.LayerPropertyRead += OnLayerPropertyRead;
-            _mapLayers.LayerDeleted += OnLayerDeleted;
+            _mapLayersHandler = mapLayers;
+            _mapLayersHandler.LayerPropertyRead += OnLayerPropertyRead;
+            _mapLayersHandler.LayerDeleted += OnLayerDeleted;
             layerGrid.CellClick += OnCellClick;
             layerGrid.CellDoubleClick += OnCellDoubleClick;
             layerGrid.DragDrop += OnLayerGrid_DragDrop;
@@ -159,7 +161,7 @@ namespace FAD3
                     Width = layerGrid.Columns[2].Width,
                     Visible = false
                 };
-                _mapLayers.LayerSymbol(e.LayerHandle, pic, e.LayerType);
+                _mapLayersHandler.LayerSymbol(e.LayerHandle, pic, e.LayerType);
                 layerGrid.Rows.Insert(0, new object[] { e.LayerVisible, e.LayerName, pic.Image });
                 layerGrid[0, 0].Tag = e.LayerHandle;
                 MarkCurrentLayerName(0);
@@ -175,7 +177,7 @@ namespace FAD3
         private void OnMapLayersForm_Load(object sender, EventArgs e)
         {
             global.LoadFormSettings(this);
-            _mapLayers.ReadLayers();
+            _mapLayersHandler.ReadLayers();
 
             layerGrid.DefaultCellStyle.SelectionBackColor = SystemColors.Window;
             layerGrid.DefaultCellStyle.SelectionForeColor = SystemColors.WindowText;
@@ -184,7 +186,7 @@ namespace FAD3
         private void MapLayersForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             _instance = null;
-            _mapLayers.LayerPropertyRead -= OnLayerPropertyRead;
+            _mapLayersHandler.LayerPropertyRead -= OnLayerPropertyRead;
             global.SaveFormSettings(this);
         }
 
@@ -214,12 +216,12 @@ namespace FAD3
                 layerGrid[0, e.RowIndex].Value = !isVisible;
                 var h = (int)layerGrid[0, e.RowIndex].Tag;
                 var layerName = layerGrid[e.ColumnIndex + 1, e.RowIndex].Value.ToString();
-                _mapLayers.EditLayer(h, layerName, !isVisible);
+                _mapLayersHandler.EditLayer(h, layerName, !isVisible);
             }
             if (e.ColumnIndex == 1)
             {
                 MarkCurrentLayerName(e.RowIndex);
-                _mapLayers.set_MapLayer((int)layerGrid[0, e.RowIndex].Tag);
+                _mapLayersHandler.set_MapLayer((int)layerGrid[0, e.RowIndex].Tag);
             }
         }
 

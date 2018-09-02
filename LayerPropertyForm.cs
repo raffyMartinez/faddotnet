@@ -26,8 +26,8 @@ namespace FAD3
             InitializeComponent();
             _parentForm = parent;
             _layerHandle = layerHandle;
-            _mapLayers = _parentForm.mapLayers;
-            _mapLayer = _parentForm.mapLayers.get_MapLayer(_layerHandle);
+            _mapLayers = _parentForm.MapLayers;
+            _mapLayer = _parentForm.MapLayers.get_MapLayer(_layerHandle);
         }
 
         private void ProcessMapLayer(MapLayer mapLayer)

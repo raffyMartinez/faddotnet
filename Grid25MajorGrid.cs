@@ -33,6 +33,7 @@ namespace FAD3
             _listIntersectedMajorGrids = new List<(int, double, double)>();     //list of sides to be labelled
 
         private MapLayersHandler _mapLayers;                                    //reference to the map layers class
+        public MapInterActionHandler MapInterActionHandler { get; set; }        //reference to the MapInterActionHandler class
         private int[] _selectedShapeIndexes;                                    //holds the indexes of selected shapes
         private Extents _selectedMajorGridShapesExtent = new Extents();         //extent of the selected major grid
 
@@ -43,6 +44,7 @@ namespace FAD3
         private int _hCursorDefineGrid;
         private string _mapTitle;                                                //title of the fishing ground grid map
         private MapLayer _currentMapLayer;
+        private bool _enableMapInteraction;
 
         /// <summary>
         /// Constructor and sets default behaviour and WGS UTM projection of map control
@@ -113,7 +115,7 @@ namespace FAD3
         /// <summary>
         /// References the collection of map layers
         /// </summary>
-        public MapLayersHandler mapLayers
+        public MapLayersHandler MapLayers
         {
             get { return _mapLayers; }
             set
@@ -123,15 +125,39 @@ namespace FAD3
             }
         }
 
+        private bool EnableMapInteraction
+
+        {
+            get { return _enableMapInteraction; }
+            set
+            {
+                _enableMapInteraction = value;
+            }
+        }
+
+        /// <summary>
+        /// Sets the current layer which is the layer selected in the mapLayers list
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="e"></param>
         private void OnCurrentLayer(MapLayersHandler s, LayerProperty e)
         {
             _currentMapLayer = _mapLayers.get_MapLayer(e.LayerHandle);
+
+            //let the current class handle map interaction if the current layer is Grid25
+            EnableMapInteraction = _currentMapLayer.Name == "Grid25";
+
+            //let MapInteractionHandler handle map interaction if property EnableMapInteraction is false
+            if (MapInterActionHandler != null)
+            {
+                MapInterActionHandler.EnableMapInteraction = !EnableMapInteraction;
+            }
         }
 
         /// <summary>
         /// Returns the minor grid class
         /// </summary>
-        public Grid25MinorGrid minorGrids
+        public Grid25MinorGrid MinorGrids
         {
             get { return _grid25MinorGrid; }
         }
@@ -287,6 +313,8 @@ namespace FAD3
                     _shapeFileSelectedMajorGridBuffer = null;
                 }
 
+                _mapLayers = null;
+
                 _axMap = null;
                 _disposed = true;
             }
@@ -312,9 +340,11 @@ namespace FAD3
                 //create a category which will set the appearance of selected grids
                 if (sf.StartEditingTable(null))
                 {
-                    var category = new ShapefileCategory();
-                    category.Name = "Selected grid";
-                    category.Expression = @"[toGrid] =""T""";
+                    var category = new ShapefileCategory
+                    {
+                        Name = "Selected grid",
+                        Expression = @"[toGrid] =""T"""
+                    };
                     category.DrawingOptions.FillColor = new Utils().ColorByName(tkMapColor.Red);
                     category.DrawingOptions.FillTransparency = 25;
                     category.DrawingOptions.LineWidth = 2;
@@ -533,7 +563,7 @@ namespace FAD3
         /// <param name="e"></param>
         private void OnMapDoubleClick(object sender, EventArgs e)
         {
-            if (!_inDefineMinorGrid && _axMap.CursorMode == tkCursorMode.cmSelection)
+            if (!_inDefineMinorGrid && _axMap.CursorMode == tkCursorMode.cmSelection && EnableMapInteraction)
             {
                 var isTouching = false;
                 var cellValue = "";
@@ -599,7 +629,10 @@ namespace FAD3
 
         private void OnMapMouseDown(object sender, _DMapEvents_MouseDownEvent e)
         {
-            _selectionFromSelectBox = false;
+            if (_enableMapInteraction)
+            {
+                _selectionFromSelectBox = false;
+            }
         }
 
         /// <summary>
@@ -610,7 +643,9 @@ namespace FAD3
         private void OnMapMouseUp(object sender, _DMapEvents_MouseUpEvent e)
         {
             //we only proceed if a drag-select was not done
-            if (!_selectionFromSelectBox && _axMap.CursorMode == tkCursorMode.cmSelection)
+            if (_enableMapInteraction
+                && !_selectionFromSelectBox
+                && _axMap.CursorMode == tkCursorMode.cmSelection)
             {
                 var extL = 0D;
                 var extR = 0D;
@@ -638,63 +673,62 @@ namespace FAD3
         /// <param name="e"></param>
         private void OnMapSelectBoxFinal(object sender, _DMapEvents_SelectBoxFinalEvent e)
         {
-            var extL = 0D;
-            var extR = 0D;
-            var extT = 0D;
-            var extB = 0D;
-            Extents selectionBoxExtent = new Extents();
-
-            _axMap.PixelToProj(e.left, e.top, ref extL, ref extT);
-            _axMap.PixelToProj(e.right, e.bottom, ref extR, ref extB);
-            selectionBoxExtent.SetBounds(extL, extB, 0, extR, extT, 0);
-
-            if (_inDefineMinorGrid && _axMap.UDCursorHandle == _hCursorDefineGrid)
+            if (_enableMapInteraction)
             {
-                //This is where the actual work of constructing the grid map takes place
+                var extL = 0D;
+                var extR = 0D;
+                var extT = 0D;
+                var extB = 0D;
+                Extents selectionBoxExtent = new Extents();
 
-                //pass the extents of the selected major grids and the extent defined by the select box
-                //if minor grid is defined successfully, we proceed with the next steps
-                if (_grid25MinorGrid.DefineMinorGrids(_selectedMajorGridShapesExtent, selectionBoxExtent))
+                _axMap.PixelToProj(e.left, e.top, ref extL, ref extT);
+                _axMap.PixelToProj(e.right, e.bottom, ref extR, ref extB);
+                selectionBoxExtent.SetBounds(extL, extB, 0, extR, extT, 0);
+
+                if (_inDefineMinorGrid && _axMap.UDCursorHandle == _hCursorDefineGrid)
                 {
-                    var minorGridExtent = _grid25MinorGrid.MinorGridLinesShapeFile.Extents;
+                    //This is where the actual work of constructing the grid map takes place
 
-                    //get the intersection of the minorGridExtent and the selected major grids
-                    if (MajorGridsIntersectMinorGridExtent(minorGridExtent))
+                    //pass the extents of the selected major grids and the extent defined by the select box
+                    //if minor grid is defined successfully, we proceed with the next steps
+                    if (_grid25MinorGrid.DefineMinorGrids(_selectedMajorGridShapesExtent, selectionBoxExtent))
                     {
-                        _shapeFileSelectedMajorGridBuffer = _shapefileMajorGridIntersect.BufferByDistance(0, 1, false, true);
-                        _shapeFileSelectedMajorGridBuffer.GeoProjection = _axMap.GeoProjection;
+                        var minorGridExtent = _grid25MinorGrid.MinorGridLinesShapeFile.Extents;
 
-                        if (_shapefileMajorGridIntersect.NumShapes > 0)
+                        //get the intersection of the minorGridExtent and the selected major grids
+                        if (MajorGridsIntersectMinorGridExtent(minorGridExtent))
                         {
-                            if (_grid25MinorGrid.ClipMinorGrid(_shapeFileSelectedMajorGridBuffer))
+                            _shapeFileSelectedMajorGridBuffer = _shapefileMajorGridIntersect.BufferByDistance(0, 1, false, true);
+                            _shapeFileSelectedMajorGridBuffer.GeoProjection = _axMap.GeoProjection;
+
+                            if (_shapefileMajorGridIntersect.NumShapes > 0
+                                && _grid25MinorGrid.ClipMinorGrid(_shapeFileSelectedMajorGridBuffer)
+                                && DefineBoundingRectangle(minorGridExtent))
                             {
-                                if (DefineBoundingRectangle(minorGridExtent))
+                                _grid25LabelManager = new Grid25LabelManager(_axMap.GeoProjection);
+
+                                if (_grid25LabelManager.LabelGrid(_shapeFileSelectedMajorGridBuffer, _gridAndLabelProperties, _mapTitle))
                                 {
-                                    _grid25LabelManager = new Grid25LabelManager(_axMap.GeoProjection);
+                                    _grid25LabelManager.AddMajorGridLabels(_listIntersectedMajorGrids);
+                                    _grid25LabelManager.Grid25Labels.Labels.ApplyCategories();
 
-                                    if (_grid25LabelManager.LabelGrid(_shapeFileSelectedMajorGridBuffer, _gridAndLabelProperties, _mapTitle))
-                                    {
-                                        _grid25LabelManager.AddMajorGridLabels(_listIntersectedMajorGrids);
-                                        _grid25LabelManager.Grid25Labels.Labels.ApplyCategories();
-
-                                        //we add the layers using the maplayer class, then we add the layer handles to listGridLayers
-                                        _listGridLayers.Add(_mapLayers.AddLayer(_grid25MinorGrid.MinorGridLinesShapeFile, "Minor grid", true, true));
-                                        _listGridLayers.Add(_mapLayers.AddLayer(_grid25LabelManager.Grid25Labels, "Labels", true, true));
-                                        _listGridLayers.Add(_mapLayers.AddLayer(_shapefileMajorGridIntersect, "Major grid", true, true));
-                                        _listGridLayers.Add(_mapLayers.AddLayer(_shapefileBoundingRectangle, "MBR", true, true));
-                                    }
-                                    _axMap.MapCursor = tkCursor.crsrMapDefault;
+                                    //we add the layers using the maplayer class, then we add the layer handles to listGridLayers
+                                    _listGridLayers.Add(_mapLayers.AddLayer(_grid25MinorGrid.MinorGridLinesShapeFile, "Minor grid", true, true));
+                                    _listGridLayers.Add(_mapLayers.AddLayer(_grid25LabelManager.Grid25Labels, "Labels", true, true));
+                                    _listGridLayers.Add(_mapLayers.AddLayer(_shapefileMajorGridIntersect, "Major grid", true, true));
+                                    _listGridLayers.Add(_mapLayers.AddLayer(_shapefileBoundingRectangle, "MBR", true, true));
                                 }
+                                _axMap.MapCursor = tkCursor.crsrMapDefault;
                             }
                         }
                     }
                 }
-            }
-            else
-            {
-                //pass the extent to SelectGrids function
-                //FromSelectionBox is true because we dragged a selection box
-                SelectGrids(selectionBoxExtent, SelectionFromSelectBox: true);
+                else
+                {
+                    //pass the extent to SelectGrids function
+                    //FromSelectionBox is true because we dragged a selection box
+                    SelectGrids(selectionBoxExtent, SelectionFromSelectBox: true);
+                }
             }
         }
 
