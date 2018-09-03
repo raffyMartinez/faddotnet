@@ -52,6 +52,13 @@ namespace FAD3
             get { return _grid25MajorGrid; }
         }
 
+        public void MapFishingGround(string grid25Name, FishingGrid.fadUTMZone utmZone)
+        {
+            FishingGroundMappingHandler fgmh = new FishingGroundMappingHandler(axMap.GeoProjection);
+            fgmh.MapLayersHandler = _mapLayersHandler;
+            fgmh.MapFishingGround(grid25Name, utmZone);
+        }
+
         public void createGrid25MajorGrid(FishingGrid.fadUTMZone UTMZone)
         {
             _grid25MajorGrid = new Grid25MajorGrid(axMap);
@@ -60,7 +67,6 @@ namespace FAD3
             _grid25MajorGrid.MapInterActionHandler = _mapInterActionHandler;
             axMap.GeoProjection.SetWgs84Projection(_grid25MajorGrid.Grid25Geoprojection);
             axMap.MapUnits = tkUnitsOfMeasure.umMeters;
-
             _mapLayersHandler.AddLayer(grid25MajorGrid.Grid25Grid, "Grid25", true, true);
         }
 

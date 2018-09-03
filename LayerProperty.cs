@@ -12,7 +12,7 @@ namespace FAD3
         public string LayerName { get; }
         public bool ShowInLayerUI { get; }
         public bool LayerVisible { get; }
-        public bool LayerDeleted { get; }
+        public bool LayerRemoved { get; }
         public string LayerType { get; }
 
         public LayerProperty(int layerHandle, string layerName, bool layerVIsible, bool showInLayerUI, string layerType)
@@ -24,10 +24,10 @@ namespace FAD3
             LayerType = layerType;
         }
 
-        public LayerProperty(int layerHandle, bool layerDeleted)
+        public LayerProperty(int layerHandle, bool layerRemoved)
         {
             LayerHandle = layerHandle;
-            LayerDeleted = LayerDeleted;
+            LayerRemoved = layerRemoved;
         }
     }
 }

@@ -106,6 +106,12 @@ namespace FAD3
         public bool ClipMinorGrid(Shapefile clippingShapefile)
         {
             _shapefileMinorGridLines = clippingShapefile.GetIntersection(false, _shapefileMinorGridLines, false, ShpfileType.SHP_POLYLINE);
+
+            //When we clip a shapefile and the result is the same shapefile, the shapeID field is duplicated.
+            //The original ID field is renamed to MWShapeI_1.
+            //We delete the duplicate and rename MWShapeI_1 to MWShapeID.
+            _shapefileMinorGridLines.EditDeleteField(0, null);
+            _shapefileMinorGridLines.Field[0].Name = "MWShapeID";
             return _shapefileMinorGridLines.NumShapes > 0;
         }
 

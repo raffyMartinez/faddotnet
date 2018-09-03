@@ -13,17 +13,18 @@ namespace FAD3
     public class MapLayersHandler : IDisposable
     {
         public bool _disposed;
-        private AxMap _axmap;
-        private Dictionary<int, MapLayer> _layerPropertiesDictionary = new Dictionary<int, MapLayer>();
-        private MapLayer _currentMapLayer;
+        private AxMap _axmap;                                                                       //reference to tha map control in the mapping form
+        private Dictionary<int, MapLayer> _mapLayerDictionary = new Dictionary<int, MapLayer>();    //contains MapLayers with the layer handle as key
+        private MapLayer _currentMapLayer;                                                          //the current layer selected in the map layers form
 
-        public delegate void LayerPropertyReadHandler(MapLayersHandler s, LayerProperty e);
+        public delegate void LayerReadHandler(MapLayersHandler s, LayerProperty e);                 //an event that is raised when a layer from the mapcontrol
 
-        public event LayerPropertyReadHandler LayerPropertyRead;
+        //is retrieved and then the listener is able to add the layer to the layers list
+        public event LayerReadHandler LayerRead;
 
-        public delegate void LayerDeletedHandler(MapLayersHandler s, LayerProperty e);
+        public delegate void LayerRemovedHandler(MapLayersHandler s, LayerProperty e);
 
-        public event LayerDeletedHandler LayerDeleted;
+        public event LayerRemovedHandler LayerRemoved;
 
         public delegate void CurrentLayerHandler(MapLayersHandler s, LayerProperty e);
 
@@ -78,7 +79,7 @@ namespace FAD3
                     break;
 
                 case "ImageClass":
-                    if (_layerPropertiesDictionary[layerHandle].ImageThumbnail == null)
+                    if (_mapLayerDictionary[layerHandle].ImageThumbnail == null)
                     {
                         string filename = _axmap.get_Image(layerHandle).Filename;
                         bmp = new Bitmap(w, h);
@@ -87,11 +88,11 @@ namespace FAD3
                         g.FillRectangle(Brushes.White, (rect.Width / 5) * 1, rect.Height / 4, w, h);
                         g.DrawImage(new Bitmap(filename), 0, 0, w, h);
                         pic.Image = bmp;
-                        _layerPropertiesDictionary[layerHandle].ImageThumbnail = bmp;
+                        _mapLayerDictionary[layerHandle].ImageThumbnail = bmp;
                     }
                     else
                     {
-                        pic.Image = _layerPropertiesDictionary[layerHandle].ImageThumbnail;
+                        pic.Image = _mapLayerDictionary[layerHandle].ImageThumbnail;
                     }
                     break;
             }
@@ -99,12 +100,12 @@ namespace FAD3
 
         public Dictionary<int, MapLayer> LayerDictionary
         {
-            get { return _layerPropertiesDictionary; }
+            get { return _mapLayerDictionary; }
         }
 
         public void ClearAllSelections()
         {
-            foreach (var item in _layerPropertiesDictionary)
+            foreach (var item in _mapLayerDictionary)
             {
                 if (item.Value.LayerType == "ShapefileClass")
                 {
@@ -121,7 +122,7 @@ namespace FAD3
 
         public void set_MapLayer(int layerHandle)
         {
-            _currentMapLayer = _layerPropertiesDictionary[layerHandle];
+            _currentMapLayer = _mapLayerDictionary[layerHandle];
             //if there are listeners to the event
             if (CurrentLayer != null)
             {
@@ -133,7 +134,7 @@ namespace FAD3
 
         public MapLayer get_MapLayer(int layerHandle)
         {
-            return _layerPropertiesDictionary[layerHandle];
+            return _mapLayerDictionary[layerHandle];
         }
 
         public int get_LayerPosition(int layerHandle)
@@ -146,7 +147,7 @@ namespace FAD3
             var layerMoved = false;
             if (_axmap.MoveLayerBottom(layerHandle))
             {
-                _layerPropertiesDictionary[layerHandle].LayerPosition = _axmap.get_LayerPosition(layerHandle);
+                _mapLayerDictionary[layerHandle].LayerPosition = _axmap.get_LayerPosition(layerHandle);
                 layerMoved = true;
             }
             return layerMoved;
@@ -185,11 +186,11 @@ namespace FAD3
             {
                 if (disposing)
                 {
-                    foreach (var item in _layerPropertiesDictionary)
+                    foreach (var item in _mapLayerDictionary)
                     {
                         item.Value.Dispose();
                     }
-                    _layerPropertiesDictionary = null;
+                    _mapLayerDictionary = null;
                 }
                 _axmap = null;
                 _disposed = true;
@@ -204,17 +205,17 @@ namespace FAD3
             for (int n = 0; n < _axmap.NumLayers; n++)
             {
                 var h = _axmap.get_LayerHandle(n);
-                if (_layerPropertiesDictionary[h].VisibleInLayersUI)
+                if (_mapLayerDictionary[h].VisibleInLayersUI)
                 {
                     //if there is a listener to the event
-                    if (LayerPropertyRead != null)
+                    if (LayerRead != null)
                     {
                         //get the corresponding layer item in the dictionary
-                        var item = _layerPropertiesDictionary[h];
+                        var item = _mapLayerDictionary[h];
 
                         //fill up the event argument class with the layer item
                         LayerProperty lp = new LayerProperty(item.Handle, item.Name, item.Visible, item.VisibleInLayersUI, item.LayerType);
-                        LayerPropertyRead(this, lp);
+                        LayerRead(this, lp);
                     }
                 }
             }
@@ -233,20 +234,37 @@ namespace FAD3
             }
         }
 
+        public void RemoveLayer(string layerName)
+        {
+            var layerHandle = 0;
+            var found = false;
+            foreach (var item in _mapLayerDictionary)
+            {
+                if (item.Value.Name == layerName)
+                {
+                    layerHandle = item.Key;
+                    found = true;
+                    break;
+                }
+            }
+            if (found) RemoveLayer(layerHandle);
+        }
+
         /// <summary>
-        /// removes a layer
+        /// removes a layer and raises a Layer removed event. Listener will then remove the layer from the list of layers
         /// </summary>
         /// <param name="layerHandle"></param>
         public void RemoveLayer(int layerHandle)
         {
-            _layerPropertiesDictionary.Remove(layerHandle);
+            _mapLayerDictionary[layerHandle].Dispose();
+            _mapLayerDictionary.Remove(layerHandle);
             _axmap.RemoveLayer(layerHandle);
-
+            _axmap.Redraw();
             //fire the layer deleted event
-            if (LayerDeleted != null)
+            if (LayerRemoved != null)
             {
-                LayerProperty lp = new LayerProperty(layerHandle, layerDeleted: true);
-                LayerDeleted(this, lp);
+                LayerProperty lp = new LayerProperty(layerHandle, layerRemoved: true);
+                LayerRemoved(this, lp);
             }
         }
 
@@ -259,9 +277,9 @@ namespace FAD3
         /// <param name="isShown"></param>
         public void EditLayer(int layerHandle, string layerName, bool visible, bool isShown = true)
         {
-            if (_layerPropertiesDictionary.ContainsKey(layerHandle))
+            if (_mapLayerDictionary.ContainsKey(layerHandle))
             {
-                var ly = _layerPropertiesDictionary[layerHandle];
+                var ly = _mapLayerDictionary[layerHandle];
                 ly.Name = layerName;
                 ly.Visible = visible;
                 ly.VisibleInLayersUI = isShown;
@@ -356,7 +374,7 @@ namespace FAD3
             mapLayer.LayerPosition = _axmap.get_LayerPosition(layerHandle);
             mapLayer.LayerObject = _axmap.get_GetObject(layerHandle);
 
-            _layerPropertiesDictionary.Add(layerHandle, mapLayer);
+            _mapLayerDictionary.Add(layerHandle, mapLayer);
             _axmap.Redraw();
             set_MapLayer(layerHandle);
             return mapLayer;
@@ -377,10 +395,10 @@ namespace FAD3
                 _axmap.set_LayerName(h, layerName);
                 mapLayer = SetMapLayer(h, layerName, true, true, sf.GeoProjection);
 
-                if (LayerPropertyRead != null)
+                if (LayerRead != null)
                 {
                     LayerProperty lp = new LayerProperty(h, layerName, true, true, mapLayer.LayerType);
-                    LayerPropertyRead(this, lp);
+                    LayerRead(this, lp);
                 }
             }
             return h;
@@ -401,10 +419,10 @@ namespace FAD3
                 _axmap.set_LayerName(h, layerName);
                 mapLayer = SetMapLayer(h, layerName, true, true, image.GeoProjection, "ImageClass");
 
-                if (LayerPropertyRead != null)
+                if (LayerRead != null)
                 {
                     LayerProperty lp = new LayerProperty(h, layerName, true, true, mapLayer.LayerType);
-                    LayerPropertyRead(this, lp);
+                    LayerRead(this, lp);
                 }
             }
             return h;
@@ -437,10 +455,10 @@ namespace FAD3
                 _axmap.set_LayerName(h, layerName);
                 mapLayer = SetMapLayer(h, layerName, true, showInLayerUI, gp);
 
-                if (LayerPropertyRead != null)
+                if (LayerRead != null)
                 {
                     LayerProperty lp = new LayerProperty(h, layerName, visible, showInLayerUI, mapLayer.LayerType);
-                    LayerPropertyRead(this, lp);
+                    LayerRead(this, lp);
                 }
             }
 

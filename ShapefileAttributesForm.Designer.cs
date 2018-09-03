@@ -28,19 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.lvAttributes = new System.Windows.Forms.ListView();
+            this.labelShapeFileName = new System.Windows.Forms.Label();
+            this.chkRemember = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
-            // 
-            // statusStrip1
-            // 
-            this.statusStrip1.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.statusStrip1.Location = new System.Drawing.Point(0, 532);
-            this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Padding = new System.Windows.Forms.Padding(1, 0, 19, 0);
-            this.statusStrip1.Size = new System.Drawing.Size(798, 22);
-            this.statusStrip1.TabIndex = 1;
-            this.statusStrip1.Text = "statusStrip1";
             // 
             // lvAttributes
             // 
@@ -49,17 +40,38 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lvAttributes.Location = new System.Drawing.Point(0, 33);
             this.lvAttributes.Name = "lvAttributes";
-            this.lvAttributes.Size = new System.Drawing.Size(798, 496);
+            this.lvAttributes.Size = new System.Drawing.Size(798, 482);
             this.lvAttributes.TabIndex = 2;
             this.lvAttributes.UseCompatibleStateImageBehavior = false;
+            // 
+            // labelShapeFileName
+            // 
+            this.labelShapeFileName.AutoSize = true;
+            this.labelShapeFileName.Location = new System.Drawing.Point(12, 9);
+            this.labelShapeFileName.Name = "labelShapeFileName";
+            this.labelShapeFileName.Size = new System.Drawing.Size(45, 16);
+            this.labelShapeFileName.TabIndex = 3;
+            this.labelShapeFileName.Text = "label1";
+            // 
+            // chkRemember
+            // 
+            this.chkRemember.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.chkRemember.AutoSize = true;
+            this.chkRemember.Location = new System.Drawing.Point(9, 524);
+            this.chkRemember.Name = "chkRemember";
+            this.chkRemember.Size = new System.Drawing.Size(95, 20);
+            this.chkRemember.TabIndex = 4;
+            this.chkRemember.Text = "Remember";
+            this.chkRemember.UseVisualStyleBackColor = true;
             // 
             // ShapefileAttributesForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(798, 554);
+            this.Controls.Add(this.chkRemember);
+            this.Controls.Add(this.labelShapeFileName);
             this.Controls.Add(this.lvAttributes);
-            this.Controls.Add(this.statusStrip1);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "ShapefileAttributesForm";
@@ -72,7 +84,8 @@
         }
 
         #endregion
-        private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ListView lvAttributes;
+        private System.Windows.Forms.Label labelShapeFileName;
+        private System.Windows.Forms.CheckBox chkRemember;
     }
 }

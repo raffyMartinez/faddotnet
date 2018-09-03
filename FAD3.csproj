@@ -142,6 +142,7 @@
     <Compile Include="FishingGroundExtentsForm.Designer.cs">
       <DependentUpon>FishingGroundExtentsForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="FishingGroundMappingHandler.cs" />
     <Compile Include="GMSLineClass.cs" />
     <Compile Include="Grid25GenerateForm.cs">
       <SubType>Form</SubType>

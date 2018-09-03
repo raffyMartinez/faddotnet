@@ -112,8 +112,8 @@ namespace FAD3
             InitializeComponent();
             _parentForm = parent;
             _mapLayersHandler = mapLayers;
-            _mapLayersHandler.LayerPropertyRead += OnLayerPropertyRead;
-            _mapLayersHandler.LayerDeleted += OnLayerDeleted;
+            _mapLayersHandler.LayerRead += OnLayerRead;
+            _mapLayersHandler.LayerRemoved += OnLayerDeleted;
             layerGrid.CellClick += OnCellClick;
             layerGrid.CellDoubleClick += OnCellDoubleClick;
             layerGrid.DragDrop += OnLayerGrid_DragDrop;
@@ -151,7 +151,7 @@ namespace FAD3
             }
         }
 
-        private void OnLayerPropertyRead(MapLayersHandler layer, LayerProperty e)
+        private void OnLayerRead(MapLayersHandler layer, LayerProperty e)
         {
             if (e.ShowInLayerUI)
             {
@@ -186,7 +186,7 @@ namespace FAD3
         private void MapLayersForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             _instance = null;
-            _mapLayersHandler.LayerPropertyRead -= OnLayerPropertyRead;
+            _mapLayersHandler.LayerRead -= OnLayerRead;
             global.SaveFormSettings(this);
         }
 

@@ -19,6 +19,7 @@ namespace FAD3
         public string LayerType { get; set; }
         public object LayerObject { get; set; }
         private bool _disposed;
+        public int[] SelectedIndexes { get; set; }
 
         public MapLayer(int handle, string name, bool visible, bool visibleInLayersUI)
         {

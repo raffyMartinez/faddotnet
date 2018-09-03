@@ -676,6 +676,24 @@ namespace FAD3
             }
         }
 
+        public static (double latitude, double longitude) Grid25ToLatLong(string GridName, FishingGrid.fadUTMZone utmZone)
+        {
+            int x, y = 0;
+            MinorGridCentroid(GridName, out x, out y);
+            var converter = new LatLngUTMConverter("WGS 84");
+            var zoneNumber = 0;
+            if (utmZone == FishingGrid.fadUTMZone.utmZone50N)
+            {
+                zoneNumber = 50;
+            }
+            else if (utmZone == FishingGrid.fadUTMZone.utmZone51N)
+            {
+                zoneNumber = 51;
+            }
+            var result = converter.convertUtmToLatLng(x, y, zoneNumber, "N");
+            return (result.Lat, result.Lng);
+        }
+
         public static string Grid25_to_UTM(string GridName)
         {
             int x, y = 0;

@@ -13,14 +13,18 @@ namespace FAD3
     public class MapInterActionHandler : IDisposable
     {
         private bool _disposed;
-        private AxMap _axMap;
-        private MapLayersHandler _mapLayersHandler;
-        private bool _selectionFromSelectBox;
-        private const int CURSORWIDTH = 5;
-        private MapLayer _currentMapLayer;
-        private int[] _selectedShapeIndexes;
-        public EventHandler Selection;
+        private AxMap _axMap;                               //reference to the map control in the mapping form
+        private MapLayersHandler _mapLayersHandler;         //reference to the map layers handler class
+        private bool _selectionFromSelectBox;               //is the current selection from a selection box or from click select
+        private const int CURSORWIDTH = 5;                  //expands the click select point by 5 pixels
+        private MapLayer _currentMapLayer;                  //the current layer selected in the layers form
+        private int[] _selectedShapeIndexes;                //an array containing the selected shapes index
+        public EventHandler Selection;                      //event that shapes were selected in a shapefile
+        private int _selectedShapeIndex;                    //the index of a shape that was selected
 
+        public bool EnableMapInteraction { get; set; }      //if true, interactions with the map using the mouse is allowed
+
+        //gets the map layers handler class
         public MapLayersHandler MapLayersHandler
         {
             get { return _mapLayersHandler; }
@@ -31,6 +35,32 @@ namespace FAD3
             get { return _selectedShapeIndexes; }
         }
 
+        public int SelectedShapeIndex
+        {
+            get { return _selectedShapeIndex; }
+            set
+            {
+                _selectedShapeIndex = value;
+                Shapefile sf = _currentMapLayer.LayerObject as Shapefile;
+                sf.SelectNone();
+                sf.ShapeSelected[_selectedShapeIndex] = true;
+                if (sf.Categories.Count > 0)
+                {
+                    sf.SelectionAppearance = tkSelectionAppearance.saSelectionColor;
+                }
+                else
+                {
+                    sf.SelectionAppearance = tkSelectionAppearance.saDrawingOptions;
+                }
+                _axMap.Redraw();
+            }
+        }
+
+        /// <summary>
+        /// Constructor and sets up map control events
+        /// </summary>
+        /// <param name="mapControl"></param>
+        /// <param name="layersHandler"></param>
         public MapInterActionHandler(AxMap mapControl, MapLayersHandler layersHandler)
         {
             _mapLayersHandler = layersHandler;
@@ -67,6 +97,11 @@ namespace FAD3
             }
         }
 
+        /// <summary>
+        /// processes selection made using a mouse drag selection box
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnMapSelectBoxFinal(object sender, _DMapEvents_SelectBoxFinalEvent e)
         {
             if (EnableMapInteraction)
@@ -84,12 +119,20 @@ namespace FAD3
             }
         }
 
+        /// <summary>
+        /// Receives the extent made by selection box or a click select to select shapes in a shapefile using intersection.
+        /// Afterwards, a Selection event is raised
+        /// </summary>
+        /// <param name="selectExtents"></param>
+        /// <param name="SelectionFromSelectBox"></param>
         private void Select(Extents selectExtents, bool SelectionFromSelectBox = false)
         {
+            _selectedShapeIndexes = null;
             _selectionFromSelectBox = SelectionFromSelectBox;
             if (_currentMapLayer.LayerType == "ShapefileClass")
             {
                 var sf = _axMap.get_Shapefile(_currentMapLayer.Handle);
+                _currentMapLayer.SelectedIndexes = null;
                 sf.SelectNone();
                 sf.SelectionAppearance = tkSelectionAppearance.saDrawingOptions;
 
@@ -110,6 +153,7 @@ namespace FAD3
                 if (sf.SelectShapes(selectExtents, 0, SelectMode.INTERSECTION, ref objSelection))
                 {
                     _selectedShapeIndexes = (int[])objSelection;
+                    _currentMapLayer.SelectedIndexes = _selectedShapeIndexes;
                     for (int n = 0; n < _selectedShapeIndexes.Length; n++)
                     {
                         sf.ShapeSelected[_selectedShapeIndexes[n]] = true;
@@ -149,8 +193,6 @@ namespace FAD3
                 Select(ext, SelectionFromSelectBox: false);
             }
         }
-
-        public bool EnableMapInteraction { get; set; }
 
         public void Dispose()
         {

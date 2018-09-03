@@ -1153,6 +1153,10 @@ namespace FAD3
                     if (lvMain.Tag.ToString() == "sampling" && lvh.Item != null)
                     {
                         SamplingGUID = lvh.Item.Tag.ToString();
+                        if (FishingGrid.GridType == FishingGrid.fadGridType.gridTypeGrid25 && global.MapIsOpen)
+                        {
+                            global.MappingForm.MapFishingGround(lvh.Item.SubItems[4].Text, FishingGrid.UTMZone);
+                        }
                         _ReferenceNumber = lvh.Item.Text;
                     }
                     if (e.Button == MouseButtons.Right)

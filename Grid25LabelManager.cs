@@ -251,17 +251,14 @@ namespace FAD3
                 }
 
                 Shape shp = new Shape();
-                if (shp.Create(ShpfileType.SHP_POINT))
+                if (shp.Create(ShpfileType.SHP_POINT) && shp.InsertPoint(pt, 0))
                 {
-                    if (shp.InsertPoint(pt, 0))
+                    var iShp = _shapeFileGrid25Labels.EditAddShape(shp);
+                    if (iShp >= 0)
                     {
-                        var iShp = _shapeFileGrid25Labels.EditAddShape(shp);
-                        if (iShp >= 0)
-                        {
-                            _shapeFileGrid25Labels.EditCellValue(ifldLabel, iShp, labelValue);
-                            _shapeFileGrid25Labels.EditCellValue(ifldLocation, iShp, position.Substring(0, 1).ToUpper());
-                            _shapeFileGrid25Labels.Labels.AddLabel(labelValue, pt.x, pt.y, 0, categoryIndex);
-                        }
+                        _shapeFileGrid25Labels.EditCellValue(ifldLabel, iShp, labelValue);
+                        _shapeFileGrid25Labels.EditCellValue(ifldLocation, iShp, position.Substring(0, 1).ToUpper());
+                        _shapeFileGrid25Labels.Labels.AddLabel(labelValue, pt.x, pt.y, 0, categoryIndex);
                     }
                 }
                 y++;
@@ -277,19 +274,14 @@ namespace FAD3
             foreach (var item in labels)
             {
                 var shp = new Shape();
-                if (shp.Create(ShpfileType.SHP_POINT))
+                if (shp.Create(ShpfileType.SHP_POINT) && shp.AddPoint(item.x, item.y) >= 0)
                 {
+                    var iShp = _shapeFileGrid25Labels.EditAddShape(shp);
+                    if (iShp >= 0)
                     {
-                        if (shp.AddPoint(item.x, item.y) >= 0)
-                        {
-                            var iShp = _shapeFileGrid25Labels.EditAddShape(shp);
-                            if (iShp >= 0)
-                            {
-                                _shapeFileGrid25Labels.EditCellValue(_iFldLocation, iShp, "MG");
-                                _shapeFileGrid25Labels.EditCellValue(_iFLdLabel, iShp, item.GridNo);
-                                _shapeFileGrid25Labels.Labels.AddLabel(item.GridNo.ToString(), shp.Point[0].x, shp.Point[0].y, 0, 4);
-                            }
-                        }
+                        _shapeFileGrid25Labels.EditCellValue(_iFldLocation, iShp, "MG");
+                        _shapeFileGrid25Labels.EditCellValue(_iFLdLabel, iShp, item.GridNo);
+                        _shapeFileGrid25Labels.Labels.AddLabel(item.GridNo.ToString(), shp.Point[0].x, shp.Point[0].y, 0, 4);
                     }
                 }
             }
