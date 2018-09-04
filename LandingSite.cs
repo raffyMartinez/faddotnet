@@ -108,6 +108,65 @@ namespace FAD3
             return myCount;
         }
 
+        public List<(int year, int countSamplings)> SampledYears()
+        {
+            DataTable dt = new DataTable();
+            List<(int year, int countSamplings)> myList = new List<(int year, int countSamplings)>();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    string query = $@"SELECT Year([SamplingDate]) AS SamplingYear, Count(tblLandingSites.LSGUID) AS n
+                                            FROM tblLandingSites INNER JOIN tblSampling ON tblLandingSites.LSGUID = tblSampling.LSGUID
+                                            GROUP BY Year([SamplingDate]), tblLandingSites.LSGUID
+                                            HAVING tblLandingSites.LSGUID={{{_LandingSiteGUID}}}";
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(dt);
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        DataRow dr = dt.Rows[i];
+                        myList.Add((int.Parse(dr["SamplingYear"].ToString()), int.Parse(dr["n"].ToString())));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex);
+                }
+                return myList;
+            }
+        }
+
+        public List<(int year, int countSamplings)> SampledYears(string gearVariationGUID)
+        {
+            DataTable dt = new DataTable();
+            List<(int year, int countSamplings)> myList = new List<(int year, int countSamplings)>();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    string query = $@"SELECT Year([SamplingDate]) AS SamplingYear, Count(tblLandingSites.LSGUID) AS n
+                                      FROM tblLandingSites INNER JOIN tblSampling ON tblLandingSites.LSGUID = tblSampling.LSGUID
+                                      GROUP BY Year([SamplingDate]), tblSampling.GearVarGUID, tblLandingSites.LSGUID
+                                      HAVING tblSampling.GearVarGUID={{{gearVariationGUID}}} AND
+                                      tblLandingSites.LSGUID={{{_LandingSiteGUID}}}";
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(dt);
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        DataRow dr = dt.Rows[i];
+                        myList.Add((int.Parse(dr["SamplingYear"].ToString()), int.Parse(dr["n"].ToString())));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex);
+                }
+                return myList;
+            }
+        }
+
         /// <summary>
         /// updates the data of a landing site
         /// </summary>

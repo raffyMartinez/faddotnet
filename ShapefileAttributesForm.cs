@@ -123,7 +123,14 @@ namespace FAD3
                         lvAttributes.Columns.Add("colRow", "Row");
                         for (int n = 0; n < sf.Table.NumFields; n++)
                         {
-                            lvAttributes.Columns.Add($"col{sf.Table.Field[n].Name}", sf.Table.Field[n].Name);
+                            if (sf.Table.Field[n].Alias.Length > 0)
+                            {
+                                lvAttributes.Columns.Add($"col{sf.Table.Field[n].Name}", sf.Table.Field[n].Alias);
+                            }
+                            else
+                            {
+                                lvAttributes.Columns.Add($"col{sf.Table.Field[n].Name}", sf.Table.Field[n].Name);
+                            }
                         }
                     }
 
@@ -157,7 +164,7 @@ namespace FAD3
                             //show attribute of selected shape and display in 2 column property-value format
                             for (int k = 0; k < sf.NumFields; k++)
                             {
-                                ListViewItem lvi = new ListViewItem(new string[] { sf.Table.Field[k].Name, sf.CellValue[k, _currentMapLayer.SelectedIndexes[0]].ToString() });
+                                ListViewItem lvi = new ListViewItem(new string[] { sf.Table.Field[k].Alias.Length > 0 ? sf.Table.Field[k].Alias : sf.Table.Field[k].Name, sf.CellValue[k, _currentMapLayer.SelectedIndexes[0]].ToString() });
                                 lvAttributes.Items.Add(lvi);
                             }
                         }

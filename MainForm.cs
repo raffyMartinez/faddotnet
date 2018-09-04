@@ -27,6 +27,7 @@ namespace FAD3
     /// </summary>
     public partial class MainForm : Form
     {
+        private MapEffortHelperForm _formEffortMapper;
         private aoi _AOI = new aoi();
         private string _AOIGuid = "";
         private string _AOIName = "";
@@ -75,6 +76,36 @@ namespace FAD3
             //
             // TODO: Add constructor code after the InitializeComponent() call.
             //
+        }
+
+        public string GearVariationGUID
+        {
+            get { return _GearVarGUID; }
+        }
+
+        public landingsite LandingSite
+        {
+            get { return _ls; }
+        }
+
+        public string SamplingMonth
+        {
+            get { return _SamplingMonth; }
+        }
+
+        public string GearVariationName
+        {
+            get { return _GearVarName; }
+        }
+
+        public string LandingSiteName
+        {
+            get { return _LandingSiteName; }
+        }
+
+        public string LandingSiteGUID
+        {
+            get { return _LandingSiteGuid; }
         }
 
         public ImageList treeImages
@@ -444,8 +475,6 @@ namespace FAD3
             }
             else
             {
-                //Note: commented out because I can't make this work for now
-
                 var tsi1 = menuDropDown.Items.Add("Enumerator detail");
                 tsi1.Name = "menuEnumeratorDetail";
                 tsi1.Visible = lvh.Item.Tag != null && _TreeLevel == "aoi" && lvh.Item.Tag.ToString() == "enumerator";
@@ -492,6 +521,13 @@ namespace FAD3
                     tsi = menuDropDown.Items.Add("Landing site properties");
                     tsi.Name = "menuLandingSiteProp";
                     tsi.Enabled = _TreeLevel == "landing_site";
+
+                    sep = menuDropDown.Items.Add("-");
+                    sep.Name = "menuSeparator2";
+
+                    tsi = menuDropDown.Items.Add("Map fishing effort");
+                    tsi.Name = "menuMapEffort";
+                    tsi.Enabled = global.MapIsOpen;
 
                     break;
 
@@ -926,7 +962,30 @@ namespace FAD3
                 case "menuDeleteSampling":
                     DeleteSampling();
                     break;
+
+                case "menuMapEffort":
+                    _formEffortMapper = MapEffortHelperForm.GetInstance(this);
+                    if (!_formEffortMapper.Visible)
+                    {
+                        _formEffortMapper.Show(this);
+                    }
+                    else
+                    {
+                        _formEffortMapper.BringToFront();
+                    }
+                    _formEffortMapper.SetUpMapping(_TreeLevel);
+                    break;
             }
+        }
+
+        private void SetMappingEffortSource()
+        {
+            if (_formEffortMapper != null) _formEffortMapper.SetUpMapping(_TreeLevel);
+        }
+
+        public void EffortMapperClosed()
+        {
+            _formEffortMapper = null;
         }
 
         private void ShowCatchCompositionForm(bool IsNew = false)
@@ -1473,6 +1532,7 @@ namespace FAD3
                 statusPanelTargetArea.Text = _AOIName;
                 statusPanelLandingSite.Text = _LandingSiteName;
                 statusPanelGearUsed.Text = _GearVarName;
+                if (_TreeLevel != "root") SetMappingEffortSource();
             }
             catch (Exception ex)
             {

@@ -234,24 +234,24 @@ namespace FAD3
             }
         }
 
+        /// <summary>
+        /// Remove a layer using layer name
+        /// </summary>
+        /// <param name="layerName"></param>
         public void RemoveLayer(string layerName)
         {
-            var layerHandle = 0;
-            var found = false;
             foreach (var item in _mapLayerDictionary)
             {
                 if (item.Value.Name == layerName)
                 {
-                    layerHandle = item.Key;
-                    found = true;
+                    RemoveLayer(item.Key);
                     break;
                 }
             }
-            if (found) RemoveLayer(layerHandle);
         }
 
         /// <summary>
-        /// removes a layer and raises a Layer removed event. Listener will then remove the layer from the list of layers
+        /// Removes a layer using layer handle and raises a Layer removed event.
         /// </summary>
         /// <param name="layerHandle"></param>
         public void RemoveLayer(int layerHandle)
@@ -260,6 +260,7 @@ namespace FAD3
             _mapLayerDictionary.Remove(layerHandle);
             _axmap.RemoveLayer(layerHandle);
             _axmap.Redraw();
+
             //fire the layer deleted event
             if (LayerRemoved != null)
             {

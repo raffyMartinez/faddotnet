@@ -19,6 +19,16 @@ namespace FAD3
         private Form _parentForm;
         private MapLayer _currentMapLayer;
 
+        public MapLayersHandler MapLayersHandler
+        {
+            get { return _mapLayersHandler; }
+        }
+
+        public GeoProjection geoProjection
+        {
+            get { return axMap.GeoProjection; }
+        }
+
         public MapInterActionHandler MapInterActionHandler
         {
             get { return _mapInterActionHandler; }
@@ -28,6 +38,11 @@ namespace FAD3
         {
             if (_instance == null) _instance = new MapperForm(parentForm);
             return _instance;
+        }
+
+        public int NumLayers()
+        {
+            return axMap.NumLayers;
         }
 
         private void CleanUp()

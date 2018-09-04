@@ -61,6 +61,15 @@ namespace FAD3
             get { return _gt; }
         }
 
+        /// <summary>
+        /// Compares two grid25 locations validates them according to the following
+        /// <para>
+        /// ULGrid must be  upper left of the LRgrid which must be at the lower right position
+        /// </para>
+        /// </summary>
+        /// <param name="ULGrid"></param>
+        /// <param name="LRGrid"></param>
+        /// <returns></returns>
         public static bool ValidGridCorners(string ULGrid, string LRGrid)
         {
             var EastingUL = 0;
