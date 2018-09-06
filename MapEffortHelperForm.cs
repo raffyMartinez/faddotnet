@@ -31,6 +31,7 @@ namespace FAD3
         {
             _instance = null;
             _parentForm.EffortMapperClosed();
+            global.MappingMode = global.fad3MappingMode.defaultMode;
         }
 
         private void OnButtonClick(object sender, EventArgs e)
@@ -39,6 +40,7 @@ namespace FAD3
             {
                 case "btnOk":
                     var fgmh = new FishingGroundMappingHandler();
+                    fgmh.MapControl = global.MappingForm.MapControl;
                     fgmh.MapLayersHandler = global.MappingForm.MapLayersHandler;
                     var samplingYears = "";
                     foreach (ListViewItem lvi in lvYears.Items)
@@ -55,20 +57,21 @@ namespace FAD3
 
                     if (global.MappingForm.NumLayers() > 0)
                     {
-                        fgmh.set_GeoProjection(global.MappingForm.geoProjection);
+                        fgmh.set_GeoProjection(global.MappingForm.GeoProjection);
                         bool aggregated = chkAggregate.Checked;
+                        bool notInclude1 = chkNotInclude1.Checked;
                         switch (_treeLevel)
                         {
                             case "aoi":
-                                fgmh.MapFishingGrounds(_parentForm.AOIGUID, samplingYears, FishingGrid.UTMZone, aggregated);
+                                fgmh.MapFishingGrounds(_parentForm.AOIGUID, samplingYears, FishingGrid.UTMZone, aggregated, notInclude1);
                                 break;
 
                             case "landing_site":
-                                fgmh.MapFishingGrounds(_parentForm.AOIGUID, samplingYears, FishingGrid.UTMZone, aggregated, _parentForm.LandingSiteGUID);
+                                fgmh.MapFishingGrounds(_parentForm.AOIGUID, samplingYears, FishingGrid.UTMZone, aggregated, notInclude1, _parentForm.LandingSiteGUID);
                                 break;
 
                             case "gear":
-                                fgmh.MapFishingGrounds(_parentForm.AOIGUID, samplingYears, FishingGrid.UTMZone, aggregated, _parentForm.LandingSiteGUID, _parentForm.GearVariationGUID);
+                                fgmh.MapFishingGrounds(_parentForm.AOIGUID, samplingYears, FishingGrid.UTMZone, aggregated, notInclude1, _parentForm.LandingSiteGUID, _parentForm.GearVariationGUID);
                                 break;
 
                             case "sampling":

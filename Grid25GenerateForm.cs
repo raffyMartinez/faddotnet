@@ -28,7 +28,7 @@ namespace FAD3
         {
             InitializeComponent();
             _parentForm = parent;
-            _grid25MajorGrid = parent.grid25MajorGrid;
+            _grid25MajorGrid = parent.Grid25MajorGrid;
         }
 
         private uint ColorToUInt(Color clr)
@@ -117,6 +117,7 @@ namespace FAD3
             _labelAndGridProperties.Clear();
 
             global.SaveFormSettings(this);
+            global.MappingMode = global.fad3MappingMode.defaultMode;
         }
 
         private void Grid25GenerateForm_Load(object sender, EventArgs e)

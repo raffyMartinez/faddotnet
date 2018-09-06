@@ -41,7 +41,7 @@ namespace FAD3
         private Shapefile _shapefileMajorGrid;                                  //shapefile of the entire grid25 major grids
         private Shapefile _shapefileMajorGridIntersect;                         //shapefile of major grid intersected with extent of minor grids
         private Shapefile _shapeFileSelectedMajorGridBuffer;                    //a shapefile that holds a convex hull of the selected major grids
-        private int _hCursorDefineGrid;
+        private int _hCursorDefineGrid;                                         //the handle of the cursor used when defining selection extent of major grid
         private string _mapTitle;                                                //title of the fishing ground grid map
         private MapLayer _currentMapLayer;
         private bool _enableMapInteraction;
@@ -154,6 +154,11 @@ namespace FAD3
             }
         }
 
+        public void MoveToTop()
+        {
+            _axMap.MoveLayerTop(0);
+        }
+
         /// <summary>
         /// Returns the minor grid class
         /// </summary>
@@ -190,7 +195,7 @@ namespace FAD3
                         break;
                 }
                 FishingGrid.UTMZone = _utmZone;
-                GenerateMajorGrids();
+                //GenerateMajorGrids();
             }
         }
 
@@ -409,7 +414,7 @@ namespace FAD3
         /// <summary>
         /// creates major grids on a utm zone
         /// </summary>
-        private void GenerateMajorGrids()
+        public void GenerateMajorGrids()
         {
             var sf = new Shapefile();
             Shape shp;

@@ -7,6 +7,7 @@ using AxMapWinGIS;
 using MapWinGIS;
 using System.Drawing;
 using System.Reflection;
+using System.Xml;
 
 namespace FAD3
 {
@@ -17,17 +18,13 @@ namespace FAD3
         private Dictionary<int, MapLayer> _mapLayerDictionary = new Dictionary<int, MapLayer>();    //contains MapLayers with the layer handle as key
         private MapLayer _currentMapLayer;                                                          //the current layer selected in the map layers form
 
-        public delegate void LayerReadHandler(MapLayersHandler s, LayerProperty e);                 //an event that is raised when a layer from the mapcontrol
-
-        //is retrieved and then the listener is able to add the layer to the layers list
-        public event LayerReadHandler LayerRead;
+        public delegate void LayerReadHandler(MapLayersHandler s, LayerProperty e);                 //an event that is raised when a layer from the mapcontrol is retrieved
+        public event LayerReadHandler LayerRead;                                                    //in order for the listener is able to add the layer to the layers list
 
         public delegate void LayerRemovedHandler(MapLayersHandler s, LayerProperty e);
-
         public event LayerRemovedHandler LayerRemoved;
 
-        public delegate void CurrentLayerHandler(MapLayersHandler s, LayerProperty e);
-
+        public delegate void CurrentLayerHandler(MapLayersHandler s, LayerProperty e);              //event raised when a layer is selected from the list found in the layers form
         public event CurrentLayerHandler CurrentLayer;
 
         public AxMap MapControl
@@ -172,6 +169,8 @@ namespace FAD3
         private void OnProjectionMismatch(object sender, _DMapEvents_ProjectionMismatchEvent e)
         {
             e.reproject = tkMwBoolean.blnTrue;
+            var rcount = 0;
+            _axmap.get_Shapefile(e.layerHandle).Reproject(_axmap.GeoProjection, ref rcount);
         }
 
         public void Dispose()
@@ -292,7 +291,7 @@ namespace FAD3
         }
 
         /// <summary>
-        /// handles the opening of map layer files
+        /// Handles the opening of map layer files from a file open dialog
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
@@ -356,7 +355,7 @@ namespace FAD3
         }
 
         /// <summary>
-        /// sets up a layer and adds it to the layers dictionary
+        /// Sets up a mapLayer object from a newly added map layer and adds it to the layers dictionary
         /// </summary>
         /// <param name="layerHandle"></param>
         /// <param name="layerName"></param>
@@ -436,15 +435,17 @@ namespace FAD3
         /// <param name="layerName"></param>
         /// <param name="visible"></param>
         /// <param name="showInLayerUI"></param>
+        /// <param name="layerHandle"></param>
         /// <returns></returns>
-        public int AddLayer(object layer, string layerName, bool visible, bool showInLayerUI)
+        public int AddLayer(object layer, string layerName, bool visible, bool showInLayerUI, int? layerHandle = null)
         {
             int h = 0;
             MapLayer mapLayer;
             GeoProjection gp = new GeoProjection();
-            if (h >= 0)
+
+            var layerType = layer.GetType().Name;
+            if (layerHandle == null)
             {
-                var layerType = layer.GetType().Name;
                 switch (layerType)
                 {
                     case "ShapefileClass":
@@ -452,18 +453,117 @@ namespace FAD3
                         gp = ((Shapefile)layer).GeoProjection;
                         break;
                 }
-
-                _axmap.set_LayerName(h, layerName);
-                mapLayer = SetMapLayer(h, layerName, true, showInLayerUI, gp);
-
-                if (LayerRead != null)
+            }
+            else
+            {
+                if (layer is Shapefile)
                 {
-                    LayerProperty lp = new LayerProperty(h, layerName, visible, showInLayerUI, mapLayer.LayerType);
-                    LayerRead(this, lp);
+                    layerType = "ShapefileClass";
+                    gp = ((Shapefile)layer).GeoProjection;
                 }
+                h = layerHandle ?? default;
+                ShapefileLabelHandler sflh = new ShapefileLabelHandler((Shapefile)layer);
+            }
+
+            _axmap.set_LayerName(h, layerName);
+            mapLayer = SetMapLayer(h, layerName, visible, showInLayerUI, gp);
+
+            if (LayerRead != null)
+            {
+                LayerProperty lp = new LayerProperty(h, layerName, visible, showInLayerUI, mapLayer.LayerType);
+                LayerRead(this, lp);
             }
 
             return h;
+        }
+
+        /// <summary>
+        /// save additional map options including AvoidCollision which is not saved by SaveMapState
+        /// </summary>
+        private void SaveOtherMapOptions()
+        {
+            for (int n = 0; n < _axmap.NumLayers; n++)
+            {
+                var h = _axmap.get_LayerHandle(n);
+                var sf = _axmap.get_Shapefile(h);
+                if (sf.Labels.Count > 0)
+                {
+                    ShapefileLabelHandler.SaveLabelParameters(h, sf.Labels.AvoidCollisions);
+                }
+            }
+        }
+
+        /// <summary>
+        /// saves the map state to an xml file
+        /// </summary>
+        public void SaveMapState()
+        {
+            if (_axmap.NumLayers > 0
+                && global.MappingMode == global.fad3MappingMode.defaultMode
+                && _axmap.SaveMapState($@"{global.ApplicationPath}\mapstate", false, true))
+            {
+                SaveOtherMapOptions();
+            }
+        }
+
+        /// <summary>
+        /// Load map layers from XML file generated by axmap.SaveMapState.
+        ///
+        /// Layers are added to the map and is followed by restoring the map extent.
+        /// The first added layer automatically sets the map control's projection.
+        /// </summary>
+        /// <param name="restoreMapState">
+        /// When restoreMapState:true, map state is restored
+        /// We use restoreMapState:false to load the layers but not restore axMap extent.
+        /// </param>
+        public void LoadMapState(bool restoreMapState = true)
+        {
+            string mapStateFile = $@"{global.ApplicationPath}\mapstate";
+            var doc = new XmlDocument();
+            doc.Load(mapStateFile);
+            foreach (XmlNode ly in doc.DocumentElement.SelectNodes("//Layer"))
+            {
+                if (ly.Attributes["LayerType"].Value == "Shapefile")
+                {
+                    var sf = new Shapefile();
+                    if (sf.Open(ly.Attributes["Filename"].Value))
+                    {
+                        //the first layer added will determine the projection of the map control
+                        var h = AddLayer(sf, ly.Attributes["LayerName"].Value, ly.Attributes["LayerVisible"].Value == "1", true);
+                        _axmap.get_Shapefile(h).Deserialize(false, ly.InnerXml);
+                        ShapefileLabelHandler sflh = new ShapefileLabelHandler(_axmap.get_Shapefile(h));
+                        foreach (XmlNode child in ly.FirstChild.ChildNodes)
+                        {
+                            if (child.Name == "LabelsClass" && child.Attributes["Generated"].Value == "1")
+                            {
+                                sflh.LabelShapefile(child.OuterXml);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    //code when layertype is image
+                }
+            }
+            if (restoreMapState)
+            {
+                //We restore saved extent of the map but not the projection. Since layers
+                //were already added to the map, the first layer sets the map's projection.
+                foreach (XmlNode ms in doc.DocumentElement.SelectNodes("//MapState "))
+                {
+                    var ext = new Extents();
+                    ext.SetBounds(
+                        double.Parse(ms.Attributes["ExtentsLeft"].Value),
+                        double.Parse(ms.Attributes["ExtentsBottom"].Value),
+                        0,
+                        double.Parse(ms.Attributes["ExtentsRight"].Value),
+                        double.Parse(ms.Attributes["ExtentsTop"].Value),
+                        0);
+                    _axmap.Extents = ext;
+                    _axmap.ExtentPad = double.Parse(ms.Attributes["ExtentsPad"].Value);
+                }
+            }
         }
 
         private void OnMapLayerAdded(object sender, _DMapEvents_LayerAddedEvent e)

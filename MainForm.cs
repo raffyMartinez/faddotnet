@@ -767,7 +767,8 @@ namespace FAD3
 
         private void OnGenerateGridMapToolStripMenuItem_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
-            e.ClickedItem.Owner.Hide();
+            e.ClickedItem.OwnerItem.Owner.Hide();
+            global.MappingMode = global.fad3MappingMode.grid25Mode;
             var mf = MapperForm.GetInstance(this);
             if (!mf.Visible)
             {
@@ -776,11 +777,11 @@ namespace FAD3
                 switch (tsi.Tag.ToString())
                 {
                     case "zone50":
-                        global.MappingForm.createGrid25MajorGrid(FishingGrid.fadUTMZone.utmZone50N);
+                        global.MappingForm.CreateGrid25MajorGrid(FishingGrid.fadUTMZone.utmZone50N);
                         break;
 
                     case "zone51":
-                        global.MappingForm.createGrid25MajorGrid(FishingGrid.fadUTMZone.utmZone51N);
+                        global.MappingForm.CreateGrid25MajorGrid(FishingGrid.fadUTMZone.utmZone51N);
                         break;
                 }
                 Grid25GenerateForm ggf = new Grid25GenerateForm(global.MappingForm);
@@ -974,6 +975,7 @@ namespace FAD3
                         _formEffortMapper.BringToFront();
                     }
                     _formEffortMapper.SetUpMapping(_TreeLevel);
+                    global.MappingMode = global.fad3MappingMode.fishingGroundMappingMode;
                     break;
             }
         }

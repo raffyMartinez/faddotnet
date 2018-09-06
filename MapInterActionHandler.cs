@@ -161,7 +161,7 @@ namespace FAD3
                 }
                 _axMap.Redraw();
                 EventHandler handler = Selection;
-                if (null != handler) handler(this, EventArgs.Empty);
+                if (handler != null) handler(this, EventArgs.Empty);
             }
             else if (_currentMapLayer.LayerType == "ImageClass")
             {

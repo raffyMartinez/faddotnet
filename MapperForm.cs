@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using AxMapWinGIS;
 using MapWinGIS;
 
 namespace FAD3
@@ -24,7 +26,7 @@ namespace FAD3
             get { return _mapLayersHandler; }
         }
 
-        public GeoProjection geoProjection
+        public GeoProjection GeoProjection
         {
             get { return axMap.GeoProjection; }
         }
@@ -62,10 +64,12 @@ namespace FAD3
             get { return _currentMapLayer; }
         }
 
-        public Grid25MajorGrid grid25MajorGrid
+        public Grid25MajorGrid Grid25MajorGrid
         {
             get { return _grid25MajorGrid; }
         }
+
+        public AxMap MapControl { get; internal set; }
 
         public void MapFishingGround(string grid25Name, FishingGrid.fadUTMZone utmZone)
         {
@@ -74,15 +78,19 @@ namespace FAD3
             fgmh.MapFishingGround(grid25Name, utmZone);
         }
 
-        public void createGrid25MajorGrid(FishingGrid.fadUTMZone UTMZone)
+        public void CreateGrid25MajorGrid(FishingGrid.fadUTMZone UTMZone)
         {
             _grid25MajorGrid = new Grid25MajorGrid(axMap);
             _grid25MajorGrid.UTMZone = UTMZone;
+            _grid25MajorGrid.GenerateMajorGrids();
             _grid25MajorGrid.MapLayers = _mapLayersHandler;
             _grid25MajorGrid.MapInterActionHandler = _mapInterActionHandler;
             axMap.GeoProjection.SetWgs84Projection(_grid25MajorGrid.Grid25Geoprojection);
             axMap.MapUnits = tkUnitsOfMeasure.umMeters;
-            _mapLayersHandler.AddLayer(grid25MajorGrid.Grid25Grid, "Grid25", true, true);
+            var h = _mapLayersHandler.AddLayer(Grid25MajorGrid.Grid25Grid, "Grid25", true, true);
+            _mapLayersHandler.LoadMapState(false);
+            _grid25MajorGrid.MoveToTop();
+            _mapLayersHandler.set_MapLayer(0);
         }
 
         public MapperForm(Form parentForm)
@@ -93,6 +101,7 @@ namespace FAD3
 
         private void OnMapperForm_Load(object sender, EventArgs e)
         {
+            MapControl = axMap;
             toolstripToolBar.ClickThrough = true;
             Text = "Map";
             global.MappingForm = this;
@@ -101,6 +110,15 @@ namespace FAD3
             _mapLayersHandler.CurrentLayer += OnCurrentMapLayer;
             _mapInterActionHandler = new MapInterActionHandler(axMap, _mapLayersHandler);
             SetCursorToSelect();
+
+            if (global.MappingMode == global.fad3MappingMode.defaultMode)
+            {
+                _mapLayersHandler.LoadMapState();
+            }
+            else
+            {
+                tsButtonSave.Enabled = false;
+            }
         }
 
         private void OnCurrentMapLayer(MapLayersHandler s, LayerProperty e)
@@ -124,7 +142,7 @@ namespace FAD3
             global.SaveFormSettings(this);
         }
 
-        private void OpenFileDialog()
+        public void OpenFileDialog()
         {
             string filename = "";
             OpenFileDialog ofd = new OpenFileDialog
@@ -161,6 +179,10 @@ namespace FAD3
             ToolStripItem tsi = e.ClickedItem;
             switch (tsi.Name)
             {
+                case "tsButtonSave":
+                    _mapLayersHandler.SaveMapState();
+                    break;
+
                 case "tsButtonLayers":
                     var mlf = MapLayersForm.GetInstance(_mapLayersHandler, this);
                     if (!mlf.Visible)

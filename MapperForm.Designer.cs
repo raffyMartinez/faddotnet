@@ -34,6 +34,8 @@
             this.ilCursors = new System.Windows.Forms.ImageList(this.components);
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolstripToolBar = new ToolStripExtensions.ToolStripEx();
+            this.tsButtonSave = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.tsButtonLayers = new System.Windows.Forms.ToolStripButton();
             this.tsButtonLayerAdd = new System.Windows.Forms.ToolStripButton();
             this.tsButtonAttributes = new System.Windows.Forms.ToolStripButton();
@@ -45,9 +47,9 @@
             this.tsButtonPan = new System.Windows.Forms.ToolStripButton();
             this.tsButtonBlackArrow = new System.Windows.Forms.ToolStripButton();
             this.tsButtonMeasure = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.tsButtonClearSelection = new System.Windows.Forms.ToolStripButton();
             this.tsButtonClearAllSelection = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             ((System.ComponentModel.ISupportInitialize)(this.axMap)).BeginInit();
             this.toolstripToolBar.SuspendLayout();
             this.SuspendLayout();
@@ -84,6 +86,8 @@
             // 
             this.toolstripToolBar.ClickThrough = false;
             this.toolstripToolBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tsButtonSave,
+            this.toolStripSeparator2,
             this.tsButtonLayers,
             this.tsButtonLayerAdd,
             this.tsButtonAttributes,
@@ -105,6 +109,21 @@
             this.toolstripToolBar.TabIndex = 1;
             this.toolstripToolBar.Text = "toolStripEx1";
             this.toolstripToolBar.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnToolbarClicked);
+            // 
+            // tsButtonSave
+            // 
+            this.tsButtonSave.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsButtonSave.Image = global::FAD3.Properties.Resources.document_save;
+            this.tsButtonSave.ImageTransparentColor = System.Drawing.Color.White;
+            this.tsButtonSave.Name = "tsButtonSave";
+            this.tsButtonSave.Size = new System.Drawing.Size(23, 22);
+            this.tsButtonSave.Text = "toolStripButton1";
+            this.tsButtonSave.ToolTipText = "Save map state";
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
             // 
             // tsButtonLayers
             // 
@@ -216,6 +235,11 @@
             this.tsButtonMeasure.Text = "toolStripButton11";
             this.tsButtonMeasure.ToolTipText = "Measure";
             // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
+            // 
             // tsButtonClearSelection
             // 
             this.tsButtonClearSelection.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -235,11 +259,6 @@
             this.tsButtonClearAllSelection.Size = new System.Drawing.Size(23, 22);
             this.tsButtonClearAllSelection.Text = "toolStripButton1";
             this.tsButtonClearAllSelection.ToolTipText = "Clears selection from all layers";
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
             // 
             // MapperForm
             // 
@@ -283,5 +302,7 @@
         private System.Windows.Forms.ToolStripButton tsButtonClearSelection;
         private System.Windows.Forms.ToolStripButton tsButtonClearAllSelection;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripButton tsButtonSave;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
     }
 }

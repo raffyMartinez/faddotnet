@@ -44,7 +44,7 @@ namespace FAD3
         private static CoordinateDisplayFormat _CoordDisplayFormat = CoordinateDisplayFormat.DegreeDecimal;
         private static Color _MissingFieldBackColor = global.MissingFieldBackColor;
 
-        //private static string _MissingRequiredFiles;
+        public static fad3MappingMode MappingMode { get; set; }
 
         /// <summary>
         /// String. Returns the files required by the application that are missing
@@ -270,6 +270,7 @@ namespace FAD3
         /// </summary>
         static global()
         {
+            MappingMode = fad3MappingMode.defaultMode;
             GetAppPreferences();
             TestMPH();
             _AppPath = Application.StartupPath.ToString();
@@ -435,6 +436,22 @@ namespace FAD3
             MetaphoneCOM.DoubleMetaphoneShort mph = new MetaphoneCOM.DoubleMetaphoneShort();
             mph.ComputeMetaphoneKeys("test", out k1, out k2);
             _hasMPH = k1 > 0;
+        }
+
+        public enum fad3MappingMode
+        {
+            defaultMode,
+            grid25Mode,
+            thematicPointMode,
+            fishingGroundMappingMode
+        }
+
+        public enum ExtentCompare
+        {
+            excoSimilar,
+            excoOutside,
+            excoInside,
+            excoCrossing
         }
 
         public enum fad3CatchSubRow

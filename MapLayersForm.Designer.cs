@@ -28,12 +28,18 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.layerGrid = new System.Windows.Forms.DataGridView();
             this.Visible = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.Layer = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Symbol = new System.Windows.Forms.DataGridViewImageColumn();
             this.buttonOK = new System.Windows.Forms.Button();
+            this.menuLayers = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.itemAddLayer = new System.Windows.Forms.ToolStripMenuItem();
+            this.itemRemoveLayer = new System.Windows.Forms.ToolStripMenuItem();
+            this.itemLayerProperty = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.layerGrid)).BeginInit();
+            this.menuLayers.SuspendLayout();
             this.SuspendLayout();
             // 
             // layerGrid
@@ -96,6 +102,34 @@
             this.buttonOK.UseVisualStyleBackColor = true;
             this.buttonOK.Click += new System.EventHandler(this.OnButtonClick);
             // 
+            // menuLayers
+            // 
+            this.menuLayers.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.itemAddLayer,
+            this.itemRemoveLayer,
+            this.itemLayerProperty});
+            this.menuLayers.Name = "menuLayers";
+            this.menuLayers.Size = new System.Drawing.Size(181, 92);
+            this.menuLayers.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnMenuLayers_ItemClicked);
+            // 
+            // itemAddLayer
+            // 
+            this.itemAddLayer.Name = "itemAddLayer";
+            this.itemAddLayer.Size = new System.Drawing.Size(180, 22);
+            this.itemAddLayer.Text = "Add layer";
+            // 
+            // itemRemoveLayer
+            // 
+            this.itemRemoveLayer.Name = "itemRemoveLayer";
+            this.itemRemoveLayer.Size = new System.Drawing.Size(180, 22);
+            this.itemRemoveLayer.Text = "Remove layer";
+            // 
+            // itemLayerProperty
+            // 
+            this.itemLayerProperty.Name = "itemLayerProperty";
+            this.itemLayerProperty.Size = new System.Drawing.Size(180, 22);
+            this.itemLayerProperty.Text = "Properties";
+            // 
             // MapLayersForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -110,6 +144,7 @@
             this.Load += new System.EventHandler(this.OnMapLayersForm_Load);
             this.Resize += new System.EventHandler(this.MapLayersForm_Resize);
             ((System.ComponentModel.ISupportInitialize)(this.layerGrid)).EndInit();
+            this.menuLayers.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -121,5 +156,9 @@
         private System.Windows.Forms.DataGridViewCheckBoxColumn Visible;
         private System.Windows.Forms.DataGridViewTextBoxColumn Layer;
         private System.Windows.Forms.DataGridViewImageColumn Symbol;
+        private System.Windows.Forms.ContextMenuStrip menuLayers;
+        private System.Windows.Forms.ToolStripMenuItem itemAddLayer;
+        private System.Windows.Forms.ToolStripMenuItem itemRemoveLayer;
+        private System.Windows.Forms.ToolStripMenuItem itemLayerProperty;
     }
 }

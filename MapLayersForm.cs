@@ -40,7 +40,19 @@ namespace FAD3
             // Get the index of the item the mouse is below.
             _rowIndexFromMouseDown = layerGrid.HitTest(e.X, e.Y).RowIndex;
 
-            if (_rowIndexFromMouseDown != -1)
+            if (e.Button == MouseButtons.Right)
+            {
+                itemAddLayer.Visible = true;
+                itemRemoveLayer.Visible = true;
+                itemLayerProperty.Visible = true;
+                if (_rowIndexFromMouseDown == -1)
+                {
+                    itemRemoveLayer.Visible = false;
+                    itemLayerProperty.Visible = false;
+                }
+                menuLayers.Show(layerGrid, e.X, e.Y);
+            }
+            else if (e.Button == MouseButtons.Left && _rowIndexFromMouseDown != -1)
             {
                 // Remember the point where the mouse down occurred.
                 // The DragSize indicates the size that the mouse can move
@@ -115,11 +127,21 @@ namespace FAD3
             _mapLayersHandler.LayerRead += OnLayerRead;
             _mapLayersHandler.LayerRemoved += OnLayerDeleted;
             layerGrid.CellClick += OnCellClick;
+            layerGrid.CellMouseDown += OnCellMouseDown;
             layerGrid.CellDoubleClick += OnCellDoubleClick;
             layerGrid.DragDrop += OnLayerGrid_DragDrop;
             layerGrid.DragOver += OnLayerGrid_DragOver;
             layerGrid.MouseDown += OnLayerGrid_MouseDown;
             layerGrid.MouseMove += OnLayerGrid_MouseMove;
+        }
+
+        private void OnCellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                menuLayers.Show(layerGrid, e.X, e.Y);
+                _rowIndexFromMouseDown = e.RowIndex;
+            }
         }
 
         private void OnCellDoubleClick(object sender, DataGridViewCellEventArgs e)
@@ -236,6 +258,24 @@ namespace FAD3
                 row.Cells[1].Style.Font = new Font(Font.FontFamily.Name, Font.Size, FontStyle.Regular);
             }
             layerGrid[1, currentRow].Style.Font = new Font(Font.FontFamily.Name, Font.Size, FontStyle.Bold);
+        }
+
+        private void OnMenuLayers_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+            e.ClickedItem.Owner.Hide();
+            switch (e.ClickedItem.Name)
+            {
+                case "itemAddLayer":
+                    _parentForm.OpenFileDialog();
+                    break;
+
+                case "itemRemoveLayer":
+                    MapLayers.RemoveLayer((int)layerGrid[0, _rowIndexFromMouseDown].Tag);
+                    break;
+
+                case "itemLayerProperty":
+                    break;
+            }
         }
     }
 }

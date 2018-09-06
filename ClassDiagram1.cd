@@ -6,6 +6,16 @@
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
     <NestedTypes>
+      <Enum Name="FAD3.global.fad3MappingMode" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>global.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Enum Name="FAD3.global.ExtentCompare" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>global.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
       <Enum Name="FAD3.global.fad3CatchSubRow" Collapsed="true">
         <TypeIdentifier>
           <NewMemberFileName>global.cs</NewMemberFileName>
@@ -38,14 +48,14 @@
       </Enum>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>AGaFIRACQMIhMikwggAgohMIAQIgAwAOACMABIMKAgA=</HashCode>
+      <HashCode>AGaFIRACQMIhMikwggAgohMIAQIgAwAOACMABIMaAgA=</HashCode>
       <FileName>global.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="FAD3.aoi">
     <Position X="7" Y="13.25" Width="2.75" />
     <TypeIdentifier>
-      <HashCode>AgQAaCABUAgCAIAEIAIAEALAAEAAAEIAAEAEAgAAAAQ=</HashCode>
+      <HashCode>AgQAaCAhUAgCAIAEIAIAEALAAEAAAEIAAEAEAgAAAAQ=</HashCode>
       <FileName>AOI.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -160,7 +170,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="FAD3.mru">
-    <Position X="16.75" Y="3" Width="2.25" />
+    <Position X="15.75" Y="1.75" Width="2.25" />
     <NestedTypes>
       <Delegate Name="FAD3.mru.FileSelectedEventHandler" Collapsed="true">
         <TypeIdentifier>
@@ -225,7 +235,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="ISO_Classes.Coordinate">
-    <Position X="20.25" Y="2.5" Width="2.25" />
+    <Position X="18.75" Y="1.75" Width="2.25" />
     <TypeIdentifier>
       <HashCode>AAAAQAAAAEAAQBAMgCAIAAEACAAAAIBAAABIBAAAAAI=</HashCode>
       <FileName>Coordinate.cs</FileName>
@@ -241,7 +251,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="FAD3.Enumerators">
-    <Position X="14.25" Y="3.5" Width="2.25" />
+    <Position X="13" Y="2.25" Width="2.25" />
     <TypeIdentifier>
       <HashCode>AIAAAAAAAAAAABCAAAGAAAgAAEAAAAAEAAAAIEABAAA=</HashCode>
       <FileName>Enumerators.cs</FileName>
@@ -313,7 +323,7 @@
   <Class Name="FAD3.Grid25MajorGrid">
     <Position X="21.25" Y="8.75" Width="2.25" />
     <TypeIdentifier>
-      <HashCode>gABDwAAACCBEAEAAJJEBQwAAARAQERCIAAglkJASAAQ=</HashCode>
+      <HashCode>gABDwIgACCBEAEACNIEBQQAQARAQERCIAAhlkJASBAQ=</HashCode>
       <FileName>Grid25MajorGrid.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -329,34 +339,72 @@
   <Class Name="FAD3.Grid25LabelManager">
     <Position X="26.5" Y="8.75" Width="2.25" />
     <TypeIdentifier>
-      <HashCode>AIAEAAAAIQQCAEAAEAESAAAgCAAAIAAAAAIAAAAAAAA=</HashCode>
+      <HashCode>AIAEAAAAISQOAEAAEAETAAAgCAAAIAAAAAIAAAAAAAA=</HashCode>
       <FileName>Grid25LabelManager.cs</FileName>
     </TypeIdentifier>
+    <Lollipop Position="0.2" />
   </Class>
   <Class Name="FAD3.MapLayer">
-    <Position X="29" Y="9" Width="2.25" />
+    <Position X="28" Y="0.5" Width="2.25" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQgAAEAAAIIAAAQCABAAAA=</HashCode>
+      <HashCode>AAAgAAAAACAEAAAAAAQAAAQgAAEAAAJIAAgQAABAAAA=</HashCode>
       <FileName>MapLayer.cs</FileName>
     </TypeIdentifier>
+    <Lollipop Position="0.2" />
   </Class>
-  <Class Name="FAD3.MapLayers">
-    <Position X="31.75" Y="9" Width="2.25" />
+  <Class Name="FAD3.MapInterActionHandler">
+    <Position X="21.75" Y="1.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAKBAAAIAqAEAEQAAIAAAQAAAAAAAACAAAABQMAQQAA=</HashCode>
+      <FileName>MapInterActionHandler.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="FAD3.MapLayersHandler">
+    <Position X="24.75" Y="0.5" Width="2.75" />
     <NestedTypes>
-      <Delegate Name="FAD3.MapLayers.LayerPropertyReadHandler" Collapsed="true">
+      <Delegate Name="FAD3.MapLayersHandler.LayerReadHandler" Collapsed="true">
         <TypeIdentifier>
-          <NewMemberFileName>MapLayers.cs</NewMemberFileName>
+          <NewMemberFileName>MapLayershandler.cs</NewMemberFileName>
         </TypeIdentifier>
       </Delegate>
-      <Delegate Name="FAD3.MapLayers.LayerDeletedHandler" Collapsed="true">
+      <Delegate Name="FAD3.MapLayersHandler.LayerRemovedHandler" Collapsed="true">
         <TypeIdentifier>
-          <NewMemberFileName>MapLayers.cs</NewMemberFileName>
+          <NewMemberFileName>MapLayershandler.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+      <Delegate Name="FAD3.MapLayersHandler.CurrentLayerHandler" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>MapLayershandler.cs</NewMemberFileName>
         </TypeIdentifier>
       </Delegate>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>AAAQAAgAAAFAAAAAAABAAAAAAQAAAAABwAgAAAAAAQA=</HashCode>
-      <FileName>MapLayers.cs</FileName>
+      <HashCode>BAEYAAAAICBEEACAAABIAAAAEwAgABCDwAgAABQAAxA=</HashCode>
+      <FileName>MapLayershandler.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="FAD3.ShapefileLabelHandler">
+    <Position X="28" Y="5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAACAEAACgAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ShapefileLabelHandler.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="FAD3.ShapefileLayerHelper">
+    <Position X="29.5" Y="8" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAQAAAAAAAAAAAgAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ShapefileLayerHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FAD3.LayerProperty">
+    <Position X="30.75" Y="0.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAAAAAAAAAQAAAgAAAAABAAAAAAAABQAAA=</HashCode>
+      <FileName>LayerProperty.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Font Name="Segoe UI" Size="9" />

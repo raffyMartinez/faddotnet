@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using MapWinGIS;
+using AxMapWinGIS;
 using System.Data.OleDb;
 using System.Data;
 
@@ -13,6 +14,7 @@ namespace FAD3
         private bool _disposed;
         private GeoProjection _geoProjection = new GeoProjection();
         public MapLayersHandler MapLayersHandler { get; set; }
+        public AxMap MapControl { get; set; }
 
         public FishingGroundMappingHandler(GeoProjection geoProjection = null)
         {
@@ -68,42 +70,7 @@ namespace FAD3
             return success;
         }
 
-        private void SetShapefileFields(Shapefile sf, bool isAggregated, bool HasLandingSite, bool HasGear)
-        {
-            if (isAggregated)
-            {
-                var ifldAOI = sf.EditAddField("AOIName", FieldType.STRING_FIELD, 1, 255);
-                sf.Field[ifldAOI].Alias = "Target area name";
-                var ifldLS = 0;
-                if (HasLandingSite)
-                {
-                    ifldLS = sf.EditAddField("LSName", FieldType.STRING_FIELD, 1, 255);
-                    sf.Field[ifldLS].Alias = "Landing site name";
-                }
-                var ifldGear = 0;
-                if (HasGear)
-                {
-                    ifldGear = sf.EditAddField("GearName", FieldType.STRING_FIELD, 1, 255);
-                    sf.Field[ifldGear].Alias = "Gear variation used";
-                }
-                var ifldYear = sf.EditAddField("Year", FieldType.INTEGER_FIELD, 1, 4);
-                sf.Field[ifldYear].Alias = "Year sampled";
-                var ifldFG = sf.EditAddField("fg", FieldType.STRING_FIELD, 1, 25);
-                sf.Field[ifldFG].Alias = "Fishing ground";
-                var ifldNumber = sf.EditAddField("n", FieldType.INTEGER_FIELD, 1, 4);
-                var ifldMaxWt = sf.EditAddField("MaxWt", FieldType.DOUBLE_FIELD, 2, 8);
-                sf.Field[ifldMaxWt].Alias = "Maximum catch weight";
-                var ifldMinWt = sf.EditAddField("MinWt", FieldType.DOUBLE_FIELD, 2, 8);
-                sf.Field[ifldMinWt].Alias = "Minimum catch weight";
-                var ifldAfgWt = sf.EditAddField("AvgWt", FieldType.DOUBLE_FIELD, 2, 8);
-                sf.Field[ifldAfgWt].Alias = "Average catch weight";
-            }
-            else
-            {
-            }
-        }
-
-        public void MapFishingGrounds(string aoiGUID, string samplingYears, FishingGrid.fadUTMZone utmZone, bool Aggregated = true, string landingSiteGuid = "", string gearVariationGuid = "")
+        public void MapFishingGrounds(string aoiGUID, string samplingYears, FishingGrid.fadUTMZone utmZone, bool Aggregated = true, bool notInclude1 = false, string landingSiteGuid = "", string gearVariationGuid = "")
         {
             var query = "";
             var sf = new Shapefile();
@@ -112,7 +79,7 @@ namespace FAD3
             var ifldGear = 0;
             var ifldYear = 0;
             var ifldFG = 0;
-            var ifldNumber = 0;
+            var ifldCount = 0;
             var ifldMaxWt = 0;
             var ifldMinWt = 0;
             var ifldAfgWt = 0;
@@ -153,7 +120,7 @@ namespace FAD3
                     ifldFG = sf.EditAddField("fg", FieldType.STRING_FIELD, 1, 25);
                     sf.Field[ifldFG].Alias = "Fishing ground";
 
-                    ifldNumber = sf.EditAddField("n", FieldType.INTEGER_FIELD, 1, 4);
+                    ifldCount = sf.EditAddField("n", FieldType.INTEGER_FIELD, 1, 4);
 
                     ifldMaxWt = sf.EditAddField("MaxWt", FieldType.DOUBLE_FIELD, 2, 8);
                     sf.Field[ifldMaxWt].Alias = "Maximum catch weight";
@@ -172,8 +139,17 @@ namespace FAD3
                                 INNER JOIN ((tblAOI INNER JOIN tblLandingSites ON tblAOI.AOIGuid = tblLandingSites.AOIGuid)
                                 INNER JOIN tblSampling ON tblLandingSites.LSGUID = tblSampling.LSGUID) ON tblGearVariations.GearVarGUID = tblSampling.GearVarGUID
                                 WHERE tblLandingSites.LSGUID={{{landingSiteGuid}}} AND tblSampling.GearVarGUID={{{gearVariationGuid}}}
-                                GROUP BY tblAOI.AOIName, tblLandingSites.LSName, tblGearVariations.Variation, tblSampling.FishingGround, Year([SamplingDate])
-                                HAVING Year([SamplingDate]) In ({samplingYears})";
+                                GROUP BY tblAOI.AOIName, tblLandingSites.LSName, tblGearVariations.Variation, tblSampling.FishingGround, Year([SamplingDate]) ";
+                        //HAVING Year([SamplingDate]) In ({samplingYears})";
+
+                        if (notInclude1)
+                        {
+                            query += $"HAVING Count(tblSampling.SamplingGUID)>1 AND Year([SamplingDate]) In ({samplingYears})";
+                        }
+                        else
+                        {
+                            query += $"HAVING Year([SamplingDate]) In ({samplingYears})";
+                        }
                     }
                     else if (landingSiteGuid.Length > 0)
                     {
@@ -181,8 +157,17 @@ namespace FAD3
                             Count(tblSampling.SamplingGUID) AS n, Max(tblSampling.WtCatch) AS MaxCatch, Min(tblSampling.WtCatch) AS MinCatch,
                             Avg(tblSampling.WtCatch) AS AvgCatch FROM (tblAOI INNER JOIN tblLandingSites ON tblAOI.AOIGuid = tblLandingSites.AOIGuid)
                             INNER JOIN tblSampling ON tblLandingSites.LSGUID = tblSampling.LSGUID WHERE tblLandingSites.LSGUID={{{landingSiteGuid}}}
-                            GROUP BY tblAOI.AOIName, tblLandingSites.LSName, tblSampling.FishingGround, Year([SamplingDate])
-                            HAVING Year([SamplingDate]) In ({samplingYears})";
+                            GROUP BY tblAOI.AOIName, tblLandingSites.LSName, tblSampling.FishingGround, Year([SamplingDate]) ";
+                        //HAVING Year([SamplingDate]) In ({samplingYears})";
+
+                        if (notInclude1)
+                        {
+                            query += $"HAVING Count(tblSampling.SamplingGUID)>1 AND Year([SamplingDate]) In ({samplingYears})";
+                        }
+                        else
+                        {
+                            query += $"HAVING Year([SamplingDate]) In ({samplingYears})";
+                        }
                     }
                     else
                     {
@@ -190,8 +175,17 @@ namespace FAD3
                             Count(tblSampling.SamplingGUID) AS n, Max(tblSampling.WtCatch) AS MaxCatch,
                             Min(tblSampling.WtCatch) AS MinCatch, Avg(tblSampling.WtCatch) AS AvgCatch
                             FROM tblAOI INNER JOIN tblSampling ON tblAOI.AOIGuid = tblSampling.AOI
-                            GROUP BY tblAOI.AOIName, tblSampling.FishingGround, tblSampling.AOI, Year([SamplingDate])
-                            HAVING tblSampling.AOI= {{{aoiGUID}}} AND Year([SamplingDate]) In ({samplingYears})";
+                            GROUP BY tblAOI.AOIName, tblSampling.FishingGround, tblSampling.AOI, Year([SamplingDate]) ";
+                        //HAVING tblSampling.AOI= {{{aoiGUID}}} AND Year([SamplingDate]) In ({samplingYears})";
+
+                        if (notInclude1)
+                        {
+                            query += $"HAVING tblSampling.AOI= {{{aoiGUID}}} AND Count(tblSampling.SamplingGUID)>1 AND Year([SamplingDate]) In ({samplingYears})";
+                        }
+                        else
+                        {
+                            query += $"HAVING tblSampling.AOI= {{{aoiGUID}}} AND Year([SamplingDate]) In ({samplingYears})";
+                        }
                     }
                 }
                 else //not aggregated
@@ -299,7 +293,7 @@ namespace FAD3
                                         {
                                             sf.EditCellValue(ifldGear, n, dr["Variation"].ToString());
                                         }
-                                        sf.EditCellValue(ifldNumber, n, int.Parse(dr["n"].ToString()));
+                                        sf.EditCellValue(ifldCount, n, int.Parse(dr["n"].ToString()));
                                         sf.EditCellValue(ifldMaxWt, n, double.Parse(dr["MaxCatch"].ToString()));
                                         sf.EditCellValue(ifldMinWt, n, double.Parse(dr["MinCatch"].ToString()));
                                         sf.EditCellValue(ifldAfgWt, n, double.Parse(dr["AvgCatch"].ToString()));
@@ -368,6 +362,19 @@ namespace FAD3
                 }
                 MapLayersHandler.RemoveLayer("Fishing grounds");
                 sf.GeoProjection = _geoProjection;
+                sf.CollisionMode = tkCollisionMode.AllowCollisions;
+                sf.DefaultDrawingOptions.PointShape = tkPointShapeType.ptShapeCircle;
+                if (Aggregated)
+                {
+                    ShapefileLayerHelper.CategorizeNumericPointLayer(sf, ifldCount);
+                }
+
+                if (ShapefileLayerHelper.ExtentsPosition(MapControl.Extents, sf.Extents) == global.ExtentCompare.excoOutside)
+                {
+                    var newExtent = MapControl.Extents;
+                    newExtent.MoveTo(sf.Extents.Center.x, sf.Extents.Center.y);
+                    MapControl.Extents = newExtent;
+                }
                 MapLayersHandler.AddLayer(sf, "Fishing grounds", true, true);
             }
         }
