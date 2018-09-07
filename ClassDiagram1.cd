@@ -380,7 +380,7 @@
       </Delegate>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>BAEYAAAAICBEEACAAABIAAAAEwAgABCDwAgAABQAAxA=</HashCode>
+      <HashCode>RAEYAAAAICBEEACAAABIAAAAEwAgABCDwAgAABQAAxA=</HashCode>
       <FileName>MapLayershandler.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -406,6 +406,14 @@
       <HashCode>AAAAAAAAIAAAAAAAAAAQAAAgAAAAABAAAAAAAABQAAA=</HashCode>
       <FileName>LayerProperty.cs</FileName>
     </TypeIdentifier>
+  </Class>
+  <Class Name="FAD3.FishingGroundMappingHandler">
+    <Position X="31.25" Y="4.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>CAAAAAABAKAEAAAAAQAAAAAAAQAAAAAAAAAAAQAAAAA=</HashCode>
+      <FileName>FishingGroundMappingHandler.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
   </Class>
   <Font Name="Segoe UI" Size="9" />
 </ClassDiagram>

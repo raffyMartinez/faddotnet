@@ -57,8 +57,17 @@ namespace FAD3
                 var shp = new Shape();
                 if (shp.Create(ShpfileType.SHP_POINT))
                 {
-                    var result = FishingGrid.Grid25ToLatLong(fishingGround, utmZone);
-                    var iShp = shp.AddPoint(result.longitude, result.latitude);
+                    var iShp = 0;
+                    if (_geoProjection.IsGeographic)
+                    {
+                        var result = FishingGrid.Grid25ToLatLong(fishingGround, utmZone);
+                        iShp = shp.AddPoint(result.longitude, result.latitude);
+                    }
+                    else
+                    {
+                        FishingGrid.Grid25_to_UTM(fishingGround, out int x, out int y);
+                        iShp = shp.AddPoint(x, y);
+                    }
                     if (iShp >= 0 && sf.EditInsertShape(shp, 0))
                     {
                         MapLayersHandler.RemoveLayer("Fishing ground");
@@ -70,7 +79,9 @@ namespace FAD3
             return success;
         }
 
-        public void MapFishingGrounds(string aoiGUID, string samplingYears, FishingGrid.fadUTMZone utmZone, bool Aggregated = true, bool notInclude1 = false, string landingSiteGuid = "", string gearVariationGuid = "")
+        public void MapFishingGrounds(string aoiGUID, string samplingYears, FishingGrid.fadUTMZone utmZone,
+            bool Aggregated = true, bool notInclude1 = false, string landingSiteGuid = "",
+            string gearVariationGuid = "")
         {
             var query = "";
             var sf = new Shapefile();
@@ -274,8 +285,17 @@ namespace FAD3
                             if (shp.Create(ShpfileType.SHP_POINT))
                             {
                                 var fg = dr["FishingGround"].ToString();
-                                var result = FishingGrid.Grid25ToLatLong(fg, utmZone);
-                                var iShp = shp.AddPoint(result.longitude, result.latitude);
+                                var iShp = 0;
+                                if (_geoProjection.IsGeographic)
+                                {
+                                    var result = FishingGrid.Grid25ToLatLong(fg, utmZone);
+                                    iShp = shp.AddPoint(result.longitude, result.latitude);
+                                }
+                                else
+                                {
+                                    FishingGrid.Grid25_to_UTM(fg, out int x, out int y);
+                                    iShp = shp.AddPoint(x, y);
+                                }
                                 if (iShp >= 0 && sf.EditInsertShape(shp, n))
                                 {
                                     sf.EditCellValue(ifldAOI, n, dr["AOIName"].ToString());

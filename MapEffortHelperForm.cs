@@ -1,10 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace FAD3
@@ -14,6 +9,7 @@ namespace FAD3
         private static MapEffortHelperForm _instance;
         private MainForm _parentForm;
         private string _treeLevel;
+        private MapperForm _mapperForm;
 
         public static MapEffortHelperForm GetInstance(MainForm parentForm)
         {
@@ -163,6 +159,13 @@ namespace FAD3
             lvYears.Columns.Add("colSamplings", "n");
             lvYears.Columns.Add("colBlank", "");
             SizeColumns(lvYears);
+            _mapperForm = global.MappingForm;
+            _mapperForm.MapperClosed += OnMapperClosed;
+        }
+
+        private void OnMapperClosed(object sender, EventArgs e)
+        {
+            Close();
         }
     }
 }

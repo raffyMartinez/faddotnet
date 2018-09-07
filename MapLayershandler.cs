@@ -1,11 +1,9 @@
-﻿using System;
-using System.IO;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using AxMapWinGIS;
+﻿using AxMapWinGIS;
 using MapWinGIS;
+using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Reflection;
 using System.Xml;
 
@@ -13,6 +11,7 @@ namespace FAD3
 {
     public class MapLayersHandler : IDisposable
     {
+        private string _fileMapState;
         public bool _disposed;
         private AxMap _axmap;                                                                       //reference to tha map control in the mapping form
         private Dictionary<int, MapLayer> _mapLayerDictionary = new Dictionary<int, MapLayer>();    //contains MapLayers with the layer handle as key
@@ -169,8 +168,8 @@ namespace FAD3
         private void OnProjectionMismatch(object sender, _DMapEvents_ProjectionMismatchEvent e)
         {
             e.reproject = tkMwBoolean.blnTrue;
-            var rcount = 0;
-            _axmap.get_Shapefile(e.layerHandle).Reproject(_axmap.GeoProjection, ref rcount);
+            //var rcount = 0;
+            //_axmap.get_Shapefile(e.layerHandle).Reproject(_axmap.GeoProjection, ref rcount);
         }
 
         public void Dispose()
@@ -268,6 +267,18 @@ namespace FAD3
             }
         }
 
+        private void RemoveInMemoryLayers()
+        {
+            for (int n = 0; n < _axmap.NumLayers; n++)
+            {
+                var h = _axmap.get_LayerHandle(n);
+                if (_mapLayerDictionary[h].FileName.Length == 0)
+                {
+                    RemoveLayer(h);
+                }
+            }
+        }
+
         /// <summary>
         /// handles editing of layer name and layer visibility
         /// </summary>
@@ -325,15 +336,24 @@ namespace FAD3
                     }
                     else if (fm.LastOpenStrategy == tkFileOpenStrategy.fosRgbImage)
                     {
-                        var image = obj as MapWinGIS.Image;
-                        success = image != null;
-                        if (success)
+                        var prjFile = $@"{Path.GetDirectoryName(fileName)}\{Path.GetFileNameWithoutExtension(fileName)}.prj";
+                        var worldFile = $"{fileName}w";
+                        if (File.Exists(prjFile) && File.Exists(worldFile))
                         {
-                            if (AddLayer(image) < 0)
+                            var image = obj as MapWinGIS.Image;
+                            success = image != null;
+                            if (success)
                             {
-                                success = false;
-                                errMsg = "Failed to add layer to map";
+                                if (AddLayer(image) < 0)
+                                {
+                                    success = false;
+                                    errMsg = "Failed to add layer to map";
+                                }
                             }
+                        }
+                        else
+                        {
+                            errMsg = $"{fileName} does not have a projection or world file";
                         }
                     }
                     else if (fm.LastOpenStrategy == tkFileOpenStrategy.fosDirectGrid
@@ -363,13 +383,20 @@ namespace FAD3
         /// <param name="ShowInLayerUI"></param>
         /// <param name="gp"></param>
         /// <param name="layerType"></param>
+        /// <param name="fileName"></param>
         /// <returns></returns>
         private MapLayer SetMapLayer(int layerHandle, string layerName, bool Visible,
-                                bool ShowInLayerUI, GeoProjection gp, string layerType = "ShapefileClass")
+                                bool ShowInLayerUI, GeoProjection gp,
+                                string layerType = "ShapefileClass", string fileName = "")
         {
             var mapLayer = new MapLayer(layerHandle, layerName, Visible, ShowInLayerUI);
             mapLayer.LayerType = layerType;
             mapLayer.FileName = _axmap.get_LayerFilename(layerHandle);
+            if (mapLayer.FileName.Length == 0)
+            {
+                mapLayer.FileName = fileName;
+            }
+
             mapLayer.GeoProjectionName = gp.Name;
             mapLayer.LayerPosition = _axmap.get_LayerPosition(layerHandle);
             mapLayer.LayerObject = _axmap.get_GetObject(layerHandle);
@@ -385,15 +412,18 @@ namespace FAD3
         /// </summary>
         /// <param name="sf"></param>
         /// <returns></returns>
-        public int AddLayer(Shapefile sf)
+        public int AddLayer(Shapefile sf, string layerName = "")
         {
             var h = _axmap.AddLayer(sf, true);
             MapLayer mapLayer;
             if (h >= 0)
             {
-                var layerName = Path.GetFileName(sf.Filename);
+                if (layerName.Length == 0)
+                {
+                    layerName = Path.GetFileName(sf.Filename);
+                }
                 _axmap.set_LayerName(h, layerName);
-                mapLayer = SetMapLayer(h, layerName, true, true, sf.GeoProjection);
+                mapLayer = SetMapLayer(h, layerName, true, true, sf.GeoProjection, "ShapefileClass", sf.Filename);
 
                 if (LayerRead != null)
                 {
@@ -409,15 +439,19 @@ namespace FAD3
         /// </summary>
         /// <param name="image"></param>
         /// <returns></returns>
-        public int AddLayer(MapWinGIS.Image image)
+        public int AddLayer(MapWinGIS.Image image, string layerName = "")
         {
             var h = _axmap.AddLayer(image, true);
             MapLayer mapLayer;
             if (h >= 0)
             {
-                var layerName = Path.GetFileName(image.Filename);
+                if (layerName.Length == 0)
+                {
+                    layerName = Path.GetFileName(image.Filename);
+                }
+
                 _axmap.set_LayerName(h, layerName);
-                mapLayer = SetMapLayer(h, layerName, true, true, image.GeoProjection, "ImageClass");
+                mapLayer = SetMapLayer(h, layerName, true, true, image.GeoProjection, "ImageClass", image.Filename);
 
                 if (LayerRead != null)
                 {
@@ -437,36 +471,29 @@ namespace FAD3
         /// <param name="showInLayerUI"></param>
         /// <param name="layerHandle"></param>
         /// <returns></returns>
-        public int AddLayer(object layer, string layerName, bool visible, bool showInLayerUI, int? layerHandle = null)
+        public int AddLayer(object layer, string layerName, bool visible, bool showInLayerUI, string fileName = "")
         {
             int h = 0;
             MapLayer mapLayer;
             GeoProjection gp = new GeoProjection();
 
             var layerType = layer.GetType().Name;
-            if (layerHandle == null)
+
+            switch (layerType)
             {
-                switch (layerType)
-                {
-                    case "ShapefileClass":
-                        h = _axmap.AddLayer((Shapefile)layer, visible);
-                        gp = ((Shapefile)layer).GeoProjection;
-                        break;
-                }
-            }
-            else
-            {
-                if (layer is Shapefile)
-                {
-                    layerType = "ShapefileClass";
+                case "ShapefileClass":
+                    h = _axmap.AddLayer((Shapefile)layer, visible);
                     gp = ((Shapefile)layer).GeoProjection;
-                }
-                h = layerHandle ?? default;
-                ShapefileLabelHandler sflh = new ShapefileLabelHandler((Shapefile)layer);
+                    break;
+
+                case "ImageClass":
+                    h = _axmap.AddLayer((MapWinGIS.Image)layer, visible);
+                    gp = ((MapWinGIS.Image)layer).GeoProjection;
+                    break;
             }
 
             _axmap.set_LayerName(h, layerName);
-            mapLayer = SetMapLayer(h, layerName, visible, showInLayerUI, gp);
+            mapLayer = SetMapLayer(h, layerName, visible, showInLayerUI, gp, layerType, fileName);
 
             if (LayerRead != null)
             {
@@ -485,12 +512,35 @@ namespace FAD3
             for (int n = 0; n < _axmap.NumLayers; n++)
             {
                 var h = _axmap.get_LayerHandle(n);
-                var sf = _axmap.get_Shapefile(h);
-                if (sf.Labels.Count > 0)
+                if (_mapLayerDictionary[h].LayerType == "ShapefileClass")
                 {
-                    ShapefileLabelHandler.SaveLabelParameters(h, sf.Labels.AvoidCollisions);
+                    var sf = _axmap.get_Shapefile(h);
+                    if (sf.Labels.Count > 0)
+                    {
+                        ShapefileLabelHandler.SaveLabelParameters(_fileMapState, h, sf.Labels.AvoidCollisions);
+                    }
                 }
             }
+        }
+
+        /// <summary>
+        /// Check for blank filenames in the mapstatefile. Blank filenames happen when a layer is reprojected
+        /// and is then saved in the mapstate file.
+        /// </summary>
+        private void CheckFileNameInMapStateFile()
+        {
+            var doc = new XmlDocument();
+            var n = 0;
+            doc.Load(_fileMapState);
+            foreach (XmlNode ly in doc.DocumentElement.SelectNodes("//Layer"))
+            {
+                if (ly.Attributes["Filename"].Value.Length == 0)
+                {
+                    ly.Attributes["Filename"].Value = _mapLayerDictionary[_axmap.get_LayerHandle(n)].FileName;
+                }
+                n++;
+            }
+            doc.Save(_fileMapState);
         }
 
         /// <summary>
@@ -498,11 +548,12 @@ namespace FAD3
         /// </summary>
         public void SaveMapState()
         {
-            if (_axmap.NumLayers > 0
-                && global.MappingMode == global.fad3MappingMode.defaultMode
-                && _axmap.SaveMapState($@"{global.ApplicationPath}\mapstate", false, true))
+            RemoveInMemoryLayers();
+            if (global.MappingMode == global.fad3MappingMode.defaultMode
+                && _axmap.SaveMapState(_fileMapState, false, true))
             {
                 SaveOtherMapOptions();
+                CheckFileNameInMapStateFile();
             }
         }
 
@@ -518,51 +569,79 @@ namespace FAD3
         /// </param>
         public void LoadMapState(bool restoreMapState = true)
         {
-            string mapStateFile = $@"{global.ApplicationPath}\mapstate";
-            var doc = new XmlDocument();
-            doc.Load(mapStateFile);
-            foreach (XmlNode ly in doc.DocumentElement.SelectNodes("//Layer"))
+            _fileMapState = $@"{global.ApplicationPath}\mapstate";
+            if (File.Exists(_fileMapState))
             {
-                if (ly.Attributes["LayerType"].Value == "Shapefile")
+                var doc = new XmlDocument();
+                var proceed = true;
+                var fileName = "";
+                try
                 {
-                    var sf = new Shapefile();
-                    if (sf.Open(ly.Attributes["Filename"].Value))
+                    doc.Load(_fileMapState);
+                }
+                catch (XmlException ex)
+                {
+                    Logger.Log(ex.Message, "MapLayersHandler", "LoadMapState");
+                    proceed = false;
+                }
+                if (proceed)
+                {
+                    foreach (XmlNode ly in doc.DocumentElement.SelectNodes("//Layer"))
                     {
-                        //the first layer added will determine the projection of the map control
-                        var h = AddLayer(sf, ly.Attributes["LayerName"].Value, ly.Attributes["LayerVisible"].Value == "1", true);
-                        _axmap.get_Shapefile(h).Deserialize(false, ly.InnerXml);
-                        ShapefileLabelHandler sflh = new ShapefileLabelHandler(_axmap.get_Shapefile(h));
-                        foreach (XmlNode child in ly.FirstChild.ChildNodes)
+                        fileName = ly.Attributes["Filename"].Value;
+                        if (ly.Attributes["LayerType"].Value == "Shapefile")
                         {
-                            if (child.Name == "LabelsClass" && child.Attributes["Generated"].Value == "1")
+                            var sf = new Shapefile();
+                            if (sf.Open(fileName))
                             {
-                                sflh.LabelShapefile(child.OuterXml);
+                                //the first layer added will determine the projection of the map control
+                                //var h = AddLayer(sf, ly.Attributes["LayerName"].Value, ly.Attributes["LayerVisible"].Value == "1", true, fileName);
+                                var h = AddLayer(sf, ly.Attributes["LayerName"].Value);
+                                _axmap.get_Shapefile(h).Deserialize(false, ly.InnerXml);
+                                ShapefileLabelHandler sflh = new ShapefileLabelHandler(_axmap.get_Shapefile(h));
+                                foreach (XmlNode child in ly.FirstChild.ChildNodes)
+                                {
+                                    if (child.Name == "LabelsClass" && child.Attributes["Generated"].Value == "1")
+                                    {
+                                        sflh.LabelShapefile(child.OuterXml);
+                                    }
+                                }
+                            }
+                        }
+                        else if (ly.Attributes["LayerType"].Value == "Image")
+                        {
+                            //code when layertype is image
+                            var img = new MapWinGIS.Image();
+                            if (img.Open(fileName))
+                            {
+                                var h = AddLayer(img, ly.Attributes["LayerName"].Value);
+                                //var h = AddLayer(img, ly.Attributes["LayerName"].Value, ly.Attributes["LayerVisible"].Value == "1", true, fileName);
                             }
                         }
                     }
-                }
-                else
-                {
-                    //code when layertype is image
+                    if (restoreMapState)
+                    {
+                        //We restore saved extent of the map but not the projection. Since layers
+                        //were already added to the map, the first layer sets the map's projection.
+                        foreach (XmlNode ms in doc.DocumentElement.SelectNodes("//MapState "))
+                        {
+                            var ext = new Extents();
+                            ext.SetBounds(
+                                double.Parse(ms.Attributes["ExtentsLeft"].Value),
+                                double.Parse(ms.Attributes["ExtentsBottom"].Value),
+                                0,
+                                double.Parse(ms.Attributes["ExtentsRight"].Value),
+                                double.Parse(ms.Attributes["ExtentsTop"].Value),
+                                0);
+                            _axmap.Extents = ext;
+                            _axmap.ExtentPad = double.Parse(ms.Attributes["ExtentsPad"].Value);
+                        }
+                    }
                 }
             }
-            if (restoreMapState)
+            else
             {
-                //We restore saved extent of the map but not the projection. Since layers
-                //were already added to the map, the first layer sets the map's projection.
-                foreach (XmlNode ms in doc.DocumentElement.SelectNodes("//MapState "))
-                {
-                    var ext = new Extents();
-                    ext.SetBounds(
-                        double.Parse(ms.Attributes["ExtentsLeft"].Value),
-                        double.Parse(ms.Attributes["ExtentsBottom"].Value),
-                        0,
-                        double.Parse(ms.Attributes["ExtentsRight"].Value),
-                        double.Parse(ms.Attributes["ExtentsTop"].Value),
-                        0);
-                    _axmap.Extents = ext;
-                    _axmap.ExtentPad = double.Parse(ms.Attributes["ExtentsPad"].Value);
-                }
+                File.Create(_fileMapState);
             }
         }
 

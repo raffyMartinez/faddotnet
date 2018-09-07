@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using MapWinGIS;
+﻿using MapWinGIS;
+using System;
 using System.Xml;
 
 namespace FAD3
@@ -18,16 +15,22 @@ namespace FAD3
         }
 
         /// <summary>
-        /// labels the shapefile with parameters saved in labelXML
+        /// labels the shapefile using parameters in labelXML
         /// </summary>
         /// <param name="labelXML"></param>
         /// <returns></returns>
         public bool LabelShapefile(string labelXML)
         {
             var lbls = 0;
+
+            //applies label properties to the current shapefile's labels
             _shapeFile.Labels.Deserialize(labelXML);
+
+            //we convert string labelXML to an xml object
             var doc = new XmlDocument();
             doc.LoadXml(labelXML);
+
+            //we use attributes such as SourceField and Positioning in generating labels for the shapefile
             doc.DocumentElement.With(d =>
             {
                 lbls = _shapeFile.GenerateLabels(
@@ -52,12 +55,11 @@ namespace FAD3
         /// </summary>
         /// <param name="layerHandle"></param>
         /// <param name="AvoidCollision"></param>
-        public static void SaveLabelParameters(int layerHandle, bool AvoidCollision)
+        public static void SaveLabelParameters(string fileMapState, int layerHandle, bool AvoidCollision)
         {
-            string mapStateFile = $@"{global.ApplicationPath}\mapstate";
             var doc = new XmlDocument();
             var n = 0;
-            doc.Load(mapStateFile);
+            doc.Load(fileMapState);
             foreach (XmlNode ly in doc.DocumentElement.SelectNodes("//Layer"))
             {
                 //if (ly.Attributes["LayerType"].Value == "Shapefile")
@@ -71,7 +73,7 @@ namespace FAD3
                             att.Value = AvoidCollision ? "1" : "0";
                             child.Attributes.Append(att);
 
-                            doc.Save(mapStateFile);
+                            doc.Save(fileMapState);
                             return;
                         }
                     }

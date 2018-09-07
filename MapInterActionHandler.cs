@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using AxMapWinGIS;
+﻿using AxMapWinGIS;
 using MapWinGIS;
+using System;
 
 namespace FAD3
 {
@@ -127,44 +124,47 @@ namespace FAD3
         /// <param name="SelectionFromSelectBox"></param>
         private void Select(Extents selectExtents, bool SelectionFromSelectBox = false)
         {
-            _selectedShapeIndexes = null;
-            _selectionFromSelectBox = SelectionFromSelectBox;
-            if (_currentMapLayer.LayerType == "ShapefileClass")
+            if (_currentMapLayer != null)
             {
-                var sf = _axMap.get_Shapefile(_currentMapLayer.Handle);
-                _currentMapLayer.SelectedIndexes = null;
-                sf.SelectNone();
-                sf.SelectionAppearance = tkSelectionAppearance.saDrawingOptions;
-
-                switch (sf.ShapefileType)
+                _selectedShapeIndexes = null;
+                _selectionFromSelectBox = SelectionFromSelectBox;
+                if (_currentMapLayer.LayerType == "ShapefileClass")
                 {
-                    case ShpfileType.SHP_POINT:
-                        break;
+                    var sf = _axMap.get_Shapefile(_currentMapLayer.Handle);
+                    _currentMapLayer.SelectedIndexes = null;
+                    sf.SelectNone();
+                    sf.SelectionAppearance = tkSelectionAppearance.saDrawingOptions;
 
-                    case ShpfileType.SHP_POLYGON:
-                        break;
-
-                    case ShpfileType.SHP_POLYLINE:
-
-                        break;
-                }
-
-                var objSelection = new object();
-                if (sf.SelectShapes(selectExtents, 0, SelectMode.INTERSECTION, ref objSelection))
-                {
-                    _selectedShapeIndexes = (int[])objSelection;
-                    _currentMapLayer.SelectedIndexes = _selectedShapeIndexes;
-                    for (int n = 0; n < _selectedShapeIndexes.Length; n++)
+                    switch (sf.ShapefileType)
                     {
-                        sf.ShapeSelected[_selectedShapeIndexes[n]] = true;
+                        case ShpfileType.SHP_POINT:
+                            break;
+
+                        case ShpfileType.SHP_POLYGON:
+                            break;
+
+                        case ShpfileType.SHP_POLYLINE:
+
+                            break;
                     }
+
+                    var objSelection = new object();
+                    if (sf.SelectShapes(selectExtents, 0, SelectMode.INTERSECTION, ref objSelection))
+                    {
+                        _selectedShapeIndexes = (int[])objSelection;
+                        _currentMapLayer.SelectedIndexes = _selectedShapeIndexes;
+                        for (int n = 0; n < _selectedShapeIndexes.Length; n++)
+                        {
+                            sf.ShapeSelected[_selectedShapeIndexes[n]] = true;
+                        }
+                    }
+                    _axMap.Redraw();
+                    EventHandler handler = Selection;
+                    if (handler != null) handler(this, EventArgs.Empty);
                 }
-                _axMap.Redraw();
-                EventHandler handler = Selection;
-                if (handler != null) handler(this, EventArgs.Empty);
-            }
-            else if (_currentMapLayer.LayerType == "ImageClass")
-            {
+                else if (_currentMapLayer.LayerType == "ImageClass")
+                {
+                }
             }
         }
 

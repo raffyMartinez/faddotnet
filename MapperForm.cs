@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Windows.Forms;
-using AxMapWinGIS;
+﻿using AxMapWinGIS;
 using MapWinGIS;
+using System;
+using System.Drawing;
+using System.Windows.Forms;
 
 namespace FAD3
 {
@@ -20,6 +14,7 @@ namespace FAD3
         private MapLayersHandler _mapLayersHandler;                                 //handles map layers
         private Form _parentForm;
         private MapLayer _currentMapLayer;
+        public event EventHandler MapperClosed;
 
         public MapLayersHandler MapLayersHandler
         {
@@ -140,6 +135,11 @@ namespace FAD3
 
             _instance = null;
             global.SaveFormSettings(this);
+            EventHandler handler = MapperClosed;
+            if (handler != null)
+            {
+                handler(this, EventArgs.Empty);
+            }
         }
 
         public void OpenFileDialog()

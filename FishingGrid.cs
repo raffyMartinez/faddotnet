@@ -7,6 +7,9 @@ using Oware;
 
 namespace FAD3
 {
+    /// <summary>
+    /// Holds various functions useful in creating and validating fishing grids
+    /// </summary>
     public static class FishingGrid
     {
         private static string _AOIGuid;
@@ -20,6 +23,9 @@ namespace FAD3
         private static fadSubgridSyle _SubGridStyle = fadSubgridSyle.SubgridStyleNone;
         private static List<string> _SubGridStyleList = new List<string>();
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         static FishingGrid()
         {
             _UTMZones.Add("50N");
@@ -31,16 +37,26 @@ namespace FAD3
             _SubGridStyleList.Add("9");
         }
 
+        /// <summary>
+        /// Returns the length in meters of one side of a major grid
+        /// </summary>
         public static int MajorGridSizeMeters
         {
             get { return _grid25.MajorGridSizeMeters; }
         }
 
+        /// <summary>
+        /// Returns length in meters of one side of a minor grid
+        /// </summary>
         public static int MinorGridSizeMeters
         {
             get { return _grid25.MinorGridCellSizeMeters; }
         }
 
+        /// <summary>
+        /// Sets subgridding of minor grid for finer grid resolution.
+        /// Choices are none, 4 subgrids, or 9 subgrids.
+        /// </summary>
         public static fadSubgridSyle SubGridStyle
         {
             get { return _SubGridStyle; }
@@ -51,21 +67,25 @@ namespace FAD3
             }
         }
 
+        /// <summary>
+        /// Returns a list containing possible subgrid styles
+        /// </summary>
         public static List<string> SubGridStyles
         {
             get { return _SubGridStyleList; }
         }
 
+        /// <summary>
+        /// Returns the type of fishing grid being used
+        /// </summary>
         public static fadGridType GridType
         {
             get { return _gt; }
         }
 
         /// <summary>
-        /// Compares two grid25 locations validates them according to the following
-        /// <para>
+        /// Compares two grid25 locations validates them according to the following:
         /// ULGrid must be  upper left of the LRgrid which must be at the lower right position
-        /// </para>
         /// </summary>
         /// <param name="ULGrid"></param>
         /// <param name="LRGrid"></param>
@@ -83,6 +103,13 @@ namespace FAD3
             return EastingUL <= EastingLR && NorthingUL >= NorthingLR;
         }
 
+        /// <summary>
+        /// /Returns if a fishing grid name is valid
+        /// </summary>
+        /// <param name="UTMZone"></param>
+        /// <param name="FGGridName"></param>
+        /// <param name="ErrMsg"></param>
+        /// <returns></returns>
         public static bool ValidFGName(fadUTMZone UTMZone, string FGGridName, out string ErrMsg)
         {
             bool ValidName = false;
@@ -90,6 +117,9 @@ namespace FAD3
             return ValidName;
         }
 
+        /// <summary>
+        /// Returns the name of the grid type in use
+        /// </summary>
         public static string GridTypeName
         {
             get
@@ -115,6 +145,11 @@ namespace FAD3
             }
         }
 
+        /// <summary>
+        /// returns the UTM zone from the inputted string zone name
+        /// </summary>
+        /// <param name="ZoneName"></param>
+        /// <returns></returns>
         public static fadUTMZone ZoneFromZoneName(string ZoneName)
         {
             fadUTMZone myZone = fadUTMZone.utmZone_Undefined;
@@ -131,6 +166,9 @@ namespace FAD3
             return myZone;
         }
 
+        /// <summary>
+        /// returns the zone name of the current UTM zone
+        /// </summary>
         public static string UTMZoneName
         {
             get
@@ -150,6 +188,9 @@ namespace FAD3
             }
         }
 
+        /// <summary>
+        /// returns if the current grid is a complete grid25
+        /// </summary>
         public static bool IsCompleteGrid25
         {
             get
@@ -159,6 +200,15 @@ namespace FAD3
             }
         }
 
+        /// <summary>
+        /// returns a struct containg the elements of a grid, and using out parameters returns a bool if the name is
+        /// valid or not and possibly an error message
+        /// </summary>
+        /// <param name="UTMZone"></param>
+        /// <param name="GridName"></param>
+        /// <param name="ValidName"></param>
+        /// <param name="ErrMsg"></param>
+        /// <returns></returns>
         public static GridNameStruct ParseGridName(fadUTMZone UTMZone, string GridName, out bool ValidName, out string ErrMsg)
         {
             ErrMsg = "";
@@ -170,7 +220,7 @@ namespace FAD3
                 try
                 {
                     int MajorGrid = int.Parse(arr[0]);
-                    SetParametersOfZone(UTMZone);
+                    SetGrid25Parameters(UTMZone);
                     ValidName = MajorGrid <= _grid25.MaxGridNumber;
                     if (ValidName)
                     {
@@ -216,6 +266,9 @@ namespace FAD3
             return myNameStruct;
         }
 
+        /// <summary>
+        /// returns a list of the UTM zones that cover the fishing grounds
+        /// </summary>
         public static List<string> UTMZones
         {
             get
@@ -224,12 +277,18 @@ namespace FAD3
             }
         }
 
+        /// <summary>
+        /// manually refreshes the grid data after changing the guid of the AOI;
+        /// </summary>
         public static void Refresh()
         {
             _gt = SetupFishingGrid(_AOIGuid);
             GetSubgridType();
         }
 
+        /// <summary>
+        /// sets and gets the AOI guid of the fishing grid
+        /// </summary>
         public static string AOIGuid
         {
             get { return _AOIGuid; }
@@ -241,21 +300,30 @@ namespace FAD3
             }
         }
 
+        /// <summary>
+        /// gets and sets the UTM zone of the fishing grid
+        /// </summary>
         public static fadUTMZone UTMZone
         {
             get { return _utmZone; }
             set
             {
                 _utmZone = value;
-                SetParametersOfZone(_utmZone);
+                SetGrid25Parameters(_utmZone);
             }
         }
 
+        /// <summary>
+        /// returns a struct containing data of the grid25
+        /// </summary>
         public static Grid25Struct Grid25
         {
             get { return _grid25; }
         }
 
+        /// <summary>
+        /// categories of corners used in defining extents
+        /// </summary>
         public enum fadCornerType
         {
             cornerTypeUndefined,
@@ -263,6 +331,9 @@ namespace FAD3
             cornerTypeLowerRight
         }
 
+        /// <summary>
+        /// defines categories of grid types
+        /// </summary>
         public enum fadGridType
         {
             gridTypeNone,
@@ -270,6 +341,9 @@ namespace FAD3
             gridTypeOther
         }
 
+        /// <summary>
+        /// UTM zones that completely covers fishing grounds
+        /// </summary>
         public enum fadUTMZone
         {
             utmZone_Undefined,
@@ -277,6 +351,9 @@ namespace FAD3
             utmZone51N
         }
 
+        /// <summary>
+        /// categories of subgridding minor grids for finer resolution of fishing grounds
+        /// </summary>
         public enum fadSubgridSyle
         {
             SubgridStyleNone,
@@ -284,6 +361,9 @@ namespace FAD3
             SubgridStyle9
         }
 
+        /// <summary>
+        /// struct that holds data of a minor grid
+        /// </summary>
         public struct GridNameStruct
         {
             public int MajorGridNumber { get; set; }
@@ -292,6 +372,9 @@ namespace FAD3
             public int RowName { get; set; }
         }
 
+        /// <summary>
+        /// struct of data defining a fishing ground map
+        /// </summary>
         public struct LLBounds
         {
             public double ulX;
@@ -303,6 +386,11 @@ namespace FAD3
             public string gridDescription;
         }
 
+        /// <summary>
+        /// returns a bool if a minor grid is located inland
+        /// </summary>
+        /// <param name="MinorGridName"></param>
+        /// <returns></returns>
         public static bool MinorGridIsInland(string MinorGridName)
         {
             var conString = "Provider=Microsoft.JET.OLEDB.4.0;data source=" + _appPath + "\\grid25inland.mdb";
@@ -325,7 +413,11 @@ namespace FAD3
             return IsInland;
         }
 
-        private static void SetParametersOfZone(fadUTMZone Zone)
+        /// <summary>
+        /// sets the parametes of grid25 grids depending on the inputted zone
+        /// </summary>
+        /// <param name="Zone"></param>
+        private static void SetGrid25Parameters(fadUTMZone Zone)
         {
             //set major grids in a utm zone
             _grid25.UTMZone = Zone;
@@ -414,7 +506,7 @@ namespace FAD3
 
                                         if (UTMZoneSet)
                                         {
-                                            SetParametersOfZone(_utmZone);
+                                            SetGrid25Parameters(_utmZone);
 
                                             //read fishing grid bounds
                                             var myBound = new LLBounds();
@@ -487,6 +579,13 @@ namespace FAD3
             return gt;
         }
 
+        /// <summary>
+        /// returns longitude and latitude of a grid25 minor grid
+        /// </summary>
+        /// <param name="gridName"></param>
+        /// <param name="X"></param>
+        /// <param name="Y"></param>
+        /// <param name="CornerType"></param>
         private static void Grid25ToLL(string gridName, out double X, out double Y, fadCornerType CornerType = fadCornerType.cornerTypeUndefined)
         {
             int x_mtr, y_mtr = 0;
@@ -547,11 +646,21 @@ namespace FAD3
             }
         }
 
+        /// <summary>
+        /// returns true if a major grid is found in a list of major grids of a fishing ground
+        /// </summary>
+        /// <param name="MajorGridName"></param>
+        /// <returns></returns>
         public static bool MajorGridFound(string MajorGridName)
         {
             return _grid25.GridSet.Contains(MajorGridName);
         }
 
+        /// <summary>
+        /// returns a list of additional fishing grounds in a fishing effort/sampling
+        /// </summary>
+        /// <param name="SamplingGuid"></param>
+        /// <returns></returns>
         public static List<String> AdditionalFishingGrounds(string SamplingGuid)
         {
             var myList = new List<string>();
@@ -584,6 +693,10 @@ namespace FAD3
             return myList;
         }
 
+        /// <summary>
+        /// saves to the database the subgridding type used in a target area
+        /// </summary>
+        /// <returns></returns>
         private static bool SaveSubGridType()
         {
             var Success = false;
@@ -602,6 +715,9 @@ namespace FAD3
             return Success;
         }
 
+        /// <summary>
+        /// gets the subgrid style used in a target area
+        /// </summary>
         private static void GetSubgridType()
         {
             using (var dt = new DataTable())
@@ -627,6 +743,11 @@ namespace FAD3
             }
         }
 
+        /// <summary>
+        /// returns the column position of a major grid inside the grid25 grid system
+        /// </summary>
+        /// <param name="GridNo"></param>
+        /// <returns></returns>
         private static int MajorGridColPosition(int GridNo)
         {
             var rv = 0;
@@ -647,35 +768,57 @@ namespace FAD3
             return rv;
         }
 
+        /// <summary>
+        /// returns the y origin of a major grid
+        /// </summary>
+        /// <param name="GridNo"></param>
+        /// <returns></returns>
         private static int GridYOrigin(int GridNo)
         {
             return MajorGridRowPosition(GridNo) * _grid25.MajorGridSizeMeters + (_grid25.MajorGridYOrigin - _grid25.MajorGridSizeMeters);
         }
 
+        /// <summary>
+        /// returns the row position of a major grid inside the grid25 gridsystem
+        /// </summary>
+        /// <param name="GridNo"></param>
+        /// <returns></returns>
         private static int MajorGridRowPosition(int GridNo)
         {
             double d = (GridNo / _grid25.MajorGridColumns);
             return (int)Math.Floor(d) + 1;
         }
 
+        /// <summary>
+        /// returns the x origin of a major grid
+        /// </summary>
+        /// <param name="GridNo"></param>
+        /// <returns></returns>
         private static int GridXOrigin(int GridNo)
         {
             return MajorGridColPosition(GridNo) * _grid25.MajorGridSizeMeters + (_grid25.MajorGridXOrigin + (-50000));
         }
 
+        /// <summary>
+        /// returns centroid x and y position of a minor grid
+        /// </summary>
+        /// <param name="minorGridName"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
         private static void MinorGridCentroid(string minorGridName, out int x, out int y)
         {
             var arr = minorGridName.Split('-');
-            var MajorGrid = int.Parse(arr[0].ToString().Trim());
+            var MajorGrid = int.Parse(arr[0].Trim());
             var Success = MajorGrid <= _grid25.MaxGridNumber;
             x = y = 0;
             if (Success)
             {
-                var MinorGrid = arr[1].ToString().Trim();
+                var MinorGrid = arr[1].Trim();
                 var MajorX = GridXOrigin(MajorGrid);
                 var MajorY = GridYOrigin(MajorGrid);
-                var arr1 = MinorGrid.Substring(0, 1).ToLower().ToCharArray();
-                var MinorCol = (int)arr1[0] - 96;
+                //var arr1 = MinorGrid.Substring(0, 1).ToLower().ToCharArray();
+                //var MinorCol1 = (int)arr1[0] - 96;
+                var MinorCol = MinorGrid.ToLower()[0] - 96;
                 var MinorRow = 25 - int.Parse(MinorGrid.Substring(1, MinorGrid.Length - 1));
                 x = MajorX + (MinorCol * 2000) - 1000;
                 y = MajorY + (MinorRow * 2000) + 1000;
@@ -685,6 +828,12 @@ namespace FAD3
             }
         }
 
+        /// <summary>
+        /// returns using value tuple, the longitude,latitude equivalent of a fishing grid
+        /// </summary>
+        /// <param name="GridName"></param>
+        /// <param name="utmZone"></param>
+        /// <returns></returns>
         public static (double latitude, double longitude) Grid25ToLatLong(string GridName, FishingGrid.fadUTMZone utmZone)
         {
             int x, y = 0;
@@ -703,6 +852,11 @@ namespace FAD3
             return (result.Lat, result.Lng);
         }
 
+        /// <summary>
+        /// returns a string equivalent of the UTM position of a grid name
+        /// </summary>
+        /// <param name="GridName"></param>
+        /// <returns></returns>
         public static string Grid25_to_UTM(string GridName)
         {
             int x, y = 0;
@@ -710,6 +864,13 @@ namespace FAD3
             return UTMZoneName + " " + x + " " + y;
         }
 
+        /// <summary>
+        /// returns using out parameters the UTM easting and northing coordinates of a grid
+        /// </summary>
+        /// <param name="GridName"></param>
+        /// <param name="Easting"></param>
+        /// <param name="Northing"></param>
+        /// <returns></returns>
         public static string Grid25_to_UTM(string GridName, out int Easting, out int Northing)
         {
             Easting = Northing = 0;
@@ -723,9 +884,12 @@ namespace FAD3
 
         public static void ReadGridDetails(string AOIGuid)
         {
-            ;
         }
 
+        /// <summary>
+        /// deletes additional fishing ground maps of a target area
+        /// </summary>
+        /// <param name="TargetAreaGuid"></param>
         private static void DeleteAdditionalFishingGroundMaps(string TargetAreaGuid)
         {
             using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
@@ -737,6 +901,16 @@ namespace FAD3
             }
         }
 
+        /// <summary>
+        /// saves the grid25 parameters of a target area to the database
+        /// </summary>
+        /// <param name="TargetAreaGuid"></param>
+        /// <param name="UseGrid25"></param>
+        /// <param name="UTMZone"></param>
+        /// <param name="SubGridStyle"></param>
+        /// <param name="Maps"></param>
+        /// <param name="FirstMap"></param>
+        /// <returns></returns>
         public static bool SaveTargetAreaGrid25(string TargetAreaGuid, bool UseGrid25, string UTMZone = "",
                                int SubGridStyle = 0, Dictionary<string, (string MapName, string ULGrid, string LRGrid)> Maps = null,
                                string FirstMap = "")
@@ -785,6 +959,13 @@ namespace FAD3
             return Success;
         }
 
+        /// <summary>
+        /// saves any additional fishing ground maps of a target area to the database
+        /// </summary>
+        /// <param name="TargetAreaGuid"></param>
+        /// <param name="FirstMap"></param>
+        /// <param name="Maps"></param>
+        /// <returns></returns>
         private static bool SaveAdditionalFishingGroundMaps(string TargetAreaGuid, string FirstMap, Dictionary<string, (string MapName, string ULGrid, string LRGrid)> Maps)
         {
             var SaveCount = 0;
@@ -796,7 +977,7 @@ namespace FAD3
                 conn.Open();
                 foreach (var item in Maps.Values)
                 {
-                    if (item.Item1 != FirstMap)
+                    if (item.MapName != FirstMap)
                     {
                         var sql = $@"Insert into tblAdditionalAOIExtent
                             (AOIGuid, GridDescription, UpperLeft, LowerRight, RowNumber)
@@ -811,6 +992,9 @@ namespace FAD3
             return SaveCount > 0;
         }
 
+        /// <summary>
+        /// holds the data of a grid25 system
+        /// </summary>
         public struct Grid25Struct
         {
             private static List<string> _GridSet;
