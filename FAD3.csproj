@@ -143,6 +143,7 @@
       <DependentUpon>FishingGroundExtentsForm.cs</DependentUpon>
     </Compile>
     <Compile Include="FishingGroundMappingHandler.cs" />
+    <Compile Include="FolderBrowserLauncher.cs" />
     <Compile Include="GMSLineClass.cs" />
     <Compile Include="Grid25GenerateForm.cs">
       <SubType>Form</SubType>
@@ -153,6 +154,12 @@
     <Compile Include="Grid25MajorGrid.cs" />
     <Compile Include="Grid25MinorGrid.cs" />
     <Compile Include="Grid25LabelManager.cs" />
+    <Compile Include="Grid25SaveForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Grid25SaveForm.Designer.cs">
+      <DependentUpon>Grid25SaveForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="LayerPropertyForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -224,6 +231,7 @@
     </Compile>
     <Compile Include="Enumerators.cs" />
     <Compile Include="SaveMapImage.cs" />
+    <Compile Include="SaveMapToImage.cs" />
     <Compile Include="ShapefileAttributesForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -376,6 +384,9 @@
     <EmbeddedResource Include="Grid25GenerateForm.resx">
       <DependentUpon>Grid25GenerateForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Grid25SaveForm.resx">
+      <DependentUpon>Grid25SaveForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="LayerPropertyForm.resx">
       <DependentUpon>LayerPropertyForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -517,6 +528,7 @@
   <ItemGroup>
     <Content Include="Fatcow-Farm-Fresh-Book-key.ico" />
     <Content Include="Icon1.ico" />
+    <None Include="Resources\mbr.bmp" />
     <None Include="Resources\ruler.bmp" />
     <None Include="Resources\pan.bmp" />
     <None Include="Resources\zoomSelection.bmp" />
@@ -536,6 +548,9 @@
     <None Include="Resources\clear_all_selection.bmp" />
     <Content Include="Resources\clear_selection.bmp" />
     <None Include="Resources\document-save.bmp" />
+    <None Include="Resources\fit.bmp" />
+    <None Include="Resources\image.bmp" />
+    <None Include="Resources\im_boundary.bmp" />
     <Content Include="Resources\internet-web-browser.png" />
     <None Include="Resources\system-file-manager.png" />
     <None Include="Resources\layerAdd.bmp" />

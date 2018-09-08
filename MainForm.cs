@@ -829,11 +829,11 @@ namespace FAD3
                     });
             }
 
-            foreach (var c in tsToolbar.Items)
+            foreach (var c in toolbar.Items)
             {
                 ((ToolStripButton)c).With(o =>
                 {
-                    o.Enabled = o.Tag != null && o.Tag.ToString() == "exit";
+                    o.Enabled = o.Name == "tsButtonExit";
                 });
             }
         }
@@ -1340,14 +1340,14 @@ namespace FAD3
         private void OnToolbar_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
             ToolStripItem tsi = e.ClickedItem;
-            switch (tsi.Tag)
+            switch (tsi.Name)
             {
-                case "about":
+                case "tsButtonAbout":
                     AboutFadForm f = new AboutFadForm();
                     f.ShowDialog(this);
                     break;
 
-                case "gear":
+                case "tsButtonGear":
                     GearCodesUsageForm form = GearCodesUsageForm.GetInstance();
                     if (!form.Visible)
                     {
@@ -1359,16 +1359,16 @@ namespace FAD3
                     }
                     break;
 
-                case "fish":
+                case "tsButtonFish":
                     AllSpeciesForm asf = new AllSpeciesForm(parent: this);
                     asf.ShowDialog(this);
                     break;
 
-                case "report":
+                case "tsButtonReport":
 
                     break;
 
-                case "map":
+                case "tsButtonMap":
                     var mf = MapperForm.GetInstance(this);
                     if (!mf.Visible)
                     {
@@ -1381,7 +1381,7 @@ namespace FAD3
                     }
                     break;
 
-                case "exit":
+                case "tsButtonExit":
                     AppExit();
 
                     break;

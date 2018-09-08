@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using MapWinGIS;
 
 namespace FAD3
 {
@@ -17,6 +18,8 @@ namespace FAD3
         public object LayerObject { get; set; }
         private bool _disposed;
         public int[] SelectedIndexes { get; set; }
+        public bool IsGraticule { get; set; }
+        public bool IsFishingGrid { get; set; }
 
         public MapLayer(int handle, string name, bool visible, bool visibleInLayersUI)
         {
@@ -24,6 +27,23 @@ namespace FAD3
             Name = name;
             Visible = visible;
             VisibleInLayersUI = visibleInLayersUI;
+            IsFishingGrid = false;
+        }
+
+        public void Save(string fileName)
+        {
+            if (LayerType == "ShapefileClass")
+            {
+                ((Shapefile)LayerObject).With(sf =>
+                {
+                    sf.SaveAs(fileName + ".shp");
+                    sf.GeoProjection.WriteToFile(fileName + ".prj");
+                });
+            }
+            else
+            {
+                //for image type, possibly
+            }
         }
 
         public void Dispose()

@@ -193,6 +193,16 @@ namespace FAD3.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap fit {
+            get {
+                object obj = ResourceManager.GetObject("fit", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap fitScreen {
             get {
                 object obj = ResourceManager.GetObject("fitScreen", resourceCulture);
@@ -233,6 +243,16 @@ namespace FAD3.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap im_boundary {
+            get {
+                object obj = ResourceManager.GetObject("im_boundary", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap im_clear {
             get {
                 object obj = ResourceManager.GetObject("im_clear", resourceCulture);
@@ -256,6 +276,16 @@ namespace FAD3.Properties {
         internal static System.Drawing.Bitmap im_table {
             get {
                 object obj = ResourceManager.GetObject("im_table", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap image {
+            get {
+                object obj = ResourceManager.GetObject("image", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -366,6 +396,16 @@ namespace FAD3.Properties {
         internal static System.Drawing.Bitmap MapTileLayer_16x_24 {
             get {
                 object obj = ResourceManager.GetObject("MapTileLayer_16x_24", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap mbr {
+            get {
+                object obj = ResourceManager.GetObject("mbr", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

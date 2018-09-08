@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using Microsoft.Win32;
 using System.Windows.Forms;
 using Microsoft.VisualBasic.PowerPacks;
 
@@ -17,6 +18,11 @@ namespace FAD3
         private MapperForm _parentForm;
         private Grid25MajorGrid _grid25MajorGrid;
         private Dictionary<string, uint> _labelAndGridProperties = new Dictionary<string, uint>();
+
+        public Grid25MajorGrid Grid25MajorGrid
+        {
+            get { return _grid25MajorGrid; }
+        }
 
         public static Grid25GenerateForm GetInstance(MapperForm parent)
         {
@@ -135,7 +141,7 @@ namespace FAD3
             global.LoadFormSettings(this, true);
         }
 
-        private void shapeColor_DoubleClick(object sender, EventArgs e)
+        private void OnShapeColor_DoubleClick(object sender, EventArgs e)
         {
             var cd = new ColorDialog
             {
@@ -146,6 +152,68 @@ namespace FAD3
             };
             cd.ShowDialog();
             ((RectangleShape)sender).FillColor = cd.Color;
+        }
+
+        public string GetSavedGridsFolder()
+        {
+            RegistryKey reg_key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\FAD3", true);
+            try
+            {
+                return reg_key.GetValue("FolderSavedGrids").ToString();
+            }
+            catch
+            {
+                return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            }
+        }
+
+        private void SetSavedGridsFolder(string folderPath)
+        {
+            RegistryKey reg_key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\FAD3", true);
+            reg_key.SetValue("FolderSavedGrids", folderPath);
+        }
+
+        private void OnToolbar_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+            switch (e.ClickedItem.Name)
+            {
+                case "tsButtonMBRs":
+                    break;
+
+                case "tsButtonRetrieve":
+                    var folderBrowser = new FolderBrowserDialog();
+                    folderBrowser.ShowNewFolderButton = true;
+                    folderBrowser.SelectedPath = GetSavedGridsFolder();
+                    folderBrowser.Description = "Locate folder containing saved fishing ground grid maps";
+                    DialogResult result = FolderBrowserLauncher.ShowFolderBrowser(folderBrowser);
+                    if (result == DialogResult.OK)
+                    {
+                        SetSavedGridsFolder(folderBrowser.SelectedPath);
+                    }
+                    break;
+
+                case "tsButtonSaveImage":
+                case "tsButtonSaveShapefile":
+                    var saveForm = Grid25SaveForm.GetInstance(this);
+                    if (!saveForm.Visible)
+                    {
+                        saveForm.Show(this);
+                        saveForm.SaveType(e.ClickedItem.Name == "tsButtonSaveShapefile");
+                    }
+                    else
+                    {
+                        saveForm.BringToFront();
+                    }
+                    break;
+
+                case "tsButtonFitMap":
+                    _grid25MajorGrid.FitGridToMap();
+                    break;
+
+                case "tsButtonExit":
+                    Close();
+                    break;
+            }
         }
     }
 }

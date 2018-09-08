@@ -67,7 +67,15 @@
             this.buttonClose = new System.Windows.Forms.Button();
             this.buttonClear = new System.Windows.Forms.Button();
             this.buttonGrid = new System.Windows.Forms.Button();
+            this.toolbar = new ToolStripExtensions.ToolStripEx();
+            this.tsButtonFitMap = new System.Windows.Forms.ToolStripButton();
+            this.tsButtonSaveShapefile = new System.Windows.Forms.ToolStripButton();
+            this.tsButtonSaveImage = new System.Windows.Forms.ToolStripButton();
+            this.tsButtonMBRs = new System.Windows.Forms.ToolStripButton();
+            this.tsButtonRetrieve = new System.Windows.Forms.ToolStripButton();
+            this.tsButtonExit = new System.Windows.Forms.ToolStripButton();
             this.groupLabels.SuspendLayout();
+            this.toolbar.SuspendLayout();
             this.SuspendLayout();
             // 
             // txtMapTitle
@@ -357,7 +365,7 @@
             this.shapeMinorGridLineColor.Location = new System.Drawing.Point(229, 292);
             this.shapeMinorGridLineColor.Name = "shapeMinorGridLineColor";
             this.shapeMinorGridLineColor.Size = new System.Drawing.Size(23, 18);
-            this.shapeMinorGridLineColor.DoubleClick += new System.EventHandler(this.shapeColor_DoubleClick);
+            this.shapeMinorGridLineColor.DoubleClick += new System.EventHandler(this.OnShapeColor_DoubleClick);
             // 
             // shapeMajorGridLineColor
             // 
@@ -366,7 +374,7 @@
             this.shapeMajorGridLineColor.Location = new System.Drawing.Point(229, 248);
             this.shapeMajorGridLineColor.Name = "shapeMajorGridLineColor";
             this.shapeMajorGridLineColor.Size = new System.Drawing.Size(23, 18);
-            this.shapeMajorGridLineColor.DoubleClick += new System.EventHandler(this.shapeColor_DoubleClick);
+            this.shapeMajorGridLineColor.DoubleClick += new System.EventHandler(this.OnShapeColor_DoubleClick);
             // 
             // shapeBorderColor
             // 
@@ -374,7 +382,7 @@
             this.shapeBorderColor.Location = new System.Drawing.Point(229, 204);
             this.shapeBorderColor.Name = "shapeBorderColor";
             this.shapeBorderColor.Size = new System.Drawing.Size(23, 18);
-            this.shapeBorderColor.DoubleClick += new System.EventHandler(this.shapeColor_DoubleClick);
+            this.shapeBorderColor.DoubleClick += new System.EventHandler(this.OnShapeColor_DoubleClick);
             // 
             // shapeMajorGridLabelColor
             // 
@@ -383,7 +391,7 @@
             this.shapeMajorGridLabelColor.Location = new System.Drawing.Point(229, 159);
             this.shapeMajorGridLabelColor.Name = "shapeMajorGridLabelColor";
             this.shapeMajorGridLabelColor.Size = new System.Drawing.Size(23, 18);
-            this.shapeMajorGridLabelColor.DoubleClick += new System.EventHandler(this.shapeColor_DoubleClick);
+            this.shapeMajorGridLabelColor.DoubleClick += new System.EventHandler(this.OnShapeColor_DoubleClick);
             // 
             // shapeMinorGridLabelColor
             // 
@@ -392,7 +400,7 @@
             this.shapeMinorGridLabelColor.Location = new System.Drawing.Point(229, 118);
             this.shapeMinorGridLabelColor.Name = "shapeMinorGridLabelColor";
             this.shapeMinorGridLabelColor.Size = new System.Drawing.Size(23, 18);
-            this.shapeMinorGridLabelColor.DoubleClick += new System.EventHandler(this.shapeColor_DoubleClick);
+            this.shapeMinorGridLabelColor.DoubleClick += new System.EventHandler(this.OnShapeColor_DoubleClick);
             // 
             // buttonClose
             // 
@@ -426,11 +434,90 @@
             this.buttonGrid.UseVisualStyleBackColor = true;
             this.buttonGrid.Click += new System.EventHandler(this.OnButtons_Click);
             // 
+            // toolbar
+            // 
+            this.toolbar.ClickThrough = true;
+            this.toolbar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tsButtonFitMap,
+            this.tsButtonSaveShapefile,
+            this.tsButtonSaveImage,
+            this.tsButtonMBRs,
+            this.tsButtonRetrieve,
+            this.tsButtonExit});
+            this.toolbar.Location = new System.Drawing.Point(0, 0);
+            this.toolbar.Name = "toolbar";
+            this.toolbar.Size = new System.Drawing.Size(322, 25);
+            this.toolbar.SuppressHighlighting = true;
+            this.toolbar.TabIndex = 7;
+            this.toolbar.Text = "toolStripEx1";
+            this.toolbar.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnToolbar_ItemClicked);
+            // 
+            // tsButtonFitMap
+            // 
+            this.tsButtonFitMap.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsButtonFitMap.Image = global::FAD3.Properties.Resources.fit;
+            this.tsButtonFitMap.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsButtonFitMap.Name = "tsButtonFitMap";
+            this.tsButtonFitMap.Size = new System.Drawing.Size(23, 22);
+            this.tsButtonFitMap.Text = "toolStripButton1";
+            this.tsButtonFitMap.ToolTipText = "Fit grid to map";
+            // 
+            // tsButtonSaveShapefile
+            // 
+            this.tsButtonSaveShapefile.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsButtonSaveShapefile.Image = global::FAD3.Properties.Resources.document_save;
+            this.tsButtonSaveShapefile.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsButtonSaveShapefile.Name = "tsButtonSaveShapefile";
+            this.tsButtonSaveShapefile.Size = new System.Drawing.Size(23, 22);
+            this.tsButtonSaveShapefile.Text = "toolStripButton1";
+            this.tsButtonSaveShapefile.ToolTipText = "Save grid as shapefile";
+            // 
+            // tsButtonSaveImage
+            // 
+            this.tsButtonSaveImage.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsButtonSaveImage.Image = global::FAD3.Properties.Resources.image;
+            this.tsButtonSaveImage.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsButtonSaveImage.Name = "tsButtonSaveImage";
+            this.tsButtonSaveImage.Size = new System.Drawing.Size(23, 22);
+            this.tsButtonSaveImage.Text = "toolStripButton1";
+            this.tsButtonSaveImage.ToolTipText = "Save grid as image";
+            // 
+            // tsButtonMBRs
+            // 
+            this.tsButtonMBRs.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsButtonMBRs.Image = global::FAD3.Properties.Resources.mbr;
+            this.tsButtonMBRs.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsButtonMBRs.Name = "tsButtonMBRs";
+            this.tsButtonMBRs.Size = new System.Drawing.Size(23, 22);
+            this.tsButtonMBRs.Text = "toolStripButton1";
+            this.tsButtonMBRs.ToolTipText = "Show MBRs";
+            // 
+            // tsButtonRetrieve
+            // 
+            this.tsButtonRetrieve.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsButtonRetrieve.Image = global::FAD3.Properties.Resources.im_boundary;
+            this.tsButtonRetrieve.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsButtonRetrieve.Name = "tsButtonRetrieve";
+            this.tsButtonRetrieve.Size = new System.Drawing.Size(23, 22);
+            this.tsButtonRetrieve.Text = "toolStripButton1";
+            this.tsButtonRetrieve.ToolTipText = "Get grid boundaries";
+            // 
+            // tsButtonExit
+            // 
+            this.tsButtonExit.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsButtonExit.Image = global::FAD3.Properties.Resources.im_exit;
+            this.tsButtonExit.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsButtonExit.Name = "tsButtonExit";
+            this.tsButtonExit.Size = new System.Drawing.Size(23, 22);
+            this.tsButtonExit.Text = "toolStripButton1";
+            this.tsButtonExit.ToolTipText = "Close";
+            // 
             // Grid25GenerateForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(322, 527);
+            this.Controls.Add(this.toolbar);
             this.Controls.Add(this.buttonClose);
             this.Controls.Add(this.groupLabels);
             this.Controls.Add(this.buttonClear);
@@ -446,6 +533,8 @@
             this.Load += new System.EventHandler(this.Grid25GenerateForm_Load);
             this.groupLabels.ResumeLayout(false);
             this.groupLabels.PerformLayout();
+            this.toolbar.ResumeLayout(false);
+            this.toolbar.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -490,5 +579,12 @@
         private System.Windows.Forms.Button buttonClose;
         private System.Windows.Forms.ImageList imList;
         private System.Windows.Forms.Button buttonLabel;
+        private ToolStripExtensions.ToolStripEx toolbar;
+        private System.Windows.Forms.ToolStripButton tsButtonFitMap;
+        private System.Windows.Forms.ToolStripButton tsButtonSaveShapefile;
+        private System.Windows.Forms.ToolStripButton tsButtonSaveImage;
+        private System.Windows.Forms.ToolStripButton tsButtonMBRs;
+        private System.Windows.Forms.ToolStripButton tsButtonRetrieve;
+        private System.Windows.Forms.ToolStripButton tsButtonExit;
     }
 }

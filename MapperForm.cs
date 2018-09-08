@@ -54,6 +54,21 @@ namespace FAD3
             }
         }
 
+        public void MapDecorationsVisibility(bool visible)
+        {
+            axMap.ScalebarVisible = visible;
+            if (visible)
+            {
+                axMap.ShowCoordinates = tkCoordinatesDisplay.cdmAuto;
+                axMap.ScalebarUnits = tkScalebarUnits.GoogleStyle;
+                axMap.Redraw();
+            }
+            else
+            {
+                axMap.ShowCoordinates = tkCoordinatesDisplay.cdmNone;
+            }
+        }
+
         public MapLayer CurrentMapLayer
         {
             get { return _currentMapLayer; }

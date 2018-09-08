@@ -76,13 +76,13 @@ namespace FAD3
             this.statusPanelLandingSite = new System.Windows.Forms.ToolStripStatusLabel();
             this.statusPanelGearUsed = new System.Windows.Forms.ToolStripStatusLabel();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            this.tsToolbar = new System.Windows.Forms.ToolStrip();
-            this.tbButtonAbout = new System.Windows.Forms.ToolStripButton();
-            this.tbButtonGears = new System.Windows.Forms.ToolStripButton();
-            this.tbButtonSpecies = new System.Windows.Forms.ToolStripButton();
-            this.tbButtonReport = new System.Windows.Forms.ToolStripButton();
-            this.tbButtonMap = new System.Windows.Forms.ToolStripButton();
-            this.tbButtonExit = new System.Windows.Forms.ToolStripButton();
+            this.toolbar = new ToolStripExtensions.ToolStripEx();
+            this.tsButtonAbout = new System.Windows.Forms.ToolStripButton();
+            this.tsButtonGear = new System.Windows.Forms.ToolStripButton();
+            this.tsButtonFish = new System.Windows.Forms.ToolStripButton();
+            this.tsButtonReport = new System.Windows.Forms.ToolStripButton();
+            this.tsButtonMap = new System.Windows.Forms.ToolStripButton();
+            this.tsButtonExit = new System.Windows.Forms.ToolStripButton();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -90,7 +90,7 @@ namespace FAD3
             this.panelSamplingButtons.SuspendLayout();
             this.menuMenuBar.SuspendLayout();
             this.statusStrip1.SuspendLayout();
-            this.tsToolbar.SuspendLayout();
+            this.toolbar.SuspendLayout();
             this.SuspendLayout();
             // 
             // splitContainer1
@@ -483,94 +483,91 @@ namespace FAD3
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
             // 
-            // tsToolbar
+            // toolbar
             // 
-            this.tsToolbar.ImageScalingSize = new System.Drawing.Size(24, 24);
-            this.tsToolbar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.tbButtonAbout,
-            this.tbButtonGears,
-            this.tbButtonSpecies,
-            this.tbButtonReport,
-            this.tbButtonMap,
-            this.tbButtonExit});
-            this.tsToolbar.Location = new System.Drawing.Point(0, 24);
-            this.tsToolbar.Name = "tsToolbar";
-            this.tsToolbar.Size = new System.Drawing.Size(929, 31);
-            this.tsToolbar.TabIndex = 3;
-            this.tsToolbar.Text = "tsToolbar";
-            this.tsToolbar.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnToolbar_ItemClicked);
+            this.toolbar.ClickThrough = true;
+            this.toolbar.ImageScalingSize = new System.Drawing.Size(24, 24);
+            this.toolbar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tsButtonAbout,
+            this.tsButtonGear,
+            this.tsButtonFish,
+            this.tsButtonReport,
+            this.tsButtonMap,
+            this.tsButtonExit});
+            this.toolbar.Location = new System.Drawing.Point(0, 24);
+            this.toolbar.Name = "toolbar";
+            this.toolbar.Size = new System.Drawing.Size(929, 31);
+            this.toolbar.SuppressHighlighting = true;
+            this.toolbar.TabIndex = 3;
+            this.toolbar.Text = "toolStripEx1";
+            this.toolbar.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnToolbar_ItemClicked);
             // 
-            // tbButtonAbout
+            // tsButtonAbout
             // 
-            this.tbButtonAbout.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tbButtonAbout.Image = ((System.Drawing.Image)(resources.GetObject("tbButtonAbout.Image")));
-            this.tbButtonAbout.ImageTransparentColor = System.Drawing.Color.White;
-            this.tbButtonAbout.Name = "tbButtonAbout";
-            this.tbButtonAbout.Size = new System.Drawing.Size(28, 28);
-            this.tbButtonAbout.Tag = "about";
-            this.tbButtonAbout.Text = "toolStripButton1";
-            this.tbButtonAbout.ToolTipText = "About the software";
+            this.tsButtonAbout.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsButtonAbout.Image = global::FAD3.Properties.Resources.help_browser;
+            this.tsButtonAbout.ImageTransparentColor = System.Drawing.Color.White;
+            this.tsButtonAbout.Name = "tsButtonAbout";
+            this.tsButtonAbout.Size = new System.Drawing.Size(28, 28);
+            this.tsButtonAbout.Text = "toolStripButton1";
+            this.tsButtonAbout.ToolTipText = "About FAD3";
             // 
-            // tbButtonGears
+            // tsButtonGear
             // 
-            this.tbButtonGears.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tbButtonGears.Image = global::FAD3.Properties.Resources.imHook;
-            this.tbButtonGears.ImageTransparentColor = System.Drawing.Color.White;
-            this.tbButtonGears.Name = "tbButtonGears";
-            this.tbButtonGears.Size = new System.Drawing.Size(28, 28);
-            this.tbButtonGears.Tag = "gear";
-            this.tbButtonGears.Text = "toolStripButton2";
-            this.tbButtonGears.ToolTipText = "Fishing gears";
+            this.tsButtonGear.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsButtonGear.Image = global::FAD3.Properties.Resources.imHook;
+            this.tsButtonGear.ImageTransparentColor = System.Drawing.Color.White;
+            this.tsButtonGear.Name = "tsButtonGear";
+            this.tsButtonGear.Size = new System.Drawing.Size(28, 28);
+            this.tsButtonGear.Text = "toolStripButton2";
+            this.tsButtonGear.ToolTipText = "Fishing gears";
             // 
-            // tbButtonSpecies
+            // tsButtonFish
             // 
-            this.tbButtonSpecies.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tbButtonSpecies.Image = global::FAD3.Properties.Resources.fish2;
-            this.tbButtonSpecies.ImageTransparentColor = System.Drawing.Color.White;
-            this.tbButtonSpecies.Name = "tbButtonSpecies";
-            this.tbButtonSpecies.Size = new System.Drawing.Size(28, 28);
-            this.tbButtonSpecies.Tag = "fish";
-            this.tbButtonSpecies.Text = "toolStripButton3";
-            this.tbButtonSpecies.ToolTipText = "Species caught";
+            this.tsButtonFish.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsButtonFish.Image = global::FAD3.Properties.Resources.fish2;
+            this.tsButtonFish.ImageTransparentColor = System.Drawing.Color.White;
+            this.tsButtonFish.Name = "tsButtonFish";
+            this.tsButtonFish.Size = new System.Drawing.Size(28, 28);
+            this.tsButtonFish.Text = "toolStripButton3";
+            this.tsButtonFish.ToolTipText = "Species";
             // 
-            // tbButtonReport
+            // tsButtonReport
             // 
-            this.tbButtonReport.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tbButtonReport.Image = global::FAD3.Properties.Resources.system_file_manager;
-            this.tbButtonReport.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tbButtonReport.Name = "tbButtonReport";
-            this.tbButtonReport.Size = new System.Drawing.Size(28, 28);
-            this.tbButtonReport.Tag = "report";
-            this.tbButtonReport.Text = "Report";
+            this.tsButtonReport.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsButtonReport.Image = global::FAD3.Properties.Resources.system_file_manager;
+            this.tsButtonReport.ImageTransparentColor = System.Drawing.Color.White;
+            this.tsButtonReport.Name = "tsButtonReport";
+            this.tsButtonReport.Size = new System.Drawing.Size(28, 28);
+            this.tsButtonReport.Text = "toolStripButton4";
+            this.tsButtonReport.ToolTipText = "Reports";
             // 
-            // tbButtonMap
+            // tsButtonMap
             // 
-            this.tbButtonMap.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tbButtonMap.Image = global::FAD3.Properties.Resources.internet_web_browser;
-            this.tbButtonMap.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tbButtonMap.Name = "tbButtonMap";
-            this.tbButtonMap.Size = new System.Drawing.Size(28, 28);
-            this.tbButtonMap.Tag = "map";
-            this.tbButtonMap.Text = "toolStripButton5";
-            this.tbButtonMap.ToolTipText = "Map";
+            this.tsButtonMap.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsButtonMap.Image = global::FAD3.Properties.Resources.internet_web_browser;
+            this.tsButtonMap.ImageTransparentColor = System.Drawing.Color.White;
+            this.tsButtonMap.Name = "tsButtonMap";
+            this.tsButtonMap.Size = new System.Drawing.Size(28, 28);
+            this.tsButtonMap.Text = "toolStripButton5";
+            this.tsButtonMap.ToolTipText = "Map";
             // 
-            // tbButtonExit
+            // tsButtonExit
             // 
-            this.tbButtonExit.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tbButtonExit.Image = global::FAD3.Properties.Resources.im_exit;
-            this.tbButtonExit.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tbButtonExit.Name = "tbButtonExit";
-            this.tbButtonExit.Size = new System.Drawing.Size(28, 28);
-            this.tbButtonExit.Tag = "exit";
-            this.tbButtonExit.Text = "toolStripButton6";
-            this.tbButtonExit.ToolTipText = "Exit";
+            this.tsButtonExit.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsButtonExit.Image = global::FAD3.Properties.Resources.im_exit;
+            this.tsButtonExit.ImageTransparentColor = System.Drawing.Color.White;
+            this.tsButtonExit.Name = "tsButtonExit";
+            this.tsButtonExit.Size = new System.Drawing.Size(28, 28);
+            this.tsButtonExit.Text = "toolStripButton6";
+            this.tsButtonExit.ToolTipText = "Exit";
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(929, 530);
-            this.Controls.Add(this.tsToolbar);
+            this.Controls.Add(this.toolbar);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.menuMenuBar);
@@ -592,8 +589,8 @@ namespace FAD3
             this.menuMenuBar.PerformLayout();
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
-            this.tsToolbar.ResumeLayout(false);
-            this.tsToolbar.PerformLayout();
+            this.toolbar.ResumeLayout(false);
+            this.toolbar.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -615,11 +612,6 @@ namespace FAD3
         private System.Windows.Forms.ToolStripMenuItem toolStripRecentlyOpened;
         private System.Windows.Forms.ToolStripMenuItem testToolStripRecentOpenedList;
         private System.Windows.Forms.ImageList imageList16;
-        private System.Windows.Forms.ToolStrip tsToolbar;
-        private System.Windows.Forms.ToolStripButton tbButtonAbout;
-        private System.Windows.Forms.ToolStripButton tbButtonGears;
-        private System.Windows.Forms.ToolStripButton tbButtonSpecies;
-        private System.Windows.Forms.ToolStripButton tbButtonReport;
         private System.Windows.Forms.ToolStripMenuItem menuTools;
         private System.Windows.Forms.ToolStripMenuItem resetReferenceNumbersToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem referenceNumberRangeToolStripMenuItem;
@@ -632,8 +624,6 @@ namespace FAD3
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem onlineManualToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem showErrorMessagesToolStripMenuItem;
-        private System.Windows.Forms.ToolStripButton tbButtonMap;
-        private System.Windows.Forms.ToolStripButton tbButtonExit;
         private System.Windows.Forms.Label lblErrorFormOpen;
         private System.Windows.Forms.ListView lvMain;
         private System.Windows.Forms.Label lblTitle;
@@ -643,5 +633,12 @@ namespace FAD3
         private System.Windows.Forms.Button buttonOK;
         private System.Windows.Forms.ContextMenuStrip menuDropDown;
         private System.Windows.Forms.Label labelErrorDetail;
+        private ToolStripExtensions.ToolStripEx toolbar;
+        private System.Windows.Forms.ToolStripButton tsButtonAbout;
+        private System.Windows.Forms.ToolStripButton tsButtonGear;
+        private System.Windows.Forms.ToolStripButton tsButtonFish;
+        private System.Windows.Forms.ToolStripButton tsButtonReport;
+        private System.Windows.Forms.ToolStripButton tsButtonMap;
+        private System.Windows.Forms.ToolStripButton tsButtonExit;
     }
 }

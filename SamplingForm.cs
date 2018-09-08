@@ -271,22 +271,18 @@ namespace FAD3
                     switch (e.Key)
                     {
                         case "Enumerator":
-                            //((ComboBox)ctl).DataSource = new BindingSource(_aoi.Enumerators, null);
                             Enumerators.AOIEnumeratorsList(_AOIGuid, (ComboBox)ctl);
                             break;
 
                         case "TargetArea":
-                            //((ComboBox)ctl).DataSource = new BindingSource(_aoi.AOIs, null);
                             aoi.getAOIsEx((ComboBox)ctl);
                             break;
 
                         case "LandingSite":
-                            //((ComboBox)ctl).DataSource = new BindingSource(_aoi.LandingSites, null);
                             aoi.LandingSitesFromAOI(_AOIGuid, (ComboBox)ctl);
                             break;
 
                         case "GearClass":
-                            //((ComboBox)ctl).DataSource = new BindingSource(global.GearClass, null);
                             gear.GetGearClassEx((ComboBox)ctl);
                             break;
 
@@ -309,15 +305,9 @@ namespace FAD3
                             }
 
                             gear.GearVariationsUsage(_gearClassGuid, _AOIGuid, (ComboBox)ctl);
-                            //var MySource = global.GearVariationsUsage(_GearClassGuid, _AOIGuid, (ComboBox)ctl);
-                            //if (MySource.Count > 0)
-                            //{
-                            //    ((ComboBox)ctl).DataSource = new BindingSource(MySource, null);
-                            //}
                             break;
 
                         case "TypeOfVesselUsed":
-                            //System.Diagnostics.Debug.Assert(global.VesselTypeDict.Count > 0, "source has no rows");
                             ((ComboBox)ctl).DataSource = new BindingSource(global.VesselTypeDict, null);
                             break;
                     }
@@ -432,10 +422,6 @@ namespace FAD3
                                 break;
 
                             case "AdditionalFishingGround":
-                                //var myList = FishingGrid.AdditionalFishingGrounds(_samplingGUID);
-
-                                //foreach (var item in myList)
-                                //    ((TextBox)ctl).Text += item + "\r\n";
                                 break;
 
                             case "GearSpecs":
@@ -472,8 +458,7 @@ namespace FAD3
                             {
                                 ((ComboBox)ctl).With(o =>
                                 {
-                                    var item = o.Items[0];
-                                    o.SelectedItem = item;
+                                    o.SelectedItem = o.Items[0];
                                 });
                             }
                             _gearClassGuid = ((KeyValuePair<string, string>)((ComboBox)ctl).SelectedItem).Key;
@@ -488,8 +473,7 @@ namespace FAD3
                                 {
                                     if (o.Items.Count > 0)
                                     {
-                                        var item = o.Items[0];
-                                        o.SelectedItem = item; //combobox text is set here
+                                        o.SelectedItem = o.Items[0];
                                     }
                                 });
                             }
@@ -547,7 +531,7 @@ namespace FAD3
                 {
                     Name = "btn" + e.Key,
                     Text = ButtonText,
-                    Size = new System.Drawing.Size(_controlWidth / 2, (int)(ht * 1.7)),
+                    Size = new Size(_controlWidth / 2, (int)(ht * 1.7)),
                     Tag = e.Key
                 };
                 panelUI.Controls.Add(btn);
@@ -600,7 +584,9 @@ namespace FAD3
             panelUI.ResumeLayout();
 
             if (_isNew)
+            {
                 Text = "New sampling";
+            }
             else
             {
                 Text = "Sampling detail";

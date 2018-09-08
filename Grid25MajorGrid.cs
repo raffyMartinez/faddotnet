@@ -42,7 +42,7 @@ namespace FAD3
         private Shapefile _shapefileMajorGridIntersect;                         //shapefile of major grid intersected with extent of minor grids
         private Shapefile _shapeFileSelectedMajorGridBuffer;                    //a shapefile that holds a convex hull of the selected major grids
         private int _hCursorDefineGrid;                                         //the handle of the cursor used when defining selection extent of major grid
-        private string _mapTitle;                                                //title of the fishing ground grid map
+        private string _mapTitle;                                               //title of the fishing ground grid map
         private MapLayer _currentMapLayer;
         private bool _enableMapInteraction;
 
@@ -68,6 +68,42 @@ namespace FAD3
             _utmZone = FishingGrid.fadUTMZone.utmZone51N;
 
             _grid25MinorGrid = new Grid25MinorGrid(_axMap);
+        }
+
+        public bool Save(int DPI, string fileName)
+        {
+            SaveMapImage smi = new SaveMapImage(fileName, DPI, _axMap);
+            return true;
+        }
+
+        public bool Save(string fileName)
+        {
+            foreach (MapLayer ml in _mapLayers.LayerDictionary.Values)
+            {
+                if (ml.IsFishingGrid)
+                {
+                    ml.Save($"{fileName}_{ml.Name.ToLower()}");
+                }
+            }
+            return true;
+        }
+
+        public void FitGridToMap()
+        {
+            if (_shapefileBoundingRectangle != null)
+            {
+                int labelDistance = (int)_gridAndLabelProperties["minorGridLabelDistance"];
+                const int plusYTop = 4000;
+                const int plusYBottom = 3000;
+                const int plusX = 1500;
+
+                _shapefileBoundingRectangle.Extents.With(e =>
+                {
+                    var ext = new Extents();
+                    ext.SetBounds(e.xMin - (labelDistance * 3) - plusX, e.yMin - (labelDistance * 3) - plusYBottom, 0, e.xMax + (labelDistance * 3) + plusX, e.yMax + (labelDistance * 3) + plusYTop, 0);
+                    _axMap.Extents = ext;
+                });
+            }
         }
 
         /// <summary>
@@ -718,10 +754,24 @@ namespace FAD3
                                     _grid25LabelManager.Grid25Labels.Labels.ApplyCategories();
 
                                     //we add the layers using the maplayer class, then we add the layer handles to listGridLayers
-                                    _listGridLayers.Add(_mapLayers.AddLayer(_grid25MinorGrid.MinorGridLinesShapeFile, "Minor grid", true, true));
-                                    _listGridLayers.Add(_mapLayers.AddLayer(_grid25LabelManager.Grid25Labels, "Labels", true, true));
-                                    _listGridLayers.Add(_mapLayers.AddLayer(_shapefileMajorGridIntersect, "Major grid", true, true));
-                                    _listGridLayers.Add(_mapLayers.AddLayer(_shapefileBoundingRectangle, "MBR", true, true));
+                                    var h = _mapLayers.AddLayer(_grid25MinorGrid.MinorGridLinesShapeFile, "Minor grid", true, true);
+                                    _mapLayers.LayerDictionary[h].IsGraticule = true;
+                                    _mapLayers.LayerDictionary[h].IsFishingGrid = true;
+                                    _listGridLayers.Add(h);
+
+                                    h = _mapLayers.AddLayer(_grid25LabelManager.Grid25Labels, "Labels", true, true);
+                                    _mapLayers.LayerDictionary[h].IsFishingGrid = true;
+                                    _listGridLayers.Add(h);
+
+                                    h = _mapLayers.AddLayer(_shapefileMajorGridIntersect, "Major grid", true, true);
+                                    _mapLayers.LayerDictionary[h].IsGraticule = true;
+                                    _mapLayers.LayerDictionary[h].IsFishingGrid = true;
+                                    _listGridLayers.Add(h);
+
+                                    h = _mapLayers.AddLayer(_shapefileBoundingRectangle, "MBR", true, true);
+                                    _mapLayers.LayerDictionary[h].IsGraticule = true;
+                                    _mapLayers.LayerDictionary[h].IsFishingGrid = true;
+                                    _listGridLayers.Add(h);
                                 }
                                 _axMap.MapCursor = tkCursor.crsrMapDefault;
                             }

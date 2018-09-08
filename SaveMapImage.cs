@@ -11,13 +11,22 @@ namespace FAD3
     {
         private bool _disposed;
         private AxMap _axMap;
-        public string FileName { get; set; }
-        public int dpi { get; set; }
-        public int _hGraticule { get; set; }
-        public Shapefile _shapeFileMask;
+        private Shapefile _shapeFileMask;
 
-        public SaveMapImage(AxMap mapControl)
+        private string _fileName;
+        private int _dpi;
+        public Dictionary<int, MapLayer> MapLayerDictionary { get; set; }
+
+        public SaveMapImage(string fileName, int DPI, AxMap mapControl)
         {
+            _fileName = fileName;
+            _dpi = DPI;
+            _axMap = mapControl;
+        }
+
+        public bool Save()
+        {
+            return true;
         }
 
         public void Dispose()
