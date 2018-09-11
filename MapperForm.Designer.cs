@@ -50,6 +50,7 @@
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.tsButtonClearSelection = new System.Windows.Forms.ToolStripButton();
             this.tsButtonClearAllSelection = new System.Windows.Forms.ToolStripButton();
+            this.menuDropDown = new System.Windows.Forms.ContextMenuStrip(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.axMap)).BeginInit();
             this.toolstripToolBar.SuspendLayout();
             this.SuspendLayout();
@@ -260,6 +261,12 @@
             this.tsButtonClearAllSelection.Text = "toolStripButton1";
             this.tsButtonClearAllSelection.ToolTipText = "Clears selection from all layers";
             // 
+            // menuDropDown
+            // 
+            this.menuDropDown.Name = "menuDropDown";
+            this.menuDropDown.Size = new System.Drawing.Size(181, 26);
+            
+            // 
             // MapperForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -304,5 +311,6 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripButton tsButtonSave;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ContextMenuStrip menuDropDown;
     }
 }

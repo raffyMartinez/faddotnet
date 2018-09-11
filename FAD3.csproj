@@ -209,7 +209,7 @@
     <Compile Include="MapLayersForm.Designer.cs">
       <DependentUpon>MapLayersForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="LayerProperty.cs" />
+    <Compile Include="LayerEventArg.cs" />
     <Compile Include="MapperForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -231,7 +231,6 @@
     </Compile>
     <Compile Include="Enumerators.cs" />
     <Compile Include="SaveMapImage.cs" />
-    <Compile Include="SaveMapToImage.cs" />
     <Compile Include="ShapefileAttributesForm.cs">
       <SubType>Form</SubType>
     </Compile>

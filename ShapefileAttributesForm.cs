@@ -37,7 +37,7 @@ namespace FAD3
         /// </summary>
         /// <param name="s"></param>
         /// <param name="e"></param>
-        private void OnCurrentLayer(MapLayersHandler s, LayerProperty e)
+        private void OnCurrentLayer(MapLayersHandler s, LayerEventArg e)
         {
             _currentMapLayer = MapInterActionHandler.MapLayersHandler.CurrentMapLayer;
             DisplayAttributes();

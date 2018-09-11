@@ -28,6 +28,21 @@ namespace FAD3
         }
 
         /// <summary>
+        /// creates a shapefile for grid labels given filename
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="labelProperties"></param>
+        public void LoadLabelShapefile(string fileName, Dictionary<string, uint> labelProperties, Shapefile sfLabelPath)
+        {
+            _labelPropertiesDictionary = labelProperties;
+
+            _shapeFileGrid25Labels = new Shapefile();
+            _shapeFileGrid25Labels.Open(fileName, null);
+            _shapeFileGrid25Labels.GenerateLabels(_shapeFileGrid25Labels.FieldIndexByName["Label"], tkLabelPositioning.lpCentroid);
+            SetupLabelProperties();
+        }
+
+        /// <summary>
         /// removes all points from the shapefile and clears labels
         /// </summary>
         public void ClearLabels()
@@ -195,8 +210,8 @@ namespace FAD3
         /// <param name="categoryIndex"></param>
         private void PlaceLabels(int segments, string orientation, int offset, int labelX, int labelY, int startNode, string position, int categoryIndex)
         {
-            var ifldLocation = _shapeFileGrid25Labels.FieldIndexByName["Location"];
-            var ifldLabel = _shapeFileGrid25Labels.FieldIndexByName["Label"];
+            _iFldLocation = _shapeFileGrid25Labels.FieldIndexByName["Location"];
+            _iFLdLabel = _shapeFileGrid25Labels.FieldIndexByName["Label"];
             var labelValue = "";
             var labelNode = 0;
             int offsetSegments = offset / _cellSize;
@@ -256,8 +271,8 @@ namespace FAD3
                     var iShp = _shapeFileGrid25Labels.EditAddShape(shp);
                     if (iShp >= 0)
                     {
-                        _shapeFileGrid25Labels.EditCellValue(ifldLabel, iShp, labelValue);
-                        _shapeFileGrid25Labels.EditCellValue(ifldLocation, iShp, position.Substring(0, 1).ToUpper());
+                        _shapeFileGrid25Labels.EditCellValue(_iFLdLabel, iShp, labelValue);
+                        _shapeFileGrid25Labels.EditCellValue(_iFldLocation, iShp, position.Substring(0, 1).ToUpper());
                         _shapeFileGrid25Labels.Labels.AddLabel(labelValue, pt.x, pt.y, 0, categoryIndex);
                     }
                 }

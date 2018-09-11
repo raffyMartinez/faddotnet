@@ -3,6 +3,7 @@ using MapWinGIS;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
+using System.IO;
 
 namespace FAD3
 {
@@ -15,6 +16,11 @@ namespace FAD3
         private Form _parentForm;
         private MapLayer _currentMapLayer;
         public event EventHandler MapperClosed;
+
+        public ContextMenuStrip MapDropDownMenu
+        {
+            get { return menuDropDown; }
+        }
 
         public MapLayersHandler MapLayersHandler
         {
@@ -119,6 +125,7 @@ namespace FAD3
             _mapLayersHandler = new MapLayersHandler(axMap);
             _mapLayersHandler.CurrentLayer += OnCurrentMapLayer;
             _mapInterActionHandler = new MapInterActionHandler(axMap, _mapLayersHandler);
+            _mapInterActionHandler.MapContextMenuStrip = menuDropDown;
             SetCursorToSelect();
 
             if (global.MappingMode == global.fad3MappingMode.defaultMode)
@@ -131,7 +138,7 @@ namespace FAD3
             }
         }
 
-        private void OnCurrentMapLayer(MapLayersHandler s, LayerProperty e)
+        private void OnCurrentMapLayer(MapLayersHandler s, LayerEventArg e)
         {
             _currentMapLayer = _mapLayersHandler.get_MapLayer(e.LayerHandle);
         }
@@ -276,10 +283,6 @@ namespace FAD3
                     _mapLayersHandler.ClearAllSelections();
                     break;
             }
-        }
-
-        private void axMap_MouseDownEvent(object sender, AxMapWinGIS._DMapEvents_MouseDownEvent e)
-        {
         }
     }
 }

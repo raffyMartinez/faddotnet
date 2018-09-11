@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
+﻿using Microsoft.VisualBasic.PowerPacks;
 using Microsoft.Win32;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Windows.Forms;
-using Microsoft.VisualBasic.PowerPacks;
 
 namespace FAD3
 {
@@ -18,6 +15,13 @@ namespace FAD3
         private MapperForm _parentForm;
         private Grid25MajorGrid _grid25MajorGrid;
         private Dictionary<string, uint> _labelAndGridProperties = new Dictionary<string, uint>();
+        private List<LayerEventArg> _savedGridLayers = new List<LayerEventArg>();
+        private FishingGrid.fadUTMZone _utmZone;
+
+        public void set_UTMZone(FishingGrid.fadUTMZone utmZone)
+        {
+            _utmZone = utmZone;
+        }
 
         public Grid25MajorGrid Grid25MajorGrid
         {
@@ -35,6 +39,26 @@ namespace FAD3
             InitializeComponent();
             _parentForm = parent;
             _grid25MajorGrid = parent.Grid25MajorGrid;
+            _grid25MajorGrid.LayerSaved += OnGrid25LayerSaved;
+            _grid25MajorGrid.GridRetrieved += OnGrid25GridRetrieved;
+        }
+
+        private void OnGrid25GridRetrieved(Grid25MajorGrid s, LayerEventArg e)
+        {
+            txtMapTitle.Text = e.MapTitle;
+        }
+
+        private void OnGrid25LayerSaved(Grid25MajorGrid s, LayerEventArg e)
+        {
+            _savedGridLayers.Add(e);
+        }
+
+        private void DeleteGrid25File(string fileName)
+        {
+            if (File.Exists($"{fileName}.shp")) File.Delete($"{fileName}.shp");
+            if (File.Exists($"{fileName}.prj")) File.Delete($"{fileName}.prj");
+            if (File.Exists($"{fileName}.dbf")) File.Delete($"{fileName}.dbf");
+            if (File.Exists($"{fileName}.shx")) File.Delete($"{fileName}.shx");
         }
 
         private uint ColorToUInt(Color clr)
@@ -63,6 +87,13 @@ namespace FAD3
             _labelAndGridProperties.Add("minorGridLabelWrapped", (uint)(chkWrapLabels.Checked ? 1 : 0));
         }
 
+        private void RedoGridLabel()
+        {
+            SetupDictionary();
+            _grid25MajorGrid.RedoLabels(txtMapTitle.Text, _labelAndGridProperties);
+            _grid25MajorGrid.ApplyGridSymbology(txtMapTitle.Text);
+        }
+
         private void OnButtons_Click(object sender, EventArgs e)
         {
             switch (((Button)sender).Name)
@@ -71,8 +102,7 @@ namespace FAD3
                 case "buttonLabel":
                     if (_grid25MajorGrid.grid25LabelManager != null && _grid25MajorGrid.grid25LabelManager.Grid25Labels.NumShapes > 0)
                     {
-                        SetupDictionary();
-                        _grid25MajorGrid.RedoLabels(txtMapTitle.Text, _labelAndGridProperties);
+                        RedoGridLabel();
                     }
                     break;
 
@@ -111,6 +141,30 @@ namespace FAD3
             }
         }
 
+        private void ReviewSavedGridFiles()
+        {
+            if (_savedGridLayers != null)
+            {
+                bool willDelete = false;
+                foreach (var item in _savedGridLayers)
+                {
+                    if (!item.LayerSaved)
+                    {
+                        willDelete = true;
+                        break;
+                    }
+                }
+
+                if (willDelete)
+                {
+                    foreach (var item in _savedGridLayers)
+                    {
+                        DeleteGrid25File(item.FileName);
+                    }
+                }
+            }
+        }
+
         private void Grid25GenerateForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             if (!_formCloseDone)
@@ -118,12 +172,25 @@ namespace FAD3
                 _formCloseDone = true;
                 if (global.MappingForm != null) global.MappingForm.Close();
             }
-            _parentForm = null;
-            _instance = null;
-            _labelAndGridProperties.Clear();
+
+            CleanUp();
 
             global.SaveFormSettings(this);
             global.MappingMode = global.fad3MappingMode.defaultMode;
+            ReviewSavedGridFiles();
+        }
+
+        private void CleanUp()
+        {
+            _parentForm = null;
+            _grid25MajorGrid = null;
+            if (_labelAndGridProperties != null)
+            {
+                _labelAndGridProperties.Clear();
+                _labelAndGridProperties = null;
+            }
+            _savedGridLayers = null;
+            _instance = null;
         }
 
         private void Grid25GenerateForm_Load(object sender, EventArgs e)
@@ -180,6 +247,7 @@ namespace FAD3
                 case "tsButtonMBRs":
                     break;
 
+                //retrieve fishing grid boundaries and shows them on the map form
                 case "tsButtonRetrieve":
                     var folderBrowser = new FolderBrowserDialog();
                     folderBrowser.ShowNewFolderButton = true;
@@ -189,20 +257,24 @@ namespace FAD3
                     if (result == DialogResult.OK)
                     {
                         SetSavedGridsFolder(folderBrowser.SelectedPath);
+                        SetupDictionary();
+                        _grid25MajorGrid.ShowGridBoundaries(folderBrowser.SelectedPath, _utmZone, _labelAndGridProperties);
                     }
                     break;
 
+                //Saves fishing grids either as shapefile or image file
                 case "tsButtonSaveImage":
                 case "tsButtonSaveShapefile":
-                    var saveForm = Grid25SaveForm.GetInstance(this);
-                    if (!saveForm.Visible)
+                    if (txtMapTitle.Text.Length > 0)
                     {
-                        saveForm.Show(this);
+                        RedoGridLabel();
+                        var saveForm = new Grid25SaveForm(this);
                         saveForm.SaveType(e.ClickedItem.Name == "tsButtonSaveShapefile");
+                        saveForm.ShowDialog(this);
                     }
                     else
                     {
-                        saveForm.BringToFront();
+                        MessageBox.Show("Please provide map title", "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     break;
 

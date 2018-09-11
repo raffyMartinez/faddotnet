@@ -578,6 +578,7 @@ namespace FAD3
             this.Text = "Fisheries Assessment Database";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Activated += new System.EventHandler(this.frmMain_Activated);
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
             this.Load += new System.EventHandler(this.OnMainForm_Load);
             this.ResizeEnd += new System.EventHandler(this.frmMain_ResizeEnd);
             this.splitContainer1.Panel1.ResumeLayout(false);

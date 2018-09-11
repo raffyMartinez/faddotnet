@@ -774,17 +774,20 @@ namespace FAD3
             {
                 mf.Show(this);
                 ToolStripItem tsi = e.ClickedItem;
+                FishingGrid.fadUTMZone utmZone = FishingGrid.fadUTMZone.utmZone_Undefined;
                 switch (tsi.Tag.ToString())
                 {
                     case "zone50":
-                        global.MappingForm.CreateGrid25MajorGrid(FishingGrid.fadUTMZone.utmZone50N);
+                        utmZone = FishingGrid.fadUTMZone.utmZone50N;
                         break;
 
                     case "zone51":
-                        global.MappingForm.CreateGrid25MajorGrid(FishingGrid.fadUTMZone.utmZone51N);
+                        utmZone = FishingGrid.fadUTMZone.utmZone51N;
                         break;
                 }
+                global.MappingForm.CreateGrid25MajorGrid(utmZone);
                 Grid25GenerateForm ggf = new Grid25GenerateForm(global.MappingForm);
+                ggf.set_UTMZone(utmZone);
                 ggf.Show(global.MappingForm);
             }
             else
@@ -2488,6 +2491,15 @@ namespace FAD3
                 child.BackColor = Color.White;
                 TraverseTreeAndResetColor(child.Nodes);
             }
+        }
+
+        private void Cleanup()
+        {
+        }
+
+        private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Cleanup();
         }
     }
 }

@@ -98,6 +98,12 @@ namespace FAD3
             return success;
         }
 
+        public void LoadMinorGridShapefile(string fileName)
+        {
+            _shapefileMinorGridLines = new Shapefile();
+            _shapefileMinorGridLines.Open(fileName, null);
+        }
+
         /// <summary>
         /// Clips the rectangular shaped minor grid lines to the selected major grids whose shape may not be a 4 sided polygon
         /// </summary>

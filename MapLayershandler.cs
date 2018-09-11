@@ -17,13 +17,13 @@ namespace FAD3
         private Dictionary<int, MapLayer> _mapLayerDictionary = new Dictionary<int, MapLayer>();    //contains MapLayers with the layer handle as key
         private MapLayer _currentMapLayer;                                                          //the current layer selected in the map layers form
 
-        public delegate void LayerReadHandler(MapLayersHandler s, LayerProperty e);                 //an event that is raised when a layer from the mapcontrol is retrieved
+        public delegate void LayerReadHandler(MapLayersHandler s, LayerEventArg e);                 //an event that is raised when a layer from the mapcontrol is retrieved
         public event LayerReadHandler LayerRead;                                                    //in order for the listener is able to add the layer to the layers list
 
-        public delegate void LayerRemovedHandler(MapLayersHandler s, LayerProperty e);
+        public delegate void LayerRemovedHandler(MapLayersHandler s, LayerEventArg e);
         public event LayerRemovedHandler LayerRemoved;
 
-        public delegate void CurrentLayerHandler(MapLayersHandler s, LayerProperty e);              //event raised when a layer is selected from the list found in the layers form
+        public delegate void CurrentLayerHandler(MapLayersHandler s, LayerEventArg e);              //event raised when a layer is selected from the list found in the layers form
         public event CurrentLayerHandler CurrentLayer;
 
         public AxMap MapControl
@@ -123,7 +123,7 @@ namespace FAD3
             if (CurrentLayer != null)
             {
                 //fill up the event argument class with the layer item
-                LayerProperty lp = new LayerProperty(_currentMapLayer.Handle, _currentMapLayer.Name, _currentMapLayer.Visible, _currentMapLayer.VisibleInLayersUI, _currentMapLayer.LayerType);
+                LayerEventArg lp = new LayerEventArg(_currentMapLayer.Handle, _currentMapLayer.Name, _currentMapLayer.Visible, _currentMapLayer.VisibleInLayersUI, _currentMapLayer.LayerType);
                 CurrentLayer(this, lp);
             }
         }
@@ -212,7 +212,7 @@ namespace FAD3
                         var item = _mapLayerDictionary[h];
 
                         //fill up the event argument class with the layer item
-                        LayerProperty lp = new LayerProperty(item.Handle, item.Name, item.Visible, item.VisibleInLayersUI, item.LayerType);
+                        LayerEventArg lp = new LayerEventArg(item.Handle, item.Name, item.Visible, item.VisibleInLayersUI, item.LayerType);
                         LayerRead(this, lp);
                     }
                 }
@@ -262,7 +262,7 @@ namespace FAD3
             //fire the layer deleted event
             if (LayerRemoved != null)
             {
-                LayerProperty lp = new LayerProperty(layerHandle, layerRemoved: true);
+                LayerEventArg lp = new LayerEventArg(layerHandle, layerRemoved: true);
                 LayerRemoved(this, lp);
             }
         }
@@ -427,7 +427,7 @@ namespace FAD3
 
                 if (LayerRead != null)
                 {
-                    LayerProperty lp = new LayerProperty(h, layerName, true, true, mapLayer.LayerType);
+                    LayerEventArg lp = new LayerEventArg(h, layerName, true, true, mapLayer.LayerType);
                     LayerRead(this, lp);
                 }
             }
@@ -455,7 +455,7 @@ namespace FAD3
 
                 if (LayerRead != null)
                 {
-                    LayerProperty lp = new LayerProperty(h, layerName, true, true, mapLayer.LayerType);
+                    LayerEventArg lp = new LayerEventArg(h, layerName, true, true, mapLayer.LayerType);
                     LayerRead(this, lp);
                 }
             }
@@ -497,7 +497,7 @@ namespace FAD3
 
             if (LayerRead != null)
             {
-                LayerProperty lp = new LayerProperty(h, layerName, visible, showInLayerUI, mapLayer.LayerType);
+                LayerEventArg lp = new LayerEventArg(h, layerName, visible, showInLayerUI, mapLayer.LayerType);
                 LayerRead(this, lp);
             }
 

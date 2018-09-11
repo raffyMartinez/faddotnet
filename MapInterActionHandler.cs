@@ -1,6 +1,7 @@
 ﻿using AxMapWinGIS;
 using MapWinGIS;
 using System;
+using System.Windows.Forms;
 
 namespace FAD3
 {
@@ -20,6 +21,24 @@ namespace FAD3
         private int _selectedShapeIndex;                    //the index of a shape that was selected
 
         public bool EnableMapInteraction { get; set; }      //if true, interactions with the map using the mouse is allowed
+        private string _dropDownContext;
+        private ContextMenuStrip _mapContextMenuStrip;
+
+        public delegate void FishingGridMapSelectedHandler(MapInterActionHandler s, LayerEventArg e);
+        public event FishingGridMapSelectedHandler GridSelected;
+
+        public delegate void ShapesSelectedHandler(MapInterActionHandler s, LayerEventArg e);
+        public event ShapesSelectedHandler ShapesSelected;
+
+        public ContextMenuStrip MapContextMenuStrip
+        {
+            get { return _mapContextMenuStrip; }
+            set
+            {
+                _mapContextMenuStrip = value;
+                _mapContextMenuStrip.ItemClicked += OnMapContextMenuItemClicked;
+            }
+        }
 
         //gets the map layers handler class
         public MapLayersHandler MapLayersHandler
@@ -53,6 +72,62 @@ namespace FAD3
             }
         }
 
+        public void DropDownContext(string context)
+        {
+            _dropDownContext = context;
+            _axMap.SendMouseDown = context.Length > 0;
+        }
+
+        private void OnMapContextMenuItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+            e.ClickedItem.Owner.Hide();
+            switch (e.ClickedItem.Name)
+            {
+                case "itemRetrieveGrid":
+                case "itemDeleteGrid":
+                    var sf = ((Shapefile)_currentMapLayer.LayerObject);
+                    var baseName = (string)sf.CellValue[sf.FieldIndexByName["BaseName"], _selectedShapeIndexes[0]];
+                    if (GridSelected != null)
+                    {
+                        LayerEventArg fg = new LayerEventArg(_currentMapLayer.Handle, _currentMapLayer.Name, _currentMapLayer.Visible, _currentMapLayer.VisibleInLayersUI, _currentMapLayer.LayerType);
+                        fg.SelectedIndex = _selectedShapeIndexes[0];
+                        if (e.ClickedItem.Name == "itemRetrieveGrid")
+                        {
+                            fg.Action = "LoadGridMap";
+                        }
+                        else
+                        {
+                            fg.Action = "DeleteGridMap";
+                        }
+                        GridSelected(this, fg);
+                    }
+
+                    break;
+            }
+        }
+
+        public void SetUpMapDropDown(string context, int mouseX, int mouseY)
+        {
+            MapContextMenuStrip.Items.Clear();
+
+            switch (context)
+            {
+                case "FishingGridBoundary":
+                    var sf = (Shapefile)_currentMapLayer.LayerObject;
+
+                    var mapName = sf.CellValue[sf.FieldIndexByName["MapName"], _selectedShapeIndexes[0]];
+                    var tsi = MapContextMenuStrip.Items.Add($"Load {mapName} grid map");
+                    tsi.Name = "itemRetrieveGrid";
+                    tsi.Visible = global.MappingMode == global.fad3MappingMode.grid25Mode;
+
+                    tsi = MapContextMenuStrip.Items.Add($"Delete {mapName} grid map");
+                    tsi.Name = "itemDeleteGrid";
+                    tsi.Visible = global.MappingMode == global.fad3MappingMode.grid25Mode;
+                    break;
+            }
+            MapContextMenuStrip.Show(_axMap, new System.Drawing.Point(mouseX, mouseY));
+        }
+
         /// <summary>
         /// Constructor and sets up map control events
         /// </summary>
@@ -82,9 +157,14 @@ namespace FAD3
             }
         }
 
-        private void OnCurrentMapLayer(MapLayersHandler s, LayerProperty e)
+        private void OnCurrentMapLayer(MapLayersHandler s, LayerEventArg e)
         {
             _currentMapLayer = _mapLayersHandler.get_MapLayer(e.LayerHandle);
+            _dropDownContext = "";
+            if (_currentMapLayer.Name == "Fishing grid boundaries")
+            {
+                _dropDownContext = "FishingGridBoundary";
+            }
         }
 
         private void OnMapMouseMove(object sender, _DMapEvents_MouseMoveEvent e)
@@ -131,36 +211,44 @@ namespace FAD3
                 if (_currentMapLayer.LayerType == "ShapefileClass")
                 {
                     var sf = _axMap.get_Shapefile(_currentMapLayer.Handle);
-                    _currentMapLayer.SelectedIndexes = null;
-                    sf.SelectNone();
-                    sf.SelectionAppearance = tkSelectionAppearance.saDrawingOptions;
-
-                    switch (sf.ShapefileType)
+                    if (sf != null)
                     {
-                        case ShpfileType.SHP_POINT:
-                            break;
+                        _currentMapLayer.SelectedIndexes = null;
+                        sf.SelectNone();
+                        sf.SelectionAppearance = tkSelectionAppearance.saDrawingOptions;
 
-                        case ShpfileType.SHP_POLYGON:
-                            break;
-
-                        case ShpfileType.SHP_POLYLINE:
-
-                            break;
-                    }
-
-                    var objSelection = new object();
-                    if (sf.SelectShapes(selectExtents, 0, SelectMode.INTERSECTION, ref objSelection))
-                    {
-                        _selectedShapeIndexes = (int[])objSelection;
-                        _currentMapLayer.SelectedIndexes = _selectedShapeIndexes;
-                        for (int n = 0; n < _selectedShapeIndexes.Length; n++)
+                        switch (sf.ShapefileType)
                         {
-                            sf.ShapeSelected[_selectedShapeIndexes[n]] = true;
+                            case ShpfileType.SHP_POINT:
+                                break;
+
+                            case ShpfileType.SHP_POLYGON:
+                                break;
+
+                            case ShpfileType.SHP_POLYLINE:
+
+                                break;
                         }
+
+                        var objSelection = new object();
+                        if (sf.SelectShapes(selectExtents, 0, SelectMode.INTERSECTION, ref objSelection))
+                        {
+                            _selectedShapeIndexes = (int[])objSelection;
+                            _currentMapLayer.SelectedIndexes = _selectedShapeIndexes;
+                            for (int n = 0; n < _selectedShapeIndexes.Length; n++)
+                            {
+                                sf.ShapeSelected[_selectedShapeIndexes[n]] = true;
+                            }
+                            if (ShapesSelected != null)
+                            {
+                                var lyArg = new LayerEventArg(_currentMapLayer.Handle, _selectedShapeIndexes);
+                                ShapesSelected(this, lyArg);
+                            }
+                        }
+                        _axMap.Redraw();
+                        EventHandler handler = Selection;
+                        if (handler != null) handler(this, EventArgs.Empty);
                     }
-                    _axMap.Redraw();
-                    EventHandler handler = Selection;
-                    if (handler != null) handler(this, EventArgs.Empty);
                 }
                 else if (_currentMapLayer.LayerType == "ImageClass")
                 {
@@ -172,7 +260,20 @@ namespace FAD3
         {
             if (EnableMapInteraction)
             {
-                _selectionFromSelectBox = false;
+                if (e.button == 1)
+                {
+                    _selectionFromSelectBox = false;
+                }
+                else if (e.button == 2 && _selectedShapeIndexes != null && _selectedShapeIndexes.Length == 1 && _dropDownContext.Length > 0)
+                {
+                    if (_currentMapLayer.LayerType == "ShapefileClass")
+                    {
+                        SetUpMapDropDown(_dropDownContext, e.x, e.y);
+                    }
+                    else
+                    {
+                    }
+                }
             }
         }
 

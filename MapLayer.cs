@@ -20,6 +20,7 @@ namespace FAD3
         public int[] SelectedIndexes { get; set; }
         public bool IsGraticule { get; set; }
         public bool IsFishingGrid { get; set; }
+        public int? LayerWeight { get; set; }
 
         public MapLayer(int handle, string name, bool visible, bool visibleInLayersUI)
         {
@@ -30,20 +31,25 @@ namespace FAD3
             IsFishingGrid = false;
         }
 
-        public void Save(string fileName)
+        public bool Save(string fileName)
         {
+            var success = false;
             if (LayerType == "ShapefileClass")
             {
                 ((Shapefile)LayerObject).With(sf =>
                 {
-                    sf.SaveAs(fileName + ".shp");
-                    sf.GeoProjection.WriteToFile(fileName + ".prj");
+                    success = sf.SaveAs(fileName + ".shp");                     //saves the shapefile
+                    if (success)
+                    {
+                        sf.GeoProjection.WriteToFile(fileName + ".prj");        //save the shapefile's projection data
+                    }
                 });
             }
             else
             {
                 //for image type, possibly
             }
+            return success;
         }
 
         public void Dispose()

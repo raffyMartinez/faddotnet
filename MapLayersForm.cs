@@ -157,7 +157,7 @@ namespace FAD3
             }
         }
 
-        private void OnLayerDeleted(MapLayersHandler s, LayerProperty e)
+        private void OnLayerDeleted(MapLayersHandler s, LayerEventArg e)
         {
             for (int n = 0; n < layerGrid.Rows.Count; n++)
             {
@@ -168,7 +168,7 @@ namespace FAD3
             }
         }
 
-        private void OnLayerRead(MapLayersHandler layer, LayerProperty e)
+        private void OnLayerRead(MapLayersHandler layer, LayerEventArg e)
         {
             if (e.ShowInLayerUI)
             {

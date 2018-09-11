@@ -41,6 +41,16 @@ namespace FAD3
 
         private void OnGrid25SaveForm_Load(object sender, EventArgs e)
         {
+            if (_saveAsShapefile)
+            {
+                txtSave.Text = "file name";
+                txtSave.SelectAll();
+                txtSave.SelectionStart = 0;
+            }
+            else
+            {
+                txtSave.Text = "150";
+            }
         }
 
         private void OnGrid25SaveForm_FormClosed(object sender, FormClosedEventArgs e)
@@ -52,7 +62,7 @@ namespace FAD3
         {
             if (_saveAsShapefile)
             {
-                //input must be numeric
+                //input must be an integer
             }
             else
             {
@@ -69,14 +79,17 @@ namespace FAD3
                     {
                         if (_saveAsShapefile)
                         {
-                            _parentForm.Grid25MajorGrid.Save(txtSave.Text);
+                            //_parentForm.Grid25MajorGrid.Save(txtSave.Text);
                             FolderBrowserDialog fbd = new FolderBrowserDialog();
                             fbd.Description = "Select folder to save fishing ground grid map";
                             fbd.SelectedPath = _parentForm.GetSavedGridsFolder();
                             DialogResult result = FolderBrowserLauncher.ShowFolderBrowser(fbd);
                             if (result == DialogResult.OK && fbd.SelectedPath.Length > 0)
                             {
-                                _parentForm.Grid25MajorGrid.Save($@"{fbd.SelectedPath}\{txtSave.Text}");
+                                if (!_parentForm.Grid25MajorGrid.Save($@"{fbd.SelectedPath}\{txtSave.Text}"))
+                                {
+                                    Logger.Log("Not all grid25 shapefiles were saved.", "Grid25SaveForm", "OnButton_Click");
+                                }
                             }
                         }
                         else
