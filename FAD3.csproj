@@ -145,6 +145,7 @@
     <Compile Include="FishingGroundMappingHandler.cs" />
     <Compile Include="FolderBrowserLauncher.cs" />
     <Compile Include="GMSLineClass.cs" />
+    <Compile Include="Graticule.cs" />
     <Compile Include="Grid25GenerateForm.cs">
       <SubType>Form</SubType>
     </Compile>

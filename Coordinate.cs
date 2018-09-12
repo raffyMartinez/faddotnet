@@ -242,6 +242,66 @@ namespace ISO_Classes
             return this.ToString(format, null);
         }
 
+        public string ToString(bool isYcoord, string format)
+        {
+            StringBuilder sb = new StringBuilder();
+            float latDeg, latMin, latSec, lonDeg, lonMin, lonSec;
+            bool north, east;
+
+            if (format == null)
+                format = "DMS";
+
+            NumberFormatInfo fi = NumberFormatInfo.InvariantInfo;
+
+            switch (format.ToUpper())
+            {
+                case "":
+                case "DMS":
+                    this.GetDMS(out latDeg, out latMin, out latSec, out north, out lonDeg, out lonMin, out lonSec, out east);
+                    if (isYcoord)
+                        sb.AppendFormat(fi, "{0:0#}°{1:0#}'{2:0#.0}\"{3} ", latDeg, latMin, latSec, (north ? "N" : "S"));
+                    else
+                        sb.AppendFormat(fi, "{0:0##}°{1:0#}'{2:0#.0}\"{3}", lonDeg, lonMin, lonSec, (east ? "E" : "W"));
+
+                    break;
+
+                case "D":
+                    if (isYcoord)
+                        sb.AppendFormat(fi, "{0:0#.0000}°{1} ", Math.Abs(Latitude), (latitude > 0 ? "N" : "S"));
+                    else
+                        sb.AppendFormat(fi, "{0:0##.0000}°{1}", Math.Abs(Longitude), (longitude > 0 ? "E" : "W"));
+
+                    break;
+
+                case "DM":
+
+                    this.GetDM(out latDeg, out latMin, out north, out lonDeg, out lonMin, out east);
+                    if (isYcoord)
+                        sb.AppendFormat(fi, "{0:0#}°{1:0#.00}'{2} ", latDeg, latMin, (north ? "N" : "S"));
+                    else
+                        sb.AppendFormat(fi, "{0:0##}°{1:0#.00}'{2}", lonDeg, lonMin, (east ? "E" : "W"));
+
+                    break;
+
+                case "ISO":
+                    // Write coordinate according with ISO 6709
+                    // Latitude and Longitude in Degrees, Minutes and Seconds:
+                    // �DDMMSS.SSSS�DDDMMSS.SSSS/ (eg +123456.7-0985432.1/)
+
+                    this.GetDMS(out latDeg, out latMin, out latSec, out north, out lonDeg, out lonMin, out lonSec, out east);
+                    if (isYcoord)
+                        sb.AppendFormat(fi, "{0}{1:0#}{2:0#}{3:0#.0#}", (north ? "+" : "-"), latDeg, latMin, latSec);
+                    else
+                        sb.AppendFormat(fi, "{0}{1:0##}{2:0#}{3:0#.0#}/", (east ? "+" : "-"), lonDeg, lonMin, lonSec);
+
+                    break;
+
+                default:
+                    throw new Exception("Coordinate.ToString(): Invalid formatting string.");
+            }
+            return sb.ToString();
+        }
+
         // ToString version with formatting
         public string ToString(string format, IFormatProvider formatProvider)
         {

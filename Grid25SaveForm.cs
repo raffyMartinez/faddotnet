@@ -103,10 +103,16 @@ namespace FAD3
                             DialogResult result = sfd.ShowDialog();
                             if (result == DialogResult.OK && sfd.FileName.Length > 0)
                             {
-                                _parentForm.Grid25MajorGrid.Save(int.Parse(txtSave.Text), sfd.FileName);
+                                if (_parentForm.Grid25MajorGrid.Save(int.Parse(txtSave.Text), sfd.FileName))
+                                {
+                                    Close();
+                                }
+                                else
+                                {
+                                    Logger.Log("Was not able to save map to image.", "Grid25SaveForm", "OnButton_Click SaveMapToImage");
+                                }
                             }
                         }
-                        Close();
                     }
                     break;
 

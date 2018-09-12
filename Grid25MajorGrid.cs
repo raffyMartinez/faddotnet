@@ -94,6 +94,28 @@ namespace FAD3
             }
         }
 
+        private void AssignLayerWeight(MapLayer layer)
+        {
+            switch (layer.Name)
+            {
+                case "Minor grid":
+                    layer.LayerWeight = 4;
+                    break;
+
+                case "Labels":
+                    layer.LayerWeight = 2;
+                    break;
+
+                case "Major grid":
+                    layer.LayerWeight = 3;
+                    break;
+
+                case "MBR":
+                    layer.LayerWeight = 1;
+                    break;
+            }
+        }
+
         /// <summary>
         /// Load the fishing map whose booundary was selected in the map control
         /// </summary>
@@ -145,18 +167,21 @@ namespace FAD3
                     _grid25LabelManager.Grid25Labels.Labels.ApplyCategories();
                     h = _mapLayers.AddLayer(_grid25LabelManager.Grid25Labels, "Labels", true, true);
                     _mapLayers.LayerDictionary[h].IsFishingGrid = true;
+                    AssignLayerWeight(_mapLayers.LayerDictionary[h]);
                     _listGridLayers.Add(h);
 
                     //add minor grid shapefile to the map
                     h = _mapLayers.AddLayer(_grid25MinorGrid.MinorGridLinesShapeFile, "Minor grid", true, true);
                     _mapLayers.LayerDictionary[h].IsGraticule = true;
                     _mapLayers.LayerDictionary[h].IsFishingGrid = true;
+                    AssignLayerWeight(_mapLayers.LayerDictionary[h]);
                     _listGridLayers.Add(h);
 
                     //add major grids
                     h = _mapLayers.AddLayer(_shapefileMajorGridIntersect, "Major grid", true, true);
                     _mapLayers.LayerDictionary[h].IsGraticule = true;
                     _mapLayers.LayerDictionary[h].IsFishingGrid = true;
+                    AssignLayerWeight(_mapLayers.LayerDictionary[h]);
                     _listGridLayers.Add(h);
 
                     //add boundary
@@ -165,6 +190,7 @@ namespace FAD3
                     h = _mapLayers.AddLayer(_shapefileBoundingRectangle, "MBR", true, true);
                     _mapLayers.LayerDictionary[h].IsGraticule = true;
                     _mapLayers.LayerDictionary[h].IsFishingGrid = true;
+                    AssignLayerWeight(_mapLayers.LayerDictionary[h]);
                     _listGridLayers.Add(h);
 
                     ApplyGridSymbology();
@@ -226,11 +252,11 @@ namespace FAD3
         /// <param name="DPI"></param>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public bool Save(int DPI, string fileName)
+        public bool Save(double DPI, string fileName)
         {
             SaveMapImage smi = new SaveMapImage(fileName, DPI, _axMap);
-            smi.Save();
-            return true;
+            smi.MapLayersHandler = _mapLayers;
+            return smi.Save();
         }
 
         /// <summary>
@@ -1103,24 +1129,28 @@ namespace FAD3
                                     var h = _mapLayers.AddLayer(_grid25MinorGrid.MinorGridLinesShapeFile, "Minor grid", true, true);
                                     _mapLayers.LayerDictionary[h].IsGraticule = true;
                                     _mapLayers.LayerDictionary[h].IsFishingGrid = true;
-                                    _mapLayers.LayerDictionary[h].LayerWeight = 2;
+                                    //_mapLayers.LayerDictionary[h].LayerWeight = 2;
+                                    AssignLayerWeight(_mapLayers.LayerDictionary[h]);
                                     _listGridLayers.Add(h);
 
                                     h = _mapLayers.AddLayer(_grid25LabelManager.Grid25Labels, "Labels", true, true);
                                     _mapLayers.LayerDictionary[h].IsFishingGrid = true;
-                                    _mapLayers.LayerDictionary[h].LayerWeight = 1;
+                                    //_mapLayers.LayerDictionary[h].LayerWeight = 1;
+                                    AssignLayerWeight(_mapLayers.LayerDictionary[h]);
                                     _listGridLayers.Add(h);
 
                                     h = _mapLayers.AddLayer(_shapefileMajorGridIntersect, "Major grid", true, true);
                                     _mapLayers.LayerDictionary[h].IsGraticule = true;
                                     _mapLayers.LayerDictionary[h].IsFishingGrid = true;
-                                    _mapLayers.LayerDictionary[h].LayerWeight = 4;
+                                    //_mapLayers.LayerDictionary[h].LayerWeight = 4;
+                                    AssignLayerWeight(_mapLayers.LayerDictionary[h]);
                                     _listGridLayers.Add(h);
 
                                     h = _mapLayers.AddLayer(_shapefileBoundingRectangle, "MBR", true, true);
                                     _mapLayers.LayerDictionary[h].IsGraticule = true;
                                     _mapLayers.LayerDictionary[h].IsFishingGrid = true;
-                                    _mapLayers.LayerDictionary[h].LayerWeight = 3;
+                                    //_mapLayers.LayerDictionary[h].LayerWeight = 3;
+                                    AssignLayerWeight(_mapLayers.LayerDictionary[h]);
                                     _listGridLayers.Add(h);
 
                                     _completeFishingGrid = true;
