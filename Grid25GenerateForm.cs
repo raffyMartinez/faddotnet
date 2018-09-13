@@ -221,25 +221,6 @@ namespace FAD3
             ((RectangleShape)sender).FillColor = cd.Color;
         }
 
-        public string GetSavedGridsFolder()
-        {
-            RegistryKey reg_key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\FAD3", true);
-            try
-            {
-                return reg_key.GetValue("FolderSavedGrids").ToString();
-            }
-            catch
-            {
-                return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            }
-        }
-
-        private void SetSavedGridsFolder(string folderPath)
-        {
-            RegistryKey reg_key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\FAD3", true);
-            reg_key.SetValue("FolderSavedGrids", folderPath);
-        }
-
         private void OnToolbar_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
             switch (e.ClickedItem.Name)
@@ -251,12 +232,12 @@ namespace FAD3
                 case "tsButtonRetrieve":
                     var folderBrowser = new FolderBrowserDialog();
                     folderBrowser.ShowNewFolderButton = true;
-                    folderBrowser.SelectedPath = GetSavedGridsFolder();
+                    folderBrowser.SelectedPath = SaveMapForm.GetSavedMapsFolder();
                     folderBrowser.Description = "Locate folder containing saved fishing ground grid maps";
                     DialogResult result = FolderBrowserLauncher.ShowFolderBrowser(folderBrowser);
                     if (result == DialogResult.OK)
                     {
-                        SetSavedGridsFolder(folderBrowser.SelectedPath);
+                        SaveMapForm.SetSavedMapsFolder(folderBrowser.SelectedPath);
                         SetupDictionary();
                         _grid25MajorGrid.ShowGridBoundaries(folderBrowser.SelectedPath, _utmZone, _labelAndGridProperties);
                     }
@@ -268,7 +249,7 @@ namespace FAD3
                     if (txtMapTitle.Text.Length > 0)
                     {
                         RedoGridLabel();
-                        var saveForm = new Grid25SaveForm(this);
+                        var saveForm = new SaveMapForm(this);
                         saveForm.SaveType(e.ClickedItem.Name == "tsButtonSaveShapefile");
                         saveForm.ShowDialog(this);
                     }

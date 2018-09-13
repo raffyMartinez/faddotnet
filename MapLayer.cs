@@ -21,6 +21,7 @@ namespace FAD3
         public bool IsGraticule { get; set; }
         public bool IsFishingGrid { get; set; }
         public int? LayerWeight { get; set; }
+        public bool IsMaskLayer { get; set; }
 
         public MapLayer(int handle, string name, bool visible, bool visibleInLayersUI)
         {

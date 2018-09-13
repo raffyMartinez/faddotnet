@@ -33,6 +33,7 @@
             this.axMap = new AxMapWinGIS.AxMap();
             this.ilCursors = new System.Windows.Forms.ImageList(this.components);
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.menuDropDown = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolstripToolBar = new ToolStripExtensions.ToolStripEx();
             this.tsButtonSave = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
@@ -50,7 +51,9 @@
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.tsButtonClearSelection = new System.Windows.Forms.ToolStripButton();
             this.tsButtonClearAllSelection = new System.Windows.Forms.ToolStripButton();
-            this.menuDropDown = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsButtonGraticule = new System.Windows.Forms.ToolStripButton();
+            this.tsButtonSaveImage = new System.Windows.Forms.ToolStripButton();
             ((System.ComponentModel.ISupportInitialize)(this.axMap)).BeginInit();
             this.toolstripToolBar.SuspendLayout();
             this.SuspendLayout();
@@ -83,6 +86,11 @@
             this.statusStrip1.TabIndex = 2;
             this.statusStrip1.Text = "statusStrip1";
             // 
+            // menuDropDown
+            // 
+            this.menuDropDown.Name = "menuDropDown";
+            this.menuDropDown.Size = new System.Drawing.Size(61, 4);
+            // 
             // toolstripToolBar
             // 
             this.toolstripToolBar.ClickThrough = false;
@@ -102,7 +110,10 @@
             this.tsButtonMeasure,
             this.toolStripSeparator1,
             this.tsButtonClearSelection,
-            this.tsButtonClearAllSelection});
+            this.tsButtonClearAllSelection,
+            this.toolStripSeparator3,
+            this.tsButtonGraticule,
+            this.tsButtonSaveImage});
             this.toolstripToolBar.Location = new System.Drawing.Point(0, 0);
             this.toolstripToolBar.Name = "toolstripToolBar";
             this.toolstripToolBar.Size = new System.Drawing.Size(1067, 25);
@@ -261,11 +272,29 @@
             this.tsButtonClearAllSelection.Text = "toolStripButton1";
             this.tsButtonClearAllSelection.ToolTipText = "Clears selection from all layers";
             // 
-            // menuDropDown
+            // toolStripSeparator3
             // 
-            this.menuDropDown.Name = "menuDropDown";
-            this.menuDropDown.Size = new System.Drawing.Size(181, 26);
-            
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 25);
+            // 
+            // tsButtonGraticule
+            // 
+            this.tsButtonGraticule.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsButtonGraticule.Image = global::FAD3.Properties.Resources.graticule;
+            this.tsButtonGraticule.ImageTransparentColor = System.Drawing.Color.White;
+            this.tsButtonGraticule.Name = "tsButtonGraticule";
+            this.tsButtonGraticule.Size = new System.Drawing.Size(23, 22);
+            this.tsButtonGraticule.Tag = "Setup graticule";
+            this.tsButtonGraticule.Text = "toolStripButton1";
+            // 
+            // tsButtonSaveImage
+            // 
+            this.tsButtonSaveImage.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsButtonSaveImage.Image = global::FAD3.Properties.Resources.image;
+            this.tsButtonSaveImage.ImageTransparentColor = System.Drawing.Color.White;
+            this.tsButtonSaveImage.Name = "tsButtonSaveImage";
+            this.tsButtonSaveImage.Size = new System.Drawing.Size(23, 22);
+            this.tsButtonSaveImage.Text = "Save map as image";
             // 
             // MapperForm
             // 
@@ -312,5 +341,8 @@
         private System.Windows.Forms.ToolStripButton tsButtonSave;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ContextMenuStrip menuDropDown;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.ToolStripButton tsButtonGraticule;
+        private System.Windows.Forms.ToolStripButton tsButtonSaveImage;
     }
 }

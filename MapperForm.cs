@@ -13,9 +13,16 @@ namespace FAD3
         private Grid25MajorGrid _grid25MajorGrid;                                   //handles grid25 fishing ground grid maps
         private MapInterActionHandler _mapInterActionHandler;                       //handles interaction with the map control
         private MapLayersHandler _mapLayersHandler;                                 //handles map layers
+        private Graticule _graticule;                                               //handles map graticule
+        private SaveMapImage _saveMapImage;                                         //handles saving of map image
         private Form _parentForm;
         private MapLayer _currentMapLayer;
         public event EventHandler MapperClosed;
+
+        public Graticule Graticule
+        {
+            get { return _graticule; }
+        }
 
         public ContextMenuStrip MapDropDownMenu
         {
@@ -92,6 +99,10 @@ namespace FAD3
             FishingGroundMappingHandler fgmh = new FishingGroundMappingHandler(axMap.GeoProjection);
             fgmh.MapLayersHandler = _mapLayersHandler;
             fgmh.MapFishingGround(grid25Name, utmZone);
+        }
+
+        public void DisplayGraticule()
+        {
         }
 
         public void CreateGrid25MajorGrid(FishingGrid.fadUTMZone UTMZone)
@@ -195,6 +206,13 @@ namespace FAD3
             }
         }
 
+        public bool SaveMapImage(double DPI, string fileName)
+        {
+            _saveMapImage = new SaveMapImage(fileName, DPI, axMap);
+            _saveMapImage.MapLayersHandler = _mapLayersHandler;
+            return _saveMapImage.Save(_grid25MajorGrid != null);
+        }
+
         private void OnToolbarClicked(object sender, ToolStripItemClickedEventArgs e)
         {
             axMap.UDCursorHandle = -1;
@@ -281,6 +299,25 @@ namespace FAD3
 
                 case "tsButtonClearAllSelection":
                     _mapLayersHandler.ClearAllSelections();
+                    break;
+
+                case "tsButtonGraticule":
+                    var gf = GraticuleForm.GetInstance(this);
+                    if (!gf.Visible)
+                    {
+                        gf.Show(this);
+                        _graticule = new Graticule(axMap, _mapLayersHandler);
+                    }
+                    else
+                    {
+                        gf.BringToFront();
+                    }
+                    break;
+
+                case "tsButtonSaveImage":
+                    var saveForm = new SaveMapForm();
+                    saveForm.SaveType(SaveAsShapefile: false);
+                    saveForm.ShowDialog(this);
                     break;
             }
         }

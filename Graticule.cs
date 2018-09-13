@@ -3,19 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using MapWinGIS;
+using AxMapWinGIS;
 
 namespace FAD3
 {
     public class Graticule
     {
-        private Shapefile _sfGraticule = new Shapefile();
+        private MapLayersHandler _mapLayersHandler;
+        private AxMap _axMap;
+        private Shapefile _sfGraticule;
         private int _ifldPart;
         private int _ifldLabel;
         private int _ifldSide;
         private GeoProjection _geoProjection;
-        public int LabelFontSize { get; set; }
-        public int NumberOfGridlines { get; set; }
         private Extents _graticuleExtents;
+        private Extents _boundaryExtents;
         private Extents _mapExtents;
         private double _xOrigin;
         private double _yOrigin;
@@ -23,40 +25,95 @@ namespace FAD3
         private double _gridWidth;
         private double _intervalSize;
 
-        private bool _bottomHasLabel;
-        private bool _topHasLabel;
-        private bool _rightHasLabel;
-        private bool _leftHasLabel;
-        private string _coordFormat;
+        public bool BottomHasLabel { get; set; }
+        public bool TopHasLabel { get; set; }
+        public bool RightHasLabel { get; set; }
+        public bool LeftHasLabel { get; set; }
+        public string Name { get; set; }
+        public int LabelFontSize { get; set; }
+        public int NumberOfGridlines { get; set; }
+        public int BorderWidth { get; set; }
+        public int GridlinesWidth { get; set; }
+        public bool BoldLabels { get; set; }
+        public bool GridVisible { get; set; }
+
+        public string CoordFormat { get; set; }
 
         public Shapefile GraticuleShapeFile
         {
             get { return _sfGraticule; }
         }
 
-        public Graticule()
+        public void Configure(string name, int sizeLabelFont, int numberGridlines, int widthBorder, int widthGridlines,
+                              bool gridVisible, bool boldLabels, bool leftHasLabel, bool rightHasLabel,
+                              bool topHasLabel, bool bottomHasLabel)
         {
-            LabelFontSize = 8;
-            NumberOfGridlines = 5;
+            Name = name;
+            LabelFontSize = sizeLabelFont;
+            NumberOfGridlines = numberGridlines;
+            BorderWidth = widthBorder;
+            GridlinesWidth = widthGridlines;
+            BoldLabels = boldLabels;
+            GridVisible = gridVisible;
+            BottomHasLabel = bottomHasLabel;
+            TopHasLabel = topHasLabel;
+            LeftHasLabel = leftHasLabel;
+            RightHasLabel = rightHasLabel;
+        }
+
+        private void SetupShapefile()
+        {
+            _sfGraticule = new Shapefile();
             if (_sfGraticule.CreateNew("", ShpfileType.SHP_POLYLINE))
             {
                 _ifldPart = _sfGraticule.EditAddField("Part", FieldType.STRING_FIELD, 1, 25);
                 _ifldLabel = _sfGraticule.EditAddField("Label", FieldType.STRING_FIELD, 1, 25);
                 _ifldSide = _sfGraticule.EditAddField("Side", FieldType.STRING_FIELD, 1, 1);
+                _sfGraticule.GeoProjection = _geoProjection;
             }
+        }
+
+        public Shapefile Mask()
+        {
+            var sf = new Shapefile();
+            if (sf.CreateNew("", ShpfileType.SHP_POLYGON))
+            {
+                var shp = new Shape();
+                if (shp.Create(ShpfileType.SHP_POLYGON))
+                {
+                    shp = _mapExtents.ToShape().Clip(_boundaryExtents.ToShape(), tkClipOperation.clDifference);
+                    var iShp = sf.EditAddShape(shp);
+                    sf.DefaultDrawingOptions.LineVisible = false;
+                    sf.DefaultDrawingOptions.FillColor = new Utils().ColorByName(tkMapColor.White);
+                    return sf;
+                }
+                return null;
+            }
+            return null;
+        }
+
+        public Graticule(AxMap mapControl, MapLayersHandler layersHandler)
+        {
+            Name = "Graticule";
+            LabelFontSize = 8;
+            NumberOfGridlines = 5;
+            _axMap = mapControl;
+            _axMap.ExtentsChanged += OnMapExtentsChanged;
+            _geoProjection = _axMap.GeoProjection;
+            _mapLayersHandler = layersHandler;
 
             switch (global.CoordinateDisplay)
             {
                 case global.CoordinateDisplayFormat.DegreeDecimal:
-                    _coordFormat = "D";
+                    CoordFormat = "D";
                     break;
 
                 case global.CoordinateDisplayFormat.DegreeMinute:
-                    _coordFormat = "DM";
+                    CoordFormat = "DM";
                     break;
 
                 case global.CoordinateDisplayFormat.DegreeMinuteSecond:
-                    _coordFormat = "DMS";
+                    CoordFormat = "DMS";
                     break;
 
                 default:
@@ -64,25 +121,45 @@ namespace FAD3
             }
         }
 
+        private void OnMapExtentsChanged(object sender, EventArgs e)
+        {
+            _sfGraticule.EditClear();
+            _sfGraticule.Labels.Clear();
+            ShowGraticule();
+        }
+
+        public void ShowGraticule()
+        {
+            _mapLayersHandler.RemoveLayer(Name);
+            _mapLayersHandler.RemoveLayer("Mask");
+            SetupShapefile();
+            ComputeGraticule(_axMap.Extents.xMax, _axMap.Extents.yMax, _axMap.Extents.xMin, _axMap.Extents.yMin);
+            _sfGraticule.Labels.VerticalPosition = tkVerticalPosition.vpAboveAllLayers;
+            var maskHandle = _mapLayersHandler.AddLayer(Mask(), "Mask", true, false);
+            _mapLayersHandler.get_MapLayer(maskHandle).IsMaskLayer = true;
+            _mapLayersHandler.AddLayer(_sfGraticule, Name, true, true);
+        }
+
         private void ComputeGraticule(double xMax, double yMax, double xMin, double yMin)
         {
-            var isSecondLevel = false;
             var coordinateString = "";
-            var coord = new ISO_Classes.Coordinate;
+            var coord = new ISO_Classes.Coordinate();
             _mapExtents = new Extents();
             _mapExtents.SetBounds(xMin, yMin, 0, xMax, yMax, 0);
 
             _graticuleExtents = new Extents();
 
             var tempW = (xMax - xMin) * 0.93;
-            var tempH = (yMax - yMin * 0.93);
+            var tempH = (yMax - yMin) * 0.93;
 
-            _xOrigin = (xMin + ((xMax - xMin) / 2)) - tempW / 2;
-            _yOrigin = (yMin + ((yMax - yMin) / 2)) - tempH / 2;
+            _xOrigin = (xMin + ((xMax - xMin) / 2)) - (tempW / 2);
+            _yOrigin = (yMin + ((yMax - yMin) / 2)) - (tempH / 2);
 
             var ticLength = Math.Abs(xMin - _xOrigin) / 4;
 
             _graticuleExtents.SetBounds(_xOrigin, _yOrigin, 0, _xOrigin + tempW, _yOrigin + tempH, 0);
+            _boundaryExtents = new Extents();
+            _boundaryExtents.SetBounds(_xOrigin, _yOrigin, 0, _xOrigin + tempW, _yOrigin + tempH, 0);
 
             var graticuleShape = _graticuleExtents.ToShape();
 
@@ -123,7 +200,6 @@ namespace FAD3
             if (roundTo == 0)
             {
                 factor = 60 * 60;
-                isSecondLevel = true;
                 _intervalSize = (sideLength / (NumberOfGridlines - 1)) * factor;
                 roundTo = (int)(_intervalSize / 5) * 5;
             }
@@ -138,8 +214,8 @@ namespace FAD3
             for (int n = 0; n < 4; n++)
             {
                 _sfGraticule.Labels.Category[n].FontOutlineVisible = false;
-                _sfGraticule.Labels.Category[n].FontBold = false;
-                _sfGraticule.Labels.Category[n].FontSize = 1;
+                _sfGraticule.Labels.Category[n].FontBold = BoldLabels;
+                _sfGraticule.Labels.Category[n].FontSize = LabelFontSize;
                 _sfGraticule.Labels.Category[n].FrameVisible = false;
                 _sfGraticule.Labels.Category[n].LineOrientation = tkLineLabelOrientation.lorPerpindicular;
                 _sfGraticule.Labels.AvoidCollisions = false;
@@ -165,7 +241,7 @@ namespace FAD3
             if (_intervalSize >= 1)
             {
                 _intervalSize /= factor;
-                var baseX = ((int)(_xOrigin - (int)_xOrigin) * factor);
+                double baseX = ((int)(_xOrigin - (int)_xOrigin) * factor);
                 if (baseX / roundTo != (baseX / 10))
                 {
                     baseX = ((baseX / roundTo) + 1) * roundTo;
@@ -186,7 +262,7 @@ namespace FAD3
                             _sfGraticule.EditCellValue(_ifldPart, iShp, "Gridline");
 
                             //set tics on the bottom side
-                            if (_bottomHasLabel)
+                            if (BottomHasLabel)
                             {
                                 shp = new Shape();
                                 if (shp.Create(ShpfileType.SHP_POLYLINE))
@@ -196,7 +272,7 @@ namespace FAD3
                                     iShp = _sfGraticule.EditAddShape(shp);
                                     _sfGraticule.EditCellValue(_ifldPart, iShp, "tic");
                                     coord.SetD((float)shp.Center.y, (float)shp.Center.x);
-                                    coordinateString = coord.ToString(false, _coordFormat);
+                                    coordinateString = coord.ToString(false, CoordFormat);
                                     _sfGraticule.EditCellValue(_ifldLabel, iShp, coordinateString);
                                     _sfGraticule.EditCellValue(_ifldSide, iShp, "B");
                                     _sfGraticule.Labels.AddLabel(coordinateString, baseX, yMin - ticLength, 0, 1);
@@ -204,7 +280,7 @@ namespace FAD3
                             }
 
                             //set tics on the top side
-                            if (_topHasLabel)
+                            if (TopHasLabel)
                             {
                                 shp = new Shape();
                                 if (shp.Create(ShpfileType.SHP_POLYLINE))
@@ -214,7 +290,7 @@ namespace FAD3
                                     iShp = _sfGraticule.EditAddShape(shp);
                                     _sfGraticule.EditCellValue(_ifldPart, iShp, "tic");
                                     coord.SetD((float)shp.Center.y, (float)shp.Center.x);
-                                    coordinateString = coord.ToString(false, _coordFormat);
+                                    coordinateString = coord.ToString(false, CoordFormat);
                                     _sfGraticule.EditCellValue(_ifldLabel, iShp, coordinateString);
                                     _sfGraticule.EditCellValue(_ifldSide, iShp, "T");
                                     _sfGraticule.Labels.AddLabel(coordinateString, baseX, yMax + ticLength, 0, 0);
@@ -222,6 +298,89 @@ namespace FAD3
                             }
                         }
                     }
+                    baseX += _intervalSize;
+                }
+
+                double baseY = (int)((_yOrigin - (int)_yOrigin) * factor);
+                if (baseY / roundTo != (int)(baseY / roundTo))
+                {
+                    baseY = ((int)(baseY / roundTo) + 1) * roundTo;
+                }
+                baseY = (int)_yOrigin + (baseY / factor);
+
+                while (baseY < yMax)
+                {
+                    if (baseY > yMin)
+                    {
+                        shp = new Shape();
+                        if (shp.Create(ShpfileType.SHP_POLYLINE))
+                        {
+                            shp.AddPoint(xMin, baseY);
+                            shp.AddPoint(xMax, baseY);
+                            var iShp = _sfGraticule.EditAddShape(shp);
+                            _sfGraticule.EditCellValue(_ifldPart, iShp, "GridLine");
+                        }
+
+                        if (LeftHasLabel)
+                        {
+                            shp = new Shape();
+                            if (shp.Create(ShpfileType.SHP_POLYLINE))
+                            {
+                                shp.AddPoint(xMin, baseY);
+                                shp.AddPoint(xMin - ticLength, baseY);
+                                var iShp = _sfGraticule.EditAddShape(shp);
+                                _sfGraticule.EditCellValue(_ifldPart, iShp, "tic");
+                                coord.SetD((float)shp.Center.y, (float)shp.Center.x);
+                                coordinateString = coord.ToString(isYcoord: true, format: CoordFormat);
+                                _sfGraticule.EditCellValue(_ifldLabel, iShp, coordinateString);
+                                _sfGraticule.EditCellValue(_ifldSide, iShp, "L");
+                                _sfGraticule.Labels.AddLabel(coordinateString, xMin - (ticLength * 2), baseY, 270, 3);
+                            }
+                        }
+
+                        if (RightHasLabel)
+                        {
+                            shp = new Shape();
+                            if (shp.Create(ShpfileType.SHP_POLYLINE))
+                            {
+                                shp.AddPoint(xMax, baseY);
+                                shp.AddPoint(xMax + ticLength, baseY);
+                                var iShp = _sfGraticule.EditAddShape(shp);
+                                _sfGraticule.EditCellValue(_ifldPart, iShp, "tic");
+                                coord.SetD((float)shp.Center.y, (float)shp.Center.x);
+                                coordinateString = coord.ToString(isYcoord: true, format: CoordFormat);
+                                _sfGraticule.EditCellValue(_ifldLabel, iShp, coordinateString);
+                                _sfGraticule.EditCellValue(_ifldSide, iShp, "R");
+                                _sfGraticule.Labels.AddLabel(coordinateString, xMax + (ticLength * 2), baseY, 90, 2);
+                            }
+                        }
+                    }
+
+                    baseY += _intervalSize;
+                }
+
+                if (_sfGraticule.Categories.Generate(_ifldPart, tkClassificationType.ctUniqueValues, 1))
+                {
+                    for (int n = 0; n < _sfGraticule.Categories.Count; n++)
+                    {
+                        var category = _sfGraticule.Categories.Item[n];
+                        switch (category.Expression)
+                        {
+                            case @"[Part] = ""Border""":
+                            case @"[Part] = ""tic""":
+                                category.DrawingOptions.LineWidth = BorderWidth;
+                                category.DrawingOptions.VerticesColor = new Utils().ColorByName(tkMapColor.Black);
+                                break;
+
+                            default:
+                                category.DrawingOptions.VerticesColor = new Utils().ColorByName(tkMapColor.Gray);
+                                category.DrawingOptions.LineWidth = GridlinesWidth;
+                                category.DrawingOptions.LineVisible = GridVisible;
+                                break;
+                        }
+                    }
+
+                    _sfGraticule.Categories.ApplyExpressions();
                 }
             }
             else

@@ -152,35 +152,97 @@ namespace FAD3
         /// Initiates saving of a map to an image
         /// </summary>
         /// <returns></returns>
-        public bool Save()
+        public bool Save(bool SaveGrid25 = true)
         {
             AdjustFeatureSize();
-            return SaveMapToImage();
+            if (SaveGrid25)
+            {
+                return SaveGrid25MapToImage();
+            }
+            else
+            {
+                return SaveMaptoImage();
+            }
         }
 
         /// <summary>
         ///Creates a mask that will hide features that fall outside the extent of the fishing grid
         /// </summary>
         /// <returns></returns>
-        private Shapefile Mask()
+        private void set_Mask()
         {
+            _shapeFileMask = new Shapefile();
             var sf = new Shapefile();
             if (sf.CreateNew("", ShpfileType.SHP_POLYGON))
             {
                 var shp = _axMap.Extents.ToShape().Clip(_axMap.get_Shapefile(_handleGridBoundary).Extents.ToShape(), tkClipOperation.clDifference);
                 sf.EditAddShape(shp);
-                //sf.DefaultDrawingOptions.VerticesVisible = false;
                 sf.DefaultDrawingOptions.LineVisible = false;
                 sf.DefaultDrawingOptions.FillColor = new Utils().ColorByName(tkMapColor.White);
             }
-            return sf;
+
+            _shapeFileMask = sf;
         }
 
         /// <summary>
-        /// Saves the map image  to the filename specified
+        /// Saves a map image to a file
         /// </summary>
         /// <returns></returns>
-        private bool SaveMapToImage()
+        private bool SaveMaptoImage()
+        {
+            var layerDictionary = MapLayersHandler.LayerDictionary;
+            foreach (KeyValuePair<int, MapLayer> kv in layerDictionary)
+            {
+                if (kv.Value.Visible)
+                {
+                    _axMap.get_Shapefile(kv.Key).Labels.VerticalPosition = tkVerticalPosition.vpAboveParentLayer;
+                }
+            }
+            return SaveMapHelper(null);
+        }
+
+        /// <summary>
+        /// Actual functionality to save a map image to a file
+        /// </summary>
+        /// <param name="handleMask"> shapefile mask layer</param>
+        /// <returns></returns>
+        private bool SaveMapHelper(int? handleMask)
+        {
+            //we now compute the width (w) that corresponds to a map whose width fits the required dpi
+            var ext = _axMap.Extents;
+            var w = ((double)_axMap.Width) * ((double)_dpi / 96);
+
+            //create an image whose width (w) will result in a map whose width in pixels fits the the required dpi
+            var img = _axMap.SnapShot3(ext.xMin, ext.xMax, ext.yMax, ext.yMin, (int)w);
+
+            //spacify filename of projection file for the image
+            var prjFileName = _fileName.Replace(Path.GetExtension(_fileName), ".prj");
+
+            //restore the map to its previous state by removing the mask and setting Reset to true
+            if (handleMask != null) MapLayersHandler.RemoveLayer((int)handleMask);
+            Reset = true;
+            AdjustFeatureSize();
+
+            //save the image to disk and create a worldfile. Image format is specified by USE_FILE_EXTENSION.
+            //also save the projection file
+            if (img.Save(_fileName, WriteWorldFile: true, FileType: ImageType.USE_FILE_EXTENSION) && _axMap.GeoProjection.WriteToFile(prjFileName))
+            {
+                //show the image file using the default image viewer
+                Process.Start(_fileName);
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Saves a grid25 fishing map image  to the filename specified
+        /// </summary>
+        /// <returns></returns>
+        private bool SaveGrid25MapToImage()
         {
             var layerDictionary = MapLayersHandler.LayerDictionary;
 
@@ -222,7 +284,8 @@ namespace FAD3
             }
 
             //add a mask to the map control
-            var handleMask = MapLayersHandler.AddLayer(Mask(), "Grid mask", true, false);
+            set_Mask();
+            var handleMask = MapLayersHandler.AddLayer(_shapeFileMask, "Grid mask", true, false);
 
             //move the mask layer to the top
             _axMap.MoveLayerTop(_axMap.get_LayerPosition(handleMask));
@@ -235,34 +298,7 @@ namespace FAD3
 
             _axMap.get_Shapefile(_handleLabels).Labels.AvoidCollisions = false;
 
-            //we now compute the width (w) that corresponds to a map whose width fits the required dpi
-            var ext = _axMap.Extents;
-            var w = ((double)_axMap.Width) * ((double)_dpi / 96);
-
-            //create an image whose width (w) will result in a map whose width in pixels fits the the required dpi
-            var img = _axMap.SnapShot3(ext.xMin, ext.xMax, ext.yMax, ext.yMin, (int)w);
-
-            //spacify filename of projection file for the image
-            var prjFileName = _fileName.Replace(Path.GetExtension(_fileName), ".prj");
-
-            //restore the map to its previous state by removing the mask and setting Reset to true
-            MapLayersHandler.RemoveLayer(handleMask);
-            Reset = true;
-            AdjustFeatureSize();
-
-            //save the image to disk and create a worldfile. Image format is specified by USE_FILE_EXTENSION.
-            //also save the projection file
-            if (img.Save(_fileName, WriteWorldFile: true, FileType: ImageType.USE_FILE_EXTENSION) && _axMap.GeoProjection.WriteToFile(prjFileName))
-            {
-                //show the image file using the default image viewer
-                Process.Start(_fileName);
-
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return SaveMapHelper(handleMask);
         }
 
         public void Dispose()

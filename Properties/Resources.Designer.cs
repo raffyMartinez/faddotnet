@@ -213,6 +213,16 @@ namespace FAD3.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap graticule {
+            get {
+                object obj = ResourceManager.GetObject("graticule", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap gridCursor {
             get {
                 object obj = ResourceManager.GetObject("gridCursor", resourceCulture);

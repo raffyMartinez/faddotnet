@@ -6,13 +6,14 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Microsoft.Win32;
 
 namespace FAD3
 {
-    public partial class Grid25SaveForm : Form
+    public partial class SaveMapForm : Form
     {
         private bool _saveAsShapefile;
-        private static Grid25SaveForm _instance;
+        private static SaveMapForm _instance;
         private Grid25GenerateForm _parentForm;
 
         public void SaveType(bool SaveAsShapefile)
@@ -27,16 +28,21 @@ namespace FAD3
             }
         }
 
-        public static Grid25SaveForm GetInstance(Grid25GenerateForm Parent)
+        public static SaveMapForm GetInstance(Grid25GenerateForm Parent)
         {
-            if (_instance == null) _instance = new Grid25SaveForm(Parent);
+            if (_instance == null) _instance = new SaveMapForm(Parent);
             return _instance;
         }
 
-        public Grid25SaveForm(Grid25GenerateForm Parent)
+        public SaveMapForm(Grid25GenerateForm Parent)
         {
             InitializeComponent();
             _parentForm = Parent;
+        }
+
+        public SaveMapForm()
+        {
+            InitializeComponent();
         }
 
         private void OnGrid25SaveForm_Load(object sender, EventArgs e)
@@ -70,6 +76,25 @@ namespace FAD3
             }
         }
 
+        public static void SetSavedMapsFolder(string folderPath)
+        {
+            RegistryKey reg_key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\FAD3", true);
+            reg_key.SetValue("FolderSavedGrids", folderPath);
+        }
+
+        public static string GetSavedMapsFolder()
+        {
+            RegistryKey reg_key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\FAD3", true);
+            try
+            {
+                return reg_key.GetValue("FolderSavedGrids").ToString();
+            }
+            catch
+            {
+                return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            }
+        }
+
         private void OnButton_Click(object sender, EventArgs e)
         {
             switch (((Button)sender).Name)
@@ -82,10 +107,11 @@ namespace FAD3
                             //_parentForm.Grid25MajorGrid.Save(txtSave.Text);
                             FolderBrowserDialog fbd = new FolderBrowserDialog();
                             fbd.Description = "Select folder to save fishing ground grid map";
-                            fbd.SelectedPath = _parentForm.GetSavedGridsFolder();
+                            fbd.SelectedPath = GetSavedMapsFolder();
                             DialogResult result = FolderBrowserLauncher.ShowFolderBrowser(fbd);
                             if (result == DialogResult.OK && fbd.SelectedPath.Length > 0)
                             {
+                                SetSavedMapsFolder(fbd.SelectedPath);
                                 if (!_parentForm.Grid25MajorGrid.Save($@"{fbd.SelectedPath}\{txtSave.Text}"))
                                 {
                                     Logger.Log("Not all grid25 shapefiles were saved.", "Grid25SaveForm", "OnButton_Click");
@@ -99,11 +125,12 @@ namespace FAD3
                             sfd.Filter = "jpeg|*.jpg|tiff|*.tif";
                             sfd.FilterIndex = 2;
                             sfd.AddExtension = true;
-                            sfd.InitialDirectory = _parentForm.GetSavedGridsFolder();
+                            sfd.InitialDirectory = GetSavedMapsFolder();
                             DialogResult result = sfd.ShowDialog();
                             if (result == DialogResult.OK && sfd.FileName.Length > 0)
                             {
-                                if (_parentForm.Grid25MajorGrid.Save(int.Parse(txtSave.Text), sfd.FileName))
+                                //if (_parentForm.Grid25MajorGrid.Save(int.Parse(txtSave.Text), sfd.FileName))
+                                if (global.MappingForm.SaveMapImage(int.Parse(txtSave.Text), sfd.FileName))
                                 {
                                     Close();
                                 }

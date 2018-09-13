@@ -146,6 +146,12 @@
     <Compile Include="FolderBrowserLauncher.cs" />
     <Compile Include="GMSLineClass.cs" />
     <Compile Include="Graticule.cs" />
+    <Compile Include="GraticuleForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GraticuleForm.Designer.cs">
+      <DependentUpon>GraticuleForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Grid25GenerateForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -155,11 +161,11 @@
     <Compile Include="Grid25MajorGrid.cs" />
     <Compile Include="Grid25MinorGrid.cs" />
     <Compile Include="Grid25LabelManager.cs" />
-    <Compile Include="Grid25SaveForm.cs">
+    <Compile Include="SaveMapForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Grid25SaveForm.Designer.cs">
-      <DependentUpon>Grid25SaveForm.cs</DependentUpon>
+    <Compile Include="SaveMapForm.Designer.cs">
+      <DependentUpon>SaveMapForm.cs</DependentUpon>
     </Compile>
     <Compile Include="LayerPropertyForm.cs">
       <SubType>Form</SubType>
@@ -381,11 +387,14 @@
     <EmbeddedResource Include="GearCodesUsageForm.resx">
       <DependentUpon>GearCodesUsageForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="GraticuleForm.resx">
+      <DependentUpon>GraticuleForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Grid25GenerateForm.resx">
       <DependentUpon>Grid25GenerateForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Grid25SaveForm.resx">
-      <DependentUpon>Grid25SaveForm.cs</DependentUpon>
+    <EmbeddedResource Include="SaveMapForm.resx">
+      <DependentUpon>SaveMapForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="LayerPropertyForm.resx">
       <DependentUpon>LayerPropertyForm.cs</DependentUpon>
@@ -551,6 +560,7 @@
     <None Include="Resources\fit.bmp" />
     <None Include="Resources\image.bmp" />
     <None Include="Resources\im_boundary.bmp" />
+    <None Include="Resources\graticule.bmp" />
     <Content Include="Resources\internet-web-browser.png" />
     <None Include="Resources\system-file-manager.png" />
     <None Include="Resources\layerAdd.bmp" />

@@ -1,6 +1,6 @@
 ﻿namespace FAD3
 {
-    partial class Grid25SaveForm
+    partial class SaveMapForm
     {
         /// <summary>
         /// Required designer variable.
