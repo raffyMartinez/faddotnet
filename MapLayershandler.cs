@@ -94,6 +94,20 @@ namespace FAD3
             }
         }
 
+        public bool Exists(string name)
+        {
+            foreach (MapLayer item in _mapLayerDictionary.Values)
+            {
+                if (item.Name == name) return true;
+            }
+            return false;
+        }
+
+        public bool Exists(int layerHandle)
+        {
+            return _mapLayerDictionary.ContainsKey(layerHandle);
+        }
+
         public Dictionary<int, MapLayer> LayerDictionary
         {
             get { return _mapLayerDictionary; }
@@ -126,6 +140,16 @@ namespace FAD3
                 LayerEventArg lp = new LayerEventArg(_currentMapLayer.Handle, _currentMapLayer.Name, _currentMapLayer.Visible, _currentMapLayer.VisibleInLayersUI, _currentMapLayer.LayerType);
                 CurrentLayer(this, lp);
             }
+        }
+
+        public MapLayer get_MapLayer(string Name)
+        {
+            foreach (MapLayer item in _mapLayerDictionary.Values)
+            {
+                if (item.Name == Name)
+                    return item;
+            }
+            return null;
         }
 
         public MapLayer get_MapLayer(int layerHandle)

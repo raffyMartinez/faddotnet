@@ -7,7 +7,20 @@ using AxMapWinGIS;
 
 namespace FAD3
 {
-    public class Graticule
+    /// <summary>
+    /// <para>Helper class for map graticules.</para>
+    /// <para>
+    /// 1. Creates a map graticule
+    /// 2. Creates tic labels on sids of the map
+    /// 3. Allows labels on each side to be displayed or not
+    /// 4. Allows the inner grid to be shown or not
+    /// 5. Allows labels to be bold or not
+    /// 6. Allows resizing of font size of labels
+    /// 7. Automatically adjusts graticule when map extent is changed
+    /// 8. A helper form is required to setup input parameters of the class
+    /// </para>
+    /// </summary>
+    public class Graticule : IDisposable
     {
         private MapLayersHandler _mapLayersHandler;
         private AxMap _axMap;
@@ -37,6 +50,8 @@ namespace FAD3
         public bool BoldLabels { get; set; }
         public bool GridVisible { get; set; }
 
+        private bool _disposed;
+
         public string CoordFormat { get; set; }
 
         public Shapefile GraticuleShapeFile
@@ -44,6 +59,20 @@ namespace FAD3
             get { return _sfGraticule; }
         }
 
+        /// <summary>
+        /// Receives the input parameters needed to build the graticule
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="sizeLabelFont"></param>
+        /// <param name="numberGridlines"></param>
+        /// <param name="widthBorder"></param>
+        /// <param name="widthGridlines"></param>
+        /// <param name="gridVisible"></param>
+        /// <param name="boldLabels"></param>
+        /// <param name="leftHasLabel"></param>
+        /// <param name="rightHasLabel"></param>
+        /// <param name="topHasLabel"></param>
+        /// <param name="bottomHasLabel"></param>
         public void Configure(string name, int sizeLabelFont, int numberGridlines, int widthBorder, int widthGridlines,
                               bool gridVisible, bool boldLabels, bool leftHasLabel, bool rightHasLabel,
                               bool topHasLabel, bool bottomHasLabel)
@@ -61,6 +90,39 @@ namespace FAD3
             RightHasLabel = rightHasLabel;
         }
 
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                }
+                _axMap.ExtentsChanged -= OnMapExtentsChanged;
+                _axMap = null;
+                if (_sfGraticule != null)
+                {
+                    _sfGraticule.EditClear();
+                }
+                _sfGraticule = null;
+                _geoProjection = null;
+                _graticuleExtents = null;
+                _boundaryExtents = null;
+                _mapExtents = null;
+                _mapLayersHandler.RemoveLayer("Mask");
+                _mapLayersHandler.RemoveLayer(Name);
+                _mapLayersHandler = null;
+            }
+        }
+
+        /// <summary>
+        /// Sets up the polyline shapefile that makes the graticule
+        /// </summary>
         private void SetupShapefile()
         {
             _sfGraticule = new Shapefile();
@@ -73,6 +135,10 @@ namespace FAD3
             }
         }
 
+        /// <summary>
+        /// Creates a shapefile mask that hides features outside the extent of the graticule
+        /// </summary>
+        /// <returns></returns>
         public Shapefile Mask()
         {
             var sf = new Shapefile();
@@ -92,6 +158,11 @@ namespace FAD3
             return null;
         }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="mapControl"></param>
+        /// <param name="layersHandler"></param>
         public Graticule(AxMap mapControl, MapLayersHandler layersHandler)
         {
             Name = "Graticule";
@@ -123,11 +194,27 @@ namespace FAD3
 
         private void OnMapExtentsChanged(object sender, EventArgs e)
         {
+            if (_mapLayersHandler.Exists(Name))
+            {
+                Refresh();
+            }
+        }
+
+        /// <summary>
+        /// Rebuilds the graticule
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void Refresh()
+        {
             _sfGraticule.EditClear();
             _sfGraticule.Labels.Clear();
             ShowGraticule();
         }
 
+        /// <summary>
+        /// Calls ComputeGraticule to builds the graticule, adds a mask and then add the shapefile to the layer handler class
+        /// </summary>
         public void ShowGraticule()
         {
             _mapLayersHandler.RemoveLayer(Name);
@@ -140,6 +227,13 @@ namespace FAD3
             _mapLayersHandler.AddLayer(_sfGraticule, Name, true, true);
         }
 
+        /// <summary>
+        /// Functionality to build the graticule.Input parameters are actually from the  extent of a map control
+        /// </summary>
+        /// <param name="xMax"></param>
+        /// <param name="yMax"></param>
+        /// <param name="xMin"></param>
+        /// <param name="yMin"></param>
         private void ComputeGraticule(double xMax, double yMax, double xMin, double yMin)
         {
             var coordinateString = "";
@@ -149,20 +243,25 @@ namespace FAD3
 
             _graticuleExtents = new Extents();
 
+            //0.93 means that the graticule is 93% of the map extent
             var tempW = (xMax - xMin) * 0.93;
             var tempH = (yMax - yMin) * 0.93;
 
+            //compute the origin of the graticule
             _xOrigin = (xMin + ((xMax - xMin) / 2)) - (tempW / 2);
             _yOrigin = (yMin + ((yMax - yMin) / 2)) - (tempH / 2);
 
             var ticLength = Math.Abs(xMin - _xOrigin) / 4;
 
             _graticuleExtents.SetBounds(_xOrigin, _yOrigin, 0, _xOrigin + tempW, _yOrigin + tempH, 0);
+
+            //boundary extent is used in calculating the mask. The mask hides parts of the map control between the edge of the map control and the boundary
             _boundaryExtents = new Extents();
             _boundaryExtents.SetBounds(_xOrigin, _yOrigin, 0, _xOrigin + tempW, _yOrigin + tempH, 0);
 
             var graticuleShape = _graticuleExtents.ToShape();
 
+            //build the Border of the graticule
             Point pt1, pt2;
             Shape shp;
             for (int n = 0; n < 4; n++)
@@ -206,11 +305,13 @@ namespace FAD3
 
             roundTo = SetInterval((int)roundTo);
 
-            var cat_T = _sfGraticule.Labels.AddCategory("Top");
-            var cat_B = _sfGraticule.Labels.AddCategory("Bottom");
-            var cat_R = _sfGraticule.Labels.AddCategory("Right");
-            var cat_L = _sfGraticule.Labels.AddCategory("Left");
+            //setup label categories
+            _sfGraticule.Labels.AddCategory("Top");
+            _sfGraticule.Labels.AddCategory("Bottom");
+            _sfGraticule.Labels.AddCategory("Right");
+            _sfGraticule.Labels.AddCategory("Left");
 
+            //setup display options of labels
             for (int n = 0; n < 4; n++)
             {
                 _sfGraticule.Labels.Category[n].FontOutlineVisible = false;
@@ -236,6 +337,7 @@ namespace FAD3
                 }
             }
 
+            //set interval size which determines spacing of gridlines
             _intervalSize = (int)(_intervalSize / roundTo) * roundTo;
 
             if (_intervalSize >= 1)
@@ -256,6 +358,7 @@ namespace FAD3
                         shp = new Shape();
                         if (shp.Create(ShpfileType.SHP_POLYLINE))
                         {
+                            //Build the vertical gridlines
                             shp.AddPoint(baseX, yMin);
                             shp.AddPoint(baseX, yMax);
                             var iShp = _sfGraticule.EditAddShape(shp);
@@ -271,8 +374,13 @@ namespace FAD3
                                     shp.AddPoint(baseX, yMin - ticLength);
                                     iShp = _sfGraticule.EditAddShape(shp);
                                     _sfGraticule.EditCellValue(_ifldPart, iShp, "tic");
+
+                                    //we input the tic's location to the coordinate class
                                     coord.SetD((float)shp.Center.y, (float)shp.Center.x);
+
+                                    //coordinate string is the formatted coordinate of the tic label
                                     coordinateString = coord.ToString(false, CoordFormat);
+
                                     _sfGraticule.EditCellValue(_ifldLabel, iShp, coordinateString);
                                     _sfGraticule.EditCellValue(_ifldSide, iShp, "B");
                                     _sfGraticule.Labels.AddLabel(coordinateString, baseX, yMin - ticLength, 0, 1);
@@ -315,12 +423,14 @@ namespace FAD3
                         shp = new Shape();
                         if (shp.Create(ShpfileType.SHP_POLYLINE))
                         {
+                            //build the horizontal gridlines
                             shp.AddPoint(xMin, baseY);
                             shp.AddPoint(xMax, baseY);
                             var iShp = _sfGraticule.EditAddShape(shp);
                             _sfGraticule.EditCellValue(_ifldPart, iShp, "GridLine");
                         }
 
+                        //set tics on the left side
                         if (LeftHasLabel)
                         {
                             shp = new Shape();
@@ -334,10 +444,13 @@ namespace FAD3
                                 coordinateString = coord.ToString(isYcoord: true, format: CoordFormat);
                                 _sfGraticule.EditCellValue(_ifldLabel, iShp, coordinateString);
                                 _sfGraticule.EditCellValue(_ifldSide, iShp, "L");
+
+                                //we add tic label and rotate the label 270 degrees
                                 _sfGraticule.Labels.AddLabel(coordinateString, xMin - (ticLength * 2), baseY, 270, 3);
                             }
                         }
 
+                        //set tics on the right side
                         if (RightHasLabel)
                         {
                             shp = new Shape();
@@ -351,6 +464,8 @@ namespace FAD3
                                 coordinateString = coord.ToString(isYcoord: true, format: CoordFormat);
                                 _sfGraticule.EditCellValue(_ifldLabel, iShp, coordinateString);
                                 _sfGraticule.EditCellValue(_ifldSide, iShp, "R");
+
+                                //we add tic label and rotate the label 90 degrees
                                 _sfGraticule.Labels.AddLabel(coordinateString, xMax + (ticLength * 2), baseY, 90, 2);
                             }
                         }
@@ -359,6 +474,7 @@ namespace FAD3
                     baseY += _intervalSize;
                 }
 
+                //sets up appearance of the various lines that make up the graticule
                 if (_sfGraticule.Categories.Generate(_ifldPart, tkClassificationType.ctUniqueValues, 1))
                 {
                     for (int n = 0; n < _sfGraticule.Categories.Count; n++)
@@ -389,6 +505,11 @@ namespace FAD3
             }
         }
 
+        /// <summary>
+        /// Sets up the interval size of tics and returns interval size in minutes
+        /// </summary>
+        /// <param name="inValue"></param>
+        /// <returns></returns>
         private int SetInterval(int inValue)
         {
             if (inValue < 2)

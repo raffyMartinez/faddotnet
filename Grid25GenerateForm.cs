@@ -66,6 +66,11 @@ namespace FAD3
             return (uint)(clr.R + (clr.G << 8) + (clr.B << 16));
         }
 
+        private uint FactorBy100(string property)
+        {
+            return (uint)(double.Parse(property) * 100);
+        }
+
         /// <summary>
         /// fills a dictionary with label and grid line properties
         /// </summary>
@@ -75,9 +80,9 @@ namespace FAD3
             _labelAndGridProperties.Add("minorGridLabelDistance", uint.Parse(txtMinorGridLabelDistance.Text));
             _labelAndGridProperties.Add("minorGridLabelSize", uint.Parse(txtMinorGridLabelSize.Text));
             _labelAndGridProperties.Add("majorGridLabelSize", uint.Parse(txtMajorGridLabelSize.Text));
-            _labelAndGridProperties.Add("borderThickness", uint.Parse(txtBorderThickness.Text));
-            _labelAndGridProperties.Add("majorGridThickness", uint.Parse(txtMajorGridThickness.Text));
-            _labelAndGridProperties.Add("minorGridThickness", uint.Parse(txtMinorGridThickness.Text));
+            _labelAndGridProperties.Add("borderThickness", FactorBy100(txtBorderThickness.Text));
+            _labelAndGridProperties.Add("majorGridThickness", FactorBy100(txtMajorGridThickness.Text));
+            _labelAndGridProperties.Add("minorGridThickness", FactorBy100(txtMinorGridThickness.Text));
             _labelAndGridProperties.Add("minorGridLabelColor", ColorToUInt(shapeMinorGridLabelColor.FillColor));
             _labelAndGridProperties.Add("majorGridLabelColor", ColorToUInt(shapeMajorGridLabelColor.FillColor));
             _labelAndGridProperties.Add("borderColor", ColorToUInt(shapeBorderColor.FillColor));
@@ -178,6 +183,7 @@ namespace FAD3
             global.SaveFormSettings(this);
             global.MappingMode = global.fad3MappingMode.defaultMode;
             ReviewSavedGridFiles();
+            global.Grid25GenerateForm = null;
         }
 
         private void CleanUp()
@@ -193,6 +199,20 @@ namespace FAD3
             _instance = null;
         }
 
+        public void CreateInlandGridDB()
+        {
+            InlandGridCreateDBForm igcf = InlandGridCreateDBForm.GetInstance(this);
+            igcf.UTMZone = _utmZone;
+            if (!igcf.Visible)
+            {
+                igcf.Show(this);
+            }
+            else
+            {
+                igcf.BringToFront();
+            }
+        }
+
         private void Grid25GenerateForm_Load(object sender, EventArgs e)
         {
             txtMinorGridLabelDistance.Text = "1000";
@@ -206,6 +226,7 @@ namespace FAD3
             chkRight.Checked = true;
             chkBottom.Checked = true;
             global.LoadFormSettings(this, true);
+            global.Grid25GenerateForm = this;
         }
 
         private void OnShapeColor_DoubleClick(object sender, EventArgs e)

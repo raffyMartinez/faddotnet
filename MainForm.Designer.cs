@@ -83,6 +83,7 @@ namespace FAD3
             this.tsButtonReport = new System.Windows.Forms.ToolStripButton();
             this.tsButtonMap = new System.Windows.Forms.ToolStripButton();
             this.tsButtonExit = new System.Windows.Forms.ToolStripButton();
+            this.generateInlandDbToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -264,6 +265,7 @@ namespace FAD3
             this.menuMenuBar.Size = new System.Drawing.Size(929, 24);
             this.menuMenuBar.TabIndex = 1;
             this.menuMenuBar.Text = "menuStrip1";
+            this.menuMenuBar.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnmenuMenuBar_ItemClicked);
             // 
             // menuFile
             // 
@@ -330,7 +332,8 @@ namespace FAD3
             this.coordinateFormatToolStripMenuItem,
             this.symbolFontsToolStripMenuItem,
             this.generateGridMapToolStripMenuItem,
-            this.showErrorMessagesToolStripMenuItem});
+            this.showErrorMessagesToolStripMenuItem,
+            this.generateInlandDbToolStripMenuItem});
             this.menuTools.Name = "menuTools";
             this.menuTools.Size = new System.Drawing.Size(48, 20);
             this.menuTools.Text = "Tools";
@@ -339,28 +342,28 @@ namespace FAD3
             // resetReferenceNumbersToolStripMenuItem
             // 
             this.resetReferenceNumbersToolStripMenuItem.Name = "resetReferenceNumbersToolStripMenuItem";
-            this.resetReferenceNumbersToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
+            this.resetReferenceNumbersToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
             this.resetReferenceNumbersToolStripMenuItem.Tag = "resetRefNos";
             this.resetReferenceNumbersToolStripMenuItem.Text = "Reset reference numbers";
             // 
             // referenceNumberRangeToolStripMenuItem
             // 
             this.referenceNumberRangeToolStripMenuItem.Name = "referenceNumberRangeToolStripMenuItem";
-            this.referenceNumberRangeToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
+            this.referenceNumberRangeToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
             this.referenceNumberRangeToolStripMenuItem.Tag = "refNoRange";
             this.referenceNumberRangeToolStripMenuItem.Text = "Reference number range";
             // 
             // coordinateFormatToolStripMenuItem
             // 
             this.coordinateFormatToolStripMenuItem.Name = "coordinateFormatToolStripMenuItem";
-            this.coordinateFormatToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
+            this.coordinateFormatToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
             this.coordinateFormatToolStripMenuItem.Tag = "coordFormat";
             this.coordinateFormatToolStripMenuItem.Text = "Coordinate format";
             // 
             // symbolFontsToolStripMenuItem
             // 
             this.symbolFontsToolStripMenuItem.Name = "symbolFontsToolStripMenuItem";
-            this.symbolFontsToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
+            this.symbolFontsToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
             this.symbolFontsToolStripMenuItem.Tag = "symbolFonts";
             this.symbolFontsToolStripMenuItem.Text = "Symbol fonts";
             // 
@@ -370,7 +373,7 @@ namespace FAD3
             this.uTMZone50ToolStripMenuItem,
             this.uTMZone51ToolStripMenuItem});
             this.generateGridMapToolStripMenuItem.Name = "generateGridMapToolStripMenuItem";
-            this.generateGridMapToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
+            this.generateGridMapToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
             this.generateGridMapToolStripMenuItem.Text = "Generate grid map";
             this.generateGridMapToolStripMenuItem.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnGenerateGridMapToolStripMenuItem_DropDownItemClicked);
             // 
@@ -391,7 +394,7 @@ namespace FAD3
             // showErrorMessagesToolStripMenuItem
             // 
             this.showErrorMessagesToolStripMenuItem.Name = "showErrorMessagesToolStripMenuItem";
-            this.showErrorMessagesToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
+            this.showErrorMessagesToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
             this.showErrorMessagesToolStripMenuItem.Tag = "showError";
             this.showErrorMessagesToolStripMenuItem.Text = "Show error messages";
             // 
@@ -562,6 +565,14 @@ namespace FAD3
             this.tsButtonExit.Text = "toolStripButton6";
             this.tsButtonExit.ToolTipText = "Exit";
             // 
+            // generateInlandDbToolStripMenuItem
+            // 
+            this.generateInlandDbToolStripMenuItem.Name = "generateInlandDbToolStripMenuItem";
+            this.generateInlandDbToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
+            this.generateInlandDbToolStripMenuItem.Tag = "createInland";
+            this.generateInlandDbToolStripMenuItem.Text = "Create inland grid database";
+            this.generateInlandDbToolStripMenuItem.ToolTipText = "Creates a database containing minor grids that are located inland";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -641,5 +652,6 @@ namespace FAD3
         private System.Windows.Forms.ToolStripButton tsButtonReport;
         private System.Windows.Forms.ToolStripButton tsButtonMap;
         private System.Windows.Forms.ToolStripButton tsButtonExit;
+        private System.Windows.Forms.ToolStripMenuItem generateInlandDbToolStripMenuItem;
     }
 }

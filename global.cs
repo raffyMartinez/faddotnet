@@ -44,6 +44,8 @@ namespace FAD3
         private static CoordinateDisplayFormat _CoordDisplayFormat = CoordinateDisplayFormat.DegreeDecimal;
         private static Color _MissingFieldBackColor = global.MissingFieldBackColor;
 
+        public static Grid25GenerateForm Grid25GenerateForm { get; set; }
+
         public static fad3MappingMode MappingMode { get; set; }
 
         /// <summary>

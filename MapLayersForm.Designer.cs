@@ -38,6 +38,7 @@
             this.itemAddLayer = new System.Windows.Forms.ToolStripMenuItem();
             this.itemRemoveLayer = new System.Windows.Forms.ToolStripMenuItem();
             this.itemLayerProperty = new System.Windows.Forms.ToolStripMenuItem();
+            this.itemLayerExport = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.layerGrid)).BeginInit();
             this.menuLayers.SuspendLayout();
             this.SuspendLayout();
@@ -107,16 +108,17 @@
             this.menuLayers.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.itemAddLayer,
             this.itemRemoveLayer,
-            this.itemLayerProperty});
+            this.itemLayerProperty,
+            this.itemLayerExport});
             this.menuLayers.Name = "menuLayers";
-            this.menuLayers.Size = new System.Drawing.Size(181, 92);
+            this.menuLayers.Size = new System.Drawing.Size(181, 114);
             this.menuLayers.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnMenuLayers_ItemClicked);
             // 
             // itemAddLayer
             // 
             this.itemAddLayer.Name = "itemAddLayer";
             this.itemAddLayer.Size = new System.Drawing.Size(180, 22);
-            this.itemAddLayer.Text = "Add layer";
+            this.itemAddLayer.Text = "Add layer...";
             // 
             // itemRemoveLayer
             // 
@@ -128,7 +130,13 @@
             // 
             this.itemLayerProperty.Name = "itemLayerProperty";
             this.itemLayerProperty.Size = new System.Drawing.Size(180, 22);
-            this.itemLayerProperty.Text = "Properties";
+            this.itemLayerProperty.Text = "Properties...";
+            // 
+            // itemLayerExport
+            // 
+            this.itemLayerExport.Name = "itemLayerExport";
+            this.itemLayerExport.Size = new System.Drawing.Size(180, 22);
+            this.itemLayerExport.Text = "Export...";
             // 
             // MapLayersForm
             // 
@@ -160,5 +168,6 @@
         private System.Windows.Forms.ToolStripMenuItem itemAddLayer;
         private System.Windows.Forms.ToolStripMenuItem itemRemoveLayer;
         private System.Windows.Forms.ToolStripMenuItem itemLayerProperty;
+        private System.Windows.Forms.ToolStripMenuItem itemLayerExport;
     }
 }

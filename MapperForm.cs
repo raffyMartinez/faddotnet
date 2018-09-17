@@ -126,6 +126,11 @@ namespace FAD3
             _parentForm = parentForm;
         }
 
+        private void ConfigureMapControl()
+        {
+            axMap.ZoomBehavior = tkZoomBehavior.zbDefault;
+        }
+
         private void OnMapperForm_Load(object sender, EventArgs e)
         {
             MapControl = axMap;
@@ -147,6 +152,7 @@ namespace FAD3
             {
                 tsButtonSave.Enabled = false;
             }
+            ConfigureMapControl();
         }
 
         private void OnCurrentMapLayer(MapLayersHandler s, LayerEventArg e)
@@ -250,6 +256,7 @@ namespace FAD3
                     {
                         sfa.BringToFront();
                     }
+
                     break;
 
                 case "tsButtonZoomIn":
@@ -312,6 +319,7 @@ namespace FAD3
                     {
                         gf.BringToFront();
                     }
+                    gf.GraticuleRemoved += OnGraticuleRemoved;
                     break;
 
                 case "tsButtonSaveImage":
@@ -319,6 +327,15 @@ namespace FAD3
                     saveForm.SaveType(SaveAsShapefile: false);
                     saveForm.ShowDialog(this);
                     break;
+            }
+        }
+
+        private void OnGraticuleRemoved(object sender, EventArgs e)
+        {
+            if (_graticule != null)
+            {
+                _graticule.Dispose();
+                _graticule = null;
             }
         }
     }

@@ -129,6 +129,8 @@
     <Compile Include="CoordinateFormatSelectForm.Designer.cs">
       <DependentUpon>CoordinateFormatSelectForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="CreateInlandGridEventArgs.cs" />
+    <Compile Include="CreateInlandPointDatabase.cs" />
     <Compile Include="DBCheck.cs" />
     <Compile Include="EnumeratorEntryForm.cs">
       <SubType>Form</SubType>
@@ -161,6 +163,12 @@
     <Compile Include="Grid25MajorGrid.cs" />
     <Compile Include="Grid25MinorGrid.cs" />
     <Compile Include="Grid25LabelManager.cs" />
+    <Compile Include="InlandGridCreateDBForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="InlandGridCreateDBForm.Designer.cs">
+      <DependentUpon>InlandGridCreateDBForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="SaveMapForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -393,6 +401,9 @@
     <EmbeddedResource Include="Grid25GenerateForm.resx">
       <DependentUpon>Grid25GenerateForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="InlandGridCreateDBForm.resx">
+      <DependentUpon>InlandGridCreateDBForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="SaveMapForm.resx">
       <DependentUpon>SaveMapForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -584,6 +595,15 @@
     <None Include="Resources\jigs.bmp" />
   </ItemGroup>
   <ItemGroup>
+    <COMReference Include="ADOX">
+      <Guid>{00000600-0000-0010-8000-00AA006D2EA4}</Guid>
+      <VersionMajor>6</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
     <COMReference Include="AxMapWinGIS">
       <Guid>{C368D713-CC5F-40ED-9F53-F84FE197B96A}</Guid>
       <VersionMajor>4</VersionMajor>

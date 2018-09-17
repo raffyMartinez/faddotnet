@@ -79,13 +79,13 @@ namespace FAD3
         public void ApplyGridSymbology(string mapName = "")
         {
             _grid25MinorGrid.MinorGridLinesShapeFile.DefaultDrawingOptions.LineColor = _gridAndLabelProperties["minorGridLineColor"];
-            _grid25MinorGrid.MinorGridLinesShapeFile.DefaultDrawingOptions.LineWidth = _gridAndLabelProperties["minorGridThickness"];
+            _grid25MinorGrid.MinorGridLinesShapeFile.DefaultDrawingOptions.LineWidth = (float)_gridAndLabelProperties["minorGridThickness"] / 100;
 
             _shapefileMajorGridIntersect.DefaultDrawingOptions.FillVisible = false;
             _shapefileMajorGridIntersect.DefaultDrawingOptions.LineColor = _gridAndLabelProperties["majorGridLineColor"];
-            _shapefileMajorGridIntersect.DefaultDrawingOptions.LineWidth = _gridAndLabelProperties["majorGridThickness"];
+            _shapefileMajorGridIntersect.DefaultDrawingOptions.LineWidth = (float)_gridAndLabelProperties["majorGridThickness"] / 100;
 
-            _shapefileBoundingRectangle.DefaultDrawingOptions.LineWidth = _gridAndLabelProperties["majorGridThickness"];
+            _shapefileBoundingRectangle.DefaultDrawingOptions.LineWidth = (float)_gridAndLabelProperties["borderThickness"] / 100;
             _shapefileBoundingRectangle.DefaultDrawingOptions.LineColor = _gridAndLabelProperties["borderColor"];
             _shapefileBoundingRectangle.DefaultDrawingOptions.FillVisible = false;
             if (mapName.Length > 0)

@@ -1337,6 +1337,10 @@ namespace FAD3
                     showErrorMessagesToolStripMenuItem.Checked = !showErrorMessagesToolStripMenuItem.Checked;
                     global.ShowErrorMessage = showErrorMessagesToolStripMenuItem.Checked;
                     break;
+
+                case "createInland":
+                    global.Grid25GenerateForm?.CreateInlandGridDB();
+                    break;
             }
         }
 
@@ -2500,6 +2504,11 @@ namespace FAD3
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             Cleanup();
+        }
+
+        private void OnmenuMenuBar_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+            generateInlandDbToolStripMenuItem.Visible = global.Grid25GenerateForm != null;
         }
     }
 }

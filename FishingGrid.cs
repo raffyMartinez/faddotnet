@@ -393,14 +393,15 @@ namespace FAD3
         /// <returns></returns>
         public static bool MinorGridIsInland(string MinorGridName)
         {
-            var conString = "Provider=Microsoft.JET.OLEDB.4.0;data source=" + _appPath + "\\grid25inland.mdb";
+            var conString = $@"Provider=Microsoft.JET.OLEDB.4.0;data source= {_appPath}\grid25inland.mdb";
+
             bool IsInland = false;
             using (var con = new OleDbConnection(conString))
             {
                 try
                 {
                     con.Open();
-                    string query = $"Select grid_name from tblGrid25Inland where grid_name ='{MinorGridName}'";
+                    string query = $"Select grid_name from tblGrid25Inland where grid_name ='{MinorGridName}' and [zone] = '{UTMZoneName}'";
                     using (var dt = new DataTable())
                     {
                         var adapter = new OleDbDataAdapter(query, con);
@@ -408,13 +409,22 @@ namespace FAD3
                         IsInland = dt.Rows.Count > 0;
                     }
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex.Message, "FishingGrid.cs", "MinorGridIsInland");
+                }
             }
+
             return IsInland;
         }
 
+        public static (int x, int y) MajorGridOrigin(int gridNo)
+        {
+            return (GridXOrigin(gridNo), GridYOrigin(gridNo));
+        }
+
         /// <summary>
-        /// sets the parametes of grid25 grids depending on the inputted zone
+        /// sets the parameters of grid25 grids depending on the inputted zone
         /// </summary>
         /// <param name="Zone"></param>
         private static void SetGrid25Parameters(fadUTMZone Zone)
@@ -783,9 +793,30 @@ namespace FAD3
         /// </summary>
         /// <param name="GridNo"></param>
         /// <returns></returns>
+        //private static int MajorGridRowPosition(int GridNo)
+        //{
+        //    double d = (GridNo / _grid25.MajorGridColumns);
+        //    if (d != Math.Floor(d))
+        //    {
+        //        return (int)Math.Floor(d) + 1;
+        //    }
+        //    return (int)Math.Floor(d);
+        //}
+
+        //original
+        //private static int MajorGridRowPosition(int GridNo)
+        //{
+        //    double d = (GridNo / _grid25.MajorGridColumns);
+        //    return (int)Math.Floor(d) + 1;
+        //}
+
         private static int MajorGridRowPosition(int GridNo)
         {
-            double d = (GridNo / _grid25.MajorGridColumns);
+            double d = ((double)GridNo / _grid25.MajorGridColumns);
+            if (d == Math.Floor(d))
+            {
+                d--;
+            }
             return (int)Math.Floor(d) + 1;
         }
 

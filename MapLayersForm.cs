@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
+using MapWinGIS;
 
 namespace FAD3
 {
@@ -57,7 +58,7 @@ namespace FAD3
                 // Create a rectangle using the DragSize, with the mouse position being
                 // at the center of the rectangle.
                 _dragBoxFromMouseDown = new Rectangle(
-                          new Point(
+                          new System.Drawing.Point(
                             e.X - (dragSize.Width / 2),
                             e.Y - (dragSize.Height / 2)),
                       dragSize);
@@ -78,7 +79,7 @@ namespace FAD3
 
             // The mouse locations are relative to the screen, so they must be
             // converted to client coordinates.
-            Point clientPoint = layerGrid.PointToClient(new Point(e.X, e.Y));
+            System.Drawing.Point clientPoint = layerGrid.PointToClient(new System.Drawing.Point(e.X, e.Y));
 
             // Get the row index of the item the mouse is below.
             _rowIndexOfItemUnderMouseToDrop = layerGrid.HitTest(clientPoint.X, clientPoint.Y).RowIndex;
@@ -269,6 +270,27 @@ namespace FAD3
                     break;
 
                 case "itemLayerProperty":
+                    break;
+
+                case "itemLayerExport":
+                    switch (_mapLayersHandler.CurrentMapLayer.LayerType)
+                    {
+                        case "ShapefileClass":
+                            var sf = (Shapefile)_mapLayersHandler.CurrentMapLayer.LayerObject;
+                            var saveAs = new SaveFileDialog();
+                            saveAs.Filter = "Shapefile *.shp|*.shp|All files *.*|*.*";
+                            saveAs.FilterIndex = 1;
+                            saveAs.ShowDialog();
+                            if (saveAs.FileName.Length > 0 && sf.SaveAs(saveAs.FileName))
+                            {
+                                var prjFile = sf.Filename.Replace(".shp", ".prj");
+                                sf.GeoProjection.WriteToFile(prjFile);
+                            }
+                            break;
+
+                        case "ImageClass":
+                            break;
+                    }
                     break;
             }
         }

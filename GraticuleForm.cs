@@ -13,6 +13,7 @@ namespace FAD3
     {
         private static GraticuleForm _instance;
         private MapperForm _parentForm;
+        public event EventHandler GraticuleRemoved;
 
         public static GraticuleForm GetInstance(MapperForm parent)
         {
@@ -52,6 +53,8 @@ namespace FAD3
                     break;
 
                 case "btnRemove":
+                    GraticuleRemoved?.Invoke(this, EventArgs.Empty);
+                    Close();
                     break;
             }
         }
