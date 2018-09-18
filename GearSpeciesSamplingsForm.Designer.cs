@@ -38,28 +38,28 @@
             this.treeList.Location = new System.Drawing.Point(0, 0);
             this.treeList.Margin = new System.Windows.Forms.Padding(4);
             this.treeList.Name = "treeList";
-            this.treeList.Size = new System.Drawing.Size(259, 639);
+            this.treeList.Size = new System.Drawing.Size(227, 599);
             this.treeList.TabIndex = 0;
             this.treeList.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeList_AfterSelect);
             // 
             // lvSamplings
             // 
             this.lvSamplings.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lvSamplings.Location = new System.Drawing.Point(259, 0);
+            this.lvSamplings.Location = new System.Drawing.Point(227, 0);
             this.lvSamplings.Margin = new System.Windows.Forms.Padding(4);
             this.lvSamplings.Name = "lvSamplings";
-            this.lvSamplings.Size = new System.Drawing.Size(761, 639);
+            this.lvSamplings.Size = new System.Drawing.Size(665, 599);
             this.lvSamplings.TabIndex = 1;
             this.lvSamplings.UseCompatibleStateImageBehavior = false;
             // 
             // GearSpeciesSamplingsForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1020, 639);
+            this.ClientSize = new System.Drawing.Size(892, 599);
             this.Controls.Add(this.lvSamplings);
             this.Controls.Add(this.treeList);
-            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "GearSpeciesSamplingsForm";
             this.Text = "SpeciesSamplingsForm";

@@ -40,17 +40,17 @@
             // panelUI
             // 
             this.panelUI.AutoScroll = true;
-            this.panelUI.Location = new System.Drawing.Point(1, 60);
+            this.panelUI.Location = new System.Drawing.Point(1, 56);
             this.panelUI.Margin = new System.Windows.Forms.Padding(4);
             this.panelUI.Name = "panelUI";
-            this.panelUI.Size = new System.Drawing.Size(392, 340);
+            this.panelUI.Size = new System.Drawing.Size(343, 319);
             this.panelUI.TabIndex = 0;
             // 
             // buttonOk
             // 
-            this.buttonOk.Location = new System.Drawing.Point(335, 417);
+            this.buttonOk.Location = new System.Drawing.Point(293, 391);
             this.buttonOk.Name = "buttonOk";
-            this.buttonOk.Size = new System.Drawing.Size(50, 25);
+            this.buttonOk.Size = new System.Drawing.Size(44, 23);
             this.buttonOk.TabIndex = 1;
             this.buttonOk.Text = "Ok";
             this.buttonOk.UseVisualStyleBackColor = true;
@@ -59,9 +59,9 @@
             // buttonCancel
             // 
             this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.buttonCancel.Location = new System.Drawing.Point(271, 417);
+            this.buttonCancel.Location = new System.Drawing.Point(237, 391);
             this.buttonCancel.Name = "buttonCancel";
-            this.buttonCancel.Size = new System.Drawing.Size(58, 25);
+            this.buttonCancel.Size = new System.Drawing.Size(51, 23);
             this.buttonCancel.TabIndex = 2;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = true;
@@ -71,9 +71,9 @@
             // 
             this.labelTitle.CausesValidation = false;
             this.labelTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelTitle.Location = new System.Drawing.Point(1, 9);
+            this.labelTitle.Location = new System.Drawing.Point(1, 8);
             this.labelTitle.Name = "labelTitle";
-            this.labelTitle.Size = new System.Drawing.Size(384, 47);
+            this.labelTitle.Size = new System.Drawing.Size(336, 44);
             this.labelTitle.TabIndex = 3;
             this.labelTitle.Text = "label1";
             // 
@@ -82,9 +82,10 @@
             this.statusBar.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.statusBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.panelTip});
-            this.statusBar.Location = new System.Drawing.Point(0, 457);
+            this.statusBar.Location = new System.Drawing.Point(0, 427);
             this.statusBar.Name = "statusBar";
-            this.statusBar.Size = new System.Drawing.Size(397, 22);
+            this.statusBar.Padding = new System.Windows.Forms.Padding(1, 0, 12, 0);
+            this.statusBar.Size = new System.Drawing.Size(347, 22);
             this.statusBar.TabIndex = 4;
             this.statusBar.Text = "statusStrip1";
             // 
@@ -96,17 +97,17 @@
             // 
             // SampledGear_SpecsForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCancel;
             this.CausesValidation = false;
-            this.ClientSize = new System.Drawing.Size(397, 479);
+            this.ClientSize = new System.Drawing.Size(347, 449);
             this.Controls.Add(this.statusBar);
             this.Controls.Add(this.labelTitle);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.buttonOk);
             this.Controls.Add(this.panelUI);
-            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "SampledGear_SpecsForm";

@@ -46,64 +46,64 @@
             // 
             // textBoxPropertyName
             // 
-            this.textBoxPropertyName.Location = new System.Drawing.Point(13, 81);
+            this.textBoxPropertyName.Location = new System.Drawing.Point(11, 76);
             this.textBoxPropertyName.Margin = new System.Windows.Forms.Padding(4);
             this.textBoxPropertyName.Name = "textBoxPropertyName";
-            this.textBoxPropertyName.Size = new System.Drawing.Size(183, 22);
+            this.textBoxPropertyName.Size = new System.Drawing.Size(161, 21);
             this.textBoxPropertyName.TabIndex = 0;
             this.textBoxPropertyName.Validating += new System.ComponentModel.CancelEventHandler(this.OntextBox_Validating);
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 61);
+            this.label1.Location = new System.Drawing.Point(10, 57);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(59, 16);
+            this.label1.Size = new System.Drawing.Size(52, 15);
             this.label1.TabIndex = 1;
             this.label1.Text = "Property";
             // 
             // comboBoxType
             // 
             this.comboBoxType.FormattingEnabled = true;
-            this.comboBoxType.Location = new System.Drawing.Point(13, 129);
+            this.comboBoxType.Location = new System.Drawing.Point(11, 121);
             this.comboBoxType.Name = "comboBoxType";
-            this.comboBoxType.Size = new System.Drawing.Size(183, 24);
+            this.comboBoxType.Size = new System.Drawing.Size(161, 23);
             this.comboBoxType.TabIndex = 2;
             this.comboBoxType.Validating += new System.ComponentModel.CancelEventHandler(this.OncomboBoxType_Validating);
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 110);
+            this.label2.Location = new System.Drawing.Point(10, 103);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(40, 16);
+            this.label2.Size = new System.Drawing.Size(33, 15);
             this.label2.TabIndex = 3;
             this.label2.Text = "Type";
             // 
             // textBoxNotes
             // 
-            this.textBoxNotes.Location = new System.Drawing.Point(15, 182);
+            this.textBoxNotes.Location = new System.Drawing.Point(13, 171);
             this.textBoxNotes.Margin = new System.Windows.Forms.Padding(4);
             this.textBoxNotes.Multiline = true;
             this.textBoxNotes.Name = "textBoxNotes";
-            this.textBoxNotes.Size = new System.Drawing.Size(183, 85);
+            this.textBoxNotes.Size = new System.Drawing.Size(161, 80);
             this.textBoxNotes.TabIndex = 4;
             this.textBoxNotes.Validating += new System.ComponentModel.CancelEventHandler(this.OntextBox_Validating);
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(12, 162);
+            this.label3.Location = new System.Drawing.Point(10, 152);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(44, 16);
+            this.label3.Size = new System.Drawing.Size(39, 15);
             this.label3.TabIndex = 5;
             this.label3.Text = "Notes";
             // 
             // lvSpecs
             // 
-            this.lvSpecs.Location = new System.Drawing.Point(258, 67);
+            this.lvSpecs.Location = new System.Drawing.Point(226, 63);
             this.lvSpecs.Name = "lvSpecs";
-            this.lvSpecs.Size = new System.Drawing.Size(446, 200);
+            this.lvSpecs.Size = new System.Drawing.Size(391, 188);
             this.lvSpecs.TabIndex = 6;
             this.lvSpecs.UseCompatibleStateImageBehavior = false;
             this.lvSpecs.DoubleClick += new System.EventHandler(this.OnlvSpecs_DoubleClick);
@@ -111,9 +111,9 @@
             // 
             // buttonAdd
             // 
-            this.buttonAdd.Location = new System.Drawing.Point(207, 117);
+            this.buttonAdd.Location = new System.Drawing.Point(181, 110);
             this.buttonAdd.Name = "buttonAdd";
-            this.buttonAdd.Size = new System.Drawing.Size(38, 24);
+            this.buttonAdd.Size = new System.Drawing.Size(33, 22);
             this.buttonAdd.TabIndex = 7;
             this.buttonAdd.Text = ">";
             this.buttonAdd.UseVisualStyleBackColor = true;
@@ -121,9 +121,9 @@
             // 
             // buttonRemove
             // 
-            this.buttonRemove.Location = new System.Drawing.Point(207, 151);
+            this.buttonRemove.Location = new System.Drawing.Point(181, 142);
             this.buttonRemove.Name = "buttonRemove";
-            this.buttonRemove.Size = new System.Drawing.Size(38, 24);
+            this.buttonRemove.Size = new System.Drawing.Size(33, 22);
             this.buttonRemove.TabIndex = 8;
             this.buttonRemove.Text = "<";
             this.buttonRemove.UseVisualStyleBackColor = true;
@@ -131,9 +131,9 @@
             // 
             // buttonRemoveAll
             // 
-            this.buttonRemoveAll.Location = new System.Drawing.Point(207, 185);
+            this.buttonRemoveAll.Location = new System.Drawing.Point(181, 173);
             this.buttonRemoveAll.Name = "buttonRemoveAll";
-            this.buttonRemoveAll.Size = new System.Drawing.Size(38, 24);
+            this.buttonRemoveAll.Size = new System.Drawing.Size(33, 22);
             this.buttonRemoveAll.TabIndex = 9;
             this.buttonRemoveAll.Text = "<<";
             this.buttonRemoveAll.UseVisualStyleBackColor = true;
@@ -141,9 +141,9 @@
             // 
             // buttonOK
             // 
-            this.buttonOK.Location = new System.Drawing.Point(647, 278);
+            this.buttonOK.Location = new System.Drawing.Point(566, 261);
             this.buttonOK.Name = "buttonOK";
-            this.buttonOK.Size = new System.Drawing.Size(55, 29);
+            this.buttonOK.Size = new System.Drawing.Size(48, 27);
             this.buttonOK.TabIndex = 10;
             this.buttonOK.Text = "OK";
             this.buttonOK.UseVisualStyleBackColor = true;
@@ -151,9 +151,9 @@
             // 
             // buttonCancel
             // 
-            this.buttonCancel.Location = new System.Drawing.Point(581, 278);
+            this.buttonCancel.Location = new System.Drawing.Point(508, 261);
             this.buttonCancel.Name = "buttonCancel";
-            this.buttonCancel.Size = new System.Drawing.Size(60, 29);
+            this.buttonCancel.Size = new System.Drawing.Size(52, 27);
             this.buttonCancel.TabIndex = 11;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = true;
@@ -163,7 +163,7 @@
             // 
             this.labelTitle.AutoSize = true;
             this.labelTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelTitle.Location = new System.Drawing.Point(12, 9);
+            this.labelTitle.Location = new System.Drawing.Point(10, 8);
             this.labelTitle.Name = "labelTitle";
             this.labelTitle.Size = new System.Drawing.Size(191, 20);
             this.labelTitle.TabIndex = 12;
@@ -173,7 +173,7 @@
             // 
             this.label5.AutoSize = true;
             this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label5.Location = new System.Drawing.Point(12, 32);
+            this.label5.Location = new System.Drawing.Point(10, 30);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(466, 16);
             this.label5.TabIndex = 13;
@@ -181,9 +181,9 @@
             // 
             // ManageGearSpecsForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(716, 318);
+            this.ClientSize = new System.Drawing.Size(626, 298);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.labelTitle);
             this.Controls.Add(this.buttonCancel);
@@ -198,7 +198,7 @@
             this.Controls.Add(this.comboBoxType);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.textBoxPropertyName);
-            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "ManageGearSpecsForm";

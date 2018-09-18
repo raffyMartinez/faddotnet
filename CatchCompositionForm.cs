@@ -121,7 +121,7 @@ namespace FAD3
                 //values are scientific and local name
                 _comboIdentificationType.With(o =>
                 {
-                    o.Width = 120;
+                    o.Width = 100;
                     o.Name = "cboIdentificationType";
                     o.Location = new Point(0, 0);
                     o.Visible = false;
@@ -141,7 +141,7 @@ namespace FAD3
                 //contains all the genus from the database
                 _comboGenus.With(o =>
                 {
-                    o.Width = 120;
+                    o.Width = 100;
                     o.Font = Font;
                     o.Name = "cboGenus";
                     o.Location = new Point(0, 0);
@@ -158,7 +158,7 @@ namespace FAD3
                 //contains the species of a genus. Contents will vary depending on the current genus
                 _comboSpecies.With(o =>
                 {
-                    o.Width = 120;
+                    o.Width = 100;
                     o.Font = Font;
                     o.Name = "cboSpecies";
                     o.Location = new Point(0, 0);
@@ -173,7 +173,7 @@ namespace FAD3
                 //contains all the local names from the database
                 _comboLocalName.With(o =>
                 {
-                    o.Width = 120;
+                    o.Width = 100;
                     o.Font = Font;
                     o.Name = "cboLocalName";
                     o.Location = new Point(0, 0);
@@ -226,7 +226,7 @@ namespace FAD3
             //configure  textbox that holds the type of identification of a row
             textIdentificationType.With(o =>
             {
-                _ctlWidth = o.Width = 120;
+                _ctlWidth = o.Width = 100;
                 o.Height = _ctlHeight;
                 o.Location = new Point(labelRow.Left + labelRow.Width + _spacer, yPos);
                 o.Name = "txtIdentificationType";

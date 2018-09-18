@@ -67,6 +67,7 @@ namespace FAD3
             this.uTMZone50ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.uTMZone51ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.showErrorMessagesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.generateInlandDbToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.onlineManualToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -83,7 +84,6 @@ namespace FAD3
             this.tsButtonReport = new System.Windows.Forms.ToolStripButton();
             this.tsButtonMap = new System.Windows.Forms.ToolStripButton();
             this.tsButtonExit = new System.Windows.Forms.ToolStripButton();
-            this.generateInlandDbToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -123,7 +123,7 @@ namespace FAD3
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.treeMain.ContextMenuStrip = this.menuDropDown;
-            this.treeMain.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.treeMain.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.treeMain.ImageIndex = 0;
             this.treeMain.ImageList = this.imageList16;
             this.treeMain.Location = new System.Drawing.Point(3, 3);
@@ -204,7 +204,7 @@ namespace FAD3
             // 
             // buttonMap
             // 
-            this.buttonMap.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonMap.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonMap.Location = new System.Drawing.Point(7, 87);
             this.buttonMap.Name = "buttonMap";
             this.buttonMap.Size = new System.Drawing.Size(57, 30);
@@ -215,7 +215,7 @@ namespace FAD3
             // 
             // buttonCatch
             // 
-            this.buttonCatch.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonCatch.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonCatch.Location = new System.Drawing.Point(7, 51);
             this.buttonCatch.Name = "buttonCatch";
             this.buttonCatch.Size = new System.Drawing.Size(57, 30);
@@ -226,7 +226,7 @@ namespace FAD3
             // 
             // buttonOK
             // 
-            this.buttonOK.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonOK.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonOK.Location = new System.Drawing.Point(7, 15);
             this.buttonOK.Name = "buttonOK";
             this.buttonOK.Size = new System.Drawing.Size(57, 30);
@@ -241,7 +241,7 @@ namespace FAD3
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lvMain.ContextMenuStrip = this.menuDropDown;
-            this.lvMain.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lvMain.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lvMain.Location = new System.Drawing.Point(-1, 28);
             this.lvMain.MultiSelect = false;
             this.lvMain.Name = "lvMain";
@@ -398,6 +398,14 @@ namespace FAD3
             this.showErrorMessagesToolStripMenuItem.Tag = "showError";
             this.showErrorMessagesToolStripMenuItem.Text = "Show error messages";
             // 
+            // generateInlandDbToolStripMenuItem
+            // 
+            this.generateInlandDbToolStripMenuItem.Name = "generateInlandDbToolStripMenuItem";
+            this.generateInlandDbToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
+            this.generateInlandDbToolStripMenuItem.Tag = "createInland";
+            this.generateInlandDbToolStripMenuItem.Text = "Create inland grid database";
+            this.generateInlandDbToolStripMenuItem.ToolTipText = "Creates a database containing minor grids that are located inland";
+            // 
             // menuHelp
             // 
             this.menuHelp.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -424,7 +432,7 @@ namespace FAD3
             // 
             // statusStrip1
             // 
-            this.statusStrip1.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.statusStrip1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.statusPanelDBPath,
             this.statusPanelTargetArea,
@@ -564,14 +572,6 @@ namespace FAD3
             this.tsButtonExit.Size = new System.Drawing.Size(28, 28);
             this.tsButtonExit.Text = "toolStripButton6";
             this.tsButtonExit.ToolTipText = "Exit";
-            // 
-            // generateInlandDbToolStripMenuItem
-            // 
-            this.generateInlandDbToolStripMenuItem.Name = "generateInlandDbToolStripMenuItem";
-            this.generateInlandDbToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
-            this.generateInlandDbToolStripMenuItem.Tag = "createInland";
-            this.generateInlandDbToolStripMenuItem.Text = "Create inland grid database";
-            this.generateInlandDbToolStripMenuItem.ToolTipText = "Creates a database containing minor grids that are located inland";
             // 
             // MainForm
             // 

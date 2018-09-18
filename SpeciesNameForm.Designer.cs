@@ -49,60 +49,60 @@
             // labelGenus
             // 
             this.labelGenus.AutoSize = true;
-            this.labelGenus.Location = new System.Drawing.Point(12, 42);
+            this.labelGenus.Location = new System.Drawing.Point(10, 39);
             this.labelGenus.Name = "labelGenus";
-            this.labelGenus.Size = new System.Drawing.Size(47, 16);
+            this.labelGenus.Size = new System.Drawing.Size(43, 15);
             this.labelGenus.TabIndex = 0;
             this.labelGenus.Text = "Genus";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 70);
+            this.label2.Location = new System.Drawing.Point(10, 66);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(56, 16);
+            this.label2.Size = new System.Drawing.Size(49, 15);
             this.label2.TabIndex = 1;
             this.label2.Text = "species";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(12, 98);
+            this.label3.Location = new System.Drawing.Point(10, 92);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(39, 16);
+            this.label3.Size = new System.Drawing.Size(34, 15);
             this.label3.TabIndex = 2;
             this.label3.Text = "Taxa";
             // 
             // txtGenus
             // 
-            this.txtGenus.Location = new System.Drawing.Point(83, 39);
+            this.txtGenus.Location = new System.Drawing.Point(73, 37);
             this.txtGenus.Name = "txtGenus";
-            this.txtGenus.Size = new System.Drawing.Size(172, 22);
+            this.txtGenus.Size = new System.Drawing.Size(151, 21);
             this.txtGenus.TabIndex = 3;
             this.txtGenus.Validating += new System.ComponentModel.CancelEventHandler(this.OnTextBoxes_Validating);
             // 
             // txtSpecies
             // 
-            this.txtSpecies.Location = new System.Drawing.Point(83, 67);
+            this.txtSpecies.Location = new System.Drawing.Point(73, 63);
             this.txtSpecies.Name = "txtSpecies";
-            this.txtSpecies.Size = new System.Drawing.Size(172, 22);
+            this.txtSpecies.Size = new System.Drawing.Size(151, 21);
             this.txtSpecies.TabIndex = 4;
             this.txtSpecies.Validating += new System.ComponentModel.CancelEventHandler(this.OnTextBoxes_Validating);
             // 
             // cboTaxa
             // 
             this.cboTaxa.FormattingEnabled = true;
-            this.cboTaxa.Location = new System.Drawing.Point(83, 95);
+            this.cboTaxa.Location = new System.Drawing.Point(73, 89);
             this.cboTaxa.Name = "cboTaxa";
-            this.cboTaxa.Size = new System.Drawing.Size(172, 24);
+            this.cboTaxa.Size = new System.Drawing.Size(151, 23);
             this.cboTaxa.TabIndex = 5;
             this.cboTaxa.Validating += new System.ComponentModel.CancelEventHandler(this.OncboTaxa_Validating);
             // 
             // label4
             // 
-            this.label4.Location = new System.Drawing.Point(12, 131);
+            this.label4.Location = new System.Drawing.Point(10, 123);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(72, 36);
+            this.label4.Size = new System.Drawing.Size(63, 34);
             this.label4.TabIndex = 6;
             this.label4.Text = "Listed in Fishbase";
             // 
@@ -110,7 +110,7 @@
             // 
             this.chkInFishbase.AutoSize = true;
             this.chkInFishbase.Enabled = false;
-            this.chkInFishbase.Location = new System.Drawing.Point(90, 141);
+            this.chkInFishbase.Location = new System.Drawing.Point(79, 132);
             this.chkInFishbase.Name = "chkInFishbase";
             this.chkInFishbase.Size = new System.Drawing.Size(15, 14);
             this.chkInFishbase.TabIndex = 7;
@@ -119,18 +119,18 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(12, 193);
+            this.label5.Location = new System.Drawing.Point(10, 181);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(44, 16);
+            this.label5.Size = new System.Drawing.Size(39, 15);
             this.label5.TabIndex = 8;
             this.label5.Text = "Notes";
             // 
             // txtNotes
             // 
-            this.txtNotes.Location = new System.Drawing.Point(83, 190);
+            this.txtNotes.Location = new System.Drawing.Point(73, 178);
             this.txtNotes.Multiline = true;
             this.txtNotes.Name = "txtNotes";
-            this.txtNotes.Size = new System.Drawing.Size(172, 71);
+            this.txtNotes.Size = new System.Drawing.Size(151, 67);
             this.txtNotes.TabIndex = 9;
             this.txtNotes.Validating += new System.ComponentModel.CancelEventHandler(this.OnTextBoxes_Validating);
             // 
@@ -139,9 +139,9 @@
             this.buttonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonCancel.CausesValidation = false;
             this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.buttonCancel.Location = new System.Drawing.Point(121, 385);
+            this.buttonCancel.Location = new System.Drawing.Point(106, 361);
             this.buttonCancel.Name = "buttonCancel";
-            this.buttonCancel.Size = new System.Drawing.Size(64, 26);
+            this.buttonCancel.Size = new System.Drawing.Size(56, 24);
             this.buttonCancel.TabIndex = 12;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = true;
@@ -150,9 +150,9 @@
             // buttonOK
             // 
             this.buttonOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonOK.Location = new System.Drawing.Point(191, 385);
+            this.buttonOK.Location = new System.Drawing.Point(167, 361);
             this.buttonOK.Name = "buttonOK";
-            this.buttonOK.Size = new System.Drawing.Size(64, 26);
+            this.buttonOK.Size = new System.Drawing.Size(56, 24);
             this.buttonOK.TabIndex = 13;
             this.buttonOK.Text = "OK";
             this.buttonOK.UseVisualStyleBackColor = true;
@@ -162,18 +162,18 @@
             // 
             this.groupBox1.Controls.Add(this.buttonEdit);
             this.groupBox1.Controls.Add(this.labelRecordCount);
-            this.groupBox1.Location = new System.Drawing.Point(83, 272);
+            this.groupBox1.Location = new System.Drawing.Point(73, 255);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(172, 97);
+            this.groupBox1.Size = new System.Drawing.Size(150, 91);
             this.groupBox1.TabIndex = 14;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Records";
             // 
             // buttonEdit
             // 
-            this.buttonEdit.Location = new System.Drawing.Point(55, 54);
+            this.buttonEdit.Location = new System.Drawing.Point(48, 51);
             this.buttonEdit.Name = "buttonEdit";
-            this.buttonEdit.Size = new System.Drawing.Size(64, 26);
+            this.buttonEdit.Size = new System.Drawing.Size(56, 24);
             this.buttonEdit.TabIndex = 16;
             this.buttonEdit.Text = "Edit";
             this.buttonEdit.UseVisualStyleBackColor = true;
@@ -182,9 +182,9 @@
             // labelRecordCount
             // 
             this.labelRecordCount.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelRecordCount.Location = new System.Drawing.Point(9, 23);
+            this.labelRecordCount.Location = new System.Drawing.Point(8, 22);
             this.labelRecordCount.Name = "labelRecordCount";
-            this.labelRecordCount.Size = new System.Drawing.Size(157, 24);
+            this.labelRecordCount.Size = new System.Drawing.Size(137, 22);
             this.labelRecordCount.TabIndex = 15;
             this.labelRecordCount.Text = "0000";
             this.labelRecordCount.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -192,10 +192,10 @@
             // SpeciesNameForm
             // 
             this.AcceptButton = this.buttonOK;
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCancel;
-            this.ClientSize = new System.Drawing.Size(267, 417);
+            this.ClientSize = new System.Drawing.Size(234, 391);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.buttonOK);
             this.Controls.Add(this.buttonCancel);
@@ -209,7 +209,7 @@
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.labelGenus);
-            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "SpeciesNameForm";

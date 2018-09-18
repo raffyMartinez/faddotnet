@@ -41,59 +41,59 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(26, 40);
+            this.label1.Location = new System.Drawing.Point(23, 38);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(48, 16);
+            this.label1.Size = new System.Drawing.Size(45, 15);
             this.label1.TabIndex = 0;
             this.label1.Text = "Length";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(26, 72);
+            this.label2.Location = new System.Drawing.Point(23, 68);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(42, 16);
+            this.label2.Size = new System.Drawing.Size(38, 15);
             this.label2.TabIndex = 1;
             this.label2.Text = "Width";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(26, 104);
+            this.label3.Location = new System.Drawing.Point(23, 98);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(47, 16);
+            this.label3.Size = new System.Drawing.Size(43, 15);
             this.label3.TabIndex = 2;
             this.label3.Text = "Height";
             // 
             // textLength
             // 
-            this.textLength.Location = new System.Drawing.Point(101, 40);
+            this.textLength.Location = new System.Drawing.Point(88, 38);
             this.textLength.Name = "textLength";
-            this.textLength.Size = new System.Drawing.Size(73, 22);
+            this.textLength.Size = new System.Drawing.Size(64, 21);
             this.textLength.TabIndex = 3;
             this.textLength.Validating += new System.ComponentModel.CancelEventHandler(this.textVessel_Validating);
             // 
             // textWidth
             // 
-            this.textWidth.Location = new System.Drawing.Point(101, 72);
+            this.textWidth.Location = new System.Drawing.Point(88, 68);
             this.textWidth.Name = "textWidth";
-            this.textWidth.Size = new System.Drawing.Size(73, 22);
+            this.textWidth.Size = new System.Drawing.Size(64, 21);
             this.textWidth.TabIndex = 4;
             this.textWidth.Validating += new System.ComponentModel.CancelEventHandler(this.textVessel_Validating);
             // 
             // textHeight
             // 
-            this.textHeight.Location = new System.Drawing.Point(101, 104);
+            this.textHeight.Location = new System.Drawing.Point(88, 98);
             this.textHeight.Name = "textHeight";
-            this.textHeight.Size = new System.Drawing.Size(73, 22);
+            this.textHeight.Size = new System.Drawing.Size(64, 21);
             this.textHeight.TabIndex = 5;
             this.textHeight.Validating += new System.ComponentModel.CancelEventHandler(this.textVessel_Validating);
             // 
             // buttonOk
             // 
-            this.buttonOk.Location = new System.Drawing.Point(210, 36);
+            this.buttonOk.Location = new System.Drawing.Point(184, 34);
             this.buttonOk.Name = "buttonOk";
-            this.buttonOk.Size = new System.Drawing.Size(62, 25);
+            this.buttonOk.Size = new System.Drawing.Size(54, 23);
             this.buttonOk.TabIndex = 6;
             this.buttonOk.Text = "Ok";
             this.buttonOk.UseVisualStyleBackColor = true;
@@ -102,19 +102,19 @@
             // buttonCancel
             // 
             this.buttonCancel.CausesValidation = false;
-            this.buttonCancel.Location = new System.Drawing.Point(210, 72);
+            this.buttonCancel.Location = new System.Drawing.Point(184, 68);
             this.buttonCancel.Name = "buttonCancel";
-            this.buttonCancel.Size = new System.Drawing.Size(62, 25);
+            this.buttonCancel.Size = new System.Drawing.Size(54, 23);
             this.buttonCancel.TabIndex = 7;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = true;
             this.buttonCancel.Click += new System.EventHandler(this.buttonVessel_Click);
             // 
-            // frmVesselDimension
+            // VesselDimensionForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(292, 154);
+            this.ClientSize = new System.Drawing.Size(256, 144);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.buttonOk);
             this.Controls.Add(this.textHeight);
@@ -123,10 +123,10 @@
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
-            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Margin = new System.Windows.Forms.Padding(4);
-            this.Name = "frmVesselDimension";
+            this.Name = "VesselDimensionForm";
             this.Text = "Vessel dimension";
             this.ResumeLayout(false);
             this.PerformLayout();

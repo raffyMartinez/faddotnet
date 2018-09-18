@@ -1,20 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
-using ADOX;
+﻿using dao;          //we are using DAO because ADOx does not work in well creating new database and examining tables in existing databases
 using MapWinGIS;
-using System.Data.OleDb;
-using System.Data;
-using System.ComponentModel;
+using System;
+using System.IO;
 
 namespace FAD3
 {
+    /// <summary>
+    /// Creates a database of minor grids that are within land areas. Used for validating fishing grounds for avoiding inland fishing grids.
+    /// </summary>
     public static class CreateInlandPointDatabase
     {
         public static Shapefile LandShapefile { get; set; }
-        public static Shapefile FastPolygonShapefile { get; set; }
         public static Shapefile Grid25Shapefile { get; set; }
         public static Shapefile MinorGridsShapefile { get; private set; }
         private static Shapefile _inlandMinorGrids;
@@ -24,8 +20,6 @@ namespace FAD3
         public static FishingGrid.fadUTMZone UTMZone { get; set; }
         private static int _iFldName;
         private static int _iFldInland;
-        private static int[] _intersectedLandShapes;
-        private static string _conString;
 
         public static MapInterActionHandler MapInterActionHandler { get; set; }
 
@@ -46,76 +40,39 @@ namespace FAD3
                 && Grid25Shapefile?.ShapefileType == ShpfileType.SHP_POLYGON
                 && FileName.Length > 0)
             {
-                if (File.Exists(FileName))
+                var proceed = true;
+
+                if (StatusUpdate != null)
                 {
-                    File.Delete(FileName);
+                    CreateInlandGridEventArgs e = new CreateInlandGridEventArgs();
+                    e.Status = "Point creation started";
+                    e.StatusDescription = DateTime.Now.ToShortTimeString();
+                    StatusUpdate(e);
                 }
 
-                if (CreateTable(FileName))
+                proceed = CheckandCreateTable(FileName);
+
+                if (proceed)
                 {
-                    if (FastPolygonShapefile?.ShapefileType == ShpfileType.SHP_POLYGON)
+                    if (LandShapefile.NumSelected > 0)
                     {
-                        ListIintersectFastPolygon();
+                        ListIntersectSelectedLandArea();
                     }
                     else
                     {
-                        if (LandShapefile.NumSelected > 0)
-                        {
-                            ListIntersectSelectedLandArea();
-                        }
-                        else
-                        {
-                            ListIntersectLandArea();
-                        }
+                        ListIntersectLandArea();
                     }
 
                     ProcessInlandGrids();
                     UpdateDatabase();
 
                     global.MappingForm.MapLayersHandler.AddLayer(_inlandMinorGrids, "Inland grids", true, true);
+
+                    CreateInlandGridEventArgs e = new CreateInlandGridEventArgs();
+                    e.Status = "Point creation finished";
+                    e.StatusDescription = DateTime.Now.ToShortTimeString();
+                    StatusUpdate(e);
                 }
-            }
-        }
-
-        /// <summary>
-        /// Intersect fast polygons with grid25 major grids
-        /// </summary>
-        private static void ListIintersectFastPolygon()
-        {
-            var objSelected = new object();
-            for (int n = 0; n < FastPolygonShapefile.NumShapes; n++)
-            {
-                LandShapefile.SelectNone();
-                LandShapefile.ShapeSelected[n] = true;
-                LandShapefile.SelectByShapefile(FastPolygonShapefile, tkSpatialRelation.srWithin, true, ref objSelected);
-                _intersectedLandShapes = (int[])objSelected;
-
-                Grid25Shapefile.SelectByShapefile(FastPolygonShapefile, tkSpatialRelation.srIntersects, true, ref objSelected);
-                _intersectedMajorGrids = (int[])objSelected;
-
-                CreateMinorGridPoints();
-
-                for (int y = 0; y < _intersectedLandShapes.Length; y++)
-                {
-                    LandShapefile.SelectNone();
-                    LandShapefile.ShapeSelected[_intersectedLandShapes[y]] = true;
-                    GetMinorGridsWithinLand();
-                }
-            }
-
-            //raise event
-            if (StatusUpdate != null)
-            {
-                CreateInlandGridEventArgs e = new CreateInlandGridEventArgs();
-                e.Status = "Major grids intersected";
-                e.GridCount = _intersectedMajorGrids.Length;
-                StatusUpdate(e);
-            }
-
-            for (int n = 0; n < _intersectedLandShapes.Length; n++)
-            {
-                LandShapefile.SelectNone();
-                LandShapefile.ShapeSelected[_intersectedLandShapes[n]] = true;
             }
         }
 
@@ -145,50 +102,32 @@ namespace FAD3
         }
 
         /// <summary>
-        /// get landshapefile shapes that intersect with fast polygon
+        /// Populate the database with values from the inland minor grid shapefile
         /// </summary>
-        private static void IntersectLandWithFastPolygons()
-        {
-            var objSelected = new object();
-            LandShapefile.SelectByShapefile(FastPolygonShapefile, tkSpatialRelation.srIntersects, false, ref objSelected);
-            _intersectedLandShapes = (int[])objSelected;
-        }
-
         private static void UpdateDatabase()
         {
             var zoneName = FishingGrid.UTMZoneName;
             var gridName = "";
-
-            using (var con = new OleDbConnection(_conString))
+            var db = new DBEngine();
+            var dbData = db.OpenDatabase(FileName);
+            for (int n = 0; n < _inlandMinorGrids.NumShapes; n++)
             {
-                con.Open();
-                for (int n = 0; n < _inlandMinorGrids.NumShapes; n++)
-                {
-                    gridName = (string)_inlandMinorGrids.CellValue[_iFldName, n];
-
-                    var sql = $@"Insert into tblGrid25Inland (grid_name,[zone],x,y) values(
+                gridName = (string)_inlandMinorGrids.CellValue[_iFldName, n];
+                var sql = $@"Insert into tblGrid25Inland (grid_name,[zone],x,y) values(
                               '{gridName}',
                               '{zoneName}',
                               {_inlandMinorGrids.Shape[n].Centroid.x},
                               {_inlandMinorGrids.Shape[n].Centroid.y}
                     )";
 
-                    using (OleDbCommand update = new OleDbCommand(sql, con))
-                    {
-                        try
-                        {
-                            update.ExecuteNonQuery();
-                        }
-                        catch { }
-                    }
-                }
+                dbData.Execute(sql);
             }
         }
 
         /// <summary>
         /// Creates minor grid cells inside major grids intersected with land shapefiles
         /// </summary>
-        private static void CreateMinorGridPoints()
+        private static void PopulateMinorGrid()
         {
             FishingGrid.UTMZone = UTMZone;
 
@@ -289,7 +228,7 @@ namespace FAD3
                         StatusUpdate(e);
                     }
 
-                    CreateMinorGridPoints();
+                    PopulateMinorGrid();
                     GetMinorGridsWithinLand();
                 }
             }
@@ -325,7 +264,7 @@ namespace FAD3
                         StatusUpdate(e);
                     }
 
-                    CreateMinorGridPoints();
+                    PopulateMinorGrid();
                     GetMinorGridsWithinLand();
                 }
             }
@@ -363,7 +302,10 @@ namespace FAD3
         {
             var objSelected = new object();
             var ifldInland = MinorGridsShapefile.FieldIndexByName["inland"];
+
+            //this select operation currently uses the currenty selected land shape
             MinorGridsShapefile.SelectByShapefile(LandShapefile, tkSpatialRelation.srWithin, true, ref objSelected);
+
             var proceed = true;
             try
             {
@@ -374,6 +316,7 @@ namespace FAD3
                 Logger.Log(ex.Message, "CreateInlandPointDatabase.cs", "GetMinorGridsWithinLand");
                 proceed = false;
             }
+
             if (proceed)
             {
                 for (int n = 0; n < _withinMinorGrids.Length; n++)
@@ -393,43 +336,46 @@ namespace FAD3
         }
 
         /// <summary>
-        /// Create table for storing inland minor grids
+        /// Inspect database and create point table if not found
         /// </summary>
         /// <param name="FileName"></param>
         /// <returns></returns>
-        private static bool CreateTable(string FileName)
+        private static bool CheckandCreateTable(string fileName)
         {
-            Catalog cat = new Catalog();
-            var success = true;
-            try
-            {
-                cat.Create("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" +
-                   FileName + ";Jet OLEDB:Engine Type=5");
-                _conString = ("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + FileName);
-            }
-            catch (Exception ex)
-            {
-                success = false;
-                Logger.Log(ex.Message, "CreateInlandPointDatabase.cs", "Start()");
-            }
-            if (success)
-            {
-                ADOX.Table table = new ADOX.Table();
-                table.Name = "tblGrid25Inland";
-                table.ParentCatalog = cat;
+            var dbe = new DBEngine();
+            var tableFound = false;
 
-                table.Columns.Append("grid_name", DataTypeEnum.adVarWChar, 8);
-                table.Columns.Append("zone", DataTypeEnum.adVarWChar, 3);
-                table.Columns.Append("x", DataTypeEnum.adInteger);
-                table.Columns.Append("y", DataTypeEnum.adInteger);
-                table.Keys.Append("PrimaryKey", KeyTypeEnum.adKeyPrimary, "grid_name");
-                table.Keys["PrimaryKey"].Columns.Append("zone");
-
-                cat.Tables.Append(table);
-                cat = null;
+            if (File.Exists(fileName))
+            {
+                var dbData = dbe.OpenDatabase(fileName);
+                foreach (TableDef td in dbData.TableDefs)
+                {
+                    if (td.Name == "tblGrid25Inland")
+                    {
+                        tableFound = true;
+                        break;
+                    }
+                }
             }
 
-            return success;
+            if (!tableFound)
+            {
+                var dbData = dbe.CreateDatabase(fileName, dao.LanguageConstants.dbLangGeneral);
+                var sql = @"Create table tblGrid25Inland
+                            (grid_name TEXT(8),
+                             zone TEXT(3),
+                             x DOUBLE,
+                             y DOUBLE)";
+
+                dbData.Execute(sql);
+
+                sql = "Create index idxPrimary on tblGrid25Inland (grid_name, zone) with PRIMARY";
+
+                dbData.Execute(sql);
+
+                tableFound = true;
+            }
+            return tableFound;
         }
     }
 }

@@ -45,9 +45,9 @@
             this.listBoxFiles.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.listBoxFiles.FormattingEnabled = true;
             this.listBoxFiles.ItemHeight = 15;
-            this.listBoxFiles.Location = new System.Drawing.Point(1, 48);
+            this.listBoxFiles.Location = new System.Drawing.Point(1, 45);
             this.listBoxFiles.Name = "listBoxFiles";
-            this.listBoxFiles.Size = new System.Drawing.Size(448, 259);
+            this.listBoxFiles.Size = new System.Drawing.Size(392, 229);
             this.listBoxFiles.TabIndex = 0;
             this.listBoxFiles.MouseDown += new System.Windows.Forms.MouseEventHandler(this.listBoxFiles_MouseDown);
             // 
@@ -57,26 +57,26 @@
             this.menuOpen,
             this.menuRemove});
             this.dropDownMenu.Name = "contextMenuStrip1";
-            this.dropDownMenu.Size = new System.Drawing.Size(181, 70);
+            this.dropDownMenu.Size = new System.Drawing.Size(118, 48);
             this.dropDownMenu.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnMenuItem_ItemClicked);
             // 
             // menuOpen
             // 
             this.menuOpen.Name = "menuOpen";
-            this.menuOpen.Size = new System.Drawing.Size(180, 22);
+            this.menuOpen.Size = new System.Drawing.Size(117, 22);
             this.menuOpen.Text = "Open";
             // 
             // menuRemove
             // 
             this.menuRemove.Name = "menuRemove";
-            this.menuRemove.Size = new System.Drawing.Size(180, 22);
+            this.menuRemove.Size = new System.Drawing.Size(117, 22);
             this.menuRemove.Text = "Remove";
             // 
             // buttonOK
             // 
-            this.buttonOK.Location = new System.Drawing.Point(377, 316);
+            this.buttonOK.Location = new System.Drawing.Point(330, 296);
             this.buttonOK.Name = "buttonOK";
-            this.buttonOK.Size = new System.Drawing.Size(61, 28);
+            this.buttonOK.Size = new System.Drawing.Size(53, 26);
             this.buttonOK.TabIndex = 1;
             this.buttonOK.Text = "OK";
             this.buttonOK.UseVisualStyleBackColor = true;
@@ -84,9 +84,9 @@
             // 
             // buttonCancel
             // 
-            this.buttonCancel.Location = new System.Drawing.Point(310, 316);
+            this.buttonCancel.Location = new System.Drawing.Point(271, 296);
             this.buttonCancel.Name = "buttonCancel";
-            this.buttonCancel.Size = new System.Drawing.Size(61, 28);
+            this.buttonCancel.Size = new System.Drawing.Size(53, 26);
             this.buttonCancel.TabIndex = 2;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = true;
@@ -95,22 +95,22 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(1, 18);
+            this.label1.Location = new System.Drawing.Point(1, 17);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(401, 16);
+            this.label1.Size = new System.Drawing.Size(363, 15);
             this.label1.TabIndex = 3;
             this.label1.Text = "The list below are the FAD database files that you recently opened";
             // 
             // ManageMRUForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(450, 356);
+            this.ClientSize = new System.Drawing.Size(394, 334);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.buttonOK);
             this.Controls.Add(this.listBoxFiles);
-            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "ManageMRUForm";

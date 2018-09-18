@@ -39,26 +39,26 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(17, 61);
+            this.label1.Location = new System.Drawing.Point(15, 57);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(67, 16);
+            this.label1.Size = new System.Drawing.Size(62, 15);
             this.label1.TabIndex = 0;
             this.label1.Text = "Longitude";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(17, 30);
+            this.label2.Location = new System.Drawing.Point(15, 28);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(55, 16);
+            this.label2.Size = new System.Drawing.Size(51, 15);
             this.label2.TabIndex = 2;
             this.label2.Text = "Latitude";
             // 
             // mtextLongitude
             // 
-            this.mtextLongitude.Location = new System.Drawing.Point(91, 61);
+            this.mtextLongitude.Location = new System.Drawing.Point(80, 57);
             this.mtextLongitude.Name = "mtextLongitude";
-            this.mtextLongitude.Size = new System.Drawing.Size(160, 22);
+            this.mtextLongitude.Size = new System.Drawing.Size(140, 21);
             this.mtextLongitude.TabIndex = 3;
             this.mtextLongitude.TextMaskFormat = System.Windows.Forms.MaskFormat.IncludePromptAndLiterals;
             this.mtextLongitude.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Onmtext_KeyUp);
@@ -66,9 +66,9 @@
             // 
             // mtextLatitude
             // 
-            this.mtextLatitude.Location = new System.Drawing.Point(91, 27);
+            this.mtextLatitude.Location = new System.Drawing.Point(80, 25);
             this.mtextLatitude.Name = "mtextLatitude";
-            this.mtextLatitude.Size = new System.Drawing.Size(160, 22);
+            this.mtextLatitude.Size = new System.Drawing.Size(140, 21);
             this.mtextLatitude.TabIndex = 4;
             this.mtextLatitude.TextMaskFormat = System.Windows.Forms.MaskFormat.IncludePromptAndLiterals;
             this.mtextLatitude.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Onmtext_KeyUp);
@@ -76,9 +76,9 @@
             // 
             // buttonOK
             // 
-            this.buttonOK.Location = new System.Drawing.Point(208, 111);
+            this.buttonOK.Location = new System.Drawing.Point(182, 104);
             this.buttonOK.Name = "buttonOK";
-            this.buttonOK.Size = new System.Drawing.Size(43, 25);
+            this.buttonOK.Size = new System.Drawing.Size(38, 23);
             this.buttonOK.TabIndex = 5;
             this.buttonOK.Text = "OK";
             this.buttonOK.UseVisualStyleBackColor = true;
@@ -88,9 +88,9 @@
             // 
             this.buttonCancel.CausesValidation = false;
             this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.buttonCancel.Location = new System.Drawing.Point(142, 111);
+            this.buttonCancel.Location = new System.Drawing.Point(124, 104);
             this.buttonCancel.Name = "buttonCancel";
-            this.buttonCancel.Size = new System.Drawing.Size(60, 25);
+            this.buttonCancel.Size = new System.Drawing.Size(52, 23);
             this.buttonCancel.TabIndex = 6;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = true;
@@ -98,17 +98,17 @@
             // 
             // CoordinateEntryForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCancel;
-            this.ClientSize = new System.Drawing.Size(263, 152);
+            this.ClientSize = new System.Drawing.Size(230, 142);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.buttonOK);
             this.Controls.Add(this.mtextLatitude);
             this.Controls.Add(this.mtextLongitude);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
-            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "CoordinateEntryForm";

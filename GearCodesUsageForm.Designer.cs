@@ -46,9 +46,9 @@
             // listViewVariations
             // 
             this.listViewVariations.ContextMenuStrip = this.dropDownMenu;
-            this.listViewVariations.Location = new System.Drawing.Point(12, 80);
+            this.listViewVariations.Location = new System.Drawing.Point(10, 75);
             this.listViewVariations.Name = "listViewVariations";
-            this.listViewVariations.Size = new System.Drawing.Size(259, 283);
+            this.listViewVariations.Size = new System.Drawing.Size(227, 266);
             this.listViewVariations.TabIndex = 0;
             this.listViewVariations.UseCompatibleStateImageBehavior = false;
             this.listViewVariations.Click += new System.EventHandler(this.OnlistView_Click);
@@ -64,9 +64,9 @@
             // listViewCodes
             // 
             this.listViewCodes.ContextMenuStrip = this.dropDownMenu;
-            this.listViewCodes.Location = new System.Drawing.Point(277, 80);
+            this.listViewCodes.Location = new System.Drawing.Point(242, 75);
             this.listViewCodes.Name = "listViewCodes";
-            this.listViewCodes.Size = new System.Drawing.Size(181, 283);
+            this.listViewCodes.Size = new System.Drawing.Size(159, 266);
             this.listViewCodes.TabIndex = 1;
             this.listViewCodes.UseCompatibleStateImageBehavior = false;
             this.listViewCodes.Click += new System.EventHandler(this.OnlistView_Click);
@@ -76,9 +76,9 @@
             // listViewWhereUsed
             // 
             this.listViewWhereUsed.ContextMenuStrip = this.dropDownMenu;
-            this.listViewWhereUsed.Location = new System.Drawing.Point(464, 80);
+            this.listViewWhereUsed.Location = new System.Drawing.Point(406, 75);
             this.listViewWhereUsed.Name = "listViewWhereUsed";
-            this.listViewWhereUsed.Size = new System.Drawing.Size(220, 283);
+            this.listViewWhereUsed.Size = new System.Drawing.Size(193, 266);
             this.listViewWhereUsed.TabIndex = 2;
             this.listViewWhereUsed.UseCompatibleStateImageBehavior = false;
             this.listViewWhereUsed.Click += new System.EventHandler(this.OnlistView_Click);
@@ -88,9 +88,9 @@
             // listViewLocalNames
             // 
             this.listViewLocalNames.ContextMenuStrip = this.dropDownMenu;
-            this.listViewLocalNames.Location = new System.Drawing.Point(690, 80);
+            this.listViewLocalNames.Location = new System.Drawing.Point(604, 75);
             this.listViewLocalNames.Name = "listViewLocalNames";
-            this.listViewLocalNames.Size = new System.Drawing.Size(220, 283);
+            this.listViewLocalNames.Size = new System.Drawing.Size(193, 266);
             this.listViewLocalNames.TabIndex = 3;
             this.listViewLocalNames.UseCompatibleStateImageBehavior = false;
             this.listViewLocalNames.Click += new System.EventHandler(this.OnlistView_Click);
@@ -100,9 +100,9 @@
             // buttonOk
             // 
             this.buttonOk.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.buttonOk.Location = new System.Drawing.Point(841, 377);
+            this.buttonOk.Location = new System.Drawing.Point(736, 353);
             this.buttonOk.Name = "buttonOk";
-            this.buttonOk.Size = new System.Drawing.Size(65, 27);
+            this.buttonOk.Size = new System.Drawing.Size(57, 25);
             this.buttonOk.TabIndex = 4;
             this.buttonOk.Text = "Ok";
             this.buttonOk.UseVisualStyleBackColor = true;
@@ -111,63 +111,63 @@
             // comboClass
             // 
             this.comboClass.FormattingEnabled = true;
-            this.comboClass.Location = new System.Drawing.Point(12, 30);
+            this.comboClass.Location = new System.Drawing.Point(10, 28);
             this.comboClass.Name = "comboClass";
-            this.comboClass.Size = new System.Drawing.Size(220, 24);
+            this.comboClass.Size = new System.Drawing.Size(193, 23);
             this.comboClass.TabIndex = 5;
             this.comboClass.Validated += new System.EventHandler(this.comboClass_Validated);
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 61);
+            this.label1.Location = new System.Drawing.Point(10, 57);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(92, 16);
+            this.label1.Size = new System.Drawing.Size(83, 15);
             this.label1.TabIndex = 6;
             this.label1.Text = "Gear variation";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(274, 61);
+            this.label2.Location = new System.Drawing.Point(240, 57);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(79, 16);
+            this.label2.Size = new System.Drawing.Size(70, 15);
             this.label2.TabIndex = 7;
             this.label2.Text = "Gear codes";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(461, 61);
+            this.label3.Location = new System.Drawing.Point(403, 57);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(81, 16);
+            this.label3.Size = new System.Drawing.Size(73, 15);
             this.label3.TabIndex = 8;
             this.label3.Text = "Where used";
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(687, 61);
+            this.label4.Location = new System.Drawing.Point(601, 57);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(130, 16);
+            this.label4.Size = new System.Drawing.Size(119, 15);
             this.label4.TabIndex = 9;
             this.label4.Text = "Local names of gear";
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(12, 9);
+            this.label5.Location = new System.Drawing.Point(10, 8);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(87, 16);
+            this.label5.Size = new System.Drawing.Size(78, 15);
             this.label5.TabIndex = 10;
             this.label5.Text = "Class of gear";
             // 
-            // frmGearUsage
+            // GearCodesUsageForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonOk;
-            this.ClientSize = new System.Drawing.Size(918, 416);
+            this.ClientSize = new System.Drawing.Size(803, 390);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
@@ -179,10 +179,10 @@
             this.Controls.Add(this.listViewWhereUsed);
             this.Controls.Add(this.listViewCodes);
             this.Controls.Add(this.listViewVariations);
-            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Margin = new System.Windows.Forms.Padding(4);
-            this.Name = "frmGearUsage";
+            this.Name = "GearCodesUsageForm";
             this.Text = "Gear variations and target areas where used";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnFormClosed);
             this.Load += new System.EventHandler(this.OnFormLoad);

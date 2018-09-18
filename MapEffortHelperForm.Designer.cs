@@ -44,9 +44,9 @@
             this.lvYears.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.colYear});
             this.lvYears.HideSelection = false;
-            this.lvYears.Location = new System.Drawing.Point(12, 86);
+            this.lvYears.Location = new System.Drawing.Point(10, 81);
             this.lvYears.Name = "lvYears";
-            this.lvYears.Size = new System.Drawing.Size(159, 207);
+            this.lvYears.Size = new System.Drawing.Size(140, 194);
             this.lvYears.TabIndex = 0;
             this.lvYears.UseCompatibleStateImageBehavior = false;
             this.lvYears.View = System.Windows.Forms.View.List;
@@ -58,9 +58,9 @@
             // chkAggregate
             // 
             this.chkAggregate.AutoSize = true;
-            this.chkAggregate.Location = new System.Drawing.Point(183, 88);
+            this.chkAggregate.Location = new System.Drawing.Point(160, 82);
             this.chkAggregate.Name = "chkAggregate";
-            this.chkAggregate.Size = new System.Drawing.Size(133, 20);
+            this.chkAggregate.Size = new System.Drawing.Size(121, 19);
             this.chkAggregate.TabIndex = 1;
             this.chkAggregate.Text = "Aggregate results";
             this.chkAggregate.UseVisualStyleBackColor = true;
@@ -68,18 +68,18 @@
             // chkNotInclude1
             // 
             this.chkNotInclude1.AutoSize = true;
-            this.chkNotInclude1.Location = new System.Drawing.Point(183, 124);
+            this.chkNotInclude1.Location = new System.Drawing.Point(160, 116);
             this.chkNotInclude1.Name = "chkNotInclude1";
-            this.chkNotInclude1.Size = new System.Drawing.Size(136, 20);
+            this.chkNotInclude1.Size = new System.Drawing.Size(129, 19);
             this.chkNotInclude1.TabIndex = 2;
             this.chkNotInclude1.Text = "Do not include n=1";
             this.chkNotInclude1.UseVisualStyleBackColor = true;
             // 
             // btnOk
             // 
-            this.btnOk.Location = new System.Drawing.Point(249, 311);
+            this.btnOk.Location = new System.Drawing.Point(218, 292);
             this.btnOk.Name = "btnOk";
-            this.btnOk.Size = new System.Drawing.Size(64, 27);
+            this.btnOk.Size = new System.Drawing.Size(56, 25);
             this.btnOk.TabIndex = 3;
             this.btnOk.Text = "Ok";
             this.btnOk.UseVisualStyleBackColor = true;
@@ -87,9 +87,9 @@
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(177, 311);
+            this.btnCancel.Location = new System.Drawing.Point(155, 292);
             this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(64, 27);
+            this.btnCancel.Size = new System.Drawing.Size(56, 25);
             this.btnCancel.TabIndex = 4;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
@@ -98,26 +98,26 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 67);
+            this.label1.Location = new System.Drawing.Point(10, 63);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(134, 16);
+            this.label1.Size = new System.Drawing.Size(121, 15);
             this.label1.TabIndex = 5;
             this.label1.Text = "Select sampling year";
             // 
             // labelTitle
             // 
             this.labelTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelTitle.Location = new System.Drawing.Point(12, 9);
+            this.labelTitle.Location = new System.Drawing.Point(10, 8);
             this.labelTitle.Name = "labelTitle";
-            this.labelTitle.Size = new System.Drawing.Size(301, 58);
+            this.labelTitle.Size = new System.Drawing.Size(263, 54);
             this.labelTitle.TabIndex = 6;
             this.labelTitle.Text = "label2";
             // 
             // MapEffortHelperForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(325, 350);
+            this.ClientSize = new System.Drawing.Size(284, 328);
             this.Controls.Add(this.labelTitle);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.btnCancel);
@@ -125,7 +125,7 @@
             this.Controls.Add(this.chkNotInclude1);
             this.Controls.Add(this.chkAggregate);
             this.Controls.Add(this.lvYears);
-            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "MapEffortHelperForm";

@@ -68,7 +68,7 @@
             this.axMap.Margin = new System.Windows.Forms.Padding(4);
             this.axMap.Name = "axMap";
             this.axMap.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("axMap.OcxState")));
-            this.axMap.Size = new System.Drawing.Size(1067, 243);
+            this.axMap.Size = new System.Drawing.Size(934, 224);
             this.axMap.TabIndex = 0;
             // 
             // ilCursors
@@ -79,10 +79,10 @@
             // 
             // statusStrip1
             // 
-            this.statusStrip1.Location = new System.Drawing.Point(0, 275);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 256);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Padding = new System.Windows.Forms.Padding(1, 0, 19, 0);
-            this.statusStrip1.Size = new System.Drawing.Size(1067, 22);
+            this.statusStrip1.Padding = new System.Windows.Forms.Padding(1, 0, 17, 0);
+            this.statusStrip1.Size = new System.Drawing.Size(934, 22);
             this.statusStrip1.TabIndex = 2;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -116,7 +116,7 @@
             this.tsButtonSaveImage});
             this.toolstripToolBar.Location = new System.Drawing.Point(0, 0);
             this.toolstripToolBar.Name = "toolstripToolBar";
-            this.toolstripToolBar.Size = new System.Drawing.Size(1067, 25);
+            this.toolstripToolBar.Size = new System.Drawing.Size(934, 25);
             this.toolstripToolBar.SuppressHighlighting = true;
             this.toolstripToolBar.TabIndex = 1;
             this.toolstripToolBar.Text = "toolStripEx1";
@@ -298,13 +298,13 @@
             // 
             // MapperForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1067, 297);
+            this.ClientSize = new System.Drawing.Size(934, 278);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.toolstripToolBar);
             this.Controls.Add(this.axMap);
-            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "MapperForm";
             this.Text = "MapperForm";

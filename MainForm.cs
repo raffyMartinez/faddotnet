@@ -1082,8 +1082,7 @@ namespace FAD3
                         _topLVItemIndex = lvMain.TopItem.Index;
                         foreach (ListViewItem item in lvMain.SelectedItems)
                         {
-                            string tag = lvMain.Tag.ToString();
-                            switch (tag)
+                            switch (lvMain.Tag.ToString())
                             {
                                 case "root":
                                     if (item.Tag != null && item.Tag.ToString() == "targetArea")
@@ -1141,8 +1140,11 @@ namespace FAD3
                                         if (item.Tag.ToString() == "gearSampled")
                                         {
                                             var nd = treeMain.SelectedNode.Nodes[$"{_LandingSiteGuid}|{item.Name}"];
-                                            treeMain.SelectedNode = nd;
-                                            nd.Expand();
+                                            if (nd != null)
+                                            {
+                                                treeMain.SelectedNode = nd;
+                                                nd.Expand();
+                                            }
                                         }
                                         else if (item.Tag.ToString() == "landing_site")
                                         {
@@ -1157,8 +1159,11 @@ namespace FAD3
                                     if (item.Tag != null && item.Tag.ToString() == "monthSampled")
                                     {
                                         var nd = treeMain.SelectedNode.Nodes[item.Name];
-                                        treeMain.SelectedNode = nd;
-                                        nd.Expand();
+                                        if (nd != null)
+                                        {
+                                            treeMain.SelectedNode = nd;
+                                            nd.Expand();
+                                        }
                                     }
                                     break;
 
@@ -1184,7 +1189,9 @@ namespace FAD3
                                         }
                                     }
                                     else
+                                    {
                                         ShowSamplingDetailForm();
+                                    }
                                     break;
                             }
                         }
@@ -1408,7 +1415,6 @@ namespace FAD3
             if (e.Node.FirstNode.Text == "*dummy*")
             {
                 var myTag = (Tuple<string, string, string>)e.Node.Tag;
-                //var list = global.TreeSubNodes(myTag.Item3, myTag.Item1, myTag.Item2);
                 int n = 0;
                 foreach (var item in global.TreeSubNodes(myTag.Item3, myTag.Item1, myTag.Item2))
                 {

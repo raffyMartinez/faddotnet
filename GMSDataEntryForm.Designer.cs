@@ -58,9 +58,9 @@
             // 
             this.panelUI.AutoScroll = true;
             this.panelUI.Controls.Add(this.panelOptions);
-            this.panelUI.Location = new System.Drawing.Point(3, 79);
+            this.panelUI.Location = new System.Drawing.Point(3, 74);
             this.panelUI.Name = "panelUI";
-            this.panelUI.Size = new System.Drawing.Size(476, 364);
+            this.panelUI.Size = new System.Drawing.Size(456, 341);
             this.panelUI.TabIndex = 0;
             // 
             // panelOptions
@@ -76,15 +76,15 @@
             this.panelOptions.Controls.Add(this.buttonOptionsOK);
             this.panelOptions.Location = new System.Drawing.Point(0, 3);
             this.panelOptions.Name = "panelOptions";
-            this.panelOptions.Size = new System.Drawing.Size(473, 361);
+            this.panelOptions.Size = new System.Drawing.Size(450, 338);
             this.panelOptions.TabIndex = 12;
             // 
             // chkGonadWt
             // 
             this.chkGonadWt.AutoSize = true;
-            this.chkGonadWt.Location = new System.Drawing.Point(47, 227);
+            this.chkGonadWt.Location = new System.Drawing.Point(41, 213);
             this.chkGonadWt.Name = "chkGonadWt";
-            this.chkGonadWt.Size = new System.Drawing.Size(109, 20);
+            this.chkGonadWt.Size = new System.Drawing.Size(102, 19);
             this.chkGonadWt.TabIndex = 22;
             this.chkGonadWt.Text = "Gonad weight";
             this.chkGonadWt.UseVisualStyleBackColor = true;
@@ -94,9 +94,9 @@
             this.chkGMS.AutoSize = true;
             this.chkGMS.Checked = true;
             this.chkGMS.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkGMS.Location = new System.Drawing.Point(47, 201);
+            this.chkGMS.Location = new System.Drawing.Point(41, 188);
             this.chkGMS.Name = "chkGMS";
-            this.chkGMS.Size = new System.Drawing.Size(154, 20);
+            this.chkGMS.Size = new System.Drawing.Size(142, 19);
             this.chkGMS.TabIndex = 21;
             this.chkGMS.Text = "Gonad maturity stage";
             this.chkGMS.UseVisualStyleBackColor = true;
@@ -106,9 +106,9 @@
             this.chkSex.AutoSize = true;
             this.chkSex.Checked = true;
             this.chkSex.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkSex.Location = new System.Drawing.Point(47, 175);
+            this.chkSex.Location = new System.Drawing.Point(41, 164);
             this.chkSex.Name = "chkSex";
-            this.chkSex.Size = new System.Drawing.Size(50, 20);
+            this.chkSex.Size = new System.Drawing.Size(47, 19);
             this.chkSex.TabIndex = 20;
             this.chkSex.Text = "Sex";
             this.chkSex.UseVisualStyleBackColor = true;
@@ -116,9 +116,9 @@
             // chkWeight
             // 
             this.chkWeight.AutoSize = true;
-            this.chkWeight.Location = new System.Drawing.Point(47, 147);
+            this.chkWeight.Location = new System.Drawing.Point(41, 138);
             this.chkWeight.Name = "chkWeight";
-            this.chkWeight.Size = new System.Drawing.Size(69, 20);
+            this.chkWeight.Size = new System.Drawing.Size(64, 19);
             this.chkWeight.TabIndex = 19;
             this.chkWeight.Text = "Weight";
             this.chkWeight.UseVisualStyleBackColor = true;
@@ -128,9 +128,9 @@
             this.chkLenght.AutoSize = true;
             this.chkLenght.Checked = true;
             this.chkLenght.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkLenght.Location = new System.Drawing.Point(47, 121);
+            this.chkLenght.Location = new System.Drawing.Point(41, 113);
             this.chkLenght.Name = "chkLenght";
-            this.chkLenght.Size = new System.Drawing.Size(67, 20);
+            this.chkLenght.Size = new System.Drawing.Size(64, 19);
             this.chkLenght.TabIndex = 18;
             this.chkLenght.Text = "Length";
             this.chkLenght.UseVisualStyleBackColor = true;
@@ -138,17 +138,17 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(44, 87);
+            this.label1.Location = new System.Drawing.Point(38, 82);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(162, 16);
+            this.label1.Size = new System.Drawing.Size(148, 15);
             this.label1.TabIndex = 17;
             this.label1.Text = "Select what data to collect";
             // 
             // buttonOptionsCancel
             // 
-            this.buttonOptionsCancel.Location = new System.Drawing.Point(354, 175);
+            this.buttonOptionsCancel.Location = new System.Drawing.Point(310, 164);
             this.buttonOptionsCancel.Name = "buttonOptionsCancel";
-            this.buttonOptionsCancel.Size = new System.Drawing.Size(62, 26);
+            this.buttonOptionsCancel.Size = new System.Drawing.Size(54, 24);
             this.buttonOptionsCancel.TabIndex = 16;
             this.buttonOptionsCancel.Text = "Cancel";
             this.buttonOptionsCancel.UseVisualStyleBackColor = true;
@@ -156,9 +156,9 @@
             // 
             // buttonOptionsOK
             // 
-            this.buttonOptionsOK.Location = new System.Drawing.Point(354, 137);
+            this.buttonOptionsOK.Location = new System.Drawing.Point(310, 128);
             this.buttonOptionsOK.Name = "buttonOptionsOK";
-            this.buttonOptionsOK.Size = new System.Drawing.Size(62, 26);
+            this.buttonOptionsOK.Size = new System.Drawing.Size(54, 24);
             this.buttonOptionsOK.TabIndex = 15;
             this.buttonOptionsOK.Text = "OK";
             this.buttonOptionsOK.UseVisualStyleBackColor = true;
@@ -166,9 +166,9 @@
             // 
             // buttonOK
             // 
-            this.buttonOK.Location = new System.Drawing.Point(470, 454);
+            this.buttonOK.Location = new System.Drawing.Point(411, 426);
             this.buttonOK.Name = "buttonOK";
-            this.buttonOK.Size = new System.Drawing.Size(48, 26);
+            this.buttonOK.Size = new System.Drawing.Size(42, 24);
             this.buttonOK.TabIndex = 1;
             this.buttonOK.Text = "OK";
             this.buttonOK.UseVisualStyleBackColor = true;
@@ -178,9 +178,9 @@
             // 
             this.buttonCancel.CausesValidation = false;
             this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.buttonCancel.Location = new System.Drawing.Point(402, 454);
+            this.buttonCancel.Location = new System.Drawing.Point(352, 426);
             this.buttonCancel.Name = "buttonCancel";
-            this.buttonCancel.Size = new System.Drawing.Size(62, 26);
+            this.buttonCancel.Size = new System.Drawing.Size(54, 24);
             this.buttonCancel.TabIndex = 2;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = true;
@@ -190,7 +190,7 @@
             // 
             this.labelTitle.AutoSize = true;
             this.labelTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelTitle.Location = new System.Drawing.Point(5, 11);
+            this.labelTitle.Location = new System.Drawing.Point(4, 10);
             this.labelTitle.Name = "labelTitle";
             this.labelTitle.Size = new System.Drawing.Size(51, 16);
             this.labelTitle.TabIndex = 3;
@@ -199,9 +199,9 @@
             // buttonAdd
             // 
             this.buttonAdd.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonAdd.Location = new System.Drawing.Point(485, 79);
+            this.buttonAdd.Location = new System.Drawing.Point(465, 74);
             this.buttonAdd.Name = "buttonAdd";
-            this.buttonAdd.Size = new System.Drawing.Size(35, 26);
+            this.buttonAdd.Size = new System.Drawing.Size(31, 24);
             this.buttonAdd.TabIndex = 2;
             this.buttonAdd.Text = "+";
             this.buttonAdd.UseVisualStyleBackColor = true;
@@ -210,9 +210,9 @@
             // buttonRemove
             // 
             this.buttonRemove.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonRemove.Location = new System.Drawing.Point(485, 111);
+            this.buttonRemove.Location = new System.Drawing.Point(465, 104);
             this.buttonRemove.Name = "buttonRemove";
-            this.buttonRemove.Size = new System.Drawing.Size(35, 26);
+            this.buttonRemove.Size = new System.Drawing.Size(31, 24);
             this.buttonRemove.TabIndex = 3;
             this.buttonRemove.Text = "-";
             this.buttonRemove.UseVisualStyleBackColor = true;
@@ -222,7 +222,7 @@
             // 
             this.labelCol1.AutoSize = true;
             this.labelCol1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelCol1.Location = new System.Drawing.Point(11, 45);
+            this.labelCol1.Location = new System.Drawing.Point(10, 42);
             this.labelCol1.Name = "labelCol1";
             this.labelCol1.Size = new System.Drawing.Size(35, 15);
             this.labelCol1.TabIndex = 4;
@@ -232,7 +232,7 @@
             // 
             this.labelCol2.AutoSize = true;
             this.labelCol2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelCol2.Location = new System.Drawing.Point(67, 45);
+            this.labelCol2.Location = new System.Drawing.Point(59, 42);
             this.labelCol2.Name = "labelCol2";
             this.labelCol2.Size = new System.Drawing.Size(51, 15);
             this.labelCol2.TabIndex = 5;
@@ -242,7 +242,7 @@
             // 
             this.labelCol3.AutoSize = true;
             this.labelCol3.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelCol3.Location = new System.Drawing.Point(117, 45);
+            this.labelCol3.Location = new System.Drawing.Point(102, 42);
             this.labelCol3.Name = "labelCol3";
             this.labelCol3.Size = new System.Drawing.Size(51, 15);
             this.labelCol3.TabIndex = 6;
@@ -252,7 +252,7 @@
             // 
             this.labelCol4.AutoSize = true;
             this.labelCol4.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelCol4.Location = new System.Drawing.Point(172, 45);
+            this.labelCol4.Location = new System.Drawing.Point(150, 42);
             this.labelCol4.Name = "labelCol4";
             this.labelCol4.Size = new System.Drawing.Size(31, 15);
             this.labelCol4.TabIndex = 7;
@@ -261,26 +261,26 @@
             // labelCol5
             // 
             this.labelCol5.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelCol5.Location = new System.Drawing.Point(225, 45);
+            this.labelCol5.Location = new System.Drawing.Point(197, 42);
             this.labelCol5.Name = "labelCol5";
-            this.labelCol5.Size = new System.Drawing.Size(68, 39);
+            this.labelCol5.Size = new System.Drawing.Size(60, 37);
             this.labelCol5.TabIndex = 8;
             this.labelCol5.Text = "Gonad maturity";
             // 
             // labelCol6
             // 
             this.labelCol6.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelCol6.Location = new System.Drawing.Point(305, 45);
+            this.labelCol6.Location = new System.Drawing.Point(267, 42);
             this.labelCol6.Name = "labelCol6";
-            this.labelCol6.Size = new System.Drawing.Size(65, 31);
+            this.labelCol6.Size = new System.Drawing.Size(62, 32);
             this.labelCol6.TabIndex = 9;
             this.labelCol6.Text = "Gonad weight";
             // 
             // buttonOptions
             // 
-            this.buttonOptions.Location = new System.Drawing.Point(334, 454);
+            this.buttonOptions.Location = new System.Drawing.Point(292, 426);
             this.buttonOptions.Name = "buttonOptions";
-            this.buttonOptions.Size = new System.Drawing.Size(62, 26);
+            this.buttonOptions.Size = new System.Drawing.Size(54, 24);
             this.buttonOptions.TabIndex = 12;
             this.buttonOptions.Text = "Options";
             this.buttonOptions.UseVisualStyleBackColor = true;
@@ -288,10 +288,10 @@
             // 
             // GMSDataEntryForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCancel;
-            this.ClientSize = new System.Drawing.Size(528, 490);
+            this.ClientSize = new System.Drawing.Size(508, 459);
             this.Controls.Add(this.buttonOptions);
             this.Controls.Add(this.buttonRemove);
             this.Controls.Add(this.labelCol6);
@@ -305,7 +305,7 @@
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.buttonOK);
             this.Controls.Add(this.panelUI);
-            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.KeyPreview = true;
             this.Margin = new System.Windows.Forms.Padding(4);

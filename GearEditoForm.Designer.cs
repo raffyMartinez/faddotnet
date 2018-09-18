@@ -42,9 +42,9 @@
             // labelTitle
             // 
             this.labelTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelTitle.Location = new System.Drawing.Point(12, 9);
+            this.labelTitle.Location = new System.Drawing.Point(10, 8);
             this.labelTitle.Name = "labelTitle";
-            this.labelTitle.Size = new System.Drawing.Size(288, 28);
+            this.labelTitle.Size = new System.Drawing.Size(252, 26);
             this.labelTitle.TabIndex = 0;
             this.labelTitle.Text = "label1";
             this.labelTitle.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -52,35 +52,35 @@
             // labelDescription
             // 
             this.labelDescription.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelDescription.Location = new System.Drawing.Point(12, 34);
+            this.labelDescription.Location = new System.Drawing.Point(10, 32);
             this.labelDescription.Name = "labelDescription";
-            this.labelDescription.Size = new System.Drawing.Size(288, 45);
+            this.labelDescription.Size = new System.Drawing.Size(252, 42);
             this.labelDescription.TabIndex = 1;
             this.labelDescription.Text = "label1";
             // 
             // textBox
             // 
-            this.textBox.Location = new System.Drawing.Point(12, 82);
+            this.textBox.Location = new System.Drawing.Point(10, 77);
             this.textBox.Name = "textBox";
-            this.textBox.Size = new System.Drawing.Size(288, 22);
+            this.textBox.Size = new System.Drawing.Size(252, 21);
             this.textBox.TabIndex = 2;
             this.textBox.Validating += new System.ComponentModel.CancelEventHandler(this.OnTextBoxValidating);
             // 
             // checkBox
             // 
             this.checkBox.AutoSize = true;
-            this.checkBox.Location = new System.Drawing.Point(15, 110);
+            this.checkBox.Location = new System.Drawing.Point(13, 103);
             this.checkBox.Name = "checkBox";
-            this.checkBox.Size = new System.Drawing.Size(106, 20);
+            this.checkBox.Size = new System.Drawing.Size(98, 19);
             this.checkBox.TabIndex = 3;
             this.checkBox.Text = "Sub-variation";
             this.checkBox.UseVisualStyleBackColor = true;
             // 
             // buttonOk
             // 
-            this.buttonOk.Location = new System.Drawing.Point(236, 518);
+            this.buttonOk.Location = new System.Drawing.Point(206, 486);
             this.buttonOk.Name = "buttonOk";
-            this.buttonOk.Size = new System.Drawing.Size(64, 24);
+            this.buttonOk.Size = new System.Drawing.Size(56, 22);
             this.buttonOk.TabIndex = 5;
             this.buttonOk.Text = "OK";
             this.buttonOk.UseVisualStyleBackColor = true;
@@ -90,9 +90,9 @@
             // 
             this.buttonCancel.CausesValidation = false;
             this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.buttonCancel.Location = new System.Drawing.Point(166, 518);
+            this.buttonCancel.Location = new System.Drawing.Point(145, 486);
             this.buttonCancel.Name = "buttonCancel";
-            this.buttonCancel.Size = new System.Drawing.Size(64, 24);
+            this.buttonCancel.Size = new System.Drawing.Size(56, 22);
             this.buttonCancel.TabIndex = 6;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = true;
@@ -101,37 +101,37 @@
             // listBox
             // 
             this.listBox.FormattingEnabled = true;
-            this.listBox.ItemHeight = 16;
-            this.listBox.Location = new System.Drawing.Point(12, 136);
+            this.listBox.ItemHeight = 15;
+            this.listBox.Location = new System.Drawing.Point(10, 128);
             this.listBox.Name = "listBox";
-            this.listBox.Size = new System.Drawing.Size(288, 372);
+            this.listBox.Size = new System.Drawing.Size(252, 349);
             this.listBox.TabIndex = 7;
             // 
             // comboBox
             // 
             this.comboBox.FormattingEnabled = true;
-            this.comboBox.Location = new System.Drawing.Point(15, 82);
+            this.comboBox.Location = new System.Drawing.Point(13, 77);
             this.comboBox.Name = "comboBox";
-            this.comboBox.Size = new System.Drawing.Size(285, 24);
+            this.comboBox.Size = new System.Drawing.Size(250, 23);
             this.comboBox.TabIndex = 8;
             this.comboBox.Validating += new System.ComponentModel.CancelEventHandler(this.OnComboBoxValidating);
             // 
             // labelCode
             // 
             this.labelCode.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelCode.Location = new System.Drawing.Point(12, 82);
+            this.labelCode.Location = new System.Drawing.Point(10, 77);
             this.labelCode.Name = "labelCode";
-            this.labelCode.Size = new System.Drawing.Size(21, 25);
+            this.labelCode.Size = new System.Drawing.Size(18, 23);
             this.labelCode.TabIndex = 9;
             this.labelCode.Text = "G";
             this.labelCode.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // frmGearEditor
+            // GearEditoForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCancel;
-            this.ClientSize = new System.Drawing.Size(312, 554);
+            this.ClientSize = new System.Drawing.Size(273, 519);
             this.Controls.Add(this.labelCode);
             this.Controls.Add(this.comboBox);
             this.Controls.Add(this.listBox);
@@ -141,10 +141,10 @@
             this.Controls.Add(this.textBox);
             this.Controls.Add(this.labelDescription);
             this.Controls.Add(this.labelTitle);
-            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Margin = new System.Windows.Forms.Padding(4);
-            this.Name = "frmGearEditor";
+            this.Name = "GearEditoForm";
             this.Text = "Gear editor";
             this.Load += new System.EventHandler(this.OnFormLoad);
             this.ResumeLayout(false);

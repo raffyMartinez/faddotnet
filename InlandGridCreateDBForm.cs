@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
+﻿using MapWinGIS;
+using System;
+using System.IO;
 using System.Windows.Forms;
-using MapWinGIS;
 
 namespace FAD3
 {
@@ -37,20 +32,34 @@ namespace FAD3
                     CreateInlandPointDatabase.StatusUpdate += OnStatusUpdate;
                     CreateInlandPointDatabase.Grid25Shapefile = (Shapefile)global.MappingForm.MapLayersHandler.get_MapLayer(cboGrid25.Text).LayerObject;
                     CreateInlandPointDatabase.LandShapefile = (Shapefile)global.MappingForm.MapLayersHandler.get_MapLayer(cboLandArea.Text).LayerObject;
-                    if (cboFastPoly.Text.Length > 0)
+
+                    var fileOpen = new OpenFileDialog()
                     {
-                        CreateInlandPointDatabase.FastPolygonShapefile = (Shapefile)global.MappingForm.MapLayersHandler.get_MapLayer(cboFastPoly.Text).LayerObject;
-                    }
-                    var saveAs = new SaveFileDialog();
-                    saveAs.Filter = "MS Access database *.mdb|*.mdb|All files *.*|*.*";
-                    saveAs.FilterIndex = 1;
-                    saveAs.Title = "Provide filename for inland grid database";
-                    saveAs.ShowDialog();
-                    if (saveAs.FileName.Length > 0)
+                        CheckFileExists = false,
+                        DefaultExt = "mdb",
+                        AddExtension = true,
+                        Filter = "MS Access database *.mdb|*.mdb|All files *.*|*.*",
+                        FilterIndex = 1,
+                        Title = "Provide filename for inland grid database",
+                    };
+
+                    fileOpen.ShowDialog();
+                    if (fileOpen.FileName.Length > 0)
                     {
-                        CreateInlandPointDatabase.MapInterActionHandler = global.MappingForm.MapInterActionHandler;
-                        CreateInlandPointDatabase.FileName = saveAs.FileName;
-                        CreateInlandPointDatabase.Start();
+                        var proceed = true;
+                        if (!File.Exists(fileOpen.FileName))
+                        {
+                            proceed = false;
+                            var msg = "The file does not exist. Do you want to create a new database file?";
+                            var result = MessageBox.Show(msg, "Create database file", MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
+                            proceed = result == DialogResult.OK;
+                        }
+                        if (proceed)
+                        {
+                            CreateInlandPointDatabase.MapInterActionHandler = global.MappingForm.MapInterActionHandler;
+                            CreateInlandPointDatabase.FileName = fileOpen.FileName;
+                            CreateInlandPointDatabase.Start();
+                        }
                     }
                     break;
 
@@ -72,6 +81,7 @@ namespace FAD3
         private void OnInlandGridCreateDBForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             _instance = null;
+            _parentForm = null;
         }
 
         private void OnInlandGridCreateDBForm_Load(object sender, EventArgs e)
@@ -86,7 +96,6 @@ namespace FAD3
                 }
                 else
                 {
-                    cboFastPoly.Items.Add(item.Name);
                     cboLandArea.Items.Add(item.Name);
                 }
             }

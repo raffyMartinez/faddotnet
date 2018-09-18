@@ -50,85 +50,85 @@ namespace FAD3
             // 
             // textLandingSiteName
             // 
-            this.textLandingSiteName.Location = new System.Drawing.Point(132, 48);
+            this.textLandingSiteName.Location = new System.Drawing.Point(116, 45);
             this.textLandingSiteName.Margin = new System.Windows.Forms.Padding(4);
             this.textLandingSiteName.Name = "textLandingSiteName";
-            this.textLandingSiteName.Size = new System.Drawing.Size(185, 22);
+            this.textLandingSiteName.Size = new System.Drawing.Size(162, 21);
             this.textLandingSiteName.TabIndex = 0;
             // 
             // label1
             // 
-            this.label1.Location = new System.Drawing.Point(15, 47);
+            this.label1.Location = new System.Drawing.Point(13, 44);
             this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(104, 25);
+            this.label1.Size = new System.Drawing.Size(91, 23);
             this.label1.TabIndex = 1;
             this.label1.Text = "Name";
             // 
             // comboProvince
             // 
             this.comboProvince.FormattingEnabled = true;
-            this.comboProvince.Location = new System.Drawing.Point(133, 81);
+            this.comboProvince.Location = new System.Drawing.Point(116, 76);
             this.comboProvince.Margin = new System.Windows.Forms.Padding(4);
             this.comboProvince.Name = "comboProvince";
-            this.comboProvince.Size = new System.Drawing.Size(183, 24);
+            this.comboProvince.Size = new System.Drawing.Size(161, 23);
             this.comboProvince.TabIndex = 1;
             this.comboProvince.Validating += new System.ComponentModel.CancelEventHandler(this.OnComboBoxValidating);
             // 
             // label2
             // 
-            this.label2.Location = new System.Drawing.Point(15, 81);
+            this.label2.Location = new System.Drawing.Point(13, 76);
             this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(104, 25);
+            this.label2.Size = new System.Drawing.Size(91, 23);
             this.label2.TabIndex = 3;
             this.label2.Text = "Province";
             // 
             // comboMunicipality
             // 
             this.comboMunicipality.FormattingEnabled = true;
-            this.comboMunicipality.Location = new System.Drawing.Point(133, 114);
+            this.comboMunicipality.Location = new System.Drawing.Point(116, 107);
             this.comboMunicipality.Margin = new System.Windows.Forms.Padding(4);
             this.comboMunicipality.Name = "comboMunicipality";
-            this.comboMunicipality.Size = new System.Drawing.Size(183, 24);
+            this.comboMunicipality.Size = new System.Drawing.Size(161, 23);
             this.comboMunicipality.TabIndex = 2;
             this.comboMunicipality.Validating += new System.ComponentModel.CancelEventHandler(this.OnComboBoxValidating);
             // 
             // label3
             // 
-            this.label3.Location = new System.Drawing.Point(15, 118);
+            this.label3.Location = new System.Drawing.Point(13, 111);
             this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(104, 25);
+            this.label3.Size = new System.Drawing.Size(91, 23);
             this.label3.TabIndex = 5;
             this.label3.Text = "Municipality";
             // 
             // textCoord
             // 
-            this.textCoord.Location = new System.Drawing.Point(131, 181);
+            this.textCoord.Location = new System.Drawing.Point(115, 170);
             this.textCoord.Margin = new System.Windows.Forms.Padding(4);
             this.textCoord.Name = "textCoord";
             this.textCoord.ReadOnly = true;
-            this.textCoord.Size = new System.Drawing.Size(185, 22);
+            this.textCoord.Size = new System.Drawing.Size(162, 21);
             this.textCoord.TabIndex = 3;
             this.textCoord.Tag = "x";
             this.textCoord.DoubleClick += new System.EventHandler(this.OntextCoord_DoubleClick);
             // 
             // label4
             // 
-            this.label4.Location = new System.Drawing.Point(12, 185);
+            this.label4.Location = new System.Drawing.Point(10, 173);
             this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(104, 25);
+            this.label4.Size = new System.Drawing.Size(91, 23);
             this.label4.TabIndex = 8;
             this.label4.Text = "Coordinate";
             // 
             // buttonOk
             // 
-            this.buttonOk.Location = new System.Drawing.Point(276, 260);
+            this.buttonOk.Location = new System.Drawing.Point(242, 244);
             this.buttonOk.Margin = new System.Windows.Forms.Padding(4);
             this.buttonOk.Name = "buttonOk";
-            this.buttonOk.Size = new System.Drawing.Size(57, 26);
+            this.buttonOk.Size = new System.Drawing.Size(50, 24);
             this.buttonOk.TabIndex = 5;
             this.buttonOk.Text = "Ok";
             this.buttonOk.UseVisualStyleBackColor = true;
@@ -138,21 +138,21 @@ namespace FAD3
             // 
             this.buttonCancel.CausesValidation = false;
             this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.buttonCancel.Location = new System.Drawing.Point(196, 260);
+            this.buttonCancel.Location = new System.Drawing.Point(172, 244);
             this.buttonCancel.Margin = new System.Windows.Forms.Padding(4);
             this.buttonCancel.Name = "buttonCancel";
-            this.buttonCancel.Size = new System.Drawing.Size(72, 26);
+            this.buttonCancel.Size = new System.Drawing.Size(63, 24);
             this.buttonCancel.TabIndex = 6;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = true;
             this.buttonCancel.Click += new System.EventHandler(this.OnButtonClick);
             // 
-            // frmLandingSite
+            // LandingSiteForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCancel;
-            this.ClientSize = new System.Drawing.Size(349, 300);
+            this.ClientSize = new System.Drawing.Size(305, 281);
             this.Controls.Add(this.buttonOk);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.label4);
@@ -163,10 +163,10 @@ namespace FAD3
             this.Controls.Add(this.comboProvince);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.textLandingSiteName);
-            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Margin = new System.Windows.Forms.Padding(4);
-            this.Name = "frmLandingSite";
+            this.Name = "LandingSiteForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Landing site";
             this.Load += new System.EventHandler(this.OnFormLoad);

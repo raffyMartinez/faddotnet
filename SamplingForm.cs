@@ -18,7 +18,7 @@ namespace FAD3
         private Control _topControl;
         private string _AOIGuid = "";
         private int _widestLabel = 0;
-        private int _controlWidth = 200;
+        private int _controlWidth = 175;
         private int _yPos;
         private string _AOIName = "";
         private string _landingSiteName = "";
@@ -215,7 +215,7 @@ namespace FAD3
                 Name = "label" + e.Key,
                 Text = e.RowLabel,
                 AutoSize = true,
-                Size = new System.Drawing.Size(79, ht),
+                Size = new Size(60, ht),
                 Tag = e.Key
             };
             panelUI.Controls.Add(lbl);
@@ -626,7 +626,7 @@ namespace FAD3
                     }
                     else
                     {
-                        c.Left = _widestLabel + 25;
+                        c.Left = _widestLabel + 15;
                     }
                 }
                 else if (c.Name.Substring(0, 8) == "errLabel")

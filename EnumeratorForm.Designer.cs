@@ -53,10 +53,10 @@ namespace FAD3
             // buttonOK
             // 
             this.buttonOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonOK.Location = new System.Drawing.Point(806, 292);
+            this.buttonOK.Location = new System.Drawing.Point(705, 274);
             this.buttonOK.Margin = new System.Windows.Forms.Padding(4);
             this.buttonOK.Name = "buttonOK";
-            this.buttonOK.Size = new System.Drawing.Size(54, 31);
+            this.buttonOK.Size = new System.Drawing.Size(47, 29);
             this.buttonOK.TabIndex = 4;
             this.buttonOK.Text = "Ok";
             this.buttonOK.UseVisualStyleBackColor = true;
@@ -65,10 +65,10 @@ namespace FAD3
             // buttonCancel
             // 
             this.buttonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonCancel.Location = new System.Drawing.Point(738, 293);
+            this.buttonCancel.Location = new System.Drawing.Point(640, 275);
             this.buttonCancel.Margin = new System.Windows.Forms.Padding(4);
             this.buttonCancel.Name = "buttonCancel";
-            this.buttonCancel.Size = new System.Drawing.Size(60, 31);
+            this.buttonCancel.Size = new System.Drawing.Size(58, 29);
             this.buttonCancel.TabIndex = 5;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = true;
@@ -79,11 +79,11 @@ namespace FAD3
             this.lvEnumerators.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.lvEnumerators.Location = new System.Drawing.Point(259, 84);
+            this.lvEnumerators.Location = new System.Drawing.Point(227, 79);
             this.lvEnumerators.Margin = new System.Windows.Forms.Padding(4);
             this.lvEnumerators.MultiSelect = false;
             this.lvEnumerators.Name = "lvEnumerators";
-            this.lvEnumerators.Size = new System.Drawing.Size(617, 181);
+            this.lvEnumerators.Size = new System.Drawing.Size(540, 170);
             this.lvEnumerators.TabIndex = 3;
             this.lvEnumerators.UseCompatibleStateImageBehavior = false;
             this.lvEnumerators.DoubleClick += new System.EventHandler(this.OnlistEnumeratorSampling_DoubleClick);
@@ -91,10 +91,10 @@ namespace FAD3
             // 
             // labelSamplings
             // 
-            this.labelSamplings.Location = new System.Drawing.Point(4, 62);
+            this.labelSamplings.Location = new System.Drawing.Point(4, 58);
             this.labelSamplings.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelSamplings.Name = "labelSamplings";
-            this.labelSamplings.Size = new System.Drawing.Size(251, 18);
+            this.labelSamplings.Size = new System.Drawing.Size(220, 17);
             this.labelSamplings.TabIndex = 9;
             this.labelSamplings.Text = "Samplings enumerated";
             // 
@@ -102,9 +102,9 @@ namespace FAD3
             // 
             this.tree.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
-            this.tree.Location = new System.Drawing.Point(0, 84);
+            this.tree.Location = new System.Drawing.Point(0, 79);
             this.tree.Name = "tree";
-            this.tree.Size = new System.Drawing.Size(259, 181);
+            this.tree.Size = new System.Drawing.Size(227, 170);
             this.tree.TabIndex = 10;
             this.tree.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.tree_AfterSelect);
             // 
@@ -119,64 +119,64 @@ namespace FAD3
             this.panelTop.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelTop.Location = new System.Drawing.Point(0, 0);
             this.panelTop.Name = "panelTop";
-            this.panelTop.Size = new System.Drawing.Size(876, 84);
+            this.panelTop.Size = new System.Drawing.Size(766, 79);
             this.panelTop.TabIndex = 11;
             // 
             // chkActive
             // 
-            this.chkActive.Location = new System.Drawing.Point(555, 25);
+            this.chkActive.Location = new System.Drawing.Point(486, 23);
             this.chkActive.Margin = new System.Windows.Forms.Padding(4);
             this.chkActive.Name = "chkActive";
-            this.chkActive.Size = new System.Drawing.Size(105, 23);
+            this.chkActive.Size = new System.Drawing.Size(92, 22);
             this.chkActive.TabIndex = 10;
             this.chkActive.Text = "Active";
             this.chkActive.UseVisualStyleBackColor = true;
             // 
             // labelHireDate
             // 
-            this.labelHireDate.Location = new System.Drawing.Point(310, 25);
+            this.labelHireDate.Location = new System.Drawing.Point(271, 23);
             this.labelHireDate.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelHireDate.Name = "labelHireDate";
-            this.labelHireDate.Size = new System.Drawing.Size(84, 25);
+            this.labelHireDate.Size = new System.Drawing.Size(74, 23);
             this.labelHireDate.TabIndex = 12;
             this.labelHireDate.Text = "Hire date";
             // 
             // labelEnumeratorName
             // 
-            this.labelEnumeratorName.Location = new System.Drawing.Point(7, 22);
+            this.labelEnumeratorName.Location = new System.Drawing.Point(6, 21);
             this.labelEnumeratorName.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelEnumeratorName.Name = "labelEnumeratorName";
-            this.labelEnumeratorName.Size = new System.Drawing.Size(53, 25);
+            this.labelEnumeratorName.Size = new System.Drawing.Size(46, 23);
             this.labelEnumeratorName.TabIndex = 11;
             this.labelEnumeratorName.Text = "Name";
             // 
             // txtHireDate
             // 
-            this.txtHireDate.Location = new System.Drawing.Point(390, 23);
+            this.txtHireDate.Location = new System.Drawing.Point(341, 22);
             this.txtHireDate.Margin = new System.Windows.Forms.Padding(4);
             this.txtHireDate.Name = "txtHireDate";
-            this.txtHireDate.Size = new System.Drawing.Size(139, 22);
+            this.txtHireDate.Size = new System.Drawing.Size(122, 21);
             this.txtHireDate.TabIndex = 9;
             // 
             // txtName
             // 
-            this.txtName.Location = new System.Drawing.Point(63, 22);
+            this.txtName.Location = new System.Drawing.Point(55, 21);
             this.txtName.Margin = new System.Windows.Forms.Padding(4);
             this.txtName.Name = "txtName";
-            this.txtName.Size = new System.Drawing.Size(224, 22);
+            this.txtName.Size = new System.Drawing.Size(196, 21);
             this.txtName.TabIndex = 8;
             // 
             // EnumeratorForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(876, 337);
+            this.ClientSize = new System.Drawing.Size(766, 316);
             this.Controls.Add(this.panelTop);
             this.Controls.Add(this.tree);
             this.Controls.Add(this.lvEnumerators);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.buttonOK);
-            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "EnumeratorForm";

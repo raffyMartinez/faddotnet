@@ -54,11 +54,11 @@
             // 
             this.tabFG.Controls.Add(this.tabGrid25);
             this.tabFG.Controls.Add(this.tabText);
-            this.tabFG.Location = new System.Drawing.Point(9, 41);
+            this.tabFG.Location = new System.Drawing.Point(8, 38);
             this.tabFG.Margin = new System.Windows.Forms.Padding(4);
             this.tabFG.Name = "tabFG";
             this.tabFG.SelectedIndex = 0;
-            this.tabFG.Size = new System.Drawing.Size(399, 184);
+            this.tabFG.Size = new System.Drawing.Size(349, 172);
             this.tabFG.TabIndex = 0;
             // 
             // tabGrid25
@@ -75,20 +75,20 @@
             this.tabGrid25.Controls.Add(this.textBoxGridNo);
             this.tabGrid25.Controls.Add(this.label1);
             this.tabGrid25.Controls.Add(this.textBoxZone);
-            this.tabGrid25.Location = new System.Drawing.Point(4, 25);
+            this.tabGrid25.Location = new System.Drawing.Point(4, 24);
             this.tabGrid25.Margin = new System.Windows.Forms.Padding(4);
             this.tabGrid25.Name = "tabGrid25";
             this.tabGrid25.Padding = new System.Windows.Forms.Padding(4);
-            this.tabGrid25.Size = new System.Drawing.Size(391, 155);
+            this.tabGrid25.Size = new System.Drawing.Size(341, 144);
             this.tabGrid25.TabIndex = 0;
             this.tabGrid25.Text = "Grid 25";
             this.tabGrid25.UseVisualStyleBackColor = true;
             // 
             // lvGrids
             // 
-            this.lvGrids.Location = new System.Drawing.Point(257, 22);
+            this.lvGrids.Location = new System.Drawing.Point(225, 21);
             this.lvGrids.Name = "lvGrids";
-            this.lvGrids.Size = new System.Drawing.Size(114, 105);
+            this.lvGrids.Size = new System.Drawing.Size(100, 99);
             this.lvGrids.TabIndex = 11;
             this.lvGrids.UseCompatibleStateImageBehavior = false;
             this.lvGrids.DoubleClick += new System.EventHandler(this.lvGrids_DoubleClick);
@@ -96,9 +96,9 @@
             // 
             // buttonRemoveAll
             // 
-            this.buttonRemoveAll.Location = new System.Drawing.Point(186, 93);
+            this.buttonRemoveAll.Location = new System.Drawing.Point(163, 87);
             this.buttonRemoveAll.Name = "buttonRemoveAll";
-            this.buttonRemoveAll.Size = new System.Drawing.Size(45, 25);
+            this.buttonRemoveAll.Size = new System.Drawing.Size(39, 23);
             this.buttonRemoveAll.TabIndex = 10;
             this.buttonRemoveAll.Text = "<<";
             this.buttonRemoveAll.UseVisualStyleBackColor = true;
@@ -106,9 +106,9 @@
             // 
             // buttonRemove
             // 
-            this.buttonRemove.Location = new System.Drawing.Point(186, 64);
+            this.buttonRemove.Location = new System.Drawing.Point(163, 60);
             this.buttonRemove.Name = "buttonRemove";
-            this.buttonRemove.Size = new System.Drawing.Size(45, 25);
+            this.buttonRemove.Size = new System.Drawing.Size(39, 23);
             this.buttonRemove.TabIndex = 9;
             this.buttonRemove.Text = "<";
             this.buttonRemove.UseVisualStyleBackColor = true;
@@ -116,9 +116,9 @@
             // 
             // buttonAdd
             // 
-            this.buttonAdd.Location = new System.Drawing.Point(186, 33);
+            this.buttonAdd.Location = new System.Drawing.Point(163, 31);
             this.buttonAdd.Name = "buttonAdd";
-            this.buttonAdd.Size = new System.Drawing.Size(45, 25);
+            this.buttonAdd.Size = new System.Drawing.Size(39, 23);
             this.buttonAdd.TabIndex = 8;
             this.buttonAdd.Text = ">";
             this.buttonAdd.UseVisualStyleBackColor = true;
@@ -127,17 +127,17 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(15, 108);
+            this.label4.Location = new System.Drawing.Point(13, 101);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(35, 16);
+            this.label4.Size = new System.Drawing.Size(32, 15);
             this.label4.TabIndex = 7;
             this.label4.Text = "Row";
             // 
             // textBoxRow
             // 
-            this.textBoxRow.Location = new System.Drawing.Point(73, 105);
+            this.textBoxRow.Location = new System.Drawing.Point(64, 98);
             this.textBoxRow.Name = "textBoxRow";
-            this.textBoxRow.Size = new System.Drawing.Size(92, 22);
+            this.textBoxRow.Size = new System.Drawing.Size(81, 21);
             this.textBoxRow.TabIndex = 6;
             this.textBoxRow.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnTextBox_KeyDown);
             this.textBoxRow.Validating += new System.ComponentModel.CancelEventHandler(this.OntextBoxValidating);
@@ -145,17 +145,17 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(15, 80);
+            this.label3.Location = new System.Drawing.Point(13, 75);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(53, 16);
+            this.label3.Size = new System.Drawing.Size(50, 15);
             this.label3.TabIndex = 5;
             this.label3.Text = "Column";
             // 
             // textBoxColumn
             // 
-            this.textBoxColumn.Location = new System.Drawing.Point(73, 77);
+            this.textBoxColumn.Location = new System.Drawing.Point(64, 72);
             this.textBoxColumn.Name = "textBoxColumn";
-            this.textBoxColumn.Size = new System.Drawing.Size(92, 22);
+            this.textBoxColumn.Size = new System.Drawing.Size(81, 21);
             this.textBoxColumn.TabIndex = 4;
             this.textBoxColumn.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnTextBox_KeyDown);
             this.textBoxColumn.Validating += new System.ComponentModel.CancelEventHandler(this.OntextBoxValidating);
@@ -163,17 +163,17 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(15, 52);
+            this.label2.Location = new System.Drawing.Point(13, 49);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(43, 16);
+            this.label2.Size = new System.Drawing.Size(40, 15);
             this.label2.TabIndex = 3;
             this.label2.Text = "Grid #";
             // 
             // textBoxGridNo
             // 
-            this.textBoxGridNo.Location = new System.Drawing.Point(73, 49);
+            this.textBoxGridNo.Location = new System.Drawing.Point(64, 46);
             this.textBoxGridNo.Name = "textBoxGridNo";
-            this.textBoxGridNo.Size = new System.Drawing.Size(92, 22);
+            this.textBoxGridNo.Size = new System.Drawing.Size(81, 21);
             this.textBoxGridNo.TabIndex = 2;
             this.textBoxGridNo.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnTextBox_KeyDown);
             this.textBoxGridNo.Validating += new System.ComponentModel.CancelEventHandler(this.OntextBoxValidating);
@@ -181,17 +181,17 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(15, 25);
+            this.label1.Location = new System.Drawing.Point(13, 23);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(39, 16);
+            this.label1.Size = new System.Drawing.Size(35, 15);
             this.label1.TabIndex = 1;
             this.label1.Text = "Zone";
             // 
             // textBoxZone
             // 
-            this.textBoxZone.Location = new System.Drawing.Point(73, 22);
+            this.textBoxZone.Location = new System.Drawing.Point(64, 21);
             this.textBoxZone.Name = "textBoxZone";
-            this.textBoxZone.Size = new System.Drawing.Size(92, 22);
+            this.textBoxZone.Size = new System.Drawing.Size(81, 21);
             this.textBoxZone.TabIndex = 0;
             // 
             // tabText
@@ -200,16 +200,16 @@
             this.tabText.Margin = new System.Windows.Forms.Padding(4);
             this.tabText.Name = "tabText";
             this.tabText.Padding = new System.Windows.Forms.Padding(4);
-            this.tabText.Size = new System.Drawing.Size(391, 155);
+            this.tabText.Size = new System.Drawing.Size(341, 143);
             this.tabText.TabIndex = 1;
             this.tabText.Text = "Text";
             this.tabText.UseVisualStyleBackColor = true;
             // 
             // buttonOK
             // 
-            this.buttonOK.Location = new System.Drawing.Point(359, 237);
+            this.buttonOK.Location = new System.Drawing.Point(314, 222);
             this.buttonOK.Name = "buttonOK";
-            this.buttonOK.Size = new System.Drawing.Size(45, 25);
+            this.buttonOK.Size = new System.Drawing.Size(39, 23);
             this.buttonOK.TabIndex = 9;
             this.buttonOK.Text = "OK";
             this.buttonOK.UseVisualStyleBackColor = true;
@@ -218,9 +218,9 @@
             // buttonCancel
             // 
             this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.buttonCancel.Location = new System.Drawing.Point(293, 237);
+            this.buttonCancel.Location = new System.Drawing.Point(253, 222);
             this.buttonCancel.Name = "buttonCancel";
-            this.buttonCancel.Size = new System.Drawing.Size(60, 25);
+            this.buttonCancel.Size = new System.Drawing.Size(55, 23);
             this.buttonCancel.TabIndex = 10;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = true;
@@ -228,9 +228,9 @@
             // 
             // buttonGrids
             // 
-            this.buttonGrids.Location = new System.Drawing.Point(227, 237);
+            this.buttonGrids.Location = new System.Drawing.Point(195, 222);
             this.buttonGrids.Name = "buttonGrids";
-            this.buttonGrids.Size = new System.Drawing.Size(60, 25);
+            this.buttonGrids.Size = new System.Drawing.Size(52, 23);
             this.buttonGrids.TabIndex = 11;
             this.buttonGrids.Text = "Grids";
             this.buttonGrids.UseVisualStyleBackColor = true;
@@ -238,15 +238,15 @@
             // 
             // FishingGroundForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCancel;
-            this.ClientSize = new System.Drawing.Size(421, 274);
+            this.ClientSize = new System.Drawing.Size(368, 257);
             this.Controls.Add(this.buttonGrids);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.buttonOK);
             this.Controls.Add(this.tabFG);
-            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "FishingGroundForm";

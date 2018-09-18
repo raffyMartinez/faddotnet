@@ -37,9 +37,9 @@
             // 
             // buttonOK
             // 
-            this.buttonOK.Location = new System.Drawing.Point(364, 274);
+            this.buttonOK.Location = new System.Drawing.Point(318, 257);
             this.buttonOK.Name = "buttonOK";
-            this.buttonOK.Size = new System.Drawing.Size(45, 24);
+            this.buttonOK.Size = new System.Drawing.Size(39, 22);
             this.buttonOK.TabIndex = 0;
             this.buttonOK.Text = "OK";
             this.buttonOK.UseVisualStyleBackColor = true;
@@ -51,9 +51,9 @@
             this.columnHeader1,
             this.columnHeader2,
             this.columnHeader3});
-            this.lvGrids.Location = new System.Drawing.Point(3, 38);
+            this.lvGrids.Location = new System.Drawing.Point(3, 36);
             this.lvGrids.Name = "lvGrids";
-            this.lvGrids.Size = new System.Drawing.Size(406, 230);
+            this.lvGrids.Size = new System.Drawing.Size(356, 216);
             this.lvGrids.TabIndex = 1;
             this.lvGrids.UseCompatibleStateImageBehavior = false;
             this.lvGrids.View = System.Windows.Forms.View.Details;
@@ -72,14 +72,14 @@
             // 
             // FishingGroundExtentsForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(414, 308);
+            this.ClientSize = new System.Drawing.Size(362, 289);
             this.Controls.Add(this.lvGrids);
             this.Controls.Add(this.buttonOK);
-            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "FishingGroundExtentsForm";
             this.Text = "FishingGroundExtentsForm";
             this.Load += new System.EventHandler(this.FishingGroundExtentsForm_Load);

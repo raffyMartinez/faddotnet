@@ -53,73 +53,73 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(7, 78);
+            this.label1.Location = new System.Drawing.Point(8, 90);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(122, 13);
+            this.label1.Size = new System.Drawing.Size(141, 15);
             this.label1.TabIndex = 0;
             this.label1.Text = "Size of coordinate labels";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(7, 107);
+            this.label2.Location = new System.Drawing.Point(8, 123);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(97, 13);
+            this.label2.Size = new System.Drawing.Size(115, 15);
             this.label2.TabIndex = 1;
             this.label2.Text = "Number of gridlines";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(7, 165);
+            this.label3.Location = new System.Drawing.Point(8, 190);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(70, 13);
+            this.label3.Size = new System.Drawing.Size(82, 15);
             this.label3.TabIndex = 2;
             this.label3.Text = "Gridline width";
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(7, 136);
+            this.label4.Location = new System.Drawing.Point(8, 157);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(66, 13);
+            this.label4.Size = new System.Drawing.Size(76, 15);
             this.label4.TabIndex = 3;
             this.label4.Text = "Border width";
             // 
             // txtLabelSize
             // 
-            this.txtLabelSize.Location = new System.Drawing.Point(135, 75);
+            this.txtLabelSize.Location = new System.Drawing.Point(157, 87);
             this.txtLabelSize.Name = "txtLabelSize";
-            this.txtLabelSize.Size = new System.Drawing.Size(51, 20);
+            this.txtLabelSize.Size = new System.Drawing.Size(59, 21);
             this.txtLabelSize.TabIndex = 4;
             // 
             // txtNumberOfGridlines
             // 
-            this.txtNumberOfGridlines.Location = new System.Drawing.Point(135, 104);
+            this.txtNumberOfGridlines.Location = new System.Drawing.Point(157, 120);
             this.txtNumberOfGridlines.Name = "txtNumberOfGridlines";
-            this.txtNumberOfGridlines.Size = new System.Drawing.Size(51, 20);
+            this.txtNumberOfGridlines.Size = new System.Drawing.Size(59, 21);
             this.txtNumberOfGridlines.TabIndex = 5;
             // 
             // txtBordeWidth
             // 
-            this.txtBordeWidth.Location = new System.Drawing.Point(135, 133);
+            this.txtBordeWidth.Location = new System.Drawing.Point(157, 153);
             this.txtBordeWidth.Name = "txtBordeWidth";
-            this.txtBordeWidth.Size = new System.Drawing.Size(51, 20);
+            this.txtBordeWidth.Size = new System.Drawing.Size(59, 21);
             this.txtBordeWidth.TabIndex = 6;
             // 
             // txtGridlineWidth
             // 
-            this.txtGridlineWidth.Location = new System.Drawing.Point(135, 162);
+            this.txtGridlineWidth.Location = new System.Drawing.Point(157, 187);
             this.txtGridlineWidth.Name = "txtGridlineWidth";
-            this.txtGridlineWidth.Size = new System.Drawing.Size(51, 20);
+            this.txtGridlineWidth.Size = new System.Drawing.Size(59, 21);
             this.txtGridlineWidth.TabIndex = 7;
             // 
             // chkShowGrid
             // 
             this.chkShowGrid.AutoSize = true;
-            this.chkShowGrid.Location = new System.Drawing.Point(10, 208);
+            this.chkShowGrid.Location = new System.Drawing.Point(12, 240);
             this.chkShowGrid.Name = "chkShowGrid";
-            this.chkShowGrid.Size = new System.Drawing.Size(73, 17);
+            this.chkShowGrid.Size = new System.Drawing.Size(81, 19);
             this.chkShowGrid.TabIndex = 8;
             this.chkShowGrid.Text = "Show grid";
             this.chkShowGrid.UseVisualStyleBackColor = true;
@@ -127,9 +127,9 @@
             // chkLeft
             // 
             this.chkLeft.AutoSize = true;
-            this.chkLeft.Location = new System.Drawing.Point(10, 231);
+            this.chkLeft.Location = new System.Drawing.Point(12, 267);
             this.chkLeft.Name = "chkLeft";
-            this.chkLeft.Size = new System.Drawing.Size(44, 17);
+            this.chkLeft.Size = new System.Drawing.Size(46, 19);
             this.chkLeft.TabIndex = 9;
             this.chkLeft.Text = "Left";
             this.chkLeft.UseVisualStyleBackColor = true;
@@ -137,9 +137,9 @@
             // chkTop
             // 
             this.chkTop.AutoSize = true;
-            this.chkTop.Location = new System.Drawing.Point(68, 231);
+            this.chkTop.Location = new System.Drawing.Point(79, 267);
             this.chkTop.Name = "chkTop";
-            this.chkTop.Size = new System.Drawing.Size(45, 17);
+            this.chkTop.Size = new System.Drawing.Size(47, 19);
             this.chkTop.TabIndex = 10;
             this.chkTop.Text = "Top";
             this.chkTop.UseVisualStyleBackColor = true;
@@ -147,9 +147,9 @@
             // chkRight
             // 
             this.chkRight.AutoSize = true;
-            this.chkRight.Location = new System.Drawing.Point(125, 231);
+            this.chkRight.Location = new System.Drawing.Point(146, 267);
             this.chkRight.Name = "chkRight";
-            this.chkRight.Size = new System.Drawing.Size(51, 17);
+            this.chkRight.Size = new System.Drawing.Size(55, 19);
             this.chkRight.TabIndex = 11;
             this.chkRight.Text = "Right";
             this.chkRight.UseVisualStyleBackColor = true;
@@ -157,9 +157,9 @@
             // chkBottom
             // 
             this.chkBottom.AutoSize = true;
-            this.chkBottom.Location = new System.Drawing.Point(186, 231);
+            this.chkBottom.Location = new System.Drawing.Point(217, 267);
             this.chkBottom.Name = "chkBottom";
-            this.chkBottom.Size = new System.Drawing.Size(59, 17);
+            this.chkBottom.Size = new System.Drawing.Size(65, 19);
             this.chkBottom.TabIndex = 12;
             this.chkBottom.Text = "Bottom";
             this.chkBottom.UseVisualStyleBackColor = true;
@@ -167,34 +167,34 @@
             // chkBold
             // 
             this.chkBold.AutoSize = true;
-            this.chkBold.Location = new System.Drawing.Point(186, 208);
+            this.chkBold.Location = new System.Drawing.Point(217, 240);
             this.chkBold.Name = "chkBold";
-            this.chkBold.Size = new System.Drawing.Size(77, 17);
+            this.chkBold.Size = new System.Drawing.Size(87, 19);
             this.chkBold.TabIndex = 13;
             this.chkBold.Text = "Bold labels";
             this.chkBold.UseVisualStyleBackColor = true;
             // 
             // txtName
             // 
-            this.txtName.Location = new System.Drawing.Point(10, 39);
+            this.txtName.Location = new System.Drawing.Point(12, 45);
             this.txtName.Name = "txtName";
-            this.txtName.Size = new System.Drawing.Size(251, 20);
+            this.txtName.Size = new System.Drawing.Size(292, 21);
             this.txtName.TabIndex = 14;
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(10, 23);
+            this.label5.Location = new System.Drawing.Point(12, 27);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(90, 13);
+            this.label5.Size = new System.Drawing.Size(104, 15);
             this.label5.TabIndex = 15;
             this.label5.Text = "Name of graticule";
             // 
             // btnRemove
             // 
-            this.btnRemove.Location = new System.Drawing.Point(68, 275);
+            this.btnRemove.Location = new System.Drawing.Point(79, 317);
             this.btnRemove.Name = "btnRemove";
-            this.btnRemove.Size = new System.Drawing.Size(142, 30);
+            this.btnRemove.Size = new System.Drawing.Size(166, 35);
             this.btnRemove.TabIndex = 16;
             this.btnRemove.Text = "Remove graticule";
             this.btnRemove.UseVisualStyleBackColor = true;
@@ -202,9 +202,9 @@
             // 
             // btnOk
             // 
-            this.btnOk.Location = new System.Drawing.Point(279, 39);
+            this.btnOk.Location = new System.Drawing.Point(325, 45);
             this.btnOk.Name = "btnOk";
-            this.btnOk.Size = new System.Drawing.Size(56, 24);
+            this.btnOk.Size = new System.Drawing.Size(65, 28);
             this.btnOk.TabIndex = 17;
             this.btnOk.Text = "Ok";
             this.btnOk.UseVisualStyleBackColor = true;
@@ -212,9 +212,9 @@
             // 
             // btnApply
             // 
-            this.btnApply.Location = new System.Drawing.Point(279, 69);
+            this.btnApply.Location = new System.Drawing.Point(325, 80);
             this.btnApply.Name = "btnApply";
-            this.btnApply.Size = new System.Drawing.Size(56, 24);
+            this.btnApply.Size = new System.Drawing.Size(65, 28);
             this.btnApply.TabIndex = 18;
             this.btnApply.Text = "Apply";
             this.btnApply.UseVisualStyleBackColor = true;
@@ -222,9 +222,9 @@
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(279, 107);
+            this.btnCancel.Location = new System.Drawing.Point(325, 123);
             this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(56, 24);
+            this.btnCancel.Size = new System.Drawing.Size(65, 28);
             this.btnCancel.TabIndex = 19;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
@@ -232,9 +232,9 @@
             // 
             // GraticuleForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(345, 324);
+            this.ClientSize = new System.Drawing.Size(402, 374);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnApply);
             this.Controls.Add(this.btnOk);
@@ -255,6 +255,7 @@
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
+            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "GraticuleForm";
             this.Text = "Graticule";
