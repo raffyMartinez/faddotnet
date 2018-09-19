@@ -314,7 +314,6 @@ namespace FAD3
             //setup display options of labels
             for (int n = 0; n < 4; n++)
             {
-                _sfGraticule.Labels.Category[n].FontOutlineVisible = false;
                 _sfGraticule.Labels.Category[n].FontBold = BoldLabels;
                 _sfGraticule.Labels.Category[n].FontSize = LabelFontSize;
                 _sfGraticule.Labels.Category[n].FrameVisible = false;

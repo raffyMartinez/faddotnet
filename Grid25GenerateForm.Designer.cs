@@ -124,7 +124,7 @@
             this.groupLabels.Controls.Add(this.shapeContainer1);
             this.groupLabels.Location = new System.Drawing.Point(4, 89);
             this.groupLabels.Name = "groupLabels";
-            this.groupLabels.Size = new System.Drawing.Size(269, 352);
+            this.groupLabels.Size = new System.Drawing.Size(245, 352);
             this.groupLabels.TabIndex = 4;
             this.groupLabels.TabStop = false;
             this.groupLabels.Text = "Labels";
@@ -133,7 +133,7 @@
             // 
             this.buttonLabel.ImageKey = "label";
             this.buttonLabel.ImageList = this.imList;
-            this.buttonLabel.Location = new System.Drawing.Point(230, 323);
+            this.buttonLabel.Location = new System.Drawing.Point(201, 323);
             this.buttonLabel.Name = "buttonLabel";
             this.buttonLabel.Size = new System.Drawing.Size(23, 23);
             this.buttonLabel.TabIndex = 26;
@@ -150,7 +150,7 @@
             // 
             // label12
             // 
-            this.label12.Location = new System.Drawing.Point(158, 285);
+            this.label12.Location = new System.Drawing.Point(146, 285);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(43, 37);
             this.label12.TabIndex = 24;
@@ -158,7 +158,7 @@
             // 
             // label11
             // 
-            this.label11.Location = new System.Drawing.Point(157, 244);
+            this.label11.Location = new System.Drawing.Point(145, 244);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(43, 37);
             this.label11.TabIndex = 23;
@@ -166,7 +166,7 @@
             // 
             // label10
             // 
-            this.label10.Location = new System.Drawing.Point(157, 202);
+            this.label10.Location = new System.Drawing.Point(145, 202);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(51, 37);
             this.label10.TabIndex = 22;
@@ -174,7 +174,7 @@
             // 
             // label9
             // 
-            this.label9.Location = new System.Drawing.Point(157, 161);
+            this.label9.Location = new System.Drawing.Point(145, 161);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(43, 37);
             this.label9.TabIndex = 21;
@@ -182,7 +182,7 @@
             // 
             // label8
             // 
-            this.label8.Location = new System.Drawing.Point(157, 120);
+            this.label8.Location = new System.Drawing.Point(145, 120);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(43, 37);
             this.label8.TabIndex = 20;
@@ -253,7 +253,7 @@
             this.txtMinorGridThickness.Location = new System.Drawing.Point(73, 289);
             this.txtMinorGridThickness.Margin = new System.Windows.Forms.Padding(4);
             this.txtMinorGridThickness.Name = "txtMinorGridThickness";
-            this.txtMinorGridThickness.Size = new System.Drawing.Size(64, 21);
+            this.txtMinorGridThickness.Size = new System.Drawing.Size(50, 21);
             this.txtMinorGridThickness.TabIndex = 13;
             // 
             // txtMajorGridThickness
@@ -261,7 +261,7 @@
             this.txtMajorGridThickness.Location = new System.Drawing.Point(72, 248);
             this.txtMajorGridThickness.Margin = new System.Windows.Forms.Padding(4);
             this.txtMajorGridThickness.Name = "txtMajorGridThickness";
-            this.txtMajorGridThickness.Size = new System.Drawing.Size(64, 21);
+            this.txtMajorGridThickness.Size = new System.Drawing.Size(50, 21);
             this.txtMajorGridThickness.TabIndex = 12;
             // 
             // txtBorderThickness
@@ -269,7 +269,7 @@
             this.txtBorderThickness.Location = new System.Drawing.Point(73, 206);
             this.txtBorderThickness.Margin = new System.Windows.Forms.Padding(4);
             this.txtBorderThickness.Name = "txtBorderThickness";
-            this.txtBorderThickness.Size = new System.Drawing.Size(64, 21);
+            this.txtBorderThickness.Size = new System.Drawing.Size(50, 21);
             this.txtBorderThickness.TabIndex = 11;
             // 
             // txtMajorGridLabelSize
@@ -277,7 +277,7 @@
             this.txtMajorGridLabelSize.Location = new System.Drawing.Point(72, 165);
             this.txtMajorGridLabelSize.Margin = new System.Windows.Forms.Padding(4);
             this.txtMajorGridLabelSize.Name = "txtMajorGridLabelSize";
-            this.txtMajorGridLabelSize.Size = new System.Drawing.Size(64, 21);
+            this.txtMajorGridLabelSize.Size = new System.Drawing.Size(50, 21);
             this.txtMajorGridLabelSize.TabIndex = 10;
             // 
             // txtMinorGridLabelSize
@@ -285,7 +285,7 @@
             this.txtMinorGridLabelSize.Location = new System.Drawing.Point(72, 124);
             this.txtMinorGridLabelSize.Margin = new System.Windows.Forms.Padding(4);
             this.txtMinorGridLabelSize.Name = "txtMinorGridLabelSize";
-            this.txtMinorGridLabelSize.Size = new System.Drawing.Size(64, 21);
+            this.txtMinorGridLabelSize.Size = new System.Drawing.Size(50, 21);
             this.txtMinorGridLabelSize.TabIndex = 9;
             // 
             // txtMinorGridLabelDistance
@@ -293,7 +293,7 @@
             this.txtMinorGridLabelDistance.Location = new System.Drawing.Point(73, 82);
             this.txtMinorGridLabelDistance.Margin = new System.Windows.Forms.Padding(4);
             this.txtMinorGridLabelDistance.Name = "txtMinorGridLabelDistance";
-            this.txtMinorGridLabelDistance.Size = new System.Drawing.Size(64, 21);
+            this.txtMinorGridLabelDistance.Size = new System.Drawing.Size(50, 21);
             this.txtMinorGridLabelDistance.TabIndex = 8;
             // 
             // label7
@@ -355,14 +355,14 @@
             this.shapeBorderColor,
             this.shapeMajorGridLabelColor,
             this.shapeMinorGridLabelColor});
-            this.shapeContainer1.Size = new System.Drawing.Size(263, 332);
+            this.shapeContainer1.Size = new System.Drawing.Size(239, 332);
             this.shapeContainer1.TabIndex = 25;
             this.shapeContainer1.TabStop = false;
             // 
             // shapeMinorGridLineColor
             // 
             this.shapeMinorGridLineColor.FillStyle = Microsoft.VisualBasic.PowerPacks.FillStyle.Solid;
-            this.shapeMinorGridLineColor.Location = new System.Drawing.Point(229, 277);
+            this.shapeMinorGridLineColor.Location = new System.Drawing.Point(197, 277);
             this.shapeMinorGridLineColor.Name = "shapeMinorGridLineColor";
             this.shapeMinorGridLineColor.Size = new System.Drawing.Size(23, 18);
             this.shapeMinorGridLineColor.DoubleClick += new System.EventHandler(this.OnShapeColor_DoubleClick);
@@ -371,7 +371,7 @@
             // 
             this.shapeMajorGridLineColor.FillColor = System.Drawing.Color.Red;
             this.shapeMajorGridLineColor.FillStyle = Microsoft.VisualBasic.PowerPacks.FillStyle.Solid;
-            this.shapeMajorGridLineColor.Location = new System.Drawing.Point(229, 236);
+            this.shapeMajorGridLineColor.Location = new System.Drawing.Point(197, 236);
             this.shapeMajorGridLineColor.Name = "shapeMajorGridLineColor";
             this.shapeMajorGridLineColor.Size = new System.Drawing.Size(23, 18);
             this.shapeMajorGridLineColor.DoubleClick += new System.EventHandler(this.OnShapeColor_DoubleClick);
@@ -379,7 +379,7 @@
             // shapeBorderColor
             // 
             this.shapeBorderColor.FillStyle = Microsoft.VisualBasic.PowerPacks.FillStyle.Solid;
-            this.shapeBorderColor.Location = new System.Drawing.Point(229, 193);
+            this.shapeBorderColor.Location = new System.Drawing.Point(197, 193);
             this.shapeBorderColor.Name = "shapeBorderColor";
             this.shapeBorderColor.Size = new System.Drawing.Size(23, 18);
             this.shapeBorderColor.DoubleClick += new System.EventHandler(this.OnShapeColor_DoubleClick);
@@ -388,7 +388,7 @@
             // 
             this.shapeMajorGridLabelColor.FillColor = System.Drawing.Color.Red;
             this.shapeMajorGridLabelColor.FillStyle = Microsoft.VisualBasic.PowerPacks.FillStyle.Solid;
-            this.shapeMajorGridLabelColor.Location = new System.Drawing.Point(229, 149);
+            this.shapeMajorGridLabelColor.Location = new System.Drawing.Point(197, 149);
             this.shapeMajorGridLabelColor.Name = "shapeMajorGridLabelColor";
             this.shapeMajorGridLabelColor.Size = new System.Drawing.Size(23, 18);
             this.shapeMajorGridLabelColor.DoubleClick += new System.EventHandler(this.OnShapeColor_DoubleClick);
@@ -397,14 +397,14 @@
             // 
             this.shapeMinorGridLabelColor.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.shapeMinorGridLabelColor.FillStyle = Microsoft.VisualBasic.PowerPacks.FillStyle.Solid;
-            this.shapeMinorGridLabelColor.Location = new System.Drawing.Point(229, 108);
+            this.shapeMinorGridLabelColor.Location = new System.Drawing.Point(197, 108);
             this.shapeMinorGridLabelColor.Name = "shapeMinorGridLabelColor";
             this.shapeMinorGridLabelColor.Size = new System.Drawing.Size(23, 18);
             this.shapeMinorGridLabelColor.DoubleClick += new System.EventHandler(this.OnShapeColor_DoubleClick);
             // 
             // buttonClose
             // 
-            this.buttonClose.Location = new System.Drawing.Point(198, 457);
+            this.buttonClose.Location = new System.Drawing.Point(229, 457);
             this.buttonClose.Name = "buttonClose";
             this.buttonClose.Size = new System.Drawing.Size(48, 28);
             this.buttonClose.TabIndex = 5;
@@ -416,7 +416,7 @@
             // 
             this.buttonClear.ImageIndex = 1;
             this.buttonClear.ImageList = this.imList;
-            this.buttonClear.Location = new System.Drawing.Point(280, 130);
+            this.buttonClear.Location = new System.Drawing.Point(257, 130);
             this.buttonClear.Name = "buttonClear";
             this.buttonClear.Size = new System.Drawing.Size(23, 23);
             this.buttonClear.TabIndex = 3;
@@ -427,7 +427,7 @@
             // 
             this.buttonGrid.ImageIndex = 0;
             this.buttonGrid.ImageList = this.imList;
-            this.buttonGrid.Location = new System.Drawing.Point(279, 102);
+            this.buttonGrid.Location = new System.Drawing.Point(256, 102);
             this.buttonGrid.Name = "buttonGrid";
             this.buttonGrid.Size = new System.Drawing.Size(23, 23);
             this.buttonGrid.TabIndex = 2;
@@ -446,7 +446,7 @@
             this.tsButtonExit});
             this.toolbar.Location = new System.Drawing.Point(0, 0);
             this.toolbar.Name = "toolbar";
-            this.toolbar.Size = new System.Drawing.Size(309, 25);
+            this.toolbar.Size = new System.Drawing.Size(285, 25);
             this.toolbar.SuppressHighlighting = true;
             this.toolbar.TabIndex = 7;
             this.toolbar.Text = "toolStripEx1";
@@ -516,7 +516,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(309, 494);
+            this.ClientSize = new System.Drawing.Size(285, 494);
             this.Controls.Add(this.toolbar);
             this.Controls.Add(this.buttonClose);
             this.Controls.Add(this.groupLabels);

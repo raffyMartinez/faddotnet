@@ -169,6 +169,13 @@
     <Compile Include="InlandGridCreateDBForm.Designer.cs">
       <DependentUpon>InlandGridCreateDBForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="LabelProperty.cs" />
+    <Compile Include="LabelsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LabelsForm.Designer.cs">
+      <DependentUpon>LabelsForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="SaveMapForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -403,6 +410,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="InlandGridCreateDBForm.resx">
       <DependentUpon>InlandGridCreateDBForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LabelsForm.resx">
+      <DependentUpon>LabelsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="SaveMapForm.resx">
       <DependentUpon>SaveMapForm.cs</DependentUpon>

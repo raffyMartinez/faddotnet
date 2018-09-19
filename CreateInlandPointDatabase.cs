@@ -63,7 +63,6 @@ namespace FAD3
                         ListIntersectLandArea();
                     }
 
-                    ProcessInlandGrids();
                     UpdateDatabase();
 
                     global.MappingForm.MapLayersHandler.AddLayer(_inlandMinorGrids, "Inland grids", true, true);
@@ -77,28 +76,21 @@ namespace FAD3
         }
 
         /// <summary>
-        ///Process inland grids created by intersecting minor grids with land shapes
+        ///Minor grids that are inside land will be copied to another shapefile of inland minor grids
         /// </summary>
         private static void ProcessInlandGrids()
         {
-            if (MinorGridsShapefile.NumSelected > 0)
+            if (_inlandMinorGrids.NumShapes == 0)
             {
-                if (_inlandMinorGrids.NumShapes == 0)
-                {
-                    _inlandMinorGrids = MinorGridsShapefile.ExportSelection();
-                }
-                else
-                {
-                    _inlandMinorGrids.Merge(false, MinorGridsShapefile, true); //   = MinorGridsInlandShapefile.ExportSelection();
-                }
-                _inlandMinorGrids.DefaultDrawingOptions.FillVisible = false;
-                _inlandMinorGrids.DefaultDrawingOptions.LineWidth = 1.1f;
-                _inlandMinorGrids.DefaultDrawingOptions.LineColor = new Utils().ColorByName(tkMapColor.Red);
-
-                //clear all shapes from the minorgrid shapefile so that during the next intersection process, the next selected
-                //land shape will not deal with grids that do not intersect with it.
-                MinorGridsShapefile.EditClear();
+                _inlandMinorGrids = MinorGridsShapefile.ExportSelection();
             }
+            else
+            {
+                _inlandMinorGrids = _inlandMinorGrids.Merge(false, MinorGridsShapefile, true);
+            }
+            _inlandMinorGrids.DefaultDrawingOptions.FillVisible = false;
+            _inlandMinorGrids.DefaultDrawingOptions.LineWidth = 1.1f;
+            _inlandMinorGrids.DefaultDrawingOptions.LineColor = new Utils().ColorByName(tkMapColor.Red);
         }
 
         /// <summary>
@@ -122,6 +114,10 @@ namespace FAD3
 
                 dbData.Execute(sql);
             }
+
+            dbData.Close();
+            dbData = null;
+            db = null;
         }
 
         /// <summary>
@@ -129,6 +125,7 @@ namespace FAD3
         /// </summary>
         private static void PopulateMinorGrid()
         {
+            MinorGridsShapefile.EditClear();
             FishingGrid.UTMZone = UTMZone;
 
             int ifldGridNo = Grid25Shapefile.FieldIndexByName["grid_no"];
@@ -142,7 +139,8 @@ namespace FAD3
                 //get the origin of the current major grid
                 var origin = FishingGrid.MajorGridOrigin(gridNumber);
 
-                //build a minor grid, a point at a time
+                //build a minor grid, a point at a time. Here we will be creating 5 points, one point for each corner of the grid.
+                //The 5th point is needed to close the polygon.
                 for (int row = 25; row > 0; row--)
                 {
                     for (int col = 0; col < 25; col++)
@@ -172,7 +170,11 @@ namespace FAD3
                                         break;
                                 }
                             }
+
+                            //add the new shape to the shapefile. iShp is the index of the newest added shape
                             var iShp = MinorGridsShapefile.EditAddShape(shp);
+
+                            //a new shape will have an index (iShp) of zero or greater
                             if (iShp >= 0)
                             {
                                 //name the cell
@@ -229,7 +231,7 @@ namespace FAD3
                     }
 
                     PopulateMinorGrid();
-                    GetMinorGridsWithinLand();
+                    if (GetMinorGridsWithinLand()) ProcessInlandGrids();
                 }
             }
         }
@@ -265,7 +267,7 @@ namespace FAD3
                     }
 
                     PopulateMinorGrid();
-                    GetMinorGridsWithinLand();
+                    if (GetMinorGridsWithinLand()) ProcessInlandGrids();
                 }
             }
         }
@@ -296,29 +298,19 @@ namespace FAD3
         }
 
         /// <summary>
-        /// Intersect minor grids with the currently selected land shapefile
+        /// Intersect minor grids with the currently selected land shapefile. Returns true if current land shape contains minor grid
         /// </summary>
-        private static void GetMinorGridsWithinLand()
+        private static bool GetMinorGridsWithinLand()
         {
             var objSelected = new object();
             var ifldInland = MinorGridsShapefile.FieldIndexByName["inland"];
 
-            //this select operation currently uses the currenty selected land shape
+            //this operation selects those minor grids within the selected land shape.
             MinorGridsShapefile.SelectByShapefile(LandShapefile, tkSpatialRelation.srWithin, true, ref objSelected);
 
-            var proceed = true;
             try
             {
                 _withinMinorGrids = (int[])objSelected;
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(ex.Message, "CreateInlandPointDatabase.cs", "GetMinorGridsWithinLand");
-                proceed = false;
-            }
-
-            if (proceed)
-            {
                 for (int n = 0; n < _withinMinorGrids.Length; n++)
                 {
                     MinorGridsShapefile.EditCellValue(ifldInland, _withinMinorGrids[n], true);
@@ -332,6 +324,12 @@ namespace FAD3
                     e.GridCount = _withinMinorGrids.Length;
                     StatusUpdate(e);
                 }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message, "CreateInlandPointDatabase.cs", "GetMinorGridsWithinLand");
+                return false;
             }
         }
 
@@ -356,26 +354,41 @@ namespace FAD3
                         break;
                     }
                 }
+
+                if (!tableFound)
+                {
+                    tableFound = CreateInlandGridTable(dbData);
+                }
             }
 
             if (!tableFound)
             {
-                var dbData = dbe.CreateDatabase(fileName, dao.LanguageConstants.dbLangGeneral);
-                var sql = @"Create table tblGrid25Inland
+                var dbData = dbe.CreateDatabase(fileName, LanguageConstants.dbLangGeneral);
+                tableFound = CreateInlandGridTable(dbData);
+            }
+            return tableFound;
+        }
+
+        /// <summary>
+        /// Helper function to create the inland grid table
+        /// </summary>
+        /// <param name="dbData"></param>
+        /// <returns></returns>
+        private static bool CreateInlandGridTable(Database dbData)
+        {
+            var sql = @"Create table tblGrid25Inland
                             (grid_name TEXT(8),
                              zone TEXT(3),
                              x DOUBLE,
                              y DOUBLE)";
 
-                dbData.Execute(sql);
+            dbData.Execute(sql);
 
-                sql = "Create index idxPrimary on tblGrid25Inland (grid_name, zone) with PRIMARY";
+            sql = "Create index idxPrimary on tblGrid25Inland (grid_name, zone) with PRIMARY";
 
-                dbData.Execute(sql);
+            dbData.Execute(sql);
 
-                tableFound = true;
-            }
-            return tableFound;
+            return true;
         }
     }
 }

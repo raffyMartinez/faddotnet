@@ -8,10 +8,59 @@ namespace FAD3
     {
         private bool _disposed;
         private Shapefile _shapeFile;
+        public LabelProperty LabelProperty { get; set; }
+
+        private void SetupLabelClass(Shapefile sf)
+        {
+            sf.Labels.With(l =>
+            {
+                LabelProperty.Alignment = l.Alignment;
+                LabelProperty.FontName = l.FontName;
+                LabelProperty.FontSize = l.FontSize;
+                LabelProperty.FontColor = l.FontColor;
+                LabelProperty.FontColor2 = l.FontColor2;
+                LabelProperty.FontGradientMode = l.FontGradientMode;
+                LabelProperty.FontBold = l.FontBold;
+                LabelProperty.FontItalic = l.FontItalic;
+                LabelProperty.FontStrikeout = l.FontStrikeOut;
+                LabelProperty.FontUnderline = l.FontUnderline;
+                LabelProperty.FontTransparency = l.FontTransparency;
+                LabelProperty.FontOutlineColor = l.FontOutlineColor;
+                LabelProperty.FontOutlineWidth = l.FrameOutlineWidth;
+                LabelProperty.FontOutlineVisible = l.FontOutlineVisible;
+
+                LabelProperty.FrameBackColor = l.FrameBackColor;
+                LabelProperty.FrameBackColor2 = l.FrameBackColor2;
+                LabelProperty.FrameGradientMode = l.FrameGradientMode;
+                LabelProperty.FrameOutlineColor = l.FrameOutlineColor;
+                LabelProperty.FrameOutlineStyle = l.FrameOutlineStyle;
+                LabelProperty.FrameOutlineWidth = l.FrameOutlineWidth;
+                LabelProperty.FramePaddingX = l.FramePaddingX;
+                LabelProperty.FramePaddingY = l.FramePaddingY;
+                LabelProperty.FrameTransparency = l.FrameTransparency;
+                LabelProperty.FrameType = l.FrameType;
+                LabelProperty.FrameVisible = l.FrameVisible;
+
+                LabelProperty.HaloColor = l.HaloColor;
+                LabelProperty.HaloSize = l.HaloSize;
+                LabelProperty.HaloVisible = l.HaloVisible;
+
+                LabelProperty.InboxAlignment = l.InboxAlignment;
+                LabelProperty.LineOrientation = l.LineOrientation;
+                LabelProperty.OffsetX = l.OffsetX;
+                LabelProperty.OffsetY = l.OffsetY;
+
+                LabelProperty.ShadowColor = l.ShadowColor;
+                LabelProperty.ShadowOffsetX = l.ShadowOffsetX;
+                LabelProperty.ShadowOffsetY = l.ShadowOffsetY;
+                LabelProperty.ShadowVisible = l.ShadowVisible;
+            });
+        }
 
         public ShapefileLabelHandler(Shapefile sf)
         {
             _shapeFile = sf;
+            SetupLabelClass(sf);
         }
 
         /// <summary>
@@ -25,6 +74,7 @@ namespace FAD3
 
             //applies label properties to the current shapefile's labels
             _shapeFile.Labels.Deserialize(labelXML);
+            SetupLabelClass(_shapeFile);
 
             //we convert string labelXML to an xml object
             var doc = new XmlDocument();
@@ -34,8 +84,8 @@ namespace FAD3
             doc.DocumentElement.With(d =>
             {
                 lbls = _shapeFile.GenerateLabels(
-                int.Parse(d.Attributes["SourceField"].Value),
-                (tkLabelPositioning)int.Parse(d.Attributes["Positioning"].Value), true);
+                    int.Parse(d.Attributes["SourceField"].Value),
+                    (tkLabelPositioning)int.Parse(d.Attributes["Positioning"].Value), true);
 
                 //AvoidCollision is not included in labelXML so we put it here
                 _shapeFile.Labels.AvoidCollisions = d.Attributes["AvoidCollision"].Value == "1";
