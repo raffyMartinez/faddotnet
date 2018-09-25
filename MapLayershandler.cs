@@ -16,6 +16,8 @@ namespace FAD3
         private AxMap _axmap;                                                                       //reference to tha map control in the mapping form
         private Dictionary<int, MapLayer> _mapLayerDictionary = new Dictionary<int, MapLayer>();    //contains MapLayers with the layer handle as key
         private MapLayer _currentMapLayer;                                                          //the current layer selected in the map layers form
+        private ShapefileLabelHandler _sfLabelHandler;
+        private SymbologyHandler _sfSymbologyHandler;
 
         public delegate void LayerReadHandler(MapLayersHandler s, LayerEventArg e);                 //an event that is raised when a layer from the mapcontrol is retrieved
         public event LayerReadHandler LayerRead;                                                    //in order for the listener is able to add the layer to the layers list
@@ -25,6 +27,16 @@ namespace FAD3
 
         public delegate void CurrentLayerHandler(MapLayersHandler s, LayerEventArg e);              //event raised when a layer is selected from the list found in the layers form
         public event CurrentLayerHandler CurrentLayer;
+
+        public ShapefileLabelHandler ShapeFileLableHandler
+        {
+            get { return _sfLabelHandler; }
+        }
+
+        public SymbologyHandler SymbologyHandler
+        {
+            get { return _sfSymbologyHandler; }
+        }
 
         public AxMap MapControl
         {
@@ -133,6 +145,9 @@ namespace FAD3
         public void set_MapLayer(int layerHandle)
         {
             _currentMapLayer = _mapLayerDictionary[layerHandle];
+            _sfLabelHandler = new ShapefileLabelHandler(_currentMapLayer);
+            _sfSymbologyHandler = new SymbologyHandler(_currentMapLayer);
+
             //if there are listeners to the event
             if (CurrentLayer != null)
             {
@@ -436,10 +451,9 @@ namespace FAD3
         /// </summary>
         /// <param name="sf"></param>
         /// <returns></returns>
-        public int AddLayer(Shapefile sf, string layerName = "")
+        public int AddLayer(Shapefile sf, string layerName = "", bool isVisible = true)
         {
-            var h = _axmap.AddLayer(sf, true);
-            MapLayer mapLayer;
+            var h = _axmap.AddLayer(sf, isVisible);
             if (h >= 0)
             {
                 if (layerName.Length == 0)
@@ -447,11 +461,11 @@ namespace FAD3
                     layerName = Path.GetFileName(sf.Filename);
                 }
                 _axmap.set_LayerName(h, layerName);
-                mapLayer = SetMapLayer(h, layerName, true, true, sf.GeoProjection, "ShapefileClass", sf.Filename);
+                _currentMapLayer = SetMapLayer(h, layerName, isVisible, true, sf.GeoProjection, "ShapefileClass", sf.Filename);
 
                 if (LayerRead != null)
                 {
-                    LayerEventArg lp = new LayerEventArg(h, layerName, true, true, mapLayer.LayerType);
+                    LayerEventArg lp = new LayerEventArg(h, layerName, true, true, _currentMapLayer.LayerType);
                     LayerRead(this, lp);
                 }
             }
@@ -463,9 +477,9 @@ namespace FAD3
         /// </summary>
         /// <param name="image"></param>
         /// <returns></returns>
-        public int AddLayer(MapWinGIS.Image image, string layerName = "")
+        public int AddLayer(MapWinGIS.Image image, string layerName = "", bool isVisible = true)
         {
-            var h = _axmap.AddLayer(image, true);
+            var h = _axmap.AddLayer(image, isVisible);
             MapLayer mapLayer;
             if (h >= 0)
             {
@@ -475,11 +489,11 @@ namespace FAD3
                 }
 
                 _axmap.set_LayerName(h, layerName);
-                mapLayer = SetMapLayer(h, layerName, true, true, image.GeoProjection, "ImageClass", image.Filename);
+                _currentMapLayer = SetMapLayer(h, layerName, isVisible, true, image.GeoProjection, "ImageClass", image.Filename);
 
                 if (LayerRead != null)
                 {
-                    LayerEventArg lp = new LayerEventArg(h, layerName, true, true, mapLayer.LayerType);
+                    LayerEventArg lp = new LayerEventArg(h, layerName, true, true, _currentMapLayer.LayerType);
                     LayerRead(this, lp);
                 }
             }
@@ -517,11 +531,12 @@ namespace FAD3
             }
 
             _axmap.set_LayerName(h, layerName);
-            mapLayer = SetMapLayer(h, layerName, visible, showInLayerUI, gp, layerType, fileName);
+            //mapLayer = SetMapLayer(h, layerName, visible, showInLayerUI, gp, layerType, fileName);
+            _currentMapLayer = SetMapLayer(h, layerName, visible, showInLayerUI, gp, layerType, fileName);
 
             if (LayerRead != null)
             {
-                LayerEventArg lp = new LayerEventArg(h, layerName, visible, showInLayerUI, mapLayer.LayerType);
+                LayerEventArg lp = new LayerEventArg(h, layerName, visible, showInLayerUI, _currentMapLayer.LayerType);
                 LayerRead(this, lp);
             }
 
@@ -613,21 +628,23 @@ namespace FAD3
                     foreach (XmlNode ly in doc.DocumentElement.SelectNodes("//Layer"))
                     {
                         fileName = ly.Attributes["Filename"].Value;
+                        var isVisible = true;
+                        isVisible = ly.Attributes["LayerVisible"]?.Value == "1";
                         if (ly.Attributes["LayerType"].Value == "Shapefile")
                         {
                             var sf = new Shapefile();
                             if (sf.Open(fileName))
                             {
-                                //the first layer added will determine the projection of the map control
-                                //var h = AddLayer(sf, ly.Attributes["LayerName"].Value, ly.Attributes["LayerVisible"].Value == "1", true, fileName);
-                                var h = AddLayer(sf, ly.Attributes["LayerName"].Value);
-                                _axmap.get_Shapefile(h).Deserialize(false, ly.InnerXml);
-                                ShapefileLabelHandler sflh = new ShapefileLabelHandler(_axmap.get_Shapefile(h));
+                                var h = AddLayer(sf, ly.Attributes["LayerName"].Value, isVisible);
+                                _sfSymbologyHandler.SymbolizeLayer(ly.InnerXml);
+                                _currentMapLayer.Visible = ly.Attributes["LayerVisible"].Value == "1";
+                                _sfLabelHandler = new ShapefileLabelHandler(_currentMapLayer);
                                 foreach (XmlNode child in ly.FirstChild.ChildNodes)
                                 {
                                     if (child.Name == "LabelsClass" && child.Attributes["Generated"].Value == "1")
                                     {
-                                        sflh.LabelShapefile(child.OuterXml);
+                                        _currentMapLayer.IsLabeled = child.Attributes["Generated"].Value == "1";
+                                        _sfLabelHandler.LabelShapefile(child.OuterXml);
                                     }
                                 }
                             }
@@ -638,8 +655,7 @@ namespace FAD3
                             var img = new MapWinGIS.Image();
                             if (img.Open(fileName))
                             {
-                                var h = AddLayer(img, ly.Attributes["LayerName"].Value);
-                                //var h = AddLayer(img, ly.Attributes["LayerName"].Value, ly.Attributes["LayerVisible"].Value == "1", true, fileName);
+                                var h = AddLayer(img, ly.Attributes["LayerName"].Value, isVisible);
                             }
                         }
                     }

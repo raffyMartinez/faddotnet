@@ -22,6 +22,12 @@ namespace FAD3
         public bool IsFishingGrid { get; set; }
         public int? LayerWeight { get; set; }
         public bool IsMaskLayer { get; set; }
+        public bool IsLabeled { get; set; }
+        public int LabelField { get; set; }
+        public string Expression { get; set; }
+        public string LabelSource { get; set; }
+        public string LabelsVisibilityExpression { get; set; }
+        public string ShapesVisibilityExpression { get; set; }
 
         public MapLayer(int handle, string name, bool visible, bool visibleInLayersUI)
         {

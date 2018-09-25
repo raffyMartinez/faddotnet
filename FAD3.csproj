@@ -138,6 +138,7 @@
     <Compile Include="EnumeratorEntryForm.Designer.cs">
       <DependentUpon>EnumeratorEntryForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="FADColors.cs" />
     <Compile Include="FishingGroundExtentsForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -146,6 +147,9 @@
     </Compile>
     <Compile Include="FishingGroundMappingHandler.cs" />
     <Compile Include="FolderBrowserLauncher.cs" />
+    <Compile Include="FontComboBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="GMSLineClass.cs" />
     <Compile Include="Graticule.cs" />
     <Compile Include="GraticuleForm.cs">
@@ -175,6 +179,12 @@
     </Compile>
     <Compile Include="LabelsForm.Designer.cs">
       <DependentUpon>LabelsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LayerSymbologyForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LayerSymbologyForm.Designer.cs">
+      <DependentUpon>LayerSymbologyForm.cs</DependentUpon>
     </Compile>
     <Compile Include="SaveMapForm.cs">
       <SubType>Form</SubType>
@@ -273,6 +283,7 @@
     <Compile Include="GearSpeciesSamplingsForm.Designer.cs">
       <DependentUpon>GearSpeciesSamplingsForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="SymbologyHandler.cs" />
     <Compile Include="TargetAreaForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -370,6 +381,12 @@
     </Compile>
     <Compile Include="Sampling.cs" />
     <Compile Include="UIRow.cs" />
+    <Compile Include="VisibilityQueryForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VisibilityQueryForm.Designer.cs">
+      <DependentUpon>VisibilityQueryForm.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="AllSpeciesForm.resx">
@@ -413,6 +430,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="LabelsForm.resx">
       <DependentUpon>LabelsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LayerSymbologyForm.resx">
+      <DependentUpon>LayerSymbologyForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="SaveMapForm.resx">
       <DependentUpon>SaveMapForm.cs</DependentUpon>
@@ -487,6 +507,9 @@
     <EmbeddedResource Include="SampledGear_SpecsForm.resx">
       <DependentUpon>SampledGear_SpecsForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="VisibilityQueryForm.resx">
+      <DependentUpon>VisibilityQueryForm.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0,Profile=Client">
@@ -558,6 +581,8 @@
   <ItemGroup>
     <Content Include="Fatcow-Farm-Fresh-Book-key.ico" />
     <Content Include="Icon1.ico" />
+    <None Include="Resources\UNDRLN.BMP" />
+    <None Include="Resources\ITL.BMP" />
     <None Include="Resources\mbr.bmp" />
     <None Include="Resources\ruler.bmp" />
     <None Include="Resources\pan.bmp" />
@@ -576,6 +601,7 @@
     <None Include="Resources\arrow.bmp" />
     <None Include="Resources\arrow32.bmp" />
     <None Include="Resources\clear_all_selection.bmp" />
+    <None Include="Resources\BLD.BMP" />
     <Content Include="Resources\clear_selection.bmp" />
     <None Include="Resources\document-save.bmp" />
     <None Include="Resources\fit.bmp" />

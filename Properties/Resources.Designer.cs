@@ -113,6 +113,16 @@ namespace FAD3.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap BLD {
+            get {
+                object obj = ResourceManager.GetObject("BLD", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap clear_all_selection {
             get {
                 object obj = ResourceManager.GetObject("clear_all_selection", resourceCulture);
@@ -353,6 +363,16 @@ namespace FAD3.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap ITL {
+            get {
+                object obj = ResourceManager.GetObject("ITL", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap jigs {
             get {
                 object obj = ResourceManager.GetObject("jigs", resourceCulture);
@@ -566,6 +586,16 @@ namespace FAD3.Properties {
         internal static System.Drawing.Bitmap traps {
             get {
                 object obj = ResourceManager.GetObject("traps", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap UNDRLN {
+            get {
+                object obj = ResourceManager.GetObject("UNDRLN", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

@@ -36,6 +36,14 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.txtFileName = new System.Windows.Forms.TextBox();
+            this.btnLabelFeatures = new System.Windows.Forms.Button();
+            this.btnLabelCategories = new System.Windows.Forms.Button();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.btnFeatureSymbols = new System.Windows.Forms.Button();
+            this.btnFeatureCategories = new System.Windows.Forms.Button();
+            this.groupBox1.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // txtLayerName
@@ -102,11 +110,72 @@
             this.txtFileName.Size = new System.Drawing.Size(252, 21);
             this.txtFileName.TabIndex = 6;
             // 
+            // btnLabelFeatures
+            // 
+            this.btnLabelFeatures.Location = new System.Drawing.Point(38, 28);
+            this.btnLabelFeatures.Name = "btnLabelFeatures";
+            this.btnLabelFeatures.Size = new System.Drawing.Size(78, 27);
+            this.btnLabelFeatures.TabIndex = 8;
+            this.btnLabelFeatures.Text = "Features";
+            this.btnLabelFeatures.UseVisualStyleBackColor = true;
+            this.btnLabelFeatures.Click += new System.EventHandler(this.OnButtonClick);
+            // 
+            // btnLabelCategories
+            // 
+            this.btnLabelCategories.Location = new System.Drawing.Point(38, 65);
+            this.btnLabelCategories.Name = "btnLabelCategories";
+            this.btnLabelCategories.Size = new System.Drawing.Size(78, 27);
+            this.btnLabelCategories.TabIndex = 9;
+            this.btnLabelCategories.Text = "Categories";
+            this.btnLabelCategories.UseVisualStyleBackColor = true;
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.btnLabelFeatures);
+            this.groupBox1.Controls.Add(this.btnLabelCategories);
+            this.groupBox1.Location = new System.Drawing.Point(27, 195);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(142, 113);
+            this.groupBox1.TabIndex = 10;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Labels";
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.btnFeatureSymbols);
+            this.groupBox2.Controls.Add(this.btnFeatureCategories);
+            this.groupBox2.Location = new System.Drawing.Point(214, 195);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(142, 113);
+            this.groupBox2.TabIndex = 11;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Symbols";
+            // 
+            // btnFeatureSymbols
+            // 
+            this.btnFeatureSymbols.Location = new System.Drawing.Point(36, 28);
+            this.btnFeatureSymbols.Name = "btnFeatureSymbols";
+            this.btnFeatureSymbols.Size = new System.Drawing.Size(80, 27);
+            this.btnFeatureSymbols.TabIndex = 8;
+            this.btnFeatureSymbols.Text = "Features";
+            this.btnFeatureSymbols.UseVisualStyleBackColor = true;
+            // 
+            // btnFeatureCategories
+            // 
+            this.btnFeatureCategories.Location = new System.Drawing.Point(36, 65);
+            this.btnFeatureCategories.Name = "btnFeatureCategories";
+            this.btnFeatureCategories.Size = new System.Drawing.Size(80, 27);
+            this.btnFeatureCategories.TabIndex = 9;
+            this.btnFeatureCategories.Text = "Categories";
+            this.btnFeatureCategories.UseVisualStyleBackColor = true;
+            // 
             // LayerPropertyForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(525, 545);
+            this.ClientSize = new System.Drawing.Size(380, 356);
+            this.Controls.Add(this.groupBox2);
+            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.txtFileName);
             this.Controls.Add(this.label3);
@@ -122,6 +191,8 @@
             this.Text = "LayerPropertyForm";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.LayerPropertyForm_FormClosed);
             this.Load += new System.EventHandler(this.LayerPropertyForm_Load);
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox2.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -137,5 +208,11 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox txtFileName;
+        private System.Windows.Forms.Button btnLabelFeatures;
+        private System.Windows.Forms.Button btnLabelCategories;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.Button btnFeatureSymbols;
+        private System.Windows.Forms.Button btnFeatureCategories;
     }
 }

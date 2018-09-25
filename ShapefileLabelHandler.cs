@@ -9,6 +9,7 @@ namespace FAD3
         private bool _disposed;
         private Shapefile _shapeFile;
         public LabelProperty LabelProperty { get; set; }
+        private MapLayer _mapLayer;
 
         private void SetupLabelClass(Shapefile sf)
         {
@@ -57,10 +58,11 @@ namespace FAD3
             });
         }
 
-        public ShapefileLabelHandler(Shapefile sf)
+        public ShapefileLabelHandler(MapLayer mapLayer)
         {
-            _shapeFile = sf;
-            SetupLabelClass(sf);
+            _mapLayer = mapLayer;
+            _shapeFile = (Shapefile)_mapLayer.LayerObject;
+            //SetupLabelClass(_shapeFile);
         }
 
         /// <summary>
@@ -74,7 +76,7 @@ namespace FAD3
 
             //applies label properties to the current shapefile's labels
             _shapeFile.Labels.Deserialize(labelXML);
-            SetupLabelClass(_shapeFile);
+            //SetupLabelClass(_shapeFile);
 
             //we convert string labelXML to an xml object
             var doc = new XmlDocument();
@@ -83,9 +85,24 @@ namespace FAD3
             //we use attributes such as SourceField and Positioning in generating labels for the shapefile
             doc.DocumentElement.With(d =>
             {
-                lbls = _shapeFile.GenerateLabels(
-                    int.Parse(d.Attributes["SourceField"].Value),
-                    (tkLabelPositioning)int.Parse(d.Attributes["Positioning"].Value), true);
+                if (d.Attributes["Expression"] != null)
+                {
+                    _mapLayer.Expression = d.Attributes["Expression"].Value;
+                    _shapeFile.Labels.Expression = _mapLayer.Expression;
+                    lbls = _shapeFile.Labels.Count;
+                    _mapLayer.LabelSource = "Expression";
+                }
+                else if (d.Attributes["SourceField"].Value != null)
+                {
+                    _mapLayer.LabelField = int.Parse(d.Attributes["SourceField"].Value);
+                    lbls = _shapeFile.GenerateLabels(_mapLayer.LabelField, (tkLabelPositioning)int.Parse(d.Attributes["Positioning"].Value), true);
+                    _mapLayer.LabelSource = "SourceField";
+                }
+
+                if (d.Attributes["VisibilityExpression"].Value != null)
+                {
+                    _mapLayer.LabelsVisibilityExpression = d.Attributes["VisibilityExpression"].Value;
+                }
 
                 //AvoidCollision is not included in labelXML so we put it here
                 _shapeFile.Labels.AvoidCollisions = d.Attributes["AvoidCollision"].Value == "1";
@@ -142,6 +159,66 @@ namespace FAD3
                 _shapeFile = null;
                 _disposed = true;
             }
+        }
+
+        /// <summary>
+        /// Tests expression entered by user
+        /// </summary>
+        public static (bool isValid, string message) TestExpression(string expression, Shapefile shapeFile)
+        {
+            var result = string.Empty;
+            var isValid = true;
+            if (expression.Length > 0)
+            {
+                string expr = FixExpression(expression);
+                if (expr == String.Empty)
+                {
+                    result = "No expression";
+                }
+                else
+                {
+                    string err = "";
+                    if (!shapeFile.Table.TestExpression(expr, tkValueType.vtString, ref err))
+                    {
+                        result = err;
+                        isValid = false;
+                    }
+                    else
+                    {
+                        result = "Expression is valid";
+                    }
+                }
+            }
+
+            return (isValid, result);
+        }
+
+        /// <summary>
+        /// Returns the expression which complies with the ocx parser rules
+        /// The new line characters should be placed in quotes
+        /// </summary>
+        public static string FixExpression(string s)
+        {
+            string res = "";
+            int count = 0;
+            for (int i = 0; i < s.Length; i++)
+            {
+                if (s[i] == '\"')
+                {
+                    count++;
+                }
+
+                // there is new line character outside any brackets
+                if (s[i] == '\n' && count % 2 == 0)
+                {
+                    res += "\"\n\"+";
+                }
+                else
+                {
+                    res += s[i];
+                }
+            }
+            return res;
         }
     }
 }

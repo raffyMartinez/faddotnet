@@ -56,5 +56,32 @@ namespace FAD3
             _instance = null;
             global.SaveFormSettings(this);
         }
+
+        private void OnButtonClick(object sender, EventArgs e)
+        {
+            switch (((Button)sender).Name)
+            {
+                case "btnLabelFeatures":
+                    var labelsForm = LabelsForm.GetInstance(_mapLayer);
+                    if (!labelsForm.Visible)
+                    {
+                        labelsForm.Show(this);
+                    }
+                    else
+                    {
+                        labelsForm.BringToFront();
+                    }
+                    break;
+
+                case "btnLabelCategories":
+                    break;
+
+                case "btnFeatureSymbols":
+                    break;
+
+                case "btnFeatureCategories":
+                    break;
+            }
+        }
     }
 }

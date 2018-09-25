@@ -25,6 +25,7 @@ namespace FAD3
         private int _handleLabels;
         private int _handleMajorGrid;
         private int _handleMinorGrid;
+        private Dictionary<int, int> _frameWidthDict = new Dictionary<int, int>();
 
         /// <summary>
         /// Constructor
@@ -62,37 +63,50 @@ namespace FAD3
         /// Sets different numeric properties of labels to fit the desired DPI of the output map
         /// </summary>
         /// <param name="labels"></param>
-        private void AdjustLabelProperties(Labels labels)
+        private void AdjustLabelProperties(int layerHandle)
         {
-            labels.With(lbl =>
-            {
-                lbl.VerticalPosition = tkVerticalPosition.vpAboveParentLayer;
-                lbl.FontSize = (int)AdjustLabelProperty(lbl.FontSize);
-                lbl.OffsetX = AdjustLabelProperty(lbl.OffsetX);
-                lbl.OffsetY = AdjustLabelProperty(lbl.OffsetY);
-                lbl.FontOutlineWidth = (int)AdjustLabelProperty(lbl.FontOutlineWidth);
-                lbl.FrameOutlineWidth = (int)AdjustLabelProperty(lbl.FrameOutlineWidth);
-                lbl.FramePaddingX = (int)AdjustLabelProperty(lbl.FramePaddingX);
-                lbl.FramePaddingY = (int)AdjustLabelProperty(lbl.FramePaddingY);
-                lbl.ShadowOffsetX = (int)AdjustLabelProperty(lbl.ShadowOffsetX);
-                lbl.ShadowOffsetY = (int)AdjustLabelProperty(lbl.ShadowOffsetY);
+            _axMap.get_Shapefile(layerHandle).Labels.With(lbl =>
+           {
+               lbl.VerticalPosition = tkVerticalPosition.vpAboveParentLayer;
+               lbl.FontSize = (int)AdjustLabelProperty(lbl.FontSize);
+               lbl.OffsetX = AdjustLabelProperty(lbl.OffsetX);
+               lbl.OffsetY = AdjustLabelProperty(lbl.OffsetY);
+               lbl.FontOutlineWidth = (int)AdjustLabelProperty(lbl.FontOutlineWidth);
+               lbl.FramePaddingX = (int)AdjustLabelProperty(lbl.FramePaddingX);
+               lbl.FramePaddingY = (int)AdjustLabelProperty(lbl.FramePaddingY);
+               lbl.ShadowOffsetX = (int)AdjustLabelProperty(lbl.ShadowOffsetX);
+               lbl.ShadowOffsetY = (int)AdjustLabelProperty(lbl.ShadowOffsetY);
 
-                if (lbl.NumCategories > 0)
-                {
-                    for (int n = 0; n < lbl.NumCategories; n++)
-                    {
-                        lbl.Category[n].FontSize = (int)AdjustLabelProperty(lbl.Category[n].FontSize);
-                        lbl.Category[n].OffsetX = AdjustLabelProperty(lbl.Category[n].OffsetX);
-                        lbl.Category[n].OffsetY = AdjustLabelProperty(lbl.Category[n].OffsetY);
-                        lbl.Category[n].FontOutlineWidth = (int)AdjustLabelProperty(lbl.Category[n].FontOutlineWidth);
-                        lbl.Category[n].FrameOutlineWidth = (int)AdjustLabelProperty(lbl.Category[n].FrameOutlineWidth);
-                        lbl.Category[n].FramePaddingX = (int)AdjustLabelProperty(lbl.Category[n].FramePaddingX);
-                        lbl.Category[n].FramePaddingY = (int)AdjustLabelProperty(lbl.Category[n].FramePaddingY);
-                        lbl.Category[n].ShadowOffsetX = (int)AdjustLabelProperty(lbl.Category[n].ShadowOffsetX);
-                        lbl.Category[n].ShadowOffsetY = (int)AdjustLabelProperty(lbl.Category[n].ShadowOffsetY);
-                    }
-                }
-            });
+               if (Reset)
+               {
+                   lbl.FrameOutlineWidth = _frameWidthDict[layerHandle];
+                   _frameWidthDict[layerHandle] = lbl.FrameOutlineWidth;
+               }
+               else
+               {
+                   if (!_frameWidthDict.ContainsKey(layerHandle))
+                   {
+                       _frameWidthDict.Add(layerHandle, lbl.FrameOutlineWidth);
+                   }
+                   lbl.FrameOutlineWidth = (int)AdjustLabelProperty(lbl.FrameOutlineWidth);
+               }
+
+               if (lbl.NumCategories > 0)
+               {
+                   for (int n = 0; n < lbl.NumCategories; n++)
+                   {
+                       lbl.Category[n].FontSize = (int)AdjustLabelProperty(lbl.Category[n].FontSize);
+                       lbl.Category[n].OffsetX = AdjustLabelProperty(lbl.Category[n].OffsetX);
+                       lbl.Category[n].OffsetY = AdjustLabelProperty(lbl.Category[n].OffsetY);
+                       lbl.Category[n].FontOutlineWidth = (int)AdjustLabelProperty(lbl.Category[n].FontOutlineWidth);
+                       lbl.Category[n].FramePaddingX = (int)AdjustLabelProperty(lbl.Category[n].FramePaddingX);
+                       lbl.Category[n].FramePaddingY = (int)AdjustLabelProperty(lbl.Category[n].FramePaddingY);
+                       lbl.Category[n].ShadowOffsetX = (int)AdjustLabelProperty(lbl.Category[n].ShadowOffsetX);
+                       lbl.Category[n].ShadowOffsetY = (int)AdjustLabelProperty(lbl.Category[n].ShadowOffsetY);
+                       lbl.Category[n].FrameOutlineWidth = (int)AdjustLabelProperty(lbl.Category[n].FrameOutlineWidth);
+                   }
+               }
+           });
         }
 
         /// <summary>
@@ -107,7 +121,7 @@ namespace FAD3
 
                 if (_axMap.get_LayerVisible(h))
                 {
-                    AdjustLabelProperties(_axMap.get_Shapefile(h).Labels);
+                    AdjustLabelProperties(h);
 
                     _axMap.get_Shapefile(h).DefaultDrawingOptions.With(ddo =>
                     {
@@ -215,7 +229,7 @@ namespace FAD3
             //create an image whose width (w) will result in a map whose width in pixels fits the the required dpi
             var img = _axMap.SnapShot3(ext.xMin, ext.xMax, ext.yMax, ext.yMin, (int)w);
 
-            //spacify filename of projection file for the image
+            //specify filename of projection file for the image
             var prjFileName = _fileName.Replace(Path.GetExtension(_fileName), ".prj");
 
             //restore the map to its previous state by removing the mask and setting Reset to true
