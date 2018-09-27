@@ -45,6 +45,52 @@ namespace FAD3
             get { return _grid25.MajorGridSizeMeters; }
         }
 
+        public static (string grid25Grid, double easting, double northing, bool isValid) LongLatToGrid25(double longitude, double latitude, fadUTMZone utmZone = fadUTMZone.utmZone51N, string datumName = "WGS 84")
+        {
+            bool proceed = true;
+            switch (utmZone)
+            {
+                case fadUTMZone.utmZone50N:
+                    proceed = longitude >= 114 && longitude <= 120;
+                    break;
+
+                case fadUTMZone.utmZone51N:
+                    proceed = longitude >= 120 && longitude <= 126;
+                    break;
+
+                default:
+                    proceed = false;
+                    break;
+            }
+
+            if (proceed && latitude > 0)
+            {
+                var ll2UTM = new LatLngUTMConverter(datumName);
+                var result = ll2UTM.convertLatLngToUtm(latitude, longitude);
+                double mgEasting = result.UTMEasting;
+                double mgNorthing = result.UTMNorthing;
+                var minorGridResult = utmCoordinatesToGrid25(mgEasting, mgNorthing, utmZone);
+                return (minorGridResult.grid25Name, minorGridResult.Easting, minorGridResult.Northing, true);
+            }
+            return ("", 0, 0, proceed);
+        }
+
+        public static (string grid25Name, int Easting, int Northing) utmCoordinatesToGrid25(double easting, double northing, fadUTMZone utmZone)
+        {
+            SetGrid25Parameters(utmZone);
+            int mjCol = 1 + (int)(easting - _grid25.MajorGridXOrigin) / 50000;
+            int mjRow = (int)(northing - _grid25.MajorGridYOrigin) / 50000;
+            int mgNumber = mjRow * (_grid25.MajorGridColumns) + mjCol;
+            int mnCol = (int)(((easting / _grid25.MajorGridSizeMeters) - (int)(easting / _grid25.MajorGridSizeMeters)) * _grid25.MajorGridSizeMeters);
+            int mnRow = (int)(((northing / _grid25.MajorGridSizeMeters) - (int)(northing / _grid25.MajorGridSizeMeters)) * _grid25.MajorGridSizeMeters);
+            mnCol /= _grid25.MinorGridCellSizeMeters;
+            mnRow /= _grid25.MinorGridCellSizeMeters;
+            var col = (char)('A' + mnCol);
+            int outEasting = (int)(easting / _grid25.MinorGridCellSizeMeters) * _grid25.MinorGridCellSizeMeters + (_grid25.MinorGridCellSizeMeters / 2);
+            int outNorthing = (int)(northing / _grid25.MinorGridCellSizeMeters) * _grid25.MinorGridCellSizeMeters + (_grid25.MinorGridCellSizeMeters / 2);
+            return ($"{mgNumber.ToString()}-{col}{(25 - mnRow).ToString()}", outEasting, outNorthing);
+        }
+
         /// <summary>
         /// Returns length in meters of one side of a minor grid
         /// </summary>
@@ -402,6 +448,33 @@ namespace FAD3
                 {
                     con.Open();
                     string query = $"Select grid_name from tblGrid25Inland where grid_name ='{MinorGridName}' and [zone] = '{UTMZoneName}'";
+                    using (var dt = new DataTable())
+                    {
+                        var adapter = new OleDbDataAdapter(query, con);
+                        adapter.Fill(dt);
+                        IsInland = dt.Rows.Count > 0;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex.Message, "FishingGrid.cs", "MinorGridIsInland");
+                }
+            }
+
+            return IsInland;
+        }
+
+        public static bool MinorGridIsInland(string MinorGridName, string utmZoneName)
+        {
+            var conString = $@"Provider=Microsoft.JET.OLEDB.4.0;data source= {_appPath}\grid25inland.mdb";
+
+            bool IsInland = false;
+            using (var con = new OleDbConnection(conString))
+            {
+                try
+                {
+                    con.Open();
+                    string query = $"Select grid_name from tblGrid25Inland where grid_name ='{MinorGridName}' and [zone] = '{utmZoneName}'";
                     using (var dt = new DataTable())
                     {
                         var adapter = new OleDbDataAdapter(query, con);

@@ -240,6 +240,12 @@ namespace FAD3
             {
                 MarkCurrentLayerName(e.RowIndex);
                 _mapLayersHandler.set_MapLayer((int)layerGrid[0, e.RowIndex].Tag);
+                itemConvertToGrid25.Enabled = false;
+                if (global.MappingMode == global.fad3MappingMode.grid25Mode && _mapLayersHandler.CurrentMapLayer.LayerType == "ShapefileClass")
+                {
+                    var sf = _mapLayersHandler.CurrentMapLayer.LayerObject as Shapefile;
+                    itemConvertToGrid25.Enabled = sf.ShapefileType == ShpfileType.SHP_POINT;
+                }
             }
         }
 
@@ -291,6 +297,29 @@ namespace FAD3
                         case "ImageClass":
                             break;
                     }
+                    break;
+            }
+        }
+
+        private void OnoptionsToolStripMenuItem_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+            e.ClickedItem.OwnerItem.Owner.Hide();
+            switch (e.ClickedItem.Name)
+            {
+                case "itemConvertToGrid25":
+                    var cgf = ConvertToGrid25Form.GetInstance();
+                    cgf.MapLayer = _mapLayersHandler.CurrentMapLayer;
+                    if (!cgf.Visible)
+                    {
+                        cgf.Show(this);
+                    }
+                    else
+                    {
+                        cgf.BringToFront();
+                    }
+
+                    //var sf = ShapefileLayerHelper.ConvertToGrid25((Shapefile)_mapLayersHandler.CurrentMapLayer.LayerObject, global.MappingForm.UTMZone);
+                    //global.MappingForm.MapLayersHandler.AddLayer(sf, "Converted");
                     break;
             }
         }

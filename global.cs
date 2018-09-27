@@ -463,6 +463,13 @@ namespace FAD3
             GMS
         }
 
+        public enum fad3ActionType
+        {
+            atIgnore,
+            atTakeNote,
+            atRemove
+        }
+
         public enum fad3DataStatus
         {
             statusFromDB,

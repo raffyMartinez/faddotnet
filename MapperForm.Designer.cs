@@ -54,6 +54,8 @@
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.tsButtonGraticule = new System.Windows.Forms.ToolStripButton();
             this.tsButtonSaveImage = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsButtonCloseMap = new System.Windows.Forms.ToolStripButton();
             ((System.ComponentModel.ISupportInitialize)(this.axMap)).BeginInit();
             this.toolstripToolBar.SuspendLayout();
             this.SuspendLayout();
@@ -113,7 +115,9 @@
             this.tsButtonClearAllSelection,
             this.toolStripSeparator3,
             this.tsButtonGraticule,
-            this.tsButtonSaveImage});
+            this.tsButtonSaveImage,
+            this.toolStripSeparator4,
+            this.tsButtonCloseMap});
             this.toolstripToolBar.Location = new System.Drawing.Point(0, 0);
             this.toolstripToolBar.Name = "toolstripToolBar";
             this.toolstripToolBar.Size = new System.Drawing.Size(934, 25);
@@ -296,6 +300,21 @@
             this.tsButtonSaveImage.Size = new System.Drawing.Size(23, 22);
             this.tsButtonSaveImage.Text = "Save map as image";
             // 
+            // toolStripSeparator4
+            // 
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(6, 25);
+            // 
+            // tsButtonCloseMap
+            // 
+            this.tsButtonCloseMap.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsButtonCloseMap.Image = global::FAD3.Properties.Resources.im_exit;
+            this.tsButtonCloseMap.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsButtonCloseMap.Name = "tsButtonCloseMap";
+            this.tsButtonCloseMap.Size = new System.Drawing.Size(23, 22);
+            this.tsButtonCloseMap.Text = "toolStripButton1";
+            this.tsButtonCloseMap.ToolTipText = "Close map";
+            // 
             // MapperForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -344,5 +363,7 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripButton tsButtonGraticule;
         private System.Windows.Forms.ToolStripButton tsButtonSaveImage;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+        private System.Windows.Forms.ToolStripButton tsButtonCloseMap;
     }
 }

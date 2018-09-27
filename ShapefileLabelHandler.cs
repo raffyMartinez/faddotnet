@@ -92,14 +92,14 @@ namespace FAD3
                     lbls = _shapeFile.Labels.Count;
                     _mapLayer.LabelSource = "Expression";
                 }
-                else if (d.Attributes["SourceField"].Value != null)
+                else if (d.Attributes["SourceField"] != null)
                 {
                     _mapLayer.LabelField = int.Parse(d.Attributes["SourceField"].Value);
                     lbls = _shapeFile.GenerateLabels(_mapLayer.LabelField, (tkLabelPositioning)int.Parse(d.Attributes["Positioning"].Value), true);
                     _mapLayer.LabelSource = "SourceField";
                 }
 
-                if (d.Attributes["VisibilityExpression"].Value != null)
+                if (d.Attributes["VisibilityExpression"] != null)
                 {
                     _mapLayer.LabelsVisibilityExpression = d.Attributes["VisibilityExpression"].Value;
                 }

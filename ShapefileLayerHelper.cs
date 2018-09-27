@@ -26,6 +26,104 @@ namespace FAD3
             }
         }
 
+        /// <summary>
+        /// Creates a new shapefile from a point shapefile where each point is located in the center of a grid25 cell. All fields in the source point shapefile are copied to the new shapefile
+        /// </summary>
+        /// <param name="pointShapefile"></param>
+        /// <param name="utmZone"></param>
+        /// <returns></returns>
+        public static Shapefile ConvertToGrid25(Shapefile pointShapefile, FishingGrid.fadUTMZone utmZone,
+            global.fad3ActionType inlandAction = global.fad3ActionType.atIgnore,
+            global.fad3ActionType outsideMapAction = global.fad3ActionType.atIgnore)
+        {
+            var sf = new Shapefile();
+            var listFields = new List<string>();
+            var zoneName = string.Empty;
+            if (sf.CreateNewWithShapeID("", ShpfileType.SHP_POINT))
+            {
+                var gp = new GeoProjection();
+                switch (utmZone)
+                {
+                    case FishingGrid.fadUTMZone.utmZone50N:
+                        gp.SetWgs84Projection(tkWgs84Projection.Wgs84_UTM_zone_50N);
+                        zoneName = "50N";
+                        break;
+
+                    case FishingGrid.fadUTMZone.utmZone51N:
+                        gp.SetWgs84Projection(tkWgs84Projection.Wgs84_UTM_zone_51N);
+                        zoneName = "51N";
+                        break;
+                }
+
+                sf.GeoProjection = gp;
+
+                for (int f = 0; f < pointShapefile.NumFields; f++)
+                {
+                    listFields.Add(pointShapefile.Field[f].Name);
+                    sf.EditAddField(listFields[f], pointShapefile.Field[f].Type, pointShapefile.Field[f].Precision, pointShapefile.Field[f].Width);
+                }
+                var ifldGrid = sf.EditAddField("grid25", FieldType.STRING_FIELD, 1, 8);
+
+                var ifldInlandAction = -1;
+                if (inlandAction == global.fad3ActionType.atTakeNote)
+                {
+                    ifldInlandAction = sf.EditAddField("isInland", FieldType.BOOLEAN_FIELD, 1, 1);
+                }
+
+                var ifldOutsideAction = -1;
+                if (outsideMapAction == global.fad3ActionType.atTakeNote)
+                {
+                    ifldOutsideAction = sf.EditAddField("isOutsid", FieldType.BOOLEAN_FIELD, 1, 1);
+                }
+
+                for (int n = 0; n < pointShapefile.NumShapes; n++)
+                {
+                    var shp = new Shape();
+                    if (shp.Create(ShpfileType.SHP_POINT))
+                    {
+                        //get the x,y coordinates of the source point shape
+                        var x = pointShapefile.Shape[n].Point[0].x;
+                        var y = pointShapefile.Shape[n].Point[0].y;
+
+                        //call the function that returns the coordinates of the grid center where the point is located
+                        var result = FishingGrid.utmCoordinatesToGrid25(x, y, utmZone);
+
+                        var removeInland = false;
+                        var isInland = false;
+                        if (inlandAction != global.fad3ActionType.atIgnore)
+                        {
+                            isInland = FishingGrid.MinorGridIsInland(result.grid25Name, zoneName);
+                            removeInland = isInland && inlandAction == global.fad3ActionType.atRemove;
+                        }
+
+                        if (!removeInland)
+                        {
+                            //create a new point shape and add it to the destination shapefile
+                            shp.AddPoint(result.Easting, result.Northing);
+                            var iShp = sf.EditAddShape(shp);
+
+                            //update the destination shapefile fields
+                            foreach (var item in listFields)
+                            {
+                                var ifldDestination = sf.FieldIndexByName[item];
+                                var ifldSource = pointShapefile.FieldIndexByName[item];
+                                sf.EditCellValue(ifldDestination, iShp, pointShapefile.CellValue[ifldSource, n]);
+                            }
+                            sf.EditCellValue(ifldGrid, iShp, result.grid25Name);
+
+                            if (ifldInlandAction >= 0)
+                            {
+                                sf.EditCellValue(ifldInlandAction, iShp, isInland);
+                            }
+                        }
+                    }
+                }
+
+                return sf;
+            }
+            return null;
+        }
+
         public static global.ExtentCompare ExtentsPosition(Extents ext1, Extents ext2)
         {
             global.ExtentCompare exco = global.ExtentCompare.excoSimilar;

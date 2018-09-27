@@ -362,7 +362,7 @@ namespace FAD3
                     _shapeFile.Labels.ShadowOffsetX = int.Parse(txtShadowOffsetX.Text);
                     _shapeFile.Labels.ShadowOffsetY = int.Parse(txtShadowOffsetY.Text);
 
-                    if (_mapLayer.LabelsVisibilityExpression.Length > 0)
+                    if (_mapLayer.LabelsVisibilityExpression?.Length > 0)
                     {
                         _shapeFile.Labels.VisibilityExpression = _mapLayer.LabelsVisibilityExpression;
                     }
@@ -428,8 +428,7 @@ namespace FAD3
                     {
                         visibilityQueryForm.BringToFront();
                     }
-                    
-                    
+
                     break;
             }
         }

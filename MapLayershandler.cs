@@ -145,8 +145,11 @@ namespace FAD3
         public void set_MapLayer(int layerHandle)
         {
             _currentMapLayer = _mapLayerDictionary[layerHandle];
-            _sfLabelHandler = new ShapefileLabelHandler(_currentMapLayer);
-            _sfSymbologyHandler = new SymbologyHandler(_currentMapLayer);
+            if (_currentMapLayer.LayerType == "ShapefileClass")
+            {
+                _sfLabelHandler = new ShapefileLabelHandler(_currentMapLayer);
+                _sfSymbologyHandler = new SymbologyHandler(_currentMapLayer);
+            }
 
             //if there are listeners to the event
             if (CurrentLayer != null)
@@ -531,7 +534,6 @@ namespace FAD3
             }
 
             _axmap.set_LayerName(h, layerName);
-            //mapLayer = SetMapLayer(h, layerName, visible, showInLayerUI, gp, layerType, fileName);
             _currentMapLayer = SetMapLayer(h, layerName, visible, showInLayerUI, gp, layerType, fileName);
 
             if (LayerRead != null)

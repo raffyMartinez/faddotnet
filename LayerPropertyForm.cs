@@ -46,7 +46,7 @@ namespace FAD3
 
         private void LayerPropertyForm_Load(object sender, EventArgs e)
         {
-            global.LoadFormSettings(this);
+            global.LoadFormSettings(this, true);
 
             ProcessMapLayer(_mapLayer);
         }
@@ -80,6 +80,10 @@ namespace FAD3
                     break;
 
                 case "btnFeatureCategories":
+                    break;
+
+                case "btnClose":
+                    Close();
                     break;
             }
         }

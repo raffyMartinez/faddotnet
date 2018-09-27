@@ -19,6 +19,8 @@ namespace FAD3
         private MapLayer _currentMapLayer;
         public event EventHandler MapperClosed;
 
+        public FishingGrid.fadUTMZone UTMZone { get; private set; }
+
         public Graticule Graticule
         {
             get { return _graticule; }
@@ -105,10 +107,11 @@ namespace FAD3
         {
         }
 
-        public void CreateGrid25MajorGrid(FishingGrid.fadUTMZone UTMZone)
+        public void CreateGrid25MajorGrid(FishingGrid.fadUTMZone utmZone)
         {
+            UTMZone = utmZone;
             _grid25MajorGrid = new Grid25MajorGrid(axMap);
-            _grid25MajorGrid.UTMZone = UTMZone;
+            _grid25MajorGrid.UTMZone = utmZone;
             _grid25MajorGrid.GenerateMajorGrids();
             _grid25MajorGrid.MapLayers = _mapLayersHandler;
             _grid25MajorGrid.MapInterActionHandler = _mapInterActionHandler;
@@ -326,6 +329,10 @@ namespace FAD3
                     var saveForm = new SaveMapForm();
                     saveForm.SaveType(SaveAsShapefile: false);
                     saveForm.ShowDialog(this);
+                    break;
+
+                case "tsButtonCloseMap":
+                    Close();
                     break;
             }
         }

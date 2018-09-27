@@ -116,6 +116,12 @@
     </Compile>
     <Compile Include="CatchLine.cs" />
     <Compile Include="CatchName.cs" />
+    <Compile Include="ConvertToGrid25Form.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ConvertToGrid25Form.Designer.cs">
+      <DependentUpon>ConvertToGrid25Form.cs</DependentUpon>
+    </Compile>
     <Compile Include="Coordinate.cs" />
     <Compile Include="CoordinateEntryForm.cs">
       <SubType>Form</SubType>
@@ -394,6 +400,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="CatchCompositionForm.resx">
       <DependentUpon>CatchCompositionForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ConvertToGrid25Form.resx">
+      <DependentUpon>ConvertToGrid25Form.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="CoordinateEntryForm.resx">
       <DependentUpon>CoordinateEntryForm.cs</DependentUpon>

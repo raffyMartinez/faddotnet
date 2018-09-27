@@ -42,13 +42,14 @@
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.btnFeatureSymbols = new System.Windows.Forms.Button();
             this.btnFeatureCategories = new System.Windows.Forms.Button();
+            this.btnClose = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // txtLayerName
             // 
-            this.txtLayerName.Location = new System.Drawing.Point(114, 53);
+            this.txtLayerName.Location = new System.Drawing.Point(114, 27);
             this.txtLayerName.Name = "txtLayerName";
             this.txtLayerName.Size = new System.Drawing.Size(252, 21);
             this.txtLayerName.TabIndex = 0;
@@ -56,7 +57,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(10, 53);
+            this.label1.Location = new System.Drawing.Point(10, 27);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(72, 15);
             this.label1.TabIndex = 1;
@@ -64,7 +65,7 @@
             // 
             // txtGeoProjection
             // 
-            this.txtGeoProjection.Location = new System.Drawing.Point(114, 80);
+            this.txtGeoProjection.Location = new System.Drawing.Point(114, 54);
             this.txtGeoProjection.Name = "txtGeoProjection";
             this.txtGeoProjection.Size = new System.Drawing.Size(252, 21);
             this.txtGeoProjection.TabIndex = 2;
@@ -72,7 +73,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(10, 80);
+            this.label2.Location = new System.Drawing.Point(10, 54);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(62, 15);
             this.label2.TabIndex = 3;
@@ -80,7 +81,7 @@
             // 
             // txtLayerType
             // 
-            this.txtLayerType.Location = new System.Drawing.Point(114, 106);
+            this.txtLayerType.Location = new System.Drawing.Point(114, 80);
             this.txtLayerType.Name = "txtLayerType";
             this.txtLayerType.Size = new System.Drawing.Size(252, 21);
             this.txtLayerType.TabIndex = 4;
@@ -88,7 +89,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(10, 106);
+            this.label3.Location = new System.Drawing.Point(10, 80);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(33, 15);
             this.label3.TabIndex = 5;
@@ -97,7 +98,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(10, 132);
+            this.label4.Location = new System.Drawing.Point(10, 106);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(59, 15);
             this.label4.TabIndex = 7;
@@ -105,7 +106,7 @@
             // 
             // txtFileName
             // 
-            this.txtFileName.Location = new System.Drawing.Point(114, 132);
+            this.txtFileName.Location = new System.Drawing.Point(114, 106);
             this.txtFileName.Name = "txtFileName";
             this.txtFileName.Size = new System.Drawing.Size(252, 21);
             this.txtFileName.TabIndex = 6;
@@ -128,12 +129,13 @@
             this.btnLabelCategories.TabIndex = 9;
             this.btnLabelCategories.Text = "Categories";
             this.btnLabelCategories.UseVisualStyleBackColor = true;
+            this.btnLabelCategories.Click += new System.EventHandler(this.OnButtonClick);
             // 
             // groupBox1
             // 
             this.groupBox1.Controls.Add(this.btnLabelFeatures);
             this.groupBox1.Controls.Add(this.btnLabelCategories);
-            this.groupBox1.Location = new System.Drawing.Point(27, 195);
+            this.groupBox1.Location = new System.Drawing.Point(26, 155);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(142, 113);
             this.groupBox1.TabIndex = 10;
@@ -144,7 +146,7 @@
             // 
             this.groupBox2.Controls.Add(this.btnFeatureSymbols);
             this.groupBox2.Controls.Add(this.btnFeatureCategories);
-            this.groupBox2.Location = new System.Drawing.Point(214, 195);
+            this.groupBox2.Location = new System.Drawing.Point(213, 155);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(142, 113);
             this.groupBox2.TabIndex = 11;
@@ -159,6 +161,7 @@
             this.btnFeatureSymbols.TabIndex = 8;
             this.btnFeatureSymbols.Text = "Features";
             this.btnFeatureSymbols.UseVisualStyleBackColor = true;
+            this.btnFeatureSymbols.Click += new System.EventHandler(this.OnButtonClick);
             // 
             // btnFeatureCategories
             // 
@@ -168,12 +171,24 @@
             this.btnFeatureCategories.TabIndex = 9;
             this.btnFeatureCategories.Text = "Categories";
             this.btnFeatureCategories.UseVisualStyleBackColor = true;
+            this.btnFeatureCategories.Click += new System.EventHandler(this.OnButtonClick);
+            // 
+            // btnClose
+            // 
+            this.btnClose.Location = new System.Drawing.Point(306, 329);
+            this.btnClose.Name = "btnClose";
+            this.btnClose.Size = new System.Drawing.Size(60, 27);
+            this.btnClose.TabIndex = 12;
+            this.btnClose.Text = "Close";
+            this.btnClose.UseVisualStyleBackColor = true;
+            this.btnClose.Click += new System.EventHandler(this.OnButtonClick);
             // 
             // LayerPropertyForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(380, 356);
+            this.ClientSize = new System.Drawing.Size(380, 370);
+            this.Controls.Add(this.btnClose);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.label4);
@@ -214,5 +229,6 @@
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Button btnFeatureSymbols;
         private System.Windows.Forms.Button btnFeatureCategories;
+        private System.Windows.Forms.Button btnClose;
     }
 }
