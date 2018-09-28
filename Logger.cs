@@ -25,7 +25,7 @@ namespace FAD3
 
         public static void Log(Exception ex, Boolean ShowMessage = false)
         {
-            string filepath = Path.GetDirectoryName(global.AppPath) + "\\error.log";
+            string filepath = Application.StartupPath + "\\fad.log";
             using (StreamWriter writer = new StreamWriter(filepath, true))
             {
                 writer.WriteLine("Message: " + ex.Message + "<br/>" + Environment.NewLine +
@@ -65,7 +65,9 @@ namespace FAD3
 
         public static void Log(string s)
         {
-            string filepath = Path.GetDirectoryName(global.AppPath) + "\\error.log";
+            //string filepath = Path.GetDirectoryName(global.AppPath) + "\\error.log";
+            //string filepath = global.AppPath + "\\fad.log";
+            string filepath = Application.StartupPath + "\\fad.log";
             using (StreamWriter writer = new StreamWriter(filepath, true))
             {
                 writer.WriteLine("Message: " + s + "<br/>" + "Date :" + DateTime.Now.ToString());
@@ -74,7 +76,7 @@ namespace FAD3
 
         public static void Log(string errorDescription, string className, string methodName)
         {
-            string filepath = Path.GetDirectoryName(global.AppPath) + "\\error.log";
+            string filepath = Application.StartupPath + "\\fad.log";
             using (StreamWriter writer = new StreamWriter(filepath, true))
             {
                 writer.WriteLine($"Error: {errorDescription} at Class:{className} at  Method{methodName} at Date : { DateTime.Now.ToString()}");

@@ -40,13 +40,14 @@
             this.rbOutsideRemove = new System.Windows.Forms.RadioButton();
             this.rbOutsideIgnore = new System.Windows.Forms.RadioButton();
             this.lblTitle = new System.Windows.Forms.Label();
+            this.chkIncludeCoordinates = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnOk
             // 
-            this.btnOk.Location = new System.Drawing.Point(242, 195);
+            this.btnOk.Location = new System.Drawing.Point(242, 232);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(54, 28);
             this.btnOk.TabIndex = 1;
@@ -56,7 +57,7 @@
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(180, 195);
+            this.btnCancel.Location = new System.Drawing.Point(180, 232);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(54, 28);
             this.btnCancel.TabIndex = 2;
@@ -176,11 +177,22 @@
             this.lblTitle.TabIndex = 5;
             this.lblTitle.Text = "label1";
             // 
+            // chkIncludeCoordinates
+            // 
+            this.chkIncludeCoordinates.AutoSize = true;
+            this.chkIncludeCoordinates.Location = new System.Drawing.Point(15, 195);
+            this.chkIncludeCoordinates.Name = "chkIncludeCoordinates";
+            this.chkIncludeCoordinates.Size = new System.Drawing.Size(119, 17);
+            this.chkIncludeCoordinates.TabIndex = 6;
+            this.chkIncludeCoordinates.Text = "Include coordinates";
+            this.chkIncludeCoordinates.UseVisualStyleBackColor = true;
+            // 
             // ConvertToGrid25Form
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(312, 246);
+            this.ClientSize = new System.Drawing.Size(312, 272);
+            this.Controls.Add(this.chkIncludeCoordinates);
             this.Controls.Add(this.lblTitle);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
@@ -213,5 +225,6 @@
         private System.Windows.Forms.RadioButton rbOutsideIgnore;
         private System.Windows.Forms.Label lblTitle;
         private System.Windows.Forms.Button btnSelectMap;
+        private System.Windows.Forms.CheckBox chkIncludeCoordinates;
     }
 }

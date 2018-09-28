@@ -28,7 +28,15 @@ namespace FAD3
             labelCredits.Text = "";
             if (global.HasMPH)
             {
-                labelCredits.Text = "DoubleMetaphone by Adam Nelson";
+                labelCredits.Text = "The following software comoponents are used by the software:\r\nDoubleMetaphone by Adam Nelson";
+            }
+            if (global.HasMPH)
+            {
+                labelCredits.Text += $"\r\nMapwindows Mapping Components version {axMap.VersionNumber}\r\nhttps://www.mapwindow.org";
+            }
+            else
+            {
+                labelCredits.Text += $"The following software comoponents are used by the software:\r\nMapwindows Mapping Components version {axMap.VersionNumber}\r\nhttps://www.mapwindow.org";
             }
 
             if (labelCredits.Text.Length > 0)
@@ -36,7 +44,7 @@ namespace FAD3
 
             labelCredits.Text += "Written by: Raffy Martinez\r\n";
             labelCredits.Text += "raffy.martinez@gmail.com";
-            labelCredits.Font = new Font(ff, 10F, FontStyle.Regular);
+            labelCredits.Font = new Font(ff, 8F, FontStyle.Regular);
             labelCredits.Location = new Point((this.Width - labelCredits.Width) / 2, labelApp.Location.Y + (labelApp.Size.Height * 2));
             labelCredits.TextAlign = ContentAlignment.MiddleCenter;
 
@@ -44,7 +52,7 @@ namespace FAD3
             {
                 o.Location = new Point(0, labelCredits.Top + labelCredits.Height + 10);
                 o.Text = $"Net framework: {Environment.Version}";
-                o.Font = new Font(ff, 10F, FontStyle.Regular);
+                o.Font = new Font(ff, 8F, FontStyle.Regular);
                 o.TextAlign = ContentAlignment.MiddleCenter;
             });
         }

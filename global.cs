@@ -272,14 +272,14 @@ namespace FAD3
         /// </summary>
         static global()
         {
+            _AppPath = Application.StartupPath.ToString();
             MappingMode = fad3MappingMode.defaultMode;
             GetAppPreferences();
-            TestMPH();
-            _AppPath = Application.StartupPath.ToString();
             _templateMDBFile = ApplicationPath + "\\template.mdb";
             _ConnectionStringTemplate = "Provider=Microsoft.JET.OLEDB.4.0;data source=" + _AppPath + "\\template.mdb";
             ReferenceNumberManager.ReadRefNoRange();
             GetCoordinateDisplayFormat();
+            TestMPH();
         }
 
         /// <summary>

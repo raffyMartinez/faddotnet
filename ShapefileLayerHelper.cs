@@ -34,7 +34,8 @@ namespace FAD3
         /// <returns></returns>
         public static Shapefile ConvertToGrid25(Shapefile pointShapefile, FishingGrid.fadUTMZone utmZone,
             global.fad3ActionType inlandAction = global.fad3ActionType.atIgnore,
-            global.fad3ActionType outsideMapAction = global.fad3ActionType.atIgnore)
+            global.fad3ActionType outsideMapAction = global.fad3ActionType.atIgnore,
+            bool includeCoordinates = false)
         {
             var sf = new Shapefile();
             var listFields = new List<string>();
@@ -57,6 +58,7 @@ namespace FAD3
 
                 sf.GeoProjection = gp;
 
+                //recreate all fields from source to destination
                 for (int f = 0; f < pointShapefile.NumFields; f++)
                 {
                     listFields.Add(pointShapefile.Field[f].Name);
@@ -74,6 +76,15 @@ namespace FAD3
                 if (outsideMapAction == global.fad3ActionType.atTakeNote)
                 {
                     ifldOutsideAction = sf.EditAddField("isOutsid", FieldType.BOOLEAN_FIELD, 1, 1);
+                }
+
+                //create fields for coordinate data
+                var ifldCoordinatesX = -1;
+                var ifldCoordinatesY = -1;
+                if (includeCoordinates)
+                {
+                    ifldCoordinatesX = sf.EditAddField("Grid25X", FieldType.INTEGER_FIELD, 0, 8);
+                    ifldCoordinatesY = sf.EditAddField("Grid25Y", FieldType.INTEGER_FIELD, 0, 8);
                 }
 
                 for (int n = 0; n < pointShapefile.NumShapes; n++)
@@ -111,6 +122,14 @@ namespace FAD3
                             }
                             sf.EditCellValue(ifldGrid, iShp, result.grid25Name);
 
+                            //update coordinate fields if required
+                            if (includeCoordinates)
+                            {
+                                sf.EditCellValue(ifldCoordinatesX, iShp, result.Easting);
+                                sf.EditCellValue(ifldCoordinatesY, iShp, result.Northing);
+                            }
+
+                            //update isInland field if required
                             if (ifldInlandAction >= 0)
                             {
                                 sf.EditCellValue(ifldInlandAction, iShp, isInland);

@@ -35,7 +35,7 @@ namespace FAD3
                     if (MapLayer?.LayerType == "ShapefileClass")
                     {
                         var sfSource = MapLayer.LayerObject as Shapefile;
-                        if (sfSource.ShapefileType == ShpfileType.SHP_POINT)
+                        if (sfSource?.ShapefileType == ShpfileType.SHP_POINT)
                         {
                             global.fad3ActionType inlandAction = global.fad3ActionType.atIgnore;
                             if (rbInlandNote.Checked)
@@ -47,7 +47,7 @@ namespace FAD3
                                 inlandAction = global.fad3ActionType.atRemove;
                             }
 
-                            var sfConverted = ShapefileLayerHelper.ConvertToGrid25(sfSource, global.MappingForm.UTMZone, inlandAction);
+                            var sfConverted = ShapefileLayerHelper.ConvertToGrid25(sfSource, global.MappingForm.UTMZone, inlandAction, includeCoordinates: chkIncludeCoordinates.Checked);
                             var name = Path.GetFileNameWithoutExtension(MapLayer.FileName);
                             if (global.MappingForm.MapLayersHandler.AddLayer(sfConverted, name + "_converted") >= 0)
                             {

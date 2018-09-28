@@ -169,12 +169,15 @@ namespace FAD3
         public static void ReadRefNoRange()
         {
             RegistryKey rk = Registry.CurrentUser.OpenSubKey("SOFTWARE\\FAD3");
-            string ReturnValue = rk.GetValue("RNRange", "NULL").ToString();
-            if (ReturnValue.Length > 0 && ReturnValue != "NULL")
+            if (rk != null)
             {
-                string[] arr = ReturnValue.Split('|');
-                _RefNoRangeMin = int.Parse(arr[0]);
-                _RefNoRangeMax = int.Parse(arr[1]);
+                string ReturnValue = rk.GetValue("RNRange", "NULL").ToString();
+                if (ReturnValue.Length > 0 && ReturnValue != "NULL")
+                {
+                    string[] arr = ReturnValue.Split('|');
+                    _RefNoRangeMin = int.Parse(arr[0]);
+                    _RefNoRangeMax = int.Parse(arr[1]);
+                }
             }
         }
 
