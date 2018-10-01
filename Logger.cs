@@ -65,8 +65,6 @@ namespace FAD3
 
         public static void Log(string s)
         {
-            //string filepath = Path.GetDirectoryName(global.AppPath) + "\\error.log";
-            //string filepath = global.AppPath + "\\fad.log";
             string filepath = Application.StartupPath + "\\fad.log";
             using (StreamWriter writer = new StreamWriter(filepath, true))
             {

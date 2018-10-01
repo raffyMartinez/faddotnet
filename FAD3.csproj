@@ -186,6 +186,14 @@
     <Compile Include="LabelsForm.Designer.cs">
       <DependentUpon>LabelsForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="LandingSiteFromKML.cs" />
+    <Compile Include="LandingSiteFromKMLForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LandingSiteFromKMLForm.Designer.cs">
+      <DependentUpon>LandingSiteFromKMLForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LandingSiteMappingHandler.cs" />
     <Compile Include="LayerSymbologyForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -439,6 +447,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="LabelsForm.resx">
       <DependentUpon>LabelsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LandingSiteFromKMLForm.resx">
+      <DependentUpon>LandingSiteFromKMLForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="LayerSymbologyForm.resx">
       <DependentUpon>LayerSymbologyForm.cs</DependentUpon>

@@ -157,7 +157,7 @@ namespace FAD3
                     }
                     else
                     {
-                        if (sf.NumSelected == 1)
+                        if (sf.NumSelected == 1 && _currentMapLayer.SelectedIndexes != null)
                         {
                             labelShapeFileName.Text = "Attribute data of the selected shape (n=1)";
 
@@ -170,20 +170,23 @@ namespace FAD3
                         }
                         else
                         {
-                            labelShapeFileName.Text = $"Attribute data of the selected shapes (n={_currentMapLayer.SelectedIndexes.Length.ToString()})";
-
-                            //show attributes of selected shapes
-                            for (int row = 0; row < _currentMapLayer.SelectedIndexes.Length; row++)
+                            if (_currentMapLayer.SelectedIndexes != null)
                             {
-                                string[] rowData = new string[sf.NumFields + 1];
-                                rowData[0] = (row + 1).ToString();
-                                for (int col = 0; col < sf.NumFields; col++)
+                                labelShapeFileName.Text = $"Attribute data of the selected shapes (n={_currentMapLayer.SelectedIndexes.Length.ToString()})";
+
+                                //show attributes of selected shapes
+                                for (int row = 0; row < _currentMapLayer.SelectedIndexes.Length; row++)
                                 {
-                                    rowData[col + 1] = sf.CellValue[col, _currentMapLayer.SelectedIndexes[row]].ToString();
+                                    string[] rowData = new string[sf.NumFields + 1];
+                                    rowData[0] = (row + 1).ToString();
+                                    for (int col = 0; col < sf.NumFields; col++)
+                                    {
+                                        rowData[col + 1] = sf.CellValue[col, _currentMapLayer.SelectedIndexes[row]].ToString();
+                                    }
+                                    ListViewItem lvi = new ListViewItem(rowData);
+                                    lvAttributes.Items.Add(lvi);
+                                    lvi.Name = _currentMapLayer.SelectedIndexes[row].ToString();
                                 }
-                                ListViewItem lvi = new ListViewItem(rowData);
-                                lvAttributes.Items.Add(lvi);
-                                lvi.Name = _currentMapLayer.SelectedIndexes[row].ToString();
                             }
                         }
                     }

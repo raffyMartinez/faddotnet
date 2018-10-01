@@ -92,7 +92,6 @@ namespace FAD3
                     if (mtextLatitude.Text != _YCoordinatePrompt && mtextLongitude.Text != _XCoordinatePrompt)
                     {
                         _Coordinate.SetDMS(_LatDeg, _LatMin, _LatSec, _IsNorth, _LonDeg, _LonMin, _LonSec, _IsEast);
-                        _ParentForm.RefreshCoordinate();
                         Close();
                     }
                     else

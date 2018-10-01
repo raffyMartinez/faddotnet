@@ -38,7 +38,7 @@ namespace FAD3
         private string _GearVarName = "";
         private string _LandingSiteGuid = "";
         private string _LandingSiteName = "";
-        private landingsite _ls = new landingsite();
+        private Landingsite _ls = new Landingsite();
         private TreeNode _LSNode;
         private int _MouseX = 0;
         private int _MouseY = 0;
@@ -83,7 +83,7 @@ namespace FAD3
             get { return _GearVarGUID; }
         }
 
-        public landingsite LandingSite
+        public Landingsite LandingSite
         {
             get { return _ls; }
         }
@@ -333,6 +333,12 @@ namespace FAD3
             SetupTree(filename);
         }
 
+        public void NewLandingSite(string NodeName, string nodeGUID, string aoiGUID)
+        {
+            treeMain.SelectedNode = treeMain.Nodes["root"].Nodes[aoiGUID];
+            NewLandingSite(NodeName, nodeGUID);
+        }
+
         public void NewLandingSite(string NodeName, string nodeGUID)
         {
             TreeNode NewNode = new TreeNode();
@@ -340,6 +346,7 @@ namespace FAD3
             NewNode.Tag = Tuple.Create(nodeGUID, "", "landing_site");
             NewNode.Name = nodeGUID;
             NewNode.ImageKey = "LandingSite";
+            treeMain.SelectedNode.Expand();
             treeMain.SelectedNode.Nodes.Add(NewNode);
             treeMain.SelectedNode = NewNode;
         }
@@ -502,6 +509,14 @@ namespace FAD3
                     tsi = menuDropDown.Items.Add("New landing site");
                     tsi.Name = "menuNewLandingSite";
                     tsi.Enabled = _TreeLevel == "aoi";
+
+                    tsi = menuDropDown.Items.Add("Get landing sites from Google Earth KML");
+                    tsi.Name = "menuLandingSiteFromKML";
+                    tsi.Enabled = _TreeLevel == "aoi";
+
+                    tsi = menuDropDown.Items.Add("Show landing sites on map");
+                    tsi.Name = "menuShowOnMapLandingSites";
+                    tsi.Enabled = _TreeLevel == "aoi" && global.MapIsOpen;
 
                     tsi = menuDropDown.Items.Add("New sampling");
                     tsi.Name = "menuNewSampling";
@@ -853,8 +868,24 @@ namespace FAD3
                     break;
 
                 case "menuNewLandingSite":
-                    LandingSiteForm fls = new LandingSiteForm(_AOI, this, _ls, IsNew: true);
+                    LandingSiteForm fls = new LandingSiteForm(_AOI, this, _ls, isNew: true);
                     fls.ShowDialog(this);
+                    break;
+
+                case "menuLandingSiteFromKML":
+                    LandingSiteFromKMLForm lskf = LandingSiteFromKMLForm.GetInstance(_AOI);
+                    if (!lskf.Visible)
+                    {
+                        lskf.Show(this);
+                    }
+                    else
+                    {
+                        lskf.BringToFront();
+                    }
+                    break;
+
+                case "menuShowOnMapLandingSites":
+                    LandingSiteMappingHandler.ShowLandingSitesOnMap(global.MappingForm.MapLayersHandler, _AOIGuid, global.MappingForm.GeoProjection);
                     break;
 
                 case "menuNewSampling":

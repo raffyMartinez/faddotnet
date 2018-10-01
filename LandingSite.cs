@@ -20,19 +20,33 @@ namespace FAD3
     /// <summary>
     /// Description of LandingSite.
     /// </summary>
-    public class landingsite
+    public class Landingsite : EventArgs
     {
         private string _LandingSiteGUID = "";
         private long _GearUsedCount = 0;
         private string _LandingSiteName = "";
         private double _xCoord = 0;
         private double _yCoord = 0;
-        private Coordinate _Coordinate;
+        private bool _isInsideTargetArea;
+        private Coordinate _coordinate;
         private bool _IsNew = false;
 
         public Coordinate Coordinate
         {
-            get { return _Coordinate; }
+            get { return _coordinate; }
+            set { _coordinate = value; }
+        }
+
+        public void xyKMLCoordinate(double xCoordinate, double yCoordinate, bool isInsideTargetArea)
+        {
+            _xCoord = xCoordinate;
+            _yCoord = yCoordinate;
+            _isInsideTargetArea = isInsideTargetArea;
+        }
+
+        public bool IsInsideTargetArea
+        {
+            get { return _isInsideTargetArea; }
         }
 
         public double xCoord
@@ -65,14 +79,14 @@ namespace FAD3
             return deg.ToString() + "° " + string.Format("{0:0.00000}", min);
         }
 
-        public landingsite()
+        public Landingsite()
         {
             //empty default constructor
         }
 
         public void IsNew()
         {
-            _Coordinate = new Coordinate();
+            _coordinate = new Coordinate();
             _IsNew = true;
         }
 
@@ -82,7 +96,7 @@ namespace FAD3
             set { _LandingSiteName = value; }
         }
 
-        public landingsite(string LandingSiteGUID)
+        public Landingsite(string LandingSiteGUID)
         {
             _LandingSiteGUID = LandingSiteGUID;
         }
@@ -185,8 +199,8 @@ namespace FAD3
                     var yCoord = "null";
                     if (bool.Parse(LSData["HasCoordinate"]))
                     {
-                        xCoord = _Coordinate.Longitude.ToString();
-                        yCoord = _Coordinate.Latitude.ToString();
+                        xCoord = _coordinate.Longitude.ToString();
+                        yCoord = _coordinate.Latitude.ToString();
                     }
 
                     if (isNew)
@@ -225,13 +239,39 @@ namespace FAD3
             return Success;
         }
 
+        public static Dictionary<int, (string landingSiteName, string Municipality, string Province, int MunicipalityNumber)> LandingSiteDictionary(string AOIGuid)
+        {
+            var dict = new Dictionary<int, (string landingSiteName, string Municipality, string Province, int MunicipalityNumber)>();
+            var myDT = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    string query = $@"SELECT LSName, Municipality, ProvinceName, Municipalities.MunNo
+                            FROM Provinces INNER JOIN (Municipalities INNER JOIN tblLandingSites ON Municipalities.MunNo = tblLandingSites.MunNo)
+                            ON Provinces.ProvNo = Municipalities.ProvNo
+                            WHERE tblLandingSites.AOIGuid={{{AOIGuid}}}";
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(myDT);
+                    for (int i = 0; i < myDT.Rows.Count; i++)
+                    {
+                        DataRow dr = myDT.Rows[i];
+                        dict.Add((int)dr["MunNo"], (dr["LSName"].ToString(), dr["Municipality"].ToString(), dr["ProvinceName"].ToString(), (int)dr["MunNo"]));
+                    }
+                }
+                catch (Exception ex) { Logger.Log(ex); }
+            }
+            return dict;
+        }
+
         public string LandingSiteGUID
         {
             get { return _LandingSiteGUID; }
             set
             {
                 _LandingSiteGUID = value;
-                _Coordinate = new Coordinate();
+                _coordinate = new Coordinate();
             }
         }
 
@@ -326,7 +366,7 @@ namespace FAD3
                         myLSData.Add("CoordinateStringXY", $"{dr["cx"].ToString()},{dr["cy"].ToString()}");
                         if (myLSData["CoordinateStringXY"].Length > 1)
                         {
-                            _Coordinate.SetD(float.Parse(dr["cy"].ToString()), float.Parse(dr["cx"].ToString()));
+                            _coordinate.SetD(float.Parse(dr["cy"].ToString()), float.Parse(dr["cx"].ToString()));
                             switch (global.CoordinateDisplay)
                             {
                                 case global.CoordinateDisplayFormat.DegreeDecimal:

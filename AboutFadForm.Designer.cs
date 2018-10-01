@@ -32,7 +32,6 @@
             this.button1 = new System.Windows.Forms.Button();
             this.labelApp = new System.Windows.Forms.Label();
             this.labelCredits = new System.Windows.Forms.Label();
-            this.labelNetFramework = new System.Windows.Forms.Label();
             this.axMap = new AxMapWinGIS.AxMap();
             ((System.ComponentModel.ISupportInitialize)(this.axMap)).BeginInit();
             this.SuspendLayout();
@@ -61,18 +60,10 @@
             this.labelCredits.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelCredits.Location = new System.Drawing.Point(4, 59);
             this.labelCredits.Name = "labelCredits";
-            this.labelCredits.Size = new System.Drawing.Size(328, 78);
+            this.labelCredits.Size = new System.Drawing.Size(328, 124);
             this.labelCredits.TabIndex = 2;
             this.labelCredits.Text = "label1";
             this.labelCredits.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-            // 
-            // labelNetFramework
-            // 
-            this.labelNetFramework.Location = new System.Drawing.Point(5, 150);
-            this.labelNetFramework.Name = "labelNetFramework";
-            this.labelNetFramework.Size = new System.Drawing.Size(331, 21);
-            this.labelNetFramework.TabIndex = 3;
-            this.labelNetFramework.Text = "label1";
             // 
             // axMap
             // 
@@ -91,7 +82,6 @@
             this.CancelButton = this.button1;
             this.ClientSize = new System.Drawing.Size(338, 235);
             this.Controls.Add(this.axMap);
-            this.Controls.Add(this.labelNetFramework);
             this.Controls.Add(this.labelCredits);
             this.Controls.Add(this.labelApp);
             this.Controls.Add(this.button1);
@@ -111,7 +101,6 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label labelApp;
         private System.Windows.Forms.Label labelCredits;
-        private System.Windows.Forms.Label labelNetFramework;
         private AxMapWinGIS.AxMap axMap;
     }
 }

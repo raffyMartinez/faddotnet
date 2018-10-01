@@ -23,11 +23,9 @@ namespace FAD3
         [STAThread]
         private static void Main(string[] args)
         {
-            Logger.Log("Start Program.Main function");
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            Logger.Log("will go into global.TestRequiredFilesExists()");
             global.TestRequiredFilesExists();
             Logger.Log("will open main form");
             try

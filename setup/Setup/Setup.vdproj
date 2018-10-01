@@ -280,6 +280,14 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.6.1"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.6.1 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.6.1"
+                    }
+                }
             }
         }
     }
@@ -997,7 +1005,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Fisheries Assessment Database"
         "ProductCode" = "8:{85D290DB-DFE6-4B6C-B04C-5B36FA09DB91}"
-        "PackageCode" = "8:{A73A1B82-391C-4CAD-A145-18BA5D66FE36}"
+        "PackageCode" = "8:{EAAE64FA-B9C6-4A10-A002-886481CB094C}"
         "UpgradeCode" = "8:{60988C37-38EC-41CE-B9B2-C691852182A4}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -1117,7 +1125,7 @@
         }
         "Shortcut"
         {
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_357F3345B46A4802BC518AC4C298685B"
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_62BCD04FABF4483E90D6F7BFF636FCA0"
             {
             "Name" = "8:Fisheries Assessment Database"
             "Arguments" = "8:"
@@ -1125,13 +1133,13 @@
             "ShowCmd" = "3:1"
             "IconIndex" = "3:0"
             "Transitive" = "11:FALSE"
-            "Target" = "8:_892242A4306740F39FBCA9A94D27BD72"
-            "Folder" = "8:_892242A4306740F39FBCA9A94D27BD72"
-            "WorkingFolder" = "8:_892242A4306740F39FBCA9A94D27BD72"
+            "Target" = "8:_2D8D7F9F8D2848B59928476736B21088"
+            "Folder" = "8:_2DDFC85DC5FD41F8AA5E9FCEA1AB6EA9"
+            "WorkingFolder" = "8:_294D09F47B1E4BEC9A6B0F2F033191E9"
             "Icon" = "8:_3EEEFFADB6E8464999202E0D7D5DB325"
             "Feature" = "8:"
             }
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_7448F664AFAC4062B680BAAD1EEF0896"
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_C13FB7F8B4F7467F9A1BA1A881EE65D7"
             {
             "Name" = "8:Fisheries Assessment Database"
             "Arguments" = "8:"
@@ -1139,9 +1147,9 @@
             "ShowCmd" = "3:1"
             "IconIndex" = "3:0"
             "Transitive" = "11:FALSE"
-            "Target" = "8:_2DDFC85DC5FD41F8AA5E9FCEA1AB6EA9"
-            "Folder" = "8:_2DDFC85DC5FD41F8AA5E9FCEA1AB6EA9"
-            "WorkingFolder" = "8:_645DAEAD316843C197D0703D95C728B5"
+            "Target" = "8:_2D8D7F9F8D2848B59928476736B21088"
+            "Folder" = "8:_892242A4306740F39FBCA9A94D27BD72"
+            "WorkingFolder" = "8:_294D09F47B1E4BEC9A6B0F2F033191E9"
             "Icon" = "8:_3EEEFFADB6E8464999202E0D7D5DB325"
             "Feature" = "8:"
             }

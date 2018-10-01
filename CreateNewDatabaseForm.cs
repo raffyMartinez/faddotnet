@@ -94,6 +94,21 @@ namespace FAD3
             }
         }
 
+        private string TableFieldList(string tableName)
+        {
+            var dbe = new DBEngine();
+            var dbTemplate = dbe.OpenDatabase(global.TemplateMDBFile);
+            var fieldList = string.Empty;
+            foreach (Field f in dbTemplate.TableDefs[tableName].Fields)
+            {
+                fieldList += $"{f.Name}, ";
+            }
+            fieldList = fieldList.Trim(new char[] { ',', ' ' });
+            dbTemplate.Close();
+            dbTemplate = null;
+            return fieldList;
+        }
+
         private bool UpdateNewMDB()
         {
             var dbe = new DBEngine();
@@ -103,7 +118,8 @@ namespace FAD3
             var qd = new dao.QueryDef();
             foreach (var item in _requiredTables)
             {
-                sql = $"Insert Into {item} In '{_newMDBFile}' Select * from {item}";
+                //sql = $"Insert Into {item} In '{_newMDBFile}' Select * from {item}";
+                sql = $"Insert Into {item} In '{_newMDBFile}' Select {TableFieldList(item)} from {item}";
                 // MessageBox.Show(sql);
                 qd = dbData.CreateQueryDef("", sql);
                 qd.Execute();
@@ -114,52 +130,52 @@ namespace FAD3
 
             if (checkAOI.Checked)
             {
-                sql = $"Insert Into tblAOI In '{_newMDBFile}' Select * from tblAOI";
+                sql = $"Insert Into tblAOI In '{_newMDBFile}' Select {TableFieldList("tblAOI")} from tblAOI";
                 qd = dbData.CreateQueryDef("", sql);
                 qd.Execute();
 
-                sql = $"Insert Into tblAdditionalAOIExtent In '{_newMDBFile}' Select * from tblAdditionalAOIExtent";
+                sql = $"Insert Into tblAdditionalAOIExtent In '{_newMDBFile}' Select {TableFieldList("tblAdditionalAOIExtent")} from tblAdditionalAOIExtent";
                 qd = dbData.CreateQueryDef("", sql);
                 qd.Execute();
             }
 
             if (checkAOI.Checked && checkLandingSites.Checked)
             {
-                sql = $"Insert Into tblLandingSites In '{_newMDBFile}' Select * from tblLandingSites";
+                sql = $"Insert Into tblLandingSites In '{_newMDBFile}' Select {TableFieldList("tblLandingSites")} from tblLandingSites";
                 qd = dbData.CreateQueryDef("", sql);
                 qd.Execute();
             }
 
             if (checkGearLocalNames.Checked)
             {
-                sql = $"Insert Into tblGearLocalNames In '{_newMDBFile}' Select * from tblGearLocalNames";
+                sql = $"Insert Into tblGearLocalNames In '{_newMDBFile}' Select {TableFieldList("tblGearLocalNames")} from tblGearLocalNames";
                 qd = dbData.CreateQueryDef("", sql);
                 qd.Execute();
             }
 
             if (checkGearVar.Checked)
             {
-                sql = $"Insert Into tblGearVariations In '{_newMDBFile}' Select * from tblGearVariations";
+                sql = $"Insert Into tblGearVariations In '{_newMDBFile}' Select  {TableFieldList("tblGearVariations")} from tblGearVariations";
                 qd = dbData.CreateQueryDef("", sql);
                 qd.Execute();
 
-                sql = $"Insert Into tblRefGearCodes In '{_newMDBFile}' Select * from tblRefGearCodes";
+                sql = $"Insert Into tblRefGearCodes In '{_newMDBFile}' Select {TableFieldList("tblRefGearCodes")} from tblRefGearCodes";
                 qd = dbData.CreateQueryDef("", sql);
                 qd.Execute();
 
-                sql = $"Insert Into tblGearSpecs In '{_newMDBFile}' Select * from tblGearSpecs where Version = '2'";
+                sql = $"Insert Into tblGearSpecs In '{_newMDBFile}' Select {TableFieldList("tblGearSpecs")} from tblGearSpecs where Version = '2'";
                 qd = dbData.CreateQueryDef("", sql);
                 qd.Execute();
 
                 if (checkAOI.Checked)
                 {
-                    sql = $"Insert Into tblRefGearCodes_Usage In '{_newMDBFile}' Select * from tblRefGearCodes_Usage";
+                    sql = $"Insert Into tblRefGearCodes_Usage In '{_newMDBFile}' Select {TableFieldList("tblRefGearCodes_Usage")} from tblRefGearCodes_Usage";
                     qd = dbData.CreateQueryDef("", sql);
                     qd.Execute();
 
                     if (checkGearLocalNames.Checked)
                     {
-                        sql = $"Insert Into tblRefGearUsage_LocalName In '{_newMDBFile}' Select * from tblRefGearUsage_LocalName";
+                        sql = $"Insert Into tblRefGearUsage_LocalName In '{_newMDBFile}' Select {TableFieldList("tblRefGearUsage_LocalName")} from tblRefGearUsage_LocalName";
                         qd = dbData.CreateQueryDef("", sql);
                         qd.Execute();
                     }
@@ -168,21 +184,21 @@ namespace FAD3
 
             if (checkSciNames.Checked)
             {
-                sql = $"Insert Into tblAllSpecies In '{_newMDBFile}' Select * from tblAllSpecies";
+                sql = $"Insert Into tblAllSpecies In '{_newMDBFile}' Select {TableFieldList("tblAllSpecies")} from tblAllSpecies";
                 qd = dbData.CreateQueryDef("", sql);
                 qd.Execute();
             }
 
             if (checkFishLocalNames.Checked)
             {
-                sql = $"Insert Into tblBaseLocalNames In '{_newMDBFile}' Select * from tblBaseLocalNames";
+                sql = $"Insert Into tblBaseLocalNames In '{_newMDBFile}' Select {TableFieldList("tblBaseLocalNames")}  from tblBaseLocalNames";
                 qd = dbData.CreateQueryDef("", sql);
                 qd.Execute();
             }
 
             if (checkAOI.Checked && checkEnumerators.Checked)
             {
-                sql = $"Insert Into tblEnumerators In '{_newMDBFile}' Select * from tblEnumerators";
+                sql = $"Insert Into tblEnumerators In '{_newMDBFile}' Select {TableFieldList("tblEnumerators")} from tblEnumerators";
                 qd = dbData.CreateQueryDef("", sql);
                 qd.Execute();
             }

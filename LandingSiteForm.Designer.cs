@@ -53,7 +53,7 @@ namespace FAD3
             this.textLandingSiteName.Location = new System.Drawing.Point(116, 45);
             this.textLandingSiteName.Margin = new System.Windows.Forms.Padding(4);
             this.textLandingSiteName.Name = "textLandingSiteName";
-            this.textLandingSiteName.Size = new System.Drawing.Size(162, 21);
+            this.textLandingSiteName.Size = new System.Drawing.Size(247, 21);
             this.textLandingSiteName.TabIndex = 0;
             // 
             // label1
@@ -71,7 +71,7 @@ namespace FAD3
             this.comboProvince.Location = new System.Drawing.Point(116, 76);
             this.comboProvince.Margin = new System.Windows.Forms.Padding(4);
             this.comboProvince.Name = "comboProvince";
-            this.comboProvince.Size = new System.Drawing.Size(161, 23);
+            this.comboProvince.Size = new System.Drawing.Size(247, 23);
             this.comboProvince.TabIndex = 1;
             this.comboProvince.Validating += new System.ComponentModel.CancelEventHandler(this.OnComboBoxValidating);
             // 
@@ -90,7 +90,7 @@ namespace FAD3
             this.comboMunicipality.Location = new System.Drawing.Point(116, 107);
             this.comboMunicipality.Margin = new System.Windows.Forms.Padding(4);
             this.comboMunicipality.Name = "comboMunicipality";
-            this.comboMunicipality.Size = new System.Drawing.Size(161, 23);
+            this.comboMunicipality.Size = new System.Drawing.Size(247, 23);
             this.comboMunicipality.TabIndex = 2;
             this.comboMunicipality.Validating += new System.ComponentModel.CancelEventHandler(this.OnComboBoxValidating);
             // 
@@ -109,7 +109,7 @@ namespace FAD3
             this.textCoord.Margin = new System.Windows.Forms.Padding(4);
             this.textCoord.Name = "textCoord";
             this.textCoord.ReadOnly = true;
-            this.textCoord.Size = new System.Drawing.Size(162, 21);
+            this.textCoord.Size = new System.Drawing.Size(248, 21);
             this.textCoord.TabIndex = 3;
             this.textCoord.Tag = "x";
             this.textCoord.DoubleClick += new System.EventHandler(this.OntextCoord_DoubleClick);
@@ -125,7 +125,7 @@ namespace FAD3
             // 
             // buttonOk
             // 
-            this.buttonOk.Location = new System.Drawing.Point(242, 244);
+            this.buttonOk.Location = new System.Drawing.Point(313, 244);
             this.buttonOk.Margin = new System.Windows.Forms.Padding(4);
             this.buttonOk.Name = "buttonOk";
             this.buttonOk.Size = new System.Drawing.Size(50, 24);
@@ -138,7 +138,7 @@ namespace FAD3
             // 
             this.buttonCancel.CausesValidation = false;
             this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.buttonCancel.Location = new System.Drawing.Point(172, 244);
+            this.buttonCancel.Location = new System.Drawing.Point(243, 244);
             this.buttonCancel.Margin = new System.Windows.Forms.Padding(4);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(63, 24);
@@ -152,7 +152,7 @@ namespace FAD3
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCancel;
-            this.ClientSize = new System.Drawing.Size(305, 281);
+            this.ClientSize = new System.Drawing.Size(385, 281);
             this.Controls.Add(this.buttonOk);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.label4);

@@ -430,6 +430,11 @@ namespace FAD3
             public string ulGridName;
             public string lrGridName;
             public string gridDescription;
+
+            public bool IsInisde(double x, double y)
+            {
+                return x >= ulX && x <= lrX && y <= ulY && y >= lrY;
+            }
         }
 
         /// <summary>
@@ -637,8 +642,8 @@ namespace FAD3
                                                             myBound.lrY = y;
 
                                                             Grid25ToLL(dr["UpperLeft"].ToString(), out x, out y, fadCornerType.cornerTypeUpperLeft);
-                                                            myBound.lrX = x;
-                                                            myBound.lrY = y;
+                                                            myBound.ulX = x;
+                                                            myBound.ulY = y;
 
                                                             myBound.gridDescription = dr["GridDescription"].ToString();
                                                             myBound.lrGridName = lr;

@@ -220,6 +220,32 @@ namespace FAD3
             return list;
         }
 
+        public static string CoordinateFormatCode
+        {
+            get
+            {
+                var coordinateformat = "D";
+                switch (CoordinateDisplay)
+                {
+                    case CoordinateDisplayFormat.DegreeDecimal:
+                        break;
+
+                    case CoordinateDisplayFormat.DegreeMinute:
+                        coordinateformat = "DM";
+                        break;
+
+                    case CoordinateDisplayFormat.DegreeMinuteSecond:
+                        coordinateformat = "DMS";
+                        break;
+
+                    case CoordinateDisplayFormat.UTM:
+                        break;
+                }
+
+                return coordinateformat;
+            }
+        }
+
         public static CoordinateDisplayFormat CoordinateDisplay
         {
             get { return _CoordDisplayFormat; }

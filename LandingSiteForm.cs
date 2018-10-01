@@ -11,6 +11,7 @@
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using ISO_Classes;
 
 namespace FAD3
 {
@@ -19,14 +20,33 @@ namespace FAD3
     /// </summary>
     public partial class LandingSiteForm : Form
     {
-        private aoi _AOI;
+        private aoi _aoi;
         private bool _isNew = false;
-        private landingsite _LandingSite;
-        private string _LSGUID = "";
-        private long _MunicipalityNumber;
-        private MainForm _ParentForm;
+        private Landingsite _landingSite;
+        private string _lsGUID = "";
+        private long _municipalityNumber;
+        private MainForm _parentForm;
+        private LandingSiteFromKMLForm _parentKMLForm;
+        private string _landingSiteName;
+        private double _xCoordinate;
+        private double _yCoordinate;
+        private bool _definedFromKML;
+        private string _coordinateformat;
 
-        public LandingSiteForm(aoi aoi, MainForm Parent, landingsite LandingSite, bool IsNew = false)
+        public LandingSiteForm(aoi aoi, LandingSiteFromKMLForm kmlParentForm, string name, double xCoord, double yCoord, bool isNew = false, bool definedFromKML = true)
+        {
+            InitializeComponent();
+            _aoi = aoi;
+            _landingSiteName = name;
+            _xCoordinate = xCoord;
+            _yCoordinate = yCoord;
+            _isNew = isNew;
+            _definedFromKML = definedFromKML;
+            SetupProvinceComboBox();
+            _parentKMLForm = kmlParentForm;
+        }
+
+        public LandingSiteForm(aoi aoi, MainForm parent, Landingsite landingSite, bool isNew = false)
         {
             //
             // The InitializeComponent() call is required for Windows Forms designer support.
@@ -36,19 +56,24 @@ namespace FAD3
             //
             // TODO: Add constructor code after the InitializeComponent() call.
             //
-            _AOI = aoi;
-            _ParentForm = Parent;
-            _isNew = IsNew;
-            _LandingSite = LandingSite;
+            _aoi = aoi;
+            _parentForm = parent;
+            _isNew = isNew;
+            _landingSite = landingSite;
 
             Text = "Landing site";
 
             if (_isNew)
             {
                 Text = "New landing site";
-                _LandingSite.IsNew();
+                _landingSite.IsNew();
             }
 
+            SetupProvinceComboBox();
+        }
+
+        private void SetupProvinceComboBox()
+        {
             comboProvince.DataSource = new BindingSource(global.provinceDict, null);
             comboProvince.DisplayMember = "Value";
             comboProvince.ValueMember = "Key";
@@ -56,38 +81,16 @@ namespace FAD3
             comboProvince.AutoCompleteSource = AutoCompleteSource.ListItems;
         }
 
-        public landingsite LandingSite
+        public Landingsite LandingSite
         {
-            get { return _LandingSite; }
-            set { _LandingSite = value; }
+            get { return _landingSite; }
+            set { _landingSite = value; }
         }
 
         public string LSGUID
         {
-            get { return _LSGUID; }
-            set { _LSGUID = value; }
-        }
-
-        public void RefreshCoordinate()
-        {
-            var format = "D";
-            switch (global.CoordinateDisplay)
-            {
-                case global.CoordinateDisplayFormat.DegreeDecimal:
-                    break;
-
-                case global.CoordinateDisplayFormat.DegreeMinute:
-                    format = "DM";
-                    break;
-
-                case global.CoordinateDisplayFormat.DegreeMinuteSecond:
-                    format = "DMS";
-                    break;
-
-                case global.CoordinateDisplayFormat.UTM:
-                    break;
-            }
-            textCoord.Text = _LandingSite.Coordinate.ToString(format);
+            get { return _lsGUID; }
+            set { _lsGUID = value; }
         }
 
         private void OnFormShown(object sender, EventArgs e)
@@ -98,9 +101,17 @@ namespace FAD3
         private void OnFormLoad(object sender, EventArgs e)
         {
             textLandingSiteName.Focus();
-            if (!_isNew && _LandingSite != null)
+            if (_definedFromKML)
             {
-                Dictionary<string, string> myLSData = _LandingSite.LandingSiteDataEx();
+                //DefineCoordinateFormat();
+                _coordinateformat = global.CoordinateFormatCode;
+                textLandingSiteName.Text = _landingSiteName;
+                var coordinate = new Coordinate((float)_yCoordinate, (float)_xCoordinate);
+                textCoord.Text = $"{coordinate.ToString(false, _coordinateformat)}, {coordinate.ToString(true, _coordinateformat)}";
+            }
+            else if (!_isNew && _landingSite != null)
+            {
+                Dictionary<string, string> myLSData = _landingSite.LandingSiteDataEx();
                 if (myLSData.Count > 0)
                 {
                     textLandingSiteName.Text = myLSData["LSName"];
@@ -108,10 +119,15 @@ namespace FAD3
                     long key = ((KeyValuePair<long, string>)comboProvince.SelectedItem).Key;
                     SetMunicipalitiesCombo(key);
                     comboMunicipality.Text = myLSData["Municipality"];
-                    _MunicipalityNumber = ((KeyValuePair<long, string>)comboMunicipality.SelectedItem).Key;
+                    _municipalityNumber = ((KeyValuePair<long, string>)comboMunicipality.SelectedItem).Key;
                     textCoord.Text = myLSData["CoordinateStringXY"];
                 }
             }
+        }
+
+        private bool ValidateForm()
+        {
+            return textLandingSiteName.Text.Length > 0 && comboMunicipality.Text.Length > 0 && comboProvince.Text.Length > 0;
         }
 
         private void OnButtonClick(object sender, EventArgs e)
@@ -119,28 +135,49 @@ namespace FAD3
             switch (((Button)sender).Name)
             {
                 case "buttonOk":
-                    string myGUID = "";
-                    Dictionary<string, string> LSData = new Dictionary<string, string>();
-                    long key = ((KeyValuePair<long, string>)comboMunicipality.SelectedItem).Key;
-                    LSData.Add("LSName", textLandingSiteName.Text);
-                    LSData.Add("MunNo", _MunicipalityNumber.ToString());
-                    LSData.Add("HasCoordinate", (textCoord.Text.Length > 0).ToString());
-                    LSData.Add("AOIGuid", _AOI.AOIGUID);
-                    if (_isNew)
+                    if (ValidateForm())
                     {
-                        myGUID = Guid.NewGuid().ToString();
+                        if (!_definedFromKML)
+                        {
+                            string myGUID = "";
+                            Dictionary<string, string> LSData = new Dictionary<string, string>();
+                            long key = ((KeyValuePair<long, string>)comboMunicipality.SelectedItem).Key;
+                            LSData.Add("LSName", textLandingSiteName.Text);
+                            LSData.Add("MunNo", _municipalityNumber.ToString());
+                            LSData.Add("HasCoordinate", (textCoord.Text.Length > 0).ToString());
+                            LSData.Add("AOIGuid", _aoi.AOIGUID);
+                            if (_isNew)
+                            {
+                                myGUID = Guid.NewGuid().ToString();
+                            }
+                            else
+                            {
+                                myGUID = _landingSite.LandingSiteGUID;
+                            }
+                            LSData.Add("LSGUID", myGUID);
+
+                            if (_landingSite.UpdateData(_isNew, LSData))
+                            {
+                                if (_isNew)
+                                {
+                                    _parentForm.NewLandingSite(LSData["LSName"], myGUID);
+                                }
+                                else
+                                {
+                                    _parentForm.RefreshLV("landing_site");
+                                }
+                            }
+                        }
+                        else
+                        {
+                            _parentKMLForm.LandingSiteName = textLandingSiteName.Text;
+                            _parentKMLForm.LandingSiteMunicipalityNumber = (int)_municipalityNumber;
+                            _parentKMLForm.LandingSiteMunicipalityName = $"{comboMunicipality.Text}, {comboProvince.Text}";
+                        }
+                        Close();
                     }
                     else
                     {
-                        myGUID = _LandingSite.LandingSiteGUID;
-                    }
-                    LSData.Add("LSGUID", myGUID);
-
-                    if (_LandingSite.UpdateData(_isNew, LSData))
-                    {
-                        if (_isNew) _ParentForm.NewLandingSite(LSData["LSName"], myGUID);
-                        else _ParentForm.RefreshLV("landing_site");
-                        Close();
                     }
                     break;
 
@@ -178,7 +215,7 @@ namespace FAD3
 
                             try
                             {
-                                _MunicipalityNumber = ((KeyValuePair<long, string>)comboMunicipality.SelectedItem).Key;
+                                _municipalityNumber = ((KeyValuePair<long, string>)comboMunicipality.SelectedItem).Key;
                             }
                             catch (System.NullReferenceException ex)
                             {
@@ -198,9 +235,13 @@ namespace FAD3
 
         private void OntextCoord_DoubleClick(object sender, EventArgs e)
         {
-            CoordinateEntryForm cef = new CoordinateEntryForm(textCoord.Text.Length == 0, this, _LandingSite.Coordinate);
-            cef.Coordinate = _LandingSite.Coordinate;
-            cef.ShowDialog(this);
+            if (!_definedFromKML)
+            {
+                CoordinateEntryForm cef = new CoordinateEntryForm(textCoord.Text.Length == 0, this, _landingSite.Coordinate);
+                cef.Coordinate = _landingSite.Coordinate;
+                cef.ShowDialog(this);
+                textCoord.Text = _landingSite.Coordinate.ToString(global.CoordinateFormatCode);
+            }
         }
 
         private void SetMunicipalitiesCombo(long ProvNo)

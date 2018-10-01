@@ -27,6 +27,18 @@ namespace FAD3
         private Dictionary<string, string> _aois = new Dictionary<string, string>();
         private Dictionary<string, string> _landingSites = new Dictionary<string, string>();
 
+        public bool LandingSiteExists(string landingSiteName)
+        {
+            bool exists = false;
+            getLandingSites();
+            if (_landingSites.ContainsValue(landingSiteName))
+            {
+                exists = true;
+            }
+
+            return exists;
+        }
+
         public string MajorGrids
         {
             get { return _MajorGrids; }
@@ -211,6 +223,38 @@ namespace FAD3
                     Logger.Log(ex);
                 }
             }
+        }
+
+        public static Landingsite LandingSiteFromName(string name, string AOIGuid)
+        {
+            var landingSite = new Landingsite();
+            DataTable dt = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    string query = $"SELECT * from tblLandingSite where LSName = '{name}' and AOIGuid = {{{AOIGuid}}}";
+                    using (var adapter = new OleDbDataAdapter(query, conection))
+                    {
+                        adapter.Fill(dt);
+                        if (dt.Rows.Count > 0)
+                        {
+                            DataRow dr = dt.Rows[0];
+                            landingSite.LandingSiteGUID = dr["LSGUID"].ToString();
+                        }
+                        else
+                        {
+                            landingSite = null;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex);
+                }
+            }
+            return landingSite;
         }
 
         public static Dictionary<string, string> LandingSitesFromAOI(string AOIguid, ComboBox c = null)

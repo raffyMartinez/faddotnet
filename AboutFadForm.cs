@@ -11,6 +11,8 @@ namespace FAD3
 {
     public partial class AboutFadForm : Form
     {
+        private List<String> componentList = new List<string>();
+
         public AboutFadForm()
         {
             InitializeComponent();
@@ -28,33 +30,21 @@ namespace FAD3
             labelCredits.Text = "";
             if (global.HasMPH)
             {
-                labelCredits.Text = "The following software comoponents are used by the software:\r\nDoubleMetaphone by Adam Nelson";
+                componentList.Add("DoubleMetaphone by Adam Nelson");
             }
-            if (global.HasMPH)
+            componentList.Add($"Mapwindows Mapping Components version {axMap.VersionNumber}\r\nwww.Mapwindows.org");
+            componentList.Add($"Microsoft net framework: {Environment.Version}");
+            foreach (var item in componentList)
             {
-                labelCredits.Text += $"\r\nMapwindows Mapping Components version {axMap.VersionNumber}\r\nhttps://www.mapwindow.org";
+                labelCredits.Text += $"{item}\r\n";
             }
-            else
-            {
-                labelCredits.Text += $"The following software comoponents are used by the software:\r\nMapwindows Mapping Components version {axMap.VersionNumber}\r\nhttps://www.mapwindow.org";
-            }
-
-            if (labelCredits.Text.Length > 0)
-                labelCredits.Text += "\r\n\r\n";
+            labelCredits.Text = $"This software make use of the following {(componentList.Count == 1 ? "component:" : "components:")}\r\n{labelCredits.Text}\r\n";
 
             labelCredits.Text += "Written by: Raffy Martinez\r\n";
             labelCredits.Text += "raffy.martinez@gmail.com";
             labelCredits.Font = new Font(ff, 8F, FontStyle.Regular);
             labelCredits.Location = new Point((this.Width - labelCredits.Width) / 2, labelApp.Location.Y + (labelApp.Size.Height * 2));
             labelCredits.TextAlign = ContentAlignment.MiddleCenter;
-
-            labelNetFramework.With(o =>
-            {
-                o.Location = new Point(0, labelCredits.Top + labelCredits.Height + 10);
-                o.Text = $"Net framework: {Environment.Version}";
-                o.Font = new Font(ff, 8F, FontStyle.Regular);
-                o.TextAlign = ContentAlignment.MiddleCenter;
-            });
         }
     }
 }
