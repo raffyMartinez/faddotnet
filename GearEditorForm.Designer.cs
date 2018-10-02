@@ -1,6 +1,6 @@
 ﻿namespace FAD3
 {
-    partial class GearEditoForm
+    partial class GearEditorForm
     {
         /// <summary>
         /// Required designer variable.

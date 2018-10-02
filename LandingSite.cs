@@ -122,6 +122,56 @@ namespace FAD3
             return myCount;
         }
 
+        public static bool Delete(string landingSiteGuid)
+        {
+            bool Success = false;
+            string updateQuery = "";
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    updateQuery = $"Delete * from tblLandingSites where LSGUID = {{{landingSiteGuid}}}";
+                    conn.Open();
+                    using (OleDbCommand update = new OleDbCommand(updateQuery, conn))
+                    {
+                        Success = (update.ExecuteNonQuery() > 0);
+                    }
+                    conn.Close();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log($"{ex.Message}\r\n{ex.Source}");
+                }
+            }
+
+            return Success;
+        }
+
+        public static bool Delete(string name, string aoiGuid)
+        {
+            bool Success = false;
+            string updateQuery = "";
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    updateQuery = $"Delete * from tblLandingSites where LSName = '{name}' and AOIGuid = {{{aoiGuid}}}";
+                    conn.Open();
+                    using (OleDbCommand update = new OleDbCommand(updateQuery, conn))
+                    {
+                        Success = (update.ExecuteNonQuery() > 0);
+                    }
+                    conn.Close();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log($"{ex.Message}\r\n{ex.Source}");
+                }
+            }
+
+            return Success;
+        }
+
         public List<(int year, int countSamplings)> SampledYears()
         {
             DataTable dt = new DataTable();

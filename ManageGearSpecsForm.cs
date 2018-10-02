@@ -11,14 +11,15 @@ namespace FAD3
 {
     public partial class ManageGearSpecsForm : Form
     {
-        string _GearVarGuid;
-        string _GearVarName;
-        List<ManageGearSpecsClass.GearSpecification> _GearSpecs = new List<ManageGearSpecsClass.GearSpecification>();
-        ListViewHitTestInfo _HitItem;
-        int HiddenColIndex;
-        List<string> _DeletedSpecsRow = new List<string>();
+        private string _GearVarGuid;
+        private string _GearVarName;
+        private List<ManageGearSpecsClass.GearSpecification> _GearSpecs = new List<ManageGearSpecsClass.GearSpecification>();
+        private ListViewHitTestInfo _HitItem;
+        private int HiddenColIndex;
+        private List<string> _DeletedSpecsRow = new List<string>();
+        private SampledGear_SpecsForm _parentForm;
 
-        public ManageGearSpecsForm(string GearVarGuid, string GearVarName = null)
+        public ManageGearSpecsForm(string GearVarGuid, string GearVarName = null, SampledGear_SpecsForm parent = null)
         {
             InitializeComponent();
             _GearVarGuid = GearVarGuid;
@@ -31,6 +32,8 @@ namespace FAD3
             }
 
             _GearSpecs = ManageGearSpecsClass.GearSpecifications;
+
+            if (parent != null) _parentForm = parent;
         }
 
         private void ManageGearSpecs_Load(object sender, EventArgs e)
@@ -66,7 +69,6 @@ namespace FAD3
                 }
 
             AdjustColWidths();
-
         }
 
         private void AdjustColWidths()
@@ -88,14 +90,18 @@ namespace FAD3
             {
                 case "buttonOK":
                     if (SaveProperties()) Close();
+                    if (_parentForm != null) _parentForm.RefreshSpecs();
                     break;
+
                 case "buttonCancel":
                     Close();
                     break;
+
                 case "buttonAdd":
                     AddPropertyToList();
                     ClearFields();
                     break;
+
                 case "buttonRemove":
                     if (lvSpecs.SelectedItems.Count > 0)
                     {
@@ -104,6 +110,7 @@ namespace FAD3
                     }
                     ClearFields();
                     break;
+
                 case "buttonRemoveAll":
                     lvSpecs.Clear();
                     ClearFields();
@@ -202,7 +209,6 @@ namespace FAD3
                     comboBoxType.Text = o.SubItems[1].Text;
                     textBoxNotes.Text = o.SubItems[2].Text;
                 });
-
             }
         }
 
@@ -217,7 +223,6 @@ namespace FAD3
             {
                 e.Cancel = true;
                 e.NewWidth = lvSpecs.Columns[e.ColumnIndex].Width;
-
             }
         }
 

@@ -234,7 +234,7 @@ namespace FAD3
                 try
                 {
                     conection.Open();
-                    string query = $"SELECT * from tblLandingSite where LSName = '{name}' and AOIGuid = {{{AOIGuid}}}";
+                    string query = $"SELECT * from tblLandingSites where LSName = '{name}' and AOIGuid = {{{AOIGuid}}}";
                     using (var adapter = new OleDbDataAdapter(query, conection))
                     {
                         adapter.Fill(dt);
@@ -252,6 +252,7 @@ namespace FAD3
                 catch (Exception ex)
                 {
                     Logger.Log(ex);
+                    landingSite = null;
                 }
             }
             return landingSite;

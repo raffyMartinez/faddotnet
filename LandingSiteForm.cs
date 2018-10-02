@@ -127,7 +127,18 @@ namespace FAD3
 
         private bool ValidateForm()
         {
-            return textLandingSiteName.Text.Length > 0 && comboMunicipality.Text.Length > 0 && comboProvince.Text.Length > 0;
+            if (textLandingSiteName.Text.Length > 0 && comboMunicipality.Text.Length > 0 && comboProvince.Text.Length > 0)
+            {
+                if (aoi.LandingSiteFromName(textLandingSiteName.Text, _aoi.AOIGUID) == null)
+                {
+                    return true;
+                }
+                else
+                {
+                    MessageBox.Show("A landing site with the same name already exists", "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            return false;
         }
 
         private void OnButtonClick(object sender, EventArgs e)

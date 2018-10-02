@@ -228,11 +228,11 @@
     <Compile Include="FishingGroundForm.Designer.cs">
       <DependentUpon>FishingGroundForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="GearEditoForm.cs">
+    <Compile Include="GearEditorForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GearEditoForm.Designer.cs">
-      <DependentUpon>GearEditoForm.cs</DependentUpon>
+    <Compile Include="GearEditorForm.Designer.cs">
+      <DependentUpon>GearEditorForm.cs</DependentUpon>
     </Compile>
     <Compile Include="GearCodesUsageForm.cs">
       <SubType>Form</SubType>
@@ -430,8 +430,8 @@
     <EmbeddedResource Include="FishingGroundForm.resx">
       <DependentUpon>FishingGroundForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GearEditoForm.resx">
-      <DependentUpon>GearEditoForm.cs</DependentUpon>
+    <EmbeddedResource Include="GearEditorForm.resx">
+      <DependentUpon>GearEditorForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GearCodesUsageForm.resx">
       <DependentUpon>GearCodesUsageForm.cs</DependentUpon>

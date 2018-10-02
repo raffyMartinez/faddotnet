@@ -151,9 +151,9 @@
             // 
             // buttonCancel
             // 
-            this.buttonCancel.Location = new System.Drawing.Point(508, 261);
+            this.buttonCancel.Location = new System.Drawing.Point(503, 261);
             this.buttonCancel.Name = "buttonCancel";
-            this.buttonCancel.Size = new System.Drawing.Size(52, 27);
+            this.buttonCancel.Size = new System.Drawing.Size(57, 27);
             this.buttonCancel.TabIndex = 11;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = true;

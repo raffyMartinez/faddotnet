@@ -8,9 +8,9 @@ namespace FAD3
 {
     public static class ManageGearSpecsClass
     {
-        private static string _GearVarGuid;
-        private static string _GearVarName;
-        private static string _SamplingGuid;
+        private static string _gearVarGuid;
+        private static string _gearVarName;
+        private static string _samplingGuid = "";
         private static bool _HasSampledGearSpecs;
         private static bool _HasUnsavedSampledGearSpecEdits;
 
@@ -26,14 +26,14 @@ namespace FAD3
         /// </summary>
         public static string SamplingGuid
         {
-            get { return _SamplingGuid; }
+            get { return _samplingGuid; }
             set
             {
                 //set flag to false if sampling guid changes
-                if (_SamplingGuid != value)
+                if (_samplingGuid != value)
                     _HasUnsavedSampledGearSpecEdits = false;
 
-                _SamplingGuid = value;
+                _samplingGuid = value;
 
                 //get the specs of the sampled gear from the database
                 if (!_HasUnsavedSampledGearSpecEdits && _GearSpecifications.Count > 0)
@@ -111,7 +111,7 @@ namespace FAD3
         /// <param name="GearVarGuid"></param>
         public static void GearVarGuid(string GearVarGuid)
         {
-            _GearVarGuid = GearVarGuid;
+            _gearVarGuid = GearVarGuid;
             GetGearSpecs();  //get spec template of the gear variation
         }
 
@@ -122,8 +122,8 @@ namespace FAD3
         /// <param name="GearVarName"></param>
         public static void GearVariation(string GearVarGuid, string GearVarName)
         {
-            _GearVarGuid = GearVarGuid;
-            _GearVarName = GearVarName;
+            _gearVarGuid = GearVarGuid;
+            _gearVarName = GearVarName;
             GetGearSpecs();  //get spec template of the gear variation
         }
 
@@ -138,8 +138,13 @@ namespace FAD3
         /// <summary>
         /// save the specs of the gear that was sampled
         /// </summary>
-        public static bool SaveSampledGearSpecs()
+        public static bool SaveSampledGearSpecs(string samplingGuid)
         {
+            if (_samplingGuid.Length == 0)
+            {
+                _samplingGuid = samplingGuid;
+            }
+
             using (var con = new OleDbConnection(global.ConnectionString))
             {
                 con.Open();
@@ -154,7 +159,7 @@ namespace FAD3
                     {
                         sql = $@"Insert into tblSampledGearSpec (RowID, SamplingGUID, SpecID, [Value]) values (
                                 '{kv.Value.RowID}',
-                                {{{ _SamplingGuid}}},
+                                {{{ _samplingGuid}}},
                                 '{kv.Value.SpecificationGuid}',
                                 '{kv.Value.SpecificationValue}')";
                     }
@@ -235,7 +240,7 @@ namespace FAD3
                 _SampledGearSpecs.Clear();
                 var sql = $@"SELECT tblGearSpecs.RowID, ElementName, SpecID, Value
                     FROM tblGearSpecs INNER JOIN tblSampledGearSpec ON tblGearSpecs.RowID = tblSampledGearSpec.SpecID
-                    WHERE tblGearSpecs.Version = '2' AND tblSampledGearSpec.SamplingGUID = {{{_SamplingGuid}}}";
+                    WHERE tblGearSpecs.Version = '2' AND tblSampledGearSpec.SamplingGUID = {{{_samplingGuid}}}";
 
                 using (var dt = new DataTable())
                 {
@@ -249,7 +254,7 @@ namespace FAD3
 
                         s.RowID = dr["RowID"].ToString();
                         s.SpecificationValue = dr["Value"].ToString();
-                        s.SamplingGuid = _SamplingGuid;
+                        s.SamplingGuid = _samplingGuid;
                         s.SpecificationGuid = dr["SpecID"].ToString();
                         s.SpecificationName = dr["ElementName"].ToString();
                         s.DataStatus = global.fad3DataStatus.statusFromDB;
@@ -272,7 +277,7 @@ namespace FAD3
             {
                 con.Open();
                 string query = $@"Select RowID, ElementName, Description, ElementType, Sequence
-                               from tblGearSpecs where Version = '2' and GearVarGuid ={{{_GearVarGuid}}}
+                               from tblGearSpecs where Version = '2' and GearVarGuid ={{{_gearVarGuid}}}
                                order by sequence";
                 using (var dt = new DataTable())
                 {
@@ -329,7 +334,7 @@ namespace FAD3
                               {spec.Sequence},
                               '{version}',
                               {{{Guid.NewGuid().ToString()}}},
-                              {{{_GearVarGuid}}})";
+                              {{{_gearVarGuid}}})";
                     }
                     else if (spec.DataStatus == global.fad3DataStatus.statusForDeletion)
                     {

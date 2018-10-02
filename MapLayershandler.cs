@@ -454,8 +454,12 @@ namespace FAD3
         /// </summary>
         /// <param name="sf"></param>
         /// <returns></returns>
-        public int AddLayer(Shapefile sf, string layerName = "", bool isVisible = true)
+        public int AddLayer(Shapefile sf, string layerName = "", bool isVisible = true, bool uniqueLayer = false)
         {
+            if (uniqueLayer)
+            {
+                RemoveLayer(layerName);
+            }
             var h = _axmap.AddLayer(sf, isVisible);
             if (h >= 0)
             {

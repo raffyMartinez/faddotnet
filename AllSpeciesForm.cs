@@ -25,6 +25,26 @@ namespace FAD3
             _parent = parent;
         }
 
+        /// <summary>
+        /// Sizes all columns so that it fits the widest column content or the column header content
+        /// </summary>
+        private void SizeColumns(ListView lv, bool init = true)
+        {
+            foreach (ColumnHeader c in lv.Columns)
+            {
+                if (init)
+                {
+                    c.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
+                    c.Tag = c.Width;
+                }
+                else
+                {
+                    c.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+                    c.Width = c.Width > (int)c.Tag ? c.Width : (int)c.Tag;
+                }
+            }
+        }
+
         private void AllSpeciesForm_Load(object sender, EventArgs e)
         {
             dropDownMenu.ItemClicked += OnDropDownMenuItemClicked;
@@ -47,7 +67,9 @@ namespace FAD3
                     o.Columns.Add("Notes");
                     o.HideSelection = false;
                 });
+            SizeColumns(lvNames);
             FillListNames();
+            SizeColumns(lvNames, false);
         }
 
         private void OnDropDownMenuItemClicked(object sender, ToolStripItemClickedEventArgs e)
@@ -93,21 +115,6 @@ namespace FAD3
                 lvi.Name = item.Value.catchNameGuid;
                 lvNames.Items.Add(lvi);
                 n++;
-            }
-            foreach (ColumnHeader ch in lvNames.Columns)
-            {
-                switch (ch.Name)
-                {
-                    case "Genus":
-                    case "Species":
-                    case "Taxa":
-                        ch.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
-                        break;
-
-                    default:
-                        ch.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
-                        break;
-                }
             }
         }
 

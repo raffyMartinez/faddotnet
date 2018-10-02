@@ -12,63 +12,63 @@ namespace FAD3
 {
     public partial class GearCodesUsageForm : Form
     {
-        private string _GearClassName = "";
-        private string _GearClassGuid = "";
-        private string _GearVarName = "";
-        private string _GearVarGuid = "";
-        private string _GearRefCode = "";
-        private string _TargetAreaName = "";
-        private string _TargetAreaGuid = "";
-        private string _TargetAreaUsageRow = "";
-        private string _LocalNameGuid = "";
-        private string _LocalName;
+        private string _gearClassName = "";
+        private string _gearClassGuid = "";
+        private string _gearVarName = "";
+        private string _gearVarGuid = "";
+        private string _gearRefCode = "";
+        private string _targetAreaName = "";
+        private string _targetAreaGuid = "";
+        private string _targetAreaUsageRow = "";
+        private string _localNameGuid = "";
+        private string _localName;
         private global.fad3GearEditAction _action;
 
-        private SamplingForm _Parent;
+        private SamplingForm _parentForm;
         private static GearCodesUsageForm _instance;
 
-        public static GearCodesUsageForm GetInstance(string GearVarGuid = "", string TargetAreaGuid = "", string GearClassName = "")
+        public static GearCodesUsageForm GetInstance(string gearVarGuid = "", string targetAreaGuid = "", string gearClassName = "")
         {
-            if (_instance == null) _instance = new GearCodesUsageForm(GearVarGuid, TargetAreaGuid, GearClassName);
+            if (_instance == null) _instance = new GearCodesUsageForm(gearVarGuid, targetAreaGuid, gearClassName);
             return _instance;
         }
 
-        public void TargetArea(string TargetAreaName, string TargetAreaGuid)
+        public void TargetArea(string targetAreaName, string targetAreaGuid)
         {
-            _TargetAreaName = TargetAreaName;
-            _TargetAreaGuid = TargetAreaGuid;
+            _targetAreaName = targetAreaName;
+            _targetAreaGuid = targetAreaGuid;
         }
 
         public string GearRefCode
         {
-            get { return _GearRefCode; }
-            set { _GearRefCode = value; }
+            get { return _gearRefCode; }
+            set { _gearRefCode = value; }
         }
 
-        public void GearVariation(string VariationName, string VariationGUID)
+        public void GearVariation(string variationName, string variationGUID)
         {
-            _GearVarName = VariationName;
-            _GearVarGuid = VariationGUID;
+            _gearVarName = variationName;
+            _gearVarGuid = variationGUID;
         }
 
         public string GearClassName
         {
-            get { return _GearClassName; }
-            set { _GearClassName = value; }
+            get { return _gearClassName; }
+            set { _gearClassName = value; }
         }
 
         public SamplingForm Parent_Form
         {
-            get { return _Parent; }
-            set { _Parent = value; }
+            get { return _parentForm; }
+            set { _parentForm = value; }
         }
 
-        public GearCodesUsageForm(string GearVarGuid = "", string TargetAreaGuid = "", string GearClassName = "")
+        public GearCodesUsageForm(string gearVarGuid = "", string targetAreaGuid = "", string gearClassName = "")
         {
             InitializeComponent();
-            _GearVarGuid = GearVarGuid;
-            _TargetAreaGuid = TargetAreaGuid;
-            _GearClassName = GearClassName;
+            _gearVarGuid = gearVarGuid;
+            _targetAreaGuid = targetAreaGuid;
+            _gearClassName = gearClassName;
         }
 
         private static void FillGearVarSpecsColumn(ListView lv)
@@ -83,14 +83,12 @@ namespace FAD3
 
         public void PopulateLists()
         {
-            var WidthPercent = .8D;
-
             //fill the combobox with gear class names
             ReadGearClass();
 
-            if (_GearClassName.Length > 0)
+            if (_gearClassName.Length > 0)
             {
-                comboClass.Text = _GearClassName;
+                comboClass.Text = _gearClassName;
             }
             else
             {
@@ -115,47 +113,48 @@ namespace FAD3
 
             //fill this listview with gear variations belonging to a class
             var lv = listViewVariations;
-            ch = lv.Columns.Add("Variation");
-            var cw = ch.Width;
+            lv.Columns.Add("Variation");
             lv.Columns.Add("Specs");
+            SizeColumns(lv);
             FillVariationsList();
-            if (_GearVarGuid.Length > 0)
-                lv.Items[_GearVarGuid].Selected = true;
+            if (_gearVarGuid.Length > 0)
+                lv.Items[_gearVarGuid].Selected = true;
             else
             {
                 lv.Items[0].Selected = true;
-                _GearVarGuid = lv.Items[0].Name;
+                _gearVarGuid = lv.Items[0].Name;
             }
-            ch.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
-            if (ch.Width < cw) ch.Width = cw;
             FillGearVarSpecsColumn(lv);
+            SizeColumns(lv, false);
 
             //fill this list view with gear codes belonging to a variation
             lv = listViewCodes;
-            var ch1 = lv.Columns.Add("Code");
-            var ch2 = lv.Columns.Add("Sub-variation");
+            lv.Columns.Add("Code");
+            lv.Columns.Add("Sub-variation");
+            SizeColumns(lv);
             FillRefCodeList();
-            ch1.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
-            ch2.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
-            if (_GearRefCode.Length > 0 && lv.Items.ContainsKey(_GearRefCode))
-                lv.Items[_GearRefCode].Selected = true;
+            SizeColumns(lv, false);
+            if (_gearRefCode.Length > 0 && lv.Items.ContainsKey(_gearRefCode))
+                lv.Items[_gearRefCode].Selected = true;
             else
             {
                 lv.Items[0].Selected = true;
-                _GearRefCode = lv.Items[0].Name;
+                _gearRefCode = lv.Items[0].Name;
             }
 
             //fill this list view with target areas where the variation is used
-            if (_GearRefCode.Length > 0)
+            if (_gearRefCode.Length > 0)
             {
                 lv = listViewWhereUsed;
-                ch = lv.Columns.Add("Target area of use");
+                lv.Columns.Add("Target area of use");
+                SizeColumns(lv);
                 FillRefCodeUsage();
-                if (_TargetAreaGuid.Length > 0)
+                SizeColumns(lv, false);
+                if (_targetAreaGuid.Length > 0)
                 {
                     if (lv.Items.Count > 0)
                     {
-                        lv.Items[_TargetAreaGuid].Selected = true;
+                        lv.Items[_targetAreaGuid].Selected = true;
                     }
                 }
                 else
@@ -163,24 +162,40 @@ namespace FAD3
                     if (lv.Items.Count > 0)
                     {
                         lv.Items[0].Selected = true;
-                        _TargetAreaGuid = lv.Items[0].Name;
+                        _targetAreaGuid = lv.Items[0].Name;
                     }
                 }
-                ch.Width = (int)(lv.Width * WidthPercent);
             }
 
             //fill this list view with the local names used in a target area
 
             lv = listViewLocalNames;
             ch = lv.Columns.Add("Local name");
-            if (_TargetAreaGuid.Length > 0)
+            SizeColumns(lv);
+            if (_targetAreaGuid.Length > 0)
             {
                 FillLocalNames();
-                ch.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+                SizeColumns(lv, false);
             }
-            else
+        }
+
+        /// <summary>
+        /// Sizes all columns so that it fits the widest column content or the column header content
+        /// </summary>
+        private void SizeColumns(ListView lv, bool init = true)
+        {
+            foreach (ColumnHeader c in lv.Columns)
             {
-                ch.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
+                if (init)
+                {
+                    c.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
+                    c.Tag = c.Width;
+                }
+                else
+                {
+                    c.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+                    c.Width = c.Width > (int)c.Tag ? c.Width : (int)c.Tag;
+                }
             }
         }
 
@@ -192,7 +207,7 @@ namespace FAD3
         private void FillLocalNames()
         {
             listViewLocalNames.Items.Clear();
-            var list = gear.GearLocalName_TargetArea(_GearRefCode, _TargetAreaGuid);
+            var list = gear.GearLocalName_TargetArea(_gearRefCode, _targetAreaGuid);
             foreach (var i in list)
             {
                 var lvi = new ListViewItem
@@ -208,7 +223,7 @@ namespace FAD3
         private void FillRefCodeUsage()
         {
             listViewWhereUsed.Items.Clear();
-            var list = gear.TargetAreaUsed_RefCode(_GearRefCode);
+            var list = gear.TargetAreaUsed_RefCode(_gearRefCode);
             foreach (var i in list)
             {
                 var lvi = new ListViewItem
@@ -224,7 +239,7 @@ namespace FAD3
         private void FillRefCodeList()
         {
             listViewCodes.Items.Clear();
-            var list = gear.GearSubVariations(_GearVarGuid);
+            var list = gear.GearSubVariations(_gearVarGuid);
             foreach (KeyValuePair<string, bool> kv in list)
             {
                 var lvi = new ListViewItem
@@ -288,14 +303,14 @@ namespace FAD3
 
                     if (listViewVariations.Items.Count > 0)
                     {
-                        if (listViewVariations.Items.ContainsKey(_GearVarGuid))
+                        if (listViewVariations.Items.ContainsKey(_gearVarGuid))
                         {
-                            listViewVariations.Items[_GearVarGuid].Selected = true;
+                            listViewVariations.Items[_gearVarGuid].Selected = true;
                         }
                         else
                         {
                             listViewVariations.Items[0].Selected = true;
-                            _GearVarGuid = listViewVariations.Items[0].Name;
+                            _gearVarGuid = listViewVariations.Items[0].Name;
                         }
 
                         EventArgs ea = new EventArgs();
@@ -317,7 +332,7 @@ namespace FAD3
             switch (lv.Name)
             {
                 case "listViewCodes":
-                    _GearRefCode = lvi.Name;
+                    _gearRefCode = lvi.Name;
 
                     listViewWhereUsed.Items.Clear();
                     listViewLocalNames.Items.Clear();
@@ -325,14 +340,14 @@ namespace FAD3
                     FillRefCodeUsage();
                     if (listViewWhereUsed.Items.Count > 0)
                     {
-                        if (!listViewWhereUsed.Items.ContainsKey(_TargetAreaGuid))
+                        if (!listViewWhereUsed.Items.ContainsKey(_targetAreaGuid))
                         {
                             listViewWhereUsed.Items[0].Selected = true;
-                            _TargetAreaGuid = listViewWhereUsed.Items[0].Name;
+                            _targetAreaGuid = listViewWhereUsed.Items[0].Name;
                         }
                         else
                         {
-                            listViewWhereUsed.Items[_TargetAreaGuid].Selected = true;
+                            listViewWhereUsed.Items[_targetAreaGuid].Selected = true;
                         }
                         FillLocalNames();
                     }
@@ -342,8 +357,8 @@ namespace FAD3
                     break;
 
                 case "listViewVariations":
-                    _GearVarGuid = lvi.Name;
-                    _GearVarName = lvi.Text;
+                    _gearVarGuid = lvi.Name;
+                    _gearVarName = lvi.Text;
 
                     listViewCodes.Items.Clear();
                     listViewWhereUsed.Items.Clear();
@@ -352,19 +367,19 @@ namespace FAD3
                     FillRefCodeList();
                     if (listViewCodes.Items.Count > 0)
                     {
-                        _GearRefCode = listViewCodes.Items[0].Name;
-                        listViewCodes.Items[_GearRefCode].Selected = true;
+                        _gearRefCode = listViewCodes.Items[0].Name;
+                        listViewCodes.Items[_gearRefCode].Selected = true;
                         FillRefCodeUsage();
                         if (listViewWhereUsed.Items.Count > 0)
                         {
-                            if (!listViewWhereUsed.Items.ContainsKey(_TargetAreaGuid))
+                            if (!listViewWhereUsed.Items.ContainsKey(_targetAreaGuid))
                             {
                                 listViewWhereUsed.Items[0].Selected = true;
-                                _TargetAreaGuid = listViewWhereUsed.Items[0].Name;
+                                _targetAreaGuid = listViewWhereUsed.Items[0].Name;
                             }
                             else
                             {
-                                listViewWhereUsed.Items[_TargetAreaGuid].Selected = true;
+                                listViewWhereUsed.Items[_targetAreaGuid].Selected = true;
                             }
                             FillLocalNames();
                         }
@@ -372,8 +387,8 @@ namespace FAD3
                     break;
 
                 case "listViewWhereUsed":
-                    _TargetAreaGuid = lvi.Name;
-                    _TargetAreaUsageRow = lvi.Tag.ToString();
+                    _targetAreaGuid = lvi.Name;
+                    _targetAreaUsageRow = lvi.Tag.ToString();
                     FillLocalNames();
                     break;
             }
@@ -394,16 +409,16 @@ namespace FAD3
                     switch (lv.Name)
                     {
                         case "listViewCodes":
-                            _TargetAreaGuid = "";
-                            _TargetAreaUsageRow = "";
+                            _targetAreaGuid = "";
+                            _targetAreaUsageRow = "";
                             break;
 
                         case "listViewWhereUsed":
                             break;
 
                         case "listViewVariations":
-                            _GearRefCode = "";
-                            _TargetAreaGuid = "";
+                            _gearRefCode = "";
+                            _targetAreaGuid = "";
                             break;
 
                         case "listViewLocalNames":
@@ -422,7 +437,7 @@ namespace FAD3
                     case "listViewWhereUsed":
                         var tsi = dropDownMenu.Items.Add("Add target area where used");
                         tsi.Name = "itemAddTargetArea";
-                        tsi.Enabled = _GearRefCode.Length > 0;
+                        tsi.Enabled = _gearRefCode.Length > 0;
 
                         tsi = dropDownMenu.Items.Add("Delete target area");
                         tsi.Name = "itemDeleteTargetArea";
@@ -454,7 +469,7 @@ namespace FAD3
                     case "listViewLocalNames":
                         tsi = dropDownMenu.Items.Add("Add a gear local name");
                         tsi.Name = "itemAddLocalName";
-                        tsi.Enabled = _TargetAreaGuid.Length > 0;
+                        tsi.Enabled = _targetAreaGuid.Length > 0;
 
                         tsi = dropDownMenu.Items.Add("Delete gear local name");
                         tsi.Name = "itemDeleteLocalName";
@@ -464,7 +479,7 @@ namespace FAD3
                     case "listViewCodes":
                         tsi = dropDownMenu.Items.Add("Add a gear code");
                         tsi.Name = "itemAddGearCode";
-                        tsi.Enabled = _GearVarGuid.Length > 0;
+                        tsi.Enabled = _gearVarGuid.Length > 0;
 
                         tsi = dropDownMenu.Items.Add("Delete gear code");
                         tsi.Name = "itemDeleteGearCode";
@@ -483,7 +498,7 @@ namespace FAD3
             {
                 case "itemGearSamplings":
 
-                    var ef = GearSpeciesSamplingsForm.GetInstance(_GearVarGuid, _GearVarName, this);
+                    var ef = GearSpeciesSamplingsForm.GetInstance(_gearVarGuid, _gearVarName, this);
                     if (!ef.Visible)
                     {
                         ef.Show(this);
@@ -491,7 +506,7 @@ namespace FAD3
                     else
                     {
                         ef.BringToFront();
-                        ef.setItemGuid_Name_Parent(_GearVarGuid, _GearVarName, this);
+                        ef.setItemGuid_Name_Parent(_gearVarGuid, _gearVarName, this);
                     }
                     break;
 
@@ -542,7 +557,6 @@ namespace FAD3
                         }
                     }
                     break;
-                    break;
 
                 case "itemDeleteLocalName":
                     RowNumberForDeletion = listViewLocalNames.SelectedItems[0].Tag.ToString();
@@ -559,13 +573,13 @@ namespace FAD3
 
                 case "itemDeleteGearVariation":
 
-                    if (_GearVarGuid.Length > 0)
+                    if (_gearVarGuid.Length > 0)
                     {
                         if (MessageBox.Show("Please confirm that you want to delete this variation",
                                             "Confirmation needed", MessageBoxButtons.OKCancel,
                                             MessageBoxIcon.Exclamation) == DialogResult.OK)
                         {
-                            var result = gear.DeleteGearVariation(_GearVarGuid);
+                            var result = gear.DeleteGearVariation(_gearVarGuid);
                             if (!result.success)
                             {
                                 var reason = result.reason;
@@ -590,11 +604,11 @@ namespace FAD3
                 case "itemAddGearVariation":
                 case "itemAddLocalName":
                 case "itemAddGearCode":
-                    _GearClassGuid = ((KeyValuePair<string, string>)comboClass.SelectedItem).Key;
-                    GearEditoForm f = new GearEditoForm(this)
+                    _gearClassGuid = ((KeyValuePair<string, string>)comboClass.SelectedItem).Key;
+                    GearEditorForm f = new GearEditorForm(this)
                     {
-                        GearClassGuid = _GearClassGuid,
-                        GearVariationGuid = _GearVarGuid,
+                        GearClassGuid = _gearClassGuid,
+                        GearVariationGuid = _gearVarGuid,
                         Action = _action,
                         InList = myList
                     };
@@ -619,32 +633,33 @@ namespace FAD3
 
         public void UsageTargetArea(string targetAreaGuid, string targetAreaName)
         {
-            _TargetAreaGuid = targetAreaGuid;
-            _TargetAreaName = targetAreaName;
+            _targetAreaGuid = targetAreaGuid;
+            _targetAreaName = targetAreaName;
 
-            if (_GearRefCode.Length > 0 && _TargetAreaGuid.Length > 0)
+            if (_gearRefCode.Length > 0 && _targetAreaGuid.Length > 0)
             {
-                var result = gear.AddGearCodeUsageTargetArea(_GearRefCode, _TargetAreaGuid);
+                var result = gear.AddGearCodeUsageTargetArea(_gearRefCode, _targetAreaGuid);
                 if (result.Success)
                 {
-                    var newLVI = listViewWhereUsed.Items.Add(_TargetAreaGuid, _TargetAreaName, null);
+                    var newLVI = listViewWhereUsed.Items.Add(_targetAreaGuid, _targetAreaName, null);
                     newLVI.Tag = result.NewRow;
-                    _TargetAreaUsageRow = result.NewRow;
+                    _targetAreaUsageRow = result.NewRow;
+                    _parentForm.GearVariationUseRefresh();
                 }
             }
         }
 
         public void UsageLocalName(string localNameGuid, string localName)
         {
-            _LocalNameGuid = localNameGuid;
-            _LocalName = localName;
+            _localNameGuid = localNameGuid;
+            _localName = localName;
 
-            if (_GearRefCode.Length > 0 && _TargetAreaGuid.Length > 0 && _LocalNameGuid.Length > 0 && _TargetAreaUsageRow.Length > 0)
+            if (_gearRefCode.Length > 0 && _targetAreaGuid.Length > 0 && _localNameGuid.Length > 0 && _targetAreaUsageRow.Length > 0)
             {
-                var result = gear.AddUsageLocalName(_TargetAreaUsageRow, _LocalNameGuid);
+                var result = gear.AddUsageLocalName(_targetAreaUsageRow, _localNameGuid);
                 if (result.Success)
                 {
-                    var newLVI = listViewLocalNames.Items.Add(_LocalNameGuid, _LocalName, null);
+                    var newLVI = listViewLocalNames.Items.Add(_localNameGuid, _localName, null);
                     newLVI.Tag = result.NewRow;
                 }
             }
@@ -652,12 +667,12 @@ namespace FAD3
 
         public void UsageGearCode(string gearCode, bool isVariation)
         {
-            _GearRefCode = gearCode;
-            if (_GearVarGuid.Length > 0)
+            _gearRefCode = gearCode;
+            if (_gearVarGuid.Length > 0)
             {
-                if (gear.AddGearVariationReferenceCode(_GearRefCode, _GearVarGuid, isVariation))
+                if (gear.AddGearVariationReferenceCode(_gearRefCode, _gearVarGuid, isVariation))
                 {
-                    var lvi = listViewCodes.Items.Add(_GearRefCode, _GearRefCode, null);
+                    var lvi = listViewCodes.Items.Add(_gearRefCode, _gearRefCode, null);
                     lvi.SubItems.Add(isVariation.ToString());
                 }
             }
@@ -665,8 +680,8 @@ namespace FAD3
 
         public void UsageGearVariation(string gearVariationName)
         {
-            _GearVarName = gearVariationName;
-            if (_GearClassGuid.Length > 0)
+            _gearVarName = gearVariationName;
+            if (_gearClassGuid.Length > 0)
             {
                 var dms = new DoubleMetaphoneShort();
                 dms.ComputeMetaphoneKeys(gearVariationName, out short key1, out short key2);
@@ -692,11 +707,11 @@ namespace FAD3
 
                 if (proceed)
                 {
-                    var result = gear.AddGearVariation(_GearClassGuid, gearVariationName);
+                    var result = gear.AddGearVariation(_gearClassGuid, gearVariationName);
                     if (result.success)
                     {
-                        _GearVarGuid = result.newGuid;
-                        listViewVariations.Items.Add(_GearVarGuid, gearVariationName, null);
+                        _gearVarGuid = result.newGuid;
+                        listViewVariations.Items.Add(_gearVarGuid, gearVariationName, null);
                     }
                 }
             }

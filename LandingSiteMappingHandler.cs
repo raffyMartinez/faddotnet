@@ -5,14 +5,16 @@ using System.Text;
 using System.Data.OleDb;
 using System.Data;
 using MapWinGIS;
+using Oware;
 
 namespace FAD3
 {
     public static class LandingSiteMappingHandler
     {
-        public static void ShowLandingSitesOnMap(MapLayersHandler layersHandler, string aoiGUID, GeoProjection gp)
+        public static bool ShowLandingSitesOnMap(MapLayersHandler layersHandler, string aoiGUID, GeoProjection gp, bool uniqueLayerName = false)
         {
             var myDT = new DataTable();
+            var iShp = -1;
             using (var conection = new OleDbConnection(global.ConnectionString))
             {
                 try
@@ -35,33 +37,48 @@ namespace FAD3
                             var ifldX = sf.EditAddField("x", FieldType.DOUBLE_FIELD, 8, 12);
                             var ifldY = sf.EditAddField("y", FieldType.DOUBLE_FIELD, 8, 12);
                             sf.GeoProjection = gp;
+
                             for (int i = 0; i < myDT.Rows.Count; i++)
                             {
                                 DataRow dr = myDT.Rows[i];
-                                var x = (double)dr["cx"];
-                                var y = (double)dr["cy"];
-                                var name = dr["LSName"].ToString();
-                                var LGU = $"{dr["Municipality"].ToString()}, {dr["ProvinceName"].ToString()}";
-                                var shp = new Shape();
-                                if (shp.Create(ShpfileType.SHP_POINT))
+                                if (dr["cx"].ToString().Length > 0 && dr["cy"].ToString().Length > 0)
                                 {
-                                    shp.AddPoint(x, y);
-                                    var iShp = sf.EditAddShape(shp);
-                                    if (iShp >= 0)
+                                    var x = (double)dr["cx"];
+                                    var y = (double)dr["cy"];
+                                    var name = dr["LSName"].ToString();
+                                    var LGU = $"{dr["Municipality"].ToString()}, {dr["ProvinceName"].ToString()}";
+                                    var shp = new Shape();
+                                    if (shp.Create(ShpfileType.SHP_POINT))
                                     {
-                                        sf.EditCellValue(ifldName, iShp, name);
-                                        sf.EditCellValue(ifldLGU, iShp, LGU);
-                                        sf.EditCellValue(ifldX, iShp, x);
-                                        sf.EditCellValue(ifldY, iShp, y);
+                                        if (global.MappingMode == global.fad3MappingMode.grid25Mode)
+                                        {
+                                            var converter = new LatLngUTMConverter("WGS 84");
+                                            var result = converter.convertLatLngToUtm(y, x);
+                                            x = result.Easting;
+                                            y = result.Northing;
+                                        }
+
+                                        shp.AddPoint(x, y);
+
+                                        iShp = sf.EditAddShape(shp);
+                                        if (iShp >= 0)
+                                        {
+                                            sf.EditCellValue(ifldName, iShp, name);
+                                            sf.EditCellValue(ifldLGU, iShp, LGU);
+                                            sf.EditCellValue(ifldX, iShp, x);
+                                            sf.EditCellValue(ifldY, iShp, y);
+                                        }
                                     }
                                 }
                             }
-                            layersHandler.AddLayer(sf, "Landing sites", true);
+                            if (iShp >= 0) layersHandler.AddLayer(sf, "Landing sites", true, uniqueLayerName);
                         }
                     }
                 }
                 catch (Exception ex) { Logger.Log(ex); }
             }
+
+            return iShp >= 0;
         }
     }
 }

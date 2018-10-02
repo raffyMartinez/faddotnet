@@ -29,19 +29,19 @@ namespace FAD3
     {
         private MapEffortHelperForm _formEffortMapper;
         private aoi _AOI = new aoi();
-        private string _AOIGuid = "";
-        private string _AOIName = "";
-        private global.fad3CatchSubRow _CatchSubRow;
-        private string _GearClassGUID = "";
-        private string _GearClassName = "";
+        private string _aoiGuid = "";
+        private string _aoiName = "";
+        private global.fad3CatchSubRow _catchSubRow;
+        private string _gearClassGUID = "";
+        private string _gearClassName = "";
         private string _GearVarGUID = "";
         private string _GearVarName = "";
         private string _LandingSiteGuid = "";
         private string _LandingSiteName = "";
         private Landingsite _ls = new Landingsite();
         private TreeNode _LSNode;
-        private int _MouseX = 0;
-        private int _MouseY = 0;
+        private int _mouseX = 0;
+        private int _mouseY = 0;
         private mru _mrulist = new mru();
         private bool _newSamplingEntered;
         private string _oldMDB = "";
@@ -53,12 +53,12 @@ namespace FAD3
         private int _statusPanelWidth = 200;
         private bool _subListExisting = false;
         private int _topLVItemIndex = 0;
-        private string _TreeLevel = "";
-        private string _VesHeight = "";
-        private string _VesLength = "";
-        private string _VesWidth = "";
+        private string _treeLevel = "";
+        private string _vesHeight = "";
+        private string _vesLength = "";
+        private string _vesWidth = "";
         private CatchName.Taxa _taxa = CatchName.Taxa.To_be_determined;
-        private string _ReferenceNumber = "";
+        private string _referenceNumber = "";
 
         private ListView lvCatch;
         private ListView lvLF_GMS;
@@ -120,26 +120,26 @@ namespace FAD3
 
         public string AOIGUID
         {
-            get { return _AOIGuid; }
+            get { return _aoiGuid; }
             set
             {
-                if (value != _AOIGuid)
+                if (value != _aoiGuid)
                 {
-                    _AOIGuid = value;
-                    _AOI.AOIGUID = _AOIGuid;
-                    FishingGrid.AOIGuid = _AOIGuid;
-                    Enumerators.AOIGuid = _AOIGuid;
+                    _aoiGuid = value;
+                    _AOI.AOIGUID = _aoiGuid;
+                    FishingGrid.AOIGuid = _aoiGuid;
+                    Enumerators.AOIGuid = _aoiGuid;
                 }
             }
         }
 
         public string AOIName
         {
-            get { return _AOIName; }
+            get { return _aoiName; }
             set
             {
-                _AOIName = value;
-                _AOI.AOIName = _AOIName;
+                _aoiName = value;
+                _AOI.AOIName = _aoiName;
             }
         }
 
@@ -409,7 +409,7 @@ namespace FAD3
                 SetupCatchListView(Show: false);
             }
 
-            _TreeLevel = "root";
+            _treeLevel = "root";
             if (!SetupTree(filename, FromMRU: true))
             {
                 _mrulist.RemoveFile(filename);
@@ -429,7 +429,7 @@ namespace FAD3
             Close();
         }
 
-        private void ApplyListViewColumnWidth(string TreeLevel)
+        private bool ApplyListViewColumnWidth(string TreeLevel)
         {
             //apply column widths saved in registry
             lvMain.Tag = TreeLevel;
@@ -445,11 +445,13 @@ namespace FAD3
                     ch.Width = Convert.ToInt32(arr[i]);
                     i++;
                 }
+                return i > 0;
             }
             catch (Exception ex)
             {
                 Logger.Log(ex);
             }
+            return false;
         }
 
         /// <summary>
@@ -458,7 +460,7 @@ namespace FAD3
         private void BackToSamplingMonth()
         {
             SetupSamplingButtonFrame(false);
-            SetUPLV(_TreeLevel);
+            SetUPLV(_treeLevel);
             lvMain.Focus();
             var lvi = lvMain.Items[_SamplingGUID];
             if (lvMain.Items.Contains(lvi))
@@ -484,11 +486,11 @@ namespace FAD3
             {
                 var tsi1 = menuDropDown.Items.Add("Enumerator detail");
                 tsi1.Name = "menuEnumeratorDetail";
-                tsi1.Visible = lvh.Item.Tag != null && _TreeLevel == "aoi" && lvh.Item.Tag.ToString() == "enumerator";
+                tsi1.Visible = lvh.Item.Tag != null && _treeLevel == "aoi" && lvh.Item.Tag.ToString() == "enumerator";
 
                 tsi1 = menuDropDown.Items.Add("Landing site detail");
                 tsi1.Name = "menuLandingSiteDetail";
-                tsi1.Visible = lvh.Item.Tag != null && _TreeLevel == "landing_site" && lvh.Item.Tag.ToString() == "landing_site";
+                tsi1.Visible = lvh.Item.Tag != null && _treeLevel == "landing_site" && lvh.Item.Tag.ToString() == "landing_site";
 
                 tsi1 = menuDropDown.Items.Add("Delete sampling");
                 tsi1.Name = "menuDeleteSampling";
@@ -504,56 +506,63 @@ namespace FAD3
                 case "treeMain":
                     var tsi = menuDropDown.Items.Add("New target area");
                     tsi.Name = "menuNewTargetArea";
-                    tsi.Enabled = _TreeLevel == "root";
+                    tsi.Enabled = _treeLevel == "root";
 
-                    tsi = menuDropDown.Items.Add("New landing site");
-                    tsi.Name = "menuNewLandingSite";
-                    tsi.Enabled = _TreeLevel == "aoi";
+                    tsi = menuDropDown.Items.Add("Enumerators");
+                    tsi.Name = "menuEnumerators";
+                    tsi.Enabled = _treeLevel == "aoi";
 
-                    tsi = menuDropDown.Items.Add("Get landing sites from Google Earth KML");
-                    tsi.Name = "menuLandingSiteFromKML";
-                    tsi.Enabled = _TreeLevel == "aoi";
-
-                    tsi = menuDropDown.Items.Add("Show landing sites on map");
-                    tsi.Name = "menuShowOnMapLandingSites";
-                    tsi.Enabled = _TreeLevel == "aoi" && global.MapIsOpen;
-
-                    tsi = menuDropDown.Items.Add("New sampling");
-                    tsi.Name = "menuNewSampling";
-                    tsi.Enabled = _TreeLevel == "sampling" || _TreeLevel == "landing_site" || _TreeLevel == "gear";
+                    tsi = menuDropDown.Items.Add("Target area properties");
+                    tsi.Name = "menuTargetAreaProp";
+                    tsi.Enabled = _treeLevel == "aoi";
 
                     var sep = menuDropDown.Items.Add("-");
                     sep.Name = "menuSeparator1";
 
-                    tsi = menuDropDown.Items.Add("Enumerators");
-                    tsi.Name = "menuEnumerators";
-                    tsi.Enabled = _TreeLevel == "aoi";
+                    tsi = menuDropDown.Items.Add("New landing site");
+                    tsi.Name = "menuNewLandingSite";
+                    tsi.Enabled = _treeLevel == "aoi";
 
-                    tsi = menuDropDown.Items.Add("Target area properties");
-                    tsi.Name = "menuTargetAreaProp";
-                    tsi.Enabled = _TreeLevel == "aoi";
+                    tsi = menuDropDown.Items.Add("Get landing sites from Google Earth KML");
+                    tsi.Name = "menuLandingSiteFromKML";
+                    tsi.Enabled = _treeLevel == "aoi";
+
+                    tsi = menuDropDown.Items.Add("Show landing sites on map");
+                    tsi.Name = "menuShowOnMapLandingSites";
+                    tsi.Enabled = _treeLevel == "aoi" && global.MapIsOpen;
 
                     tsi = menuDropDown.Items.Add("Landing site properties");
                     tsi.Name = "menuLandingSiteProp";
-                    tsi.Enabled = _TreeLevel == "landing_site";
+                    tsi.Enabled = _treeLevel == "landing_site";
 
                     sep = menuDropDown.Items.Add("-");
                     sep.Name = "menuSeparator2";
 
+                    tsi = menuDropDown.Items.Add("New sampling");
+                    tsi.Name = "menuNewSampling";
+                    tsi.Enabled = _treeLevel == "sampling" || _treeLevel == "landing_site" || _treeLevel == "gear";
+
                     tsi = menuDropDown.Items.Add("Map fishing effort");
                     tsi.Name = "menuMapEffort";
                     tsi.Enabled = global.MapIsOpen;
+
+                    sep = menuDropDown.Items.Add("-");
+                    sep.Name = "menuSeparator3";
+
+                    tsi = menuDropDown.Items.Add("Delete");
+                    tsi.Name = "menuDeleteTreeItem";
+                    tsi.Enabled = _treeLevel != "root";
 
                     break;
 
                 case "lvMain":
                     tsi = menuDropDown.Items.Add("New sampling");
                     tsi.Name = "menuNewSampling";
-                    tsi.Visible = _TreeLevel == "sampling" || _TreeLevel == "landing_site" || _TreeLevel == "gear";
+                    tsi.Visible = _treeLevel == "sampling" || _treeLevel == "landing_site" || _treeLevel == "gear";
 
                     sep = menuDropDown.Items.Add("-");
                     sep.Name = "menuSeparator1";
-                    sep.Visible = _TreeLevel == "landing_site";
+                    sep.Visible = _treeLevel == "landing_site";
                     break;
 
                 case "lvCatch":
@@ -571,12 +580,12 @@ namespace FAD3
                     var MenuName = "";
                     if (((ListView)Source).Items.Count > 0)
                     {
-                        if (_CatchSubRow == global.fad3CatchSubRow.GMS)
+                        if (_catchSubRow == global.fad3CatchSubRow.GMS)
                         {
                             MenuPrompt = "Edit GMS table";
                             MenuName = "menuEditGMSTable";
                         }
-                        else if (_CatchSubRow == global.fad3CatchSubRow.LF)
+                        else if (_catchSubRow == global.fad3CatchSubRow.LF)
                         {
                             MenuPrompt = "Edit Length-frequency table";
                             MenuName = "menuEditLFTable";
@@ -584,12 +593,12 @@ namespace FAD3
                     }
                     else
                     {
-                        if (_CatchSubRow == global.fad3CatchSubRow.GMS)
+                        if (_catchSubRow == global.fad3CatchSubRow.GMS)
                         {
                             MenuPrompt = "New GMS table";
                             MenuName = "menuNewGMSTable";
                         }
-                        else if (_CatchSubRow == global.fad3CatchSubRow.LF)
+                        else if (_catchSubRow == global.fad3CatchSubRow.LF)
                         {
                             MenuPrompt = "New Length-frequency table";
                             MenuName = "menuNewLFTable";
@@ -862,6 +871,23 @@ namespace FAD3
             e.ClickedItem.Owner.Hide();
             switch (ItemName)
             {
+                case "menuDeleteTreeItem":
+                    var myTag = (Tuple<string, string, string>)treeMain.SelectedNode.Tag;
+                    switch (_treeLevel)
+                    {
+                        case "aoi":
+                            break;
+
+                        case "landing_site":
+                            var result = MessageBox.Show("Are you sure you want to delete the selected landing site", "Confirmation needed", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
+                            if (result == DialogResult.Yes && Landingsite.Delete(myTag.Item1))
+                            {
+                                treeMain.Nodes.Remove(treeMain.SelectedNode);
+                            }
+                            break;
+                    }
+                    break;
+
                 case "menuNewTargetArea":
                     TargetAreaForm tf = new TargetAreaForm(this, IsNew: true);
                     tf.ShowDialog(this);
@@ -885,13 +911,16 @@ namespace FAD3
                     break;
 
                 case "menuShowOnMapLandingSites":
-                    LandingSiteMappingHandler.ShowLandingSitesOnMap(global.MappingForm.MapLayersHandler, _AOIGuid, global.MappingForm.GeoProjection);
+                    if (!LandingSiteMappingHandler.ShowLandingSitesOnMap(global.MappingForm.MapLayersHandler, _aoiGuid, global.MappingForm.GeoProjection, true))
+                    {
+                        MessageBox.Show("Landing sites could not be shown on the map.\r\nPlease check landing site coordinates", "Mapping error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
                     break;
 
                 case "menuNewSampling":
                     if (FishingGrid.IsCompleteGrid25)
                     {
-                        if (Enumerators.AOIHaveEnumerators(_AOIGuid))
+                        if (Enumerators.AOIHaveEnumerators(_aoiGuid))
                             NewSamplingForm();
                         else
                         {
@@ -1008,7 +1037,7 @@ namespace FAD3
                     {
                         _formEffortMapper.BringToFront();
                     }
-                    _formEffortMapper.SetUpMapping(_TreeLevel);
+                    _formEffortMapper.SetUpMapping(_treeLevel);
                     global.MappingMode = global.fad3MappingMode.fishingGroundMappingMode;
                     break;
             }
@@ -1016,7 +1045,7 @@ namespace FAD3
 
         private void SetMappingEffortSource()
         {
-            if (_formEffortMapper != null) _formEffortMapper.SetUpMapping(_TreeLevel);
+            if (_formEffortMapper != null) _formEffortMapper.SetUpMapping(_treeLevel);
         }
 
         public void EffortMapperClosed()
@@ -1026,7 +1055,7 @@ namespace FAD3
 
         private void ShowCatchCompositionForm(bool IsNew = false)
         {
-            CatchCompositionForm ccf = new CatchCompositionForm(IsNew, this, _SamplingGUID, _ReferenceNumber, _weightOfCatch, _weightOfSample);
+            CatchCompositionForm ccf = new CatchCompositionForm(IsNew, this, _SamplingGUID, _referenceNumber, _weightOfCatch, _weightOfSample);
             ccf.ShowDialog(this);
         }
 
@@ -1036,8 +1065,8 @@ namespace FAD3
             var f3 = new SamplingForm
             {
                 IsNew = true,
-                GearClassName = _GearClassName,
-                GearClassGuid = _GearClassGUID,
+                GearClassName = _gearClassName,
+                GearClassGuid = _gearClassGUID,
                 GearVarGuid = _GearVarGUID,
                 GearVarName = _GearVarName,
                 AOIGuid = AOIGUID,
@@ -1063,7 +1092,9 @@ namespace FAD3
 
                 case "buttonCatch":
                     SetupCatchListView();
+                    SizeColumns(lvCatch);
                     ShowCatchComposition(_SamplingGUID);
+                    //SizeColumns(lvCatch, false);
                     break;
 
                 case "buttonMap":
@@ -1083,7 +1114,7 @@ namespace FAD3
                 case "btnSubLF":
                     if (SetupLF_GMSListView(Show: true, Content: global.fad3CatchSubRow.LF))
                     {
-                        _CatchSubRow = global.fad3CatchSubRow.LF;
+                        _catchSubRow = global.fad3CatchSubRow.LF;
                         Show_LF_GMS_List(lvCatch.SelectedItems[0].Name);
                     }
                     break;
@@ -1091,7 +1122,7 @@ namespace FAD3
                 case "btnSubGMS":
                     if (SetupLF_GMSListView(Show: true, Content: global.fad3CatchSubRow.GMS))
                     {
-                        _CatchSubRow = global.fad3CatchSubRow.GMS;
+                        _catchSubRow = global.fad3CatchSubRow.GMS;
                         if (Enum.TryParse(lvCatch.SelectedItems[0].SubItems[7].Text, out CatchName.Taxa myTaxa))
                         {
                             _taxa = myTaxa;
@@ -1233,9 +1264,9 @@ namespace FAD3
                         break;
 
                     case "lvLF_GMS":
-                        if (_CatchSubRow == global.fad3CatchSubRow.LF)
+                        if (_catchSubRow == global.fad3CatchSubRow.LF)
                             ShowLFForm();
-                        else if (_CatchSubRow == global.fad3CatchSubRow.GMS)
+                        else if (_catchSubRow == global.fad3CatchSubRow.GMS)
                             ShowGMSForm(_taxa);
                         break;
                 }
@@ -1245,10 +1276,10 @@ namespace FAD3
         private void OnListView_MouseDown(object sender, MouseEventArgs e)
         {
             ListView lv = (ListView)sender;
-            _MouseX = e.Location.X;
-            _MouseY = e.Location.Y;
+            _mouseX = e.Location.X;
+            _mouseY = e.Location.Y;
 
-            ListViewHitTestInfo lvh = lv.HitTest(_MouseX, _MouseY);
+            ListViewHitTestInfo lvh = lv.HitTest(_mouseX, _mouseY);
             switch (lv.Name)
             {
                 case "lvMain":
@@ -1259,11 +1290,11 @@ namespace FAD3
                         {
                             global.MappingForm.MapFishingGround(lvh.Item.SubItems[4].Text, FishingGrid.UTMZone);
                         }
-                        _ReferenceNumber = lvh.Item.Text;
+                        _referenceNumber = lvh.Item.Text;
                     }
                     if (e.Button == MouseButtons.Right)
                     {
-                        if (_TreeLevel == "sampling" || _TreeLevel == "aoi" || _TreeLevel == "landing_site")
+                        if (_treeLevel == "sampling" || _treeLevel == "aoi" || _treeLevel == "landing_site")
                         {
                             ConfigDropDownMenu(lvMain, lvh);
                         }
@@ -1278,7 +1309,7 @@ namespace FAD3
                     if (e.Button == MouseButtons.Right)
                     {
                         ConfigDropDownMenu(lvCatch);
-                        menuDropDown.Show(lv, new Point(_MouseX, _MouseY));
+                        menuDropDown.Show(lv, new Point(_mouseX, _mouseY));
                     }
                     else
                     {
@@ -1297,7 +1328,7 @@ namespace FAD3
                     if (e.Button == MouseButtons.Right)
                     {
                         ConfigDropDownMenu(lv);
-                        menuDropDown.Show(lv, new Point(_MouseX, _MouseY));
+                        menuDropDown.Show(lv, new Point(_mouseX, _mouseY));
                     }
                     else
                     {
@@ -1306,10 +1337,15 @@ namespace FAD3
             }
         }
 
-        private void OnListViewLeave(object sender, EventArgs e)
+        private void SaveColumnWidthToRegistry()
         {
             if (lvMain.Columns.Count > 0)
-                SaveColumnWidthEx(sender, lvMain.Tag.ToString());
+                SaveColumnWidthEx(lvMain, lvMain.Tag.ToString());
+        }
+
+        private void OnListViewLeave(object sender, EventArgs e)
+        {
+            SaveColumnWidthToRegistry();
         }
 
         private void OnMenuFile_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
@@ -1506,52 +1542,52 @@ namespace FAD3
             {
                 _LandingSiteName = "";
                 _GearVarName = "";
-                _GearClassName = "";
+                _gearClassName = "";
                 _LandingSiteGuid = "";
                 _GearVarGUID = "";
-                _GearClassGUID = "";
+                _gearClassGUID = "";
 
                 TreeNode nd = treeMain.SelectedNode;
                 ResetTheBackColor(treeMain);
                 nd.BackColor = Color.Gainsboro;
 
                 var myTag = (Tuple<string, string, string>)nd.Tag;
-                _TreeLevel = myTag.Item3;
+                _treeLevel = myTag.Item3;
 
                 statusPanelTargetArea.Width = _statusPanelWidth;
-                switch (_TreeLevel)
+                switch (_treeLevel)
                 {
                     case "gear":
-                        _AOIName = treeMain.SelectedNode.Parent.Parent.Text;
+                        _aoiName = treeMain.SelectedNode.Parent.Parent.Text;
                         this.AOIGUID = treeMain.SelectedNode.Parent.Parent.Name;
                         _LandingSiteName = treeMain.SelectedNode.Parent.Text;
                         _LandingSiteGuid = treeMain.SelectedNode.Parent.Name;
                         _GearVarName = treeMain.SelectedNode.Text;
                         _GearVarGUID = myTag.Item2;
                         var rv = gear.GearClassGuidNameFromGearVarGuid(_GearVarGUID);
-                        _GearClassName = rv.Value;
-                        _GearClassGUID = rv.Key;
+                        _gearClassName = rv.Value;
+                        _gearClassGUID = rv.Key;
                         _LSNode = e.Node.Parent;
 
                         break;
 
                     case "sampling":
-                        _AOIName = treeMain.SelectedNode.Parent.Parent.Parent.Text;
+                        _aoiName = treeMain.SelectedNode.Parent.Parent.Parent.Text;
                         this.AOIGUID = ((Tuple<string, string, string>)treeMain.SelectedNode.Parent.Parent.Parent.Tag).Item1;
                         _LandingSiteName = treeMain.SelectedNode.Parent.Parent.Text;
                         _LandingSiteGuid = myTag.Item1;
                         _GearVarName = treeMain.SelectedNode.Parent.Text;
                         _GearVarGUID = myTag.Item2;
                         rv = gear.GearClassGuidNameFromGearVarGuid(_GearVarGUID);
-                        _GearClassName = rv.Value;
-                        _GearClassGUID = rv.Key;
+                        _gearClassName = rv.Value;
+                        _gearClassGUID = rv.Key;
                         _LSNode = e.Node.Parent.Parent;
                         _SamplingMonth = e.Node.Text;
 
                         break;
 
                     case "aoi":
-                        _AOIName = treeMain.SelectedNode.Text;
+                        _aoiName = treeMain.SelectedNode.Text;
                         this.AOIGUID = treeMain.SelectedNode.Name;
                         _LandingSiteName = "";
                         _LandingSiteGuid = "";
@@ -1563,7 +1599,7 @@ namespace FAD3
                         break;
 
                     case "landing_site":
-                        _AOIName = treeMain.SelectedNode.Parent.Text;
+                        _aoiName = treeMain.SelectedNode.Parent.Text;
                         this.AOIGUID = treeMain.SelectedNode.Parent.Name;
                         _LandingSiteName = treeMain.SelectedNode.Text;
                         _LandingSiteGuid = treeMain.SelectedNode.Name;
@@ -1574,11 +1610,11 @@ namespace FAD3
                         break;
                 }
 
-                SetUPLV(_TreeLevel);
-                statusPanelTargetArea.Text = _AOIName;
+                SetUPLV(_treeLevel);
+                statusPanelTargetArea.Text = _aoiName;
                 statusPanelLandingSite.Text = _LandingSiteName;
                 statusPanelGearUsed.Text = _GearVarName;
-                if (_TreeLevel != "root") SetMappingEffortSource();
+                if (_treeLevel != "root") SetMappingEffortSource();
             }
             catch (Exception ex)
             {
@@ -1952,6 +1988,7 @@ namespace FAD3
         /// <param name="TreeLevel"></param>
         private void SetUPLV(string TreeLevel)
         {
+            var savedColWidthExist = true;
             lvMain.SuspendLayout();
 
             int i = 0;
@@ -1973,7 +2010,7 @@ namespace FAD3
                     break;
 
                 case "aoi":
-                    lblTitle.Text = "Area of interest";
+                    lblTitle.Text = "Target area";
                     break;
 
                 case "landing_site":
@@ -2004,10 +2041,14 @@ namespace FAD3
             }
 
             //apply column widths saved in registry
-            ApplyListViewColumnWidth(TreeLevel);
+            if (!ApplyListViewColumnWidth(TreeLevel))
+            {
+                savedColWidthExist = false;
+                SizeColumns(lvMain);
+            }
 
             //add rows to the listview
-            switch (_TreeLevel)
+            switch (_treeLevel)
             {
                 case "sampling":
                     FillLVSamplingSummary(_LandingSiteGuid, _GearVarGUID, _SamplingMonth);
@@ -2118,7 +2159,7 @@ namespace FAD3
                     lvi = lvMain.Items.Add("");
                     lvi = lvMain.Items.Add("Enumerators");
                     i = 0;
-                    foreach (KeyValuePair<string, string> item in Enumerators.EnumeratorsWithCount(_AOIGuid))
+                    foreach (KeyValuePair<string, string> item in Enumerators.EnumeratorsWithCount(_aoiGuid))
                     {
                         if (i > 0)
                         {
@@ -2135,7 +2176,7 @@ namespace FAD3
                     // so we just show a simple list
                     if (i == 0)
                     {
-                        foreach (KeyValuePair<string, string> item in Enumerators.AOIEnumeratorsList(_AOIGuid))
+                        foreach (KeyValuePair<string, string> item in Enumerators.AOIEnumeratorsList(_aoiGuid))
                         {
                             if (i > 0)
                             {
@@ -2230,7 +2271,11 @@ namespace FAD3
                     }
                     break;
             }
-
+            if (!savedColWidthExist)
+            {
+                SizeColumns(lvMain, false);
+                SaveColumnWidthToRegistry();
+            }
             lvMain.ResumeLayout();
         }
 
@@ -2290,7 +2335,7 @@ namespace FAD3
         {
             lvLF_GMS.Items.Clear();
             int n = 1;
-            if (_CatchSubRow == global.fad3CatchSubRow.LF)
+            if (_catchSubRow == global.fad3CatchSubRow.LF)
             {
                 foreach (KeyValuePair<string, sampling.LFLine> kv in _Sampling.LFData(CatchRowGuid))
                 {
@@ -2305,7 +2350,7 @@ namespace FAD3
                     n++;
                 }
             }
-            else if (_CatchSubRow == global.fad3CatchSubRow.GMS)
+            else if (_catchSubRow == global.fad3CatchSubRow.GMS)
             {
                 foreach (KeyValuePair<string, GMSLineClass> kv in GMSManager.RetrieveGMSData(CatchRowGuid))
                 {
@@ -2385,6 +2430,26 @@ namespace FAD3
                                 c.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
                             break;
                     }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sizes all columns so that it fits the widest column content or the column header content
+        /// </summary>
+        private void SizeColumns(ListView lv, bool init = true)
+        {
+            foreach (ColumnHeader c in lv.Columns)
+            {
+                if (init)
+                {
+                    c.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
+                    c.Tag = c.Width;
+                }
+                else
+                {
+                    c.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+                    c.Width = c.Width > (int)c.Tag ? c.Width : (int)c.Tag;
                 }
             }
         }
@@ -2470,9 +2535,9 @@ namespace FAD3
                     }
                 }
 
-                _VesHeight = effortData["VesHeight"];
-                _VesLength = effortData["VesLength"];
-                _VesWidth = effortData["VesWidth"];
+                _vesHeight = effortData["VesHeight"];
+                _vesLength = effortData["VesLength"];
+                _vesWidth = effortData["VesWidth"];
 
                 DateEncoded = effortData["DateEncoded"];
             }
@@ -2514,9 +2579,9 @@ namespace FAD3
             fs.SamplingGUID = _SamplingGUID;
             fs.ListViewSamplingDetail(lvMain);
             fs.AOI = _AOI;
-            fs.AOIGuid = _AOIGuid;
+            fs.AOIGuid = _aoiGuid;
             fs.Parent_Form = this;
-            fs.VesselDimension(_VesLength, _VesWidth, _VesHeight);
+            fs.VesselDimension(_vesLength, _vesWidth, _vesHeight);
             fs.Show(this);
         }
 

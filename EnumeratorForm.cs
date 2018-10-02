@@ -146,6 +146,26 @@ namespace FAD3
                 return false;
         }
 
+        /// <summary>
+        /// Sizes all columns so that it fits the widest column content or the column header content
+        /// </summary>
+        private void SizeColumns(ListView lv, bool init = true)
+        {
+            foreach (ColumnHeader c in lv.Columns)
+            {
+                if (init)
+                {
+                    c.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
+                    c.Tag = c.Width;
+                }
+                else
+                {
+                    c.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+                    c.Width = c.Width > (int)c.Tag ? c.Width : (int)c.Tag;
+                }
+            }
+        }
+
         private void ConfigureListEnumerators()
         {
             labelSamplings.Visible = false;
@@ -169,11 +189,7 @@ namespace FAD3
                 o.Columns.Add("Active");
                 o.Columns.Add("");
                 o.Height = buttonOK.Top - o.Top - 10;
-
-                foreach (ColumnHeader col in o.Columns)
-                {
-                    col.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
-                }
+                SizeColumns(lvEnumerators);
             });
 
             Button buttonAdd = new Button
@@ -209,24 +225,7 @@ namespace FAD3
                 lvi.SubItems.Add(kv.Value.IsActive.ToString());
             }
 
-            if (lvEnumerators.Items.Count > 0)
-            {
-                foreach (ColumnHeader col in lvEnumerators.Columns)
-                {
-                    switch (col.Text)
-                    {
-                        case "Enumerator name":
-                            col.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
-                            break;
-
-                        case "Date hired":
-                        case "":
-                        case "Active":
-                            col.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
-                            break;
-                    }
-                }
-            }
+            SizeColumns(lvEnumerators, false);
         }
 
         private void ConfigureListEnumeratorSamplings()
@@ -255,11 +254,7 @@ namespace FAD3
                 o.Columns.Add("Weight of catch");
                 o.Columns.Add("Type of vessel used");
                 o.Columns.Add("Rows");
-
-                foreach (ColumnHeader c in o.Columns)
-                {
-                    c.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
-                }
+                SizeColumns(lvEnumerators);
 
                 o.HideSelection = false;
                 o.Location = new Point(tree.Width, tree.Top);
@@ -272,6 +267,7 @@ namespace FAD3
                 _samplings = Enumerators.GetEnumeratorSamplings();
                 ConfigureTree();
                 PopulateList(tree.Nodes["root"]);
+                SizeColumns(lvEnumerators, false);
                 Text = "Enumerator data and sampling list";
             }
         }

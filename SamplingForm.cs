@@ -62,6 +62,20 @@ namespace FAD3
             }
         }
 
+        public void GearVariationUseRefresh()
+        {
+            var targetCombo = new ComboBox();
+            var key = "";
+            var comboItems = new Dictionary<string, string>();
+
+            _gearClassName = ((ComboBox)panelUI.Controls["comboGearClass"]).Text;
+            string myAOIGUID = ((KeyValuePair<string, string>)((ComboBox)panelUI.Controls["comboTargetArea"]).SelectedItem).Key;
+            key = ((KeyValuePair<string, string>)((ComboBox)panelUI.Controls["comboGearClass"]).SelectedItem).Key;
+            targetCombo = (ComboBox)panelUI.Controls["comboFishingGear"];
+            comboItems = gear.GearVariationsUsage(key, myAOIGUID);
+            ChangeComboDataSource(targetCombo, comboItems);
+        }
+
         public void NewReferenceNumber(string newRefNumber)
         {
             _newReferenceNumber = newRefNumber;
@@ -479,7 +493,10 @@ namespace FAD3
                             }
 
                             if (ctl.Text.Length > 0)
+                            {
                                 _gearVarGuid = ((KeyValuePair<string, string>)((ComboBox)ctl).SelectedItem).Key;
+                                _gearVarName = ((ComboBox)ctl).Text;
+                            }
 
                             break;
 
@@ -700,7 +717,7 @@ namespace FAD3
             PopulateFGList();
 
             if (_sampling.UpdateEffort(_isNew, EffortData, _fishingGrounds))
-                return ManageGearSpecsClass.SaveSampledGearSpecs();
+                return ManageGearSpecsClass.SaveSampledGearSpecs(_samplingGUID);
             else
                 return false;
         }
@@ -724,7 +741,15 @@ namespace FAD3
                     break;
 
                 case "btnGearClass":
+
                     GearCodesUsageForm form = GearCodesUsageForm.GetInstance(_gearVarGuid, _AOIGuid, _gearClassName);
+                    form.With(o =>
+                    {
+                        o.GearRefCode = _gearRefCode;
+                        o.Parent_Form = this;
+                        o.TargetArea(_AOIName, _AOIGuid);
+                        o.GearVariation(_gearVarName, _gearVarGuid);
+                    });
                     if (!form.Visible)
                     {
                         form.Show(this);
@@ -734,28 +759,24 @@ namespace FAD3
                         form.BringToFront();
                     }
 
-                    form.With(o =>
-                    {
-                        //o.GearClassName = _GearClassName;
-                        o.GearRefCode = _gearRefCode;
-                        o.Parent_Form = this;
-                        o.TargetArea(_AOIName, _AOIGuid);
-                        o.GearVariation(_gearVarName, _gearVarGuid);
-                    });
                     break;
 
                 case "btnGearSpecs":
-                    SampledGear_SpecsForm sgf = SampledGear_SpecsForm.GetInstance(_gearVarGuid, _gearVarName, this);
+                    if (_gearVarName.Length > 0 && _gearVarGuid.Length > 0)
+                    {
+                        SampledGear_SpecsForm sgf = SampledGear_SpecsForm.GetInstance(_gearVarGuid, _gearVarName, this);
 
-                    if (!sgf.Visible)
-                    {
-                        sgf.Show(this);
+                        if (!sgf.Visible)
+                        {
+                            sgf.Show(this);
+                        }
+                        else
+                        {
+                            sgf.BringToFront();
+                        }
+
+                        sgf.SamplingGUID = _samplingGUID;
                     }
-                    else
-                    {
-                        sgf.BringToFront();
-                    }
-                    sgf.SamplingGUID = _samplingGUID;
                     break;
 
                 case "btnVesselDimension":
@@ -1161,11 +1182,12 @@ namespace FAD3
                                     break;
 
                                 case "comboGearClass":
-                                    _gearClassName = ((ComboBox)panelUI.Controls["comboGearClass"]).Text;
-                                    string myAOIGUID = ((KeyValuePair<string, string>)((ComboBox)panelUI.Controls["comboTargetArea"]).SelectedItem).Key;
-                                    targetCombo = (ComboBox)panelUI.Controls["comboFishingGear"];
-                                    comboItems = gear.GearVariationsUsage(key, myAOIGUID);
-                                    ChangeComboDataSource(targetCombo, comboItems);
+                                    //_gearClassName = ((ComboBox)panelUI.Controls["comboGearClass"]).Text;
+                                    //string myAOIGUID = ((KeyValuePair<string, string>)((ComboBox)panelUI.Controls["comboTargetArea"]).SelectedItem).Key;
+                                    //targetCombo = (ComboBox)panelUI.Controls["comboFishingGear"];
+                                    //comboItems = gear.GearVariationsUsage(key, myAOIGUID);
+                                    //ChangeComboDataSource(targetCombo, comboItems);
+                                    GearVariationUseRefresh();
                                     break;
 
                                 case "comboFishingGear":
@@ -1217,6 +1239,8 @@ namespace FAD3
 
                     case "comboGearClass":
                         panelUI.Controls["comboFishingGear"].Text = "";
+                        _gearVarGuid = "";
+                        _gearVarName = "";
                         break;
                 }
             }
