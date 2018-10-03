@@ -154,7 +154,7 @@ namespace FAD3
                 Button btnOk = new Button
                 {
                     Text = "Ok",
-                    Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular,
+                    Font = new Font("Microsoft Sans Serif", 9F, FontStyle.Regular,
                            GraphicsUnit.Point, (byte)(0)),
                     AutoSize = true,
                     Name = "buttonNoSpecsOk"

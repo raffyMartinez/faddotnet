@@ -147,6 +147,60 @@ namespace FAD3
             return Success;
         }
 
+        public static bool MoveToLandingSite(string fromLandingSiteGUID, string toLandingSiteGuid)
+        {
+            bool Success = false;
+            string updateQuery = "";
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    updateQuery = $"UPDATE tblSampling SET tblSampling.LSGUID = {{{toLandingSiteGuid}}} WHERE LSGUID = {{{fromLandingSiteGUID}}}";
+                    conn.Open();
+                    using (OleDbCommand update = new OleDbCommand(updateQuery, conn))
+                    {
+                        Success = (update.ExecuteNonQuery() > 0);
+                    }
+                    conn.Close();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log($"{ex.Message}\r\n{ex.Source}");
+                }
+            }
+
+            return Success;
+        }
+
+        public static List<(string gearVariationName, string gearVariationGuid, string gearClassName)> SampledGearsFromLandingSite(string landingSiteGuid)
+        {
+            DataTable dt = new DataTable();
+            List<(string gearVariationName, string gearVariationGuid, string gearClassName)> myList = new List<(string gearVariationName, string gearVariationGuid, string gearClassName)>();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    string query = $@"SELECT DISTINCT tblGearVariations.GearVarGUID, tblGearVariations.Variation, GearClassName
+                                     FROM tblGearClass INNER JOIN (tblGearVariations INNER JOIN tblSampling ON tblGearVariations.GearVarGUID =
+                                     tblSampling.GearVarGUID) ON tblGearClass.GearClass = tblGearVariations.GearClass
+                                     WHERE tblSampling.LSGUID={{{landingSiteGuid}}}";
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(dt);
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        DataRow dr = dt.Rows[i];
+                        myList.Add((dr["Variation"].ToString(), dr["GearVarGUID"].ToString(), dr["GearClassName"].ToString()));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex);
+                }
+                return myList;
+            }
+        }
+
         public static bool Delete(string name, string aoiGuid)
         {
             bool Success = false;

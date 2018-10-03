@@ -65,6 +65,7 @@ namespace FAD3
 
         //for column sort
         private int _sortColumn = -1;
+        private TreeNode _nodeParent;
 
         public MainForm()
         {
@@ -2611,6 +2612,157 @@ namespace FAD3
         private void OnmenuMenuBar_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
             generateInlandDbToolStripMenuItem.Visible = global.Grid25GenerateForm != null;
+        }
+
+        private void OnItemDrag(object sender, ItemDragEventArgs e)
+        {
+            _nodeParent = ((TreeNode)e.Item).Parent;
+            DoDragDrop(e.Item, DragDropEffects.Move);
+        }
+
+        private void OnDragEnter(object sender, DragEventArgs e)
+        {
+            e.Effect = DragDropEffects.Move;
+        }
+
+        private void OnDragDrop(object sender, DragEventArgs e)
+        {
+            // Retrieve the client coordinates of the drop location.
+            Point targetPoint = treeMain.PointToClient(new Point(e.X, e.Y));
+
+            // Retrieve the node at the drop location.
+            TreeNode targetNode = treeMain.GetNodeAt(targetPoint);
+
+            // Retrieve the node that was dragged.
+            //TreeNode draggedNode = e.Data.GetData(typeof(TreeNode));
+            TreeNode draggedNode = (TreeNode)e.Data.GetData(typeof(TreeNode));
+
+            if (targetNode.Parent == _nodeParent)
+            {
+                // Sanity check
+                if (draggedNode == null)
+                {
+                    return;
+                }
+
+                // Did the user drop on a valid target node?
+                if (targetNode == null)
+                {
+                    // The user dropped the node on the treeview control instead
+                    // of another node so lets place the node at the bottom of the tree.
+                    draggedNode.Remove();
+                    treeMain.Nodes.Add(draggedNode);
+                    draggedNode.Expand();
+                }
+                else
+                {
+                    TreeNode parentNode = targetNode;
+
+                    // Confirm that the node at the drop location is not
+                    // the dragged node and that target node isn't null
+                    // (for example if you drag outside the control)
+                    if (!draggedNode.Equals(targetNode) && targetNode != null)
+                    {
+                        bool canDrop = true;
+
+                        // Crawl our way up from the node we dropped on to find out if
+                        // if the target node is our parent.
+                        while (canDrop && (parentNode != null))
+                        {
+                            canDrop = !Object.ReferenceEquals(draggedNode, parentNode);
+                            parentNode = parentNode.Parent;
+                        }
+
+                        // Is this a valid drop location?
+                        if (canDrop)
+                        {
+                            // Yes. Move the node, expand it, and select it.
+                            var sourceTag = (Tuple<string, string, string>)draggedNode.Tag;
+                            var destinationTag = (Tuple<string, string, string>)targetNode.Tag;
+                            var result = MessageBox.Show($"Are you sure you want to transfer sampling data from {draggedNode.Text} to {targetNode.Text}?",
+                                                            "Confirmation needed", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                            if (result == DialogResult.Yes && Landingsite.MoveToLandingSite(sourceTag.Item1, destinationTag.Item1))
+                            {
+                                //targetNode.Nodes.Add(draggedNode);
+                                draggedNode.Nodes.Clear();
+                                RefreshLandingSiteNodeNodes(targetNode);
+                                targetNode.Expand();
+                            }
+                        }
+                    }
+                }
+
+                // Optional: Select the dropped node and navigate (however you do it)
+                treeMain.SelectedNode = draggedNode;
+                // NavigateToContent(draggedNode.Tag);
+            }
+            else
+            {
+                MessageBox.Show("Can only transfer sampling data to landing sites of the same target area", "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
+        private void RefreshLandingSiteNodeNodes(TreeNode landingSiteNode)
+        {
+            landingSiteNode.Nodes.Clear();
+            var tag = (Tuple<string, string, string>)landingSiteNode.Tag;
+            var gearList = Landingsite.SampledGearsFromLandingSite(tag.Item1);
+            if (gearList.Count > 0)
+            {
+                foreach (var item in gearList)
+                {
+                    var node = landingSiteNode.Nodes.Add(item.gearVariationGuid, item.gearVariationName);
+                    node.Tag = Tuple.Create(tag.Item1, item.gearVariationGuid, "gear");
+                    node.Name = $"{tag.Item1}|{item.gearVariationGuid}";
+                    node.ImageKey = gear.GearClassImageKeyFromGearClasName(item.gearClassName);
+                    node.Nodes.Add("*dummy*");
+                }
+            }
+            else
+            {
+                landingSiteNode.Nodes.Add("*dummy*");
+            }
+        }
+
+        private void OnDragOver1(object sender, DragEventArgs e)
+        {
+            TreeNode node = treeMain.GetNodeAt(treeMain.PointToClient(new Point(e.X, e.Y)));
+            var tag = (Tuple<string, string, string>)node.Tag;
+            if (tag.Item3 == "landing_site")
+            {
+                if (node.Parent == _nodeParent)
+                {
+                    treeMain.SelectedNode = node;
+                }
+            }
+            else
+            {
+                treeMain.SelectedNode = null;
+            }
+        }
+
+        private void OnDragOver(object sender, DragEventArgs e)
+        {
+            Point p = treeMain.PointToClient(new Point(e.X, e.Y));
+            TreeNode node = treeMain.GetNodeAt(p.X, p.Y);
+            var tag = (Tuple<string, string, string>)node.Tag;
+            if (node.PrevVisibleNode != null)
+            {
+                node.PrevVisibleNode.BackColor = Color.White;
+            }
+            if (node.NextVisibleNode != null)
+            {
+                node.NextVisibleNode.BackColor = Color.White;
+            }
+            if (tag.Item3 == "landing_site" && node.Parent == _nodeParent)
+            {
+                node.BackColor = Color.Aquamarine;
+            }
+        }
+
+        private void OntreeMain_MouseUp(object sender, MouseEventArgs e)
+        {
+            treeMain.Cursor = Cursors.Default;
         }
     }
 }

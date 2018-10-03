@@ -119,11 +119,13 @@ namespace FAD3
             // 
             // treeMain
             // 
+            this.treeMain.AllowDrop = true;
             this.treeMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.treeMain.ContextMenuStrip = this.menuDropDown;
             this.treeMain.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.treeMain.HideSelection = false;
             this.treeMain.ImageIndex = 0;
             this.treeMain.ImageList = this.imageList16;
             this.treeMain.Location = new System.Drawing.Point(3, 3);
@@ -133,8 +135,13 @@ namespace FAD3
             this.treeMain.Size = new System.Drawing.Size(234, 445);
             this.treeMain.TabIndex = 0;
             this.treeMain.AfterExpand += new System.Windows.Forms.TreeViewEventHandler(this.OntreeMainAfterExpand);
+            this.treeMain.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.OnItemDrag);
             this.treeMain.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.OnTreeMainAfterSelect);
+            this.treeMain.DragDrop += new System.Windows.Forms.DragEventHandler(this.OnDragDrop);
+            this.treeMain.DragEnter += new System.Windows.Forms.DragEventHandler(this.OnDragEnter);
+            this.treeMain.DragOver += new System.Windows.Forms.DragEventHandler(this.OnDragOver);
             this.treeMain.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OntreeMain_MouseDown);
+            this.treeMain.MouseUp += new System.Windows.Forms.MouseEventHandler(this.OntreeMain_MouseUp);
             // 
             // menuDropDown
             // 
@@ -452,7 +459,7 @@ namespace FAD3
             this.statusPanelDBPath.BorderStyle = System.Windows.Forms.Border3DStyle.Etched;
             this.statusPanelDBPath.DoubleClickEnabled = true;
             this.statusPanelDBPath.Name = "statusPanelDBPath";
-            this.statusPanelDBPath.Size = new System.Drawing.Size(53, 21);
+            this.statusPanelDBPath.Size = new System.Drawing.Size(50, 21);
             this.statusPanelDBPath.Text = "DBPath";
             this.statusPanelDBPath.DoubleClick += new System.EventHandler(this.statusPanelDBPath_DoubleClick);
             // 
