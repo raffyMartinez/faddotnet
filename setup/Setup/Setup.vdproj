@@ -190,18 +190,6 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_2D8D7F9F8D2848B59928476736B21088"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_C923FDE8D9464953A48FEE37E24BB2B7"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_0B1235C2D20B462C4F18D70A52AF4439"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -209,6 +197,18 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_A0206DD6F6C29644F42FA567DA15053C"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_2D8D7F9F8D2848B59928476736B21088"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_C923FDE8D9464953A48FEE37E24BB2B7"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -1005,7 +1005,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Fisheries Assessment Database"
         "ProductCode" = "8:{85D290DB-DFE6-4B6C-B04C-5B36FA09DB91}"
-        "PackageCode" = "8:{EAAE64FA-B9C6-4A10-A002-886481CB094C}"
+        "PackageCode" = "8:{E2EA756D-B4A7-4079-BC7E-659FAB57A4D8}"
         "UpgradeCode" = "8:{60988C37-38EC-41CE-B9B2-C691852182A4}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"

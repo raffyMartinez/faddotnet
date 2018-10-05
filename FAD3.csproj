@@ -79,6 +79,7 @@
   <ItemGroup>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Microsoft.VisualBasic.PowerPacks, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -100,284 +101,306 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AllSpeciesForm.cs">
+    <Compile Include="Database\Forms\AllSpeciesForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="AllSpeciesForm.Designer.cs">
+    <Compile Include="Database\Forms\AllSpeciesForm.Designer.cs">
       <DependentUpon>AllSpeciesForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="AOI.cs" />
-    <Compile Include="CatchComposition.cs" />
-    <Compile Include="CatchCompositionForm.cs">
+    <Compile Include="Database\AOI.cs" />
+    <Compile Include="Database\CatchComposition.cs" />
+    <Compile Include="Database\Forms\CatchCompositionForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="CatchCompositionForm.Designer.cs">
+    <Compile Include="Database\Forms\CatchCompositionForm.Designer.cs">
       <DependentUpon>CatchCompositionForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="CatchLine.cs" />
-    <Compile Include="CatchName.cs" />
-    <Compile Include="ConvertToGrid25Form.cs">
+    <Compile Include="Database\CatchLine.cs" />
+    <Compile Include="Database\CatchName.cs" />
+    <Compile Include="Mapping\Colors.cs" />
+    <Compile Include="Mapping\Forms\ConvertToGrid25Form.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ConvertToGrid25Form.Designer.cs">
+    <Compile Include="Mapping\Forms\ConvertToGrid25Form.Designer.cs">
       <DependentUpon>ConvertToGrid25Form.cs</DependentUpon>
     </Compile>
-    <Compile Include="Coordinate.cs" />
-    <Compile Include="CoordinateEntryForm.cs">
+    <Compile Include="Database\Coordinate.cs" />
+    <Compile Include="Database\Forms\CoordinateEntryForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="CoordinateEntryForm.Designer.cs">
+    <Compile Include="Database\Forms\CoordinateEntryForm.Designer.cs">
       <DependentUpon>CoordinateEntryForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="CoordinateFormatSelectForm.cs">
+    <Compile Include="Database\Forms\CoordinateFormatSelectForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="CoordinateFormatSelectForm.Designer.cs">
+    <Compile Include="Database\Forms\CoordinateFormatSelectForm.Designer.cs">
       <DependentUpon>CoordinateFormatSelectForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="CreateInlandGridEventArgs.cs" />
-    <Compile Include="CreateInlandPointDatabase.cs" />
-    <Compile Include="DBCheck.cs" />
-    <Compile Include="EnumeratorEntryForm.cs">
+    <Compile Include="Mapping\CreateInlandGridEventArgs.cs" />
+    <Compile Include="Mapping\CreateInlandPointDatabase.cs" />
+    <Compile Include="Database\DBCheck.cs" />
+    <Compile Include="Database\SamplingEnumerators\EnumeratorEntryForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="EnumeratorEntryForm.Designer.cs">
+    <Compile Include="Database\SamplingEnumerators\EnumeratorEntryForm.Designer.cs">
       <DependentUpon>EnumeratorEntryForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="FADColors.cs" />
-    <Compile Include="FishingGroundExtentsForm.cs">
+    <Compile Include="GUI\FADColors.cs" />
+    <Compile Include="Database\Forms\FishingGroundExtentsForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FishingGroundExtentsForm.Designer.cs">
+    <Compile Include="Database\Forms\FishingGroundExtentsForm.Designer.cs">
       <DependentUpon>FishingGroundExtentsForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="FishingGroundMappingHandler.cs" />
-    <Compile Include="FolderBrowserLauncher.cs" />
-    <Compile Include="FontComboBox.cs">
+    <Compile Include="Mapping\FishingGroundMappingHandler.cs" />
+    <Compile Include="GUI\FolderBrowserLauncher.cs" />
+    <Compile Include="GUI\FontComboBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="GMSLineClass.cs" />
-    <Compile Include="Graticule.cs" />
-    <Compile Include="GraticuleForm.cs">
+    <Compile Include="Database\GMSLineClass.cs" />
+    <Compile Include="Mapping\Graticule.cs" />
+    <Compile Include="Mapping\Forms\GraticuleForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GraticuleForm.Designer.cs">
+    <Compile Include="Mapping\Forms\GraticuleForm.Designer.cs">
       <DependentUpon>GraticuleForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Grid25GenerateForm.cs">
+    <Compile Include="Mapping\Forms\Grid25GenerateForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Grid25GenerateForm.Designer.cs">
+    <Compile Include="Mapping\Forms\Grid25GenerateForm.Designer.cs">
       <DependentUpon>Grid25GenerateForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Grid25MajorGrid.cs" />
-    <Compile Include="Grid25MinorGrid.cs" />
-    <Compile Include="Grid25LabelManager.cs" />
-    <Compile Include="InlandGridCreateDBForm.cs">
+    <Compile Include="Mapping\Grid25MajorGrid.cs" />
+    <Compile Include="Mapping\Grid25MinorGrid.cs" />
+    <Compile Include="Mapping\Grid25LabelManager.cs" />
+    <Compile Include="Mapping\Forms\InlandGridCreateDBForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="InlandGridCreateDBForm.Designer.cs">
+    <Compile Include="Mapping\Forms\InlandGridCreateDBForm.Designer.cs">
       <DependentUpon>InlandGridCreateDBForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="LabelProperty.cs" />
-    <Compile Include="LabelsForm.cs">
+    <Compile Include="Mapping\LabelProperty.cs" />
+    <Compile Include="Mapping\Forms\LabelsForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="LabelsForm.Designer.cs">
+    <Compile Include="Mapping\Forms\LabelsForm.Designer.cs">
       <DependentUpon>LabelsForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="LandingSiteFromKML.cs" />
-    <Compile Include="LandingSiteFromKMLForm.cs">
+    <Compile Include="Database\LandingSiteFromKML.cs" />
+    <Compile Include="Database\Forms\LandingSiteFromKMLForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="LandingSiteFromKMLForm.Designer.cs">
+    <Compile Include="Database\Forms\LandingSiteFromKMLForm.Designer.cs">
       <DependentUpon>LandingSiteFromKMLForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="LandingSiteMappingHandler.cs" />
-    <Compile Include="LayerSymbologyForm.cs">
+    <Compile Include="Mapping\LandingSiteMappingHandler.cs" />
+    <Compile Include="Mapping\Forms\PointLayerSymbologyForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="LayerSymbologyForm.Designer.cs">
-      <DependentUpon>LayerSymbologyForm.cs</DependentUpon>
+    <Compile Include="Mapping\Forms\PointLayerSymbologyForm.Designer.cs">
+      <DependentUpon>PointLayerSymbologyForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="SaveMapForm.cs">
+    <Compile Include="Mapping\Forms\SaveMapForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="SaveMapForm.Designer.cs">
+    <Compile Include="Mapping\Forms\SaveMapForm.Designer.cs">
       <DependentUpon>SaveMapForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="LayerPropertyForm.cs">
+    <Compile Include="Database\Forms\LayerPropertyForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="LayerPropertyForm.Designer.cs">
+    <Compile Include="Database\Forms\LayerPropertyForm.Designer.cs">
       <DependentUpon>LayerPropertyForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Logger.cs" />
-    <Compile Include="extension.cs" />
-    <Compile Include="FishingGroundDefinitionForm.cs">
+    <Compile Include="GUI\Logger.cs" />
+    <Compile Include="GUI\extension.cs" />
+    <Compile Include="Database\Forms\FishingGroundDefinitionForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FishingGroundDefinitionForm.Designer.cs">
+    <Compile Include="Database\Forms\FishingGroundDefinitionForm.Designer.cs">
       <DependentUpon>FishingGroundDefinitionForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="FishingGrid.cs" />
-    <Compile Include="FishingVessel.cs" />
-    <Compile Include="FishingGroundForm.cs">
+    <Compile Include="Database\FishingGrid.cs" />
+    <Compile Include="Database\FishingVessel.cs" />
+    <Compile Include="Database\Forms\FishingGroundForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FishingGroundForm.Designer.cs">
+    <Compile Include="Database\Forms\FishingGroundForm.Designer.cs">
       <DependentUpon>FishingGroundForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="GearEditorForm.cs">
+    <Compile Include="Database\Forms\GearEditorForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GearEditorForm.Designer.cs">
+    <Compile Include="Database\Forms\GearEditorForm.Designer.cs">
       <DependentUpon>GearEditorForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="GearCodesUsageForm.cs">
+    <Compile Include="Database\Forms\GearCodesUsageForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GearCodesUsageForm.Designer.cs">
+    <Compile Include="Database\Forms\GearCodesUsageForm.Designer.cs">
       <DependentUpon>GearCodesUsageForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="MapEffortHelperForm.cs">
+    <Compile Include="Mapping\Forms\MapEffortHelperForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="MapEffortHelperForm.Designer.cs">
+    <Compile Include="Mapping\Forms\MapEffortHelperForm.Designer.cs">
       <DependentUpon>MapEffortHelperForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="MapInterActionHandler.cs" />
-    <Compile Include="MapLayer.cs" />
-    <Compile Include="MapLayershandler.cs" />
-    <Compile Include="MapLayersForm.cs">
+    <Compile Include="Mapping\MapInterActionHandler.cs" />
+    <Compile Include="Mapping\MapLayer.cs" />
+    <Compile Include="Mapping\MapLayershandler.cs" />
+    <Compile Include="Mapping\Forms\MapLayersForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="MapLayersForm.Designer.cs">
+    <Compile Include="Mapping\Forms\MapLayersForm.Designer.cs">
       <DependentUpon>MapLayersForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="LayerEventArg.cs" />
-    <Compile Include="MapperForm.cs">
+    <Compile Include="Database\LayerEventArg.cs" />
+    <Compile Include="Mapping\Forms\MapperForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="MapperForm.Designer.cs">
+    <Compile Include="Mapping\Forms\MapperForm.Designer.cs">
       <DependentUpon>MapperForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="ReferenceNumberRangeForm.cs">
+    <Compile Include="Database\Forms\ReferenceNumberRangeForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ReferenceNumberRangeForm.Designer.cs">
+    <Compile Include="Database\Forms\ReferenceNumberRangeForm.Designer.cs">
       <DependentUpon>ReferenceNumberRangeForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="GMSManager.cs" />
-    <Compile Include="AboutFadForm.cs">
+    <Compile Include="Database\GMSManager.cs" />
+    <Compile Include="GUI\Forms\AboutFadForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="AboutFadForm.Designer.cs">
+    <Compile Include="GUI\Forms\AboutFadForm.Designer.cs">
       <DependentUpon>AboutFadForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Enumerators.cs" />
-    <Compile Include="SaveMapImage.cs" />
-    <Compile Include="ShapefileAttributesForm.cs">
+    <Compile Include="Database\SamplingEnumerators\Enumerators.cs" />
+    <Compile Include="Mapping\SaveMapImage.cs" />
+    <Compile Include="Mapping\Forms\ShapefileAttributesForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ShapefileAttributesForm.Designer.cs">
+    <Compile Include="Mapping\Forms\ShapefileAttributesForm.Designer.cs">
       <DependentUpon>ShapefileAttributesForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="ShapefileLabelHandler.cs" />
-    <Compile Include="ShapefileLayerHelper.cs" />
-    <Compile Include="SpeciesNameForm.cs">
+    <Compile Include="Mapping\ShapefileLabelHandler.cs" />
+    <Compile Include="Mapping\ShapefileLayerHelper.cs" />
+    <Compile Include="Database\Forms\SpeciesNameForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="SpeciesNameForm.Designer.cs">
+    <Compile Include="Database\Forms\SpeciesNameForm.Designer.cs">
       <DependentUpon>SpeciesNameForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="GearSpeciesSamplingsForm.cs">
+    <Compile Include="Database\Forms\GearSpeciesSamplingsForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GearSpeciesSamplingsForm.Designer.cs">
+    <Compile Include="Database\Forms\GearSpeciesSamplingsForm.Designer.cs">
       <DependentUpon>GearSpeciesSamplingsForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="SymbologyHandler.cs" />
-    <Compile Include="TargetAreaForm.cs">
+    <Compile Include="Mapping\PointLayerSymbologyHandler.cs" />
+    <Compile Include="Database\Forms\TargetAreaForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="TargetAreaForm.Designer.cs">
+    <Compile Include="Database\Forms\TargetAreaForm.Designer.cs">
       <DependentUpon>TargetAreaForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="EnumeratorForm.cs">
+    <Compile Include="Database\SamplingEnumerators\EnumeratorForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="EnumeratorForm.Designer.cs">
+    <Compile Include="Database\SamplingEnumerators\EnumeratorForm.Designer.cs">
       <DependentUpon>EnumeratorForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="LandingSiteForm.cs">
+    <Compile Include="Database\Forms\LandingSiteForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="LandingSiteForm.Designer.cs">
+    <Compile Include="Database\Forms\LandingSiteForm.Designer.cs">
       <DependentUpon>LandingSiteForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="MainForm.cs">
+    <Compile Include="GUI\Forms\MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="MainForm.Designer.cs">
+    <Compile Include="GUI\Forms\MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="CreateNewDatabaseForm.cs">
+    <Compile Include="Database\Forms\CreateNewDatabaseForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="CreateNewDatabaseForm.Designer.cs">
+    <Compile Include="Database\Forms\CreateNewDatabaseForm.Designer.cs">
       <DependentUpon>CreateNewDatabaseForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="SamplingForm.cs">
+    <Compile Include="Database\Forms\SamplingForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="SamplingForm.Designer.cs">
+    <Compile Include="Database\Forms\SamplingForm.Designer.cs">
       <DependentUpon>SamplingForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="ToolStripEx.cs" />
-    <Compile Include="VesselDimensionForm.cs">
+    <Compile Include="Database\Forms\TargetAreaGearsForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="VesselDimensionForm.Designer.cs">
+    <Compile Include="Database\Forms\TargetAreaGearsForm.Designer.cs">
+      <DependentUpon>TargetAreaGearsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\ToolStripEx.cs" />
+    <Compile Include="Database\Forms\VesselDimensionForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Database\Forms\VesselDimensionForm.Designer.cs">
       <DependentUpon>VesselDimensionForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="gear.cs" />
-    <Compile Include="ReferenceNumberForm.cs">
+    <Compile Include="Database\gear.cs" />
+    <Compile Include="Database\Forms\ReferenceNumberForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ReferenceNumberForm.Designer.cs">
+    <Compile Include="Database\Forms\ReferenceNumberForm.Designer.cs">
       <DependentUpon>ReferenceNumberForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="global.cs" />
-    <Compile Include="GMSDataEntryForm.cs">
+    <Compile Include="GUI\global.cs" />
+    <Compile Include="Database\Forms\GMSDataEntryForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GMSDataEntryForm.Designer.cs">
+    <Compile Include="Database\Forms\GMSDataEntryForm.Designer.cs">
       <DependentUpon>GMSDataEntryForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="LandingSite.cs" />
-    <Compile Include="LatLngUTMConverter.cs" />
-    <Compile Include="LengthFreqForm.cs">
+    <Compile Include="Database\LandingSite.cs" />
+    <Compile Include="Mapping\LatLngUTMConverter.cs" />
+    <Compile Include="Database\Forms\LengthFreqForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="LengthFreqForm.Designer.cs">
+    <Compile Include="Database\Forms\LengthFreqForm.Designer.cs">
       <DependentUpon>LengthFreqForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="ManageGearSpecsClass.cs" />
-    <Compile Include="ManageGearSpecsForm.cs">
+    <Compile Include="Database\ManageGearSpecsClass.cs" />
+    <Compile Include="Database\Forms\ManageGearSpecsForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ManageGearSpecsForm.Designer.cs">
+    <Compile Include="Database\Forms\ManageGearSpecsForm.Designer.cs">
       <DependentUpon>ManageGearSpecsForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="ManageMRUForm.cs">
+    <Compile Include="GUI\Forms\ManageMRUForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ManageMRUForm.Designer.cs">
+    <Compile Include="GUI\Forms\ManageMRUForm.Designer.cs">
       <DependentUpon>ManageMRUForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="mru.cs" />
-    <Compile Include="names.cs" />
+    <Compile Include="GUI\mru.cs" />
+    <Compile Include="Database\names.cs" />
+    <Compile Include="Mapping\UserControls\CharacterControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Mapping\UserControls\ListControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Mapping\UserControls\ListControl.Designer.cs">
+      <DependentUpon>ListControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Mapping\UserControls\SymbolControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Mapping\UserControls\SymbolControl.Designer.cs">
+      <DependentUpon>SymbolControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -385,149 +408,155 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="ReferenceNumberManager.cs" />
-    <Compile Include="registrytools.cs" />
-    <Compile Include="SampledGear_SpecsForm.cs">
+    <Compile Include="Database\ReferenceNumberManager.cs" />
+    <Compile Include="GUI\registrytools.cs" />
+    <Compile Include="Database\Forms\SampledGear_SpecsForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="SampledGear_SpecsForm.Designer.cs">
+    <Compile Include="Database\Forms\SampledGear_SpecsForm.Designer.cs">
       <DependentUpon>SampledGear_SpecsForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Sampling.cs" />
-    <Compile Include="UIRow.cs" />
-    <Compile Include="VisibilityQueryForm.cs">
+    <Compile Include="Database\Sampling.cs" />
+    <Compile Include="Database\UIRow.cs" />
+    <Compile Include="Mapping\Forms\VisibilityQueryForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="VisibilityQueryForm.Designer.cs">
+    <Compile Include="Mapping\Forms\VisibilityQueryForm.Designer.cs">
       <DependentUpon>VisibilityQueryForm.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="AllSpeciesForm.resx">
+    <EmbeddedResource Include="Database\Forms\AllSpeciesForm.resx">
       <DependentUpon>AllSpeciesForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="CatchCompositionForm.resx">
+    <EmbeddedResource Include="Database\Forms\CatchCompositionForm.resx">
       <DependentUpon>CatchCompositionForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ConvertToGrid25Form.resx">
+    <EmbeddedResource Include="Mapping\Forms\ConvertToGrid25Form.resx">
       <DependentUpon>ConvertToGrid25Form.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="CoordinateEntryForm.resx">
+    <EmbeddedResource Include="Database\Forms\CoordinateEntryForm.resx">
       <DependentUpon>CoordinateEntryForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="CoordinateFormatSelectForm.resx">
+    <EmbeddedResource Include="Database\Forms\CoordinateFormatSelectForm.resx">
       <DependentUpon>CoordinateFormatSelectForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="EnumeratorEntryForm.resx">
+    <EmbeddedResource Include="Database\SamplingEnumerators\EnumeratorEntryForm.resx">
       <DependentUpon>EnumeratorEntryForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="FishingGroundDefinitionForm.resx">
+    <EmbeddedResource Include="Database\Forms\FishingGroundDefinitionForm.resx">
       <DependentUpon>FishingGroundDefinitionForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="FishingGroundExtentsForm.resx">
+    <EmbeddedResource Include="Database\Forms\FishingGroundExtentsForm.resx">
       <DependentUpon>FishingGroundExtentsForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="FishingGroundForm.resx">
+    <EmbeddedResource Include="Database\Forms\FishingGroundForm.resx">
       <DependentUpon>FishingGroundForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GearEditorForm.resx">
+    <EmbeddedResource Include="Database\Forms\GearEditorForm.resx">
       <DependentUpon>GearEditorForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GearCodesUsageForm.resx">
+    <EmbeddedResource Include="Database\Forms\GearCodesUsageForm.resx">
       <DependentUpon>GearCodesUsageForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GraticuleForm.resx">
+    <EmbeddedResource Include="Mapping\Forms\GraticuleForm.resx">
       <DependentUpon>GraticuleForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Grid25GenerateForm.resx">
+    <EmbeddedResource Include="Mapping\Forms\Grid25GenerateForm.resx">
       <DependentUpon>Grid25GenerateForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="InlandGridCreateDBForm.resx">
+    <EmbeddedResource Include="Mapping\Forms\InlandGridCreateDBForm.resx">
       <DependentUpon>InlandGridCreateDBForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="LabelsForm.resx">
+    <EmbeddedResource Include="Mapping\Forms\LabelsForm.resx">
       <DependentUpon>LabelsForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="LandingSiteFromKMLForm.resx">
+    <EmbeddedResource Include="Database\Forms\LandingSiteFromKMLForm.resx">
       <DependentUpon>LandingSiteFromKMLForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="LayerSymbologyForm.resx">
-      <DependentUpon>LayerSymbologyForm.cs</DependentUpon>
+    <EmbeddedResource Include="Mapping\Forms\PointLayerSymbologyForm.resx">
+      <DependentUpon>PointLayerSymbologyForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="SaveMapForm.resx">
+    <EmbeddedResource Include="Mapping\Forms\SaveMapForm.resx">
       <DependentUpon>SaveMapForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="LayerPropertyForm.resx">
+    <EmbeddedResource Include="Database\Forms\LayerPropertyForm.resx">
       <DependentUpon>LayerPropertyForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="AboutFadForm.resx">
+    <EmbeddedResource Include="GUI\Forms\AboutFadForm.resx">
       <DependentUpon>AboutFadForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="MapEffortHelperForm.resx">
+    <EmbeddedResource Include="Mapping\Forms\MapEffortHelperForm.resx">
       <DependentUpon>MapEffortHelperForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="MapLayersForm.resx">
+    <EmbeddedResource Include="Mapping\Forms\MapLayersForm.resx">
       <DependentUpon>MapLayersForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="MapperForm.resx">
+    <EmbeddedResource Include="Mapping\Forms\MapperForm.resx">
       <DependentUpon>MapperForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ShapefileAttributesForm.resx">
+    <EmbeddedResource Include="Mapping\Forms\ShapefileAttributesForm.resx">
       <DependentUpon>ShapefileAttributesForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="SpeciesNameForm.resx">
+    <EmbeddedResource Include="Database\Forms\SpeciesNameForm.resx">
       <DependentUpon>SpeciesNameForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GearSpeciesSamplingsForm.resx">
+    <EmbeddedResource Include="Database\Forms\GearSpeciesSamplingsForm.resx">
       <DependentUpon>GearSpeciesSamplingsForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="TargetAreaForm.resx">
+    <EmbeddedResource Include="Database\Forms\TargetAreaForm.resx">
       <DependentUpon>TargetAreaForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="EnumeratorForm.resx">
+    <EmbeddedResource Include="Database\SamplingEnumerators\EnumeratorForm.resx">
       <DependentUpon>EnumeratorForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="LandingSiteForm.resx">
+    <EmbeddedResource Include="Database\Forms\LandingSiteForm.resx">
       <DependentUpon>LandingSiteForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="MainForm.resx">
+    <EmbeddedResource Include="GUI\Forms\MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="CreateNewDatabaseForm.resx">
+    <EmbeddedResource Include="Database\Forms\CreateNewDatabaseForm.resx">
       <DependentUpon>CreateNewDatabaseForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ReferenceNumberRangeForm.resx">
+    <EmbeddedResource Include="Database\Forms\ReferenceNumberRangeForm.resx">
       <DependentUpon>ReferenceNumberRangeForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="SamplingForm.resx">
+    <EmbeddedResource Include="Database\Forms\SamplingForm.resx">
       <DependentUpon>SamplingForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="VesselDimensionForm.resx">
+    <EmbeddedResource Include="Database\Forms\TargetAreaGearsForm.resx">
+      <DependentUpon>TargetAreaGearsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Database\Forms\VesselDimensionForm.resx">
       <DependentUpon>VesselDimensionForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ReferenceNumberForm.resx">
+    <EmbeddedResource Include="Database\Forms\ReferenceNumberForm.resx">
       <DependentUpon>ReferenceNumberForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GMSDataEntryForm.resx">
+    <EmbeddedResource Include="Database\Forms\GMSDataEntryForm.resx">
       <DependentUpon>GMSDataEntryForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="LengthFreqForm.resx">
+    <EmbeddedResource Include="Database\Forms\LengthFreqForm.resx">
       <DependentUpon>LengthFreqForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ManageGearSpecsForm.resx">
+    <EmbeddedResource Include="Database\Forms\ManageGearSpecsForm.resx">
       <DependentUpon>ManageGearSpecsForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ManageMRUForm.resx">
+    <EmbeddedResource Include="GUI\Forms\ManageMRUForm.resx">
       <DependentUpon>ManageMRUForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Mapping\UserControls\ListControl.resx">
+      <DependentUpon>ListControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="SampledGear_SpecsForm.resx">
+    <EmbeddedResource Include="Database\Forms\SampledGear_SpecsForm.resx">
       <DependentUpon>SampledGear_SpecsForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="VisibilityQueryForm.resx">
+    <EmbeddedResource Include="Mapping\Forms\VisibilityQueryForm.resx">
       <DependentUpon>VisibilityQueryForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
