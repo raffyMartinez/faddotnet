@@ -118,6 +118,7 @@
     <Compile Include="Database\CatchLine.cs" />
     <Compile Include="Database\CatchName.cs" />
     <Compile Include="Mapping\Colors.cs" />
+    <Compile Include="Mapping\ColorSchemes.cs" />
     <Compile Include="Mapping\Forms\ConvertToGrid25Form.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -208,10 +209,10 @@
     <Compile Include="Mapping\Forms\SaveMapForm.Designer.cs">
       <DependentUpon>SaveMapForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Database\Forms\LayerPropertyForm.cs">
+    <Compile Include="Mapping\Forms\LayerPropertyForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Database\Forms\LayerPropertyForm.Designer.cs">
+    <Compile Include="Mapping\Forms\LayerPropertyForm.Designer.cs">
       <DependentUpon>LayerPropertyForm.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\Logger.cs" />
@@ -389,11 +390,20 @@
     <Compile Include="Mapping\UserControls\CharacterControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="Mapping\UserControls\ImageCombo.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Mapping\UserControls\ListControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Mapping\UserControls\ListControl.Designer.cs">
       <DependentUpon>ListControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Mapping\UserControls\NumericUpDownExt.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Mapping\UserControls\NumericUpDownExt.Designer.cs">
+      <DependentUpon>NumericUpDownExt.cs</DependentUpon>
     </Compile>
     <Compile Include="Mapping\UserControls\SymbolControl.cs">
       <SubType>UserControl</SubType>
@@ -480,7 +490,7 @@
     <EmbeddedResource Include="Mapping\Forms\SaveMapForm.resx">
       <DependentUpon>SaveMapForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Database\Forms\LayerPropertyForm.resx">
+    <EmbeddedResource Include="Mapping\Forms\LayerPropertyForm.resx">
       <DependentUpon>LayerPropertyForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Forms\AboutFadForm.resx">

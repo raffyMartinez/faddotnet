@@ -31,6 +31,11 @@ namespace FAD3
             }
         }
 
+        public void ShapefileLayerPropertyChanged()
+        {
+            global.MappingForm.MapControl.Redraw();
+        }
+
         private void OnLayerGrid_MouseDown(object sender, MouseEventArgs e)
         {
             // Get the index of the item the mouse is below.

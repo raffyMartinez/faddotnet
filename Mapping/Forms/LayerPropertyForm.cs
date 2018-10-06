@@ -21,6 +21,11 @@ namespace FAD3
         private string _layerName;
         private MapLayersHandler _mapLayers;
 
+        public MapLayersForm Parentform
+        {
+            get { return _parentForm; }
+        }
+
         public LayerPropertyForm(MapLayersForm parent, int layerHandle)
         {
             InitializeComponent();
@@ -81,7 +86,7 @@ namespace FAD3
                     switch (_shapefileLayer.ShapefileType)
                     {
                         case ShpfileType.SHP_POINT:
-                            var pointSymbologyForm = PointLayerSymbologyForm.GetInstance(_mapLayer);
+                            var pointSymbologyForm = PointLayerSymbologyForm.GetInstance(this, _mapLayer);
                             if (pointSymbologyForm.Visible)
                             {
                                 pointSymbologyForm.BringToFront();

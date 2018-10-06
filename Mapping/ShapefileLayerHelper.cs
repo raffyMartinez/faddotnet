@@ -143,6 +143,27 @@ namespace FAD3
             return null;
         }
 
+        public static ShpfileType ShapefileType2D(MapWinGIS.ShpfileType shpType)
+        {
+            if (shpType == ShpfileType.SHP_POLYGON || shpType == ShpfileType.SHP_POLYGONM || shpType == ShpfileType.SHP_POLYGONZ)
+            {
+                return ShpfileType.SHP_POLYGON;
+            }
+            else if (shpType == ShpfileType.SHP_POLYLINE || shpType == ShpfileType.SHP_POLYLINEM || shpType == ShpfileType.SHP_POLYLINEZ)
+            {
+                return ShpfileType.SHP_POLYLINE;
+            }
+            else if (shpType == ShpfileType.SHP_POINT || shpType == ShpfileType.SHP_POINTM || shpType == ShpfileType.SHP_POINTZ ||
+                     shpType == ShpfileType.SHP_MULTIPOINT || shpType == ShpfileType.SHP_MULTIPOINTM || shpType == ShpfileType.SHP_MULTIPOINTZ)
+            {
+                return ShpfileType.SHP_POINT;
+            }
+            else
+            {
+                return ShpfileType.SHP_NULLSHAPE;
+            }
+        }
+
         public static global.ExtentCompare ExtentsPosition(Extents ext1, Extents ext2)
         {
             global.ExtentCompare exco = global.ExtentCompare.excoSimilar;
