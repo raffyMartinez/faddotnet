@@ -160,6 +160,12 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Database\GMSLineClass.cs" />
+    <Compile Include="Mapping\Forms\PolygonLayerSymbologyForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Mapping\Forms\PolygonLayerSymbologyForm.Designer.cs">
+      <DependentUpon>PolygonLayerSymbologyForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Mapping\Graticule.cs" />
     <Compile Include="Mapping\Forms\GraticuleForm.cs">
       <SubType>Form</SubType>
@@ -258,7 +264,7 @@
     <Compile Include="Mapping\Forms\MapLayersForm.Designer.cs">
       <DependentUpon>MapLayersForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Database\LayerEventArg.cs" />
+    <Compile Include="Mapping\LayerEventArg.cs" />
     <Compile Include="Mapping\Forms\MapperForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -411,6 +417,12 @@
     <Compile Include="Mapping\UserControls\SymbolControl.Designer.cs">
       <DependentUpon>SymbolControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="Mapping\UserControls\TransparencyControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Mapping\UserControls\TransparencyControl.Designer.cs">
+      <DependentUpon>TransparencyControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -487,6 +499,9 @@
     <EmbeddedResource Include="Mapping\Forms\PointLayerSymbologyForm.resx">
       <DependentUpon>PointLayerSymbologyForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Mapping\Forms\PolygonLayerSymbologyForm.resx">
+      <DependentUpon>PolygonLayerSymbologyForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Mapping\Forms\SaveMapForm.resx">
       <DependentUpon>SaveMapForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -558,6 +573,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Mapping\UserControls\ListControl.resx">
       <DependentUpon>ListControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Mapping\UserControls\TransparencyControl.resx">
+      <DependentUpon>TransparencyControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -743,6 +761,12 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="Owf.Controls.Office2007ColorPicker\Owf.Controls.Office2007ColorPicker.csproj">
+      <Project>{F017C4CB-751D-4F5D-8A72-96A279135473}</Project>
+      <Name>Owf.Controls.Office2007ColorPicker</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

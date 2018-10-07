@@ -15,22 +15,22 @@ namespace FAD3
     {
         private static VisibilityQueryForm _instance;
         private Shapefile _shapeFile;
-        private MapLayer _mapLayer;
+        private MapLayersHandler _layersHandler;
         private bool _selectionMode;
-        public bool LabelVisibilityMode { get; set; }
+        public VisibilityExpressionTarget ExpressionTarget { get; set; }
         public string VisibilityExpression { get; set; }
 
-        public static VisibilityQueryForm GetInstance(MapLayer mapLayer)
+        public static VisibilityQueryForm GetInstance(MapLayersHandler handler)
         {
-            if (_instance == null) _instance = new VisibilityQueryForm(mapLayer);
+            if (_instance == null) _instance = new VisibilityQueryForm(handler);
             return _instance;
         }
 
-        public VisibilityQueryForm(MapLayer mapLayer)
+        public VisibilityQueryForm(MapLayersHandler handler)
         {
             InitializeComponent();
-            _mapLayer = mapLayer;
-            _shapeFile = _mapLayer.LayerObject as Shapefile;
+            _layersHandler = handler;
+            _shapeFile = _layersHandler.CurrentMapLayer.LayerObject as Shapefile;
         }
 
         private void OnButtonClick(object sender, EventArgs e)
@@ -55,11 +55,7 @@ namespace FAD3
                 case "btnOk":
                     if (TestExpression())
                     {
-                        if (LabelVisibilityMode)
-                            _mapLayer.LabelsVisibilityExpression = textQuery.Text;
-                        else
-                            _mapLayer.ShapesVisibilityExpression = textQuery.Text;
-
+                        _layersHandler.VisibilityExpression(textQuery.Text, ExpressionTarget);
                         Close();
                     }
                     break;

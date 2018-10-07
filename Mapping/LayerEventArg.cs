@@ -16,6 +16,8 @@ namespace FAD3
         public string Action { get; set; }
         public string MapTitle { get; set; }
         public int[] SelectedIndexes { get; set; }
+        public string VisibilityExpression { get; }
+        public VisibilityExpressionTarget ExpressionTarget { get; }
 
         public LayerEventArg(int layerHandle, string layerName, bool layerVIsible, bool showInLayerUI, string layerType)
         {
@@ -49,6 +51,13 @@ namespace FAD3
             LayerHandle = layerHandle;
             LayerSaved = layerSaved;
             FileName = fileName;
+        }
+
+        public LayerEventArg(int layerHandle, VisibilityExpressionTarget target, string visibilityExpression)
+        {
+            LayerHandle = layerHandle;
+            ExpressionTarget = target;
+            VisibilityExpression = visibilityExpression;
         }
     }
 }

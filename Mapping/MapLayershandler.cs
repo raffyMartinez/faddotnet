@@ -9,6 +9,12 @@ using System.Xml;
 
 namespace FAD3
 {
+    public enum VisibilityExpressionTarget
+    {
+        ExpressionTargetLabel,
+        ExpressionTargetShape
+    }
+
     public class MapLayersHandler : IDisposable
     {
         private string _fileMapState;
@@ -27,6 +33,9 @@ namespace FAD3
 
         public delegate void CurrentLayerHandler(MapLayersHandler s, LayerEventArg e);              //event raised when a layer is selected from the list found in the layers form
         public event CurrentLayerHandler CurrentLayer;
+
+        public delegate void VisibilityExpressionSet(MapLayersHandler s, LayerEventArg e);
+        public event VisibilityExpressionSet OnVisibilityExpressionSet;
 
         public ShapefileLabelHandler ShapeFileLableHandler
         {
@@ -103,6 +112,25 @@ namespace FAD3
                         pic.Image = _mapLayerDictionary[layerHandle].ImageThumbnail;
                     }
                     break;
+            }
+        }
+
+        public void VisibilityExpression(string expression, VisibilityExpressionTarget expressiontarget)
+        {
+            if (expressiontarget == VisibilityExpressionTarget.ExpressionTargetLabel)
+            {
+                _currentMapLayer.LabelsVisibilityExpression = expression;
+            }
+            else
+            {
+                _currentMapLayer.ShapesVisibilityExpression = expression;
+            }
+
+            if (OnVisibilityExpressionSet != null)
+            {
+                //fill up the event argument class with the layer item
+                LayerEventArg lp = new LayerEventArg(_currentMapLayer.Handle, expressiontarget, expression);
+                OnVisibilityExpressionSet(this, lp);
             }
         }
 
@@ -645,12 +673,16 @@ namespace FAD3
                                 _sfSymbologyHandler.SymbolizeLayer(ly.InnerXml);
                                 _currentMapLayer.Visible = ly.Attributes["LayerVisible"].Value == "1";
                                 _sfLabelHandler = new ShapefileLabelHandler(_currentMapLayer);
-                                foreach (XmlNode child in ly.FirstChild.ChildNodes)
+
+                                if (ly.FirstChild.Name == "ShapefileClass")
                                 {
-                                    if (child.Name == "LabelsClass" && child.Attributes["Generated"].Value == "1")
+                                    foreach (XmlNode child in ly.FirstChild.ChildNodes)
                                     {
-                                        _currentMapLayer.IsLabeled = child.Attributes["Generated"].Value == "1";
-                                        _sfLabelHandler.LabelShapefile(child.OuterXml);
+                                        if (child.Name == "LabelsClass" && child.Attributes["Generated"].Value == "1")
+                                        {
+                                            _currentMapLayer.IsLabeled = child.Attributes["Generated"].Value == "1";
+                                            _sfLabelHandler.LabelShapefile(child.OuterXml);
+                                        }
                                     }
                                 }
                             }

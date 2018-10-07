@@ -16,26 +16,34 @@ namespace FAD3
         private Shapefile _shapeFile;
         private FontComboBox _fontComboBox;
         private static LabelsForm _instance;
+        private MapLayersHandler _layersHandler;
         private MapLayer _mapLayer;
 
-        public static LabelsForm GetInstance(MapLayer mapLayer)
+        public static LabelsForm GetInstance(MapLayersHandler layersHandler)
         {
-            if (_instance == null) return new LabelsForm(mapLayer);
+            if (_instance == null) return new LabelsForm(layersHandler);
             return _instance;
         }
 
-        public LabelsForm(MapLayer mapLayer)
+        public LabelsForm(MapLayersHandler layersHandler)
         {
             InitializeComponent();
-            _mapLayer = mapLayer;
-            _shapeFile = (Shapefile)_mapLayer.LayerObject;
+            _layersHandler = layersHandler;
+            _layersHandler.OnVisibilityExpressionSet += OnVisibilityExpression;
+            _mapLayer = _layersHandler.CurrentMapLayer;
+            _shapeFile = _mapLayer.LayerObject as Shapefile;
+        }
+
+        private void OnVisibilityExpression(MapLayersHandler s, LayerEventArg e)
+        {
+            txtVisibilityExpression.Text = e.VisibilityExpression;
         }
 
         private void CleanUp()
         {
             _shapeFile = null;
             _fontComboBox = null;
-            _mapLayer = null;
+            _layersHandler = null;
         }
 
         private uint ColorToUInt(Color clr)
@@ -417,9 +425,9 @@ namespace FAD3
                     break;
 
                 case "btnDefineVisibilityExpression":
-                    var visibilityQueryForm = VisibilityQueryForm.GetInstance(_mapLayer);
+                    var visibilityQueryForm = VisibilityQueryForm.GetInstance(_layersHandler);
                     visibilityQueryForm.VisibilityExpression = txtVisibilityExpression.Text;
-                    visibilityQueryForm.LabelVisibilityMode = true;
+                    visibilityQueryForm.ExpressionTarget = VisibilityExpressionTarget.ExpressionTargetLabel;
                     if (!visibilityQueryForm.Visible)
                     {
                         visibilityQueryForm.Show(this);

@@ -103,14 +103,18 @@ namespace FAD3
 
             //appearance
             comboLineWidth.SelectedIndex = (int)_options.LineWidth - 1;
-            udTransparency.SetValue(_options.FillTransparency);
+            //udTransparency.SetValue(_options.FillTransparency);
+            transpFillColor.Value = (byte)_options.FillTransparency;
             chkFillVisible.Checked = _options.FillVisible;
             chkOutlineVisible.Checked = _options.LineVisible;
             rectOutlineColor.FillColor = FAD3.Mapping.Colors.UintToColor(_options.LineColor);
 
-            symbolControl1.ForeColor = Mapping.Colors.UintToColor(_options.FillColor);
-            characterControl1.ForeColor = Mapping.Colors.UintToColor(_options.FillColor);
-            comboPointType.Color1 = Mapping.Colors.UintToColor(_options.FillColor);
+            var color = Mapping.Colors.UintToColor(_options.FillColor);
+            symbolControl1.ForeColor = color;
+            characterControl1.ForeColor = color;
+            transpFillColor.BandColor = color;
+            comboPointType.Color1 = color;
+
             characterControl1.SelectedCharacterCode = (byte)_options.PointCharacter;
 
             _noEvents = false;
@@ -196,8 +200,8 @@ namespace FAD3
 
             _options.PointSize = (float)udSize.Value;
             _options.PointRotation = (double)udRotation.Value;
-            _options.FillTransparency = (float)udTransparency.Value;
-            _options.LineTransparency = (float)udTransparency.Value;
+            //_options.FillTransparency = (float)udTransparency.Value;
+            _options.FillTransparency = (float)transpFillColor.Value;
             _options.PointSidesCount = (int)udNumberOfSides.Value;
             _options.PointSidesRatio = (float)udSideRatio.Value / 10;
             _options.PointShape = (tkPointShapeType)comboPointType.SelectedIndex;
@@ -228,10 +232,16 @@ namespace FAD3
                 characterControl1.ForeColor = rect.FillColor;
                 symbolControl1.ForeColor = rect.FillColor;
                 comboPointType.Color1 = rect.FillColor;
+                transpFillColor.BandColor = rect.FillColor;
             }
             else if (rect.Name == "rectOutlineColor")
             {
             }
+            ApplyOptionsToGUI(null, null);
+        }
+
+        private void OnTransparencyValueChanged(object sender, byte value)
+        {
             ApplyOptionsToGUI(null, null);
         }
     }

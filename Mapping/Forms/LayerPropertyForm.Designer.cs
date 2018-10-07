@@ -36,20 +36,38 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.txtFileName = new System.Windows.Forms.TextBox();
-            this.btnLabelFeatures = new System.Windows.Forms.Button();
-            this.btnLabelCategories = new System.Windows.Forms.Button();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.btnClose = new System.Windows.Forms.Button();
+            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabAppearance = new System.Windows.Forms.TabPage();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.btnFeatureSymbols = new System.Windows.Forms.Button();
             this.btnFeatureCategories = new System.Windows.Forms.Button();
-            this.btnClose = new System.Windows.Forms.Button();
-            this.groupBox1.SuspendLayout();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.btnLabelFeatures = new System.Windows.Forms.Button();
+            this.btnLabelCategories = new System.Windows.Forms.Button();
+            this.tabCategories = new System.Windows.Forms.TabPage();
+            this.tabVisibility = new System.Windows.Forms.TabPage();
+            this.btnApplyVisibility = new System.Windows.Forms.Button();
+            this.btnDefineVisibilityExpression = new System.Windows.Forms.Button();
+            this.label23 = new System.Windows.Forms.Label();
+            this.txtVisibilityExpression = new System.Windows.Forms.TextBox();
+            this.tabSelection = new System.Windows.Forms.TabPage();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.shapeContainer1 = new Microsoft.VisualBasic.PowerPacks.ShapeContainer();
+            this.rectangleShape1 = new Microsoft.VisualBasic.PowerPacks.RectangleShape();
+            this.transpSelection = new FAD3.Mapping.UserControls.TransparencyControl();
+            this.tabControl1.SuspendLayout();
+            this.tabAppearance.SuspendLayout();
             this.groupBox2.SuspendLayout();
+            this.groupBox1.SuspendLayout();
+            this.tabVisibility.SuspendLayout();
+            this.tabSelection.SuspendLayout();
             this.SuspendLayout();
             // 
             // txtLayerName
             // 
-            this.txtLayerName.Location = new System.Drawing.Point(114, 27);
+            this.txtLayerName.Location = new System.Drawing.Point(114, 16);
             this.txtLayerName.Name = "txtLayerName";
             this.txtLayerName.Size = new System.Drawing.Size(252, 21);
             this.txtLayerName.TabIndex = 0;
@@ -57,7 +75,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(10, 27);
+            this.label1.Location = new System.Drawing.Point(10, 16);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(72, 15);
             this.label1.TabIndex = 1;
@@ -65,7 +83,7 @@
             // 
             // txtGeoProjection
             // 
-            this.txtGeoProjection.Location = new System.Drawing.Point(114, 54);
+            this.txtGeoProjection.Location = new System.Drawing.Point(114, 43);
             this.txtGeoProjection.Name = "txtGeoProjection";
             this.txtGeoProjection.Size = new System.Drawing.Size(252, 21);
             this.txtGeoProjection.TabIndex = 2;
@@ -73,7 +91,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(10, 54);
+            this.label2.Location = new System.Drawing.Point(10, 43);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(62, 15);
             this.label2.TabIndex = 3;
@@ -81,7 +99,7 @@
             // 
             // txtLayerType
             // 
-            this.txtLayerType.Location = new System.Drawing.Point(114, 80);
+            this.txtLayerType.Location = new System.Drawing.Point(114, 69);
             this.txtLayerType.Name = "txtLayerType";
             this.txtLayerType.Size = new System.Drawing.Size(252, 21);
             this.txtLayerType.TabIndex = 4;
@@ -89,7 +107,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(10, 80);
+            this.label3.Location = new System.Drawing.Point(10, 69);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(33, 15);
             this.label3.TabIndex = 5;
@@ -98,7 +116,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(10, 106);
+            this.label4.Location = new System.Drawing.Point(10, 95);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(59, 15);
             this.label4.TabIndex = 7;
@@ -106,50 +124,53 @@
             // 
             // txtFileName
             // 
-            this.txtFileName.Location = new System.Drawing.Point(114, 106);
+            this.txtFileName.Location = new System.Drawing.Point(114, 95);
             this.txtFileName.Name = "txtFileName";
             this.txtFileName.Size = new System.Drawing.Size(252, 21);
             this.txtFileName.TabIndex = 6;
             // 
-            // btnLabelFeatures
+            // btnClose
             // 
-            this.btnLabelFeatures.Location = new System.Drawing.Point(38, 28);
-            this.btnLabelFeatures.Name = "btnLabelFeatures";
-            this.btnLabelFeatures.Size = new System.Drawing.Size(78, 27);
-            this.btnLabelFeatures.TabIndex = 8;
-            this.btnLabelFeatures.Text = "Features";
-            this.btnLabelFeatures.UseVisualStyleBackColor = true;
-            this.btnLabelFeatures.Click += new System.EventHandler(this.OnButtonClick);
+            this.btnClose.Location = new System.Drawing.Point(313, 368);
+            this.btnClose.Name = "btnClose";
+            this.btnClose.Size = new System.Drawing.Size(60, 27);
+            this.btnClose.TabIndex = 12;
+            this.btnClose.Text = "Close";
+            this.btnClose.UseVisualStyleBackColor = true;
+            this.btnClose.Click += new System.EventHandler(this.OnButtonClick);
             // 
-            // btnLabelCategories
+            // tabControl1
             // 
-            this.btnLabelCategories.Location = new System.Drawing.Point(38, 65);
-            this.btnLabelCategories.Name = "btnLabelCategories";
-            this.btnLabelCategories.Size = new System.Drawing.Size(78, 27);
-            this.btnLabelCategories.TabIndex = 9;
-            this.btnLabelCategories.Text = "Categories";
-            this.btnLabelCategories.UseVisualStyleBackColor = true;
-            this.btnLabelCategories.Click += new System.EventHandler(this.OnButtonClick);
+            this.tabControl1.Controls.Add(this.tabAppearance);
+            this.tabControl1.Controls.Add(this.tabCategories);
+            this.tabControl1.Controls.Add(this.tabVisibility);
+            this.tabControl1.Controls.Add(this.tabSelection);
+            this.tabControl1.Location = new System.Drawing.Point(4, 135);
+            this.tabControl1.Name = "tabControl1";
+            this.tabControl1.SelectedIndex = 0;
+            this.tabControl1.Size = new System.Drawing.Size(373, 227);
+            this.tabControl1.TabIndex = 13;
             // 
-            // groupBox1
+            // tabAppearance
             // 
-            this.groupBox1.Controls.Add(this.btnLabelFeatures);
-            this.groupBox1.Controls.Add(this.btnLabelCategories);
-            this.groupBox1.Location = new System.Drawing.Point(26, 155);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(142, 113);
-            this.groupBox1.TabIndex = 10;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Labels";
+            this.tabAppearance.Controls.Add(this.groupBox2);
+            this.tabAppearance.Controls.Add(this.groupBox1);
+            this.tabAppearance.Location = new System.Drawing.Point(4, 24);
+            this.tabAppearance.Name = "tabAppearance";
+            this.tabAppearance.Padding = new System.Windows.Forms.Padding(3);
+            this.tabAppearance.Size = new System.Drawing.Size(365, 199);
+            this.tabAppearance.TabIndex = 0;
+            this.tabAppearance.Text = "Appearance";
+            this.tabAppearance.UseVisualStyleBackColor = true;
             // 
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.btnFeatureSymbols);
             this.groupBox2.Controls.Add(this.btnFeatureCategories);
-            this.groupBox2.Location = new System.Drawing.Point(213, 155);
+            this.groupBox2.Location = new System.Drawing.Point(206, 41);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(142, 113);
-            this.groupBox2.TabIndex = 11;
+            this.groupBox2.TabIndex = 12;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Symbols";
             // 
@@ -173,24 +194,166 @@
             this.btnFeatureCategories.UseVisualStyleBackColor = true;
             this.btnFeatureCategories.Click += new System.EventHandler(this.OnButtonClick);
             // 
-            // btnClose
+            // groupBox1
             // 
-            this.btnClose.Location = new System.Drawing.Point(306, 329);
-            this.btnClose.Name = "btnClose";
-            this.btnClose.Size = new System.Drawing.Size(60, 27);
-            this.btnClose.TabIndex = 12;
-            this.btnClose.Text = "Close";
-            this.btnClose.UseVisualStyleBackColor = true;
-            this.btnClose.Click += new System.EventHandler(this.OnButtonClick);
+            this.groupBox1.Controls.Add(this.btnLabelFeatures);
+            this.groupBox1.Controls.Add(this.btnLabelCategories);
+            this.groupBox1.Location = new System.Drawing.Point(17, 41);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(142, 113);
+            this.groupBox1.TabIndex = 11;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Labels";
+            // 
+            // btnLabelFeatures
+            // 
+            this.btnLabelFeatures.Location = new System.Drawing.Point(38, 28);
+            this.btnLabelFeatures.Name = "btnLabelFeatures";
+            this.btnLabelFeatures.Size = new System.Drawing.Size(78, 27);
+            this.btnLabelFeatures.TabIndex = 8;
+            this.btnLabelFeatures.Text = "Features";
+            this.btnLabelFeatures.UseVisualStyleBackColor = true;
+            this.btnLabelFeatures.Click += new System.EventHandler(this.OnButtonClick);
+            // 
+            // btnLabelCategories
+            // 
+            this.btnLabelCategories.Location = new System.Drawing.Point(38, 65);
+            this.btnLabelCategories.Name = "btnLabelCategories";
+            this.btnLabelCategories.Size = new System.Drawing.Size(78, 27);
+            this.btnLabelCategories.TabIndex = 9;
+            this.btnLabelCategories.Text = "Categories";
+            this.btnLabelCategories.UseVisualStyleBackColor = true;
+            this.btnLabelCategories.Click += new System.EventHandler(this.OnButtonClick);
+            // 
+            // tabCategories
+            // 
+            this.tabCategories.Location = new System.Drawing.Point(4, 24);
+            this.tabCategories.Name = "tabCategories";
+            this.tabCategories.Padding = new System.Windows.Forms.Padding(3);
+            this.tabCategories.Size = new System.Drawing.Size(365, 199);
+            this.tabCategories.TabIndex = 1;
+            this.tabCategories.Text = "Categories";
+            this.tabCategories.UseVisualStyleBackColor = true;
+            // 
+            // tabVisibility
+            // 
+            this.tabVisibility.Controls.Add(this.btnApplyVisibility);
+            this.tabVisibility.Controls.Add(this.btnDefineVisibilityExpression);
+            this.tabVisibility.Controls.Add(this.label23);
+            this.tabVisibility.Controls.Add(this.txtVisibilityExpression);
+            this.tabVisibility.Location = new System.Drawing.Point(4, 24);
+            this.tabVisibility.Name = "tabVisibility";
+            this.tabVisibility.Padding = new System.Windows.Forms.Padding(3);
+            this.tabVisibility.Size = new System.Drawing.Size(365, 199);
+            this.tabVisibility.TabIndex = 2;
+            this.tabVisibility.Text = "Visibility";
+            this.tabVisibility.UseVisualStyleBackColor = true;
+            // 
+            // btnApplyVisibility
+            // 
+            this.btnApplyVisibility.Location = new System.Drawing.Point(293, 67);
+            this.btnApplyVisibility.Name = "btnApplyVisibility";
+            this.btnApplyVisibility.Size = new System.Drawing.Size(52, 24);
+            this.btnApplyVisibility.TabIndex = 53;
+            this.btnApplyVisibility.Text = "Apply";
+            this.btnApplyVisibility.UseVisualStyleBackColor = true;
+            this.btnApplyVisibility.Click += new System.EventHandler(this.OnButtonClick);
+            // 
+            // btnDefineVisibilityExpression
+            // 
+            this.btnDefineVisibilityExpression.Location = new System.Drawing.Point(293, 37);
+            this.btnDefineVisibilityExpression.Name = "btnDefineVisibilityExpression";
+            this.btnDefineVisibilityExpression.Size = new System.Drawing.Size(52, 24);
+            this.btnDefineVisibilityExpression.TabIndex = 52;
+            this.btnDefineVisibilityExpression.Text = "Define";
+            this.btnDefineVisibilityExpression.UseVisualStyleBackColor = true;
+            this.btnDefineVisibilityExpression.Click += new System.EventHandler(this.OnButtonClick);
+            // 
+            // label23
+            // 
+            this.label23.AutoSize = true;
+            this.label23.Location = new System.Drawing.Point(14, 16);
+            this.label23.Name = "label23";
+            this.label23.Size = new System.Drawing.Size(113, 15);
+            this.label23.TabIndex = 51;
+            this.label23.Text = "Visibility expression";
+            // 
+            // txtVisibilityExpression
+            // 
+            this.txtVisibilityExpression.Location = new System.Drawing.Point(17, 37);
+            this.txtVisibilityExpression.Multiline = true;
+            this.txtVisibilityExpression.Name = "txtVisibilityExpression";
+            this.txtVisibilityExpression.Size = new System.Drawing.Size(270, 68);
+            this.txtVisibilityExpression.TabIndex = 50;
+            // 
+            // tabSelection
+            // 
+            this.tabSelection.Controls.Add(this.transpSelection);
+            this.tabSelection.Controls.Add(this.label6);
+            this.tabSelection.Controls.Add(this.label5);
+            this.tabSelection.Controls.Add(this.shapeContainer1);
+            this.tabSelection.Location = new System.Drawing.Point(4, 24);
+            this.tabSelection.Name = "tabSelection";
+            this.tabSelection.Padding = new System.Windows.Forms.Padding(3);
+            this.tabSelection.Size = new System.Drawing.Size(365, 199);
+            this.tabSelection.TabIndex = 3;
+            this.tabSelection.Text = "Selection appearance";
+            this.tabSelection.UseVisualStyleBackColor = true;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(35, 35);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(36, 15);
+            this.label6.TabIndex = 2;
+            this.label6.Text = "Color";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(33, 76);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(81, 15);
+            this.label5.TabIndex = 1;
+            this.label5.Text = "Transparency";
+            // 
+            // shapeContainer1
+            // 
+            this.shapeContainer1.Location = new System.Drawing.Point(3, 3);
+            this.shapeContainer1.Margin = new System.Windows.Forms.Padding(0);
+            this.shapeContainer1.Name = "shapeContainer1";
+            this.shapeContainer1.Shapes.AddRange(new Microsoft.VisualBasic.PowerPacks.Shape[] {
+            this.rectangleShape1});
+            this.shapeContainer1.Size = new System.Drawing.Size(359, 193);
+            this.shapeContainer1.TabIndex = 3;
+            this.shapeContainer1.TabStop = false;
+            // 
+            // rectangleShape1
+            // 
+            this.rectangleShape1.FillStyle = Microsoft.VisualBasic.PowerPacks.FillStyle.Solid;
+            this.rectangleShape1.Location = new System.Drawing.Point(137, 32);
+            this.rectangleShape1.Name = "rectangleShape1";
+            this.rectangleShape1.Size = new System.Drawing.Size(29, 15);
+            // 
+            // transpSelection
+            // 
+            this.transpSelection.BandColor = System.Drawing.Color.Empty;
+            this.transpSelection.Location = new System.Drawing.Point(129, 76);
+            this.transpSelection.MaximumSize = new System.Drawing.Size(1024, 32);
+            this.transpSelection.MinimumSize = new System.Drawing.Size(128, 32);
+            this.transpSelection.Name = "transpSelection";
+            this.transpSelection.Size = new System.Drawing.Size(179, 32);
+            this.transpSelection.TabIndex = 14;
+            this.transpSelection.Value = ((byte)(255));
             // 
             // LayerPropertyForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(380, 370);
+            this.ClientSize = new System.Drawing.Size(380, 403);
+            this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.btnClose);
-            this.Controls.Add(this.groupBox2);
-            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.txtFileName);
             this.Controls.Add(this.label3);
@@ -206,8 +369,14 @@
             this.Text = "LayerPropertyForm";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.LayerPropertyForm_FormClosed);
             this.Load += new System.EventHandler(this.LayerPropertyForm_Load);
-            this.groupBox1.ResumeLayout(false);
+            this.tabControl1.ResumeLayout(false);
+            this.tabAppearance.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
+            this.groupBox1.ResumeLayout(false);
+            this.tabVisibility.ResumeLayout(false);
+            this.tabVisibility.PerformLayout();
+            this.tabSelection.ResumeLayout(false);
+            this.tabSelection.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -223,12 +392,26 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox txtFileName;
-        private System.Windows.Forms.Button btnLabelFeatures;
-        private System.Windows.Forms.Button btnLabelCategories;
-        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.Button btnClose;
+        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabPage tabAppearance;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Button btnFeatureSymbols;
         private System.Windows.Forms.Button btnFeatureCategories;
-        private System.Windows.Forms.Button btnClose;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.Button btnLabelFeatures;
+        private System.Windows.Forms.Button btnLabelCategories;
+        private System.Windows.Forms.TabPage tabCategories;
+        private System.Windows.Forms.TabPage tabVisibility;
+        private System.Windows.Forms.Button btnDefineVisibilityExpression;
+        private System.Windows.Forms.Label label23;
+        private System.Windows.Forms.TextBox txtVisibilityExpression;
+        private System.Windows.Forms.Button btnApplyVisibility;
+        private System.Windows.Forms.TabPage tabSelection;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label5;
+        private Microsoft.VisualBasic.PowerPacks.ShapeContainer shapeContainer1;
+        private Microsoft.VisualBasic.PowerPacks.RectangleShape rectangleShape1;
+        private Mapping.UserControls.TransparencyControl transpSelection;
     }
 }
