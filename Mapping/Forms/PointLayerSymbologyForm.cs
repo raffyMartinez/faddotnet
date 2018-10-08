@@ -162,15 +162,22 @@ namespace FAD3
             _instance = null;
         }
 
+        private void ApplyOptions()
+        {
+            _parentForm.Parentform.ShapefileLayerPropertyChanged();
+        }
+
         private void OnButtonClick(object sender, EventArgs e)
         {
             switch (((Button)sender).Name)
             {
                 case "btnOk":
+                    ApplyOptions();
+                    Close();
                     break;
 
                 case "btnApply":
-                    _parentForm.Parentform.ShapefileLayerPropertyChanged();
+                    ApplyOptions();
                     break;
 
                 case "btnCancel":

@@ -52,11 +52,12 @@
             this.label23 = new System.Windows.Forms.Label();
             this.txtVisibilityExpression = new System.Windows.Forms.TextBox();
             this.tabSelection = new System.Windows.Forms.TabPage();
+            this.transpSelection = new FAD3.Mapping.UserControls.TransparencyControl();
             this.label6 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.shapeContainer1 = new Microsoft.VisualBasic.PowerPacks.ShapeContainer();
             this.rectangleShape1 = new Microsoft.VisualBasic.PowerPacks.RectangleShape();
-            this.transpSelection = new FAD3.Mapping.UserControls.TransparencyControl();
+            this.btnApply = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabAppearance.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -71,6 +72,7 @@
             this.txtLayerName.Name = "txtLayerName";
             this.txtLayerName.Size = new System.Drawing.Size(252, 21);
             this.txtLayerName.TabIndex = 0;
+            this.txtLayerName.TextChanged += new System.EventHandler(this.txtLayerName_TextChanged);
             // 
             // label1
             // 
@@ -300,6 +302,17 @@
             this.tabSelection.Text = "Selection appearance";
             this.tabSelection.UseVisualStyleBackColor = true;
             // 
+            // transpSelection
+            // 
+            this.transpSelection.BandColor = System.Drawing.Color.Empty;
+            this.transpSelection.Location = new System.Drawing.Point(129, 76);
+            this.transpSelection.MaximumSize = new System.Drawing.Size(1024, 32);
+            this.transpSelection.MinimumSize = new System.Drawing.Size(128, 32);
+            this.transpSelection.Name = "transpSelection";
+            this.transpSelection.Size = new System.Drawing.Size(179, 32);
+            this.transpSelection.TabIndex = 14;
+            this.transpSelection.Value = ((byte)(255));
+            // 
             // label6
             // 
             this.label6.AutoSize = true;
@@ -336,22 +349,23 @@
             this.rectangleShape1.Name = "rectangleShape1";
             this.rectangleShape1.Size = new System.Drawing.Size(29, 15);
             // 
-            // transpSelection
+            // btnApply
             // 
-            this.transpSelection.BandColor = System.Drawing.Color.Empty;
-            this.transpSelection.Location = new System.Drawing.Point(129, 76);
-            this.transpSelection.MaximumSize = new System.Drawing.Size(1024, 32);
-            this.transpSelection.MinimumSize = new System.Drawing.Size(128, 32);
-            this.transpSelection.Name = "transpSelection";
-            this.transpSelection.Size = new System.Drawing.Size(179, 32);
-            this.transpSelection.TabIndex = 14;
-            this.transpSelection.Value = ((byte)(255));
+            this.btnApply.Enabled = false;
+            this.btnApply.Location = new System.Drawing.Point(247, 368);
+            this.btnApply.Name = "btnApply";
+            this.btnApply.Size = new System.Drawing.Size(60, 27);
+            this.btnApply.TabIndex = 14;
+            this.btnApply.Text = "Apply";
+            this.btnApply.UseVisualStyleBackColor = true;
+            this.btnApply.Click += new System.EventHandler(this.OnButtonClick);
             // 
             // LayerPropertyForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(380, 403);
+            this.Controls.Add(this.btnApply);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.btnClose);
             this.Controls.Add(this.label4);
@@ -413,5 +427,6 @@
         private Microsoft.VisualBasic.PowerPacks.ShapeContainer shapeContainer1;
         private Microsoft.VisualBasic.PowerPacks.RectangleShape rectangleShape1;
         private Mapping.UserControls.TransparencyControl transpSelection;
+        private System.Windows.Forms.Button btnApply;
     }
 }

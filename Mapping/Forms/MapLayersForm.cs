@@ -14,6 +14,8 @@ namespace FAD3
         private Rectangle _dragBoxFromMouseDown;
         private int _rowIndexFromMouseDown;
         private int _rowIndexOfItemUnderMouseToDrop;
+        private int _layerRow;
+        private int _layerCol;
 
         private void OnLayerGrid_MouseMove(object sender, MouseEventArgs e)
         {
@@ -127,6 +129,7 @@ namespace FAD3
             _mapLayersHandler = mapLayers;
             _mapLayersHandler.LayerRead += OnLayerRead;
             _mapLayersHandler.LayerRemoved += OnLayerDeleted;
+            _mapLayersHandler.OnLayerNameUpdate += OnLayerNameUpdated;
             layerGrid.CellClick += OnCellClick;
             layerGrid.CellMouseDown += OnCellMouseDown;
             layerGrid.CellDoubleClick += OnCellDoubleClick;
@@ -134,6 +137,11 @@ namespace FAD3
             layerGrid.DragOver += OnLayerGrid_DragOver;
             layerGrid.MouseDown += OnLayerGrid_MouseDown;
             layerGrid.MouseMove += OnLayerGrid_MouseMove;
+        }
+
+        private void OnLayerNameUpdated(MapLayersHandler s, LayerEventArg e)
+        {
+            layerGrid[_layerCol, _layerRow].Value = e.LayerName;
         }
 
         private void OnCellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
@@ -150,6 +158,8 @@ namespace FAD3
             //we only respond to double-click on the name column
             if (e.ColumnIndex == 1)
             {
+                _layerRow = e.RowIndex;
+                _layerCol = e.ColumnIndex;
                 var hLyr = (int)layerGrid[0, e.RowIndex].Tag;
                 var lpf = LayerPropertyForm.GetInstance(this, hLyr);
                 if (!lpf.Visible)

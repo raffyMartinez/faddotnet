@@ -37,6 +37,22 @@ namespace FAD3
         public delegate void VisibilityExpressionSet(MapLayersHandler s, LayerEventArg e);
         public event VisibilityExpressionSet OnVisibilityExpressionSet;
 
+        public delegate void LayerNameUpdate(MapLayersHandler s, LayerEventArg e);
+        public event LayerNameUpdate OnLayerNameUpdate;
+
+        public void UpdateCurrentLayerName(string layerName)
+        {
+            if (OnLayerNameUpdate != null)
+            {
+                //fill up the event argument class with the layer item
+                _currentMapLayer.Name = layerName;
+                _axmap.set_LayerName(_currentMapLayer.Handle, layerName);
+                LayerEventArg lp = new LayerEventArg(_currentMapLayer.Handle);
+                lp.LayerName = _currentMapLayer.Name;
+                OnLayerNameUpdate(this, lp);
+            }
+        }
+
         public ShapefileLabelHandler ShapeFileLableHandler
         {
             get { return _sfLabelHandler; }
@@ -503,6 +519,7 @@ namespace FAD3
                     LayerEventArg lp = new LayerEventArg(h, layerName, true, true, _currentMapLayer.LayerType);
                     LayerRead(this, lp);
                 }
+                Mapping.LineWidthFix.FixLineWidth(sf.DefaultDrawingOptions);
             }
             return h;
         }
@@ -515,7 +532,6 @@ namespace FAD3
         public int AddLayer(MapWinGIS.Image image, string layerName = "", bool isVisible = true)
         {
             var h = _axmap.AddLayer(image, isVisible);
-            MapLayer mapLayer;
             if (h >= 0)
             {
                 if (layerName.Length == 0)
@@ -547,7 +563,6 @@ namespace FAD3
         public int AddLayer(object layer, string layerName, bool visible, bool showInLayerUI, string fileName = "")
         {
             int h = 0;
-            MapLayer mapLayer;
             GeoProjection gp = new GeoProjection();
 
             var layerType = layer.GetType().Name;
@@ -557,6 +572,7 @@ namespace FAD3
                 case "ShapefileClass":
                     h = _axmap.AddLayer((Shapefile)layer, visible);
                     gp = ((Shapefile)layer).GeoProjection;
+                    Mapping.LineWidthFix.FixLineWidth(((Shapefile)layer).DefaultDrawingOptions);
                     break;
 
                 case "ImageClass":

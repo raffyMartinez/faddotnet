@@ -5,7 +5,7 @@ namespace FAD3
     public class LayerEventArg : EventArgs
     {
         public int LayerHandle { get; }
-        public string LayerName { get; }
+        public string LayerName { get; set; }
         public bool ShowInLayerUI { get; }
         public bool LayerVisible { get; }
         public bool LayerRemoved { get; }
@@ -58,6 +58,11 @@ namespace FAD3
             LayerHandle = layerHandle;
             ExpressionTarget = target;
             VisibilityExpression = visibilityExpression;
+        }
+
+        public LayerEventArg(int layerHandle)
+        {
+            LayerHandle = layerHandle;
         }
     }
 }

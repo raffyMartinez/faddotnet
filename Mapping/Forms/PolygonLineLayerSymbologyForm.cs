@@ -10,26 +10,29 @@ using MapWinGIS;
 
 namespace FAD3.Mapping.Forms
 {
-    public partial class PolygonLayerSymbologyForm : Form
+    public partial class PolygonLineLayerSymbologyForm : Form
     {
-        private static PolygonLayerSymbologyForm _instance;
+        private static PolygonLineLayerSymbologyForm _instance;
         private LayerPropertyForm _parentForm;
         private MapLayer _mapLayer;
         private ShapeDrawingOptions _options = null;
         private bool _noEvents;
+        private ShpfileType _shpFileType = ShpfileType.SHP_POLYGON;
 
-        public static PolygonLayerSymbologyForm GetInstance(LayerPropertyForm parent, MapLayer mapLayer)
+        public static PolygonLineLayerSymbologyForm GetInstance(LayerPropertyForm parent, MapLayer mapLayer)
         {
-            if (_instance == null) return new PolygonLayerSymbologyForm(parent, mapLayer);
+            if (_instance == null) return new PolygonLineLayerSymbologyForm(parent, mapLayer);
             return _instance;
         }
 
-        public PolygonLayerSymbologyForm(LayerPropertyForm parent, MapLayer mapLayer)
+        public PolygonLineLayerSymbologyForm(LayerPropertyForm parent, MapLayer mapLayer)
         {
             InitializeComponent();
             _parentForm = parent;
             _mapLayer = mapLayer;
             _options = ((Shapefile)_mapLayer.LayerObject).DefaultDrawingOptions;
+            _shpFileType = ((Shapefile)_mapLayer.LayerObject).ShapefileType;
+            LineWidthFix.FixLineWidth(_options);
         }
 
         private void OnFormLoad(object sender, EventArgs e)
@@ -66,35 +69,48 @@ namespace FAD3.Mapping.Forms
             // adding event handlers
             // -----------------------------------------------------
             // fill
-            chkFill.CheckedChanged += new EventHandler(GUI2Options);
-            clpFillColor.SelectedColorChanged += new EventHandler(GUI2Options);
+            chkFill.CheckedChanged += GUI2Options;
+            clpFillColor.SelectedColorChanged += GUI2Options;
 
             // hatch
-            icbHatchType.SelectedIndexChanged += new EventHandler(GUI2Options);
-            chkTransparentBackground.CheckedChanged += new EventHandler(GUI2Options);
-            clpHatchBack.SelectedColorChanged += new EventHandler(GUI2Options);
+            icbHatchType.SelectedIndexChanged += GUI2Options;
+            chkTransparentBackground.CheckedChanged += GUI2Options;
+            clpHatchBack.SelectedColorChanged += GUI2Options;
 
             // gradient
-            clpGradient2.SelectedColorChanged += new EventHandler(GUI2Options);
-            udGradientRotation.ValueChanged += new EventHandler(GUI2Options);
-            cboGradientType.SelectedIndexChanged += new EventHandler(GUI2Options);
-            cboGradientBounds.SelectedIndexChanged += new EventHandler(GUI2Options);
+            clpGradient2.SelectedColorChanged += GUI2Options;
+            udGradientRotation.ValueChanged += GUI2Options;
+            cboGradientType.SelectedIndexChanged += GUI2Options;
+            cboGradientBounds.SelectedIndexChanged += GUI2Options;
 
             // outline
-            chkOutline.CheckedChanged += new EventHandler(GUI2Options);
-            icbLineStyle.SelectedIndexChanged += new EventHandler(GUI2Options);
-            icbLineWidth.SelectedIndexChanged += new EventHandler(GUI2Options);
-            clpOutline.SelectedColorChanged += new EventHandler(GUI2Options);
+            chkOutline.CheckedChanged += GUI2Options;
+            icbLineStyle.SelectedIndexChanged += GUI2Options;
+            icbLineWidth.SelectedIndexChanged += GUI2Options;
+            clpOutline.SelectedColorChanged += GUI2Options;
 
             // vertices
-            chkVertices.CheckedChanged += new EventHandler(GUI2Options);
-            cboVerticesType.SelectedIndexChanged += new EventHandler(GUI2Options);
-            clpVertexColor.SelectedColorChanged += new EventHandler(GUI2Options);
-            chkVerticesFillVisible.CheckedChanged += new EventHandler(GUI2Options);
-            udVerticesSize.ValueChanged += new EventHandler(GUI2Options);
+            chkVertices.CheckedChanged += GUI2Options;
+            cboVerticesType.SelectedIndexChanged += GUI2Options;
+            clpVertexColor.SelectedColorChanged += GUI2Options;
+            chkVerticesFillVisible.CheckedChanged += GUI2Options;
+            udVerticesSize.ValueChanged += GUI2Options;
 
             transpFill.ValueChanged += OnTransparencyChange;
             transpOutline.ValueChanged += OnTransparencyChange;
+
+            if (_shpFileType != ShpfileType.SHP_POLYGON)
+            {
+                tabsProperties.TabPages.Remove(tabsProperties.TabPages["tabFill"]);
+                chkVertices.Location = chkOutline.Location;
+                chkOutline.Location = chkFill.Location;
+                chkFill.Visible = false;
+                Text = "Polyline layer symbology";
+            }
+            else
+            {
+                Text = "Polygon layer symbology";
+            }
         }
 
         private void OnTransparencyChange(object sender, byte value)
@@ -183,6 +199,8 @@ namespace FAD3.Mapping.Forms
             // outline
             _options.LineStipple = (tkDashStyle)icbLineStyle.SelectedIndex;
             _options.LineWidth = (float)icbLineWidth.SelectedIndex + 1;
+            LineWidthFix.FixLineWidth(_options);
+
             _options.LineVisible = chkOutline.Checked;
             _options.LineColor = Colors.ColorToUInteger(clpOutline.Color);
 
@@ -220,7 +238,14 @@ namespace FAD3.Mapping.Forms
             IntPtr ptr = g.GetHdc();
 
             // creating shape to draw
-            _options.DrawRectangle(ptr, 40.0f, 40.0f, rect.Width - 80, rect.Height - 80, true, rect.Width, rect.Height, Colors.ColorToUInteger(this.BackColor));
+            if (_shpFileType == ShpfileType.SHP_POLYGON)
+            {
+                _options.DrawRectangle(ptr, 40.0f, 40.0f, rect.Width - 80, rect.Height - 80, true, rect.Width, rect.Height, Colors.ColorToUInteger(this.BackColor));
+            }
+            else
+            {
+                _options.DrawLine(ptr, 40.0f, 40.0f, rect.Width - 80, rect.Height - 80, true, rect.Width, rect.Height, Colors.ColorToUInteger(this.BackColor));
+            }
 
             g.ReleaseHdc();
             pctPreview.Image = bmp;
@@ -243,6 +268,30 @@ namespace FAD3.Mapping.Forms
 
                 case 2:
                     grpGradient.Visible = true;
+                    break;
+            }
+        }
+
+        private void ApplyOptions()
+        {
+            _parentForm.Parentform.ShapefileLayerPropertyChanged();
+        }
+
+        private void OnButtonClick(object sender, EventArgs e)
+        {
+            switch (((Button)sender).Name)
+            {
+                case "btnOk":
+                    ApplyOptions();
+                    Close();
+                    break;
+
+                case "btnCancel":
+                    Close();
+                    break;
+
+                case "btnApply":
+                    ApplyOptions();
                     break;
             }
         }

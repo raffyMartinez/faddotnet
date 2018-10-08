@@ -182,6 +182,7 @@ namespace FAD3
             {
                 handler(this, EventArgs.Empty);
             }
+            global.mainForm.SetMapDependendMenus();
         }
 
         public void OpenFileDialog()

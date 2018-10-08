@@ -84,6 +84,8 @@ namespace FAD3
             this.tsButtonReport = new System.Windows.Forms.ToolStripButton();
             this.tsButtonMap = new System.Windows.Forms.ToolStripButton();
             this.tsButtonExit = new System.Windows.Forms.ToolStripButton();
+            this.cholorophyllGridMappingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -338,9 +340,11 @@ namespace FAD3
             this.referenceNumberRangeToolStripMenuItem,
             this.coordinateFormatToolStripMenuItem,
             this.symbolFontsToolStripMenuItem,
-            this.generateGridMapToolStripMenuItem,
             this.showErrorMessagesToolStripMenuItem,
-            this.generateInlandDbToolStripMenuItem});
+            this.toolStripSeparator2,
+            this.generateInlandDbToolStripMenuItem,
+            this.generateGridMapToolStripMenuItem,
+            this.cholorophyllGridMappingToolStripMenuItem});
             this.menuTools.Name = "menuTools";
             this.menuTools.Size = new System.Drawing.Size(48, 20);
             this.menuTools.Text = "Tools";
@@ -580,6 +584,19 @@ namespace FAD3
             this.tsButtonExit.Text = "toolStripButton6";
             this.tsButtonExit.ToolTipText = "Exit";
             // 
+            // cholorophyllGridMappingToolStripMenuItem
+            // 
+            this.cholorophyllGridMappingToolStripMenuItem.Enabled = false;
+            this.cholorophyllGridMappingToolStripMenuItem.Name = "cholorophyllGridMappingToolStripMenuItem";
+            this.cholorophyllGridMappingToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
+            this.cholorophyllGridMappingToolStripMenuItem.Tag = "chlorophyll";
+            this.cholorophyllGridMappingToolStripMenuItem.Text = "Cholorophyll grid mapping";
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(215, 6);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -660,5 +677,7 @@ namespace FAD3
         private System.Windows.Forms.ToolStripButton tsButtonMap;
         private System.Windows.Forms.ToolStripButton tsButtonExit;
         private System.Windows.Forms.ToolStripMenuItem generateInlandDbToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripMenuItem cholorophyllGridMappingToolStripMenuItem;
     }
 }

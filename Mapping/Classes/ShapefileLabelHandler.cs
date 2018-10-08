@@ -105,7 +105,10 @@ namespace FAD3
                 }
 
                 //AvoidCollision is not included in labelXML so we put it here
-                _shapeFile.Labels.AvoidCollisions = d.Attributes["AvoidCollision"].Value == "1";
+                if (d.Attributes["AvoidCollision"]?.Value == "1")
+                {
+                    _shapeFile.Labels.AvoidCollisions = d.Attributes["AvoidCollision"].Value == "1";
+                }
             });
 
             return lbls >= 0;

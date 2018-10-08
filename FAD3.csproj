@@ -107,25 +107,31 @@
     <Compile Include="Database\Forms\AllSpeciesForm.Designer.cs">
       <DependentUpon>AllSpeciesForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Database\AOI.cs" />
-    <Compile Include="Database\CatchComposition.cs" />
+    <Compile Include="Database\Classes\AOI.cs" />
+    <Compile Include="Database\Classes\CatchComposition.cs" />
     <Compile Include="Database\Forms\CatchCompositionForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Database\Forms\CatchCompositionForm.Designer.cs">
       <DependentUpon>CatchCompositionForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Database\CatchLine.cs" />
-    <Compile Include="Database\CatchName.cs" />
-    <Compile Include="Mapping\Colors.cs" />
-    <Compile Include="Mapping\ColorSchemes.cs" />
+    <Compile Include="Database\Classes\CatchLine.cs" />
+    <Compile Include="Database\Classes\CatchName.cs" />
+    <Compile Include="Mapping\Classes\Colors.cs" />
+    <Compile Include="Mapping\Classes\ColorSchemes.cs" />
+    <Compile Include="Mapping\Forms\ChlorophyllForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Mapping\Forms\ChlorophyllForm.Designer.cs">
+      <DependentUpon>ChlorophyllForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Mapping\Forms\ConvertToGrid25Form.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Mapping\Forms\ConvertToGrid25Form.Designer.cs">
       <DependentUpon>ConvertToGrid25Form.cs</DependentUpon>
     </Compile>
-    <Compile Include="Database\Coordinate.cs" />
+    <Compile Include="Database\Classes\Coordinate.cs" />
     <Compile Include="Database\Forms\CoordinateEntryForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -138,35 +144,35 @@
     <Compile Include="Database\Forms\CoordinateFormatSelectForm.Designer.cs">
       <DependentUpon>CoordinateFormatSelectForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Mapping\CreateInlandGridEventArgs.cs" />
-    <Compile Include="Mapping\CreateInlandPointDatabase.cs" />
-    <Compile Include="Database\DBCheck.cs" />
+    <Compile Include="Mapping\Classes\CreateInlandGridEventArgs.cs" />
+    <Compile Include="Mapping\Classes\CreateInlandPointDatabase.cs" />
+    <Compile Include="Database\Classes\DBCheck.cs" />
     <Compile Include="Database\SamplingEnumerators\EnumeratorEntryForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Database\SamplingEnumerators\EnumeratorEntryForm.Designer.cs">
       <DependentUpon>EnumeratorEntryForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\FADColors.cs" />
+    <Compile Include="GUI\Classes\FADColors.cs" />
     <Compile Include="Database\Forms\FishingGroundExtentsForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Database\Forms\FishingGroundExtentsForm.Designer.cs">
       <DependentUpon>FishingGroundExtentsForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Mapping\FishingGroundMappingHandler.cs" />
-    <Compile Include="GUI\FolderBrowserLauncher.cs" />
-    <Compile Include="GUI\FontComboBox.cs">
+    <Compile Include="Mapping\Classes\FishingGroundMappingHandler.cs" />
+    <Compile Include="GUI\Classes\FolderBrowserLauncher.cs" />
+    <Compile Include="GUI\User controls\FontComboBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Database\GMSLineClass.cs" />
-    <Compile Include="Mapping\Forms\PolygonLayerSymbologyForm.cs">
+    <Compile Include="Database\Classes\GMSLineClass.cs" />
+    <Compile Include="Mapping\Forms\PolygonLineLayerSymbologyForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Mapping\Forms\PolygonLayerSymbologyForm.Designer.cs">
-      <DependentUpon>PolygonLayerSymbologyForm.cs</DependentUpon>
+    <Compile Include="Mapping\Forms\PolygonLineLayerSymbologyForm.Designer.cs">
+      <DependentUpon>PolygonLineLayerSymbologyForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Mapping\Graticule.cs" />
+    <Compile Include="Mapping\Classes\Graticule.cs" />
     <Compile Include="Mapping\Forms\GraticuleForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -179,30 +185,30 @@
     <Compile Include="Mapping\Forms\Grid25GenerateForm.Designer.cs">
       <DependentUpon>Grid25GenerateForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Mapping\Grid25MajorGrid.cs" />
-    <Compile Include="Mapping\Grid25MinorGrid.cs" />
-    <Compile Include="Mapping\Grid25LabelManager.cs" />
+    <Compile Include="Mapping\Classes\Grid25MajorGrid.cs" />
+    <Compile Include="Mapping\Classes\Grid25MinorGrid.cs" />
+    <Compile Include="Mapping\Classes\Grid25LabelManager.cs" />
     <Compile Include="Mapping\Forms\InlandGridCreateDBForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Mapping\Forms\InlandGridCreateDBForm.Designer.cs">
       <DependentUpon>InlandGridCreateDBForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Mapping\LabelProperty.cs" />
+    <Compile Include="Mapping\Classes\LabelProperty.cs" />
     <Compile Include="Mapping\Forms\LabelsForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Mapping\Forms\LabelsForm.Designer.cs">
       <DependentUpon>LabelsForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Database\LandingSiteFromKML.cs" />
+    <Compile Include="Database\Classes\LandingSiteFromKML.cs" />
     <Compile Include="Database\Forms\LandingSiteFromKMLForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Database\Forms\LandingSiteFromKMLForm.Designer.cs">
       <DependentUpon>LandingSiteFromKMLForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Mapping\LandingSiteMappingHandler.cs" />
+    <Compile Include="Mapping\Classes\LandingSiteMappingHandler.cs" />
     <Compile Include="Mapping\Forms\PointLayerSymbologyForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -221,16 +227,16 @@
     <Compile Include="Mapping\Forms\LayerPropertyForm.Designer.cs">
       <DependentUpon>LayerPropertyForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\Logger.cs" />
-    <Compile Include="GUI\extension.cs" />
+    <Compile Include="GUI\Classes\Logger.cs" />
+    <Compile Include="GUI\Classes\extension.cs" />
     <Compile Include="Database\Forms\FishingGroundDefinitionForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Database\Forms\FishingGroundDefinitionForm.Designer.cs">
       <DependentUpon>FishingGroundDefinitionForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Database\FishingGrid.cs" />
-    <Compile Include="Database\FishingVessel.cs" />
+    <Compile Include="Database\Classes\FishingGrid.cs" />
+    <Compile Include="Database\Classes\FishingVessel.cs" />
     <Compile Include="Database\Forms\FishingGroundForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -255,16 +261,17 @@
     <Compile Include="Mapping\Forms\MapEffortHelperForm.Designer.cs">
       <DependentUpon>MapEffortHelperForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Mapping\MapInterActionHandler.cs" />
-    <Compile Include="Mapping\MapLayer.cs" />
-    <Compile Include="Mapping\MapLayershandler.cs" />
+    <Compile Include="Mapping\Classes\LineWidthFix.cs" />
+    <Compile Include="Mapping\Classes\MapInterActionHandler.cs" />
+    <Compile Include="Mapping\Classes\MapLayer.cs" />
+    <Compile Include="Mapping\Classes\MapLayershandler.cs" />
     <Compile Include="Mapping\Forms\MapLayersForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Mapping\Forms\MapLayersForm.Designer.cs">
       <DependentUpon>MapLayersForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Mapping\LayerEventArg.cs" />
+    <Compile Include="Mapping\Classes\LayerEventArg.cs" />
     <Compile Include="Mapping\Forms\MapperForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -277,7 +284,7 @@
     <Compile Include="Database\Forms\ReferenceNumberRangeForm.Designer.cs">
       <DependentUpon>ReferenceNumberRangeForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Database\GMSManager.cs" />
+    <Compile Include="Database\Classes\GMSManager.cs" />
     <Compile Include="GUI\Forms\AboutFadForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -285,15 +292,15 @@
       <DependentUpon>AboutFadForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Database\SamplingEnumerators\Enumerators.cs" />
-    <Compile Include="Mapping\SaveMapImage.cs" />
+    <Compile Include="Mapping\Classes\SaveMapImage.cs" />
     <Compile Include="Mapping\Forms\ShapefileAttributesForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Mapping\Forms\ShapefileAttributesForm.Designer.cs">
       <DependentUpon>ShapefileAttributesForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Mapping\ShapefileLabelHandler.cs" />
-    <Compile Include="Mapping\ShapefileLayerHelper.cs" />
+    <Compile Include="Mapping\Classes\ShapefileLabelHandler.cs" />
+    <Compile Include="Mapping\Classes\ShapefileLayerHelper.cs" />
     <Compile Include="Database\Forms\SpeciesNameForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -306,7 +313,7 @@
     <Compile Include="Database\Forms\GearSpeciesSamplingsForm.Designer.cs">
       <DependentUpon>GearSpeciesSamplingsForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Mapping\PointLayerSymbologyHandler.cs" />
+    <Compile Include="Mapping\Classes\PointLayerSymbologyHandler.cs" />
     <Compile Include="Database\Forms\TargetAreaForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -349,36 +356,36 @@
     <Compile Include="Database\Forms\TargetAreaGearsForm.Designer.cs">
       <DependentUpon>TargetAreaGearsForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\ToolStripEx.cs" />
+    <Compile Include="GUI\Classes\ToolStripEx.cs" />
     <Compile Include="Database\Forms\VesselDimensionForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Database\Forms\VesselDimensionForm.Designer.cs">
       <DependentUpon>VesselDimensionForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Database\gear.cs" />
+    <Compile Include="Database\Classes\gear.cs" />
     <Compile Include="Database\Forms\ReferenceNumberForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Database\Forms\ReferenceNumberForm.Designer.cs">
       <DependentUpon>ReferenceNumberForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\global.cs" />
+    <Compile Include="GUI\Classes\global.cs" />
     <Compile Include="Database\Forms\GMSDataEntryForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Database\Forms\GMSDataEntryForm.Designer.cs">
       <DependentUpon>GMSDataEntryForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Database\LandingSite.cs" />
-    <Compile Include="Mapping\LatLngUTMConverter.cs" />
+    <Compile Include="Database\Classes\LandingSite.cs" />
+    <Compile Include="Mapping\Classes\LatLngUTMConverter.cs" />
     <Compile Include="Database\Forms\LengthFreqForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Database\Forms\LengthFreqForm.Designer.cs">
       <DependentUpon>LengthFreqForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Database\ManageGearSpecsClass.cs" />
+    <Compile Include="Database\Classes\ManageGearSpecsClass.cs" />
     <Compile Include="Database\Forms\ManageGearSpecsForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -391,8 +398,8 @@
     <Compile Include="GUI\Forms\ManageMRUForm.Designer.cs">
       <DependentUpon>ManageMRUForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\mru.cs" />
-    <Compile Include="Database\names.cs" />
+    <Compile Include="GUI\Classes\mru.cs" />
+    <Compile Include="Database\Classes\names.cs" />
     <Compile Include="Mapping\UserControls\CharacterControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -430,16 +437,16 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Database\ReferenceNumberManager.cs" />
-    <Compile Include="GUI\registrytools.cs" />
+    <Compile Include="Database\Classes\ReferenceNumberManager.cs" />
+    <Compile Include="GUI\Classes\registrytools.cs" />
     <Compile Include="Database\Forms\SampledGear_SpecsForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Database\Forms\SampledGear_SpecsForm.Designer.cs">
       <DependentUpon>SampledGear_SpecsForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Database\Sampling.cs" />
-    <Compile Include="Database\UIRow.cs" />
+    <Compile Include="Database\Classes\Sampling.cs" />
+    <Compile Include="Database\Classes\UIRow.cs" />
     <Compile Include="Mapping\Forms\VisibilityQueryForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -453,6 +460,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Database\Forms\CatchCompositionForm.resx">
       <DependentUpon>CatchCompositionForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Mapping\Forms\ChlorophyllForm.resx">
+      <DependentUpon>ChlorophyllForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Mapping\Forms\ConvertToGrid25Form.resx">
       <DependentUpon>ConvertToGrid25Form.cs</DependentUpon>
@@ -499,8 +509,8 @@
     <EmbeddedResource Include="Mapping\Forms\PointLayerSymbologyForm.resx">
       <DependentUpon>PointLayerSymbologyForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Mapping\Forms\PolygonLayerSymbologyForm.resx">
-      <DependentUpon>PolygonLayerSymbologyForm.cs</DependentUpon>
+    <EmbeddedResource Include="Mapping\Forms\PolygonLineLayerSymbologyForm.resx">
+      <DependentUpon>PolygonLineLayerSymbologyForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Mapping\Forms\SaveMapForm.resx">
       <DependentUpon>SaveMapForm.cs</DependentUpon>

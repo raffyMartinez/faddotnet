@@ -19,7 +19,6 @@ namespace FAD3
         private MapLayer _mapLayer;
         private string _layerType;
         private Shapefile _shapefileLayer;
-        private string _layerName;
         private MapLayersHandler _mapLayers;
 
         public MapLayersForm Parentform
@@ -64,6 +63,7 @@ namespace FAD3
 
             ProcessMapLayer(_mapLayer);
             transpSelection.FixLayout();
+            btnApply.Enabled = false;
         }
 
         private void LayerPropertyForm_FormClosed(object sender, FormClosedEventArgs e)
@@ -107,18 +107,16 @@ namespace FAD3
                             break;
 
                         case ShpfileType.SHP_POLYGON:
-                            var polygonForm = PolygonLayerSymbologyForm.GetInstance(this, _mapLayer);
-                            if (polygonForm.Visible)
+                        case ShpfileType.SHP_POLYLINE:
+                            var symbologyForm = PolygonLineLayerSymbologyForm.GetInstance(this, _mapLayer);
+                            if (symbologyForm.Visible)
                             {
-                                polygonForm.BringToFront();
+                                symbologyForm.BringToFront();
                             }
                             else
                             {
-                                polygonForm.Show(this);
+                                symbologyForm.Show(this);
                             }
-                            break;
-
-                        case ShpfileType.SHP_POLYLINE:
                             break;
                     }
 
@@ -149,7 +147,17 @@ namespace FAD3
                     _shapefileLayer.VisibilityExpression = _mapLayer.ShapesVisibilityExpression;
                     global.MappingForm.MapControl.Redraw();
                     break;
+
+                case "btnApply":
+                    _mapLayers.UpdateCurrentLayerName(txtLayerName.Text);
+                    btnApply.Enabled = false;
+                    break;
             }
+        }
+
+        private void txtLayerName_TextChanged(object sender, EventArgs e)
+        {
+            btnApply.Enabled = true;
         }
     }
 }

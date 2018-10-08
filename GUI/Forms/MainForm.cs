@@ -1461,7 +1461,25 @@ namespace FAD3
                 case "createInland":
                     global.Grid25GenerateForm?.CreateInlandGridDB();
                     break;
+
+                case "chlorophyll":
+                    var chForm = Mapping.Forms.ChlorophyllForm.GetInstance();
+                    if (chForm.Visible)
+                    {
+                        chForm.BringToFront();
+                    }
+                    else
+
+                    {
+                        chForm.Show(this);
+                    }
+                    break;
             }
+        }
+
+        public void SetMapDependendMenus()
+        {
+            cholorophyllGridMappingToolStripMenuItem.Enabled = global.MapIsOpen;
         }
 
         private void OnToolbar_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
@@ -1506,6 +1524,7 @@ namespace FAD3
                         mf.BringToFront();
                         mf.Focus();
                     }
+                    SetMapDependendMenus();
                     break;
 
                 case "tsButtonExit":

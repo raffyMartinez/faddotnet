@@ -133,12 +133,14 @@ namespace FAD3
                                 {
                                     _axMap.get_Shapefile(h).Categories.Item[y].DrawingOptions.LineWidth /= (float)(_dpi / 96);
                                     _axMap.get_Shapefile(h).Categories.Item[y].DrawingOptions.PointSize /= (float)(_dpi / 96);
+                                    _axMap.get_Shapefile(h).Categories.Item[y].DrawingOptions.VerticesSize /= (int)(_dpi / 96);
                                 }
                             }
                             else
                             {
                                 ddo.PointSize /= (float)(_dpi / 96);
                                 ddo.LineWidth /= (float)(_dpi / 96);
+                                ddo.VerticesSize /= (int)(_dpi / 96);
                             }
                         }
                         else
@@ -149,12 +151,14 @@ namespace FAD3
                                 {
                                     _axMap.get_Shapefile(h).Categories.Item[y].DrawingOptions.LineWidth *= (float)(_dpi / 96);
                                     _axMap.get_Shapefile(h).Categories.Item[y].DrawingOptions.PointSize *= (float)(_dpi / 96);
+                                    _axMap.get_Shapefile(h).Categories.Item[y].DrawingOptions.VerticesSize *= (int)(_dpi / 96);
                                 }
                             }
                             else
                             {
                                 ddo.PointSize *= (float)(_dpi / 96);
                                 ddo.LineWidth *= (float)(_dpi / 96);
+                                ddo.VerticesSize *= (int)(_dpi / 96);
                             }
                         }
                     });

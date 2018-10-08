@@ -1,6 +1,6 @@
 ﻿namespace FAD3.Mapping.Forms
 {
-    partial class PolygonLayerSymbologyForm
+    partial class PolygonLineLayerSymbologyForm
     {
         /// <summary>
         /// Required designer variable.
@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.tabProperties = new System.Windows.Forms.TabControl();
+            this.tabsProperties = new System.Windows.Forms.TabControl();
             this.tabFill = new System.Windows.Forms.TabPage();
             this.label6 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
@@ -62,6 +62,13 @@
             this.transpOutline = new FAD3.Mapping.UserControls.TransparencyControl();
             this.clpOutline = new Owf.Controls.Office2007ColorPicker(this.components);
             this.tabVertices = new System.Windows.Forms.TabPage();
+            this.clpVertexColor = new Owf.Controls.Office2007ColorPicker(this.components);
+            this.udVerticesSize = new MWLite.Symbology.Controls.NumericUpDownExt(this.components);
+            this.chkVerticesFillVisible = new System.Windows.Forms.CheckBox();
+            this.label29 = new System.Windows.Forms.Label();
+            this.cboVerticesType = new System.Windows.Forms.ComboBox();
+            this.label28 = new System.Windows.Forms.Label();
+            this.label27 = new System.Windows.Forms.Label();
             this.btnApply = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnOk = new System.Windows.Forms.Button();
@@ -70,34 +77,28 @@
             this.chkFill = new System.Windows.Forms.CheckBox();
             this.chkOutline = new System.Windows.Forms.CheckBox();
             this.chkVertices = new System.Windows.Forms.CheckBox();
-            this.udVerticesSize = new MWLite.Symbology.Controls.NumericUpDownExt(this.components);
-            this.chkVerticesFillVisible = new System.Windows.Forms.CheckBox();
-            this.label29 = new System.Windows.Forms.Label();
-            this.cboVerticesType = new System.Windows.Forms.ComboBox();
-            this.label28 = new System.Windows.Forms.Label();
-            this.label27 = new System.Windows.Forms.Label();
-            this.clpVertexColor = new Owf.Controls.Office2007ColorPicker(this.components);
-            this.tabProperties.SuspendLayout();
+            this.label13 = new System.Windows.Forms.Label();
+            this.tabsProperties.SuspendLayout();
             this.tabFill.SuspendLayout();
             this.grpGradient.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.udGradientRotation)).BeginInit();
             this.grpHatch.SuspendLayout();
             this.tabOutline.SuspendLayout();
             this.tabVertices.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pctPreview)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.udVerticesSize)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pctPreview)).BeginInit();
             this.SuspendLayout();
             // 
-            // tabProperties
+            // tabsProperties
             // 
-            this.tabProperties.Controls.Add(this.tabFill);
-            this.tabProperties.Controls.Add(this.tabOutline);
-            this.tabProperties.Controls.Add(this.tabVertices);
-            this.tabProperties.Location = new System.Drawing.Point(160, 18);
-            this.tabProperties.Name = "tabProperties";
-            this.tabProperties.SelectedIndex = 0;
-            this.tabProperties.Size = new System.Drawing.Size(392, 359);
-            this.tabProperties.TabIndex = 0;
+            this.tabsProperties.Controls.Add(this.tabFill);
+            this.tabsProperties.Controls.Add(this.tabOutline);
+            this.tabsProperties.Controls.Add(this.tabVertices);
+            this.tabsProperties.Location = new System.Drawing.Point(160, 18);
+            this.tabsProperties.Name = "tabsProperties";
+            this.tabsProperties.SelectedIndex = 0;
+            this.tabsProperties.Size = new System.Drawing.Size(392, 359);
+            this.tabsProperties.TabIndex = 0;
             // 
             // tabFill
             // 
@@ -467,6 +468,7 @@
             // 
             // tabVertices
             // 
+            this.tabVertices.Controls.Add(this.label13);
             this.tabVertices.Controls.Add(this.clpVertexColor);
             this.tabVertices.Controls.Add(this.udVerticesSize);
             this.tabVertices.Controls.Add(this.chkVerticesFillVisible);
@@ -482,6 +484,75 @@
             this.tabVertices.Text = "Vertices";
             this.tabVertices.UseVisualStyleBackColor = true;
             // 
+            // clpVertexColor
+            // 
+            this.clpVertexColor.Color = System.Drawing.Color.Black;
+            this.clpVertexColor.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.clpVertexColor.DropDownHeight = 1;
+            this.clpVertexColor.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.clpVertexColor.FormattingEnabled = true;
+            this.clpVertexColor.IntegralHeight = false;
+            this.clpVertexColor.Items.AddRange(new object[] {
+            "Color"});
+            this.clpVertexColor.Location = new System.Drawing.Point(114, 45);
+            this.clpVertexColor.Name = "clpVertexColor";
+            this.clpVertexColor.Size = new System.Drawing.Size(50, 21);
+            this.clpVertexColor.TabIndex = 110;
+            // 
+            // udVerticesSize
+            // 
+            this.udVerticesSize.Location = new System.Drawing.Point(114, 93);
+            this.udVerticesSize.Name = "udVerticesSize";
+            this.udVerticesSize.Size = new System.Drawing.Size(57, 20);
+            this.udVerticesSize.TabIndex = 23;
+            // 
+            // chkVerticesFillVisible
+            // 
+            this.chkVerticesFillVisible.AutoSize = true;
+            this.chkVerticesFillVisible.Location = new System.Drawing.Point(114, 144);
+            this.chkVerticesFillVisible.Name = "chkVerticesFillVisible";
+            this.chkVerticesFillVisible.Size = new System.Drawing.Size(15, 14);
+            this.chkVerticesFillVisible.TabIndex = 22;
+            this.chkVerticesFillVisible.UseVisualStyleBackColor = true;
+            // 
+            // label29
+            // 
+            this.label29.AutoSize = true;
+            this.label29.Location = new System.Drawing.Point(55, 95);
+            this.label29.Name = "label29";
+            this.label29.Size = new System.Drawing.Size(27, 13);
+            this.label29.TabIndex = 21;
+            this.label29.Text = "Size";
+            // 
+            // cboVerticesType
+            // 
+            this.cboVerticesType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cboVerticesType.FormattingEnabled = true;
+            this.cboVerticesType.Location = new System.Drawing.Point(297, 280);
+            this.cboVerticesType.Name = "cboVerticesType";
+            this.cboVerticesType.Size = new System.Drawing.Size(72, 21);
+            this.cboVerticesType.TabIndex = 20;
+            this.cboVerticesType.Visible = false;
+            // 
+            // label28
+            // 
+            this.label28.AutoSize = true;
+            this.label28.Location = new System.Drawing.Point(256, 283);
+            this.label28.Name = "label28";
+            this.label28.Size = new System.Drawing.Size(31, 13);
+            this.label28.TabIndex = 19;
+            this.label28.Text = "Type";
+            this.label28.Visible = false;
+            // 
+            // label27
+            // 
+            this.label27.AutoSize = true;
+            this.label27.Location = new System.Drawing.Point(55, 48);
+            this.label27.Name = "label27";
+            this.label27.Size = new System.Drawing.Size(31, 13);
+            this.label27.TabIndex = 18;
+            this.label27.Text = "Color";
+            // 
             // btnApply
             // 
             this.btnApply.Location = new System.Drawing.Point(444, 384);
@@ -490,6 +561,7 @@
             this.btnApply.TabIndex = 9;
             this.btnApply.Text = "Apply";
             this.btnApply.UseVisualStyleBackColor = true;
+            this.btnApply.Click += new System.EventHandler(this.OnButtonClick);
             // 
             // btnCancel
             // 
@@ -499,6 +571,7 @@
             this.btnCancel.TabIndex = 8;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
+            this.btnCancel.Click += new System.EventHandler(this.OnButtonClick);
             // 
             // btnOk
             // 
@@ -508,6 +581,7 @@
             this.btnOk.TabIndex = 7;
             this.btnOk.Text = "Ok";
             this.btnOk.UseVisualStyleBackColor = true;
+            this.btnOk.Click += new System.EventHandler(this.OnButtonClick);
             // 
             // label1
             // 
@@ -557,75 +631,16 @@
             this.chkVertices.Text = "Show Vertices";
             this.chkVertices.UseVisualStyleBackColor = true;
             // 
-            // udVerticesSize
+            // label13
             // 
-            this.udVerticesSize.Location = new System.Drawing.Point(283, 69);
-            this.udVerticesSize.Name = "udVerticesSize";
-            this.udVerticesSize.Size = new System.Drawing.Size(57, 20);
-            this.udVerticesSize.TabIndex = 23;
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(55, 145);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(46, 13);
+            this.label13.TabIndex = 111;
+            this.label13.Text = "Show fill";
             // 
-            // chkVerticesFillVisible
-            // 
-            this.chkVerticesFillVisible.AutoSize = true;
-            this.chkVerticesFillVisible.Location = new System.Drawing.Point(234, 119);
-            this.chkVerticesFillVisible.Name = "chkVerticesFillVisible";
-            this.chkVerticesFillVisible.Size = new System.Drawing.Size(70, 17);
-            this.chkVerticesFillVisible.TabIndex = 22;
-            this.chkVerticesFillVisible.Text = "Fill visible";
-            this.chkVerticesFillVisible.UseVisualStyleBackColor = true;
-            // 
-            // label29
-            // 
-            this.label29.AutoSize = true;
-            this.label29.Location = new System.Drawing.Point(231, 71);
-            this.label29.Name = "label29";
-            this.label29.Size = new System.Drawing.Size(27, 13);
-            this.label29.TabIndex = 21;
-            this.label29.Text = "Size";
-            // 
-            // cboVerticesType
-            // 
-            this.cboVerticesType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cboVerticesType.FormattingEnabled = true;
-            this.cboVerticesType.Location = new System.Drawing.Point(91, 116);
-            this.cboVerticesType.Name = "cboVerticesType";
-            this.cboVerticesType.Size = new System.Drawing.Size(72, 21);
-            this.cboVerticesType.TabIndex = 20;
-            // 
-            // label28
-            // 
-            this.label28.AutoSize = true;
-            this.label28.Location = new System.Drawing.Point(50, 119);
-            this.label28.Name = "label28";
-            this.label28.Size = new System.Drawing.Size(31, 13);
-            this.label28.TabIndex = 19;
-            this.label28.Text = "Type";
-            // 
-            // label27
-            // 
-            this.label27.AutoSize = true;
-            this.label27.Location = new System.Drawing.Point(50, 72);
-            this.label27.Name = "label27";
-            this.label27.Size = new System.Drawing.Size(31, 13);
-            this.label27.TabIndex = 18;
-            this.label27.Text = "Color";
-            // 
-            // clpVertexColor
-            // 
-            this.clpVertexColor.Color = System.Drawing.Color.Black;
-            this.clpVertexColor.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-            this.clpVertexColor.DropDownHeight = 1;
-            this.clpVertexColor.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.clpVertexColor.FormattingEnabled = true;
-            this.clpVertexColor.IntegralHeight = false;
-            this.clpVertexColor.Items.AddRange(new object[] {
-            "Color"});
-            this.clpVertexColor.Location = new System.Drawing.Point(91, 68);
-            this.clpVertexColor.Name = "clpVertexColor";
-            this.clpVertexColor.Size = new System.Drawing.Size(50, 21);
-            this.clpVertexColor.TabIndex = 110;
-            // 
-            // PolygonLayerSymbologyForm
+            // PolygonLineLayerSymbologyForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -638,13 +653,13 @@
             this.Controls.Add(this.btnApply);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnOk);
-            this.Controls.Add(this.tabProperties);
+            this.Controls.Add(this.tabsProperties);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
-            this.Name = "PolygonLayerSymbologyForm";
+            this.Name = "PolygonLineLayerSymbologyForm";
             this.Text = "PolygonLayerSymbologyForm";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnFormClosed);
             this.Load += new System.EventHandler(this.OnFormLoad);
-            this.tabProperties.ResumeLayout(false);
+            this.tabsProperties.ResumeLayout(false);
             this.tabFill.ResumeLayout(false);
             this.tabFill.PerformLayout();
             this.grpGradient.ResumeLayout(false);
@@ -656,8 +671,8 @@
             this.tabOutline.PerformLayout();
             this.tabVertices.ResumeLayout(false);
             this.tabVertices.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pctPreview)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.udVerticesSize)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pctPreview)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -665,7 +680,7 @@
 
         #endregion
 
-        private System.Windows.Forms.TabControl tabProperties;
+        private System.Windows.Forms.TabControl tabsProperties;
         private System.Windows.Forms.TabPage tabFill;
         private System.Windows.Forms.TabPage tabOutline;
         private System.Windows.Forms.Button btnApply;
@@ -713,5 +728,6 @@
         private System.Windows.Forms.ComboBox cboVerticesType;
         private System.Windows.Forms.Label label28;
         private System.Windows.Forms.Label label27;
+        private System.Windows.Forms.Label label13;
     }
 }
