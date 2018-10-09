@@ -8,6 +8,8 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO;
 using System.Data.OleDb;
+using ISO_Classes;
+using FAD3.Mapping.Classes;
 
 namespace FAD3.Mapping.Forms
 {
@@ -16,6 +18,13 @@ namespace FAD3.Mapping.Forms
         private string _connString;
         private static ChlorophyllForm _instance;
         private string _excelFileName;
+        private DataSet _excelData;
+        private int _firstColIndex;
+        private int _lastColIndex;
+        private int _latitudeColIndex;
+        private int _longitudeColIndex;
+        private Dictionary<int, (double latitude, double longitude)> _dictGridCentroidCoordinates = new Dictionary<int, (double latitude, double longitude)>();
+        private List<double> _dataValues = new List<double>();
 
         public static ChlorophyllForm GetInstance()
         {
@@ -37,6 +46,7 @@ namespace FAD3.Mapping.Forms
         {
             btnOk.Enabled = false;
             btnReadSheet.Enabled = false;
+            SizeColumns(lvBreaks);
         }
 
         private void OpenFile()
@@ -55,14 +65,43 @@ namespace FAD3.Mapping.Forms
             }
         }
 
+        private string GetConnectionString(bool UseHeader)
+        {
+            Dictionary<string, string> props = new Dictionary<string, string>();
+
+            // XLSX - Excel 2007, 2010, 2012, 2013
+            props["Provider"] = "Microsoft.ACE.OLEDB.12.0;";
+            if (UseHeader)
+            {
+                props["Extended Properties"] = @"""Excel 12.0 XML;HDR=YES;IMEX=1"";";
+            }
+            else
+            {
+                props["Extended Properties"] = @"""Excel 12.0 XML;HDR=NO;IMEX=1;"";";
+            }
+            props["Data Source"] = _excelFileName;
+
+            // XLS - Excel 2003 and Older
+            //props["Provider"] = "Microsoft.Jet.OLEDB.4.0";
+            //props["Extended Properties"] = "Excel 8.0";
+            //props["Data Source"] = "C:\\MyExcel.xls";
+
+            StringBuilder sb = new StringBuilder();
+
+            foreach (KeyValuePair<string, string> prop in props)
+            {
+                sb.Append(prop.Key);
+                sb.Append('=');
+                sb.Append(prop.Value);
+                //sb.Append(';');
+            }
+
+            return sb.ToString();
+        }
+
         private void ReadExcelFile()
         {
-            var header = "HDR=NO";
-            if (chkHasHeader.Checked)
-            {
-                header = "HDR=YES";
-            }
-            _connString = $@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={_excelFileName};Extended Properties=""Excel 8.0;{header}""";
+            _connString = GetConnectionString(chkHasHeader.Checked);
             OleDbConnection connection = new OleDbConnection(_connString);
             connection.Open();
             DataTable dtTables = new DataTable();
@@ -74,11 +113,6 @@ namespace FAD3.Mapping.Forms
                     listSheets.Items.Add(r["TABLE_NAME"].ToString());
                 }
             }
-
-            //DataSet dsData = new DataSet();
-            //string command = "Select * from [Sheet1$]";
-
-            //OleDbDataAdapter adaptor = new OleDbDataAdapter(command, connection);
         }
 
         private void ReadSheet()
@@ -94,34 +128,30 @@ namespace FAD3.Mapping.Forms
             var adapter = new OleDbDataAdapter();
             adapter.SelectCommand = cmd;
 
-            // adapter.FillSchema(ds
             adapter.Fill(excelTable);
 
-            DataSet ds = new DataSet();
-            ds.Tables.Add(excelTable);
-            foreach (DataRow dr in ds.Tables[0].Rows)
-            {
-            }
+            _excelData = new DataSet();
+            _excelData.Tables.Add(excelTable);
 
-            txtRows.Text = ds.Tables[0].Rows.Count.ToString();
+            txtRows.Text = _excelData.Tables[0].Rows.Count.ToString();
             cboLatitude.Items.Clear();
             cboLongitude.Items.Clear();
-            for (int n = 0; n < ds.Tables[0].Columns.Count; n++)
+            for (int n = 0; n < _excelData.Tables[0].Columns.Count; n++)
             {
                 if (n == 0)
                 {
-                    cboLatitude.Items.Add(ds.Tables[0].Columns[n].ColumnName);
-                    cboLongitude.Items.Add(ds.Tables[0].Columns[n].ColumnName);
+                    cboLatitude.Items.Add(_excelData.Tables[0].Columns[n].ColumnName);
+                    cboLongitude.Items.Add(_excelData.Tables[0].Columns[n].ColumnName);
                 }
                 else if (n == 1)
                 {
-                    cboLatitude.Items.Add(ds.Tables[0].Columns[n].ColumnName);
-                    cboLongitude.Items.Add(ds.Tables[0].Columns[n].ColumnName);
+                    cboLatitude.Items.Add(_excelData.Tables[0].Columns[n].ColumnName);
+                    cboLongitude.Items.Add(_excelData.Tables[0].Columns[n].ColumnName);
                 }
                 else
                 {
-                    cboFirstData.Items.Add(ds.Tables[0].Columns[n].ColumnName);
-                    cboLastData.Items.Add(ds.Tables[0].Columns[n].ColumnName);
+                    cboFirstData.Items.Add(_excelData.Tables[0].Columns[n].ColumnName);
+                    cboLastData.Items.Add(_excelData.Tables[0].Columns[n].ColumnName);
                 }
             }
         }
@@ -148,12 +178,162 @@ namespace FAD3.Mapping.Forms
                 case "btnReadWorkbook":
                     ReadExcelFile();
                     break;
+
+                case "btnShowGrid":
+                    MapGridPoints();
+                    break;
+
+                case "btnMapSelected":
+                    break;
+
+                case "btnCategorize":
+                    if (txtCategoryCount.Text.Length > 0)
+                    {
+                        listSheetsForMapping();
+                        listCoordinates();
+                        getDataValues();
+                        doJenksFisher();
+                    }
+
+                    break;
+
+                case "btnGetSheets":
+
+                    break;
             }
+        }
+
+        private void MapGridPoints()
+        {
+            MakeGridFromPoints.GeoProjection = global.MappingForm.MapControl.GeoProjection;
+            MakeGridFromPoints.Coordinates = _dictGridCentroidCoordinates;
+            MakeGridFromPoints.MakePointShapefile();
+            global.MappingForm.MapLayersHandler.AddLayer(MakeGridFromPoints.PointShapefile, "Grid points");
         }
 
         private void OnListBoxClick(object sender, EventArgs e)
         {
             btnReadSheet.Enabled = true;
+        }
+
+        private void listSheetsForMapping()
+        {
+            listSelectedSheets.Items.Clear();
+            var includeColumn = false;
+            if (cboLongitude.Text.Length > 0 && cboLatitude.Text.Length > 0 && cboFirstData.Text.Length > 0 && cboLastData.Text.Length > 0)
+            {
+                for (int n = 0; n < _excelData.Tables[0].Columns.Count; n++)
+                {
+                    if (!includeColumn && (n - 2) == _firstColIndex)
+                    {
+                        includeColumn = true;
+                    }
+                    if (includeColumn)
+                    {
+                        listSelectedSheets.Items.Add(_excelData.Tables[0].Columns[n].ColumnName);
+                    }
+                    if (includeColumn && (n - 2) == _lastColIndex)
+                    {
+                        includeColumn = false;
+                    }
+                }
+            }
+        }
+
+        private void getDataValues()
+        {
+            var table = _excelData.Tables[0];
+
+            for (int row = 0; row < table.Rows.Count; row++)
+            {
+                var arr = table.Rows[row].ItemArray;
+                for (int col = _firstColIndex + 2; col <= _lastColIndex + 2; col++)
+                {
+                    double? v = arr[col] as double?;
+                    if (v != null)
+                    {
+                        _dataValues.Add((double)v);
+                    }
+                }
+            }
+        }
+
+        private void listCoordinates()
+        {
+            var table = _excelData.Tables[0];
+
+            for (int row = 0; row < table.Rows.Count; row++)
+            {
+                var arr = table.Rows[row].ItemArray;
+                var latitude = (double)arr[_latitudeColIndex];
+                var longitude = (double)arr[_longitudeColIndex];
+                _dictGridCentroidCoordinates.Add(row, (latitude, longitude));
+            }
+        }
+
+        /// <summary>
+        /// Sizes all columns so that it fits the widest column content or the column header content
+        /// </summary>
+        private void SizeColumns(ListView lv, bool init = true)
+        {
+            foreach (ColumnHeader c in lv.Columns)
+            {
+                if (init)
+                {
+                    c.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
+                    c.Tag = c.Width;
+                }
+                else
+                {
+                    c.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+                    c.Width = c.Width > (int)c.Tag ? c.Width : (int)c.Tag;
+                }
+            }
+        }
+
+        private void doJenksFisher()
+        {
+            var listBreaks = JenksFisher.CreateJenksFisherBreaksArray(_dataValues, int.Parse(txtCategoryCount.Text));
+            var n = 0;
+            var lower = listBreaks.Min().ToString();
+            var upper = string.Empty;
+            foreach (var item in listBreaks)
+            {
+                if (n > 0)
+                {
+                    upper = item.ToString();
+                    lvBreaks.Items.Add($"{lower} - {upper}");
+                    lower = item.ToString();
+                }
+                n++;
+            }
+            txtValuesCount.Text = _dataValues.Count.ToString();
+            lvBreaks.Items.Add($"> {listBreaks.Max().ToString()}");
+
+            SizeColumns(lvBreaks, false);
+        }
+
+        private void OnComboIndexChanged(object sender, EventArgs e)
+        {
+            var cbo = (ComboBox)sender;
+            switch (cbo.Name)
+            {
+                case "cboFirstData":
+                    _firstColIndex = cbo.SelectedIndex;
+                    break;
+
+                case "cboLastData":
+                    _lastColIndex = cbo.SelectedIndex;
+                    break;
+
+                case "cboLongitude":
+                    _longitudeColIndex = cbo.SelectedIndex;
+                    break;
+
+                case "cboLatitude":
+                    _latitudeColIndex = cbo.SelectedIndex;
+                    break;
+            }
         }
     }
 }

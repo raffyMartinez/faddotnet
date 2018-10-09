@@ -77,6 +77,9 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
+      <HintPath>packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Microsoft.VisualBasic.PowerPacks, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="PresentationCore" />
@@ -119,6 +122,9 @@
     <Compile Include="Database\Classes\CatchName.cs" />
     <Compile Include="Mapping\Classes\Colors.cs" />
     <Compile Include="Mapping\Classes\ColorSchemes.cs" />
+    <Compile Include="Mapping\Classes\Discretizer.cs" />
+    <Compile Include="Mapping\Classes\JenksFisher.cs" />
+    <Compile Include="Mapping\Classes\MakeGridFromPoints.cs" />
     <Compile Include="Mapping\Forms\ChlorophyllForm.cs">
       <SubType>Form</SubType>
     </Compile>
