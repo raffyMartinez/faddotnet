@@ -7,7 +7,7 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>FAD3</RootNamespace>
     <AssemblyName>FAD3</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
     <AppDesignerFolder>Properties</AppDesignerFolder>

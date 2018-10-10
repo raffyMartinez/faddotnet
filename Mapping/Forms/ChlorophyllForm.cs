@@ -160,6 +160,10 @@ namespace FAD3.Mapping.Forms
         {
             switch (((Button)sender).Name)
             {
+                case "btnDefineCell":
+                    MakeGridFromPoints.MakeGridShapefile();
+                    break;
+
                 case "btnOk":
                     break;
 
@@ -205,6 +209,7 @@ namespace FAD3.Mapping.Forms
 
         private void MapGridPoints()
         {
+            MakeGridFromPoints.MapInteractionHandler = global.MappingForm.MapInterActionHandler;
             MakeGridFromPoints.GeoProjection = global.MappingForm.MapControl.GeoProjection;
             MakeGridFromPoints.Coordinates = _dictGridCentroidCoordinates;
             MakeGridFromPoints.MakePointShapefile();
@@ -291,25 +296,58 @@ namespace FAD3.Mapping.Forms
             }
         }
 
+        private int GetClassSize(double value1, double value2 = 0, bool greaterThan = false)
+        {
+            int count = 0;
+            if (!greaterThan)
+            {
+                foreach (var item in _dataValues)
+                {
+                    if (item >= value1 && item < value2)
+                    {
+                        count++;
+                    }
+                    else if (item == value2)
+                    {
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                foreach (var item in _dataValues)
+                {
+                    if (item >= value1)
+                    {
+                        count++;
+                    }
+                }
+            }
+            return count;
+        }
+
         private void doJenksFisher()
         {
+            _dataValues.Sort();
             var listBreaks = JenksFisher.CreateJenksFisherBreaksArray(_dataValues, int.Parse(txtCategoryCount.Text));
             var n = 0;
-            var lower = listBreaks.Min().ToString();
-            var upper = string.Empty;
+            var lower = listBreaks.Min();
+            var upper = 0D;
+            ListViewItem lvi = null;
             foreach (var item in listBreaks)
             {
                 if (n > 0)
                 {
-                    upper = item.ToString();
-                    lvBreaks.Items.Add($"{lower} - {upper}");
-                    lower = item.ToString();
+                    upper = item;
+                    lvi = lvBreaks.Items.Add($"{lower.ToString()} - {upper.ToString()}");
+                    lvi.SubItems.Add(GetClassSize(lower, upper).ToString());
+                    lower = item;
                 }
                 n++;
             }
             txtValuesCount.Text = _dataValues.Count.ToString();
-            lvBreaks.Items.Add($"> {listBreaks.Max().ToString()}");
-
+            lvi = lvBreaks.Items.Add($"> {listBreaks.Max().ToString()}");
+            lvi.SubItems.Add(GetClassSize(listBreaks.Max(), 0, true).ToString());
             SizeColumns(lvBreaks, false);
         }
 

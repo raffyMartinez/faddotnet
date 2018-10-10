@@ -493,6 +493,21 @@ namespace FAD3
             return mapLayer;
         }
 
+        public int AddNewShapefileLayer(string layerName, ShpfileType shapefileType, bool isVisile = true, bool visibleInUI = false)
+        {
+            var sf = new Shapefile();
+            if (sf.CreateNewWithShapeID("", shapefileType))
+            {
+                sf.GeoProjection = _axmap.GeoProjection;
+            }
+            var h = _axmap.AddLayer(sf, isVisile);
+            if (h >= 0)
+            {
+                _axmap.set_LayerName(h, layerName);
+            }
+            return h;
+        }
+
         /// <summary>
         /// handles a shapefile added to the map using file open dialog
         /// </summary>

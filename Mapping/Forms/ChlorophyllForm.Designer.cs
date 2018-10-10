@@ -68,6 +68,7 @@
             this.label7 = new System.Windows.Forms.Label();
             this.btnOk = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
+            this.btnDefineCell = new System.Windows.Forms.Button();
             this.tabsPages.SuspendLayout();
             this.tabInstructions.SuspendLayout();
             this.tabUI.SuspendLayout();
@@ -348,11 +349,11 @@
             // 
             // btnShowGrid
             // 
-            this.btnShowGrid.Location = new System.Drawing.Point(369, 301);
+            this.btnShowGrid.Location = new System.Drawing.Point(346, 301);
             this.btnShowGrid.Name = "btnShowGrid";
-            this.btnShowGrid.Size = new System.Drawing.Size(74, 25);
+            this.btnShowGrid.Size = new System.Drawing.Size(97, 25);
             this.btnShowGrid.TabIndex = 13;
-            this.btnShowGrid.Text = "Show grid";
+            this.btnShowGrid.Text = "Map data points";
             this.btnShowGrid.UseVisualStyleBackColor = true;
             this.btnShowGrid.Click += new System.EventHandler(this.OnButtonClick);
             // 
@@ -406,6 +407,7 @@
             // 
             // tabExtract
             // 
+            this.tabExtract.Controls.Add(this.btnDefineCell);
             this.tabExtract.Controls.Add(this.btnMapSelected);
             this.tabExtract.Controls.Add(this.listSelectedSheets);
             this.tabExtract.Controls.Add(this.label7);
@@ -461,6 +463,16 @@
             this.button1.TabIndex = 3;
             this.button1.Text = "Cancel";
             this.button1.UseVisualStyleBackColor = true;
+            // 
+            // btnDefineCell
+            // 
+            this.btnDefineCell.Location = new System.Drawing.Point(240, 101);
+            this.btnDefineCell.Name = "btnDefineCell";
+            this.btnDefineCell.Size = new System.Drawing.Size(100, 39);
+            this.btnDefineCell.TabIndex = 16;
+            this.btnDefineCell.Text = "Define grid shape";
+            this.btnDefineCell.UseVisualStyleBackColor = true;
+            this.btnDefineCell.Click += new System.EventHandler(this.OnButtonClick);
             // 
             // ChlorophyllForm
             // 
@@ -530,5 +542,6 @@
         private System.Windows.Forms.TextBox txtCategoryCount;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Button btnMapSelected;
+        private System.Windows.Forms.Button btnDefineCell;
     }
 }

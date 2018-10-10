@@ -10,6 +10,7 @@ namespace FAD3
     /// </summary>
     public class MapInterActionHandler : IDisposable
     {
+        private tkCursorMode _mapCursorMode;
         private bool _disposed;
         private AxMap _axMap;                               //reference to the map control in the mapping form
         private MapLayersHandler _mapLayersHandler;         //reference to the map layers handler class
@@ -29,6 +30,15 @@ namespace FAD3
 
         public delegate void ShapesSelectedHandler(MapInterActionHandler s, LayerEventArg e);
         public event ShapesSelectedHandler ShapesSelected;
+
+        public tkCursorMode MapCursorMode
+        {
+            get { return _mapCursorMode; }
+            set
+            {
+                _mapCursorMode = value;
+            }
+        }
 
         public ContextMenuStrip MapContextMenuStrip
         {
@@ -143,11 +153,16 @@ namespace FAD3
             _axMap.SelectBoxFinal += OnMapSelectBoxFinal;
             _axMap.MouseMoveEvent += OnMapMouseMove;
             _axMap.DblClick += OnMapDoubleClick;
+            _axMap.SelectionChanged += OnMapSelectionChanged;
             _axMap.SendMouseDown = true;
             _axMap.SendMouseMove = true;
             _axMap.SendSelectBoxFinal = true;
             _axMap.SendMouseUp = true;
             EnableMapInteraction = true;
+        }
+
+        private void OnMapSelectionChanged(object sender, _DMapEvents_SelectionChangedEvent e)
+        {
         }
 
         private void OnMapDoubleClick(object sender, EventArgs e)
