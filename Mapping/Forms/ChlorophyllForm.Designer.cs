@@ -52,6 +52,10 @@
             this.chkHasHeader = new System.Windows.Forms.CheckBox();
             this.btnOpen = new System.Windows.Forms.Button();
             this.tabCategorize = new System.Windows.Forms.TabPage();
+            this.label12 = new System.Windows.Forms.Label();
+            this.label11 = new System.Windows.Forms.Label();
+            this.txtMaximum = new System.Windows.Forms.TextBox();
+            this.txtMinimum = new System.Windows.Forms.TextBox();
             this.btnCategorize = new System.Windows.Forms.Button();
             this.txtCategoryCount = new System.Windows.Forms.TextBox();
             this.label10 = new System.Windows.Forms.Label();
@@ -63,12 +67,14 @@
             this.colCategory = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.colCount = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.tabExtract = new System.Windows.Forms.TabPage();
+            this.lblMappedSheet = new System.Windows.Forms.Label();
+            this.listSelectedSheets = new System.Windows.Forms.ListBox();
+            this.btnDefineGrid = new System.Windows.Forms.Button();
             this.btnMapSelected = new System.Windows.Forms.Button();
-            this.listSelectedSheets = new System.Windows.Forms.CheckedListBox();
             this.label7 = new System.Windows.Forms.Label();
             this.btnOk = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
-            this.btnDefineCell = new System.Windows.Forms.Button();
+            this.btnCancel = new System.Windows.Forms.Button();
+            this.colColor = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.tabsPages.SuspendLayout();
             this.tabInstructions.SuspendLayout();
             this.tabUI.SuspendLayout();
@@ -148,8 +154,9 @@
             // 
             // cboLastData
             // 
+            this.cboLastData.Enabled = false;
             this.cboLastData.FormattingEnabled = true;
-            this.cboLastData.Location = new System.Drawing.Point(304, 139);
+            this.cboLastData.Location = new System.Drawing.Point(299, 178);
             this.cboLastData.Name = "cboLastData";
             this.cboLastData.Size = new System.Drawing.Size(114, 21);
             this.cboLastData.TabIndex = 21;
@@ -157,8 +164,9 @@
             // 
             // cboFirstData
             // 
+            this.cboFirstData.Enabled = false;
             this.cboFirstData.FormattingEnabled = true;
-            this.cboFirstData.Location = new System.Drawing.Point(305, 103);
+            this.cboFirstData.Location = new System.Drawing.Point(300, 142);
             this.cboFirstData.Name = "cboFirstData";
             this.cboFirstData.Size = new System.Drawing.Size(114, 21);
             this.cboFirstData.TabIndex = 20;
@@ -195,7 +203,8 @@
             // txtRows
             // 
             this.txtRows.BackColor = System.Drawing.SystemColors.Window;
-            this.txtRows.Location = new System.Drawing.Point(305, 176);
+            this.txtRows.Enabled = false;
+            this.txtRows.Location = new System.Drawing.Point(299, 30);
             this.txtRows.Name = "txtRows";
             this.txtRows.ReadOnly = true;
             this.txtRows.Size = new System.Drawing.Size(113, 20);
@@ -204,7 +213,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(185, 179);
+            this.label5.Location = new System.Drawing.Point(179, 33);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(80, 13);
             this.label5.TabIndex = 14;
@@ -212,8 +221,9 @@
             // 
             // cboLatitude
             // 
+            this.cboLatitude.Enabled = false;
             this.cboLatitude.FormattingEnabled = true;
-            this.cboLatitude.Location = new System.Drawing.Point(304, 66);
+            this.cboLatitude.Location = new System.Drawing.Point(299, 105);
             this.cboLatitude.Name = "cboLatitude";
             this.cboLatitude.Size = new System.Drawing.Size(114, 21);
             this.cboLatitude.TabIndex = 11;
@@ -221,8 +231,9 @@
             // 
             // cboLongitude
             // 
+            this.cboLongitude.Enabled = false;
             this.cboLongitude.FormattingEnabled = true;
-            this.cboLongitude.Location = new System.Drawing.Point(304, 29);
+            this.cboLongitude.Location = new System.Drawing.Point(299, 68);
             this.cboLongitude.Name = "cboLongitude";
             this.cboLongitude.Size = new System.Drawing.Size(114, 21);
             this.cboLongitude.TabIndex = 10;
@@ -231,7 +242,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(184, 142);
+            this.label4.Location = new System.Drawing.Point(179, 181);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(88, 13);
             this.label4.TabIndex = 9;
@@ -240,7 +251,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(184, 106);
+            this.label3.Location = new System.Drawing.Point(179, 145);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(87, 13);
             this.label3.TabIndex = 8;
@@ -249,7 +260,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(184, 69);
+            this.label2.Location = new System.Drawing.Point(179, 108);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(106, 13);
             this.label2.TabIndex = 7;
@@ -258,7 +269,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(184, 32);
+            this.label1.Location = new System.Drawing.Point(179, 71);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(115, 13);
             this.label1.TabIndex = 6;
@@ -266,6 +277,7 @@
             // 
             // btnReadWorkbook
             // 
+            this.btnReadWorkbook.Enabled = false;
             this.btnReadWorkbook.Location = new System.Drawing.Point(260, 68);
             this.btnReadWorkbook.Name = "btnReadWorkbook";
             this.btnReadWorkbook.Size = new System.Drawing.Size(98, 25);
@@ -305,6 +317,10 @@
             // 
             // tabCategorize
             // 
+            this.tabCategorize.Controls.Add(this.label12);
+            this.tabCategorize.Controls.Add(this.label11);
+            this.tabCategorize.Controls.Add(this.txtMaximum);
+            this.tabCategorize.Controls.Add(this.txtMinimum);
             this.tabCategorize.Controls.Add(this.btnCategorize);
             this.tabCategorize.Controls.Add(this.txtCategoryCount);
             this.tabCategorize.Controls.Add(this.label10);
@@ -320,6 +336,38 @@
             this.tabCategorize.TabIndex = 3;
             this.tabCategorize.Text = "Categories";
             this.tabCategorize.UseVisualStyleBackColor = true;
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(16, 307);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(51, 13);
+            this.label12.TabIndex = 21;
+            this.label12.Text = "Maximum";
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(16, 282);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(48, 13);
+            this.label11.TabIndex = 20;
+            this.label11.Text = "Minimum";
+            // 
+            // txtMaximum
+            // 
+            this.txtMaximum.Location = new System.Drawing.Point(130, 306);
+            this.txtMaximum.Name = "txtMaximum";
+            this.txtMaximum.Size = new System.Drawing.Size(64, 20);
+            this.txtMaximum.TabIndex = 19;
+            // 
+            // txtMinimum
+            // 
+            this.txtMinimum.Location = new System.Drawing.Point(130, 279);
+            this.txtMinimum.Name = "txtMinimum";
+            this.txtMinimum.Size = new System.Drawing.Size(64, 20);
+            this.txtMinimum.TabIndex = 18;
             // 
             // btnCategorize
             // 
@@ -386,7 +434,8 @@
             // 
             this.lvBreaks.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.colCategory,
-            this.colCount});
+            this.colCount,
+            this.colColor});
             this.lvBreaks.FullRowSelect = true;
             this.lvBreaks.Location = new System.Drawing.Point(19, 106);
             this.lvBreaks.Name = "lvBreaks";
@@ -407,9 +456,10 @@
             // 
             // tabExtract
             // 
-            this.tabExtract.Controls.Add(this.btnDefineCell);
-            this.tabExtract.Controls.Add(this.btnMapSelected);
+            this.tabExtract.Controls.Add(this.lblMappedSheet);
             this.tabExtract.Controls.Add(this.listSelectedSheets);
+            this.tabExtract.Controls.Add(this.btnDefineGrid);
+            this.tabExtract.Controls.Add(this.btnMapSelected);
             this.tabExtract.Controls.Add(this.label7);
             this.tabExtract.Location = new System.Drawing.Point(4, 22);
             this.tabExtract.Name = "tabExtract";
@@ -418,6 +468,36 @@
             this.tabExtract.TabIndex = 2;
             this.tabExtract.Text = "Mapping";
             this.tabExtract.UseVisualStyleBackColor = true;
+            // 
+            // lblMappedSheet
+            // 
+            this.lblMappedSheet.AutoSize = true;
+            this.lblMappedSheet.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblMappedSheet.Location = new System.Drawing.Point(174, 213);
+            this.lblMappedSheet.Name = "lblMappedSheet";
+            this.lblMappedSheet.Size = new System.Drawing.Size(120, 18);
+            this.lblMappedSheet.TabIndex = 18;
+            this.lblMappedSheet.Text = "Sheet mapped:";
+            this.lblMappedSheet.Visible = false;
+            // 
+            // listSelectedSheets
+            // 
+            this.listSelectedSheets.FormattingEnabled = true;
+            this.listSelectedSheets.Location = new System.Drawing.Point(15, 32);
+            this.listSelectedSheets.Name = "listSelectedSheets";
+            this.listSelectedSheets.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
+            this.listSelectedSheets.Size = new System.Drawing.Size(143, 303);
+            this.listSelectedSheets.TabIndex = 17;
+            // 
+            // btnDefineGrid
+            // 
+            this.btnDefineGrid.Location = new System.Drawing.Point(240, 101);
+            this.btnDefineGrid.Name = "btnDefineGrid";
+            this.btnDefineGrid.Size = new System.Drawing.Size(100, 39);
+            this.btnDefineGrid.TabIndex = 16;
+            this.btnDefineGrid.Text = "Define grid shape";
+            this.btnDefineGrid.UseVisualStyleBackColor = true;
+            this.btnDefineGrid.Click += new System.EventHandler(this.OnButtonClick);
             // 
             // btnMapSelected
             // 
@@ -428,14 +508,6 @@
             this.btnMapSelected.Text = "Map selected sheets";
             this.btnMapSelected.UseVisualStyleBackColor = true;
             this.btnMapSelected.Click += new System.EventHandler(this.OnButtonClick);
-            // 
-            // listSelectedSheets
-            // 
-            this.listSelectedSheets.FormattingEnabled = true;
-            this.listSelectedSheets.Location = new System.Drawing.Point(15, 32);
-            this.listSelectedSheets.Name = "listSelectedSheets";
-            this.listSelectedSheets.Size = new System.Drawing.Size(137, 304);
-            this.listSelectedSheets.TabIndex = 4;
             // 
             // label7
             // 
@@ -455,31 +527,26 @@
             this.btnOk.Text = "Ok";
             this.btnOk.UseVisualStyleBackColor = true;
             // 
-            // button1
+            // btnCancel
             // 
-            this.button1.Location = new System.Drawing.Point(360, 404);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(50, 25);
-            this.button1.TabIndex = 3;
-            this.button1.Text = "Cancel";
-            this.button1.UseVisualStyleBackColor = true;
+            this.btnCancel.Location = new System.Drawing.Point(360, 404);
+            this.btnCancel.Name = "btnCancel";
+            this.btnCancel.Size = new System.Drawing.Size(50, 25);
+            this.btnCancel.TabIndex = 3;
+            this.btnCancel.Text = "Cancel";
+            this.btnCancel.UseVisualStyleBackColor = true;
+            this.btnCancel.Click += new System.EventHandler(this.OnButtonClick);
             // 
-            // btnDefineCell
+            // colColor
             // 
-            this.btnDefineCell.Location = new System.Drawing.Point(240, 101);
-            this.btnDefineCell.Name = "btnDefineCell";
-            this.btnDefineCell.Size = new System.Drawing.Size(100, 39);
-            this.btnDefineCell.TabIndex = 16;
-            this.btnDefineCell.Text = "Define grid shape";
-            this.btnDefineCell.UseVisualStyleBackColor = true;
-            this.btnDefineCell.Click += new System.EventHandler(this.OnButtonClick);
+            this.colColor.Text = "Symbol";
             // 
             // ChlorophyllForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(473, 437);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnOk);
             this.Controls.Add(this.tabsPages);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
@@ -508,7 +575,7 @@
         private System.Windows.Forms.TabPage tabInstructions;
         private System.Windows.Forms.TabPage tabUI;
         private System.Windows.Forms.Button btnOk;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.Button btnOpen;
         private System.Windows.Forms.ComboBox cboLatitude;
         private System.Windows.Forms.ComboBox cboLongitude;
@@ -529,7 +596,6 @@
         private System.Windows.Forms.ComboBox cboLastData;
         private System.Windows.Forms.ComboBox cboFirstData;
         private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.CheckedListBox listSelectedSheets;
         private System.Windows.Forms.TabPage tabCategorize;
         private System.Windows.Forms.TextBox txtValuesCount;
         private System.Windows.Forms.Label label9;
@@ -542,6 +608,13 @@
         private System.Windows.Forms.TextBox txtCategoryCount;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Button btnMapSelected;
-        private System.Windows.Forms.Button btnDefineCell;
+        private System.Windows.Forms.Button btnDefineGrid;
+        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.TextBox txtMaximum;
+        private System.Windows.Forms.TextBox txtMinimum;
+        private System.Windows.Forms.ListBox listSelectedSheets;
+        private System.Windows.Forms.Label lblMappedSheet;
+        private System.Windows.Forms.ColumnHeader colColor;
     }
 }

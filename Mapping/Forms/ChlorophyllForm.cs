@@ -10,6 +10,7 @@ using System.IO;
 using System.Data.OleDb;
 using ISO_Classes;
 using FAD3.Mapping.Classes;
+using MapWinGIS;
 
 namespace FAD3.Mapping.Forms
 {
@@ -25,6 +26,10 @@ namespace FAD3.Mapping.Forms
         private int _longitudeColIndex;
         private Dictionary<int, (double latitude, double longitude)> _dictGridCentroidCoordinates = new Dictionary<int, (double latitude, double longitude)>();
         private List<double> _dataValues = new List<double>();
+        private int _currentSheetIndex;
+        private int _listIndex;
+        private List<double?> _columnValues = new List<double?>();
+        private Shapefile _grid;
 
         public static ChlorophyllForm GetInstance()
         {
@@ -154,14 +159,35 @@ namespace FAD3.Mapping.Forms
                     cboLastData.Items.Add(_excelData.Tables[0].Columns[n].ColumnName);
                 }
             }
+
+            cboLatitude.Enabled = true;
+            cboLongitude.Enabled = true;
+            cboFirstData.Enabled = true;
+            cboLastData.Enabled = true;
+        }
+
+        private void listCoordinates()
+        {
+            var table = _excelData.Tables[0];
+
+            for (int row = 0; row < table.Rows.Count; row++)
+            {
+                var arr = table.Rows[row].ItemArray;
+                var latitude = (double)arr[_latitudeColIndex];
+                var longitude = (double)arr[_longitudeColIndex];
+                _dictGridCentroidCoordinates.Add(row, (latitude, longitude));
+            }
         }
 
         private void OnButtonClick(object sender, EventArgs e)
         {
             switch (((Button)sender).Name)
             {
-                case "btnDefineCell":
-                    MakeGridFromPoints.MakeGridShapefile();
+                case "btnDefineGrid":
+                    if (MakeGridFromPoints.MakeGridShapefile())
+                    {
+                        global.MappingForm.MapLayersHandler.AddLayer(MakeGridFromPoints.GridShapefile, "Mesh");
+                    }
                     break;
 
                 case "btnOk":
@@ -173,10 +199,14 @@ namespace FAD3.Mapping.Forms
 
                 case "btnOpen":
                     OpenFile();
+                    btnReadWorkbook.Enabled = _excelFileName.Length > 0 && File.Exists(_excelFileName);
                     break;
 
                 case "btnReadSheet":
-                    ReadSheet();
+                    if (listSheets.SelectedIndex >= 0)
+                    {
+                        ReadSheet();
+                    }
                     break;
 
                 case "btnReadWorkbook":
@@ -188,6 +218,20 @@ namespace FAD3.Mapping.Forms
                     break;
 
                 case "btnMapSelected":
+                    if (listSelectedSheets.SelectedItems.Count > 0)
+                    {
+                        lblMappedSheet.Visible = true;
+                        if (_currentSheetIndex < listSelectedSheets.SelectedItems.Count)
+                        {
+                            _listIndex = listSelectedSheets.SelectedIndices[_currentSheetIndex];
+                            MapSheet(_currentSheetIndex);
+                            _currentSheetIndex++;
+                        }
+                        else
+                        {
+                            _currentSheetIndex = 0;
+                        }
+                    }
                     break;
 
                 case "btnCategorize":
@@ -207,13 +251,42 @@ namespace FAD3.Mapping.Forms
             }
         }
 
+        private void MapSheet(int index)
+        {
+            lblMappedSheet.Text = $"Sheet mapped: {listSelectedSheets.SelectedItems[index]}";
+            lblMappedSheet.Tag = listSelectedSheets.SelectedItems[index];
+            var table = _excelData.Tables[0];
+            _columnValues.Clear();
+            for (int row = 0; row < table.Rows.Count; row++)
+            {
+                var arr = table.Rows[row].ItemArray;
+                var col = _listIndex + _firstColIndex + 2;
+                double? v = null;
+                if (arr[col].GetType().Name == "String")
+                {
+                    if (double.TryParse((string)arr[col], out double d))
+                    {
+                        v = d;
+                    }
+                }
+                else
+                {
+                    v = arr[col] as double?;
+                }
+                _columnValues.Add(v);
+            }
+            MakeGridFromPoints.MapColumn(_columnValues, lblMappedSheet.Tag.ToString());
+            global.MappingForm.MapControl.Redraw();
+        }
+
         private void MapGridPoints()
         {
             MakeGridFromPoints.MapInteractionHandler = global.MappingForm.MapInterActionHandler;
             MakeGridFromPoints.GeoProjection = global.MappingForm.MapControl.GeoProjection;
             MakeGridFromPoints.Coordinates = _dictGridCentroidCoordinates;
-            MakeGridFromPoints.MakePointShapefile();
-            global.MappingForm.MapLayersHandler.AddLayer(MakeGridFromPoints.PointShapefile, "Grid points");
+
+            if (MakeGridFromPoints.MakePointShapefile())
+                global.MappingForm.MapLayersHandler.AddLayer(MakeGridFromPoints.PointShapefile, "Grid points");
         }
 
         private void OnListBoxClick(object sender, EventArgs e)
@@ -260,19 +333,6 @@ namespace FAD3.Mapping.Forms
                         _dataValues.Add((double)v);
                     }
                 }
-            }
-        }
-
-        private void listCoordinates()
-        {
-            var table = _excelData.Tables[0];
-
-            for (int row = 0; row < table.Rows.Count; row++)
-            {
-                var arr = table.Rows[row].ItemArray;
-                var latitude = (double)arr[_latitudeColIndex];
-                var longitude = (double)arr[_longitudeColIndex];
-                _dictGridCentroidCoordinates.Add(row, (latitude, longitude));
             }
         }
 
@@ -334,6 +394,7 @@ namespace FAD3.Mapping.Forms
             var lower = listBreaks.Min();
             var upper = 0D;
             ListViewItem lvi = null;
+            MakeGridFromPoints.Categories.Clear();
             foreach (var item in listBreaks)
             {
                 if (n > 0)
@@ -341,11 +402,15 @@ namespace FAD3.Mapping.Forms
                     upper = item;
                     lvi = lvBreaks.Items.Add($"{lower.ToString()} - {upper.ToString()}");
                     lvi.SubItems.Add(GetClassSize(lower, upper).ToString());
+                    MakeGridFromPoints.AddCategory(lower, upper);
                     lower = item;
                 }
                 n++;
             }
             txtValuesCount.Text = _dataValues.Count.ToString();
+            txtMinimum.Text = _dataValues.Min().ToString();
+            txtMaximum.Text = _dataValues.Max().ToString();
+            MakeGridFromPoints.AddCategory(upper, _dataValues.Max() + 1);
             lvi = lvBreaks.Items.Add($"> {listBreaks.Max().ToString()}");
             lvi.SubItems.Add(GetClassSize(listBreaks.Max(), 0, true).ToString());
             SizeColumns(lvBreaks, false);
