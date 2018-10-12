@@ -125,7 +125,6 @@
     <Compile Include="Mapping\Classes\Discretizer.cs" />
     <Compile Include="Mapping\Classes\JenksFisher.cs" />
     <Compile Include="Mapping\Classes\MakeGridFromPoints.cs" />
-    <Compile Include="Mapping\Classes\MappingUtilities.cs" />
     <Compile Include="Mapping\Forms\ChlorophyllForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -702,6 +701,7 @@
   <ItemGroup>
     <Content Include="Fatcow-Farm-Fresh-Book-key.ico" />
     <Content Include="Icon1.ico" />
+    <None Include="Resources\Up.png" />
     <None Include="Resources\UNDRLN.BMP" />
     <None Include="Resources\ITL.BMP" />
     <None Include="Resources\mbr.bmp" />
@@ -730,6 +730,7 @@
     <None Include="Resources\im_boundary.bmp" />
     <None Include="Resources\graticule.bmp" />
     <Content Include="Resources\colorschemes.xml" />
+    <None Include="Resources\down.png" />
     <Content Include="Resources\internet-web-browser.png" />
     <None Include="Resources\system-file-manager.png" />
     <None Include="Resources\layerAdd.bmp" />

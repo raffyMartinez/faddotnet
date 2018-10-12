@@ -27,12 +27,14 @@ namespace FAD3
         private MapLayer _currentMapLayer;                                                          //the current layer selected in the map layers form
         private ShapefileLabelHandler _sfLabelHandler;
         private PointLayerSymbologyHandler _sfSymbologyHandler;
-        private ColorSchemes _layerColors;
+        //private ColorSchemes _layerColors;
 
-        public ColorSchemes LayerColors
-        {
-            get { return _layerColors; }
-        }
+        //public ColorSchemes LayerColors
+        //{
+        //    get { return _layerColors; }
+        //}
+
+        public ColorSchemes LayerColors;
 
         public delegate void LayerReadHandler(MapLayersHandler s, LayerEventArg e);                 //an event that is raised when a layer from the mapcontrol is retrieved
         public event LayerReadHandler LayerRead;                                                    //in order for the listener is able to add the layer to the layers list
@@ -246,7 +248,7 @@ namespace FAD3
 
         private void SetLayerColorSchemes()
         {
-            _layerColors = new ColorSchemes(ColorSchemeType.Layer);
+            LayerColors = new ColorSchemes(ColorSchemeType.Layer);
             XmlDocument doc = new XmlDocument();
             doc.LoadXml(Properties.Resources.colorschemes);
             LayerColors.LoadXML(doc);

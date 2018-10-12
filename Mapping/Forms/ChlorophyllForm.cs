@@ -31,6 +31,7 @@ namespace FAD3.Mapping.Forms
         private int _listIndex;
         private List<double?> _columnValues = new List<double?>();
         private int _dataPoints;
+        private int _selectionIndex = 0;
 
         public static ChlorophyllForm GetInstance()
         {
@@ -193,13 +194,21 @@ namespace FAD3.Mapping.Forms
         {
             switch (((Button)sender).Name)
             {
+                case "btnUp":
+                    MapSheet(false);
+                    break;
+
+                case "btnDown":
+                    MapSheet(true);
+                    break;
+
                 case "btnInstructions":
                     InstructionsForm form = new InstructionsForm();
                     form.ShowDialog(this);
                     break;
 
                 case "btnColorScheme":
-                    ColorSchemesForm csf = new ColorSchemesForm(ref MappingUtilities.LayerColors);
+                    ColorSchemesForm csf = new ColorSchemesForm(ref global.MappingForm.MapLayersHandler.LayerColors);
                     break;
 
                 case "btnDefineGrid":
@@ -270,16 +279,65 @@ namespace FAD3.Mapping.Forms
             }
         }
 
+        private void MapSheet(bool forward)
+        {
+            if (listSelectedSheets.Items.Count > 0)
+            {
+                if (listSelectedSheets.SelectedItems.Count == 1)
+                {
+                    var selection = listSelectedSheets.SelectedIndex;
+                    listSelectedSheets.SelectedItems.Clear();
+                    if (forward)
+                    {
+                        selection++;
+                    }
+                    else
+                    {
+                        selection--;
+                    }
+                    listSelectedSheets.SelectedIndex = selection;
+                    _selectionIndex = 0;
+                }
+                else if (listSelectedSheets.SelectedItems.Count == 0)
+                {
+                    listSelectedSheets.SelectedIndex = 0;
+                    _selectionIndex = 0;
+                }
+                else if (listSelectedSheets.SelectedItems.Count > 1)
+                {
+                    if (_selectionIndex == 0)
+                    {
+                    }
+                    else
+                    {
+                        if (forward)
+                        {
+                            _selectionIndex++;
+                        }
+                        else
+                        {
+                            _selectionIndex--;
+                        }
+                    }
+                }
+
+                if (listSelectedSheets.SelectedIndices.Count > 0)
+                {
+                    MapSheet(listSelectedSheets.SelectedIndices[_selectionIndex]);
+                }
+            }
+        }
+
         private void MapSheet(int index)
         {
-            lblMappedSheet.Text = $"Sheet mapped: {listSelectedSheets.SelectedItems[index]}";
-            lblMappedSheet.Tag = listSelectedSheets.SelectedItems[index];
+            lblMappedSheet.Text = $"Sheet mapped: {listSelectedSheets.Items[index]}";
+            lblMappedSheet.Tag = listSelectedSheets.Items[index];
             var table = _excelData.Tables[0];
             _columnValues.Clear();
             for (int row = 0; row < table.Rows.Count; row++)
             {
                 var arr = table.Rows[row].ItemArray;
-                var col = _listIndex + _firstColIndex + 2;
+                var col = index + _firstColIndex + 2;
                 double? v = null;
                 if (arr[col].GetType().Name == "String")
                 {
@@ -295,6 +353,7 @@ namespace FAD3.Mapping.Forms
                 _columnValues.Add(v);
             }
             MakeGridFromPoints.MapColumn(_columnValues, lblMappedSheet.Tag.ToString());
+            //MakeGridFromPoints.MapColumn(_columnValues, "test");
             global.MappingForm.MapControl.Redraw();
             UpdateSheetSummary(MakeGridFromPoints.SheetMapSummary);
         }
@@ -491,6 +550,29 @@ namespace FAD3.Mapping.Forms
                     _latitudeColIndex = cbo.SelectedIndex;
                     break;
             }
+        }
+
+        private void OnCellDblClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.ColumnIndex == 3)
+            {
+                ColorDialog cd = new ColorDialog()
+                {
+                    AllowFullOpen = true,
+                    AnyColor = true,
+                    Color = dgCategories[e.ColumnIndex, e.RowIndex].Style.BackColor
+                };
+                dgCategories.ClearSelection();
+                cd.ShowDialog();
+                dgCategories[e.ColumnIndex, e.RowIndex].Style.BackColor = cd.Color;
+                MakeGridFromPoints.Categories.Item[e.RowIndex].DrawingOptions.FillColor = Colors.ColorToUInteger(cd.Color);
+                MakeGridFromPoints.Categories.Item[e.RowIndex].DrawingOptions.LineColor = MakeGridFromPoints.Categories.Item[e.RowIndex].DrawingOptions.FillColor;
+            }
+        }
+
+        private void OnSelectedSheetsClick(object sender, EventArgs e)
+        {
+            MapSheet(listSelectedSheets.SelectedIndices[0]);
         }
     }
 }

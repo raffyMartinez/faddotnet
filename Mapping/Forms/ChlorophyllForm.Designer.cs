@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ChlorophyllForm));
             this.tabsPages = new System.Windows.Forms.TabControl();
             this.tabUI = new System.Windows.Forms.TabPage();
-            this.btnInstructions = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.cboLastData = new System.Windows.Forms.ComboBox();
             this.cboFirstData = new System.Windows.Forms.ComboBox();
@@ -51,24 +51,6 @@
             this.chkHasHeader = new System.Windows.Forms.CheckBox();
             this.btnOpen = new System.Windows.Forms.Button();
             this.tabCategorize = new System.Windows.Forms.TabPage();
-            this.label13 = new System.Windows.Forms.Label();
-            this.btnColorScheme = new System.Windows.Forms.Button();
-            this.dgCategories = new System.Windows.Forms.DataGridView();
-            this.btnCategorize = new System.Windows.Forms.Button();
-            this.txtCategoryCount = new System.Windows.Forms.TextBox();
-            this.label10 = new System.Windows.Forms.Label();
-            this.btnShowGrid = new System.Windows.Forms.Button();
-            this.label8 = new System.Windows.Forms.Label();
-            this.tabExtract = new System.Windows.Forms.TabPage();
-            this.lblMappedSheet = new System.Windows.Forms.Label();
-            this.listSelectedSheets = new System.Windows.Forms.ListBox();
-            this.btnMapSelected = new System.Windows.Forms.Button();
-            this.label7 = new System.Windows.Forms.Label();
-            this.btnOk = new System.Windows.Forms.Button();
-            this.btnCancel = new System.Windows.Forms.Button();
-            this.icbColorScheme = new FAD3.Mapping.UserControls.ImageCombo();
-            this.btnDefineGrid = new System.Windows.Forms.Button();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.label12 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
@@ -76,22 +58,44 @@
             this.txtMinimum = new System.Windows.Forms.TextBox();
             this.txtValuesCount = new System.Windows.Forms.TextBox();
             this.label9 = new System.Windows.Forms.Label();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.btnShowGrid = new System.Windows.Forms.Button();
+            this.btnDefineGrid = new System.Windows.Forms.Button();
+            this.label13 = new System.Windows.Forms.Label();
+            this.btnColorScheme = new System.Windows.Forms.Button();
+            this.dgCategories = new System.Windows.Forms.DataGridView();
             this.colShow = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.dgcolCategory = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dgcolCount = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dgCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.btnCategorize = new System.Windows.Forms.Button();
+            this.txtCategoryCount = new System.Windows.Forms.TextBox();
+            this.label10 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
+            this.tabExtract = new System.Windows.Forms.TabPage();
+            this.btnDown = new System.Windows.Forms.Button();
+            this.imageList1 = new System.Windows.Forms.ImageList(this.components);
+            this.btnUp = new System.Windows.Forms.Button();
             this.dgSheetSummary = new System.Windows.Forms.DataGridView();
             this.colSymbol = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colCount = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colPercent = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.lblMappedSheet = new System.Windows.Forms.Label();
+            this.listSelectedSheets = new System.Windows.Forms.ListBox();
+            this.btnMapSelected = new System.Windows.Forms.Button();
+            this.label7 = new System.Windows.Forms.Label();
+            this.btnInstructions = new System.Windows.Forms.Button();
+            this.btnOk = new System.Windows.Forms.Button();
+            this.btnCancel = new System.Windows.Forms.Button();
+            this.icbColorScheme = new FAD3.Mapping.UserControls.ImageCombo();
             this.tabsPages.SuspendLayout();
             this.tabUI.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.tabCategorize.SuspendLayout();
+            this.groupBox3.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgCategories)).BeginInit();
             this.tabExtract.SuspendLayout();
-            this.groupBox2.SuspendLayout();
-            this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgSheetSummary)).BeginInit();
             this.SuspendLayout();
             // 
@@ -120,16 +124,6 @@
             this.tabUI.TabIndex = 1;
             this.tabUI.Text = "Start";
             this.tabUI.UseVisualStyleBackColor = true;
-            // 
-            // btnInstructions
-            // 
-            this.btnInstructions.Location = new System.Drawing.Point(267, 472);
-            this.btnInstructions.Name = "btnInstructions";
-            this.btnInstructions.Size = new System.Drawing.Size(77, 25);
-            this.btnInstructions.TabIndex = 21;
-            this.btnInstructions.Text = "Instructions";
-            this.btnInstructions.UseVisualStyleBackColor = true;
-            this.btnInstructions.Click += new System.EventHandler(this.OnButtonClick);
             // 
             // groupBox1
             // 
@@ -335,200 +329,6 @@
             this.tabCategorize.Text = "Categories";
             this.tabCategorize.UseVisualStyleBackColor = true;
             // 
-            // label13
-            // 
-            this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(12, 51);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(76, 13);
-            this.label13.TabIndex = 25;
-            this.label13.Text = "Color schemes";
-            // 
-            // btnColorScheme
-            // 
-            this.btnColorScheme.Location = new System.Drawing.Point(246, 45);
-            this.btnColorScheme.Name = "btnColorScheme";
-            this.btnColorScheme.Size = new System.Drawing.Size(90, 25);
-            this.btnColorScheme.TabIndex = 23;
-            this.btnColorScheme.Text = "Choose colors";
-            this.btnColorScheme.UseVisualStyleBackColor = true;
-            this.btnColorScheme.Click += new System.EventHandler(this.OnButtonClick);
-            // 
-            // dgCategories
-            // 
-            this.dgCategories.AllowUserToAddRows = false;
-            this.dgCategories.AllowUserToDeleteRows = false;
-            this.dgCategories.AllowUserToResizeColumns = false;
-            this.dgCategories.AllowUserToResizeRows = false;
-            this.dgCategories.BackgroundColor = System.Drawing.SystemColors.Window;
-            this.dgCategories.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgCategories.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.colShow,
-            this.dgcolCategory,
-            this.dgcolCount,
-            this.dgCol});
-            this.dgCategories.GridColor = System.Drawing.SystemColors.Window;
-            this.dgCategories.Location = new System.Drawing.Point(6, 97);
-            this.dgCategories.Name = "dgCategories";
-            this.dgCategories.ReadOnly = true;
-            this.dgCategories.RowHeadersVisible = false;
-            this.dgCategories.Size = new System.Drawing.Size(448, 194);
-            this.dgCategories.TabIndex = 22;
-            // 
-            // btnCategorize
-            // 
-            this.btnCategorize.Location = new System.Drawing.Point(246, 16);
-            this.btnCategorize.Name = "btnCategorize";
-            this.btnCategorize.Size = new System.Drawing.Size(90, 25);
-            this.btnCategorize.TabIndex = 17;
-            this.btnCategorize.Text = "Categorize";
-            this.btnCategorize.UseVisualStyleBackColor = true;
-            this.btnCategorize.Click += new System.EventHandler(this.OnButtonClick);
-            // 
-            // txtCategoryCount
-            // 
-            this.txtCategoryCount.Location = new System.Drawing.Point(144, 19);
-            this.txtCategoryCount.Name = "txtCategoryCount";
-            this.txtCategoryCount.Size = new System.Drawing.Size(91, 20);
-            this.txtCategoryCount.TabIndex = 16;
-            // 
-            // label10
-            // 
-            this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(12, 22);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(108, 13);
-            this.label10.TabIndex = 15;
-            this.label10.Text = "Number of categories";
-            // 
-            // btnShowGrid
-            // 
-            this.btnShowGrid.Location = new System.Drawing.Point(68, 20);
-            this.btnShowGrid.Name = "btnShowGrid";
-            this.btnShowGrid.Size = new System.Drawing.Size(73, 25);
-            this.btnShowGrid.TabIndex = 13;
-            this.btnShowGrid.Text = "Data points";
-            this.btnShowGrid.UseVisualStyleBackColor = true;
-            this.btnShowGrid.Click += new System.EventHandler(this.OnButtonClick);
-            // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(6, 81);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(57, 13);
-            this.label8.TabIndex = 10;
-            this.label8.Text = "Categories";
-            // 
-            // tabExtract
-            // 
-            this.tabExtract.Controls.Add(this.dgSheetSummary);
-            this.tabExtract.Controls.Add(this.lblMappedSheet);
-            this.tabExtract.Controls.Add(this.listSelectedSheets);
-            this.tabExtract.Controls.Add(this.btnMapSelected);
-            this.tabExtract.Controls.Add(this.label7);
-            this.tabExtract.Location = new System.Drawing.Point(4, 22);
-            this.tabExtract.Name = "tabExtract";
-            this.tabExtract.Padding = new System.Windows.Forms.Padding(3);
-            this.tabExtract.Size = new System.Drawing.Size(462, 418);
-            this.tabExtract.TabIndex = 2;
-            this.tabExtract.Text = "Mapping";
-            this.tabExtract.UseVisualStyleBackColor = true;
-            // 
-            // lblMappedSheet
-            // 
-            this.lblMappedSheet.AutoSize = true;
-            this.lblMappedSheet.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblMappedSheet.Location = new System.Drawing.Point(12, 348);
-            this.lblMappedSheet.Name = "lblMappedSheet";
-            this.lblMappedSheet.Size = new System.Drawing.Size(120, 18);
-            this.lblMappedSheet.TabIndex = 18;
-            this.lblMappedSheet.Text = "Sheet mapped:";
-            this.lblMappedSheet.Visible = false;
-            // 
-            // listSelectedSheets
-            // 
-            this.listSelectedSheets.FormattingEnabled = true;
-            this.listSelectedSheets.Location = new System.Drawing.Point(15, 32);
-            this.listSelectedSheets.Name = "listSelectedSheets";
-            this.listSelectedSheets.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-            this.listSelectedSheets.Size = new System.Drawing.Size(143, 303);
-            this.listSelectedSheets.TabIndex = 17;
-            // 
-            // btnMapSelected
-            // 
-            this.btnMapSelected.Location = new System.Drawing.Point(32, 373);
-            this.btnMapSelected.Name = "btnMapSelected";
-            this.btnMapSelected.Size = new System.Drawing.Size(100, 39);
-            this.btnMapSelected.TabIndex = 15;
-            this.btnMapSelected.Text = "Map selected sheets";
-            this.btnMapSelected.UseVisualStyleBackColor = true;
-            this.btnMapSelected.Click += new System.EventHandler(this.OnButtonClick);
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(12, 16);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(40, 13);
-            this.label7.TabIndex = 1;
-            this.label7.Text = "Sheets";
-            // 
-            // btnOk
-            // 
-            this.btnOk.Location = new System.Drawing.Point(421, 472);
-            this.btnOk.Name = "btnOk";
-            this.btnOk.Size = new System.Drawing.Size(45, 25);
-            this.btnOk.TabIndex = 2;
-            this.btnOk.Text = "Ok";
-            this.btnOk.UseVisualStyleBackColor = true;
-            // 
-            // btnCancel
-            // 
-            this.btnCancel.Location = new System.Drawing.Point(365, 472);
-            this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(50, 25);
-            this.btnCancel.TabIndex = 3;
-            this.btnCancel.Text = "Cancel";
-            this.btnCancel.UseVisualStyleBackColor = true;
-            this.btnCancel.Click += new System.EventHandler(this.OnButtonClick);
-            // 
-            // icbColorScheme
-            // 
-            this.icbColorScheme.Color1 = System.Drawing.Color.Gray;
-            this.icbColorScheme.Color2 = System.Drawing.Color.Gray;
-            this.icbColorScheme.ColorSchemes = null;
-            this.icbColorScheme.ComboStyle = FAD3.Mapping.UserControls.ImageComboStyle.ColorSchemeGraduated;
-            this.icbColorScheme.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-            this.icbColorScheme.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.icbColorScheme.FormattingEnabled = true;
-            this.icbColorScheme.Location = new System.Drawing.Point(144, 49);
-            this.icbColorScheme.Name = "icbColorScheme";
-            this.icbColorScheme.OutlineColor = System.Drawing.Color.Black;
-            this.icbColorScheme.Size = new System.Drawing.Size(91, 21);
-            this.icbColorScheme.TabIndex = 24;
-            // 
-            // btnDefineGrid
-            // 
-            this.btnDefineGrid.Location = new System.Drawing.Point(68, 62);
-            this.btnDefineGrid.Name = "btnDefineGrid";
-            this.btnDefineGrid.Size = new System.Drawing.Size(73, 25);
-            this.btnDefineGrid.TabIndex = 26;
-            this.btnDefineGrid.Text = "Grid";
-            this.btnDefineGrid.UseVisualStyleBackColor = true;
-            this.btnDefineGrid.Click += new System.EventHandler(this.OnButtonClick);
-            // 
-            // groupBox2
-            // 
-            this.groupBox2.Controls.Add(this.btnShowGrid);
-            this.groupBox2.Controls.Add(this.btnDefineGrid);
-            this.groupBox2.Location = new System.Drawing.Point(250, 306);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(200, 101);
-            this.groupBox2.TabIndex = 27;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Show on map";
-            // 
             // groupBox3
             // 
             this.groupBox3.Controls.Add(this.label12);
@@ -592,6 +392,79 @@
             this.label9.TabIndex = 22;
             this.label9.Text = "Number of values";
             // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.btnShowGrid);
+            this.groupBox2.Controls.Add(this.btnDefineGrid);
+            this.groupBox2.Location = new System.Drawing.Point(250, 306);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(200, 101);
+            this.groupBox2.TabIndex = 27;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Show on map";
+            // 
+            // btnShowGrid
+            // 
+            this.btnShowGrid.Location = new System.Drawing.Point(68, 20);
+            this.btnShowGrid.Name = "btnShowGrid";
+            this.btnShowGrid.Size = new System.Drawing.Size(73, 25);
+            this.btnShowGrid.TabIndex = 13;
+            this.btnShowGrid.Text = "Data points";
+            this.btnShowGrid.UseVisualStyleBackColor = true;
+            this.btnShowGrid.Click += new System.EventHandler(this.OnButtonClick);
+            // 
+            // btnDefineGrid
+            // 
+            this.btnDefineGrid.Location = new System.Drawing.Point(68, 62);
+            this.btnDefineGrid.Name = "btnDefineGrid";
+            this.btnDefineGrid.Size = new System.Drawing.Size(73, 25);
+            this.btnDefineGrid.TabIndex = 26;
+            this.btnDefineGrid.Text = "Grid";
+            this.btnDefineGrid.UseVisualStyleBackColor = true;
+            this.btnDefineGrid.Click += new System.EventHandler(this.OnButtonClick);
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(12, 18);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(76, 13);
+            this.label13.TabIndex = 25;
+            this.label13.Text = "Color schemes";
+            // 
+            // btnColorScheme
+            // 
+            this.btnColorScheme.Location = new System.Drawing.Point(366, 16);
+            this.btnColorScheme.Name = "btnColorScheme";
+            this.btnColorScheme.Size = new System.Drawing.Size(90, 25);
+            this.btnColorScheme.TabIndex = 23;
+            this.btnColorScheme.Text = "Choose colors";
+            this.btnColorScheme.UseVisualStyleBackColor = true;
+            this.btnColorScheme.Visible = false;
+            this.btnColorScheme.Click += new System.EventHandler(this.OnButtonClick);
+            // 
+            // dgCategories
+            // 
+            this.dgCategories.AllowUserToAddRows = false;
+            this.dgCategories.AllowUserToDeleteRows = false;
+            this.dgCategories.AllowUserToResizeColumns = false;
+            this.dgCategories.AllowUserToResizeRows = false;
+            this.dgCategories.BackgroundColor = System.Drawing.SystemColors.Window;
+            this.dgCategories.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgCategories.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.colShow,
+            this.dgcolCategory,
+            this.dgcolCount,
+            this.dgCol});
+            this.dgCategories.GridColor = System.Drawing.SystemColors.Window;
+            this.dgCategories.Location = new System.Drawing.Point(6, 97);
+            this.dgCategories.Name = "dgCategories";
+            this.dgCategories.ReadOnly = true;
+            this.dgCategories.RowHeadersVisible = false;
+            this.dgCategories.Size = new System.Drawing.Size(448, 194);
+            this.dgCategories.TabIndex = 22;
+            this.dgCategories.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellDblClick);
+            // 
             // colShow
             // 
             this.colShow.HeaderText = "";
@@ -617,6 +490,87 @@
             this.dgCol.ReadOnly = true;
             this.dgCol.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             this.dgCol.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // btnCategorize
+            // 
+            this.btnCategorize.Location = new System.Drawing.Point(250, 43);
+            this.btnCategorize.Name = "btnCategorize";
+            this.btnCategorize.Size = new System.Drawing.Size(90, 25);
+            this.btnCategorize.TabIndex = 17;
+            this.btnCategorize.Text = "Categorize";
+            this.btnCategorize.UseVisualStyleBackColor = true;
+            this.btnCategorize.Click += new System.EventHandler(this.OnButtonClick);
+            // 
+            // txtCategoryCount
+            // 
+            this.txtCategoryCount.Location = new System.Drawing.Point(144, 46);
+            this.txtCategoryCount.Name = "txtCategoryCount";
+            this.txtCategoryCount.Size = new System.Drawing.Size(91, 20);
+            this.txtCategoryCount.TabIndex = 16;
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(12, 49);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(108, 13);
+            this.label10.TabIndex = 15;
+            this.label10.Text = "Number of categories";
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(6, 81);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(57, 13);
+            this.label8.TabIndex = 10;
+            this.label8.Text = "Categories";
+            // 
+            // tabExtract
+            // 
+            this.tabExtract.Controls.Add(this.btnDown);
+            this.tabExtract.Controls.Add(this.btnUp);
+            this.tabExtract.Controls.Add(this.dgSheetSummary);
+            this.tabExtract.Controls.Add(this.lblMappedSheet);
+            this.tabExtract.Controls.Add(this.listSelectedSheets);
+            this.tabExtract.Controls.Add(this.btnMapSelected);
+            this.tabExtract.Controls.Add(this.label7);
+            this.tabExtract.Location = new System.Drawing.Point(4, 22);
+            this.tabExtract.Name = "tabExtract";
+            this.tabExtract.Padding = new System.Windows.Forms.Padding(3);
+            this.tabExtract.Size = new System.Drawing.Size(462, 418);
+            this.tabExtract.TabIndex = 2;
+            this.tabExtract.Text = "Mapping";
+            this.tabExtract.UseVisualStyleBackColor = true;
+            // 
+            // btnDown
+            // 
+            this.btnDown.ImageKey = "down";
+            this.btnDown.ImageList = this.imageList1;
+            this.btnDown.Location = new System.Drawing.Point(164, 154);
+            this.btnDown.Name = "btnDown";
+            this.btnDown.Size = new System.Drawing.Size(30, 30);
+            this.btnDown.TabIndex = 23;
+            this.btnDown.UseVisualStyleBackColor = true;
+            this.btnDown.Click += new System.EventHandler(this.OnButtonClick);
+            // 
+            // imageList1
+            // 
+            this.imageList1.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList1.ImageStream")));
+            this.imageList1.TransparentColor = System.Drawing.Color.White;
+            this.imageList1.Images.SetKeyName(0, "down");
+            this.imageList1.Images.SetKeyName(1, "up");
+            // 
+            // btnUp
+            // 
+            this.btnUp.ImageKey = "up";
+            this.btnUp.ImageList = this.imageList1;
+            this.btnUp.Location = new System.Drawing.Point(164, 109);
+            this.btnUp.Name = "btnUp";
+            this.btnUp.Size = new System.Drawing.Size(30, 30);
+            this.btnUp.TabIndex = 22;
+            this.btnUp.UseVisualStyleBackColor = true;
+            this.btnUp.Click += new System.EventHandler(this.OnButtonClick);
             // 
             // dgSheetSummary
             // 
@@ -658,6 +612,89 @@
             this.colPercent.Name = "colPercent";
             this.colPercent.ReadOnly = true;
             // 
+            // lblMappedSheet
+            // 
+            this.lblMappedSheet.AutoSize = true;
+            this.lblMappedSheet.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblMappedSheet.Location = new System.Drawing.Point(12, 348);
+            this.lblMappedSheet.Name = "lblMappedSheet";
+            this.lblMappedSheet.Size = new System.Drawing.Size(120, 18);
+            this.lblMappedSheet.TabIndex = 18;
+            this.lblMappedSheet.Text = "Sheet mapped:";
+            // 
+            // listSelectedSheets
+            // 
+            this.listSelectedSheets.FormattingEnabled = true;
+            this.listSelectedSheets.Location = new System.Drawing.Point(15, 32);
+            this.listSelectedSheets.Name = "listSelectedSheets";
+            this.listSelectedSheets.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
+            this.listSelectedSheets.Size = new System.Drawing.Size(143, 303);
+            this.listSelectedSheets.TabIndex = 17;
+            this.listSelectedSheets.Click += new System.EventHandler(this.OnSelectedSheetsClick);
+            // 
+            // btnMapSelected
+            // 
+            this.btnMapSelected.Location = new System.Drawing.Point(32, 373);
+            this.btnMapSelected.Name = "btnMapSelected";
+            this.btnMapSelected.Size = new System.Drawing.Size(100, 39);
+            this.btnMapSelected.TabIndex = 15;
+            this.btnMapSelected.Text = "Map selected sheets";
+            this.btnMapSelected.UseVisualStyleBackColor = true;
+            this.btnMapSelected.Click += new System.EventHandler(this.OnButtonClick);
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(12, 16);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(40, 13);
+            this.label7.TabIndex = 1;
+            this.label7.Text = "Sheets";
+            // 
+            // btnInstructions
+            // 
+            this.btnInstructions.Location = new System.Drawing.Point(7, 472);
+            this.btnInstructions.Name = "btnInstructions";
+            this.btnInstructions.Size = new System.Drawing.Size(77, 25);
+            this.btnInstructions.TabIndex = 21;
+            this.btnInstructions.Text = "Instructions";
+            this.btnInstructions.UseVisualStyleBackColor = true;
+            this.btnInstructions.Click += new System.EventHandler(this.OnButtonClick);
+            // 
+            // btnOk
+            // 
+            this.btnOk.Location = new System.Drawing.Point(421, 472);
+            this.btnOk.Name = "btnOk";
+            this.btnOk.Size = new System.Drawing.Size(45, 25);
+            this.btnOk.TabIndex = 2;
+            this.btnOk.Text = "Ok";
+            this.btnOk.UseVisualStyleBackColor = true;
+            // 
+            // btnCancel
+            // 
+            this.btnCancel.Location = new System.Drawing.Point(365, 472);
+            this.btnCancel.Name = "btnCancel";
+            this.btnCancel.Size = new System.Drawing.Size(50, 25);
+            this.btnCancel.TabIndex = 3;
+            this.btnCancel.Text = "Cancel";
+            this.btnCancel.UseVisualStyleBackColor = true;
+            this.btnCancel.Click += new System.EventHandler(this.OnButtonClick);
+            // 
+            // icbColorScheme
+            // 
+            this.icbColorScheme.Color1 = System.Drawing.Color.Gray;
+            this.icbColorScheme.Color2 = System.Drawing.Color.Gray;
+            this.icbColorScheme.ColorSchemes = null;
+            this.icbColorScheme.ComboStyle = FAD3.Mapping.UserControls.ImageComboStyle.ColorSchemeGraduated;
+            this.icbColorScheme.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.icbColorScheme.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.icbColorScheme.FormattingEnabled = true;
+            this.icbColorScheme.Location = new System.Drawing.Point(144, 16);
+            this.icbColorScheme.Name = "icbColorScheme";
+            this.icbColorScheme.OutlineColor = System.Drawing.Color.Black;
+            this.icbColorScheme.Size = new System.Drawing.Size(91, 21);
+            this.icbColorScheme.TabIndex = 24;
+            // 
             // ChlorophyllForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -679,12 +716,12 @@
             this.groupBox1.PerformLayout();
             this.tabCategorize.ResumeLayout(false);
             this.tabCategorize.PerformLayout();
+            this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgCategories)).EndInit();
             this.tabExtract.ResumeLayout(false);
             this.tabExtract.PerformLayout();
-            this.groupBox2.ResumeLayout(false);
-            this.groupBox3.ResumeLayout(false);
-            this.groupBox3.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgSheetSummary)).EndInit();
             this.ResumeLayout(false);
 
@@ -746,5 +783,8 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn colSymbol;
         private System.Windows.Forms.DataGridViewTextBoxColumn colCount;
         private System.Windows.Forms.DataGridViewTextBoxColumn colPercent;
+        private System.Windows.Forms.Button btnDown;
+        private System.Windows.Forms.Button btnUp;
+        private System.Windows.Forms.ImageList imageList1;
     }
 }
