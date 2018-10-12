@@ -151,6 +151,31 @@ namespace FAD3.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &lt;MapWindow version=&quot;&quot;&gt;
+        ///  &lt;ColorSchemes&gt;
+        ///    &lt;ColorScheme&gt;
+        ///      &lt;Break Color=&quot;-5383962&quot; Value=&quot;0&quot; /&gt;
+        ///      &lt;Break Color=&quot;-23296&quot; Value=&quot;1&quot; /&gt;
+        ///    &lt;/ColorScheme&gt;  
+        ///    &lt;ColorScheme&gt;
+        ///      &lt;Break Color=&quot;-256&quot; Value=&quot;0&quot; /&gt;
+        ///      &lt;Break Color=&quot;-23296&quot; Value=&quot;1&quot; /&gt;
+        ///    &lt;/ColorScheme&gt;
+        ///    &lt;ColorScheme&gt;
+        ///      &lt;Break Color=&quot;-16096246&quot; Value=&quot;0&quot; /&gt;
+        ///      &lt;Break Color=&quot;-3702211&quot; Value=&quot;0.5&quot; /&gt;
+        ///      &lt;Break Color=&quot;-926587&quot; Value=&quot;1&quot; /&gt;
+        ///    &lt;/ColorScheme&gt;
+        ///    &lt;ColorScheme&gt;
+        ///      &lt;Break Color=&quot;-13399600&quot; [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string colorschemes {
+            get {
+                return ResourceManager.GetString("colorschemes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap ColumnChart_16x {

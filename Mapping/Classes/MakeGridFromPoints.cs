@@ -5,6 +5,8 @@ using System.Text;
 using MapWinGIS;
 using ISO_Classes;
 using System.Windows.Forms;
+using System.Drawing;
+using System.Drawing.Drawing2D;
 
 namespace FAD3.Mapping.Classes
 {
@@ -23,6 +25,33 @@ namespace FAD3.Mapping.Classes
         private static Shape _cell;
         private static Shapefile _gridShapeFile;
         private static ShapefileCategories _categories = new ShapefileCategories();
+        public static ColorScheme _scheme = new ColorScheme();
+        public static Color Color1 { get; set; }
+        public static Color Color2 { get; set; }
+        private static int _numberOfCategories;
+        public static ColorBlend _colorBlend = new ColorBlend();
+        public static int NumberOfCategories { get; set; }
+        private static Dictionary<string, int> _sheetMapSummary = new Dictionary<string, int>();
+
+        public static Dictionary<string, int> SheetMapSummary
+        {
+            get { return _sheetMapSummary; }
+        }
+
+        public static ColorBlend ColorBlend
+        {
+            get { return _colorBlend; }
+            set
+            {
+                _colorBlend = value;
+                _scheme = ColorSchemes.ColorBlend2ColorScheme(_colorBlend);
+            }
+        }
+
+        public static Color CategoryColor(int index)
+        {
+            return Colors.UintToColor(_gridShapeFile.Categories.Item[index].DrawingOptions.FillColor);
+        }
 
         public static ShapefileCategories Categories
         {
@@ -65,7 +94,25 @@ namespace FAD3.Mapping.Classes
             return false;
         }
 
-        public static void AddCategory(double min, double max)
+        public static void AddNullCategory()
+        {
+            var nullCategory = new ShapefileCategory();
+            nullCategory.Name = "nullCategory";
+            nullCategory.DrawingOptions.FillColor = new Utils().ColorByName(tkMapColor.White);
+            nullCategory.DrawingOptions.FillVisible = false;
+            nullCategory.DrawingOptions.LineVisible = false;
+            _categories.Add2(nullCategory);
+            if (!_sheetMapSummary.Keys.Contains("Null"))
+            {
+                _sheetMapSummary.Add("Null", 0);
+            }
+            else
+            {
+                _sheetMapSummary["Null"] = 0;
+            }
+        }
+
+        public static Color AddCategory(double min, double max)
         {
             var cat = new ShapefileCategory();
             cat.MinValue = min;
@@ -73,30 +120,20 @@ namespace FAD3.Mapping.Classes
             cat.Name = _categories.Count.ToString();
             cat.ValueType = tkCategoryValue.cvRange;
             _categories.Add2(cat);
-            switch (_categories.Count)
-            {
-                case 1:
-                    cat.DrawingOptions.FillColor = new Utils().ColorByName(tkMapColor.LightCyan);
-                    break;
 
-                case 2:
-                    cat.DrawingOptions.FillColor = new Utils().ColorByName(tkMapColor.Blue);
-                    break;
-
-                case 3:
-                    cat.DrawingOptions.FillColor = new Utils().ColorByName(tkMapColor.LightGreen);
-                    break;
-
-                case 4:
-                    cat.DrawingOptions.FillColor = new Utils().ColorByName(tkMapColor.ForestGreen);
-                    break;
-
-                case 5:
-                    cat.DrawingOptions.FillColor = new Utils().ColorByName(tkMapColor.Orange);
-                    break;
-            }
+            cat.DrawingOptions.FillColor = _scheme.get_GraduatedColor((double)(_categories.Count) / (double)NumberOfCategories);
             cat.DrawingOptions.LineColor = cat.DrawingOptions.FillColor;
             cat.DrawingOptions.LineWidth = 1.1F;
+            if (!_sheetMapSummary.Keys.Contains(cat.Name))
+            {
+                _sheetMapSummary.Add(cat.Name, 0);
+            }
+            else
+            {
+                _sheetMapSummary[cat.Name] = 0;
+            }
+
+            return Colors.UintToColor(cat.DrawingOptions.FillColor);
         }
 
         public static bool MakeGridShapefile()
@@ -108,29 +145,43 @@ namespace FAD3.Mapping.Classes
             return false;
         }
 
+        private static void ClearSummaryValues()
+        {
+            foreach (var item in _sheetMapSummary.Keys.ToList<string>())
+            {
+                _sheetMapSummary[item] = 0;
+            }
+        }
+
         public static void MapColumn(List<double?> values, string name)
         {
-            //_gridShapeFile.Categories = _categories;
-            _gridShapeFile.EditDeleteField(2, null);
-            var iFld = _gridShapeFile.EditAddField(name, FieldType.DOUBLE_FIELD, 9, 13);
-            for (int n = 0; n < _gridShapeFile.NumShapes; n++)
+            if (_gridShapeFile != null)
             {
-                if (_gridShapeFile.EditCellValue(iFld, n, values[n]))
+                ClearSummaryValues();
+                _gridShapeFile.EditDeleteField(2, null);
+                var iFld = _gridShapeFile.EditAddField(name, FieldType.DOUBLE_FIELD, 9, 13);
+                for (int n = 0; n < _gridShapeFile.NumShapes; n++)
                 {
-                    for (int c = 0; c < _categories.Count; c++)
+                    if (_gridShapeFile.EditCellValue(iFld, n, values[n]))
                     {
-                        double min = (double)_categories.Item[c].MinValue;
-                        double max = (double)_categories.Item[c].MaxValue;
-                        if (values[n] >= min && values[n] < max)
+                        for (int c = 0; c < _categories.Count; c++)
                         {
-                            _gridShapeFile.ShapeCategory[n] = c;
-                            break;
+                            double min = (double)_categories.Item[c].MinValue;
+                            double max = (double)_categories.Item[c].MaxValue;
+                            if (values[n] >= min && values[n] < max)
+                            {
+                                _gridShapeFile.ShapeCategory[n] = c;
+
+                                _sheetMapSummary[_categories.Item[c].Name]++;
+                                break;
+                            }
                         }
                     }
-                }
-                else
-                {
-                    _gridShapeFile.ShapeCategory2[n] = "nullCategory";
+                    else
+                    {
+                        _gridShapeFile.ShapeCategory2[n] = "nullCategory";
+                        _sheetMapSummary["Null"]++;
+                    }
                 }
             }
         }
@@ -166,15 +217,11 @@ namespace FAD3.Mapping.Classes
                 }
             }
             _cell = null;
+            _gridShapeFile.DefaultDrawingOptions.FillColor = new Utils().ColorByName(tkMapColor.White);
             _gridShapeFile.DefaultDrawingOptions.FillVisible = false;
             _gridShapeFile.DefaultDrawingOptions.LineColor = new Utils().ColorByName(tkMapColor.DimGray);
             _gridShapeFile.Categories = _categories;
 
-            var nullCategory = new ShapefileCategory();
-            nullCategory.Name = "nullCategory";
-            nullCategory.DrawingOptions.FillVisible = false;
-            nullCategory.DrawingOptions.LineVisible = false;
-            _categories.Add2(nullCategory);
             return iShp >= 0;
         }
 

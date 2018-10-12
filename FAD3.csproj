@@ -125,6 +125,7 @@
     <Compile Include="Mapping\Classes\Discretizer.cs" />
     <Compile Include="Mapping\Classes\JenksFisher.cs" />
     <Compile Include="Mapping\Classes\MakeGridFromPoints.cs" />
+    <Compile Include="Mapping\Classes\MappingUtilities.cs" />
     <Compile Include="Mapping\Forms\ChlorophyllForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -172,6 +173,24 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Database\Classes\GMSLineClass.cs" />
+    <Compile Include="Mapping\Forms\ColorSchemeForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Mapping\Forms\ColorSchemeForm.designer.cs">
+      <DependentUpon>ColorSchemeForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Mapping\Forms\ColorSchemesForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Mapping\Forms\ColorSchemesForm.designer.cs">
+      <DependentUpon>ColorSchemesForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Mapping\Forms\InstructionsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Mapping\Forms\InstructionsForm.Designer.cs">
+      <DependentUpon>InstructionsForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Mapping\Forms\PolygonLineLayerSymbologyForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -497,11 +516,20 @@
     <EmbeddedResource Include="Database\Forms\GearCodesUsageForm.resx">
       <DependentUpon>GearCodesUsageForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Mapping\Forms\ColorSchemeForm.resx">
+      <DependentUpon>ColorSchemeForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Mapping\Forms\ColorSchemesForm.resx">
+      <DependentUpon>ColorSchemesForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Mapping\Forms\GraticuleForm.resx">
       <DependentUpon>GraticuleForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Mapping\Forms\Grid25GenerateForm.resx">
       <DependentUpon>Grid25GenerateForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Mapping\Forms\InstructionsForm.resx">
+      <DependentUpon>InstructionsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Mapping\Forms\InlandGridCreateDBForm.resx">
       <DependentUpon>InlandGridCreateDBForm.cs</DependentUpon>
@@ -701,6 +729,7 @@
     <None Include="Resources\image.bmp" />
     <None Include="Resources\im_boundary.bmp" />
     <None Include="Resources\graticule.bmp" />
+    <Content Include="Resources\colorschemes.xml" />
     <Content Include="Resources\internet-web-browser.png" />
     <None Include="Resources\system-file-manager.png" />
     <None Include="Resources\layerAdd.bmp" />

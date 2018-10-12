@@ -28,11 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ChlorophyllForm));
-            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
+            this.components = new System.ComponentModel.Container();
             this.tabsPages = new System.Windows.Forms.TabControl();
-            this.tabInstructions = new System.Windows.Forms.TabPage();
             this.tabUI = new System.Windows.Forms.TabPage();
+            this.btnInstructions = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.cboLastData = new System.Windows.Forms.ComboBox();
             this.cboFirstData = new System.Windows.Forms.ComboBox();
@@ -52,69 +51,60 @@
             this.chkHasHeader = new System.Windows.Forms.CheckBox();
             this.btnOpen = new System.Windows.Forms.Button();
             this.tabCategorize = new System.Windows.Forms.TabPage();
-            this.label12 = new System.Windows.Forms.Label();
-            this.label11 = new System.Windows.Forms.Label();
-            this.txtMaximum = new System.Windows.Forms.TextBox();
-            this.txtMinimum = new System.Windows.Forms.TextBox();
+            this.label13 = new System.Windows.Forms.Label();
+            this.btnColorScheme = new System.Windows.Forms.Button();
+            this.dgCategories = new System.Windows.Forms.DataGridView();
             this.btnCategorize = new System.Windows.Forms.Button();
             this.txtCategoryCount = new System.Windows.Forms.TextBox();
             this.label10 = new System.Windows.Forms.Label();
             this.btnShowGrid = new System.Windows.Forms.Button();
-            this.txtValuesCount = new System.Windows.Forms.TextBox();
-            this.label9 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
-            this.lvBreaks = new System.Windows.Forms.ListView();
-            this.colCategory = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.colCount = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.tabExtract = new System.Windows.Forms.TabPage();
             this.lblMappedSheet = new System.Windows.Forms.Label();
             this.listSelectedSheets = new System.Windows.Forms.ListBox();
-            this.btnDefineGrid = new System.Windows.Forms.Button();
             this.btnMapSelected = new System.Windows.Forms.Button();
             this.label7 = new System.Windows.Forms.Label();
             this.btnOk = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
-            this.colColor = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.icbColorScheme = new FAD3.Mapping.UserControls.ImageCombo();
+            this.btnDefineGrid = new System.Windows.Forms.Button();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.label12 = new System.Windows.Forms.Label();
+            this.label11 = new System.Windows.Forms.Label();
+            this.txtMaximum = new System.Windows.Forms.TextBox();
+            this.txtMinimum = new System.Windows.Forms.TextBox();
+            this.txtValuesCount = new System.Windows.Forms.TextBox();
+            this.label9 = new System.Windows.Forms.Label();
+            this.colShow = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.dgcolCategory = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dgcolCount = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dgCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dgSheetSummary = new System.Windows.Forms.DataGridView();
+            this.colSymbol = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colCount = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colPercent = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tabsPages.SuspendLayout();
-            this.tabInstructions.SuspendLayout();
             this.tabUI.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.tabCategorize.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgCategories)).BeginInit();
             this.tabExtract.SuspendLayout();
+            this.groupBox2.SuspendLayout();
+            this.groupBox3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgSheetSummary)).BeginInit();
             this.SuspendLayout();
-            // 
-            // richTextBox1
-            // 
-            this.richTextBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.richTextBox1.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.richTextBox1.Location = new System.Drawing.Point(3, 3);
-            this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(454, 293);
-            this.richTextBox1.TabIndex = 0;
-            this.richTextBox1.Text = resources.GetString("richTextBox1.Text");
             // 
             // tabsPages
             // 
-            this.tabsPages.Controls.Add(this.tabInstructions);
             this.tabsPages.Controls.Add(this.tabUI);
             this.tabsPages.Controls.Add(this.tabCategorize);
             this.tabsPages.Controls.Add(this.tabExtract);
             this.tabsPages.Location = new System.Drawing.Point(3, 22);
             this.tabsPages.Name = "tabsPages";
             this.tabsPages.SelectedIndex = 0;
-            this.tabsPages.Size = new System.Drawing.Size(470, 376);
+            this.tabsPages.Size = new System.Drawing.Size(470, 444);
             this.tabsPages.TabIndex = 1;
-            // 
-            // tabInstructions
-            // 
-            this.tabInstructions.Controls.Add(this.richTextBox1);
-            this.tabInstructions.Location = new System.Drawing.Point(4, 22);
-            this.tabInstructions.Name = "tabInstructions";
-            this.tabInstructions.Padding = new System.Windows.Forms.Padding(3);
-            this.tabInstructions.Size = new System.Drawing.Size(462, 350);
-            this.tabInstructions.TabIndex = 0;
-            this.tabInstructions.Text = "Instructions";
-            this.tabInstructions.UseVisualStyleBackColor = true;
             // 
             // tabUI
             // 
@@ -126,10 +116,20 @@
             this.tabUI.Location = new System.Drawing.Point(4, 22);
             this.tabUI.Name = "tabUI";
             this.tabUI.Padding = new System.Windows.Forms.Padding(3);
-            this.tabUI.Size = new System.Drawing.Size(462, 350);
+            this.tabUI.Size = new System.Drawing.Size(462, 418);
             this.tabUI.TabIndex = 1;
             this.tabUI.Text = "Start";
             this.tabUI.UseVisualStyleBackColor = true;
+            // 
+            // btnInstructions
+            // 
+            this.btnInstructions.Location = new System.Drawing.Point(267, 472);
+            this.btnInstructions.Name = "btnInstructions";
+            this.btnInstructions.Size = new System.Drawing.Size(77, 25);
+            this.btnInstructions.TabIndex = 21;
+            this.btnInstructions.Text = "Instructions";
+            this.btnInstructions.UseVisualStyleBackColor = true;
+            this.btnInstructions.Click += new System.EventHandler(this.OnButtonClick);
             // 
             // groupBox1
             // 
@@ -146,7 +146,7 @@
             this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.label1);
-            this.groupBox1.Location = new System.Drawing.Point(9, 112);
+            this.groupBox1.Location = new System.Drawing.Point(9, 111);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(434, 223);
             this.groupBox1.TabIndex = 20;
@@ -278,7 +278,7 @@
             // btnReadWorkbook
             // 
             this.btnReadWorkbook.Enabled = false;
-            this.btnReadWorkbook.Location = new System.Drawing.Point(260, 68);
+            this.btnReadWorkbook.Location = new System.Drawing.Point(260, 69);
             this.btnReadWorkbook.Name = "btnReadWorkbook";
             this.btnReadWorkbook.Size = new System.Drawing.Size(98, 25);
             this.btnReadWorkbook.TabIndex = 19;
@@ -289,7 +289,7 @@
             // txtFile
             // 
             this.txtFile.BackColor = System.Drawing.SystemColors.Window;
-            this.txtFile.Location = new System.Drawing.Point(75, 25);
+            this.txtFile.Location = new System.Drawing.Point(75, 26);
             this.txtFile.Name = "txtFile";
             this.txtFile.ReadOnly = true;
             this.txtFile.Size = new System.Drawing.Size(379, 20);
@@ -298,7 +298,7 @@
             // chkHasHeader
             // 
             this.chkHasHeader.AutoSize = true;
-            this.chkHasHeader.Location = new System.Drawing.Point(91, 73);
+            this.chkHasHeader.Location = new System.Drawing.Point(91, 74);
             this.chkHasHeader.Name = "chkHasHeader";
             this.chkHasHeader.Size = new System.Drawing.Size(144, 17);
             this.chkHasHeader.TabIndex = 5;
@@ -307,7 +307,7 @@
             // 
             // btnOpen
             // 
-            this.btnOpen.Location = new System.Drawing.Point(19, 22);
+            this.btnOpen.Location = new System.Drawing.Point(19, 23);
             this.btnOpen.Name = "btnOpen";
             this.btnOpen.Size = new System.Drawing.Size(50, 25);
             this.btnOpen.TabIndex = 4;
@@ -317,63 +317,69 @@
             // 
             // tabCategorize
             // 
-            this.tabCategorize.Controls.Add(this.label12);
-            this.tabCategorize.Controls.Add(this.label11);
-            this.tabCategorize.Controls.Add(this.txtMaximum);
-            this.tabCategorize.Controls.Add(this.txtMinimum);
+            this.tabCategorize.Controls.Add(this.groupBox3);
+            this.tabCategorize.Controls.Add(this.groupBox2);
+            this.tabCategorize.Controls.Add(this.label13);
+            this.tabCategorize.Controls.Add(this.btnColorScheme);
+            this.tabCategorize.Controls.Add(this.dgCategories);
             this.tabCategorize.Controls.Add(this.btnCategorize);
             this.tabCategorize.Controls.Add(this.txtCategoryCount);
             this.tabCategorize.Controls.Add(this.label10);
-            this.tabCategorize.Controls.Add(this.btnShowGrid);
-            this.tabCategorize.Controls.Add(this.txtValuesCount);
-            this.tabCategorize.Controls.Add(this.label9);
             this.tabCategorize.Controls.Add(this.label8);
-            this.tabCategorize.Controls.Add(this.lvBreaks);
+            this.tabCategorize.Controls.Add(this.icbColorScheme);
             this.tabCategorize.Location = new System.Drawing.Point(4, 22);
             this.tabCategorize.Name = "tabCategorize";
             this.tabCategorize.Padding = new System.Windows.Forms.Padding(3);
-            this.tabCategorize.Size = new System.Drawing.Size(462, 350);
+            this.tabCategorize.Size = new System.Drawing.Size(462, 418);
             this.tabCategorize.TabIndex = 3;
             this.tabCategorize.Text = "Categories";
             this.tabCategorize.UseVisualStyleBackColor = true;
             // 
-            // label12
+            // label13
             // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(16, 307);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(51, 13);
-            this.label12.TabIndex = 21;
-            this.label12.Text = "Maximum";
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(12, 51);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(76, 13);
+            this.label13.TabIndex = 25;
+            this.label13.Text = "Color schemes";
             // 
-            // label11
+            // btnColorScheme
             // 
-            this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(16, 282);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(48, 13);
-            this.label11.TabIndex = 20;
-            this.label11.Text = "Minimum";
+            this.btnColorScheme.Location = new System.Drawing.Point(246, 45);
+            this.btnColorScheme.Name = "btnColorScheme";
+            this.btnColorScheme.Size = new System.Drawing.Size(90, 25);
+            this.btnColorScheme.TabIndex = 23;
+            this.btnColorScheme.Text = "Choose colors";
+            this.btnColorScheme.UseVisualStyleBackColor = true;
+            this.btnColorScheme.Click += new System.EventHandler(this.OnButtonClick);
             // 
-            // txtMaximum
+            // dgCategories
             // 
-            this.txtMaximum.Location = new System.Drawing.Point(130, 306);
-            this.txtMaximum.Name = "txtMaximum";
-            this.txtMaximum.Size = new System.Drawing.Size(64, 20);
-            this.txtMaximum.TabIndex = 19;
-            // 
-            // txtMinimum
-            // 
-            this.txtMinimum.Location = new System.Drawing.Point(130, 279);
-            this.txtMinimum.Name = "txtMinimum";
-            this.txtMinimum.Size = new System.Drawing.Size(64, 20);
-            this.txtMinimum.TabIndex = 18;
+            this.dgCategories.AllowUserToAddRows = false;
+            this.dgCategories.AllowUserToDeleteRows = false;
+            this.dgCategories.AllowUserToResizeColumns = false;
+            this.dgCategories.AllowUserToResizeRows = false;
+            this.dgCategories.BackgroundColor = System.Drawing.SystemColors.Window;
+            this.dgCategories.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgCategories.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.colShow,
+            this.dgcolCategory,
+            this.dgcolCount,
+            this.dgCol});
+            this.dgCategories.GridColor = System.Drawing.SystemColors.Window;
+            this.dgCategories.Location = new System.Drawing.Point(6, 97);
+            this.dgCategories.Name = "dgCategories";
+            this.dgCategories.ReadOnly = true;
+            this.dgCategories.RowHeadersVisible = false;
+            this.dgCategories.Size = new System.Drawing.Size(448, 194);
+            this.dgCategories.TabIndex = 22;
             // 
             // btnCategorize
             // 
-            this.btnCategorize.Location = new System.Drawing.Point(145, 47);
+            this.btnCategorize.Location = new System.Drawing.Point(246, 16);
             this.btnCategorize.Name = "btnCategorize";
-            this.btnCategorize.Size = new System.Drawing.Size(67, 25);
+            this.btnCategorize.Size = new System.Drawing.Size(90, 25);
             this.btnCategorize.TabIndex = 17;
             this.btnCategorize.Text = "Categorize";
             this.btnCategorize.UseVisualStyleBackColor = true;
@@ -381,15 +387,15 @@
             // 
             // txtCategoryCount
             // 
-            this.txtCategoryCount.Location = new System.Drawing.Point(148, 21);
+            this.txtCategoryCount.Location = new System.Drawing.Point(144, 19);
             this.txtCategoryCount.Name = "txtCategoryCount";
-            this.txtCategoryCount.Size = new System.Drawing.Size(64, 20);
+            this.txtCategoryCount.Size = new System.Drawing.Size(91, 20);
             this.txtCategoryCount.TabIndex = 16;
             // 
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(16, 24);
+            this.label10.Location = new System.Drawing.Point(12, 22);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(108, 13);
             this.label10.TabIndex = 15;
@@ -397,74 +403,34 @@
             // 
             // btnShowGrid
             // 
-            this.btnShowGrid.Location = new System.Drawing.Point(346, 301);
+            this.btnShowGrid.Location = new System.Drawing.Point(68, 20);
             this.btnShowGrid.Name = "btnShowGrid";
-            this.btnShowGrid.Size = new System.Drawing.Size(97, 25);
+            this.btnShowGrid.Size = new System.Drawing.Size(73, 25);
             this.btnShowGrid.TabIndex = 13;
-            this.btnShowGrid.Text = "Map data points";
+            this.btnShowGrid.Text = "Data points";
             this.btnShowGrid.UseVisualStyleBackColor = true;
             this.btnShowGrid.Click += new System.EventHandler(this.OnButtonClick);
-            // 
-            // txtValuesCount
-            // 
-            this.txtValuesCount.Location = new System.Drawing.Point(130, 253);
-            this.txtValuesCount.Name = "txtValuesCount";
-            this.txtValuesCount.Size = new System.Drawing.Size(64, 20);
-            this.txtValuesCount.TabIndex = 12;
-            // 
-            // label9
-            // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(16, 256);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(90, 13);
-            this.label9.TabIndex = 11;
-            this.label9.Text = "Number of values";
             // 
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(16, 90);
+            this.label8.Location = new System.Drawing.Point(6, 81);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(57, 13);
             this.label8.TabIndex = 10;
             this.label8.Text = "Categories";
             // 
-            // lvBreaks
-            // 
-            this.lvBreaks.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.colCategory,
-            this.colCount,
-            this.colColor});
-            this.lvBreaks.FullRowSelect = true;
-            this.lvBreaks.Location = new System.Drawing.Point(19, 106);
-            this.lvBreaks.Name = "lvBreaks";
-            this.lvBreaks.ShowItemToolTips = true;
-            this.lvBreaks.Size = new System.Drawing.Size(424, 141);
-            this.lvBreaks.TabIndex = 9;
-            this.lvBreaks.UseCompatibleStateImageBehavior = false;
-            this.lvBreaks.View = System.Windows.Forms.View.Details;
-            // 
-            // colCategory
-            // 
-            this.colCategory.Text = "Category";
-            this.colCategory.Width = 0;
-            // 
-            // colCount
-            // 
-            this.colCount.Text = "Count";
-            // 
             // tabExtract
             // 
+            this.tabExtract.Controls.Add(this.dgSheetSummary);
             this.tabExtract.Controls.Add(this.lblMappedSheet);
             this.tabExtract.Controls.Add(this.listSelectedSheets);
-            this.tabExtract.Controls.Add(this.btnDefineGrid);
             this.tabExtract.Controls.Add(this.btnMapSelected);
             this.tabExtract.Controls.Add(this.label7);
             this.tabExtract.Location = new System.Drawing.Point(4, 22);
             this.tabExtract.Name = "tabExtract";
             this.tabExtract.Padding = new System.Windows.Forms.Padding(3);
-            this.tabExtract.Size = new System.Drawing.Size(462, 350);
+            this.tabExtract.Size = new System.Drawing.Size(462, 418);
             this.tabExtract.TabIndex = 2;
             this.tabExtract.Text = "Mapping";
             this.tabExtract.UseVisualStyleBackColor = true;
@@ -473,7 +439,7 @@
             // 
             this.lblMappedSheet.AutoSize = true;
             this.lblMappedSheet.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblMappedSheet.Location = new System.Drawing.Point(174, 213);
+            this.lblMappedSheet.Location = new System.Drawing.Point(12, 348);
             this.lblMappedSheet.Name = "lblMappedSheet";
             this.lblMappedSheet.Size = new System.Drawing.Size(120, 18);
             this.lblMappedSheet.TabIndex = 18;
@@ -489,19 +455,9 @@
             this.listSelectedSheets.Size = new System.Drawing.Size(143, 303);
             this.listSelectedSheets.TabIndex = 17;
             // 
-            // btnDefineGrid
-            // 
-            this.btnDefineGrid.Location = new System.Drawing.Point(240, 101);
-            this.btnDefineGrid.Name = "btnDefineGrid";
-            this.btnDefineGrid.Size = new System.Drawing.Size(100, 39);
-            this.btnDefineGrid.TabIndex = 16;
-            this.btnDefineGrid.Text = "Define grid shape";
-            this.btnDefineGrid.UseVisualStyleBackColor = true;
-            this.btnDefineGrid.Click += new System.EventHandler(this.OnButtonClick);
-            // 
             // btnMapSelected
             // 
-            this.btnMapSelected.Location = new System.Drawing.Point(240, 156);
+            this.btnMapSelected.Location = new System.Drawing.Point(32, 373);
             this.btnMapSelected.Name = "btnMapSelected";
             this.btnMapSelected.Size = new System.Drawing.Size(100, 39);
             this.btnMapSelected.TabIndex = 15;
@@ -520,7 +476,7 @@
             // 
             // btnOk
             // 
-            this.btnOk.Location = new System.Drawing.Point(416, 404);
+            this.btnOk.Location = new System.Drawing.Point(421, 472);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(45, 25);
             this.btnOk.TabIndex = 2;
@@ -529,7 +485,7 @@
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(360, 404);
+            this.btnCancel.Location = new System.Drawing.Point(365, 472);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(50, 25);
             this.btnCancel.TabIndex = 3;
@@ -537,15 +493,177 @@
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.OnButtonClick);
             // 
-            // colColor
+            // icbColorScheme
             // 
-            this.colColor.Text = "Symbol";
+            this.icbColorScheme.Color1 = System.Drawing.Color.Gray;
+            this.icbColorScheme.Color2 = System.Drawing.Color.Gray;
+            this.icbColorScheme.ColorSchemes = null;
+            this.icbColorScheme.ComboStyle = FAD3.Mapping.UserControls.ImageComboStyle.ColorSchemeGraduated;
+            this.icbColorScheme.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.icbColorScheme.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.icbColorScheme.FormattingEnabled = true;
+            this.icbColorScheme.Location = new System.Drawing.Point(144, 49);
+            this.icbColorScheme.Name = "icbColorScheme";
+            this.icbColorScheme.OutlineColor = System.Drawing.Color.Black;
+            this.icbColorScheme.Size = new System.Drawing.Size(91, 21);
+            this.icbColorScheme.TabIndex = 24;
+            // 
+            // btnDefineGrid
+            // 
+            this.btnDefineGrid.Location = new System.Drawing.Point(68, 62);
+            this.btnDefineGrid.Name = "btnDefineGrid";
+            this.btnDefineGrid.Size = new System.Drawing.Size(73, 25);
+            this.btnDefineGrid.TabIndex = 26;
+            this.btnDefineGrid.Text = "Grid";
+            this.btnDefineGrid.UseVisualStyleBackColor = true;
+            this.btnDefineGrid.Click += new System.EventHandler(this.OnButtonClick);
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.btnShowGrid);
+            this.groupBox2.Controls.Add(this.btnDefineGrid);
+            this.groupBox2.Location = new System.Drawing.Point(250, 306);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(200, 101);
+            this.groupBox2.TabIndex = 27;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Show on map";
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.label12);
+            this.groupBox3.Controls.Add(this.label11);
+            this.groupBox3.Controls.Add(this.txtMaximum);
+            this.groupBox3.Controls.Add(this.txtMinimum);
+            this.groupBox3.Controls.Add(this.txtValuesCount);
+            this.groupBox3.Controls.Add(this.label9);
+            this.groupBox3.Location = new System.Drawing.Point(7, 306);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(192, 101);
+            this.groupBox3.TabIndex = 28;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "Summary";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(11, 74);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(51, 13);
+            this.label12.TabIndex = 27;
+            this.label12.Text = "Maximum";
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(11, 49);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(48, 13);
+            this.label11.TabIndex = 26;
+            this.label11.Text = "Minimum";
+            // 
+            // txtMaximum
+            // 
+            this.txtMaximum.Location = new System.Drawing.Point(108, 73);
+            this.txtMaximum.Name = "txtMaximum";
+            this.txtMaximum.Size = new System.Drawing.Size(64, 20);
+            this.txtMaximum.TabIndex = 25;
+            // 
+            // txtMinimum
+            // 
+            this.txtMinimum.Location = new System.Drawing.Point(108, 46);
+            this.txtMinimum.Name = "txtMinimum";
+            this.txtMinimum.Size = new System.Drawing.Size(64, 20);
+            this.txtMinimum.TabIndex = 24;
+            // 
+            // txtValuesCount
+            // 
+            this.txtValuesCount.Location = new System.Drawing.Point(108, 20);
+            this.txtValuesCount.Name = "txtValuesCount";
+            this.txtValuesCount.Size = new System.Drawing.Size(64, 20);
+            this.txtValuesCount.TabIndex = 23;
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(11, 23);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(90, 13);
+            this.label9.TabIndex = 22;
+            this.label9.Text = "Number of values";
+            // 
+            // colShow
+            // 
+            this.colShow.HeaderText = "";
+            this.colShow.Name = "colShow";
+            this.colShow.ReadOnly = true;
+            // 
+            // dgcolCategory
+            // 
+            this.dgcolCategory.HeaderText = "Category";
+            this.dgcolCategory.Name = "dgcolCategory";
+            this.dgcolCategory.ReadOnly = true;
+            // 
+            // dgcolCount
+            // 
+            this.dgcolCount.HeaderText = "Count";
+            this.dgcolCount.Name = "dgcolCount";
+            this.dgcolCount.ReadOnly = true;
+            // 
+            // dgCol
+            // 
+            this.dgCol.HeaderText = "Symbol";
+            this.dgCol.Name = "dgCol";
+            this.dgCol.ReadOnly = true;
+            this.dgCol.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgCol.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // dgSheetSummary
+            // 
+            this.dgSheetSummary.AllowUserToAddRows = false;
+            this.dgSheetSummary.AllowUserToDeleteRows = false;
+            this.dgSheetSummary.AllowUserToResizeColumns = false;
+            this.dgSheetSummary.AllowUserToResizeRows = false;
+            this.dgSheetSummary.BackgroundColor = System.Drawing.SystemColors.Window;
+            this.dgSheetSummary.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgSheetSummary.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.colSymbol,
+            this.colCount,
+            this.colPercent});
+            this.dgSheetSummary.Location = new System.Drawing.Point(225, 32);
+            this.dgSheetSummary.Name = "dgSheetSummary";
+            this.dgSheetSummary.ReadOnly = true;
+            this.dgSheetSummary.RowHeadersVisible = false;
+            this.dgSheetSummary.Size = new System.Drawing.Size(219, 235);
+            this.dgSheetSummary.TabIndex = 19;
+            // 
+            // colSymbol
+            // 
+            this.colSymbol.Frozen = true;
+            this.colSymbol.HeaderText = "Symbol";
+            this.colSymbol.Name = "colSymbol";
+            this.colSymbol.ReadOnly = true;
+            // 
+            // colCount
+            // 
+            this.colCount.Frozen = true;
+            this.colCount.HeaderText = "Count";
+            this.colCount.Name = "colCount";
+            this.colCount.ReadOnly = true;
+            // 
+            // colPercent
+            // 
+            this.colPercent.Frozen = true;
+            this.colPercent.HeaderText = "Percent";
+            this.colPercent.Name = "colPercent";
+            this.colPercent.ReadOnly = true;
             // 
             // ChlorophyllForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(473, 437);
+            this.ClientSize = new System.Drawing.Size(473, 504);
+            this.Controls.Add(this.btnInstructions);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnOk);
             this.Controls.Add(this.tabsPages);
@@ -555,24 +673,25 @@
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnFormClosed);
             this.Load += new System.EventHandler(this.OnFormLoad);
             this.tabsPages.ResumeLayout(false);
-            this.tabInstructions.ResumeLayout(false);
             this.tabUI.ResumeLayout(false);
             this.tabUI.PerformLayout();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.tabCategorize.ResumeLayout(false);
             this.tabCategorize.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgCategories)).EndInit();
             this.tabExtract.ResumeLayout(false);
             this.tabExtract.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgSheetSummary)).EndInit();
             this.ResumeLayout(false);
 
         }
 
         #endregion
-
-        private System.Windows.Forms.RichTextBox richTextBox1;
         private System.Windows.Forms.TabControl tabsPages;
-        private System.Windows.Forms.TabPage tabInstructions;
         private System.Windows.Forms.TabPage tabUI;
         private System.Windows.Forms.Button btnOk;
         private System.Windows.Forms.Button btnCancel;
@@ -597,24 +716,35 @@
         private System.Windows.Forms.ComboBox cboFirstData;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.TabPage tabCategorize;
-        private System.Windows.Forms.TextBox txtValuesCount;
-        private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.ListView lvBreaks;
-        private System.Windows.Forms.ColumnHeader colCategory;
-        private System.Windows.Forms.ColumnHeader colCount;
         private System.Windows.Forms.Button btnShowGrid;
         private System.Windows.Forms.Button btnCategorize;
         private System.Windows.Forms.TextBox txtCategoryCount;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Button btnMapSelected;
+        private System.Windows.Forms.ListBox listSelectedSheets;
+        private System.Windows.Forms.Label lblMappedSheet;
+        private System.Windows.Forms.DataGridView dgCategories;
+        private System.Windows.Forms.Button btnColorScheme;
+        private System.Windows.Forms.Label label13;
+        private UserControls.ImageCombo icbColorScheme;
+        private System.Windows.Forms.Button btnInstructions;
+        private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Button btnDefineGrid;
+        private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.TextBox txtMaximum;
         private System.Windows.Forms.TextBox txtMinimum;
-        private System.Windows.Forms.ListBox listSelectedSheets;
-        private System.Windows.Forms.Label lblMappedSheet;
-        private System.Windows.Forms.ColumnHeader colColor;
+        private System.Windows.Forms.TextBox txtValuesCount;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn colShow;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dgcolCategory;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dgcolCount;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dgCol;
+        private System.Windows.Forms.DataGridView dgSheetSummary;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colSymbol;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colCount;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colPercent;
     }
 }

@@ -11,6 +11,7 @@ using System.Data.OleDb;
 using ISO_Classes;
 using FAD3.Mapping.Classes;
 using MapWinGIS;
+using System.Drawing.Drawing2D;
 
 namespace FAD3.Mapping.Forms
 {
@@ -29,7 +30,7 @@ namespace FAD3.Mapping.Forms
         private int _currentSheetIndex;
         private int _listIndex;
         private List<double?> _columnValues = new List<double?>();
-        private Shapefile _grid;
+        private int _dataPoints;
 
         public static ChlorophyllForm GetInstance()
         {
@@ -51,7 +52,14 @@ namespace FAD3.Mapping.Forms
         {
             btnOk.Enabled = false;
             btnReadSheet.Enabled = false;
-            SizeColumns(lvBreaks);
+            SizeColumns(dgCategories);
+            SizeColumns(dgSheetSummary);
+            icbColorScheme.ComboStyle = UserControls.ImageComboStyle.ColorSchemeGraduated;
+            icbColorScheme.ColorSchemes = global.MappingForm.MapLayersHandler.LayerColors;
+            if (icbColorScheme.Items.Count > 0)
+            {
+                icbColorScheme.SelectedIndex = 0;
+            }
         }
 
         private void OpenFile()
@@ -138,7 +146,8 @@ namespace FAD3.Mapping.Forms
             _excelData = new DataSet();
             _excelData.Tables.Add(excelTable);
 
-            txtRows.Text = _excelData.Tables[0].Rows.Count.ToString();
+            _dataPoints = _excelData.Tables[0].Rows.Count;
+            txtRows.Text = _dataPoints.ToString();
             cboLatitude.Items.Clear();
             cboLongitude.Items.Clear();
             for (int n = 0; n < _excelData.Tables[0].Columns.Count; n++)
@@ -168,6 +177,7 @@ namespace FAD3.Mapping.Forms
 
         private void listCoordinates()
         {
+            _dictGridCentroidCoordinates.Clear();
             var table = _excelData.Tables[0];
 
             for (int row = 0; row < table.Rows.Count; row++)
@@ -183,6 +193,15 @@ namespace FAD3.Mapping.Forms
         {
             switch (((Button)sender).Name)
             {
+                case "btnInstructions":
+                    InstructionsForm form = new InstructionsForm();
+                    form.ShowDialog(this);
+                    break;
+
+                case "btnColorScheme":
+                    ColorSchemesForm csf = new ColorSchemesForm(ref MappingUtilities.LayerColors);
+                    break;
+
                 case "btnDefineGrid":
                     if (MakeGridFromPoints.MakeGridShapefile())
                     {
@@ -199,7 +218,7 @@ namespace FAD3.Mapping.Forms
 
                 case "btnOpen":
                     OpenFile();
-                    btnReadWorkbook.Enabled = _excelFileName.Length > 0 && File.Exists(_excelFileName);
+                    btnReadWorkbook.Enabled = _excelFileName?.Length > 0 && File.Exists(_excelFileName);
                     break;
 
                 case "btnReadSheet":
@@ -277,6 +296,24 @@ namespace FAD3.Mapping.Forms
             }
             MakeGridFromPoints.MapColumn(_columnValues, lblMappedSheet.Tag.ToString());
             global.MappingForm.MapControl.Redraw();
+            UpdateSheetSummary(MakeGridFromPoints.SheetMapSummary);
+        }
+
+        private void UpdateSheetSummary(Dictionary<string, int> summary)
+        {
+            var row = 0;
+            dgSheetSummary.Rows.Clear();
+            foreach (KeyValuePair<string, int> kv in summary)
+            {
+                var firstColText = "";
+                if (kv.Key == "Null")
+                {
+                    firstColText = "Null";
+                }
+                row = dgSheetSummary.Rows.Add(new object[] { firstColText, kv.Value.ToString(), (((double)kv.Value / (double)_dataPoints) * 100).ToString() });
+                dgSheetSummary[0, row].Style.BackColor = MakeGridFromPoints.CategoryColor(row);
+            }
+            dgSheetSummary.ClearSelection();
         }
 
         private void MapGridPoints()
@@ -320,6 +357,7 @@ namespace FAD3.Mapping.Forms
 
         private void getDataValues()
         {
+            _dataValues.Clear();
             var table = _excelData.Tables[0];
 
             for (int row = 0; row < table.Rows.Count; row++)
@@ -339,18 +377,22 @@ namespace FAD3.Mapping.Forms
         /// <summary>
         /// Sizes all columns so that it fits the widest column content or the column header content
         /// </summary>
-        private void SizeColumns(ListView lv, bool init = true)
+        private void SizeColumns(DataGridView dg, bool init = true, bool PreserveLastColWidth = false)
         {
-            foreach (ColumnHeader c in lv.Columns)
+            var n = 0;
+            foreach (DataGridViewColumn c in dg.Columns)
             {
+                n++;
                 if (init)
                 {
-                    c.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
+                    c.AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader;
                     c.Tag = c.Width;
                 }
                 else
                 {
-                    c.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+                    if (n == dg.ColumnCount && PreserveLastColWidth) return;
+
+                    c.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCellsExceptHeader;
                     c.Width = c.Width > (int)c.Tag ? c.Width : (int)c.Tag;
                 }
             }
@@ -388,32 +430,44 @@ namespace FAD3.Mapping.Forms
 
         private void doJenksFisher()
         {
-            _dataValues.Sort();
-            var listBreaks = JenksFisher.CreateJenksFisherBreaksArray(_dataValues, int.Parse(txtCategoryCount.Text));
-            var n = 0;
-            var lower = listBreaks.Min();
-            var upper = 0D;
-            ListViewItem lvi = null;
-            MakeGridFromPoints.Categories.Clear();
-            foreach (var item in listBreaks)
+            if (txtCategoryCount.Text.Length > 0)
             {
-                if (n > 0)
+                dgCategories.Rows.Clear();
+                _dataValues.Sort();
+                var listBreaks = JenksFisher.CreateJenksFisherBreaksArray(_dataValues, int.Parse(txtCategoryCount.Text));
+                var n = 0;
+                var lower = listBreaks.Min();
+                var upper = 0D;
+                int row;
+                Color color;
+
+                MakeGridFromPoints.Categories.Clear();
+                ColorBlend blend = (ColorBlend)icbColorScheme.ColorSchemes.List[icbColorScheme.SelectedIndex];
+                MakeGridFromPoints.NumberOfCategories = int.Parse(txtCategoryCount.Text);
+                MakeGridFromPoints.ColorBlend = blend;
+                //MakeGridFromPoints.GenerateColorScheme(int.Parse(txtCategoryCount.Text));
+
+                foreach (var item in listBreaks)
                 {
-                    upper = item;
-                    lvi = lvBreaks.Items.Add($"{lower.ToString()} - {upper.ToString()}");
-                    lvi.SubItems.Add(GetClassSize(lower, upper).ToString());
-                    MakeGridFromPoints.AddCategory(lower, upper);
-                    lower = item;
+                    if (n > 0)
+                    {
+                        upper = item;
+                        color = MakeGridFromPoints.AddCategory(lower, upper);
+                        row = dgCategories.Rows.Add(new object[] { true, $"{lower.ToString()} - {upper.ToString()}", GetClassSize(lower, upper).ToString(), "" });
+                        dgCategories[3, row].Style.BackColor = color;
+                        lower = item;
+                    }
+                    n++;
                 }
-                n++;
+                txtValuesCount.Text = _dataValues.Count.ToString();
+                txtMinimum.Text = _dataValues.Min().ToString();
+                txtMaximum.Text = _dataValues.Max().ToString();
+                color = MakeGridFromPoints.AddCategory(upper, _dataValues.Max() + 1);
+                row = dgCategories.Rows.Add(new object[] { true, $"> {listBreaks.Max().ToString()}", GetClassSize(listBreaks.Max(), 0, true).ToString(), "" });
+                dgCategories[3, row].Style.BackColor = color;
+                SizeColumns(dgCategories, false, true);
+                MakeGridFromPoints.AddNullCategory();
             }
-            txtValuesCount.Text = _dataValues.Count.ToString();
-            txtMinimum.Text = _dataValues.Min().ToString();
-            txtMaximum.Text = _dataValues.Max().ToString();
-            MakeGridFromPoints.AddCategory(upper, _dataValues.Max() + 1);
-            lvi = lvBreaks.Items.Add($"> {listBreaks.Max().ToString()}");
-            lvi.SubItems.Add(GetClassSize(listBreaks.Max(), 0, true).ToString());
-            SizeColumns(lvBreaks, false);
         }
 
         private void OnComboIndexChanged(object sender, EventArgs e)

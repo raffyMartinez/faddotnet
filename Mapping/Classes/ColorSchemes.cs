@@ -15,7 +15,7 @@ namespace FAD3.Mapping
         Charts = 1,
     }
 
-    internal class ColorSchemes
+    public class ColorSchemes
     {
         // The list of color schemes used in image combos
         public List<ColorBlend> List;

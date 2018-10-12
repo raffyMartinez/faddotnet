@@ -3,11 +3,14 @@ using MapWinGIS;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.IO;
 using System.Reflection;
 using System.Xml;
+using FAD3.Mapping;
 
 namespace FAD3
+
 {
     public enum VisibilityExpressionTarget
     {
@@ -24,6 +27,12 @@ namespace FAD3
         private MapLayer _currentMapLayer;                                                          //the current layer selected in the map layers form
         private ShapefileLabelHandler _sfLabelHandler;
         private PointLayerSymbologyHandler _sfSymbologyHandler;
+        private ColorSchemes _layerColors;
+
+        public ColorSchemes LayerColors
+        {
+            get { return _layerColors; }
+        }
 
         public delegate void LayerReadHandler(MapLayersHandler s, LayerEventArg e);                 //an event that is raised when a layer from the mapcontrol is retrieved
         public event LayerReadHandler LayerRead;                                                    //in order for the listener is able to add the layer to the layers list
@@ -235,6 +244,14 @@ namespace FAD3
             return layerMoved;
         }
 
+        private void SetLayerColorSchemes()
+        {
+            _layerColors = new ColorSchemes(ColorSchemeType.Layer);
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(Properties.Resources.colorschemes);
+            LayerColors.LoadXML(doc);
+        }
+
         /// <summary>
         /// constructor
         /// </summary>
@@ -244,6 +261,7 @@ namespace FAD3
             _axmap = mapControl;
             _axmap.LayerAdded += OnMapLayerAdded;
             _axmap.ProjectionMismatch += OnProjectionMismatch;
+            SetLayerColorSchemes();
         }
 
         /// <summary>
