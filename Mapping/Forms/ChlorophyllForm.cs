@@ -1,17 +1,15 @@
-﻿using System;
+﻿using FAD3.Mapping.Classes;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
+using System.Data.OleDb;
 using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using System.IO;
-using System.Data.OleDb;
-using ISO_Classes;
-using FAD3.Mapping.Classes;
-using MapWinGIS;
-using System.Drawing.Drawing2D;
+using System.Windows.Forms.DataVisualization.Charting;
 
 namespace FAD3.Mapping.Forms
 {
@@ -27,8 +25,6 @@ namespace FAD3.Mapping.Forms
         private int _longitudeColIndex;
         private Dictionary<int, (double latitude, double longitude)> _dictGridCentroidCoordinates = new Dictionary<int, (double latitude, double longitude)>();
         private List<double> _dataValues = new List<double>();
-        private int _currentSheetIndex;
-        private int _listIndex;
         private List<double?> _columnValues = new List<double?>();
         private int _dataPoints;
         private int _selectionIndex = 0;
@@ -53,6 +49,7 @@ namespace FAD3.Mapping.Forms
         {
             btnOk.Enabled = false;
             btnReadSheet.Enabled = false;
+            lblMappedSheet.Visible = false;
             SizeColumns(dgCategories);
             SizeColumns(dgSheetSummary);
             icbColorScheme.ComboStyle = UserControls.ImageComboStyle.ColorSchemeGraduated;
@@ -245,23 +242,6 @@ namespace FAD3.Mapping.Forms
                     MapGridPoints();
                     break;
 
-                case "btnMapSelected":
-                    if (listSelectedSheets.SelectedItems.Count > 0)
-                    {
-                        lblMappedSheet.Visible = true;
-                        if (_currentSheetIndex < listSelectedSheets.SelectedItems.Count)
-                        {
-                            _listIndex = listSelectedSheets.SelectedIndices[_currentSheetIndex];
-                            MapSheet(_currentSheetIndex);
-                            _currentSheetIndex++;
-                        }
-                        else
-                        {
-                            _currentSheetIndex = 0;
-                        }
-                    }
-                    break;
-
                 case "btnCategorize":
                     if (txtCategoryCount.Text.Length > 0)
                     {
@@ -305,33 +285,39 @@ namespace FAD3.Mapping.Forms
                 }
                 else if (listSelectedSheets.SelectedItems.Count > 1)
                 {
-                    if (_selectionIndex == 0)
+                    if (forward)
                     {
+                        _selectionIndex++;
+                        if (_selectionIndex == listSelectedSheets.SelectedIndices.Count)
+                        {
+                            _selectionIndex = 0;
+                        }
                     }
                     else
                     {
-                        if (forward)
+                        _selectionIndex--;
+                        if (_selectionIndex == -1)
                         {
-                            _selectionIndex++;
-                        }
-                        else
-                        {
-                            _selectionIndex--;
+                            _selectionIndex = listSelectedSheets.SelectedIndices.Count - 1;
                         }
                     }
                 }
 
-                if (listSelectedSheets.SelectedIndices.Count > 0)
+                if (listSelectedSheets.SelectedIndices.Count > 0 && _selectionIndex <= listSelectedSheets.SelectedIndices.Count)
                 {
                     MapSheet(listSelectedSheets.SelectedIndices[_selectionIndex]);
+                }
+                else
+                {
+                    _selectionIndex = 0;
                 }
             }
         }
 
         private void MapSheet(int index)
         {
-            lblMappedSheet.Text = $"Sheet mapped: {listSelectedSheets.Items[index]}";
-            lblMappedSheet.Tag = listSelectedSheets.Items[index];
+            lblMappedSheet.Text = $"{listSelectedSheets.Items[index]}";
+            lblMappedSheet.Visible = true;
             var table = _excelData.Tables[0];
             _columnValues.Clear();
             for (int row = 0; row < table.Rows.Count; row++)
@@ -352,9 +338,22 @@ namespace FAD3.Mapping.Forms
                 }
                 _columnValues.Add(v);
             }
-            MakeGridFromPoints.MapColumn(_columnValues, lblMappedSheet.Tag.ToString());
-            //MakeGridFromPoints.MapColumn(_columnValues, "test");
+            MakeGridFromPoints.MapColumn(_columnValues, lblMappedSheet.Text.ToString());
             global.MappingForm.MapControl.Redraw();
+
+            graphSheet.Series.Clear();
+            graphSheet.ChartAreas[0].AxisY.Minimum = 0;
+            graphSheet.ChartAreas[0].AxisY.Maximum = 100;
+            graphSheet.ChartAreas[0].AxisY.MajorGrid.Enabled = false;
+            graphSheet.ChartAreas[0].AxisX.MajorGrid.Enabled = false;
+            graphSheet.ChartAreas[0].AxisX.LabelStyle.Enabled = false;
+            var series = new Series
+            {
+                ChartType = SeriesChartType.Column,
+                Name = "summary",
+            };
+            graphSheet.Series.Add(series);
+
             UpdateSheetSummary(MakeGridFromPoints.SheetMapSummary);
         }
 
@@ -369,8 +368,17 @@ namespace FAD3.Mapping.Forms
                 {
                     firstColText = "Null";
                 }
-                row = dgSheetSummary.Rows.Add(new object[] { firstColText, kv.Value.ToString(), (((double)kv.Value / (double)_dataPoints) * 100).ToString() });
-                dgSheetSummary[0, row].Style.BackColor = MakeGridFromPoints.CategoryColor(row);
+                var percent = ((double)kv.Value / (double)_dataPoints) * 100;
+                row = dgSheetSummary.Rows.Add(new object[] { true, firstColText, kv.Value.ToString(), percent.ToString("N1") });
+                var pt = graphSheet.Series["summary"].Points.AddY(percent);
+                dgSheetSummary[1, row].Style.BackColor = MakeGridFromPoints.CategoryColor(row);
+                graphSheet.Series["summary"].Points[pt].Color = dgSheetSummary[1, row].Style.BackColor;
+                graphSheet.Series["summary"].Points[pt].BorderColor = Color.Black;
+                dgSheetSummary[0, row].Value = MakeGridFromPoints.GridShapefile.Categories.Item[row].DrawingOptions.FillVisible;
+                if (MakeGridFromPoints.GridShapefile.Categories.Item[row].Name == "nullCategory")
+                {
+                    dgSheetSummary[0, row].Value = !MakeGridFromPoints.GridShapefile.Categories.Item[row].DrawingOptions.FillVisible;
+                }
             }
             dgSheetSummary.ClearSelection();
         }
@@ -504,7 +512,6 @@ namespace FAD3.Mapping.Forms
                 ColorBlend blend = (ColorBlend)icbColorScheme.ColorSchemes.List[icbColorScheme.SelectedIndex];
                 MakeGridFromPoints.NumberOfCategories = int.Parse(txtCategoryCount.Text);
                 MakeGridFromPoints.ColorBlend = blend;
-                //MakeGridFromPoints.GenerateColorScheme(int.Parse(txtCategoryCount.Text));
 
                 foreach (var item in listBreaks)
                 {
@@ -512,8 +519,8 @@ namespace FAD3.Mapping.Forms
                     {
                         upper = item;
                         color = MakeGridFromPoints.AddCategory(lower, upper);
-                        row = dgCategories.Rows.Add(new object[] { true, $"{lower.ToString()} - {upper.ToString()}", GetClassSize(lower, upper).ToString(), "" });
-                        dgCategories[3, row].Style.BackColor = color;
+                        row = dgCategories.Rows.Add(new object[] { $"{lower.ToString("N5")} - {upper.ToString("N5")}", GetClassSize(lower, upper).ToString(), "" });
+                        dgCategories[2, row].Style.BackColor = color;
                         lower = item;
                     }
                     n++;
@@ -522,8 +529,8 @@ namespace FAD3.Mapping.Forms
                 txtMinimum.Text = _dataValues.Min().ToString();
                 txtMaximum.Text = _dataValues.Max().ToString();
                 color = MakeGridFromPoints.AddCategory(upper, _dataValues.Max() + 1);
-                row = dgCategories.Rows.Add(new object[] { true, $"> {listBreaks.Max().ToString()}", GetClassSize(listBreaks.Max(), 0, true).ToString(), "" });
-                dgCategories[3, row].Style.BackColor = color;
+                row = dgCategories.Rows.Add(new object[] { $"> {listBreaks.Max().ToString("N5")}", GetClassSize(listBreaks.Max(), 0, true).ToString(), "" });
+                dgCategories[2, row].Style.BackColor = color;
                 SizeColumns(dgCategories, false, true);
                 MakeGridFromPoints.AddNullCategory();
             }
@@ -554,7 +561,7 @@ namespace FAD3.Mapping.Forms
 
         private void OnCellDblClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.ColumnIndex == 3)
+            if (e.ColumnIndex == 2)
             {
                 ColorDialog cd = new ColorDialog()
                 {
@@ -573,6 +580,18 @@ namespace FAD3.Mapping.Forms
         private void OnSelectedSheetsClick(object sender, EventArgs e)
         {
             MapSheet(listSelectedSheets.SelectedIndices[0]);
+        }
+
+        private void OnGridSummaryCellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.ColumnIndex == 0)
+            {
+                bool isVisible = (bool)dgSheetSummary[0, e.RowIndex].Value;
+                dgSheetSummary[0, e.RowIndex].Value = !isVisible;
+                MakeGridFromPoints.GridShapefile.Categories.Item[e.RowIndex].DrawingOptions.FillVisible = !isVisible;
+                MakeGridFromPoints.GridShapefile.Categories.Item[e.RowIndex].DrawingOptions.LineVisible = !isVisible;
+                global.MappingForm.MapControl.Redraw();
+            }
         }
     }
 }

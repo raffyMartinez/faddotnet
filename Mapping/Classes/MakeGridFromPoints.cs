@@ -1,12 +1,8 @@
-﻿using System;
+﻿using MapWinGIS;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using MapWinGIS;
-using ISO_Classes;
-using System.Windows.Forms;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Linq;
 
 namespace FAD3.Mapping.Classes
 {
@@ -21,16 +17,28 @@ namespace FAD3.Mapping.Classes
         public static Shapefile PointShapefile { get; internal set; }
         public static GeoProjection GeoProjection { get; set; }
         public static MapInterActionHandler MapInteractionHandler { get; set; }
-        private static int iFldRow;
+        private static int _iFldRow;
         private static Shape _cell;
         private static Shapefile _gridShapeFile;
         private static ShapefileCategories _categories = new ShapefileCategories();
         public static ColorScheme _scheme = new ColorScheme();
-        public static Color Color1 { get; set; }
-        public static Color Color2 { get; set; }
-        private static int _numberOfCategories;
         public static ColorBlend _colorBlend = new ColorBlend();
-        public static int NumberOfCategories { get; set; }
+        private static int _numberOfCategories;
+        private static LinkedList<(int index, MapWinGIS.Point pt, double distance)> _cell4Points = new LinkedList<(int index, MapWinGIS.Point pt, double distance)>();
+
+        public static int NumberOfCategories
+        {
+            get { return _numberOfCategories; }
+            set
+            {
+                if (_numberOfCategories != value)
+                {
+                    _sheetMapSummary.Clear();
+                }
+                _numberOfCategories = value;
+            }
+        }
+
         private static Dictionary<string, int> _sheetMapSummary = new Dictionary<string, int>();
 
         public static Dictionary<string, int> SheetMapSummary
@@ -67,7 +75,7 @@ namespace FAD3.Mapping.Classes
                 {
                     var iShp = MapInteractionHandler.SelectedShapeIndexes[n];
                     var shp = PointShapefile.Shape[iShp];
-                    shpDict.Add((int)PointShapefile.CellValue[iFldRow, iShp], shp);
+                    shpDict.Add((int)PointShapefile.CellValue[_iFldRow, iShp], shp);
                 }
                 _cell = new Shape();
                 if (_cell.Create(ShpfileType.SHP_POLYGON))
@@ -102,14 +110,7 @@ namespace FAD3.Mapping.Classes
             nullCategory.DrawingOptions.FillVisible = false;
             nullCategory.DrawingOptions.LineVisible = false;
             _categories.Add2(nullCategory);
-            if (!_sheetMapSummary.Keys.Contains("Null"))
-            {
-                _sheetMapSummary.Add("Null", 0);
-            }
-            else
-            {
-                _sheetMapSummary["Null"] = 0;
-            }
+            _sheetMapSummary.Add("Null", 0);
         }
 
         public static Color AddCategory(double min, double max)
@@ -121,17 +122,10 @@ namespace FAD3.Mapping.Classes
             cat.ValueType = tkCategoryValue.cvRange;
             _categories.Add2(cat);
 
-            cat.DrawingOptions.FillColor = _scheme.get_GraduatedColor((double)(_categories.Count) / (double)NumberOfCategories);
+            cat.DrawingOptions.FillColor = _scheme.get_GraduatedColor((double)(_categories.Count) / (double)_numberOfCategories);
             cat.DrawingOptions.LineColor = cat.DrawingOptions.FillColor;
             cat.DrawingOptions.LineWidth = 1.1F;
-            if (!_sheetMapSummary.Keys.Contains(cat.Name))
-            {
-                _sheetMapSummary.Add(cat.Name, 0);
-            }
-            else
-            {
-                _sheetMapSummary[cat.Name] = 0;
-            }
+            _sheetMapSummary.Add(cat.Name, 0);
 
             return Colors.UintToColor(cat.DrawingOptions.FillColor);
         }
@@ -211,7 +205,7 @@ namespace FAD3.Mapping.Classes
                         iShp = _gridShapeFile.EditAddShape(gridCell);
                         if (iShp >= 0)
                         {
-                            _gridShapeFile.EditCellValue(ifldRowField, iShp, PointShapefile.CellValue[iFldRow, n]);
+                            _gridShapeFile.EditCellValue(ifldRowField, iShp, PointShapefile.CellValue[_iFldRow, n]);
                         }
                     }
                 }
@@ -229,17 +223,53 @@ namespace FAD3.Mapping.Classes
         {
             int iShp = -1;
             var sf = new Shapefile();
+            double distance = 0;
             if (sf.CreateNewWithShapeID("", ShpfileType.SHP_POINT))
             {
-                iFldRow = sf.EditAddField("row", FieldType.INTEGER_FIELD, 4, 1);
+                _iFldRow = sf.EditAddField("row", FieldType.INTEGER_FIELD, 4, 1);
                 sf.GeoProjection = GeoProjection;
                 foreach (KeyValuePair<int, (double latitude, double longitude)> kv in Coordinates)
                 {
                     var shp = new Shape();
-                    if (shp.Create(ShpfileType.SHP_POINT) && shp.AddPoint(kv.Value.longitude, kv.Value.latitude) >= 0)
+                    var pnt = new MapWinGIS.Point();
+                    pnt.x = kv.Value.longitude;
+                    pnt.y = kv.Value.latitude;
+                    if (shp.Create(ShpfileType.SHP_POINT) && shp.AddPoint(pnt.x, pnt.y) >= 0)
                     {
                         iShp = sf.EditAddShape(shp);
-                        sf.EditCellValue(iFldRow, iShp, kv.Key);
+                        sf.EditCellValue(_iFldRow, iShp, kv.Key);
+
+                        if (iShp != 0)
+                        {
+                            distance = new Utils().GeodesicDistance(_cell4Points.First.Value.pt.y, _cell4Points.First.Value.pt.x, pnt.y, pnt.x);
+                        }
+
+                        if (_cell4Points.Count == 0)
+                        {
+                            _cell4Points.AddFirst((iShp, pnt, 0));
+                        }
+                        else if (_cell4Points.Count == 4)
+                        {
+                            if (distance < _cell4Points.ElementAt(1).distance)
+                            {
+                                _cell4Points.AddAfter(_cell4Points.First, (iShp, pnt, distance));
+                                _cell4Points.RemoveLast();
+                            }
+                            else if (distance < _cell4Points.ElementAt(2).distance)
+                            {
+                                _cell4Points.AddAfter(_cell4Points.First.Next, (iShp, pnt, distance));
+                                _cell4Points.RemoveLast();
+                            }
+                            else if (distance < _cell4Points.Last.Value.distance)
+                            {
+                                _cell4Points.AddBefore(_cell4Points.Last, (iShp, pnt, distance));
+                                _cell4Points.RemoveLast();
+                            }
+                        }
+                        else
+                        {
+                            _cell4Points.AddLast((iShp, pnt, distance));
+                        }
                     }
                 }
             }

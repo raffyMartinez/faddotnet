@@ -124,6 +124,8 @@ Make sure that your data is found on the first sheet of the excel file.
 
 Format your data so that the first 2 columns (columns A and B) contains longitude-latidude data. 
 
+Although column headers are not required, having those are very useful. Put headers on Row 1.
+
 Put your temporal data starting at column C, then to column D, E, and so on.
 
 Example:
