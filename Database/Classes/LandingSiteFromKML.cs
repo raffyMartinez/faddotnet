@@ -12,9 +12,9 @@ namespace FAD3
 
         private bool IsInside(FishingGrid.Grid25Struct grid25, double xCoord, double yCoord)
         {
-            foreach (var item in grid25.Bounds)
+            foreach (var item in grid25.BoundsEx)
             {
-                if (item.IsInisde(xCoord, yCoord))
+                if (item.Value.IsInisde(xCoord, yCoord))
                 {
                     return true;
                 }

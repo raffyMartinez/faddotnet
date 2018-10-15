@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea5 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend5 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series5 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ChlorophyllForm));
             this.tabsPages = new System.Windows.Forms.TabControl();
             this.tabUI = new System.Windows.Forms.TabPage();
@@ -62,11 +62,14 @@
             this.txtValuesCount = new System.Windows.Forms.TextBox();
             this.label9 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.btnShowGrid = new System.Windows.Forms.Button();
-            this.btnDefineGrid = new System.Windows.Forms.Button();
+            this.btnShowGridPoints = new System.Windows.Forms.Button();
+            this.btnShowGridPolygons = new System.Windows.Forms.Button();
             this.label13 = new System.Windows.Forms.Label();
             this.btnColorScheme = new System.Windows.Forms.Button();
             this.dgCategories = new System.Windows.Forms.DataGridView();
+            this.dgcolCategory = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dgcolCount = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dgCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.btnCategorize = new System.Windows.Forms.Button();
             this.txtCategoryCount = new System.Windows.Forms.TextBox();
             this.label10 = new System.Windows.Forms.Label();
@@ -77,6 +80,10 @@
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.btnUp = new System.Windows.Forms.Button();
             this.dgSheetSummary = new System.Windows.Forms.DataGridView();
+            this.colVisible = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.colSymbol = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colCount = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colPercent = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.lblMappedSheet = new System.Windows.Forms.Label();
             this.listSelectedSheets = new System.Windows.Forms.ListBox();
             this.label7 = new System.Windows.Forms.Label();
@@ -84,13 +91,6 @@
             this.btnOk = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.icbColorScheme = new FAD3.Mapping.UserControls.ImageCombo();
-            this.colVisible = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.colSymbol = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colCount = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colPercent = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dgcolCategory = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dgcolCount = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dgCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tabsPages.SuspendLayout();
             this.tabUI.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -108,7 +108,7 @@
             this.tabsPages.Controls.Add(this.tabUI);
             this.tabsPages.Controls.Add(this.tabCategorize);
             this.tabsPages.Controls.Add(this.tabExtract);
-            this.tabsPages.Location = new System.Drawing.Point(3, 22);
+            this.tabsPages.Location = new System.Drawing.Point(7, 22);
             this.tabsPages.Name = "tabsPages";
             this.tabsPages.SelectedIndex = 0;
             this.tabsPages.Size = new System.Drawing.Size(470, 444);
@@ -398,8 +398,8 @@
             // 
             // groupBox2
             // 
-            this.groupBox2.Controls.Add(this.btnShowGrid);
-            this.groupBox2.Controls.Add(this.btnDefineGrid);
+            this.groupBox2.Controls.Add(this.btnShowGridPoints);
+            this.groupBox2.Controls.Add(this.btnShowGridPolygons);
             this.groupBox2.Location = new System.Drawing.Point(250, 306);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(200, 101);
@@ -407,25 +407,25 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Show on map";
             // 
-            // btnShowGrid
+            // btnShowGridPoints
             // 
-            this.btnShowGrid.Location = new System.Drawing.Point(68, 20);
-            this.btnShowGrid.Name = "btnShowGrid";
-            this.btnShowGrid.Size = new System.Drawing.Size(73, 25);
-            this.btnShowGrid.TabIndex = 13;
-            this.btnShowGrid.Text = "Data points";
-            this.btnShowGrid.UseVisualStyleBackColor = true;
-            this.btnShowGrid.Click += new System.EventHandler(this.OnButtonClick);
+            this.btnShowGridPoints.Location = new System.Drawing.Point(68, 20);
+            this.btnShowGridPoints.Name = "btnShowGridPoints";
+            this.btnShowGridPoints.Size = new System.Drawing.Size(73, 25);
+            this.btnShowGridPoints.TabIndex = 13;
+            this.btnShowGridPoints.Text = "Data points";
+            this.btnShowGridPoints.UseVisualStyleBackColor = true;
+            this.btnShowGridPoints.Click += new System.EventHandler(this.OnButtonClick);
             // 
-            // btnDefineGrid
+            // btnShowGridPolygons
             // 
-            this.btnDefineGrid.Location = new System.Drawing.Point(68, 62);
-            this.btnDefineGrid.Name = "btnDefineGrid";
-            this.btnDefineGrid.Size = new System.Drawing.Size(73, 25);
-            this.btnDefineGrid.TabIndex = 26;
-            this.btnDefineGrid.Text = "Grid";
-            this.btnDefineGrid.UseVisualStyleBackColor = true;
-            this.btnDefineGrid.Click += new System.EventHandler(this.OnButtonClick);
+            this.btnShowGridPolygons.Location = new System.Drawing.Point(68, 62);
+            this.btnShowGridPolygons.Name = "btnShowGridPolygons";
+            this.btnShowGridPolygons.Size = new System.Drawing.Size(73, 25);
+            this.btnShowGridPolygons.TabIndex = 26;
+            this.btnShowGridPolygons.Text = "Grid";
+            this.btnShowGridPolygons.UseVisualStyleBackColor = true;
+            this.btnShowGridPolygons.Click += new System.EventHandler(this.OnButtonClick);
             // 
             // label13
             // 
@@ -467,6 +467,26 @@
             this.dgCategories.Size = new System.Drawing.Size(448, 194);
             this.dgCategories.TabIndex = 22;
             this.dgCategories.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellDblClick);
+            // 
+            // dgcolCategory
+            // 
+            this.dgcolCategory.HeaderText = "Category";
+            this.dgcolCategory.Name = "dgcolCategory";
+            this.dgcolCategory.ReadOnly = true;
+            // 
+            // dgcolCount
+            // 
+            this.dgcolCount.HeaderText = "Count";
+            this.dgcolCount.Name = "dgcolCount";
+            this.dgcolCount.ReadOnly = true;
+            // 
+            // dgCol
+            // 
+            this.dgCol.HeaderText = "Symbol";
+            this.dgCol.Name = "dgCol";
+            this.dgCol.ReadOnly = true;
+            this.dgCol.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgCol.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // btnCategorize
             // 
@@ -522,28 +542,28 @@
             // 
             // graphSheet
             // 
-            chartArea5.AxisX.LabelStyle.Enabled = false;
-            chartArea5.AxisX.MajorGrid.Enabled = false;
-            chartArea5.AxisX.MajorTickMark.Enabled = false;
-            chartArea5.AxisY.IsLabelAutoFit = false;
-            chartArea5.AxisY.LabelStyle.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F);
-            chartArea5.AxisY.MajorGrid.Enabled = false;
-            chartArea5.Name = "ChartArea1";
-            chartArea5.Position.Auto = false;
-            chartArea5.Position.Height = 94F;
-            chartArea5.Position.Width = 100F;
-            this.graphSheet.ChartAreas.Add(chartArea5);
-            legend5.Enabled = false;
-            legend5.Name = "Legend1";
-            this.graphSheet.Legends.Add(legend5);
+            chartArea1.AxisX.LabelStyle.Enabled = false;
+            chartArea1.AxisX.MajorGrid.Enabled = false;
+            chartArea1.AxisX.MajorTickMark.Enabled = false;
+            chartArea1.AxisY.IsLabelAutoFit = false;
+            chartArea1.AxisY.LabelStyle.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F);
+            chartArea1.AxisY.MajorGrid.Enabled = false;
+            chartArea1.Name = "ChartArea1";
+            chartArea1.Position.Auto = false;
+            chartArea1.Position.Height = 94F;
+            chartArea1.Position.Width = 100F;
+            this.graphSheet.ChartAreas.Add(chartArea1);
+            legend1.Enabled = false;
+            legend1.Name = "Legend1";
+            this.graphSheet.Legends.Add(legend1);
             this.graphSheet.Location = new System.Drawing.Point(189, 273);
             this.graphSheet.Name = "graphSheet";
-            series5.ChartArea = "ChartArea1";
-            series5.IsVisibleInLegend = false;
-            series5.Legend = "Legend1";
-            series5.Name = "Series1";
-            series5.YValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.Double;
-            this.graphSheet.Series.Add(series5);
+            series1.ChartArea = "ChartArea1";
+            series1.IsVisibleInLegend = false;
+            series1.Legend = "Legend1";
+            series1.Name = "Series1";
+            series1.YValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.Double;
+            this.graphSheet.Series.Add(series1);
             this.graphSheet.Size = new System.Drawing.Size(265, 105);
             this.graphSheet.TabIndex = 24;
             this.graphSheet.Text = "chart1";
@@ -597,6 +617,37 @@
             this.dgSheetSummary.Size = new System.Drawing.Size(254, 235);
             this.dgSheetSummary.TabIndex = 19;
             this.dgSheetSummary.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnGridSummaryCellClick);
+            // 
+            // colVisible
+            // 
+            this.colVisible.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colVisible.Frozen = true;
+            this.colVisible.HeaderText = "";
+            this.colVisible.MinimumWidth = 25;
+            this.colVisible.Name = "colVisible";
+            this.colVisible.ReadOnly = true;
+            this.colVisible.Width = 25;
+            // 
+            // colSymbol
+            // 
+            this.colSymbol.Frozen = true;
+            this.colSymbol.HeaderText = "Symbol";
+            this.colSymbol.Name = "colSymbol";
+            this.colSymbol.ReadOnly = true;
+            // 
+            // colCount
+            // 
+            this.colCount.Frozen = true;
+            this.colCount.HeaderText = "Count";
+            this.colCount.Name = "colCount";
+            this.colCount.ReadOnly = true;
+            // 
+            // colPercent
+            // 
+            this.colPercent.Frozen = true;
+            this.colPercent.HeaderText = "Percent";
+            this.colPercent.Name = "colPercent";
+            this.colPercent.ReadOnly = true;
             // 
             // lblMappedSheet
             // 
@@ -672,57 +723,6 @@
             this.icbColorScheme.Size = new System.Drawing.Size(91, 21);
             this.icbColorScheme.TabIndex = 24;
             // 
-            // colVisible
-            // 
-            this.colVisible.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.colVisible.Frozen = true;
-            this.colVisible.HeaderText = "";
-            this.colVisible.MinimumWidth = 25;
-            this.colVisible.Name = "colVisible";
-            this.colVisible.ReadOnly = true;
-            this.colVisible.Width = 25;
-            // 
-            // colSymbol
-            // 
-            this.colSymbol.Frozen = true;
-            this.colSymbol.HeaderText = "Symbol";
-            this.colSymbol.Name = "colSymbol";
-            this.colSymbol.ReadOnly = true;
-            // 
-            // colCount
-            // 
-            this.colCount.Frozen = true;
-            this.colCount.HeaderText = "Count";
-            this.colCount.Name = "colCount";
-            this.colCount.ReadOnly = true;
-            // 
-            // colPercent
-            // 
-            this.colPercent.Frozen = true;
-            this.colPercent.HeaderText = "Percent";
-            this.colPercent.Name = "colPercent";
-            this.colPercent.ReadOnly = true;
-            // 
-            // dgcolCategory
-            // 
-            this.dgcolCategory.HeaderText = "Category";
-            this.dgcolCategory.Name = "dgcolCategory";
-            this.dgcolCategory.ReadOnly = true;
-            // 
-            // dgcolCount
-            // 
-            this.dgcolCount.HeaderText = "Count";
-            this.dgcolCount.Name = "dgcolCount";
-            this.dgcolCount.ReadOnly = true;
-            // 
-            // dgCol
-            // 
-            this.dgCol.HeaderText = "Symbol";
-            this.dgCol.Name = "dgCol";
-            this.dgCol.ReadOnly = true;
-            this.dgCol.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.dgCol.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
             // ChlorophyllForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -783,7 +783,7 @@
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.TabPage tabCategorize;
         private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.Button btnShowGrid;
+        private System.Windows.Forms.Button btnShowGridPoints;
         private System.Windows.Forms.Button btnCategorize;
         private System.Windows.Forms.TextBox txtCategoryCount;
         private System.Windows.Forms.Label label10;
@@ -795,7 +795,7 @@
         private UserControls.ImageCombo icbColorScheme;
         private System.Windows.Forms.Button btnInstructions;
         private System.Windows.Forms.GroupBox groupBox2;
-        private System.Windows.Forms.Button btnDefineGrid;
+        private System.Windows.Forms.Button btnShowGridPolygons;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.Label label11;

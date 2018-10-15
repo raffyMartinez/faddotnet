@@ -28,15 +28,20 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.btnOk = new System.Windows.Forms.Button();
             this.lblTitle = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.lvGears = new System.Windows.Forms.ListView();
+            this.contexMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.mnuMapThisGear = new System.Windows.Forms.ToolStripMenuItem();
+            this.btnBatch = new System.Windows.Forms.Button();
+            this.contexMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnOk
             // 
-            this.btnOk.Location = new System.Drawing.Point(359, 333);
+            this.btnOk.Location = new System.Drawing.Point(359, 434);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(49, 24);
             this.btnOk.TabIndex = 0;
@@ -65,17 +70,45 @@
             // 
             // lvGears
             // 
+            this.lvGears.CheckBoxes = true;
+            this.lvGears.ContextMenuStrip = this.contexMenu;
             this.lvGears.Location = new System.Drawing.Point(15, 56);
             this.lvGears.Name = "lvGears";
-            this.lvGears.Size = new System.Drawing.Size(393, 268);
+            this.lvGears.Size = new System.Drawing.Size(393, 372);
             this.lvGears.TabIndex = 5;
             this.lvGears.UseCompatibleStateImageBehavior = false;
+            this.lvGears.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnListViewMouseDown);
+            // 
+            // contexMenu
+            // 
+            this.contexMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mnuMapThisGear});
+            this.contexMenu.Name = "contexMenu";
+            this.contexMenu.Size = new System.Drawing.Size(147, 26);
+            this.contexMenu.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnContextMenuItemClicked);
+            // 
+            // mnuMapThisGear
+            // 
+            this.mnuMapThisGear.Name = "mnuMapThisGear";
+            this.mnuMapThisGear.Size = new System.Drawing.Size(146, 22);
+            this.mnuMapThisGear.Text = "Map this gear";
+            // 
+            // btnBatch
+            // 
+            this.btnBatch.Location = new System.Drawing.Point(304, 434);
+            this.btnBatch.Name = "btnBatch";
+            this.btnBatch.Size = new System.Drawing.Size(49, 24);
+            this.btnBatch.TabIndex = 6;
+            this.btnBatch.Text = "Batch";
+            this.btnBatch.UseVisualStyleBackColor = true;
+            this.btnBatch.Click += new System.EventHandler(this.OnButtonClick);
             // 
             // TargetAreaGearsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(420, 366);
+            this.ClientSize = new System.Drawing.Size(420, 470);
+            this.Controls.Add(this.btnBatch);
             this.Controls.Add(this.lvGears);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.lblTitle);
@@ -85,6 +118,7 @@
             this.Text = "TargetAreaGearsForm";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.TargetAreaGearsForm_FormClosed);
             this.Load += new System.EventHandler(this.TargetAreaGearsForm_Load);
+            this.contexMenu.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -96,5 +130,8 @@
         private System.Windows.Forms.Label lblTitle;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ListView lvGears;
+        private System.Windows.Forms.ContextMenuStrip contexMenu;
+        private System.Windows.Forms.ToolStripMenuItem mnuMapThisGear;
+        private System.Windows.Forms.Button btnBatch;
     }
 }

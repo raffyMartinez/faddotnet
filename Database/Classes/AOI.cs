@@ -435,27 +435,33 @@ namespace FAD3
             }
         }
 
-        public static List<(string gearClass, string gearVariarion, string gearCode)> TargetAreaGearsUsed(string aoiGuid)
+        public static List<(string gearClass, string gearVariation, string GearVarGuid, int count)> TargetAreaGearsUsed(string aoiGuid)
         {
-            var myList = new List<(string gearClass, string gearVariation, string gearCode)>();
+            var myList = new List<(string gearClass, string gearVariation, string GearVarGuid, int count)>();
             DataTable dt = new DataTable();
             using (var conection = new OleDbConnection(global.ConnectionString))
             {
                 try
                 {
                     conection.Open();
-                    string query = $@"SELECT tblGearClass.GearClassName, tblGearVariations.Variation, tblRefGearCodes.RefGearCode
-                                    FROM (tblGearClass INNER JOIN (tblGearVariations INNER JOIN (tblRefGearCodes INNER JOIN tblRefGearCodes_Usage
-                                    ON tblRefGearCodes.RefGearCode = tblRefGearCodes_Usage.RefGearCode) ON tblGearVariations.GearVarGUID = tblRefGearCodes.GearVar)
-                                    ON tblGearClass.GearClass = tblGearVariations.GearClass) INNER JOIN tblAOI ON tblRefGearCodes_Usage.TargetAreaGUID = tblAOI.AOIGuid
-                                    WHERE tblAOI.AOIGuid={{{aoiGuid}}} ORDER BY tblGearClass.GearClassName, tblGearVariations.Variation, tblRefGearCodes.RefGearCode";
+                    //string query = $@"SELECT tblGearClass.GearClassName, tblGearVariations.Variation, tblRefGearCodes.RefGearCode
+                    //                FROM (tblGearClass INNER JOIN (tblGearVariations INNER JOIN (tblRefGearCodes INNER JOIN tblRefGearCodes_Usage
+                    //                ON tblRefGearCodes.RefGearCode = tblRefGearCodes_Usage.RefGearCode) ON tblGearVariations.GearVarGUID = tblRefGearCodes.GearVar)
+                    //                ON tblGearClass.GearClass = tblGearVariations.GearClass) INNER JOIN tblAOI ON tblRefGearCodes_Usage.TargetAreaGUID = tblAOI.AOIGuid
+                    //                WHERE tblAOI.AOIGuid={{{aoiGuid}}} ORDER BY tblGearClass.GearClassName, tblGearVariations.Variation, tblRefGearCodes.RefGearCode";
+
+                    string query = $@"SELECT tblGearClass.GearClassName, tblGearVariations.Variation, tblGearVariations.GearVarGUID, Count(tblSampling.SamplingGUID) AS n
+                                     FROM (tblGearClass INNER JOIN tblGearVariations ON tblGearClass.GearClass = tblGearVariations.GearClass) INNER JOIN tblSampling ON
+                                     tblGearVariations.GearVarGUID = tblSampling.GearVarGUID WHERE tblSampling.AOI={{{aoiGuid}}}
+                                     GROUP BY tblGearClass.GearClassName, tblGearVariations.Variation, tblGearVariations.GearVarGUID
+                                     ORDER BY tblGearClass.GearClassName, tblGearVariations.Variation";
 
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
                     for (int i = 0; i < dt.Rows.Count; i++)
                     {
                         DataRow dr = dt.Rows[i];
-                        myList.Add((dr["GearClassName"].ToString(), dr["Variation"].ToString(), dr["RefGearCode"].ToString()));
+                        myList.Add((dr["GearClassName"].ToString(), dr["Variation"].ToString(), dr["GearVarGUID"].ToString(), (int)dr["n"]));
                     }
                 }
                 catch (Exception ex)

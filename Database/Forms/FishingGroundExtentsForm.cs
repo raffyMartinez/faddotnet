@@ -26,11 +26,11 @@ namespace FAD3
 
         private void FishingGroundExtentsForm_Load(object sender, EventArgs e)
         {
-            foreach (var item in FishingGrid.Grid25.Bounds)
+            foreach (var item in FishingGrid.Grid25.BoundsEx)
             {
-                var lvi = lvGrids.Items.Add(item.gridDescription);
-                lvi.SubItems.Add(item.ulGridName);
-                lvi.SubItems.Add(item.lrGridName);
+                var lvi = lvGrids.Items.Add(item.Value.gridDescription);
+                lvi.SubItems.Add(item.Value.ulGridName);
+                lvi.SubItems.Add(item.Value.lrGridName);
             }
 
             foreach (ColumnHeader c in lvGrids.Columns)

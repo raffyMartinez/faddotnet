@@ -241,8 +241,11 @@ namespace FAD3
         {
             get
             {
+                //return _gt == fadGridType.gridTypeGrid25 && _grid25.UTMZone != fadUTMZone.utmZone_Undefined
+                //        && _grid25.Bounds.Count > 0 && _grid25.GridSet.Count > 0;
+
                 return _gt == fadGridType.gridTypeGrid25 && _grid25.UTMZone != fadUTMZone.utmZone_Undefined
-                        && _grid25.Bounds.Count > 0 && _grid25.GridSet.Count > 0;
+                        && _grid25.BoundsEx.Count > 0 && _grid25.GridSet.Count > 0;
             }
         }
 
@@ -430,10 +433,48 @@ namespace FAD3
             public string ulGridName;
             public string lrGridName;
             public string gridDescription;
+            public bool primaryMap;
 
             public bool IsInisde(double x, double y)
             {
                 return x >= ulX && x <= lrX && y <= ulY && y >= lrY;
+            }
+
+            public bool MakePrimaryMap()
+            {
+                //if (!primaryMap && _grid25.Bounds.Count > 1)
+                if (!primaryMap && _grid25.BoundsEx.Count > 1)
+                {
+                    _grid25.BoundsEx.Remove(PrimaryFishingGroundMapName());
+                    primaryMap = UpdatePrimaryMap(gridDescription, ulGridName, lrGridName);
+                    return primaryMap;
+                }
+                return false;
+            }
+        }
+
+        public static string PrimaryFishingGroundMapName()
+        {
+            var item = new LLBounds();
+            foreach (var bounds in _grid25.BoundsEx)
+            {
+                if (bounds.Value.primaryMap)
+                {
+                    item = bounds.Value;
+                    break;
+                }
+            }
+            return item.gridDescription;
+        }
+
+        private static bool UpdatePrimaryMap(string description, string upperCorner, string lowerCorner)
+        {
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                var sql = $"Update tblAOI set GridDescription = '{description}', UpperLeftGrid= '{upperCorner}', LowerRightGrid = '{lowerCorner}' where AOIGuid = {{{_AOIGuid}}}";
+                OleDbCommand update = new OleDbCommand(sql, conn);
+                conn.Open();
+                return update.ExecuteNonQuery() > 0;
             }
         }
 
@@ -590,7 +631,8 @@ namespace FAD3
                                                 break;
                                         }
 
-                                        _grid25.Bounds.Clear();
+                                        //_grid25.Bounds.Clear();
+                                        _grid25.BoundsEx.Clear();
 
                                         if (UTMZoneSet)
                                         {
@@ -616,8 +658,10 @@ namespace FAD3
                                                 myBound.gridDescription = dr["GridDescription"].ToString();
                                                 myBound.lrGridName = lr;
                                                 myBound.ulGridName = ul;
+                                                myBound.primaryMap = true;
 
-                                                _grid25.Bounds.Add(myBound);
+                                                //_grid25.Bounds.Add(myBound);
+                                                _grid25.BoundsEx.Add(myBound.gridDescription, myBound);
                                             }
 
                                             //read additional grids
@@ -649,7 +693,8 @@ namespace FAD3
                                                             myBound.lrGridName = lr;
                                                             myBound.ulGridName = ul;
 
-                                                            _grid25.Bounds.Add(myBound);
+                                                            //_grid25.Bounds.Add(myBound);
+                                                            _grid25.BoundsEx.Add(myBound.gridDescription, myBound);
                                                         }
                                                     }
                                                 }
@@ -708,11 +753,12 @@ namespace FAD3
         private static void CalculateGridSet()
         {
             _grid25.GridSet.Clear();
-            foreach (var item in _grid25.Bounds)
+            //foreach (var item in _grid25.Bounds)
+            foreach (var item in _grid25.BoundsEx)
             {
-                var arr = item.ulGridName.Split('-');
+                var arr = item.Value.ulGridName.Split('-');
                 var ul = int.Parse(arr[0]);
-                arr = item.lrGridName.Split('-');
+                arr = item.Value.lrGridName.Split('-');
                 var lr = int.Parse(arr[0]);
 
                 var k = lr;
@@ -916,24 +962,28 @@ namespace FAD3
         /// <param name="y"></param>
         private static void MinorGridCentroid(string minorGridName, out int x, out int y)
         {
-            var arr = minorGridName.Split('-');
-            var MajorGrid = int.Parse(arr[0].Trim());
-            var Success = MajorGrid <= _grid25.MaxGridNumber;
             x = y = 0;
-            if (Success)
+            if (minorGridName.Length > 0)
             {
-                var MinorGrid = arr[1].Trim();
-                var MajorX = GridXOrigin(MajorGrid);
-                var MajorY = GridYOrigin(MajorGrid);
-                //var arr1 = MinorGrid.Substring(0, 1).ToLower().ToCharArray();
-                //var MinorCol1 = (int)arr1[0] - 96;
-                var MinorCol = MinorGrid.ToLower()[0] - 96;
-                var MinorRow = 25 - int.Parse(MinorGrid.Substring(1, MinorGrid.Length - 1));
-                x = MajorX + (MinorCol * 2000) - 1000;
-                y = MajorY + (MinorRow * 2000) + 1000;
+                var arr = minorGridName.Split('-');
+                var MajorGrid = int.Parse(arr[0].Trim());
+                var Success = MajorGrid <= _grid25.MaxGridNumber;
 
-                if (MinorCol > 0 && MinorCol < 26 && MinorRow > 0 && MinorRow < 26)
-                    CleanGridName();
+                if (Success)
+                {
+                    var MinorGrid = arr[1].Trim();
+                    var MajorX = GridXOrigin(MajorGrid);
+                    var MajorY = GridYOrigin(MajorGrid);
+                    //var arr1 = MinorGrid.Substring(0, 1).ToLower().ToCharArray();
+                    //var MinorCol1 = (int)arr1[0] - 96;
+                    var MinorCol = MinorGrid.ToLower()[0] - 96;
+                    var MinorRow = 25 - int.Parse(MinorGrid.Substring(1, MinorGrid.Length - 1));
+                    x = MajorX + (MinorCol * 2000) - 1000;
+                    y = MajorY + (MinorRow * 2000) + 1000;
+
+                    if (MinorCol > 0 && MinorCol < 26 && MinorRow > 0 && MinorRow < 26)
+                        CleanGridName();
+                }
             }
         }
 
@@ -1008,6 +1058,43 @@ namespace FAD3
                 conn.Open();
                 update.ExecuteNonQuery();
             }
+        }
+
+        public static bool DeleteFishingGroundMap(string name, string targetAreaGuid)
+        {
+            bool proceed = true;
+            if (Grid25.BoundsEx.Count == 1)
+            {
+                return false;
+            }
+            else
+            {
+                if (name == PrimaryFishingGroundMapName())
+                {
+                    proceed = false;
+                    foreach (var item in _grid25.BoundsEx)
+                    {
+                        if (!item.Value.primaryMap)
+                        {
+                            name = item.Value.gridDescription;
+                            proceed = item.Value.MakePrimaryMap();
+                            break;
+                        }
+                    }
+                }
+
+                if (proceed)
+                {
+                    using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+                    {
+                        var sql = $"Delete * from tblAdditionalAOIExtent where AOIGuid = {{{targetAreaGuid}}} AND GridDescription='{name}'";
+                        OleDbCommand update = new OleDbCommand(sql, conn);
+                        conn.Open();
+                        proceed = update.ExecuteNonQuery() > 0;
+                    }
+                }
+            }
+            return proceed;
         }
 
         /// <summary>
@@ -1114,13 +1201,20 @@ namespace FAD3
             public int MajorGridSizeMeters { get; set; }
             public int MajorGridXOrigin { get; set; }
             public int MajorGridYOrigin { get; set; }
-            private static List<LLBounds> _bounds;
 
-            public List<LLBounds> Bounds
+            //private static List<LLBounds> _bounds;
+            private static Dictionary<string, LLBounds> _boundsEx;
+
+            public Dictionary<string, LLBounds> BoundsEx
             {
-                get { return _bounds; }
-                //set { _bounds = value;  }
+                get { return _boundsEx; }
             }
+
+            //public List<LLBounds> Bounds
+            //{
+            //    get { return _bounds; }
+            //    //set { _bounds = value;  }
+            //}
 
             public List<string> GridSet
             {
@@ -1130,7 +1224,8 @@ namespace FAD3
 
             static Grid25Struct()
             {
-                _bounds = new List<LLBounds>();
+                //_bounds = new List<LLBounds>();
+                _boundsEx = new Dictionary<string, LLBounds>();
                 _GridSet = new List<string>();
             }
         }

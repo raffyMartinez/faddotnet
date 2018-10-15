@@ -216,11 +216,15 @@ namespace FAD3
             }
         }
 
-        public bool SaveMapImage(double DPI, string fileName)
+        public bool SaveMapImage(double DPI, string fileName, bool Preview = true)
         {
+            var success = false;
             _saveMapImage = new SaveMapImage(fileName, DPI, axMap);
+            _saveMapImage.PreviewImage = Preview;
             _saveMapImage.MapLayersHandler = _mapLayersHandler;
-            return _saveMapImage.Save(_grid25MajorGrid != null);
+            success = _saveMapImage.Save(_grid25MajorGrid != null);
+            _saveMapImage.Dispose();
+            return success;
         }
 
         private void OnToolbarClicked(object sender, ToolStripItemClickedEventArgs e)

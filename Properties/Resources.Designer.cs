@@ -458,6 +458,16 @@ namespace FAD3.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap mapPreview {
+            get {
+                object obj = ResourceManager.GetObject("mapPreview", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap MapTileLayer_16x_24 {
             get {
                 object obj = ResourceManager.GetObject("MapTileLayer_16x_24", resourceCulture);

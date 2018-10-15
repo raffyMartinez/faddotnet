@@ -374,7 +374,7 @@ namespace FAD3
         /// </summary>
         /// <param name="dbData"></param>
         /// <returns></returns>
-        private static bool CreateInlandGridTable(Database dbData)
+        private static bool CreateInlandGridTable(dao.Database dbData)
         {
             var sql = @"Create table tblGrid25Inland
                             (grid_name TEXT(8),

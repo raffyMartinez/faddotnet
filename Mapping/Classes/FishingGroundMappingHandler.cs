@@ -285,94 +285,97 @@ namespace FAD3
                             if (shp.Create(ShpfileType.SHP_POINT))
                             {
                                 var fg = dr["FishingGround"].ToString();
-                                var iShp = 0;
-                                if (_geoProjection.IsGeographic)
+                                if (!FishingGrid.MinorGridIsInland(fg))
                                 {
-                                    var result = FishingGrid.Grid25ToLatLong(fg, utmZone);
-                                    iShp = shp.AddPoint(result.longitude, result.latitude);
-                                }
-                                else
-                                {
-                                    FishingGrid.Grid25_to_UTM(fg, out int x, out int y);
-                                    iShp = shp.AddPoint(x, y);
-                                }
-                                if (iShp >= 0 && sf.EditInsertShape(shp, n))
-                                {
-                                    sf.EditCellValue(ifldAOI, n, dr["AOIName"].ToString());
-                                    sf.EditCellValue(ifldYear, n, int.Parse(dr["samplingYear"].ToString()));
-                                    sf.EditCellValue(ifldFG, n, dr["FishingGround"].ToString());
-
-                                    //aggregated
-                                    if (Aggregated)
+                                    var iShp = 0;
+                                    if (_geoProjection.IsGeographic)
                                     {
-                                        if (landingSiteGuid.Length > 0)
-                                        {
-                                            sf.EditCellValue(ifldLS, n, dr["LSName"].ToString());
-                                        }
-                                        if (gearVariationGuid.Length > 0)
-                                        {
-                                            sf.EditCellValue(ifldGear, n, dr["Variation"].ToString());
-                                        }
-                                        sf.EditCellValue(ifldCount, n, int.Parse(dr["n"].ToString()));
-                                        sf.EditCellValue(ifldMaxWt, n, double.Parse(dr["MaxCatch"].ToString()));
-                                        sf.EditCellValue(ifldMinWt, n, double.Parse(dr["MinCatch"].ToString()));
-                                        sf.EditCellValue(ifldAfgWt, n, double.Parse(dr["AvgCatch"].ToString()));
+                                        var result = FishingGrid.Grid25ToLatLong(fg, utmZone);
+                                        iShp = shp.AddPoint(result.longitude, result.latitude);
                                     }
-
-                                    //not aggregated
                                     else
                                     {
-                                        sf.EditCellValue(ifldEnumerator, n, dr["EnumeratorName"].ToString());
-                                        sf.EditCellValue(ifldLS, n, dr["LSName"].ToString());
-                                        sf.EditCellValue(ifldGearClass, n, dr["GearClassName"].ToString());
-                                        sf.EditCellValue(ifldGear, n, dr["Variation"].ToString());
+                                        FishingGrid.Grid25_to_UTM(fg, out int x, out int y);
+                                        iShp = shp.AddPoint(x, y);
+                                    }
+                                    if (iShp >= 0 && sf.EditInsertShape(shp, n))
+                                    {
+                                        sf.EditCellValue(ifldAOI, n, dr["AOIName"].ToString());
+                                        sf.EditCellValue(ifldYear, n, int.Parse(dr["samplingYear"].ToString()));
+                                        sf.EditCellValue(ifldFG, n, dr["FishingGround"].ToString());
 
-                                        if (dr["NoHauls"].ToString().Length > 0)
-                                            sf.EditCellValue(ifldNumberHauls, n, int.Parse(dr["NoHauls"].ToString()));
-
-                                        if (dr["NoFishers"].ToString().Length > 0)
-                                            sf.EditCellValue(ifldNumberFisher, n, int.Parse(dr["NoFishers"].ToString()));
-
-                                        if (dr["DateSet"].ToString().Length > 0)
-                                            sf.EditCellValue(ifldDateSet, n, DateTime.Parse(dr["DateSet"].ToString()));
-
-                                        if (dr["TimeSet"].ToString().Length > 0)
-                                            sf.EditCellValue(ifldTimeSet, n, DateTime.Parse(dr["TimeSet"].ToString()));
-
-                                        if (dr["DateHauled"].ToString().Length > 0)
-                                            sf.EditCellValue(ifldDateHauled, n, DateTime.Parse(dr["DateHauled"].ToString()));
-
-                                        if (dr["TimeHauled"].ToString().Length > 0)
-                                            sf.EditCellValue(ifldTimeHauled, n, DateTime.Parse(dr["TimeHauled"].ToString()));
-
-                                        if (dr["VesType"].ToString().Length > 0)
+                                        //aggregated
+                                        if (Aggregated)
                                         {
-                                            var vesselType = "Motorized";
-                                            switch (int.Parse(dr["VesType"].ToString()))
+                                            if (landingSiteGuid.Length > 0)
                                             {
-                                                case 1:
-                                                    vesselType = "Motorized";
-                                                    break;
-
-                                                case 2:
-                                                    vesselType = "Non-motorized";
-                                                    break;
-
-                                                case 3:
-                                                    vesselType = "No vessel used";
-                                                    break;
-
-                                                case 4:
-                                                    vesselType = "Not provided";
-                                                    break;
+                                                sf.EditCellValue(ifldLS, n, dr["LSName"].ToString());
                                             }
-                                            sf.EditCellValue(ifldVessel, n, vesselType);
+                                            if (gearVariationGuid.Length > 0)
+                                            {
+                                                sf.EditCellValue(ifldGear, n, dr["Variation"].ToString());
+                                            }
+                                            sf.EditCellValue(ifldCount, n, int.Parse(dr["n"].ToString()));
+                                            sf.EditCellValue(ifldMaxWt, n, double.Parse(dr["MaxCatch"].ToString()));
+                                            sf.EditCellValue(ifldMinWt, n, double.Parse(dr["MinCatch"].ToString()));
+                                            sf.EditCellValue(ifldAfgWt, n, double.Parse(dr["AvgCatch"].ToString()));
                                         }
 
-                                        if (dr["hp"].ToString().Length > 0)
-                                            sf.EditCellValue(ifldHP, n, dr["hp"].ToString());
+                                        //not aggregated
+                                        else
+                                        {
+                                            sf.EditCellValue(ifldEnumerator, n, dr["EnumeratorName"].ToString());
+                                            sf.EditCellValue(ifldLS, n, dr["LSName"].ToString());
+                                            sf.EditCellValue(ifldGearClass, n, dr["GearClassName"].ToString());
+                                            sf.EditCellValue(ifldGear, n, dr["Variation"].ToString());
 
-                                        sf.EditCellValue(ifldCatchWt, n, double.Parse(dr["WtCatch"].ToString()));
+                                            if (dr["NoHauls"].ToString().Length > 0)
+                                                sf.EditCellValue(ifldNumberHauls, n, int.Parse(dr["NoHauls"].ToString()));
+
+                                            if (dr["NoFishers"].ToString().Length > 0)
+                                                sf.EditCellValue(ifldNumberFisher, n, int.Parse(dr["NoFishers"].ToString()));
+
+                                            if (dr["DateSet"].ToString().Length > 0)
+                                                sf.EditCellValue(ifldDateSet, n, DateTime.Parse(dr["DateSet"].ToString()));
+
+                                            if (dr["TimeSet"].ToString().Length > 0)
+                                                sf.EditCellValue(ifldTimeSet, n, DateTime.Parse(dr["TimeSet"].ToString()));
+
+                                            if (dr["DateHauled"].ToString().Length > 0)
+                                                sf.EditCellValue(ifldDateHauled, n, DateTime.Parse(dr["DateHauled"].ToString()));
+
+                                            if (dr["TimeHauled"].ToString().Length > 0)
+                                                sf.EditCellValue(ifldTimeHauled, n, DateTime.Parse(dr["TimeHauled"].ToString()));
+
+                                            if (dr["VesType"].ToString().Length > 0)
+                                            {
+                                                var vesselType = "Motorized";
+                                                switch (int.Parse(dr["VesType"].ToString()))
+                                                {
+                                                    case 1:
+                                                        vesselType = "Motorized";
+                                                        break;
+
+                                                    case 2:
+                                                        vesselType = "Non-motorized";
+                                                        break;
+
+                                                    case 3:
+                                                        vesselType = "No vessel used";
+                                                        break;
+
+                                                    case 4:
+                                                        vesselType = "Not provided";
+                                                        break;
+                                                }
+                                                sf.EditCellValue(ifldVessel, n, vesselType);
+                                            }
+
+                                            if (dr["hp"].ToString().Length > 0)
+                                                sf.EditCellValue(ifldHP, n, dr["hp"].ToString());
+
+                                            sf.EditCellValue(ifldCatchWt, n, double.Parse(dr["WtCatch"].ToString()));
+                                        }
                                     }
                                 }
                             }
@@ -384,10 +387,18 @@ namespace FAD3
                 sf.GeoProjection = _geoProjection;
                 sf.CollisionMode = tkCollisionMode.AllowCollisions;
                 sf.DefaultDrawingOptions.PointShape = tkPointShapeType.ptShapeCircle;
+                sf.DefaultDrawingOptions.FillColor = new Utils().ColorByName(tkMapColor.Red);
+                sf.DefaultDrawingOptions.LineColor = new Utils().ColorByName(tkMapColor.White);
                 if (Aggregated)
                 {
                     ShapefileLayerHelper.CategorizeNumericPointLayer(sf, ifldCount);
                 }
+                else
+                {
+                    sf.DefaultDrawingOptions.PointSize = 7;
+                }
+                sf.SelectionAppearance = tkSelectionAppearance.saDrawingOptions;
+                sf.SelectionDrawingOptions.PointShape = tkPointShapeType.ptShapeCircle;
 
                 if (ShapefileLayerHelper.ExtentsPosition(MapControl.Extents, sf.Extents) == global.ExtentCompare.excoOutside)
                 {

@@ -49,6 +49,8 @@ namespace FAD3.Mapping.Forms
         {
             btnOk.Enabled = false;
             btnReadSheet.Enabled = false;
+            btnCategorize.Enabled = false;
+            btnShowGridPoints.Enabled = false;
             lblMappedSheet.Visible = false;
             SizeColumns(dgCategories);
             SizeColumns(dgSheetSummary);
@@ -58,6 +60,7 @@ namespace FAD3.Mapping.Forms
             {
                 icbColorScheme.SelectedIndex = 0;
             }
+            txtCategoryCount.Text = "5";
         }
 
         private void OpenFile()
@@ -191,6 +194,51 @@ namespace FAD3.Mapping.Forms
         {
             switch (((Button)sender).Name)
             {
+                case "btnOpen":
+                    OpenFile();
+                    btnReadWorkbook.Enabled = _excelFileName?.Length > 0 && File.Exists(_excelFileName);
+                    break;
+
+                case "btnReadWorkbook":
+                    ReadExcelFile();
+                    break;
+
+                case "btnReadSheet":
+                    if (listSheets.SelectedIndex >= 0)
+                    {
+                        ReadSheet();
+                    }
+                    break;
+
+                case "btnCategorize":
+                    if (txtCategoryCount.Text.Length > 0 && cboLatitude.SelectedIndex >= 0
+                        && cboLongitude.SelectedIndex > 0 && cboFirstData.SelectedIndex >= 0
+                        && cboLastData.SelectedIndex >= 0)
+                    {
+                        listSheetsForMapping();
+                        listCoordinates();
+                        getDataValues();
+                        btnShowGridPoints.Enabled = DoJenksFisher();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Specify longitude, latitude, and, first and last data columns",
+                                        "Required data is missing", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+
+                    break;
+
+                case "btnShowGridPoints":
+                    MapGridPoints();
+                    break;
+
+                case "btnShowGridPolygons":
+                    if (MakeGridFromPoints.MakeGridShapefile())
+                    {
+                        global.MappingForm.MapLayersHandler.AddLayer(MakeGridFromPoints.GridShapefile, "Mesh");
+                    }
+                    break;
+
                 case "btnUp":
                     MapSheet(false);
                     break;
@@ -208,53 +256,11 @@ namespace FAD3.Mapping.Forms
                     ColorSchemesForm csf = new ColorSchemesForm(ref global.MappingForm.MapLayersHandler.LayerColors);
                     break;
 
-                case "btnDefineGrid":
-                    if (MakeGridFromPoints.MakeGridShapefile())
-                    {
-                        global.MappingForm.MapLayersHandler.AddLayer(MakeGridFromPoints.GridShapefile, "Mesh");
-                    }
-                    break;
-
                 case "btnOk":
                     break;
 
                 case "btnCancel":
                     Close();
-                    break;
-
-                case "btnOpen":
-                    OpenFile();
-                    btnReadWorkbook.Enabled = _excelFileName?.Length > 0 && File.Exists(_excelFileName);
-                    break;
-
-                case "btnReadSheet":
-                    if (listSheets.SelectedIndex >= 0)
-                    {
-                        ReadSheet();
-                    }
-                    break;
-
-                case "btnReadWorkbook":
-                    ReadExcelFile();
-                    break;
-
-                case "btnShowGrid":
-                    MapGridPoints();
-                    break;
-
-                case "btnCategorize":
-                    if (txtCategoryCount.Text.Length > 0)
-                    {
-                        listSheetsForMapping();
-                        listCoordinates();
-                        getDataValues();
-                        doJenksFisher();
-                    }
-
-                    break;
-
-                case "btnGetSheets":
-
                     break;
             }
         }
@@ -495,7 +501,7 @@ namespace FAD3.Mapping.Forms
             return count;
         }
 
-        private void doJenksFisher()
+        private bool DoJenksFisher()
         {
             if (txtCategoryCount.Text.Length > 0)
             {
@@ -533,7 +539,9 @@ namespace FAD3.Mapping.Forms
                 dgCategories[2, row].Style.BackColor = color;
                 SizeColumns(dgCategories, false, true);
                 MakeGridFromPoints.AddNullCategory();
+                return listBreaks.Count > 0;
             }
+            return false;
         }
 
         private void OnComboIndexChanged(object sender, EventArgs e)
@@ -557,6 +565,8 @@ namespace FAD3.Mapping.Forms
                     _latitudeColIndex = cbo.SelectedIndex;
                     break;
             }
+
+            btnCategorize.Enabled = cboFirstData.SelectedIndex >= 0 && cboLastData.SelectedIndex >= 0 && cboLatitude.SelectedIndex >= 0 && cboLongitude.SelectedIndex >= 0;
         }
 
         private void OnCellDblClick(object sender, DataGridViewCellEventArgs e)

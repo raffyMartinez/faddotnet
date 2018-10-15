@@ -26,6 +26,32 @@ namespace FAD3
         private int _handleMajorGrid;
         private int _handleMinorGrid;
         private Dictionary<int, int> _frameWidthDict = new Dictionary<int, int>();
+        public bool PreviewImage { get; set; }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    _frameWidthDict.Clear();
+                    _frameWidthDict = null;
+                }
+                if (_shapeFileMask != null)
+                {
+                    _shapeFileMask.Close();
+                    _shapeFileMask = null;
+                }
+                _axMap = null;
+                _disposed = true;
+            }
+        }
 
         /// <summary>
         /// Constructor
@@ -59,6 +85,19 @@ namespace FAD3
             return value;
         }
 
+        private int AdjustLabelProperty(int value)
+        {
+            if (Reset)
+            {
+                value /= ((int)_dpi / 96);
+            }
+            else
+            {
+                value *= ((int)_dpi / 96);
+            }
+            return value;
+        }
+
         /// <summary>
         /// Sets different numeric properties of labels to fit the desired DPI of the output map
         /// </summary>
@@ -68,14 +107,14 @@ namespace FAD3
             _axMap.get_Shapefile(layerHandle).Labels.With(lbl =>
            {
                lbl.VerticalPosition = tkVerticalPosition.vpAboveParentLayer;
-               lbl.FontSize = (int)AdjustLabelProperty(lbl.FontSize);
+               lbl.FontSize = AdjustLabelProperty(lbl.FontSize);
                lbl.OffsetX = AdjustLabelProperty(lbl.OffsetX);
                lbl.OffsetY = AdjustLabelProperty(lbl.OffsetY);
-               lbl.FontOutlineWidth = (int)AdjustLabelProperty(lbl.FontOutlineWidth);
-               lbl.FramePaddingX = (int)AdjustLabelProperty(lbl.FramePaddingX);
-               lbl.FramePaddingY = (int)AdjustLabelProperty(lbl.FramePaddingY);
-               lbl.ShadowOffsetX = (int)AdjustLabelProperty(lbl.ShadowOffsetX);
-               lbl.ShadowOffsetY = (int)AdjustLabelProperty(lbl.ShadowOffsetY);
+               lbl.FontOutlineWidth = AdjustLabelProperty(lbl.FontOutlineWidth);
+               lbl.FramePaddingX = AdjustLabelProperty(lbl.FramePaddingX);
+               lbl.FramePaddingY = AdjustLabelProperty(lbl.FramePaddingY);
+               lbl.ShadowOffsetX = AdjustLabelProperty(lbl.ShadowOffsetX);
+               lbl.ShadowOffsetY = AdjustLabelProperty(lbl.ShadowOffsetY);
 
                if (Reset)
                {
@@ -95,15 +134,15 @@ namespace FAD3
                {
                    for (int n = 0; n < lbl.NumCategories; n++)
                    {
-                       lbl.Category[n].FontSize = (int)AdjustLabelProperty(lbl.Category[n].FontSize);
+                       lbl.Category[n].FontSize = AdjustLabelProperty(lbl.Category[n].FontSize);
                        lbl.Category[n].OffsetX = AdjustLabelProperty(lbl.Category[n].OffsetX);
                        lbl.Category[n].OffsetY = AdjustLabelProperty(lbl.Category[n].OffsetY);
-                       lbl.Category[n].FontOutlineWidth = (int)AdjustLabelProperty(lbl.Category[n].FontOutlineWidth);
-                       lbl.Category[n].FramePaddingX = (int)AdjustLabelProperty(lbl.Category[n].FramePaddingX);
-                       lbl.Category[n].FramePaddingY = (int)AdjustLabelProperty(lbl.Category[n].FramePaddingY);
-                       lbl.Category[n].ShadowOffsetX = (int)AdjustLabelProperty(lbl.Category[n].ShadowOffsetX);
-                       lbl.Category[n].ShadowOffsetY = (int)AdjustLabelProperty(lbl.Category[n].ShadowOffsetY);
-                       lbl.Category[n].FrameOutlineWidth = (int)AdjustLabelProperty(lbl.Category[n].FrameOutlineWidth);
+                       lbl.Category[n].FontOutlineWidth = AdjustLabelProperty(lbl.Category[n].FontOutlineWidth);
+                       lbl.Category[n].FramePaddingX = AdjustLabelProperty(lbl.Category[n].FramePaddingX);
+                       lbl.Category[n].FramePaddingY = AdjustLabelProperty(lbl.Category[n].FramePaddingY);
+                       lbl.Category[n].ShadowOffsetX = AdjustLabelProperty(lbl.Category[n].ShadowOffsetX);
+                       lbl.Category[n].ShadowOffsetY = AdjustLabelProperty(lbl.Category[n].ShadowOffsetY);
+                       lbl.Category[n].FrameOutlineWidth = AdjustLabelProperty(lbl.Category[n].FrameOutlineWidth);
                    }
                }
            });
@@ -117,51 +156,54 @@ namespace FAD3
             for (int n = 0; n < _axMap.NumLayers; n++)
             {
                 var h = _axMap.get_LayerHandle(n);
-                var categoryCount = _axMap.get_Shapefile(h).Categories.Count;
-
-                if (_axMap.get_LayerVisible(h))
+                if (_axMap.get_GetObject(h).GetType().Name == "ShapefileClass")
                 {
-                    AdjustLabelProperties(h);
+                    var categoryCount = _axMap.get_Shapefile(h).Categories.Count;
 
-                    _axMap.get_Shapefile(h).DefaultDrawingOptions.With(ddo =>
+                    if (_axMap.get_LayerVisible(h))
                     {
-                        if (Reset)
+                        AdjustLabelProperties(h);
+
+                        _axMap.get_Shapefile(h).DefaultDrawingOptions.With(ddo =>
                         {
-                            if (categoryCount > 0)
+                            if (Reset)
                             {
-                                for (int y = 0; y < categoryCount; y++)
+                                if (categoryCount > 0)
                                 {
-                                    _axMap.get_Shapefile(h).Categories.Item[y].DrawingOptions.LineWidth /= (float)(_dpi / 96);
-                                    _axMap.get_Shapefile(h).Categories.Item[y].DrawingOptions.PointSize /= (float)(_dpi / 96);
-                                    _axMap.get_Shapefile(h).Categories.Item[y].DrawingOptions.VerticesSize /= (int)(_dpi / 96);
+                                    for (int y = 0; y < categoryCount; y++)
+                                    {
+                                        _axMap.get_Shapefile(h).Categories.Item[y].DrawingOptions.LineWidth /= (float)(_dpi / 96);
+                                        _axMap.get_Shapefile(h).Categories.Item[y].DrawingOptions.PointSize /= (float)(_dpi / 96);
+                                        _axMap.get_Shapefile(h).Categories.Item[y].DrawingOptions.VerticesSize /= (int)(_dpi / 96);
+                                    }
+                                }
+                                else
+                                {
+                                    ddo.PointSize /= (float)(_dpi / 96);
+                                    ddo.LineWidth /= (float)(_dpi / 96);
+                                    ddo.VerticesSize /= (int)(_dpi / 96);
                                 }
                             }
                             else
                             {
-                                ddo.PointSize /= (float)(_dpi / 96);
-                                ddo.LineWidth /= (float)(_dpi / 96);
-                                ddo.VerticesSize /= (int)(_dpi / 96);
-                            }
-                        }
-                        else
-                        {
-                            if (categoryCount > 0)
-                            {
-                                for (int y = 0; y < categoryCount; y++)
+                                if (categoryCount > 0)
                                 {
-                                    _axMap.get_Shapefile(h).Categories.Item[y].DrawingOptions.LineWidth *= (float)(_dpi / 96);
-                                    _axMap.get_Shapefile(h).Categories.Item[y].DrawingOptions.PointSize *= (float)(_dpi / 96);
-                                    _axMap.get_Shapefile(h).Categories.Item[y].DrawingOptions.VerticesSize *= (int)(_dpi / 96);
+                                    for (int y = 0; y < categoryCount; y++)
+                                    {
+                                        _axMap.get_Shapefile(h).Categories.Item[y].DrawingOptions.LineWidth *= (float)(_dpi / 96);
+                                        _axMap.get_Shapefile(h).Categories.Item[y].DrawingOptions.PointSize *= (float)(_dpi / 96);
+                                        _axMap.get_Shapefile(h).Categories.Item[y].DrawingOptions.VerticesSize *= (int)(_dpi / 96);
+                                    }
+                                }
+                                else
+                                {
+                                    ddo.PointSize *= (float)(_dpi / 96);
+                                    ddo.LineWidth *= (float)(_dpi / 96);
+                                    ddo.VerticesSize *= (int)(_dpi / 96);
                                 }
                             }
-                            else
-                            {
-                                ddo.PointSize *= (float)(_dpi / 96);
-                                ddo.LineWidth *= (float)(_dpi / 96);
-                                ddo.VerticesSize *= (int)(_dpi / 96);
-                            }
-                        }
-                    });
+                        });
+                    }
                 }
             }
         }
@@ -172,6 +214,7 @@ namespace FAD3
         /// <returns></returns>
         public bool Save(bool SaveGrid25 = true)
         {
+            //MapLayersHandler.SaveLayerSettingsToXML();
             AdjustFeatureSize();
             if (SaveGrid25)
             {
@@ -213,7 +256,10 @@ namespace FAD3
             {
                 if (kv.Value.Visible)
                 {
-                    _axMap.get_Shapefile(kv.Key).Labels.VerticalPosition = tkVerticalPosition.vpAboveParentLayer;
+                    if (_axMap.get_GetObject(kv.Key).GetType().Name == "ShapefileClass")
+                    {
+                        _axMap.get_Shapefile(kv.Key).Labels.VerticalPosition = tkVerticalPosition.vpAboveParentLayer;
+                    }
                 }
             }
             return SaveMapHelper(null);
@@ -240,14 +286,15 @@ namespace FAD3
             if (handleMask != null) MapLayersHandler.RemoveLayer((int)handleMask);
             Reset = true;
             AdjustFeatureSize();
+            //MapLayersHandler.RestoreLayerSettingsFromXML();
 
             //save the image to disk and create a worldfile. Image format is specified by USE_FILE_EXTENSION.
             //also save the projection file
             if (img.Save(_fileName, WriteWorldFile: true, FileType: ImageType.USE_FILE_EXTENSION) && _axMap.GeoProjection.WriteToFile(prjFileName))
             {
                 //show the image file using the default image viewer
-                Process.Start(_fileName);
-
+                if (PreviewImage) Process.Start(_fileName);
+                img = null;
                 return true;
             }
             else
@@ -317,29 +364,6 @@ namespace FAD3
             _axMap.get_Shapefile(_handleLabels).Labels.AvoidCollisions = false;
 
             return SaveMapHelper(handleMask);
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_disposed)
-            {
-                if (disposing)
-                {
-                }
-                if (_shapeFileMask != null)
-                {
-                    _shapeFileMask.Close();
-                    _shapeFileMask = null;
-                }
-                _axMap = null;
-                _disposed = true;
-            }
         }
     }
 }

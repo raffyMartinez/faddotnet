@@ -73,6 +73,26 @@ namespace FAD3
             }
         }
 
+        /// <summary>
+        /// Sizes all columns so that it fits the widest column content or the column header content
+        /// </summary>
+        public static void SizeListViewColumns(ListView lv, bool init = true)
+        {
+            foreach (ColumnHeader c in lv.Columns)
+            {
+                if (init)
+                {
+                    c.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
+                    c.Tag = c.Width;
+                }
+                else
+                {
+                    c.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+                    c.Width = c.Width > (int)c.Tag ? c.Width : (int)c.Tag;
+                }
+            }
+        }
+
         public static bool MapIsOpen
         {
             get { return _mapIsOpen; }

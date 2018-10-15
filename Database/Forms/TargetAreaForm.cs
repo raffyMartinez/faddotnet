@@ -18,7 +18,7 @@ namespace FAD3
     /// </summary>
     public partial class TargetAreaForm : Form
     {
-        private aoi _AOI = new aoi();
+        private aoi _aoi = new aoi();
         private bool _IsNew = false;
         private static TargetAreaForm _instance;
         private MainForm _parent_form;
@@ -57,10 +57,10 @@ namespace FAD3
 
         public aoi AOI
         {
-            get { return _AOI; }
+            get { return _aoi; }
             set
             {
-                _AOI = value;
+                _aoi = value;
                 ShowAOIProps();
             }
         }
@@ -81,7 +81,7 @@ namespace FAD3
         {
             textBoxOtherGrid.Text = "";
 
-            var myAOIdata = _AOI.AOIDataEx();
+            var myAOIdata = _aoi.AOIDataEx();
             if (myAOIdata.Count > 0)
             {
                 txtName.Text = myAOIdata["AOIName"].ToString();
@@ -97,6 +97,7 @@ namespace FAD3
                         tabPageName = "tabGrid25";
 
                         LoadGrid25Items(lvMaps);
+                        global.SizeListViewColumns(lvMaps, false);
                         comboUTMZone.Text = "";
                         comboUTMZone.Text = FishingGrid.UTMZoneName;
                         comboSubGrid.SelectedIndex = (int)FishingGrid.SubGridStyle;
@@ -136,6 +137,8 @@ namespace FAD3
                o.FullRowSelect = true;
            });
 
+            global.SizeListViewColumns(lv);
+
             comboUTMZone.SelectedIndex = -1;
             comboSubGrid.SelectedIndex = -1;
             if (_IsNew)
@@ -150,11 +153,11 @@ namespace FAD3
             lv.Items.Clear();
             if (FishingGrid.GridType == FishingGrid.fadGridType.gridTypeGrid25)
             {
-                foreach (var item in FishingGrid.Grid25.Bounds)
+                foreach (var item in FishingGrid.Grid25.BoundsEx)
                 {
-                    var lvi = lv.Items.Add(item.gridDescription);
-                    lvi.SubItems.Add(item.ulGridName);
-                    lvi.SubItems.Add(item.lrGridName);
+                    var lvi = lv.Items.Add(item.Value.gridDescription);
+                    lvi.SubItems.Add(item.Value.ulGridName);
+                    lvi.SubItems.Add(item.Value.lrGridName);
                     lvi.Name = lvi.Text;
                 }
             }
@@ -227,13 +230,13 @@ namespace FAD3
 
             if (_IsNew)
             {
-                _AOI.AOIGUID = Guid.NewGuid().ToString();
+                _aoi.AOIGUID = Guid.NewGuid().ToString();
             }
 
             Dictionary<string, string> TargetAreaData = new Dictionary<string, string>();
             TargetAreaData.Add("AOIName", txtName.Text);
             TargetAreaData.Add("Letter", txtCode.Text);
-            TargetAreaData.Add("AOIGUID", _AOI.AOIGUID);
+            TargetAreaData.Add("AOIGUID", _aoi.AOIGUID);
             TargetAreaData.Add("DataStatus", _IsNew ?
                                               global.fad3DataStatus.statusNew.ToString() :
                                               global.fad3DataStatus.statusEdited.ToString());
@@ -264,7 +267,7 @@ namespace FAD3
                     //save other grid data
                     Maps = null;
                 }
-                Success = FishingGrid.SaveTargetAreaGrid25(_AOI.AOIGUID, UseGrid25: tabPage == "tabGrid25",
+                Success = FishingGrid.SaveTargetAreaGrid25(_aoi.AOIGUID, UseGrid25: tabPage == "tabGrid25",
                                 Zone, SubGridStyle, Maps, FirstMap);
             }
             return Success;
@@ -281,7 +284,7 @@ namespace FAD3
                         {
                             if (_IsNew)
                             {
-                                _parent_form.NewTargetArea(txtName.Text, _AOI.AOIGUID);
+                                _parent_form.NewTargetArea(txtName.Text, _aoi.AOIGUID);
                             }
                             else
                             {
@@ -379,6 +382,11 @@ namespace FAD3
                     break;
 
                 case "buttonRemoveMap":
+                    var itemText = lvMaps.SelectedItems[0].Text;
+                    if (FishingGrid.DeleteFishingGroundMap(itemText, _aoi.AOIGUID))
+                    {
+                        lvMaps.Items.RemoveByKey(itemText);
+                    }
                     break;
             }
         }

@@ -6,6 +6,8 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using FAD3.Mapping.Classes;
+using FAD3.Database.Forms;
 
 namespace FAD3
 {
@@ -13,6 +15,7 @@ namespace FAD3
     {
         private static TargetAreaGearsForm _instance;
         private aoi _aoi;
+        public aoi AOI { get { return _aoi; } }
 
         public TargetAreaGearsForm(aoi aoi)
         {
@@ -52,17 +55,17 @@ namespace FAD3
             lvGears.View = View.Details;
             lvGears.Columns.Add("Gear class");
             lvGears.Columns.Add("Variation");
-            lvGears.Columns.Add("Variation code");
+            lvGears.Columns.Add("Number sampled");
 
             SizeColumns(lvGears);
 
             foreach (var item in gearUsedList)
             {
                 var lvi = lvGears.Items.Add(item.gearClass);
-                lvi.SubItems.Add(item.gearVariarion);
-                lvi.SubItems.Add(item.gearCode);
+                lvi.SubItems.Add(item.gearVariation);
+                lvi.SubItems.Add(item.count.ToString());
+                lvi.Tag = item.GearVarGuid;
             }
-
             SizeColumns(lvGears, false);
 
             lvGears.FullRowSelect = true;
@@ -75,7 +78,47 @@ namespace FAD3
 
         private void OnButtonClick(object sender, EventArgs e)
         {
-            Close();
+            switch (((Button)sender).Name)
+            {
+                case "btnOk":
+                    Close();
+                    break;
+
+                case "btnBatch":
+                    MappingBatchForm f = new MappingBatchForm(this);
+                    f.ShowDialog(this);
+                    break;
+            }
+        }
+
+        public ListView GearListView
+        {
+            get { return lvGears; }
+        }
+
+        private void OnContextMenuItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+            e.ClickedItem.Owner.Hide();
+            switch (e.ClickedItem.Name)
+            {
+                case "mnuMapThisGear":
+                    var mehf = MapEffortHelperForm.GetInstance();
+                    if (mehf.Visible)
+                    {
+                        mehf.BringToFront();
+                    }
+                    else
+                    {
+                        mehf.Show(this);
+                    }
+                    mehf.SetUpMapping(_aoi.AOIGUID, lvGears.SelectedItems[0].Tag.ToString(), lvGears.SelectedItems[0].SubItems[1].Text, _aoi.AOIName);
+                    break;
+            }
+        }
+
+        private void OnListViewMouseDown(object sender, MouseEventArgs e)
+        {
+            mnuMapThisGear.Enabled = FishingGrid.IsCompleteGrid25 && global.MapIsOpen;
         }
     }
 }

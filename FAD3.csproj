@@ -77,12 +77,24 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DynamicInterop, Version=0.7.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\DynamicInterop.0.7.4\lib\net40\DynamicInterop.dll</HintPath>
+    </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <HintPath>packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Microsoft.VisualBasic.PowerPacks, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="NetCDFInterop, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\SDSLite.1.4\lib\net45\NetCDFInterop.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
+    <Reference Include="ScientificDataSet, Version=1.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\SDSLite.1.4\lib\net45\ScientificDataSet.dll</HintPath>
+    </Reference>
+    <Reference Include="SDSLite, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\SDSLite.1.4\lib\net45\SDSLite.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -120,9 +132,17 @@
     </Compile>
     <Compile Include="Database\Classes\CatchLine.cs" />
     <Compile Include="Database\Classes\CatchName.cs" />
+    <Compile Include="Database\Forms\MappingBatchForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Database\Forms\MappingBatchForm.Designer.cs">
+      <DependentUpon>MappingBatchForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Mapping\Classes\Colors.cs" />
     <Compile Include="Mapping\Classes\ColorSchemes.cs" />
+    <Compile Include="Mapping\Classes\ConfigureMapTextHelper.cs" />
     <Compile Include="Mapping\Classes\Discretizer.cs" />
+    <Compile Include="Mapping\Classes\FishingGearMapping.cs" />
     <Compile Include="Mapping\Classes\JenksFisher.cs" />
     <Compile Include="Mapping\Classes\MakeGridFromPoints.cs" />
     <Compile Include="Mapping\Forms\ChlorophyllForm.cs">
@@ -130,6 +150,12 @@
     </Compile>
     <Compile Include="Mapping\Forms\ChlorophyllForm.Designer.cs">
       <DependentUpon>ChlorophyllForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Mapping\Forms\ConfigureMapTextForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Mapping\Forms\ConfigureMapTextForm.Designer.cs">
+      <DependentUpon>ConfigureMapTextForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Mapping\Forms\ConvertToGrid25Form.cs">
       <SubType>Form</SubType>
@@ -485,8 +511,14 @@
     <EmbeddedResource Include="Database\Forms\CatchCompositionForm.resx">
       <DependentUpon>CatchCompositionForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Database\Forms\MappingBatchForm.resx">
+      <DependentUpon>MappingBatchForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Mapping\Forms\ChlorophyllForm.resx">
       <DependentUpon>ChlorophyllForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Mapping\Forms\ConfigureMapTextForm.resx">
+      <DependentUpon>ConfigureMapTextForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Mapping\Forms\ConvertToGrid25Form.resx">
       <DependentUpon>ConvertToGrid25Form.cs</DependentUpon>
@@ -701,6 +733,7 @@
   <ItemGroup>
     <Content Include="Fatcow-Farm-Fresh-Book-key.ico" />
     <Content Include="Icon1.ico" />
+    <None Include="Resources\mapPreview.jpg" />
     <None Include="Resources\Up.png" />
     <None Include="Resources\UNDRLN.BMP" />
     <None Include="Resources\ITL.BMP" />

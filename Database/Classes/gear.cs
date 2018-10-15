@@ -61,6 +61,37 @@ namespace FAD3
             set { _GearVarGUID = value; }
         }
 
+        public static List<(int year, int count)> GearUseCountInTargetArea(string aoiGuid, string gearVarGuid)
+        {
+            var myList = new List<(int year, int count)>();
+            var dt = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    string query = $@"SELECT Year([SamplingDate]) AS yearSampled, Count(tblSampling.SamplingGUID) AS n
+                                     FROM tblGearVariations INNER JOIN tblSampling ON tblGearVariations.GearVarGUID = tblSampling.GearVarGUID
+                                     GROUP BY tblSampling.AOI, tblSampling.GearVarGUID, Year([SamplingDate])
+                                     HAVING tblSampling.AOI ={{{aoiGuid}}} AND tblSampling.GearVarGUID= {{{gearVarGuid}}}";
+
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(dt);
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        DataRow dr = dt.Rows[i];
+                        myList.Add(((System.Int16)dr["yearSampled"], (int)dr["n"]));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex);
+                }
+            }
+
+            return myList;
+        }
+
         public static
             Dictionary<string, (string targetAreaName, string refNo, string landingSite, string gearClassName, string gear,
                                 DateTime samplingDate, string fishingGround, string vesselType, double wtCatch, string GUIDs, string EnumeratorName)>

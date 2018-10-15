@@ -64,6 +64,22 @@ namespace FAD3
             }
         }
 
+        public void SaveLayerSettingsToXML()
+        {
+            foreach (var item in _mapLayerDictionary)
+            {
+                item.Value.SaveXMLSettings();
+            }
+        }
+
+        public void RestoreLayerSettingsFromXML()
+        {
+            foreach (var item in _mapLayerDictionary)
+            {
+                item.Value.RestoreSettingsFromXML();
+            }
+        }
+
         public ShapefileLabelHandler ShapeFileLableHandler
         {
             get { return _sfLabelHandler; }
@@ -407,6 +423,12 @@ namespace FAD3
             _axmap.Redraw();
         }
 
+        public string WorldfileExtension(string extension)
+        {
+            var arr = extension.ToCharArray();
+            return $"{arr[1]}{arr[3]}w";
+        }
+
         /// <summary>
         /// Handles the opening of map layer files from a file open dialog
         /// </summary>
@@ -442,8 +464,12 @@ namespace FAD3
                     }
                     else if (fm.LastOpenStrategy == tkFileOpenStrategy.fosRgbImage)
                     {
-                        var prjFile = $@"{Path.GetDirectoryName(fileName)}\{Path.GetFileNameWithoutExtension(fileName)}.prj";
-                        var worldFile = $"{fileName}w";
+                        var folderPath = Path.GetDirectoryName(fileName);
+                        var file = Path.GetFileNameWithoutExtension(fileName);
+                        var ext = Path.GetExtension(fileName);
+                        var prjFile = $@"{folderPath}\{file}.prj";
+                        var worldFile = $@"{folderPath}\{file}.{WorldfileExtension(ext)}";
+
                         if (File.Exists(prjFile) && File.Exists(worldFile))
                         {
                             var image = obj as MapWinGIS.Image;
@@ -465,6 +491,12 @@ namespace FAD3
                     else if (fm.LastOpenStrategy == tkFileOpenStrategy.fosDirectGrid
                           || fm.LastOpenStrategy == tkFileOpenStrategy.fosProxyForGrid)
                     {
+                        var grid = new MapWinGIS.Grid();
+                        success = grid.Open(fileName, GridDataType.DoubleDataType, false, GridFileType.UseExtension, null);
+                        if (success)
+                        {
+                            AddLayer(grid, "bathymetry", true, true);
+                        }
                     }
                 }
                 else
@@ -613,6 +645,11 @@ namespace FAD3
                 case "ImageClass":
                     h = _axmap.AddLayer((MapWinGIS.Image)layer, visible);
                     gp = ((MapWinGIS.Image)layer).GeoProjection;
+                    break;
+
+                case "GridClass":
+                    h = _axmap.AddLayer((Grid)layer, visible);
+                    gp = _axmap.GeoProjection;
                     break;
             }
 

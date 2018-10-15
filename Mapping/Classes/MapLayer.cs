@@ -28,6 +28,28 @@ namespace FAD3
         public string LabelSource { get; set; }
         public string LabelsVisibilityExpression { get; set; }
         public string ShapesVisibilityExpression { get; set; }
+        public string LabelSettingsXML { get; internal set; }
+        public string SymbolSettinsXML { get; internal set; }
+
+        public void RestoreSettingsFromXML()
+        {
+            var sf = LayerObject as Shapefile;
+            if (sf != null)
+            {
+                sf.Labels.Deserialize(LabelSettingsXML);
+                sf.DefaultDrawingOptions.Deserialize(SymbolSettinsXML);
+            }
+        }
+
+        public void SaveXMLSettings()
+        {
+            var sf = LayerObject as Shapefile;
+            if (sf != null)
+            {
+                LabelSettingsXML = sf.Labels.Serialize();
+                SymbolSettinsXML = sf.DefaultDrawingOptions.Serialize();
+            }
+        }
 
         public MapLayer(int handle, string name, bool visible, bool visibleInLayersUI)
         {

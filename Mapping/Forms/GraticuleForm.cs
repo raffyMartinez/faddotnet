@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using FAD3.Mapping.Forms;
 
 namespace FAD3
 {
@@ -76,6 +77,46 @@ namespace FAD3
             chkLeft.Checked = true;
             chkRight.Checked = true;
             chkShowGrid.Checked = true;
+        }
+
+        private void OnCheckChange(object sender, EventArgs e)
+        {
+            var chkBox = (CheckBox)sender;
+            switch (chkBox.Name)
+            {
+                case "chkTitle":
+                    lnkTitle.Visible = chkBox.Checked;
+                    break;
+
+                case "chkNote":
+                    lnkNote.Visible = chkBox.Checked;
+                    break;
+            }
+        }
+
+        private void OnLinkClick(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            fadMapText mapTextPart = fadMapText.mapTextNone;
+            switch (((LinkLabel)sender).Name)
+            {
+                case "lnkTitle":
+                    mapTextPart = fadMapText.mapTextTitle;
+                    break;
+
+                case "lnkNote":
+                    mapTextPart = fadMapText.mapTextNote;
+                    break;
+            }
+
+            var configForm = ConfigureMapTextHelper.GetInstance(mapTextPart);
+            if (configForm.Visible)
+            {
+                configForm.BringToFront();
+            }
+            else
+            {
+                configForm.Show(this);
+            }
         }
     }
 }
