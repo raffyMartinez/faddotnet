@@ -36,6 +36,7 @@
             this.btnCancel = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.labelTitle = new System.Windows.Forms.Label();
+            this.chkRemoveInland = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // lvYears
@@ -77,7 +78,7 @@
             // 
             // btnOk
             // 
-            this.btnOk.Location = new System.Drawing.Point(218, 292);
+            this.btnOk.Location = new System.Drawing.Point(217, 314);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(56, 25);
             this.btnOk.TabIndex = 3;
@@ -87,7 +88,7 @@
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(155, 292);
+            this.btnCancel.Location = new System.Drawing.Point(154, 314);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(56, 25);
             this.btnCancel.TabIndex = 4;
@@ -113,11 +114,22 @@
             this.labelTitle.TabIndex = 6;
             this.labelTitle.Text = "label2";
             // 
+            // chkRemoveInland
+            // 
+            this.chkRemoveInland.AutoSize = true;
+            this.chkRemoveInland.Location = new System.Drawing.Point(10, 281);
+            this.chkRemoveInland.Name = "chkRemoveInland";
+            this.chkRemoveInland.Size = new System.Drawing.Size(145, 19);
+            this.chkRemoveInland.TabIndex = 7;
+            this.chkRemoveInland.Text = "Remove inland points";
+            this.chkRemoveInland.UseVisualStyleBackColor = true;
+            // 
             // MapEffortHelperForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(288, 328);
+            this.ClientSize = new System.Drawing.Size(288, 351);
+            this.Controls.Add(this.chkRemoveInland);
             this.Controls.Add(this.labelTitle);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.btnCancel);
@@ -147,5 +159,6 @@
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label labelTitle;
+        private System.Windows.Forms.CheckBox chkRemoveInland;
     }
 }

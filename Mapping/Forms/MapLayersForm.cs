@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 using MapWinGIS;
+using FAD3.GUI.Classes;
 
 namespace FAD3
 {
@@ -36,6 +37,7 @@ namespace FAD3
         public void ShapefileLayerPropertyChanged()
         {
             global.MappingForm.MapControl.Redraw();
+            _mapLayersHandler.RefreshMap();
         }
 
         private void OnLayerGrid_MouseDown(object sender, MouseEventArgs e)
@@ -113,6 +115,7 @@ namespace FAD3
                             _mapLayersHandler.MoveLayerBottom(pos);
                         }
                     }
+                    _mapLayersHandler.RefreshMap();
                 }
             }
         }
@@ -256,7 +259,7 @@ namespace FAD3
                 MarkCurrentLayerName(e.RowIndex);
                 _mapLayersHandler.set_MapLayer((int)layerGrid[0, e.RowIndex].Tag);
                 itemConvertToGrid25.Enabled = false;
-                if (global.MappingMode == global.fad3MappingMode.grid25Mode && _mapLayersHandler.CurrentMapLayer.LayerType == "ShapefileClass")
+                if (global.MappingMode == fad3MappingMode.grid25Mode && _mapLayersHandler.CurrentMapLayer.LayerType == "ShapefileClass")
                 {
                     var sf = _mapLayersHandler.CurrentMapLayer.LayerObject as Shapefile;
                     itemConvertToGrid25.Enabled = sf.ShapefileType == ShpfileType.SHP_POINT;

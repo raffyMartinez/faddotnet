@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using FAD3.Database.Forms;
+using FAD3.GUI.Classes;
 
 namespace FAD3
 {
@@ -13,6 +15,7 @@ namespace FAD3
         private string _gearVariationGuid;
         private string _aoiGuid;
         public bool BatchMode { get; set; }
+        public bool CombineYearsInOneMap { get; set; }
 
         public static MapEffortHelperForm GetInstance(MainForm parentForm)
         {
@@ -42,7 +45,51 @@ namespace FAD3
         {
             _instance = null;
             _parentForm?.EffortMapperClosed();
-            global.MappingMode = global.fad3MappingMode.defaultMode;
+            global.MappingMode = fad3MappingMode.defaultMode;
+        }
+
+        private void MapCheckedYears()
+        {
+            var fgmh = new FishingGroundMappingHandler();
+            fgmh.MapControl = global.MappingForm.MapControl;
+            fgmh.MapLayersHandler = global.MappingForm.MapLayersHandler;
+            var samplingYears = "";
+            foreach (ListViewItem lvi in lvYears.Items)
+            {
+                if (lvi.Checked)
+                {
+                    samplingYears += $"{lvi.Text},";
+                }
+            }
+            if (samplingYears.Length > 0)
+            {
+                samplingYears = samplingYears.Trim(',');
+            }
+
+            if (global.MappingForm.NumLayers() > 0)
+            {
+                fgmh.set_GeoProjection(global.MappingForm.GeoProjection);
+                bool aggregated = chkAggregate.Checked;
+                bool notInclude1 = chkNotInclude1.Checked;
+                switch (_treeLevel)
+                {
+                    case "aoi":
+                        fgmh.MapFishingGrounds(_parentForm.AOIGUID, samplingYears, FishingGrid.UTMZone, aggregated, notInclude1);
+                        break;
+
+                    case "landing_site":
+                        fgmh.MapFishingGrounds(_parentForm.AOIGUID, samplingYears, FishingGrid.UTMZone, aggregated, notInclude1, _parentForm.LandingSiteGUID);
+                        break;
+
+                    case "gear":
+                        fgmh.MapFishingGrounds(_parentForm.AOIGUID, samplingYears, FishingGrid.UTMZone, aggregated, notInclude1, _parentForm.LandingSiteGUID, _parentForm.GearVariationGUID);
+                        break;
+
+                    case "sampling":
+                        labelTitle.Text = $"Mapping of fishing effort on {_parentForm.SamplingMonth} using {_parentForm.GearVariationName} in {_parentForm.LandingSiteName}, {_parentForm.AOIName}";
+                        break;
+                }
+            }
         }
 
         private void OnButtonClick(object sender, EventArgs e)
@@ -52,46 +99,7 @@ namespace FAD3
                 case "btnOk":
                     if (_gearVariationGuid.Length == 0)
                     {
-                        var fgmh = new FishingGroundMappingHandler();
-                        fgmh.MapControl = global.MappingForm.MapControl;
-                        fgmh.MapLayersHandler = global.MappingForm.MapLayersHandler;
-                        var samplingYears = "";
-                        foreach (ListViewItem lvi in lvYears.Items)
-                        {
-                            if (lvi.Checked)
-                            {
-                                samplingYears += $"{lvi.Text},";
-                            }
-                        }
-                        if (samplingYears.Length > 0)
-                        {
-                            samplingYears = samplingYears.Trim(',');
-                        }
-
-                        if (global.MappingForm.NumLayers() > 0)
-                        {
-                            fgmh.set_GeoProjection(global.MappingForm.GeoProjection);
-                            bool aggregated = chkAggregate.Checked;
-                            bool notInclude1 = chkNotInclude1.Checked;
-                            switch (_treeLevel)
-                            {
-                                case "aoi":
-                                    fgmh.MapFishingGrounds(_parentForm.AOIGUID, samplingYears, FishingGrid.UTMZone, aggregated, notInclude1);
-                                    break;
-
-                                case "landing_site":
-                                    fgmh.MapFishingGrounds(_parentForm.AOIGUID, samplingYears, FishingGrid.UTMZone, aggregated, notInclude1, _parentForm.LandingSiteGUID);
-                                    break;
-
-                                case "gear":
-                                    fgmh.MapFishingGrounds(_parentForm.AOIGUID, samplingYears, FishingGrid.UTMZone, aggregated, notInclude1, _parentForm.LandingSiteGUID, _parentForm.GearVariationGUID);
-                                    break;
-
-                                case "sampling":
-                                    labelTitle.Text = $"Mapping of fishing effort on {_parentForm.SamplingMonth} using {_parentForm.GearVariationName} in {_parentForm.LandingSiteName}, {_parentForm.AOIName}";
-                                    break;
-                            }
-                        }
+                        MapCheckedYears();
                     }
                     else
                     {
@@ -106,24 +114,9 @@ namespace FAD3
             }
         }
 
-        public void MapTargetAreaGearFishingGround()
+        private void MapGear(List<int> years)
         {
-            List<int> years = new List<int>();
-            foreach (ListViewItem lvi in lvYears.Items)
-            {
-                if (BatchMode)
-                {
-                    years.Add(int.Parse(lvi.Text));
-                }
-                else
-                {
-                    if (lvi.Checked)
-                    {
-                        years.Add(int.Parse(lvi.Text));
-                    }
-                }
-            }
-            var sf = Mapping.Classes.FishingGearMapping.MapThisGear(_aoiGuid, _gearVariationGuid, years, chkAggregate.Checked, chkNotInclude1.Checked);
+            var sf = Mapping.Classes.FishingGearMapping.MapThisGear(_aoiGuid, _gearVariationGuid, years, chkAggregate.Checked, chkNotInclude1.Checked, chkRemoveInland.Checked);
             if (sf != null)
             {
                 global.MappingForm.MapLayersHandler.AddLayer(sf, "Fishing ground of gears", true, true);
@@ -135,6 +128,48 @@ namespace FAD3
                 sf.SelectionDrawingOptions.PointShape = sf.DefaultDrawingOptions.PointShape;
                 sf.SelectionDrawingOptions.PointSize = sf.DefaultDrawingOptions.PointSize;
             }
+        }
+
+        public void MapTargetAreaGearFishingGroundBatch(MappingBatchForm f)
+        {
+            List<int> years = new List<int>();
+            if (BatchMode)
+            {
+                if (!CombineYearsInOneMap)
+                {
+                    foreach (ListViewItem lvi in lvYears.Items)
+                    {
+                        years.Clear();
+                        years.Add(int.Parse(lvi.Text));
+                        MapGear(years);
+                        f.MappedYears(years);
+                    }
+                }
+                else
+                {
+                    foreach (ListViewItem lvi in lvYears.Items)
+                    {
+                        years.Add(int.Parse(lvi.Text));
+                    }
+                    MapGear(years);
+                    f.MappedYears(years);
+                }
+            }
+        }
+
+        public void MapTargetAreaGearFishingGround()
+        {
+            List<int> years = new List<int>();
+
+            foreach (ListViewItem lvi in lvYears.Items)
+            {
+                if (lvi.Checked)
+                {
+                    years.Add(int.Parse(lvi.Text));
+                }
+            }
+
+            MapGear(years);
         }
 
         private void FillUpSampledYears(List<(int year, int countSamplings)> sampledYears)
@@ -157,13 +192,18 @@ namespace FAD3
         /// </summary>
         /// <param name="aoiGUID"></param>
         /// <param name="gearVariationGuid"></param>
-        public void SetUpMapping(string aoiGUID, string gearVariationGuid, string gearVariationName, string targetArea)
+        public void SetUpMapping(string aoiGUID, string gearVariationGuid, string gearVariationName, string targetArea, bool MapFirstItemInList = false, bool RemoveInlandPoints = false)
         {
             FillUpSampledYears(gear.GearUseCountInTargetArea(aoiGUID, gearVariationGuid));
             labelTitle.Text = $"Mapping of fishing grounds of {gearVariationName} in {targetArea}";
 
             _gearVariationGuid = gearVariationGuid;
             _aoiGuid = aoiGUID;
+            if (MapFirstItemInList)
+            {
+                lvYears.Items[0].Checked = true;
+                MapTargetAreaGearFishingGround();
+            }
         }
 
         public void SetUpMapping(string treeLevel)

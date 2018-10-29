@@ -7,11 +7,11 @@
  * To change this template use Tools | Options | Coding | Edit Standard Headers.
  */
 
+using FAD3.GUI.Classes;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
-using System.Diagnostics;
 using System.Xml;
 
 namespace FAD3
@@ -384,27 +384,27 @@ namespace FAD3
                             switch (c.InnerText)
                             {
                                 case "TextBox":
-                                    uistruct.Control = UserInterfaceStructure.UIControlType.TextBox;
+                                    uistruct.Control = UIControlType.TextBox;
                                     break;
 
                                 case "ComboBox":
-                                    uistruct.Control = UserInterfaceStructure.UIControlType.ComboBox;
+                                    uistruct.Control = UIControlType.ComboBox;
                                     break;
 
                                 case "CheckBox":
-                                    uistruct.Control = UserInterfaceStructure.UIControlType.Check;
+                                    uistruct.Control = UIControlType.Check;
                                     break;
 
                                 case "MaskDate":
-                                    uistruct.Control = UserInterfaceStructure.UIControlType.DateMask;
+                                    uistruct.Control = UIControlType.DateMask;
                                     break;
 
                                 case "MaskTime":
-                                    uistruct.Control = UserInterfaceStructure.UIControlType.TimeMask;
+                                    uistruct.Control = UIControlType.TimeMask;
                                     break;
 
                                 default:
-                                    uistruct.Control = UserInterfaceStructure.UIControlType.Spacer;
+                                    uistruct.Control = UIControlType.Spacer;
                                     break;
                             }
                             break;
@@ -631,7 +631,7 @@ namespace FAD3
                         {
                             Length = double.Parse(dr["lenClass"].ToString()),
                             Freq = int.Parse(dr["Freq"].ToString()),
-                            DataStatus = global.fad3DataStatus.statusFromDB,
+                            DataStatus = fad3DataStatus.statusFromDB,
                             LFRowGuid = dr["RowGUID"].ToString(),
                             CatchRowGuid = CatchCompRowNo,
                             Sequence = dr["Sequence"] == DBNull.Value ? -1 : int.Parse(dr["Sequence"].ToString())
@@ -758,27 +758,27 @@ namespace FAD3
                                 switch (c.InnerText)
                                 {
                                     case "TextBox":
-                                        row.Control = UserInterfaceStructure.UIControlType.TextBox;
+                                        row.Control = UIControlType.TextBox;
                                         break;
 
                                     case "ComboBox":
-                                        row.Control = UserInterfaceStructure.UIControlType.ComboBox;
+                                        row.Control = UIControlType.ComboBox;
                                         break;
 
                                     case "CheckBox":
-                                        row.Control = UserInterfaceStructure.UIControlType.Check;
+                                        row.Control = UIControlType.Check;
                                         break;
 
                                     case "MaskDate":
-                                        row.Control = UserInterfaceStructure.UIControlType.DateMask;
+                                        row.Control = UIControlType.DateMask;
                                         break;
 
                                     case "MaskTime":
-                                        row.Control = UserInterfaceStructure.UIControlType.TimeMask;
+                                        row.Control = UIControlType.TimeMask;
                                         break;
 
                                     default:
-                                        row.Control = UserInterfaceStructure.UIControlType.Spacer;
+                                        row.Control = UIControlType.Spacer;
                                         break;
                                 }
                                 break;
@@ -937,7 +937,7 @@ namespace FAD3
         }
 
         private bool UpdateLF(double LenClass, long ClassCount, int Sequence,
-                                              string CatchCompRow, string RowGUID, global.fad3DataStatus DataStatus)
+                                              string CatchCompRow, string RowGUID, fad3DataStatus DataStatus)
         {
             bool Success = false;
             string query = "";
@@ -945,12 +945,12 @@ namespace FAD3
             {
                 try
                 {
-                    if (DataStatus == global.fad3DataStatus.statusNew)
+                    if (DataStatus == fad3DataStatus.statusNew)
                     {
                         query = $@"Insert into tblLF (LenClass, Freq, CatchCompRow, RowGUID, Sequence) values
                                     ({LenClass}, {ClassCount}, {{{CatchCompRow}}}, {{{RowGUID}}}, {Sequence})";
                     }
-                    else if (DataStatus == global.fad3DataStatus.statusEdited)
+                    else if (DataStatus == fad3DataStatus.statusEdited)
                     {
                         query = $@"Update tblLF set
                                    LenClass = {LenClass},
@@ -958,7 +958,7 @@ namespace FAD3
                                    Sequence= {Sequence}
                                    Where RowGUID ={{{RowGUID}}}";
                     }
-                    else if (DataStatus == global.fad3DataStatus.statusForDeletion)
+                    else if (DataStatus == fad3DataStatus.statusForDeletion)
                     {
                         query = $"Delete * from tblLF where RowGUID = {{{RowGUID}}}";
                     }
@@ -985,7 +985,7 @@ namespace FAD3
         public struct LFLine
         {
             public string CatchRowGuid { get; set; }
-            public global.fad3DataStatus DataStatus { get; set; }
+            public fad3DataStatus DataStatus { get; set; }
             public int Freq { get; set; }
             public double Length { get; set; }
             public string LFRowGuid { get; set; }
@@ -1033,15 +1033,15 @@ namespace FAD3
                 _Required = Required;
             }
 
-            public enum UIControlType
-            {
-                TextBox,
-                ComboBox,
-                Spacer,
-                DateMask,
-                TimeMask,
-                Check
-            }
+            //public enum UIControlType
+            //{
+            //    TextBox,
+            //    ComboBox,
+            //    Spacer,
+            //    DateMask,
+            //    TimeMask,
+            //    Check
+            //}
 
             public string ButtonText
             {

@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Data.OleDb;
-using System.Data;
-
-//using ADOX;
+﻿//using ADOX;
 using dao;
+using FAD3.GUI.Classes;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.OleDb;
 
 namespace FAD3
 {
@@ -58,7 +56,7 @@ namespace FAD3
             }
         }
 
-        public static bool UpdateSpeciesData(global.fad3DataStatus dataStatus, string nameGuid, string genus, string species, CatchName.Taxa taxa,
+        public static bool UpdateSpeciesData(fad3DataStatus dataStatus, string nameGuid, string genus, string species, Taxa taxa,
                               short genusMPH1, short genusMPH2, short speciesMPH1, short speciesMPH2, bool inFishbase, int? fishBaseSpeciesNo, string notes)
         {
             var sql = "";
@@ -67,7 +65,7 @@ namespace FAD3
             using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
             {
                 conn.Open();
-                if (dataStatus == global.fad3DataStatus.statusNew)
+                if (dataStatus == fad3DataStatus.statusNew)
                 {
                     sql = $@"Insert into tblAllSpecies
                            (Genus, species, ListedFB, FBSpNo, Notes, TaxaNo, SpeciesGUID,
@@ -80,7 +78,7 @@ namespace FAD3
                         Success = update.ExecuteNonQuery() > 0;
                     }
                 }
-                else if (dataStatus == global.fad3DataStatus.statusEdited)
+                else if (dataStatus == fad3DataStatus.statusEdited)
                 {
                     sql = $@"Update tblAllSpecies set
                          Genus = '{genus}',
@@ -100,7 +98,7 @@ namespace FAD3
                         Success = update.ExecuteNonQuery() > 0;
                     }
                 }
-                else if (dataStatus == global.fad3DataStatus.statusForDeletion)
+                else if (dataStatus == fad3DataStatus.statusForDeletion)
                 {
                     sql = $"Delete * from tblAllSpecies where SpeciesGUID = {{{nameGuid}}}";
                     using (OleDbCommand update = new OleDbCommand(sql, conn))
@@ -147,7 +145,7 @@ namespace FAD3
                 adapter.Fill(dt);
                 foreach (DataRow dr in dt.Rows)
                 {
-                    var taxa = (CatchName.Taxa)Enum.Parse(typeof(CatchName.Taxa), dr["TaxaNo"].ToString());
+                    var taxa = (Taxa)Enum.Parse(typeof(Taxa), dr["TaxaNo"].ToString());
                     var speciesGuid = dr["SpeciesGUID"].ToString();
                     int? fbSpNo = null;
                     if (int.TryParse(dr["FBSpNo"].ToString(), out int spNo))
@@ -248,7 +246,7 @@ namespace FAD3
         }
 
         public static (bool isFound, bool inFishbase, int? fishBaseNo, string notes,
-            short? genusKey1, short? genusKey2, short? speciesKey1, short? speciesKey2, CatchName.Taxa taxa)
+            short? genusKey1, short? genusKey2, short? speciesKey1, short? speciesKey2, Taxa taxa)
             RetrieveSpeciesData(string speciesGuid)
         {
             var sql = $"Select * from tblAllSpecies where SpeciesGUID = {{{speciesGuid}}}";
@@ -260,7 +258,7 @@ namespace FAD3
             short? genusKey2 = null;
             short? speciesKey1 = null;
             short? speciesKey2 = null;
-            CatchName.Taxa taxa = CatchName.Taxa.Fish;
+            Taxa taxa = Taxa.Fish;
             using (var conection = new OleDbConnection(global.ConnectionString))
             {
                 conection.Open();

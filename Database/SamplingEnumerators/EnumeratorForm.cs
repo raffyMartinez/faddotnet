@@ -14,6 +14,7 @@ using System.Data;
 using System.Data.OleDb;
 using System.Drawing;
 using System.Windows.Forms;
+using FAD3.GUI.Classes;
 
 namespace FAD3
 {
@@ -89,17 +90,17 @@ namespace FAD3
             }
         }
 
-        public void EditedEnumerator(string enumeratorGuid, string enumeratorName, DateTime dateHired, bool isActive, global.fad3DataStatus dataStatus)
+        public void EditedEnumerator(string enumeratorGuid, string enumeratorName, DateTime dateHired, bool isActive, fad3DataStatus dataStatus)
 
         {
-            if (dataStatus == global.fad3DataStatus.statusNew)
+            if (dataStatus == fad3DataStatus.statusNew)
             {
                 var lvi = lvEnumerators.Items.Add(enumeratorGuid, enumeratorName, null);
                 lvi.SubItems.Add(dateHired.ToString("MMM-dd-yyyy"));
                 lvi.SubItems.Add(isActive.ToString());
                 lvi.Tag = dataStatus;
             }
-            else if (dataStatus == global.fad3DataStatus.statusEdited)
+            else if (dataStatus == fad3DataStatus.statusEdited)
             {
                 var lvi = lvEnumerators.Items[enumeratorGuid];
                 lvi.Text = enumeratorName;
@@ -217,7 +218,7 @@ namespace FAD3
             buttonAdd.Click += OnButtonClick;
             buttonRemove.Click += OnButtonClick;
 
-            foreach (KeyValuePair<string, (string EnumeratorName, DateTime DateHired, bool IsActive, global.fad3DataStatus DataStatus)> kv in Enumerators.GetTargetAreaEnumerators())
+            foreach (KeyValuePair<string, (string EnumeratorName, DateTime DateHired, bool IsActive, fad3DataStatus DataStatus)> kv in Enumerators.GetTargetAreaEnumerators())
             {
                 var lvi = lvEnumerators.Items.Add(kv.Key, kv.Value.EnumeratorName, null);
                 lvi.Tag = kv.Value.DataStatus;
@@ -422,13 +423,13 @@ namespace FAD3
                     {
                         if (lvEnumerators.Items.Count > 0 || _removedEnumerators.Count > 0)
                         {
-                            var enumeratorsData = new Dictionary<string, (string enumeratorName, DateTime dateHired, bool isActive, global.fad3DataStatus DataStatus)>();
+                            var enumeratorsData = new Dictionary<string, (string enumeratorName, DateTime dateHired, bool isActive, fad3DataStatus DataStatus)>();
 
                             foreach (ListViewItem lvi in lvEnumerators.Items)
                             {
-                                var DataStatus = (global.fad3DataStatus)lvi.Tag;
+                                var DataStatus = (fad3DataStatus)lvi.Tag;
 
-                                if (DataStatus != global.fad3DataStatus.statusFromDB)
+                                if (DataStatus != fad3DataStatus.statusFromDB)
                                     enumeratorsData.Add(lvi.Name, (lvi.Text, DateTime.Parse(lvi.SubItems[1].Text), bool.Parse(lvi.SubItems[2].Text), DataStatus));
                             }
 
@@ -437,7 +438,7 @@ namespace FAD3
                                 //actually all that is needed to delete an enumerator is the Guid and the DataStatus.
                                 //The rest of the values in the tuple are not needed but they have to be filled up because
                                 //the tuple does not accept optional parameters.
-                                enumeratorsData.Add(item, ("", DateTime.Today, false, global.fad3DataStatus.statusForDeletion));
+                                enumeratorsData.Add(item, ("", DateTime.Today, false, fad3DataStatus.statusForDeletion));
                             }
 
                             if ((enumeratorsData.Count > 0 || _removedEnumerators.Count > 0) && Enumerators.SaveTargetAreaEnumerators(enumeratorsData))
@@ -507,7 +508,7 @@ namespace FAD3
                                                "Validation error", MessageBoxButtons.OKCancel, MessageBoxIcon.Information) == DialogResult.OK)
                             {
                                 lvEnumerators.SelectedItems[0].SubItems[2].Text = "False";
-                                lvEnumerators.SelectedItems[0].Tag = global.fad3DataStatus.statusEdited;
+                                lvEnumerators.SelectedItems[0].Tag = fad3DataStatus.statusEdited;
                             }
                         }
                     }
@@ -544,7 +545,7 @@ namespace FAD3
         {
             using (MainForm frm = new MainForm())
             {
-                MainForm.SaveColumnWidthEx(sender, myContext: global.lvContext.EnumeratorSampling);
+                MainForm.SaveColumnWidthEx(sender, myContext: lvContext.EnumeratorSampling);
             }
         }
 

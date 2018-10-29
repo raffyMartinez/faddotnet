@@ -31,6 +31,7 @@ namespace FAD3
             try
             {
                 Application.Run(new MainForm());
+                global.Cleanup();
             }
             catch (ObjectDisposedException) { }
             //TODO: error when closing the file when file close on the menu bar is used

@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using FAD3.GUI.Classes;
 
 namespace FAD3
 {
@@ -130,7 +131,7 @@ namespace FAD3
             _GearSpecs.Clear();
             foreach (ListViewItem lvi in lvSpecs.Items)
             {
-                global.fad3DataStatus ds;
+                fad3DataStatus ds;
                 Enum.TryParse(lvi.SubItems[3].Text, out ds);
                 var spec = new ManageGearSpecsClass.GearSpecification
                 {
@@ -141,9 +142,9 @@ namespace FAD3
                     RowGuid = lvi.Name,
                 };
 
-                if (spec.Sequence != lvi.Index + 1 && ds != global.fad3DataStatus.statusNew)
+                if (spec.Sequence != lvi.Index + 1 && ds != fad3DataStatus.statusNew)
                 {
-                    spec.DataStatus = global.fad3DataStatus.statusEdited;
+                    spec.DataStatus = fad3DataStatus.statusEdited;
                     spec.Sequence = lvi.Index + 1;
                 }
 
@@ -155,7 +156,7 @@ namespace FAD3
                 var spec = new ManageGearSpecsClass.GearSpecification
                 {
                     RowGuid = item,
-                    DataStatus = global.fad3DataStatus.statusForDeletion
+                    DataStatus = fad3DataStatus.statusForDeletion
                 };
                 _GearSpecs.Add(spec);
             }
@@ -169,7 +170,7 @@ namespace FAD3
             {
                 if (lvSpecs.SelectedItems.Count == 0)
                 {
-                    var lvi = new ListViewItem(new string[] { textBoxPropertyName.Text, comboBoxType.Text, textBoxNotes.Text, global.fad3DataStatus.statusNew.ToString() });
+                    var lvi = new ListViewItem(new string[] { textBoxPropertyName.Text, comboBoxType.Text, textBoxNotes.Text, fad3DataStatus.statusNew.ToString() });
                     lvi.Name = Guid.NewGuid().ToString();
                     lvSpecs.Items.Add(lvi);
                 }
@@ -180,7 +181,7 @@ namespace FAD3
                         o.Text = textBoxPropertyName.Text;
                         o.SubItems[1].Text = comboBoxType.Text;
                         o.SubItems[2].Text = textBoxNotes.Text;
-                        o.SubItems[3].Text = global.fad3DataStatus.statusEdited.ToString();
+                        o.SubItems[3].Text = fad3DataStatus.statusEdited.ToString();
                     });
                 }
 

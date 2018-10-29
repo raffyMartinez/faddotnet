@@ -48,7 +48,10 @@ namespace FAD3
             txtLayerType.Text = mapLayer.LayerType;
             txtFileName.Text = mapLayer.FileName;
             txtLayerName.Text = mapLayer.Name;
-            txtVisibilityExpression.Text = ((Shapefile)mapLayer.LayerObject).VisibilityExpression;
+            if (mapLayer.LayerType == "ShapefileClass")
+            {
+                txtVisibilityExpression.Text = ((Shapefile)mapLayer.LayerObject).VisibilityExpression;
+            }
         }
 
         public static LayerPropertyForm GetInstance(MapLayersForm parent, int layerHandle)

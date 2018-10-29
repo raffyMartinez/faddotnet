@@ -6,6 +6,7 @@ using MapWinGIS;
 using AxMapWinGIS;
 using System.Data.OleDb;
 using System.Data;
+using FAD3.GUI.Classes;
 
 namespace FAD3
 {
@@ -15,6 +16,7 @@ namespace FAD3
         private GeoProjection _geoProjection = new GeoProjection();
         public MapLayersHandler MapLayersHandler { get; set; }
         public AxMap MapControl { get; set; }
+        public bool RemoveInland { get; set; }
 
         public FishingGroundMappingHandler(GeoProjection geoProjection = null)
         {
@@ -48,7 +50,7 @@ namespace FAD3
             }
         }
 
-        public bool MapFishingGround(string fishingGround, FishingGrid.fadUTMZone utmZone)
+        public bool MapFishingGround(string fishingGround, fadUTMZone utmZone)
         {
             var sf = new Shapefile();
             bool success = false;
@@ -79,7 +81,7 @@ namespace FAD3
             return success;
         }
 
-        public void MapFishingGrounds(string aoiGUID, string samplingYears, FishingGrid.fadUTMZone utmZone,
+        public void MapFishingGrounds(string aoiGUID, string samplingYears, fadUTMZone utmZone,
             bool Aggregated = true, bool notInclude1 = false, string landingSiteGuid = "",
             string gearVariationGuid = "")
         {
@@ -246,15 +248,24 @@ namespace FAD3
                     ifldCatchWt = sf.EditAddField("CatchWt", FieldType.DOUBLE_FIELD, 2, 8);
                     sf.Field[ifldCatchWt].Alias = "Catch weight";
 
-                    query = @"SELECT tblAOI.AOIName, tblEnumerators.EnumeratorName, tblLandingSites.LSName,
-                                tblGearClass.GearClassName, tblGearVariations.Variation, Year([SamplingDate]) AS samplingYear,
-                                tblSampling.FishingGround, tblSampling.NoHauls, tblSampling.NoFishers, tblSampling.DateSet,
-                                tblSampling.TimeSet, tblSampling.DateHauled, tblSampling.TimeHauled, tblSampling.VesType, tblSampling.hp,
-                                tblSampling.WtCatch FROM tblGearClass INNER JOIN(tblEnumerators INNER JOIN (tblGearVariations
-                                INNER JOIN ((tblAOI INNER JOIN tblLandingSites ON tblAOI.AOIGuid = tblLandingSites.AOIGuid)
-                                INNER JOIN tblSampling ON tblLandingSites.LSGUID = tblSampling.LSGUID) ON
-                                tblGearVariations.GearVarGUID = tblSampling.GearVarGUID) ON tblEnumerators.EnumeratorID = tblSampling.Enumerator)
-                                ON tblGearClass.GearClass = tblGearVariations.GearClass ";
+                    //query = @"SELECT tblAOI.AOIName, tblEnumerators.EnumeratorName, tblLandingSites.LSName,
+                    //            tblGearClass.GearClassName, tblGearVariations.Variation, Year([SamplingDate]) AS samplingYear,
+                    //            tblSampling.FishingGround, tblSampling.NoHauls, tblSampling.NoFishers, tblSampling.DateSet,
+                    //            tblSampling.TimeSet, tblSampling.DateHauled, tblSampling.TimeHauled, tblSampling.VesType, tblSampling.hp,
+                    //            tblSampling.WtCatch FROM tblGearClass INNER JOIN(tblEnumerators INNER JOIN (tblGearVariations
+                    //            INNER JOIN ((tblAOI INNER JOIN tblLandingSites ON tblAOI.AOIGuid = tblLandingSites.AOIGuid)
+                    //            INNER JOIN tblSampling ON tblLandingSites.LSGUID = tblSampling.LSGUID) ON
+                    //            tblGearVariations.GearVarGUID = tblSampling.GearVarGUID) ON tblEnumerators.EnumeratorID = tblSampling.Enumerator)
+                    //            ON tblGearClass.GearClass = tblGearVariations.GearClass ";
+
+                    query = @"SELECT tblAOI.AOIName, tblEnumerators.EnumeratorName, tblLandingSites.LSName, tblGearClass.GearClassName,
+                            tblGearVariations.Variation, Year([SamplingDate]) AS samplingYear, tblSampling.FishingGround, tblSampling.NoHauls,
+                            tblSampling.NoFishers, tblSampling.DateSet, tblSampling.TimeSet, tblSampling.DateHauled, tblSampling.TimeHauled,
+                            tblSampling.VesType, tblSampling.hp, tblSampling.WtCatch FROM (tblAOI INNER JOIN tblLandingSites ON
+                            tblAOI.AOIGuid = tblLandingSites.AOIGuid) INNER JOIN ((tblGearClass INNER JOIN tblGearVariations ON
+                            tblGearClass.GearClass = tblGearVariations.GearClass) INNER JOIN (tblEnumerators RIGHT JOIN tblSampling ON
+                            tblEnumerators.EnumeratorID = tblSampling.Enumerator) ON tblGearVariations.GearVarGUID = tblSampling.GearVarGUID) ON
+                            tblLandingSites.LSGUID = tblSampling.LSGUID ";
 
                     if (gearVariationGuid.Length > 0)
                     {
@@ -285,7 +296,18 @@ namespace FAD3
                             if (shp.Create(ShpfileType.SHP_POINT))
                             {
                                 var fg = dr["FishingGround"].ToString();
-                                if (!FishingGrid.MinorGridIsInland(fg))
+
+                                var proceed = false;
+                                if (RemoveInland && !FishingGrid.MinorGridIsInland(fg))
+                                {
+                                    proceed = true;
+                                }
+                                else if (!RemoveInland)
+                                {
+                                    proceed = true;
+                                }
+
+                                if (proceed)
                                 {
                                     var iShp = 0;
                                     if (_geoProjection.IsGeographic)
@@ -400,7 +422,7 @@ namespace FAD3
                 sf.SelectionAppearance = tkSelectionAppearance.saDrawingOptions;
                 sf.SelectionDrawingOptions.PointShape = tkPointShapeType.ptShapeCircle;
 
-                if (ShapefileLayerHelper.ExtentsPosition(MapControl.Extents, sf.Extents) == global.ExtentCompare.excoOutside)
+                if (ShapefileLayerHelper.ExtentsPosition(MapControl.Extents, sf.Extents) == ExtentCompare.excoOutside)
                 {
                     var newExtent = MapControl.Extents;
                     newExtent.MoveTo(sf.Extents.Center.x, sf.Extents.Center.y);

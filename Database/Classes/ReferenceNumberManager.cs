@@ -1,9 +1,8 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
-using System.Text;
-using Microsoft.Win32;
 
 namespace FAD3
 {

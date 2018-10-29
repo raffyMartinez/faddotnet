@@ -1,6 +1,7 @@
 ﻿using AxMapWinGIS;
 using MapWinGIS;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -8,6 +9,7 @@ using System.IO;
 using System.Reflection;
 using System.Xml;
 using FAD3.Mapping;
+using FAD3.GUI.Classes;
 
 namespace FAD3
 
@@ -18,7 +20,7 @@ namespace FAD3
         ExpressionTargetShape
     }
 
-    public class MapLayersHandler : IDisposable
+    public class MapLayersHandler : IDisposable, IEnumerable<MapLayer>
     {
         private string _fileMapState;
         public bool _disposed;
@@ -36,6 +38,8 @@ namespace FAD3
 
         public ColorSchemes LayerColors;
 
+        public event EventHandler MapRedrawNeeded;
+
         public delegate void LayerReadHandler(MapLayersHandler s, LayerEventArg e);                 //an event that is raised when a layer from the mapcontrol is retrieved
         public event LayerReadHandler LayerRead;                                                    //in order for the listener is able to add the layer to the layers list
 
@@ -51,6 +55,9 @@ namespace FAD3
         public delegate void LayerNameUpdate(MapLayersHandler s, LayerEventArg e);
         public event LayerNameUpdate OnLayerNameUpdate;
 
+        public delegate void LayerVisibilityChanged(MapLayersHandler s, LayerEventArg e);
+        public event LayerNameUpdate OnLayerVisibilityChanged;
+
         public void UpdateCurrentLayerName(string layerName)
         {
             if (OnLayerNameUpdate != null)
@@ -62,6 +69,16 @@ namespace FAD3
                 lp.LayerName = _currentMapLayer.Name;
                 OnLayerNameUpdate(this, lp);
             }
+        }
+
+        IEnumerator<MapLayer> IEnumerable<MapLayer>.GetEnumerator()
+        {
+            return _mapLayerDictionary.Values.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return ((IEnumerable)_mapLayerDictionary.Values).GetEnumerator();
         }
 
         public void SaveLayerSettingsToXML()
@@ -213,6 +230,11 @@ namespace FAD3
             get { return _currentMapLayer; }
         }
 
+        public int NumLayers
+        {
+            get { return _mapLayerDictionary.Count; }
+        }
+
         public void set_MapLayer(int layerHandle)
         {
             _currentMapLayer = _mapLayerDictionary[layerHandle];
@@ -239,6 +261,11 @@ namespace FAD3
                     return item;
             }
             return null;
+        }
+
+        public void RefreshMap()
+        {
+            MapRedrawNeeded?.Invoke(this, EventArgs.Empty);
         }
 
         public MapLayer get_MapLayer(int layerHandle)
@@ -420,6 +447,12 @@ namespace FAD3
 
             _axmap.set_LayerName(layerHandle, layerName);
             _axmap.set_LayerVisible(layerHandle, visible);
+            if (OnLayerVisibilityChanged != null)
+            {
+                LayerEventArg lp = new LayerEventArg(layerHandle);
+                lp.LayerVisible = visible;
+                OnLayerVisibilityChanged(this, lp);
+            }
             _axmap.Redraw();
         }
 
@@ -538,11 +571,18 @@ namespace FAD3
             mapLayer.GeoProjectionName = gp.Name;
             mapLayer.LayerPosition = _axmap.get_LayerPosition(layerHandle);
             mapLayer.LayerObject = _axmap.get_GetObject(layerHandle);
+            mapLayer.Labels = _axmap.get_LayerLabels(layerHandle);
 
             _mapLayerDictionary.Add(layerHandle, mapLayer);
             _axmap.Redraw();
             set_MapLayer(layerHandle);
             return mapLayer;
+        }
+
+        public MapLayer this[int index]
+        {
+            set { _mapLayerDictionary[index] = value; }
+            get { return _mapLayerDictionary[index]; }
         }
 
         public int AddNewShapefileLayer(string layerName, ShpfileType shapefileType, bool isVisile = true, bool visibleInUI = false)
@@ -586,7 +626,7 @@ namespace FAD3
                     LayerEventArg lp = new LayerEventArg(h, layerName, true, true, _currentMapLayer.LayerType);
                     LayerRead(this, lp);
                 }
-                Mapping.LineWidthFix.FixLineWidth(sf.DefaultDrawingOptions);
+                Mapping.LineWidthFix.FixLineWidth(sf);
             }
             return h;
         }
@@ -639,7 +679,7 @@ namespace FAD3
                 case "ShapefileClass":
                     h = _axmap.AddLayer((Shapefile)layer, visible);
                     gp = ((Shapefile)layer).GeoProjection;
-                    Mapping.LineWidthFix.FixLineWidth(((Shapefile)layer).DefaultDrawingOptions);
+                    Mapping.LineWidthFix.FixLineWidth((Shapefile)layer);
                     break;
 
                 case "ImageClass":
@@ -710,7 +750,7 @@ namespace FAD3
         public void SaveMapState()
         {
             RemoveInMemoryLayers();
-            if (global.MappingMode == global.fad3MappingMode.defaultMode
+            if (global.MappingMode == fad3MappingMode.defaultMode
                 && _axmap.SaveMapState(_fileMapState, false, true))
             {
                 SaveOtherMapOptions();

@@ -10,6 +10,7 @@
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using FAD3.GUI.Classes;
 
 namespace FAD3
 {
@@ -89,11 +90,11 @@ namespace FAD3
                 var tabPageName = "";
                 switch (FishingGrid.GridType)
                 {
-                    case FishingGrid.fadGridType.gridTypeOther:
+                    case fadGridType.gridTypeOther:
                         tabPageName = "tabOtherGrid";
                         break;
 
-                    case FishingGrid.fadGridType.gridTypeGrid25:
+                    case fadGridType.gridTypeGrid25:
                         tabPageName = "tabGrid25";
 
                         LoadGrid25Items(lvMaps);
@@ -105,7 +106,7 @@ namespace FAD3
                         break;
                 }
 
-                if (FishingGrid.GridType != FishingGrid.fadGridType.gridTypeNone)
+                if (FishingGrid.GridType != fadGridType.gridTypeNone)
                 {
                     var mytab = tabAOI.TabPages[tabPageName];
                     mytab.Select();
@@ -151,7 +152,7 @@ namespace FAD3
         private void LoadGrid25Items(ListView lv)
         {
             lv.Items.Clear();
-            if (FishingGrid.GridType == FishingGrid.fadGridType.gridTypeGrid25)
+            if (FishingGrid.GridType == fadGridType.gridTypeGrid25)
             {
                 foreach (var item in FishingGrid.Grid25.BoundsEx)
                 {
@@ -238,8 +239,8 @@ namespace FAD3
             TargetAreaData.Add("Letter", txtCode.Text);
             TargetAreaData.Add("AOIGUID", _aoi.AOIGUID);
             TargetAreaData.Add("DataStatus", _IsNew ?
-                                              global.fad3DataStatus.statusNew.ToString() :
-                                              global.fad3DataStatus.statusEdited.ToString());
+                                              fad3DataStatus.statusNew.ToString() :
+                                              fad3DataStatus.statusEdited.ToString());
 
             if (aoi.UpdateData(TargetAreaData))
             {
@@ -309,8 +310,8 @@ namespace FAD3
 
         private void OnFormClosed(object sender, FormClosedEventArgs e)
         {
-            if (FishingGrid.GridType == FishingGrid.fadGridType.gridTypeGrid25)
-                FishingGrid.SubGridStyle = (FishingGrid.fadSubgridSyle)comboSubGrid.SelectedIndex;
+            if (FishingGrid.GridType == fadGridType.gridTypeGrid25)
+                FishingGrid.SubGridStyle = (fadSubgridSyle)comboSubGrid.SelectedIndex;
 
             _instance = null;
         }

@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using MapWinGIS;
 using System.IO;
+using FAD3.GUI.Classes;
 
 namespace FAD3
 {
@@ -37,14 +38,14 @@ namespace FAD3
                         var sfSource = MapLayer.LayerObject as Shapefile;
                         if (sfSource?.ShapefileType == ShpfileType.SHP_POINT)
                         {
-                            global.fad3ActionType inlandAction = global.fad3ActionType.atIgnore;
+                            fad3ActionType inlandAction = fad3ActionType.atIgnore;
                             if (rbInlandNote.Checked)
                             {
-                                inlandAction = global.fad3ActionType.atTakeNote;
+                                inlandAction = fad3ActionType.atTakeNote;
                             }
                             else if (rbInlandRemove.Checked)
                             {
-                                inlandAction = global.fad3ActionType.atRemove;
+                                inlandAction = fad3ActionType.atRemove;
                             }
 
                             var sfConverted = ShapefileLayerHelper.ConvertToGrid25(sfSource, global.MappingForm.UTMZone, inlandAction, includeCoordinates: chkIncludeCoordinates.Checked);

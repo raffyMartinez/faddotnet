@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+using FAD3.GUI.Classes;
 
 namespace FAD3
 {
@@ -95,15 +96,15 @@ namespace FAD3
 
             if (Len.Length == 0 && Freq.Length == 0 && LFRowGuid.Length == 0)
             {
-                var thisTag = new Tuple<int, string, global.fad3DataStatus>(_row, Guid.NewGuid().ToString(), global.fad3DataStatus.statusNew);
+                var thisTag = new Tuple<int, string, fad3DataStatus>(_row, Guid.NewGuid().ToString(), fad3DataStatus.statusNew);
                 textLen.Tag = thisTag;
                 textFreq.Tag = thisTag;
             }
             else
             {
-                var ds = global.fad3DataStatus.statusFromDB;
-                if (_UpdateSequence) ds = global.fad3DataStatus.statusEdited;
-                var thisTag = new Tuple<int, string, global.fad3DataStatus>(_row, LFRowGuid, ds);
+                var ds = fad3DataStatus.statusFromDB;
+                if (_UpdateSequence) ds = fad3DataStatus.statusEdited;
+                var thisTag = new Tuple<int, string, fad3DataStatus>(_row, LFRowGuid, ds);
                 textLen.Tag = thisTag;
                 textFreq.Tag = thisTag;
             }
@@ -125,15 +126,15 @@ namespace FAD3
         /// </summary>
         /// <param name="rowNumber"></param>
         /// <returns></returns>
-        private (int, global.fad3DataStatus) GetFreqValue(int rowNumber)
+        private (int, fad3DataStatus) GetFreqValue(int rowNumber)
         {
             int rv = 0;
-            global.fad3DataStatus ds = global.fad3DataStatus.statusFromDB;
+            fad3DataStatus ds = fad3DataStatus.statusFromDB;
             foreach (Control c in panelUI.Controls)
             {
                 if (c.GetType().Name == "TextBox")
                 {
-                    var thisTag = (Tuple<int, string, global.fad3DataStatus>)c.Tag;
+                    var thisTag = (Tuple<int, string, fad3DataStatus>)c.Tag;
                     if (thisTag.Item1 == rowNumber && c.Name == "textFreq")
                     {
                         rv = int.Parse(c.Text);
@@ -202,10 +203,10 @@ namespace FAD3
         {
             ((TextBox)sender).With(o =>
             {
-                var thisTag = (Tuple<int, string, global.fad3DataStatus>)o.Tag;
-                if (thisTag.Item3 != global.fad3DataStatus.statusNew)
+                var thisTag = (Tuple<int, string, fad3DataStatus>)o.Tag;
+                if (thisTag.Item3 != fad3DataStatus.statusNew)
                 {
-                    var editedTag = new Tuple<int, string, global.fad3DataStatus>(thisTag.Item1, thisTag.Item2, global.fad3DataStatus.statusEdited);
+                    var editedTag = new Tuple<int, string, fad3DataStatus>(thisTag.Item1, thisTag.Item2, fad3DataStatus.statusEdited);
                     o.Tag = editedTag;
                 }
             });
@@ -222,7 +223,7 @@ namespace FAD3
             ((TextBox)sender).With(o =>
             {
                 var s = o.Text;
-                var DataStatus = ((Tuple<int, string, global.fad3DataStatus>)o.Tag).Item3;
+                var DataStatus = ((Tuple<int, string, fad3DataStatus>)o.Tag).Item3;
                 if (s.Length > 0)
                 {
                     switch (o.Name)
@@ -250,7 +251,7 @@ namespace FAD3
                             if (!e.Cancel && _UniqueLenghtClasses && _LengthClasses.Contains(Len))
                             {
                                 //if the datastatus is original (fromDB) then the value is okay
-                                if (DataStatus != global.fad3DataStatus.statusFromDB)
+                                if (DataStatus != fad3DataStatus.statusFromDB)
                                 {
                                     e.Cancel = true;
                                     msg = "Length class already in the table";
@@ -260,7 +261,7 @@ namespace FAD3
                             if (!e.Cancel)
                             {
                                 //remove the previous value of the field if it is in the list of lengths
-                                if (Len != _OldLength && _LengthClasses.Contains(_OldLength) && DataStatus != global.fad3DataStatus.statusNew)
+                                if (Len != _OldLength && _LengthClasses.Contains(_OldLength) && DataStatus != fad3DataStatus.statusNew)
                                 {
                                     _LengthClasses.Remove(_OldLength);
                                 }
@@ -348,7 +349,7 @@ namespace FAD3
                     ((TextBox)c).With(o =>
                     {
                         var s = o.Text;
-                        var thisTag = (Tuple<int, string, global.fad3DataStatus>)o.Tag;
+                        var thisTag = (Tuple<int, string, fad3DataStatus>)o.Tag;
                         var myLF = new sampling.LFLine();
                         switch (o.Name)
                         {
@@ -362,7 +363,7 @@ namespace FAD3
                                 //if Length field is unchanged, we get the edit status of the
                                 //frequency field.
                                 myLF.DataStatus = thisTag.Item3;
-                                if (myLF.DataStatus == global.fad3DataStatus.statusFromDB)
+                                if (myLF.DataStatus == fad3DataStatus.statusFromDB)
                                     myLF.DataStatus = FreqPair.Item2;
 
                                 myLF.LFRowGuid = thisTag.Item2;
@@ -434,7 +435,7 @@ namespace FAD3
             ((TextBox)sender).With(o =>
             {
                 if (o.Name == "textLen" && e.KeyCode == Keys.Escape &&
-                    ((Tuple<int, string, global.fad3DataStatus>)o.Tag).Item3 != global.fad3DataStatus.statusNew)
+                    ((Tuple<int, string, fad3DataStatus>)o.Tag).Item3 != fad3DataStatus.statusNew)
                 {
                     o.Text = _OldLength.ToString();
                 }

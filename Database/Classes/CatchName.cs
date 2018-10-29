@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.OleDb;
 using System.Linq;
 using System.Text;
+using FAD3.GUI.Classes;
 
 namespace FAD3
 {
@@ -229,25 +230,6 @@ namespace FAD3
             }
 
             return taxaName;
-        }
-
-        //this is a simplistic list of taxonomic categories
-        //This list exists because it is needed for gonad maturity categories
-        //and gonad maturity stages varies by taxonomies.
-        //
-        //No new categories should be added to the database if it is
-        //not included in this enumeration
-        public enum Taxa
-        {
-            To_be_determined,
-            Fish,
-            Shrimps,
-            Cephalopods,
-            Crabs,
-            Shells,
-            Lobsters,
-            Sea_cucumbers,
-            Sea_urchins,
         }
 
         public CatchName(string inCatchNameGuid, string inGenus, string inSpecies, Taxa inTaxa,

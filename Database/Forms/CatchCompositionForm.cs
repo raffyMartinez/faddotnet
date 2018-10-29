@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+using FAD3.GUI.Classes;
 
 namespace FAD3
 {
@@ -35,7 +36,7 @@ namespace FAD3
         private int _ctlHeight;
         private int _ctlWidth = 0;
         private string _currentGenus = "";
-        private CatchComposition.Identification _CurrentIDType;
+        private Identification _CurrentIDType;
         private TextBox _currentTextBox;
         private bool _isNew;
         private MainForm _parentForm;
@@ -75,7 +76,7 @@ namespace FAD3
         /// <summary>
         /// Gets and sets the type of identification of a row
         /// </summary>
-        private CatchComposition.Identification CurrentIDType
+        private Identification CurrentIDType
         {
             get { return _CurrentIDType; }
             set { _CurrentIDType = value; }
@@ -203,11 +204,11 @@ namespace FAD3
             if (isNew)
             {
                 key = Guid.NewGuid().ToString();
-                CurrentIDType = CatchComposition.Identification.Scientific;
+                CurrentIDType = Identification.Scientific;
                 _currentRow = key;
                 _CatchCompositionData.Add(key, new CatchLine(_samplingGuid));
                 _CatchCompositionData[key].Sequence = _row;
-                _CatchCompositionData[key].dataStatus = global.fad3DataStatus.statusNew;
+                _CatchCompositionData[key].dataStatus = fad3DataStatus.statusNew;
                 _CatchCompositionData[key].NameType = CurrentIDType;
                 _CatchCompositionData[key].CatchCompGUID = key;
             }
@@ -668,7 +669,7 @@ namespace FAD3
 
                 case "txtName1":
                 case "txtName2":
-                    if (CurrentIDType == CatchComposition.Identification.LocalName)
+                    if (CurrentIDType == Identification.LocalName)
                     {
                         if (txt.Name == "txtName1")
                             _cboEditor = _comboLocalName;
@@ -709,7 +710,7 @@ namespace FAD3
                     {
                         if (txt.Name == "txtIdentificationType")
                         {
-                            var kv = (KeyValuePair<CatchComposition.Identification, string>)_cboEditor.Items[itemIndex];
+                            var kv = (KeyValuePair<Identification, string>)_cboEditor.Items[itemIndex];
                             _cboEditor.Text = CatchComposition.IdentificationTypeToString(kv.Key);
                         }
                         else if (txt.Name == "txtName2")
@@ -1055,7 +1056,7 @@ namespace FAD3
                             break;
 
                         case "txtName2":
-                            if (CurrentIDType == CatchComposition.Identification.LocalName)
+                            if (CurrentIDType == Identification.LocalName)
                                 GetTextBox(fromTextBox: (TextBox)this.ActiveControl, GetNext: true).Focus();
                             break;
 
@@ -1130,7 +1131,7 @@ namespace FAD3
                 }
 
                 SetIDType(o);
-                if (o.Name == "txtName2" && _CurrentIDType == CatchComposition.Identification.Scientific)
+                if (o.Name == "txtName2" && _CurrentIDType == Identification.Scientific)
                 {
                     if (_newGenus.Length == 0)
                     {
@@ -1161,7 +1162,7 @@ namespace FAD3
             var weight = 0D;
             foreach (var item in _CatchCompositionData)
             {
-                if (item.Value.dataStatus != global.fad3DataStatus.statusForDeletion) weight += item.Value.CatchWeight;
+                if (item.Value.dataStatus != fad3DataStatus.statusForDeletion) weight += item.Value.CatchWeight;
             }
             labelSumOfWeight.Text = $"{_emptySumOfWeightsLabel} {weight}";
 
@@ -1227,7 +1228,7 @@ namespace FAD3
                                   break;
 
                               case "txtName2":
-                                  if (CurrentIDType == CatchComposition.Identification.LocalName && o.Text.Length > 0)
+                                  if (CurrentIDType == Identification.LocalName && o.Text.Length > 0)
                                   {
                                       msg = "This field should be blank";
                                   }
@@ -1370,7 +1371,7 @@ namespace FAD3
             {
                 _CatchCompositionData[_currentRow].With(ccd =>
                 {
-                    if (ccd.NameType == CatchComposition.Identification.Scientific)
+                    if (ccd.NameType == Identification.Scientific)
                     {
                         HasRequirements = ccd.Name1 != null && ccd.Name2 != null && ccd.CatchWeight > 0;
                         if (!HasRequirements)
@@ -1430,7 +1431,7 @@ namespace FAD3
             var Cancel = false;
             var msg = "";
             SetIDType(_lastIdentification);
-            if (CurrentIDType == CatchComposition.Identification.Scientific)
+            if (CurrentIDType == Identification.Scientific)
             {
                 Cancel = _lastIdentification.Text.Length == 0 || _lastName1.Text.Length == 0
                     || _lastName2.Text.Length == 0 || _lastWeight.Text.Length == 0;
@@ -1447,7 +1448,7 @@ namespace FAD3
                 _lastName1.BackColor = _lastName1.Text.Length == 0 ? global.MissingFieldBackColor : SystemColors.Window;
                 _lastWeight.BackColor = _lastWeight.Text.Length == 0 ? global.MissingFieldBackColor : SystemColors.Window;
 
-                if (CurrentIDType == CatchComposition.Identification.Scientific)
+                if (CurrentIDType == Identification.Scientific)
                 {
                     _lastName2.BackColor = _lastName2.Text.Length == 0 ? global.MissingFieldBackColor : SystemColors.Window;
                 }
@@ -1506,9 +1507,9 @@ namespace FAD3
 
         private void SetRowStatusToEdited(Control source)
         {
-            if (_CatchCompositionData[source.Tag.ToString()].dataStatus != global.fad3DataStatus.statusNew)
+            if (_CatchCompositionData[source.Tag.ToString()].dataStatus != fad3DataStatus.statusNew)
             {
-                _CatchCompositionData[source.Tag.ToString()].dataStatus = global.fad3DataStatus.statusEdited;
+                _CatchCompositionData[source.Tag.ToString()].dataStatus = fad3DataStatus.statusEdited;
             }
         }
 

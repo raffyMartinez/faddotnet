@@ -7,7 +7,7 @@ namespace FAD3
         public int LayerHandle { get; }
         public string LayerName { get; set; }
         public bool ShowInLayerUI { get; }
-        public bool LayerVisible { get; }
+        public bool LayerVisible { get; set; }
         public bool LayerRemoved { get; }
         public string LayerType { get; }
         public bool LayerSaved { get; }

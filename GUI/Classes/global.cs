@@ -16,6 +16,7 @@ using System.Diagnostics;
 using System.Windows.Forms;
 using Microsoft.Win32;
 using System.Drawing;
+using FAD3.GUI.Classes;
 
 namespace FAD3
 {
@@ -25,6 +26,7 @@ namespace FAD3
     ///
     public static class global
     {
+        private static List<string> _listBarangays = new List<string>();
         private static Dictionary<string, string> _VesselTypeDict = new Dictionary<string, string>();
         private static Dictionary<long, string> _provinceDict = new Dictionary<long, string>();
         private static Dictionary<long, string> _munDict = new Dictionary<long, string>();
@@ -43,6 +45,7 @@ namespace FAD3
         private static bool _AllRequiredFilesExists = true;
         private static CoordinateDisplayFormat _CoordDisplayFormat = CoordinateDisplayFormat.DegreeDecimal;
         private static Color _MissingFieldBackColor = global.MissingFieldBackColor;
+        private static List<string> _tempFiles = new List<string>();
 
         public static Grid25GenerateForm Grid25GenerateForm { get; set; }
 
@@ -60,6 +63,25 @@ namespace FAD3
                 s += _InlandGridDBFileExists ? "" : "\r\n- grid25inland.mdb";
 
                 return s;
+            }
+        }
+
+        public static void Cleanup()
+        {
+            _mapForm = null;
+            foreach (var item in _tempFiles)
+            {
+                if (File.Exists(item))
+                {
+                    try
+                    {
+                        File.Delete(item);
+                    }
+                    catch
+                    {
+                        //ignore
+                    }
+                }
             }
         }
 
@@ -313,6 +335,14 @@ namespace FAD3
             get { return _TemplateFileExists; }
         }
 
+        public static void ListTemporaryFile(string fileName)
+        {
+            if (!_tempFiles.Contains(fileName))
+            {
+                _tempFiles.Add(fileName);
+            }
+        }
+
         /// <summary>
         /// Class constructor
         /// </summary>
@@ -486,80 +516,6 @@ namespace FAD3
             _hasMPH = k1 > 0;
         }
 
-        public enum fad3MappingMode
-        {
-            defaultMode,
-            grid25Mode,
-            thematicPointMode,
-            fishingGroundMappingMode
-        }
-
-        public enum ExtentCompare
-        {
-            excoSimilar,
-            excoOutside,
-            excoInside,
-            excoCrossing
-        }
-
-        public enum fad3CatchSubRow
-        {
-            none,
-            LF,
-            GMS
-        }
-
-        public enum fad3ActionType
-        {
-            atIgnore,
-            atTakeNote,
-            atRemove
-        }
-
-        public enum fad3DataStatus
-        {
-            statusFromDB,
-            statusNew,
-            statusEdited,
-            statusForDeletion
-        }
-
-        public enum fad3GearEditAction
-        {
-            addAOI,
-            addLocalName,
-            addGearCode,
-            addGearVariation,
-            editLocalName,
-            editGearVariation,
-            editGearCode
-        }
-
-        public enum lvContext
-        {
-            None = 0,
-            CatchAndEffort,
-            CatchComposition,
-            EnumeratorSampling,
-            LengthFreq,
-            GMS
-        }
-
-        public enum CatchMeristics
-        {
-            LengtFreq,
-            LengthWeightSexMaturity,
-            LenghtWeightSex,
-        }
-
-        public enum CoordinateDisplayFormat
-        {
-            DegreeDecimal,
-            DegreeMinute,
-            DegreeMinuteSecond,
-            UTM
-        }
-
         public static bool ShowErrorMessage
         {
             get { return _ShowErrorMessage; }
@@ -569,6 +525,28 @@ namespace FAD3
         public static string AppPath
         {
             get { return _AppPath; }
+        }
+
+        public static void BarangaysFromMunicipalityNo(long MunicipalityNumber)
+        {
+            var myDT = new DataTable();
+            using (var conection = new OleDbConnection(_ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    string query = $"Select Distinct Barangay from tblGearInventoryBarangay where Municipality= {MunicipalityNumber} Order By Barangay";
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(myDT);
+                    _listBarangays.Clear();
+                    for (int i = 0; i < myDT.Rows.Count; i++)
+                    {
+                        DataRow dr = myDT.Rows[i];
+                        _listBarangays.Add(dr["Barangay"].ToString());
+                    }
+                }
+                catch (Exception ex) { Logger.Log(ex); }
+            }
         }
 
         /// <summary>
@@ -597,12 +575,17 @@ namespace FAD3
             }
         }
 
-        public static Dictionary<long, string> munDict
+        public static List<string> BarangaysList
+        {
+            get { return _listBarangays; }
+        }
+
+        public static Dictionary<long, string> MunicipalitiesDictionary
         {
             get { return _munDict; }
         }
 
-        public static Dictionary<long, string> provinceDict
+        public static Dictionary<long, string> ProvincesDictionary
         {
             get { return _provinceDict; }
         }

@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using MapWinGIS;
 using AxMapWinGIS;
+using FAD3.Mapping.Classes;
+using FAD3.GUI.Classes;
 
 namespace FAD3
 {
@@ -37,6 +39,7 @@ namespace FAD3
         private Double _gridHeight;
         private double _gridWidth;
         private double _intervalSize;
+        public MapTextGraticuleHelper GraticuleTextHelper { get; internal set; }
 
         public bool BottomHasLabel { get; set; }
         public bool TopHasLabel { get; set; }
@@ -49,6 +52,19 @@ namespace FAD3
         public int GridlinesWidth { get; set; }
         public bool BoldLabels { get; set; }
         public bool GridVisible { get; set; }
+
+        public event EventHandler GraticuleExtentChanged;
+        public event EventHandler MapRedrawNeeded;
+
+        public Extents GraticuleExtents
+        {
+            get { return _graticuleExtents; }
+        }
+
+        public GeoProjection GeoProjection
+        {
+            get { return _geoProjection; }
+        }
 
         private bool _disposed;
 
@@ -104,16 +120,22 @@ namespace FAD3
                 {
                 }
                 _axMap.ExtentsChanged -= OnMapExtentsChanged;
+                _axMap.LayerRemoved -= OnLayerRemoved;
+                _axMap.LayerAdded -= OnLayerAdded;
                 _axMap = null;
+
                 if (_sfGraticule != null)
                 {
                     _sfGraticule.EditClear();
                 }
                 _sfGraticule = null;
+
                 _geoProjection = null;
                 _graticuleExtents = null;
                 _boundaryExtents = null;
                 _mapExtents = null;
+                _mapLayersHandler.OnLayerVisibilityChanged -= OnLayerVisibleChange;
+                _mapLayersHandler.MapRedrawNeeded -= OnRedrawNeeded;
                 _mapLayersHandler.RemoveLayer("Mask");
                 _mapLayersHandler.RemoveLayer(Name);
                 _mapLayersHandler = null;
@@ -147,6 +169,11 @@ namespace FAD3
                 var shp = new Shape();
                 if (shp.Create(ShpfileType.SHP_POLYGON))
                 {
+                    //ef is expansion factor
+                    var ef = (_mapExtents.xMax - _mapExtents.xMin) * 0.01;
+
+                    _mapExtents.SetBounds(_mapExtents.xMin - ef, _mapExtents.yMin - ef, 0, _mapExtents.xMax + ef, _mapExtents.yMax + ef, 0);
+
                     shp = _mapExtents.ToShape().Clip(_boundaryExtents.ToShape(), tkClipOperation.clDifference);
                     var iShp = sf.EditAddShape(shp);
                     sf.DefaultDrawingOptions.LineVisible = false;
@@ -170,20 +197,24 @@ namespace FAD3
             NumberOfGridlines = 5;
             _axMap = mapControl;
             _axMap.ExtentsChanged += OnMapExtentsChanged;
+            _axMap.LayerRemoved += OnLayerRemoved;
+            _axMap.LayerAdded += OnLayerAdded;
             _geoProjection = _axMap.GeoProjection;
             _mapLayersHandler = layersHandler;
-
+            _mapLayersHandler.OnLayerVisibilityChanged += OnLayerVisibleChange;
+            _mapLayersHandler.MapRedrawNeeded += OnRedrawNeeded;
+            GraticuleTextHelper = new MapTextGraticuleHelper(_geoProjection, this);
             switch (global.CoordinateDisplay)
             {
-                case global.CoordinateDisplayFormat.DegreeDecimal:
+                case CoordinateDisplayFormat.DegreeDecimal:
                     CoordFormat = "D";
                     break;
 
-                case global.CoordinateDisplayFormat.DegreeMinute:
+                case CoordinateDisplayFormat.DegreeMinute:
                     CoordFormat = "DM";
                     break;
 
-                case global.CoordinateDisplayFormat.DegreeMinuteSecond:
+                case CoordinateDisplayFormat.DegreeMinuteSecond:
                     CoordFormat = "DMS";
                     break;
 
@@ -192,11 +223,44 @@ namespace FAD3
             }
         }
 
+        private void OnRedrawNeeded(object sender, EventArgs e)
+        {
+            if (_mapLayersHandler.Exists(Name))
+            {
+                MapRedrawNeeded?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        private void OnLayerVisibleChange(MapLayersHandler s, LayerEventArg e)
+        {
+            if (_mapLayersHandler.Exists(Name))
+            {
+                MapRedrawNeeded?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        private void OnLayerAdded(object sender, _DMapEvents_LayerAddedEvent e)
+        {
+            if (_mapLayersHandler.Exists(Name))
+            {
+                MapRedrawNeeded?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        private void OnLayerRemoved(object sender, _DMapEvents_LayerRemovedEvent e)
+        {
+            if (_mapLayersHandler.Exists(Name))
+            {
+                MapRedrawNeeded?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
         private void OnMapExtentsChanged(object sender, EventArgs e)
         {
             if (_mapLayersHandler.Exists(Name))
             {
                 Refresh();
+                GraticuleExtentChanged?.Invoke(this, EventArgs.Empty);
             }
         }
 
@@ -207,8 +271,13 @@ namespace FAD3
         /// <param name="e"></param>
         public void Refresh()
         {
-            _sfGraticule.EditClear();
-            _sfGraticule.Labels.Clear();
+            _sfGraticule?.EditClear();
+            _sfGraticule?.Labels.Clear();
+            //if (GraticuleTextHelper.TitleVisible)
+            //{
+            //    _mapLayersHandler.AddLayer(GraticuleTextHelper.TextShapefile, "Text", true, true);
+            //    GraticuleTextHelper.TextShapefile.Labels.Expression = "[Text]";
+            //}
             ShowGraticule();
         }
 
@@ -238,14 +307,29 @@ namespace FAD3
         {
             var coordinateString = "";
             var coord = new ISO_Classes.Coordinate();
+            var tempW = 0D;
+            var tempH = 0D;
             _mapExtents = new Extents();
             _mapExtents.SetBounds(xMin, yMin, 0, xMax, yMax, 0);
 
             _graticuleExtents = new Extents();
 
+            //if (GraticuleTextHelper.TitleVisible)
+            //{
+            //    if (GraticuleTextHelper.NoteVisible)
+            //    {
+            //    }
+            //}
+            //else
+            //{
+            //    //0.93 means that the graticule is 93% of the map extent
+            //    tempW = (xMax - xMin) * 0.93;
+            //    tempH = (yMax - yMin) * 0.93;
+            //}
+
             //0.93 means that the graticule is 93% of the map extent
-            var tempW = (xMax - xMin) * 0.93;
-            var tempH = (yMax - yMin) * 0.93;
+            tempW = (xMax - xMin) * 0.93;
+            tempH = (yMax - yMin) * 0.93;
 
             //compute the origin of the graticule
             _xOrigin = (xMin + ((xMax - xMin) / 2)) - (tempW / 2);

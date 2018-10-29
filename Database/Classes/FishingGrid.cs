@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.OleDb;
 using System.Text;
 using Oware;
+using FAD3.GUI.Classes;
 
 namespace FAD3
 {
@@ -370,45 +371,45 @@ namespace FAD3
             get { return _grid25; }
         }
 
-        /// <summary>
-        /// categories of corners used in defining extents
-        /// </summary>
-        public enum fadCornerType
-        {
-            cornerTypeUndefined,
-            cornerTypeUpperLeft,
-            cornerTypeLowerRight
-        }
+        ///// <summary>
+        ///// categories of corners used in defining extents
+        ///// </summary>
+        //public enum fadCornerType
+        //{
+        //    cornerTypeUndefined,
+        //    cornerTypeUpperLeft,
+        //    cornerTypeLowerRight
+        //}
 
-        /// <summary>
-        /// defines categories of grid types
-        /// </summary>
-        public enum fadGridType
-        {
-            gridTypeNone,
-            gridTypeGrid25,
-            gridTypeOther
-        }
+        ///// <summary>
+        ///// defines categories of grid types
+        ///// </summary>
+        //public enum fadGridType
+        //{
+        //    gridTypeNone,
+        //    gridTypeGrid25,
+        //    gridTypeOther
+        //}
 
-        /// <summary>
-        /// UTM zones that completely covers fishing grounds
-        /// </summary>
-        public enum fadUTMZone
-        {
-            utmZone_Undefined,
-            utmZone50N,
-            utmZone51N
-        }
+        ///// <summary>
+        ///// UTM zones that completely covers fishing grounds
+        ///// </summary>
+        //public enum fadUTMZone
+        //{
+        //    utmZone_Undefined,
+        //    utmZone50N,
+        //    utmZone51N
+        //}
 
-        /// <summary>
-        /// categories of subgridding minor grids for finer resolution of fishing grounds
-        /// </summary>
-        public enum fadSubgridSyle
-        {
-            SubgridStyleNone,
-            SubgridStyle4,
-            SubgridStyle9
-        }
+        ///// <summary>
+        ///// categories of subgridding minor grids for finer resolution of fishing grounds
+        ///// </summary>
+        //public enum fadSubgridSyle
+        //{
+        //    SubgridStyleNone,
+        //    SubgridStyle4,
+        //    SubgridStyle9
+        //}
 
         /// <summary>
         /// struct that holds data of a minor grid
@@ -993,17 +994,17 @@ namespace FAD3
         /// <param name="GridName"></param>
         /// <param name="utmZone"></param>
         /// <returns></returns>
-        public static (double latitude, double longitude) Grid25ToLatLong(string GridName, FishingGrid.fadUTMZone utmZone)
+        public static (double latitude, double longitude) Grid25ToLatLong(string GridName, fadUTMZone utmZone)
         {
             int x, y = 0;
             MinorGridCentroid(GridName, out x, out y);
             var converter = new LatLngUTMConverter("WGS 84");
             var zoneNumber = 0;
-            if (utmZone == FishingGrid.fadUTMZone.utmZone50N)
+            if (utmZone == fadUTMZone.utmZone50N)
             {
                 zoneNumber = 50;
             }
-            else if (utmZone == FishingGrid.fadUTMZone.utmZone51N)
+            else if (utmZone == fadUTMZone.utmZone51N)
             {
                 zoneNumber = 51;
             }

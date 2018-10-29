@@ -6,18 +6,19 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using FAD3.GUI.Classes;
 
 namespace FAD3
 {
     public partial class FishingGroundDefinitionForm : Form
     {
-        private FishingGrid.fadUTMZone _UTMZone;
+        private fadUTMZone _UTMZone;
         private string _MapDescription;
         private string _ULGrid;
         private string _LRGrid;
         private TargetAreaForm _Parent_form;
 
-        public FishingGrid.fadUTMZone UTMZone
+        public fadUTMZone UTMZone
         {
             get { return _UTMZone; }
             set { _UTMZone = value; }
@@ -29,7 +30,7 @@ namespace FAD3
             _Parent_form = Parent;
         }
 
-        public FishingGroundDefinitionForm(TargetAreaForm Parent, FishingGrid.fadUTMZone UTMZone, string MapDescription, string ULGrid, string LRGrid)
+        public FishingGroundDefinitionForm(TargetAreaForm Parent, fadUTMZone UTMZone, string MapDescription, string ULGrid, string LRGrid)
         {
             InitializeComponent();
             _MapDescription = MapDescription;

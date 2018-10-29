@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using FAD3.GUI.Classes;
+using System;
 
 namespace FAD3
 {
@@ -12,7 +10,7 @@ namespace FAD3
         private string _buttonText;
         private int _height;
         private string _dataType;
-        private sampling.UserInterfaceStructure.UIControlType _controlType;
+        private UIControlType _controlType;
         private bool _readOnly;
         private string _ToolTip;
         private bool _Required;
@@ -23,7 +21,7 @@ namespace FAD3
         }
 
         public UIRowFromXML(string rowLabel, string key, string buttonText,
-                               sampling.UserInterfaceStructure.UIControlType control,
+                               UIControlType control,
                                int Height, string DataType, bool ReadOnly,
                                string ToolTip, bool Required)
         {
@@ -86,7 +84,7 @@ namespace FAD3
             set { _buttonText = value; }
         }
 
-        public sampling.UserInterfaceStructure.UIControlType Control
+        public UIControlType Control
         {
             get { return _controlType; }
             set { _controlType = value; }

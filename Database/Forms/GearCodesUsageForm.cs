@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using MetaphoneCOM;
+using FAD3.GUI.Classes;
 
 namespace FAD3
 {
@@ -22,7 +23,7 @@ namespace FAD3
         private string _targetAreaUsageRow = "";
         private string _localNameGuid = "";
         private string _localName;
-        private global.fad3GearEditAction _action;
+        private fad3GearEditAction _action;
 
         private SamplingForm _parentForm;
         private static GearCodesUsageForm _instance;
@@ -511,25 +512,25 @@ namespace FAD3
                     break;
 
                 case "itemAddTargetArea":
-                    _action = global.fad3GearEditAction.addAOI;
+                    _action = fad3GearEditAction.addAOI;
                     myList = listViewWhereUsed.Items.Cast<ListViewItem>()
                                                      .Select(item => item.Text)
                                                      .ToList();
                     break;
 
                 case "itemAddGearVariation":
-                    _action = global.fad3GearEditAction.addGearVariation;
+                    _action = fad3GearEditAction.addGearVariation;
                     break;
 
                 case "itemAddLocalName":
-                    _action = global.fad3GearEditAction.addLocalName;
+                    _action = fad3GearEditAction.addLocalName;
                     myList = listViewLocalNames.Items.Cast<ListViewItem>()
                                                      .Select(item => item.Text)
                                                      .ToList();
                     break;
 
                 case "itemAddGearCode":
-                    _action = global.fad3GearEditAction.addGearCode;
+                    _action = fad3GearEditAction.addGearCode;
                     break;
 
                 case "itemDeleteGearCode":
@@ -645,8 +646,8 @@ namespace FAD3
                     newLVI.Tag = result.NewRow;
                     _targetAreaUsageRow = result.NewRow;
 
-                    if(_parentForm !=null)
-                      _parentForm.GearVariationUseRefresh();
+                    if (_parentForm != null)
+                        _parentForm.GearVariationUseRefresh();
                 }
             }
         }

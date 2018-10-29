@@ -4,6 +4,7 @@ using System.Linq;
 using System.Data;
 using System.Data.OleDb;
 using System.Text;
+using FAD3.GUI.Classes;
 
 namespace FAD3
 {
@@ -40,7 +41,7 @@ namespace FAD3
                     var SubWeight = item.Value.CatchSubsampleWt == null ? "null" : item.Value.CatchSubsampleWt.ToString();
                     var SubCount = item.Value.CatchSubsampleCount == null ? "null" : item.Value.CatchSubsampleCount.ToString();
 
-                    if (item.Value.dataStatus == global.fad3DataStatus.statusNew)
+                    if (item.Value.dataStatus == fad3DataStatus.statusNew)
                     {
                         InsertCount++;
                         sql = $@"Insert into tblCatchComp (NameGUID, NameType, RowGUID, SamplingGUID, Sequence) values (
@@ -57,7 +58,7 @@ namespace FAD3
                         update = new OleDbCommand(sql, conn);
                         if (update.ExecuteNonQuery() > 0) resultCount++;
                     }
-                    else if (item.Value.dataStatus == global.fad3DataStatus.statusEdited)
+                    else if (item.Value.dataStatus == fad3DataStatus.statusEdited)
                     {
                         UpdateCount++;
                         sql = $@"Update tblCatchDetail set
@@ -80,7 +81,7 @@ namespace FAD3
                         update = new OleDbCommand(sql, conn);
                         if (update.ExecuteNonQuery() > 0) resultCount++;
                     }
-                    else if (item.Value.dataStatus == global.fad3DataStatus.statusForDeletion)
+                    else if (item.Value.dataStatus == fad3DataStatus.statusForDeletion)
                     {
                         DeleteCount++;
                         sql = $"Delete * from tblCatchDetail WHERE CatchCompRow = {{{item.Value.CatchCompGUID}}}";
@@ -175,7 +176,7 @@ namespace FAD3
                             CatchSubsampleWt = null,
                             CatchSubsampleCount = null,
                             NameType = IdType,
-                            dataStatus = global.fad3DataStatus.statusFromDB
+                            dataStatus = fad3DataStatus.statusFromDB
                         };
 
                         if (dr["swt"] != DBNull.Value)
@@ -257,12 +258,6 @@ namespace FAD3
             return myRow;
         }
 
-        public enum Identification
-        {
-            Scientific = 1,
-            LocalName
-        }
-
         public static Identification StringToIdentificationType(string IDType)
         {
             var myID = Identification.Scientific;
@@ -299,9 +294,9 @@ namespace FAD3
             return myID;
         }
 
-        public static Dictionary<CatchComposition.Identification, string> IdentificationTypes()
+        public static Dictionary<Identification, string> IdentificationTypes()
         {
-            var items = new Dictionary<CatchComposition.Identification, string>();
+            var items = new Dictionary<Identification, string>();
 
             items.Add(Identification.Scientific, "Scientific name");
             items.Add(Identification.LocalName, "Local name");

@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Windows.Forms;
+using FAD3.GUI.Classes;
 
 namespace FAD3
 {
     public partial class CoordinateFormatSelectForm : Form
     {
-        private global.CoordinateDisplayFormat _DisplayFormat;
+        private CoordinateDisplayFormat _DisplayFormat;
 
         public CoordinateFormatSelectForm()
         {
@@ -18,19 +19,19 @@ namespace FAD3
             _DisplayFormat = global.CoordinateDisplay;
             switch (_DisplayFormat)
             {
-                case global.CoordinateDisplayFormat.DegreeDecimal:
+                case CoordinateDisplayFormat.DegreeDecimal:
                     radioButtonDD.Checked = true;
                     break;
 
-                case global.CoordinateDisplayFormat.DegreeMinute:
+                case CoordinateDisplayFormat.DegreeMinute:
                     radioButtonDM.Checked = true;
                     break;
 
-                case global.CoordinateDisplayFormat.DegreeMinuteSecond:
+                case CoordinateDisplayFormat.DegreeMinuteSecond:
                     radioButtonDMS.Checked = true;
                     break;
 
-                case global.CoordinateDisplayFormat.UTM:
+                case CoordinateDisplayFormat.UTM:
                     radioButtonUTM.Checked = true;
                     break;
             }
@@ -47,19 +48,19 @@ namespace FAD3
                         switch (o.Name)
                         {
                             case "radioButtonDD":
-                                _DisplayFormat = global.CoordinateDisplayFormat.DegreeDecimal;
+                                _DisplayFormat = CoordinateDisplayFormat.DegreeDecimal;
                                 break;
 
                             case "radioButtonDM":
-                                _DisplayFormat = global.CoordinateDisplayFormat.DegreeMinute;
+                                _DisplayFormat = CoordinateDisplayFormat.DegreeMinute;
                                 break;
 
                             case "radioButtonDMS":
-                                _DisplayFormat = global.CoordinateDisplayFormat.DegreeMinuteSecond;
+                                _DisplayFormat = CoordinateDisplayFormat.DegreeMinuteSecond;
                                 break;
 
                             case "radioButtonUTM":
-                                _DisplayFormat = _DisplayFormat = global.CoordinateDisplayFormat.UTM;
+                                _DisplayFormat = _DisplayFormat = CoordinateDisplayFormat.UTM;
                                 break;
                         }
                     }

@@ -36,12 +36,15 @@
             this.contexMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.mnuMapThisGear = new System.Windows.Forms.ToolStripMenuItem();
             this.btnBatch = new System.Windows.Forms.Button();
+            this.txtCondition = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.btnSelect = new System.Windows.Forms.Button();
             this.contexMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnOk
             // 
-            this.btnOk.Location = new System.Drawing.Point(359, 434);
+            this.btnOk.Location = new System.Drawing.Point(359, 455);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(49, 24);
             this.btnOk.TabIndex = 0;
@@ -77,6 +80,7 @@
             this.lvGears.Size = new System.Drawing.Size(393, 372);
             this.lvGears.TabIndex = 5;
             this.lvGears.UseCompatibleStateImageBehavior = false;
+            this.lvGears.MouseClick += new System.Windows.Forms.MouseEventHandler(this.OnListViewMouseClick);
             this.lvGears.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnListViewMouseDown);
             // 
             // contexMenu
@@ -95,7 +99,7 @@
             // 
             // btnBatch
             // 
-            this.btnBatch.Location = new System.Drawing.Point(304, 434);
+            this.btnBatch.Location = new System.Drawing.Point(304, 455);
             this.btnBatch.Name = "btnBatch";
             this.btnBatch.Size = new System.Drawing.Size(49, 24);
             this.btnBatch.TabIndex = 6;
@@ -103,11 +107,40 @@
             this.btnBatch.UseVisualStyleBackColor = true;
             this.btnBatch.Click += new System.EventHandler(this.OnButtonClick);
             // 
+            // txtCondition
+            // 
+            this.txtCondition.Location = new System.Drawing.Point(15, 459);
+            this.txtCondition.Name = "txtCondition";
+            this.txtCondition.Size = new System.Drawing.Size(62, 20);
+            this.txtCondition.TabIndex = 7;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(14, 440);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(116, 13);
+            this.label2.TabIndex = 8;
+            this.label2.Text = "Select gears more than";
+            // 
+            // btnSelect
+            // 
+            this.btnSelect.Location = new System.Drawing.Point(92, 456);
+            this.btnSelect.Name = "btnSelect";
+            this.btnSelect.Size = new System.Drawing.Size(49, 24);
+            this.btnSelect.TabIndex = 9;
+            this.btnSelect.Text = "Select";
+            this.btnSelect.UseVisualStyleBackColor = true;
+            this.btnSelect.Click += new System.EventHandler(this.OnButtonClick);
+            // 
             // TargetAreaGearsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(420, 470);
+            this.ClientSize = new System.Drawing.Size(420, 496);
+            this.Controls.Add(this.btnSelect);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.txtCondition);
             this.Controls.Add(this.btnBatch);
             this.Controls.Add(this.lvGears);
             this.Controls.Add(this.label1);
@@ -133,5 +166,8 @@
         private System.Windows.Forms.ContextMenuStrip contexMenu;
         private System.Windows.Forms.ToolStripMenuItem mnuMapThisGear;
         private System.Windows.Forms.Button btnBatch;
+        private System.Windows.Forms.TextBox txtCondition;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Button btnSelect;
     }
 }

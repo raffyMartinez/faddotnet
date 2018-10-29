@@ -4,6 +4,8 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 using System.IO;
+using FAD3.Mapping.Classes;
+using FAD3.GUI.Classes;
 
 namespace FAD3
 {
@@ -19,7 +21,7 @@ namespace FAD3
         private MapLayer _currentMapLayer;
         public event EventHandler MapperClosed;
 
-        public FishingGrid.fadUTMZone UTMZone { get; private set; }
+        public fadUTMZone UTMZone { get; private set; }
 
         public Graticule Graticule
         {
@@ -55,6 +57,10 @@ namespace FAD3
         public int NumLayers()
         {
             return axMap.NumLayers;
+        }
+
+        private void DeleteTempFiles()
+        {
         }
 
         private void CleanUp()
@@ -96,7 +102,7 @@ namespace FAD3
 
         public AxMap MapControl { get; internal set; }
 
-        public void MapFishingGround(string grid25Name, FishingGrid.fadUTMZone utmZone)
+        public void MapFishingGround(string grid25Name, fadUTMZone utmZone)
         {
             FishingGroundMappingHandler fgmh = new FishingGroundMappingHandler(axMap.GeoProjection);
             fgmh.MapLayersHandler = _mapLayersHandler;
@@ -107,7 +113,7 @@ namespace FAD3
         {
         }
 
-        public void CreateGrid25MajorGrid(FishingGrid.fadUTMZone utmZone)
+        public void CreateGrid25MajorGrid(fadUTMZone utmZone)
         {
             UTMZone = utmZone;
             _grid25MajorGrid = new Grid25MajorGrid(axMap);
@@ -147,7 +153,7 @@ namespace FAD3
             _mapInterActionHandler.MapContextMenuStrip = menuDropDown;
             SetCursorToSelect();
 
-            if (global.MappingMode == global.fad3MappingMode.defaultMode)
+            if (global.MappingMode == fad3MappingMode.defaultMode)
             {
                 _mapLayersHandler.LoadMapState();
             }
@@ -214,6 +220,29 @@ namespace FAD3
                     MessageBox.Show(errMsg, "Error in opening file", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
+        }
+
+        public void SaveMapImageBatch(double dpi, MapTextGraticuleHelper helper, string fileName)
+        {
+            var tempFile = SaveTempMapImage(dpi);
+            Bitmap b = new Bitmap(tempFile);
+            var h = b.Height * 1.2;
+            Rectangle r = new Rectangle(0, 0, b.Width, (int)h);
+            Graphics g = Graphics.FromImage(b);
+        }
+
+        public string SaveTempMapImage(double dpi = 96)
+        {
+            string fileName = string.Empty;
+            _saveMapImage = new SaveMapImage(axMap);
+            _saveMapImage.MapLayersHandler = _mapLayersHandler;
+            if (_saveMapImage.SaveToTempFile(dpi))
+            {
+                fileName = _saveMapImage.TempMapFileName;
+                _saveMapImage.Dispose();
+                _saveMapImage = null;
+            }
+            return fileName;
         }
 
         public bool SaveMapImage(double DPI, string fileName, bool Preview = true)
@@ -317,11 +346,11 @@ namespace FAD3
                     break;
 
                 case "tsButtonGraticule":
+                    _graticule = new Graticule(axMap, _mapLayersHandler);
                     var gf = GraticuleForm.GetInstance(this);
                     if (!gf.Visible)
                     {
                         gf.Show(this);
-                        _graticule = new Graticule(axMap, _mapLayersHandler);
                     }
                     else
                     {

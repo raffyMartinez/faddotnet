@@ -16,6 +16,7 @@ namespace FAD3
         private bool _disposed;
         private AxMap _axMap;
         private Shapefile _shapeFileMask;
+        private bool _saveToTempFile;
 
         private string _fileName;
         private double _dpi;
@@ -27,6 +28,7 @@ namespace FAD3
         private int _handleMinorGrid;
         private Dictionary<int, int> _frameWidthDict = new Dictionary<int, int>();
         public bool PreviewImage { get; set; }
+        public string TempMapFileName { get { return _fileName; } }
 
         public void Dispose()
         {
@@ -45,6 +47,7 @@ namespace FAD3
                 }
                 if (_shapeFileMask != null)
                 {
+                    _shapeFileMask.EditClear();
                     _shapeFileMask.Close();
                     _shapeFileMask = null;
                 }
@@ -63,6 +66,11 @@ namespace FAD3
         {
             _fileName = fileName;
             _dpi = DPI;
+            _axMap = mapControl;
+        }
+
+        public SaveMapImage(AxMap mapControl)
+        {
             _axMap = mapControl;
         }
 
@@ -208,6 +216,14 @@ namespace FAD3
             }
         }
 
+        public bool SaveToTempFile(double dpi = 96)
+        {
+            _dpi = dpi;
+            _saveToTempFile = true;
+            AdjustFeatureSize();
+            return SaveMaptoImage();
+        }
+
         /// <summary>
         /// Initiates saving of a map to an image
         /// </summary>
@@ -215,6 +231,7 @@ namespace FAD3
         public bool Save(bool SaveGrid25 = true)
         {
             //MapLayersHandler.SaveLayerSettingsToXML();
+            _saveToTempFile = false;
             AdjustFeatureSize();
             if (SaveGrid25)
             {
@@ -236,7 +253,15 @@ namespace FAD3
             var sf = new Shapefile();
             if (sf.CreateNew("", ShpfileType.SHP_POLYGON))
             {
-                var shp = _axMap.Extents.ToShape().Clip(_axMap.get_Shapefile(_handleGridBoundary).Extents.ToShape(), tkClipOperation.clDifference);
+                var ext = _axMap.Extents;
+
+                //ef is expansion factor
+                var ef = (ext.xMax - ext.xMin) * 0.01;
+
+                ext.SetBounds(ext.xMin - ef, ext.yMin - ef, 0, ext.xMax + ef, ext.yMax + ef, 0);
+
+                //var shp = _axMap.Extents.ToShape().Clip(_axMap.get_Shapefile(_handleGridBoundary).Extents.ToShape(), tkClipOperation.clDifference);
+                var shp = ext.ToShape().Clip(_axMap.get_Shapefile(_handleGridBoundary).Extents.ToShape(), tkClipOperation.clDifference);
                 sf.EditAddShape(shp);
                 sf.DefaultDrawingOptions.LineVisible = false;
                 sf.DefaultDrawingOptions.FillColor = new Utils().ColorByName(tkMapColor.White);
@@ -279,27 +304,43 @@ namespace FAD3
             //create an image whose width (w) will result in a map whose width in pixels fits the the required dpi
             var img = _axMap.SnapShot3(ext.xMin, ext.xMax, ext.yMax, ext.yMin, (int)w);
 
-            //specify filename of projection file for the image
-            var prjFileName = _fileName.Replace(Path.GetExtension(_fileName), ".prj");
-
             //restore the map to its previous state by removing the mask and setting Reset to true
             if (handleMask != null) MapLayersHandler.RemoveLayer((int)handleMask);
             Reset = true;
             AdjustFeatureSize();
-            //MapLayersHandler.RestoreLayerSettingsFromXML();
 
-            //save the image to disk and create a worldfile. Image format is specified by USE_FILE_EXTENSION.
-            //also save the projection file
-            if (img.Save(_fileName, WriteWorldFile: true, FileType: ImageType.USE_FILE_EXTENSION) && _axMap.GeoProjection.WriteToFile(prjFileName))
+            if (_saveToTempFile)
             {
-                //show the image file using the default image viewer
-                if (PreviewImage) Process.Start(_fileName);
-                img = null;
-                return true;
+                _fileName = $@"{global.AppPath}\tempMap.jpg";
+                global.ListTemporaryFile(_fileName);
+                if (img.Save(_fileName))
+                {
+                    return true;
+                }
+                else
+                {
+                    _fileName = $@"{global.AppPath}\tempMap1.jpg";
+                    return img.Save(_fileName);
+                }
             }
             else
             {
-                return false;
+                //specify filename of projection file for the image
+                var prjFileName = _fileName.Replace(Path.GetExtension(_fileName), ".prj");
+
+                //save the image to disk and create a worldfile. Image format is specified by USE_FILE_EXTENSION.
+                //also save the projection file
+                if (img.Save(_fileName, WriteWorldFile: true, FileType: ImageType.USE_FILE_EXTENSION) && _axMap.GeoProjection.WriteToFile(prjFileName))
+                {
+                    //show the image file using the default image viewer
+                    if (PreviewImage) Process.Start(_fileName);
+                    img = null;
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
             }
         }
 

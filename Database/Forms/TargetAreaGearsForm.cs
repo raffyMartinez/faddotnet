@@ -16,6 +16,7 @@ namespace FAD3
         private static TargetAreaGearsForm _instance;
         private aoi _aoi;
         public aoi AOI { get { return _aoi; } }
+        private bool _isGearMapping;
 
         public TargetAreaGearsForm(aoi aoi)
         {
@@ -88,6 +89,16 @@ namespace FAD3
                     MappingBatchForm f = new MappingBatchForm(this);
                     f.ShowDialog(this);
                     break;
+
+                case "btnSelect":
+                    if (txtCondition.Text.Length > 0)
+                    {
+                        foreach (ListViewItem lvi in lvGears.Items)
+                        {
+                            lvi.Checked = int.Parse(lvi.SubItems[2].Text) >= int.Parse(txtCondition.Text);
+                        }
+                    }
+                    break;
             }
         }
 
@@ -99,26 +110,45 @@ namespace FAD3
         private void OnContextMenuItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
             e.ClickedItem.Owner.Hide();
+
             switch (e.ClickedItem.Name)
             {
                 case "mnuMapThisGear":
-                    var mehf = MapEffortHelperForm.GetInstance();
-                    if (mehf.Visible)
+                    _isGearMapping = false;
+                    if (global.MapIsOpen)
                     {
-                        mehf.BringToFront();
+                        MapTargetAreaGear();
+                        _isGearMapping = true;
                     }
-                    else
-                    {
-                        mehf.Show(this);
-                    }
-                    mehf.SetUpMapping(_aoi.AOIGUID, lvGears.SelectedItems[0].Tag.ToString(), lvGears.SelectedItems[0].SubItems[1].Text, _aoi.AOIName);
                     break;
             }
+        }
+
+        private void MapTargetAreaGear(bool MapFirstItemInList = false)
+        {
+            var mehf = MapEffortHelperForm.GetInstance();
+            if (mehf.Visible)
+            {
+                mehf.BringToFront();
+            }
+            else
+            {
+                mehf.Show(this);
+            }
+            mehf.SetUpMapping(_aoi.AOIGUID, lvGears.SelectedItems[0].Tag.ToString(), lvGears.SelectedItems[0].SubItems[1].Text, _aoi.AOIName, MapFirstItemInList = true);
         }
 
         private void OnListViewMouseDown(object sender, MouseEventArgs e)
         {
             mnuMapThisGear.Enabled = FishingGrid.IsCompleteGrid25 && global.MapIsOpen;
+        }
+
+        private void OnListViewMouseClick(object sender, MouseEventArgs e)
+        {
+            if (_isGearMapping)
+            {
+                MapTargetAreaGear(MapFirstItemInList: true);
+            }
         }
     }
 }

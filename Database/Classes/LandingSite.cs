@@ -12,6 +12,7 @@ using System.Data;
 using System.Data.OleDb;
 using System.Collections.Generic;
 using ISO_Classes;
+using FAD3.GUI.Classes;
 
 //using System.Diagnostics;
 
@@ -492,19 +493,19 @@ namespace FAD3
                             _coordinate.SetD(float.Parse(dr["cy"].ToString()), float.Parse(dr["cx"].ToString()));
                             switch (global.CoordinateDisplay)
                             {
-                                case global.CoordinateDisplayFormat.DegreeDecimal:
+                                case CoordinateDisplayFormat.DegreeDecimal:
                                     myLSData["CoordinateStringXY"] = Coordinate.ToString("D");
                                     break;
 
-                                case global.CoordinateDisplayFormat.DegreeMinute:
+                                case CoordinateDisplayFormat.DegreeMinute:
                                     myLSData["CoordinateStringXY"] = Coordinate.ToString("DM");
                                     break;
 
-                                case global.CoordinateDisplayFormat.DegreeMinuteSecond:
+                                case CoordinateDisplayFormat.DegreeMinuteSecond:
                                     myLSData["CoordinateStringXY"] = Coordinate.ToString("DMS");
                                     break;
 
-                                case global.CoordinateDisplayFormat.UTM:
+                                case CoordinateDisplayFormat.UTM:
                                     break;
                             }
                         }

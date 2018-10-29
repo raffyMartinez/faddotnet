@@ -6,12 +6,13 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using FAD3.GUI.Classes;
 
 namespace FAD3
 {
     public partial class GearEditorForm : Form
     {
-        private global.fad3GearEditAction _action;
+        private fad3GearEditAction _action;
         private string _GearVariationGuid = "";
         private string _GearClassGuid = "";
         private List<string> _List = new List<string>();
@@ -42,7 +43,7 @@ namespace FAD3
             set { _GearVariationGuid = value; }
         }
 
-        public global.fad3GearEditAction Action
+        public fad3GearEditAction Action
         {
             get { return _action; }
             set { _action = value; }
@@ -63,14 +64,14 @@ namespace FAD3
             int spacer = 20;
             switch (_action)
             {
-                case global.fad3GearEditAction.addGearVariation:
+                case fad3GearEditAction.addGearVariation:
                     labelTitle.Text = "Add a gear variation";
                     labelDescription.Text = "Enter a gear variation name but you cannot use " +
                                              "any of the names listed below";
                     comboBox.Visible = false;
                     break;
 
-                case global.fad3GearEditAction.addLocalName:
+                case fad3GearEditAction.addLocalName:
                     labelTitle.Text = "Add a gear local name";
                     labelDescription.Text = "Enter a gear local name but you cannot use " +
                                              "any of the local names already listed";
@@ -84,7 +85,7 @@ namespace FAD3
                     this.Height = buttonCancel.Location.Y + buttonCancel.Height + spacer * 2;
                     break;
 
-                case global.fad3GearEditAction.addGearCode:
+                case fad3GearEditAction.addGearCode:
                     labelTitle.Text = "Add a gear code";
                     labelDescription.Text = "Enter a gear code name but you cannot use " +
                                              "any of the codes listed below";
@@ -95,7 +96,7 @@ namespace FAD3
                     checkBox.Visible = true;
                     break;
 
-                case global.fad3GearEditAction.addAOI:
+                case fad3GearEditAction.addAOI:
                     labelTitle.Text = "Add a target area where used";
                     labelDescription.Text = "Enter a target area name but you cannot use " +
                                              "any of the names already listed";
@@ -120,8 +121,7 @@ namespace FAD3
         {
             switch (_action)
             {
-                case
-                global.fad3GearEditAction.addGearVariation:
+                case fad3GearEditAction.addGearVariation:
                     _List = gear.AllGearVariationNames();
                     foreach (var item in _List)
                     {
@@ -129,7 +129,7 @@ namespace FAD3
                     }
                     break;
 
-                case global.fad3GearEditAction.addGearCode:
+                case fad3GearEditAction.addGearCode:
                     foreach (var item in gear.GearCodesByClass(_GearClassGuid))
                     {
                         listBox.Items.Add(item);
@@ -138,13 +138,13 @@ namespace FAD3
                     labelCode.Text = gear.GearLetterFromGearClass(_GearClassGuid);
                     break;
 
-                case global.fad3GearEditAction.addAOI:
-                case global.fad3GearEditAction.addLocalName:
+                case fad3GearEditAction.addAOI:
+                case fad3GearEditAction.addLocalName:
                     aoi AOI = new aoi();
 
                     ((ComboBox)comboBox).With(o =>
                     {
-                        if (_action == global.fad3GearEditAction.addAOI)
+                        if (_action == fad3GearEditAction.addAOI)
                             o.DataSource = new BindingSource(AOI.AOIs, null);
                         else
                             o.DataSource = new BindingSource(gear.GearLocalNames, null); ;
@@ -174,20 +174,20 @@ namespace FAD3
 
                     switch (_action)
                     {
-                        case global.fad3GearEditAction.addGearVariation:
+                        case fad3GearEditAction.addGearVariation:
                             _parentForm.UsageGearVariation(textBox.Text);
                             break;
 
-                        case global.fad3GearEditAction.addGearCode:
+                        case fad3GearEditAction.addGearCode:
                             _parentForm.UsageGearCode(textBox.Text, checkBox.Checked);
                             break;
 
-                        case global.fad3GearEditAction.addAOI:
+                        case fad3GearEditAction.addAOI:
                             var AOIGuid = ((KeyValuePair<string, string>)comboBox.SelectedItem).Key;
                             _parentForm.UsageTargetArea(AOIGuid, comboBox.Text);
                             break;
 
-                        case global.fad3GearEditAction.addLocalName:
+                        case fad3GearEditAction.addLocalName:
                             var localNameGuid = ((KeyValuePair<string, string>)comboBox.SelectedItem).Key;
                             _parentForm.UsageLocalName(localNameGuid, comboBox.Text);
                             break;
@@ -205,7 +205,7 @@ namespace FAD3
             {
                 switch (_action)
                 {
-                    case global.fad3GearEditAction.addGearVariation:
+                    case fad3GearEditAction.addGearVariation:
                         if (s.Length > 5)
                         {
                             if (_List.Contains(s, StringComparer.OrdinalIgnoreCase))
@@ -219,7 +219,7 @@ namespace FAD3
                         }
                         break;
 
-                    case global.fad3GearEditAction.addGearCode:
+                    case fad3GearEditAction.addGearCode:
                         try
                         {
                             int Code = int.Parse(s);
@@ -272,7 +272,7 @@ namespace FAD3
             }
             else
             {
-                if (_action == global.fad3GearEditAction.addLocalName)
+                if (_action == fad3GearEditAction.addLocalName)
                 {
                     msg = s + " is not in the drop-down list\r\n" +
                           "Do you wish to add this as a new gear local name?";

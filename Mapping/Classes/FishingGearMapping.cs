@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using MapWinGIS;
 using System.Data;
 using System.Data.OleDb;
+using FAD3.GUI.Classes;
 
 namespace FAD3.Mapping.Classes
 {
@@ -13,7 +14,7 @@ namespace FAD3.Mapping.Classes
     {
         public static string SaveMapFolder { get; set; }
 
-        public static Shapefile MapThisGear(string aoiGuid, string gearVarGuid, List<int> samplingYear, bool aggregate = false, bool notInclude1 = false)
+        public static Shapefile MapThisGear(string aoiGuid, string gearVarGuid, List<int> samplingYear, bool aggregate = false, bool notInclude1 = false, bool RemoveInland = false)
         {
             var query = "";
             var dt = new DataTable();
@@ -65,7 +66,7 @@ namespace FAD3.Mapping.Classes
                     var pointAdded = false;
                     var iFldFG = 0;
                     var iFLdCount = 0;
-                    FishingGrid.fadUTMZone utmZone = FishingGrid.UTMZone;
+                    fadUTMZone utmZone = FishingGrid.UTMZone;
                     if (sf.CreateNewWithShapeID("", ShpfileType.SHP_POINT))
                     {
                         sf.GeoProjection = global.MappingForm.GeoProjection;
@@ -83,7 +84,17 @@ namespace FAD3.Mapping.Classes
                         {
                             DataRow dr = dt.Rows[i];
                             fishingGround = dr["FishingGround"].ToString();
-                            if (!FishingGrid.MinorGridIsInland(fishingGround))
+                            var proceed = false;
+                            if (RemoveInland && !FishingGrid.MinorGridIsInland(fishingGround))
+                            {
+                                proceed = true;
+                            }
+                            else if (!RemoveInland)
+                            {
+                                proceed = true;
+                            }
+
+                            if (proceed)
                             {
                                 var shp = new Shape();
                                 if (shp.Create(ShpfileType.SHP_POINT))

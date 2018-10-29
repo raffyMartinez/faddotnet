@@ -2,6 +2,7 @@
 using MapWinGIS;
 using System;
 using System.Windows.Forms;
+using FAD3.GUI.Classes;
 
 namespace FAD3
 {
@@ -128,11 +129,11 @@ namespace FAD3
                     var mapName = sf.CellValue[sf.FieldIndexByName["MapName"], _selectedShapeIndexes[0]];
                     var tsi = MapContextMenuStrip.Items.Add($"Load {mapName} grid map");
                     tsi.Name = "itemRetrieveGrid";
-                    tsi.Visible = global.MappingMode == global.fad3MappingMode.grid25Mode;
+                    tsi.Visible = global.MappingMode == fad3MappingMode.grid25Mode;
 
                     tsi = MapContextMenuStrip.Items.Add($"Delete {mapName} grid map");
                     tsi.Name = "itemDeleteGrid";
-                    tsi.Visible = global.MappingMode == global.fad3MappingMode.grid25Mode;
+                    tsi.Visible = global.MappingMode == fad3MappingMode.grid25Mode;
                     break;
             }
             MapContextMenuStrip.Show(_axMap, new System.Drawing.Point(mouseX, mouseY));

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using MetaphoneCOM;
+using FAD3.GUI.Classes;
 
 namespace FAD3
 {
@@ -16,8 +17,8 @@ namespace FAD3
         private string _species = "";
         private string _genus = "";
         private string _taxaName;
-        private CatchName.Taxa _taxa = CatchName.Taxa.To_be_determined;
-        private global.fad3DataStatus _dataStatus = global.fad3DataStatus.statusFromDB;
+        private Taxa _taxa = Taxa.To_be_determined;
+        private fad3DataStatus _dataStatus = fad3DataStatus.statusFromDB;
         private string _dialogTitle;
         private bool _inFishBase;
         private int? _fishBaseSpeciesNumber = null;
@@ -32,7 +33,7 @@ namespace FAD3
         public SpeciesNameForm(Form Parent)
         {
             InitializeComponent();
-            _dataStatus = global.fad3DataStatus.statusNew;
+            _dataStatus = fad3DataStatus.statusNew;
             _dialogTitle = "New species";
             _parentForm = Parent;
         }
@@ -42,7 +43,7 @@ namespace FAD3
             InitializeComponent();
             _genus = genus;
             _species = species;
-            _dataStatus = global.fad3DataStatus.statusNew;
+            _dataStatus = fad3DataStatus.statusNew;
             _dialogTitle = $"New species {genus} {species}";
             _parentForm = Parent;
         }
@@ -54,7 +55,7 @@ namespace FAD3
             _species = species;
             _nameGuid = nameGuid;
             _taxaName = taxaName;
-            _dataStatus = global.fad3DataStatus.statusFromDB;
+            _dataStatus = fad3DataStatus.statusFromDB;
             _dialogTitle = $"Data for the species {genus} {species}";
             _parentForm = Parent;
         }
@@ -74,7 +75,7 @@ namespace FAD3
             txtGenus.Text = _genus;
             txtSpecies.Text = _species;
 
-            if (_dataStatus != global.fad3DataStatus.statusNew)
+            if (_dataStatus != fad3DataStatus.statusNew)
             {
                 var speciesData = names.RetrieveSpeciesData(_nameGuid);
                 _taxaName = cboTaxa.Text = CatchName.TaxaNameFromTaxa(speciesData.taxa);
@@ -180,7 +181,7 @@ namespace FAD3
                     if (ValidateForm())
                     {
                         var willClose = false;
-                        if (_dataStatus == global.fad3DataStatus.statusFromDB)
+                        if (_dataStatus == fad3DataStatus.statusFromDB)
                         {
                             willClose = true;
                         }
@@ -195,7 +196,7 @@ namespace FAD3
 
                         if (_parentForm.GetType().Name != "AllSpeciesForm")
                         {
-                            if (_dataStatus == global.fad3DataStatus.statusNew)
+                            if (_dataStatus == fad3DataStatus.statusNew)
                             {
                                 ((CatchCompositionForm)_parentForm).NewName(Accepted: true, _genus, _species, _nameGuid);
                             }
@@ -264,9 +265,9 @@ namespace FAD3
                     break;
             }
 
-            if (!e.Cancel && _dataStatus != global.fad3DataStatus.statusNew)
+            if (!e.Cancel && _dataStatus != fad3DataStatus.statusNew)
             {
-                _dataStatus = o.Text != _genus ? global.fad3DataStatus.statusEdited : default;
+                _dataStatus = o.Text != _genus ? fad3DataStatus.statusEdited : default;
             }
             else if (e.Cancel)
             {
@@ -278,14 +279,14 @@ namespace FAD3
         private void OncboTaxa_Validating(object sender, CancelEventArgs e)
         {
             var o = (ComboBox)sender;
-            if (_dataStatus != global.fad3DataStatus.statusNew)
+            if (_dataStatus != fad3DataStatus.statusNew)
             {
-                _dataStatus = o.Text != _taxaName ? global.fad3DataStatus.statusEdited : default;
+                _dataStatus = o.Text != _taxaName ? fad3DataStatus.statusEdited : default;
             }
             _taxaName = o.Text;
             _taxa = CatchName.TaxaFromTaxaName(_taxaName);
 
-            if (_taxa == CatchName.Taxa.Fish)
+            if (_taxa == Taxa.Fish)
             {
                 var fbData = names.NameInFishBaseEx(_genus, _species);
                 chkInFishbase.Checked = _inFishBase = fbData.inFishBase;

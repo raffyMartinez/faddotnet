@@ -17,6 +17,8 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
+using FAD3.Database.Forms;
+using FAD3.GUI.Classes;
 
 //using dao;
 
@@ -31,7 +33,7 @@ namespace FAD3
         private aoi _aoi = new aoi();
         private string _aoiGuid = "";
         private string _aoiName = "";
-        private global.fad3CatchSubRow _catchSubRow;
+        private fad3CatchSubRow _catchSubRow;
         private string _gearClassGUID = "";
         private string _gearClassName = "";
         private string _GearVarGUID = "";
@@ -57,7 +59,7 @@ namespace FAD3
         private string _vesHeight = "";
         private string _vesLength = "";
         private string _vesWidth = "";
-        private CatchName.Taxa _taxa = CatchName.Taxa.To_be_determined;
+        private Taxa _taxa = Taxa.To_be_determined;
         private string _referenceNumber = "";
 
         private ListView lvCatch;
@@ -169,7 +171,7 @@ namespace FAD3
         /// <param name="sender"></param>
         /// <param name="context"></param>
         /// <param name="myContext"></param>
-        public static void SaveColumnWidthEx(object sender, string context = "", global.lvContext myContext = global.lvContext.None)
+        public static void SaveColumnWidthEx(object sender, string context = "", lvContext myContext = lvContext.None)
         {
             string cw = "";
             int i = 0;
@@ -195,7 +197,7 @@ namespace FAD3
             {
                 SaveContext = context;
             }
-            else if (myContext != global.lvContext.None)
+            else if (myContext != lvContext.None)
             {
                 SaveContext = myContext.ToString();
             }
@@ -517,6 +519,10 @@ namespace FAD3
                     tsi.Name = "menuGearsInTargetArea";
                     tsi.Enabled = _treeLevel == "aoi";
 
+                    tsi = menuDropDown.Items.Add("Fishing gear inventory");
+                    tsi.Name = "menuGearInventory";
+                    tsi.Enabled = _treeLevel == "aoi";
+
                     tsi = menuDropDown.Items.Add("Target area properties");
                     tsi.Name = "menuTargetAreaProp";
                     tsi.Enabled = _treeLevel == "aoi";
@@ -585,12 +591,12 @@ namespace FAD3
                     var MenuName = "";
                     if (((ListView)Source).Items.Count > 0)
                     {
-                        if (_catchSubRow == global.fad3CatchSubRow.GMS)
+                        if (_catchSubRow == fad3CatchSubRow.GMS)
                         {
                             MenuPrompt = "Edit GMS table";
                             MenuName = "menuEditGMSTable";
                         }
-                        else if (_catchSubRow == global.fad3CatchSubRow.LF)
+                        else if (_catchSubRow == fad3CatchSubRow.LF)
                         {
                             MenuPrompt = "Edit Length-frequency table";
                             MenuName = "menuEditLFTable";
@@ -598,12 +604,12 @@ namespace FAD3
                     }
                     else
                     {
-                        if (_catchSubRow == global.fad3CatchSubRow.GMS)
+                        if (_catchSubRow == fad3CatchSubRow.GMS)
                         {
                             MenuPrompt = "New GMS table";
                             MenuName = "menuNewGMSTable";
                         }
-                        else if (_catchSubRow == global.fad3CatchSubRow.LF)
+                        else if (_catchSubRow == fad3CatchSubRow.LF)
                         {
                             MenuPrompt = "New Length-frequency table";
                             MenuName = "menuNewLFTable";
@@ -797,21 +803,21 @@ namespace FAD3
         private void OnGenerateGridMapToolStripMenuItem_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
             e.ClickedItem.OwnerItem.Owner.Hide();
-            global.MappingMode = global.fad3MappingMode.grid25Mode;
+            global.MappingMode = fad3MappingMode.grid25Mode;
             var mf = MapperForm.GetInstance(this);
             if (!mf.Visible)
             {
                 mf.Show(this);
                 ToolStripItem tsi = e.ClickedItem;
-                FishingGrid.fadUTMZone utmZone = FishingGrid.fadUTMZone.utmZone_Undefined;
+                fadUTMZone utmZone = fadUTMZone.utmZone_Undefined;
                 switch (tsi.Tag.ToString())
                 {
                     case "zone50":
-                        utmZone = FishingGrid.fadUTMZone.utmZone50N;
+                        utmZone = fadUTMZone.utmZone50N;
                         break;
 
                     case "zone51":
-                        utmZone = FishingGrid.fadUTMZone.utmZone51N;
+                        utmZone = fadUTMZone.utmZone51N;
                         break;
                 }
                 global.MappingForm.CreateGrid25MajorGrid(utmZone);
@@ -929,6 +935,18 @@ namespace FAD3
                     else
                     {
                         tagf.Show(this);
+                    }
+                    break;
+
+                case "menuGearInventory":
+                    var gearInventoryForm = GearInventoryForm.GetInstance(_aoi);
+                    if (gearInventoryForm.Visible)
+                    {
+                        gearInventoryForm.BringToFront();
+                    }
+                    else
+                    {
+                        gearInventoryForm.Show(this);
                     }
                     break;
 
@@ -1052,7 +1070,7 @@ namespace FAD3
                     var lvi = lvCatch.SelectedItems[0];
                     if (Enum.TryParse(lvi.SubItems[7].Text, out _taxa))
                     {
-                        Proceed = _taxa != CatchName.Taxa.To_be_determined;
+                        Proceed = _taxa != Taxa.To_be_determined;
                     }
                     else
                     {
@@ -1084,7 +1102,7 @@ namespace FAD3
                         _formEffortMapper.BringToFront();
                     }
                     _formEffortMapper.SetUpMapping(_treeLevel);
-                    global.MappingMode = global.fad3MappingMode.fishingGroundMappingMode;
+                    global.MappingMode = fad3MappingMode.fishingGroundMappingMode;
                     break;
             }
         }
@@ -1158,18 +1176,18 @@ namespace FAD3
                     break;
 
                 case "btnSubLF":
-                    if (SetupLF_GMSListView(Show: true, Content: global.fad3CatchSubRow.LF))
+                    if (SetupLF_GMSListView(Show: true, Content: fad3CatchSubRow.LF))
                     {
-                        _catchSubRow = global.fad3CatchSubRow.LF;
+                        _catchSubRow = fad3CatchSubRow.LF;
                         Show_LF_GMS_List(lvCatch.SelectedItems[0].Name);
                     }
                     break;
 
                 case "btnSubGMS":
-                    if (SetupLF_GMSListView(Show: true, Content: global.fad3CatchSubRow.GMS))
+                    if (SetupLF_GMSListView(Show: true, Content: fad3CatchSubRow.GMS))
                     {
-                        _catchSubRow = global.fad3CatchSubRow.GMS;
-                        if (Enum.TryParse(lvCatch.SelectedItems[0].SubItems[7].Text, out CatchName.Taxa myTaxa))
+                        _catchSubRow = fad3CatchSubRow.GMS;
+                        if (Enum.TryParse(lvCatch.SelectedItems[0].SubItems[7].Text, out Taxa myTaxa))
                         {
                             _taxa = myTaxa;
                         }
@@ -1310,9 +1328,9 @@ namespace FAD3
                         break;
 
                     case "lvLF_GMS":
-                        if (_catchSubRow == global.fad3CatchSubRow.LF)
+                        if (_catchSubRow == fad3CatchSubRow.LF)
                             ShowLFForm();
-                        else if (_catchSubRow == global.fad3CatchSubRow.GMS)
+                        else if (_catchSubRow == fad3CatchSubRow.GMS)
                             ShowGMSForm(_taxa);
                         break;
                 }
@@ -1332,7 +1350,7 @@ namespace FAD3
                     if (lvMain.Tag.ToString() == "sampling" && lvh.Item != null)
                     {
                         SamplingGUID = lvh.Item.Tag.ToString();
-                        if (FishingGrid.GridType == FishingGrid.fadGridType.gridTypeGrid25 && global.MapIsOpen)
+                        if (FishingGrid.GridType == fadGridType.gridTypeGrid25 && global.MapIsOpen)
                         {
                             global.MappingForm.MapFishingGround(lvh.Item.SubItems[4].Text, FishingGrid.UTMZone);
                         }
@@ -1361,7 +1379,7 @@ namespace FAD3
                     {
                         if (lvh.Item != null)
                         {
-                            if (Enum.TryParse(lvh.Item.SubItems[7].Text, out CatchName.Taxa myTaxa))
+                            if (Enum.TryParse(lvh.Item.SubItems[7].Text, out Taxa myTaxa))
                             {
                                 _taxa = myTaxa;
                             }
@@ -1994,7 +2012,7 @@ namespace FAD3
             }
         }
 
-        private bool SetupLF_GMSListView(bool Show = true, global.fad3CatchSubRow Content = global.fad3CatchSubRow.none)
+        private bool SetupLF_GMSListView(bool Show = true, fad3CatchSubRow Content = fad3CatchSubRow.none)
         {
             var Proceed = false;
             if (_subListExisting)
@@ -2015,14 +2033,14 @@ namespace FAD3
                                    lvCatch.Columns["FromTotal"].Width + lvCatch.Columns["CompWt"].Width +
                                    lvCatch.Columns["CompCt"].Width + lvCatch.Columns["spacer"].Width + 3;
 
-                        if (Content == global.fad3CatchSubRow.LF)
+                        if (Content == fad3CatchSubRow.LF)
                         {
                             lvLF_GMS.Columns.Add("Row");
                             lvLF_GMS.Columns.Add("Length");
                             lvLF_GMS.Columns.Add("Frequency");
                             lvLF_GMS.Columns.Add("");
                         }
-                        else if (Content == global.fad3CatchSubRow.GMS)
+                        else if (Content == fad3CatchSubRow.GMS)
                         {
                             lvLF_GMS.Columns.Add("Row");
                             lvLF_GMS.Columns.Add("Length");
@@ -2396,11 +2414,11 @@ namespace FAD3
             Show_LF_GMS_List(lvCatch.SelectedItems[0].Name, _taxa);
         }
 
-        private void Show_LF_GMS_List(string CatchRowGuid, CatchName.Taxa taxa = CatchName.Taxa.To_be_determined)
+        private void Show_LF_GMS_List(string CatchRowGuid, Taxa taxa = Taxa.To_be_determined)
         {
             lvLF_GMS.Items.Clear();
             int n = 1;
-            if (_catchSubRow == global.fad3CatchSubRow.LF)
+            if (_catchSubRow == fad3CatchSubRow.LF)
             {
                 foreach (KeyValuePair<string, sampling.LFLine> kv in _Sampling.LFData(CatchRowGuid))
                 {
@@ -2415,7 +2433,7 @@ namespace FAD3
                     n++;
                 }
             }
-            else if (_catchSubRow == global.fad3CatchSubRow.GMS)
+            else if (_catchSubRow == fad3CatchSubRow.GMS)
             {
                 foreach (KeyValuePair<string, GMSLineClass> kv in GMSManager.RetrieveGMSData(CatchRowGuid))
                 {
@@ -2615,9 +2633,9 @@ namespace FAD3
             SetupSamplingButtonFrame(true);
         }
 
-        private void ShowGMSForm(CatchName.Taxa taxa, bool isNew = false)
+        private void ShowGMSForm(Taxa taxa, bool isNew = false)
         {
-            if (taxa != CatchName.Taxa.To_be_determined)
+            if (taxa != Taxa.To_be_determined)
             {
                 GMSDataEntryForm fgms = new GMSDataEntryForm(isNew, _Sampling,
                                           lvCatch.SelectedItems[0].Name,

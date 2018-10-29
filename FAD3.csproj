@@ -116,6 +116,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Database\Classes\FishingGearInventory.cs" />
     <Compile Include="Database\Forms\AllSpeciesForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -132,15 +133,28 @@
     </Compile>
     <Compile Include="Database\Classes\CatchLine.cs" />
     <Compile Include="Database\Classes\CatchName.cs" />
+    <Compile Include="Database\Forms\GearInventoryEditForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Database\Forms\GearInventoryEditForm.Designer.cs">
+      <DependentUpon>GearInventoryEditForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Database\Forms\GearInventoryForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Database\Forms\GearInventoryForm.Designer.cs">
+      <DependentUpon>GearInventoryForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Database\Forms\MappingBatchForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Database\Forms\MappingBatchForm.Designer.cs">
       <DependentUpon>MappingBatchForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="GUI\Classes\Enums.cs" />
     <Compile Include="Mapping\Classes\Colors.cs" />
     <Compile Include="Mapping\Classes\ColorSchemes.cs" />
-    <Compile Include="Mapping\Classes\ConfigureMapTextHelper.cs" />
+    <Compile Include="Mapping\Classes\MapTextGraticuleHelper.cs" />
     <Compile Include="Mapping\Classes\Discretizer.cs" />
     <Compile Include="Mapping\Classes\FishingGearMapping.cs" />
     <Compile Include="Mapping\Classes\JenksFisher.cs" />
@@ -151,11 +165,11 @@
     <Compile Include="Mapping\Forms\ChlorophyllForm.Designer.cs">
       <DependentUpon>ChlorophyllForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Mapping\Forms\ConfigureMapTextForm.cs">
+    <Compile Include="Mapping\Forms\GraticuleTextHelperForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Mapping\Forms\ConfigureMapTextForm.Designer.cs">
-      <DependentUpon>ConfigureMapTextForm.cs</DependentUpon>
+    <Compile Include="Mapping\Forms\GraticuleTextHelperForm.Designer.cs">
+      <DependentUpon>GraticuleTextHelperForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Mapping\Forms\ConvertToGrid25Form.cs">
       <SubType>Form</SubType>
@@ -511,14 +525,20 @@
     <EmbeddedResource Include="Database\Forms\CatchCompositionForm.resx">
       <DependentUpon>CatchCompositionForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Database\Forms\GearInventoryEditForm.resx">
+      <DependentUpon>GearInventoryEditForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Database\Forms\GearInventoryForm.resx">
+      <DependentUpon>GearInventoryForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Database\Forms\MappingBatchForm.resx">
       <DependentUpon>MappingBatchForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Mapping\Forms\ChlorophyllForm.resx">
       <DependentUpon>ChlorophyllForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Mapping\Forms\ConfigureMapTextForm.resx">
-      <DependentUpon>ConfigureMapTextForm.cs</DependentUpon>
+    <EmbeddedResource Include="Mapping\Forms\GraticuleTextHelperForm.resx">
+      <DependentUpon>GraticuleTextHelperForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Mapping\Forms\ConvertToGrid25Form.resx">
       <DependentUpon>ConvertToGrid25Form.cs</DependentUpon>
@@ -682,7 +702,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="ClassDiagram1.cd" />
+    <None Include="diagrams\all classes.cd" />
+    <None Include="diagrams\graticule classes.cd" />
     <None Include="fad2_TemporaryKey.pfx" />
     <None Include="packages.config" />
     <None Include="resource raw\UITable.xlsx" />

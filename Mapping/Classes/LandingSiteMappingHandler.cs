@@ -6,6 +6,7 @@ using System.Data.OleDb;
 using System.Data;
 using MapWinGIS;
 using Oware;
+using FAD3.GUI.Classes;
 
 namespace FAD3
 {
@@ -50,7 +51,7 @@ namespace FAD3
                                     var shp = new Shape();
                                     if (shp.Create(ShpfileType.SHP_POINT))
                                     {
-                                        if (global.MappingMode == global.fad3MappingMode.grid25Mode)
+                                        if (global.MappingMode == fad3MappingMode.grid25Mode)
                                         {
                                             var converter = new LatLngUTMConverter("WGS 84");
                                             var result = converter.convertLatLngToUtm(y, x);

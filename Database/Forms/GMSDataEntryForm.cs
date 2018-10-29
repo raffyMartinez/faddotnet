@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+using FAD3.GUI.Classes;
 
 namespace FAD3
 {
@@ -35,7 +36,7 @@ namespace FAD3
         private int _row = 1;
         private sampling _sampling;
         private int _spacer = 3;
-        private CatchName.Taxa _taxa = CatchName.Taxa.To_be_determined;
+        private Taxa _taxa = Taxa.To_be_determined;
         private bool _UpdateSequence = false;
         private int _y = 5;
         private MainForm _parent_form;
@@ -44,7 +45,7 @@ namespace FAD3
         private string _currentTextContents = "";
         private bool _errorValidating = false;
 
-        public GMSDataEntryForm(bool IsNew, sampling sampling, string CatchRowGuid, string CatchName, CatchName.Taxa taxa, MainForm Parent)
+        public GMSDataEntryForm(bool IsNew, sampling sampling, string CatchRowGuid, string CatchName, Taxa taxa, MainForm Parent)
         {
             InitializeComponent();
             _CatchRowGuid = CatchRowGuid;
@@ -88,7 +89,7 @@ namespace FAD3
                         o.Location = new Point(0, 0);
                         o.Visible = false;
                         o.DropDownStyle = ComboBoxStyle.DropDownList;
-                        o.DataSource = Enum.GetValues(typeof(GMSManager.sex));
+                        o.DataSource = Enum.GetValues(typeof(Sex));
                         o.AutoCompleteSource = AutoCompleteSource.ListItems;
                         o.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
                         o.Font = Font;
@@ -141,7 +142,7 @@ namespace FAD3
                 _GMSData.Add(key, new GMSLineClass(_CatchRowGuid));
                 _GMSData[key].RowGuid = Guid.NewGuid().ToString();
                 _GMSData[key].Sequence = _row;
-                _GMSData[key].DataStatus = global.fad3DataStatus.statusNew;
+                _GMSData[key].DataStatus = fad3DataStatus.statusNew;
                 _GMSData[key].Taxa = _taxa;
             }
 
@@ -285,7 +286,7 @@ namespace FAD3
                             _cboEditor.Text = _cboEditor.Items[itemIndex].ToString();
                         else
                         {
-                            var gmsStage = (KeyValuePair<GMSManager.FishCrabGMS, string>)_cboEditor.Items[itemIndex];
+                            var gmsStage = (KeyValuePair<FishCrabGMS, string>)_cboEditor.Items[itemIndex];
                             _cboEditor.Text = GMSManager.GMSStageToString(_taxa, gmsStage.Key);
                         }
                     }
@@ -482,7 +483,7 @@ namespace FAD3
             switch (_cboEditor.Name)
             {
                 case "cboSex":
-                    _GMSData[_cboEditor.Tag.ToString()].Sex = (GMSManager.sex)Enum.Parse(typeof(GMSManager.sex), _cboEditor.Text);
+                    _GMSData[_cboEditor.Tag.ToString()].Sex = (Sex)Enum.Parse(typeof(Sex), _cboEditor.Text);
                     break;
 
                 case "cboGMS":
@@ -723,9 +724,9 @@ namespace FAD3
 
         private void SetRowStatusToEdited(Control source)
         {
-            if (_GMSData[source.Tag.ToString()].DataStatus != global.fad3DataStatus.statusNew)
+            if (_GMSData[source.Tag.ToString()].DataStatus != fad3DataStatus.statusNew)
             {
-                _GMSData[source.Tag.ToString()].DataStatus = global.fad3DataStatus.statusEdited;
+                _GMSData[source.Tag.ToString()].DataStatus = fad3DataStatus.statusEdited;
             }
         }
 

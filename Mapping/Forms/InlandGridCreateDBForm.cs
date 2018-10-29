@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Windows.Forms;
+using FAD3.GUI.Classes;
 
 namespace FAD3
 {
@@ -9,7 +10,7 @@ namespace FAD3
     {
         private static InlandGridCreateDBForm _instance;
         private Grid25GenerateForm _parentForm;
-        public FishingGrid.fadUTMZone UTMZone { get; set; }
+        public fadUTMZone UTMZone { get; set; }
 
         public static InlandGridCreateDBForm GetInstance(Grid25GenerateForm parent)
         {

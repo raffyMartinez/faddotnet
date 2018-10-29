@@ -14,6 +14,20 @@ namespace FAD3.Database.Forms
     public partial class MappingBatchForm : Form
     {
         private Form _parentForm;
+        private ListViewItem _currentGearItem;
+
+        public void MappedYears(List<int> years)
+        {
+            string yearsMapped = "";
+            foreach (var item in years)
+            {
+                yearsMapped += $"{item},";
+            }
+            yearsMapped = yearsMapped.Trim(',');
+
+            var file = $@"{FishingGearMapping.SaveMapFolder}\{_currentGearItem.Text}-{_currentGearItem.SubItems[1].Text}-{yearsMapped}.tif";
+            global.MappingForm.SaveMapImage(int.Parse(txtDPI.Text), file, false);
+        }
 
         public MappingBatchForm(TargetAreaGearsForm parent)
         {
@@ -50,12 +64,14 @@ namespace FAD3.Database.Forms
                                 {
                                     if (item.Checked)
                                     {
+                                        _currentGearItem = item;
                                         var mehf = MapEffortHelperForm.GetInstance();
                                         mehf.BatchMode = true;
+                                        mehf.CombineYearsInOneMap = chkCombinedMap.Checked;
                                         mehf.SetUpMapping(f.AOI.AOIGUID, item.Tag.ToString(), item.SubItems[1].Text, f.AOI.AOIName);
-                                        mehf.MapTargetAreaGearFishingGround();
-                                        var file = $@"{FishingGearMapping.SaveMapFolder}\{item.Text}-{item.SubItems[1].Text}.tif";
-                                        global.MappingForm.SaveMapImage(int.Parse(txtDPI.Text), file, false);
+                                        mehf.MapTargetAreaGearFishingGroundBatch(this);
+                                        //var file = $@"{FishingGearMapping.SaveMapFolder}\{item.Text}-{item.SubItems[1].Text}.tif";
+                                        //global.MappingForm.SaveMapImage(int.Parse(txtDPI.Text), file, false);
                                         n++;
                                     }
                                 }

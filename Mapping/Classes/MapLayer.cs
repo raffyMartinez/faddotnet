@@ -30,6 +30,7 @@ namespace FAD3
         public string ShapesVisibilityExpression { get; set; }
         public string LabelSettingsXML { get; internal set; }
         public string SymbolSettinsXML { get; internal set; }
+        public Labels Labels { get; internal set; }
 
         public void RestoreSettingsFromXML()
         {
@@ -100,6 +101,7 @@ namespace FAD3
                 }
                 ImageThumbnail = null;
                 LayerObject = null;
+                Labels = null;
                 _disposed = true;
             }
         }

@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Windows.Forms;
 using ISO_Classes;
+using FAD3.GUI.Classes;
 
 namespace FAD3
 {
@@ -11,7 +12,7 @@ namespace FAD3
         private string _XCoordinatePrompt;
         private string _YCoordinatePrompt;
         private Coordinate _Coordinate;
-        private global.CoordinateDisplayFormat _CoordinateFormat;
+        private CoordinateDisplayFormat _CoordinateFormat;
 
         private float _LonDeg;
         private float _LatDeg;
@@ -48,27 +49,27 @@ namespace FAD3
 
             switch (_CoordinateFormat)
             {
-                case global.CoordinateDisplayFormat.DegreeDecimal:
+                case CoordinateDisplayFormat.DegreeDecimal:
                     mtextLongitude.Mask = $"000.0000° L";
                     mtextLatitude.Mask = $"00.0000° L";
 
                     break;
 
-                case global.CoordinateDisplayFormat.DegreeMinute:
+                case CoordinateDisplayFormat.DegreeMinute:
                     mtextLongitude.Mask = $"000°00.00' L";
                     mtextLatitude.Mask = $"00°00.00' L";
                     if (!_IsNew) _Coordinate.GetDM(out _LatDeg, out _LatMin, out _IsNorth, out _LonDeg, out _LonMin, out _IsEast);
                     format = "DM";
                     break;
 
-                case global.CoordinateDisplayFormat.DegreeMinuteSecond:
+                case CoordinateDisplayFormat.DegreeMinuteSecond:
                     mtextLongitude.Mask = $"000°00'00.0{_SecondSign} L";
                     mtextLatitude.Mask = $"00°00'00.0{_SecondSign} L";
                     if (!_IsNew) _Coordinate.GetDMS(out _LatDeg, out _LatMin, out _LatSec, out _IsNorth, out _LonDeg, out _LonMin, out _LonSec, out _IsEast);
                     format = "DMS";
                     break;
 
-                case global.CoordinateDisplayFormat.UTM:
+                case CoordinateDisplayFormat.UTM:
                     mtextLongitude.Mask = "";
                     mtextLatitude.Mask = "";
                     break;
@@ -126,19 +127,19 @@ namespace FAD3
                         var directionPart = 3;
                         switch (_CoordinateFormat)
                         {
-                            case global.CoordinateDisplayFormat.DegreeDecimal:
+                            case CoordinateDisplayFormat.DegreeDecimal:
                                 directionPart = 2;
                                 break;
 
-                            case global.CoordinateDisplayFormat.DegreeMinute:
+                            case CoordinateDisplayFormat.DegreeMinute:
                                 directionPart = 3;
                                 break;
 
-                            case global.CoordinateDisplayFormat.DegreeMinuteSecond:
+                            case CoordinateDisplayFormat.DegreeMinuteSecond:
                                 directionPart = 4;
                                 break;
 
-                            case global.CoordinateDisplayFormat.UTM:
+                            case CoordinateDisplayFormat.UTM:
                                 break;
                         }
 
@@ -177,7 +178,7 @@ namespace FAD3
                             {
                                 switch (_CoordinateFormat)
                                 {
-                                    case global.CoordinateDisplayFormat.DegreeDecimal:
+                                    case CoordinateDisplayFormat.DegreeDecimal:
                                         if (!e.Cancel && o.Name == "mtextLongitude")
                                         {
                                             _LonDeg = float.Parse(parts[0]);
@@ -188,7 +189,7 @@ namespace FAD3
                                         }
                                         break;
 
-                                    case global.CoordinateDisplayFormat.DegreeMinute:
+                                    case CoordinateDisplayFormat.DegreeMinute:
                                         e.Cancel = isLimit ? float.Parse(parts[1]) > 0 : float.Parse(parts[1]) >= 60;
                                         msg = isLimit ? "Minute part shoud be zero" : "Minute part should be less than 60";
                                         if (!e.Cancel && o.Name == "mtextLongitude")
@@ -203,7 +204,7 @@ namespace FAD3
                                         }
                                         break;
 
-                                    case global.CoordinateDisplayFormat.DegreeMinuteSecond:
+                                    case CoordinateDisplayFormat.DegreeMinuteSecond:
                                         e.Cancel = isLimit ? float.Parse(parts[2]) > 0 : float.Parse(parts[2]) >= 60;
                                         msg = isLimit ? "Second part should be zero" : "Second part should be less than 60";
                                         if (!e.Cancel && o.Name == "mtextLongitude")
@@ -220,7 +221,7 @@ namespace FAD3
                                         }
                                         break;
 
-                                    case global.CoordinateDisplayFormat.UTM:
+                                    case CoordinateDisplayFormat.UTM:
 
                                         break;
                                 }

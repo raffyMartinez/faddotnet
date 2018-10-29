@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
 using System.Windows.Forms;
+using FAD3.GUI.Classes;
 
 namespace FAD3
 {
@@ -480,9 +481,9 @@ namespace FAD3
             {
                 try
                 {
-                    var DataStatus = global.fad3DataStatus.statusFromDB;
+                    var DataStatus = fad3DataStatus.statusFromDB;
                     Enum.TryParse(AOIData["DataStatus"], out DataStatus);
-                    if (DataStatus == global.fad3DataStatus.statusNew)
+                    if (DataStatus == fad3DataStatus.statusNew)
                     {
                         updateQuery = $@"Insert into tblAOI (AOIGUID, AOIName, Letter)
                             Values (
@@ -490,13 +491,13 @@ namespace FAD3
                                   '{AOIData["AOIName"]}',
                                   '{AOIData["Letter"]}')";
                     }
-                    else if (DataStatus == global.fad3DataStatus.statusEdited)
+                    else if (DataStatus == fad3DataStatus.statusEdited)
                     {
                         updateQuery = $@"Update tblAOI set
                             AOIName = '{AOIData["AOIName"]}'
                             Where AOIGUID = {{{AOIData["AOIGUID"]}}}";
                     }
-                    else if (DataStatus == global.fad3DataStatus.statusForDeletion)
+                    else if (DataStatus == fad3DataStatus.statusForDeletion)
                     {
                         updateQuery = $"Delete * from tbaAOI where AOIGUID={{{AOIData["AOIGUID"]}}}";
                     }

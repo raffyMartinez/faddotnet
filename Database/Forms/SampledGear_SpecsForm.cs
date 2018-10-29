@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using FAD3.GUI.Classes;
 
 namespace FAD3
 {
@@ -100,7 +101,7 @@ namespace FAD3
                     cbo.Items.Add("No");
                 }
 
-                c.Tag = spec.Type + "|" + global.fad3DataStatus.statusFromDB.ToString();
+                c.Tag = spec.Type + "|" + fad3DataStatus.statusFromDB.ToString();
                 var arr = spec.Property.Split(' ');
                 c.Name = spec.RowGuid;
 
@@ -219,7 +220,7 @@ namespace FAD3
                 //        cbo.Items.Add("No");
                 //    }
 
-                //    c.Tag = spec.Type + "|" + global.fad3DataStatus.statusFromDB.ToString();
+                //    c.Tag = spec.Type + "|" + fad3DataStatus.statusFromDB.ToString();
                 //    var arr = spec.Property.Split(' ');
                 //    c.Name = spec.RowGuid;
 
@@ -343,14 +344,14 @@ namespace FAD3
                     MessageBox.Show(msg, "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 else
                 {
-                    var ds = global.fad3DataStatus.statusFromDB.ToString();
+                    var ds = fad3DataStatus.statusFromDB.ToString();
                     if (_isNew)
                     {
-                        ds = global.fad3DataStatus.statusNew.ToString();
+                        ds = fad3DataStatus.statusNew.ToString();
                         _sampledGearSpecDataIsEdited = true;
                     }
                     else
-                        ds = global.fad3DataStatus.statusEdited.ToString();
+                        ds = fad3DataStatus.statusEdited.ToString();
 
                     //set the tag of the control
                     o.Tag = arr[0] + "|" + ds;
@@ -371,14 +372,14 @@ namespace FAD3
                             "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     else
                     {
-                        var ds = global.fad3DataStatus.statusFromDB.ToString();
+                        var ds = fad3DataStatus.statusFromDB.ToString();
                         if (_isNew)
                         {
-                            ds = global.fad3DataStatus.statusNew.ToString();
+                            ds = fad3DataStatus.statusNew.ToString();
                             _sampledGearSpecDataIsEdited = true;
                         }
                         else
-                            ds = global.fad3DataStatus.statusEdited.ToString();
+                            ds = fad3DataStatus.statusEdited.ToString();
 
                         var arr = o.Tag.ToString().Split('|');
                         o.Tag = arr[0] + "|" + ds;
@@ -434,7 +435,7 @@ namespace FAD3
                         spec.SpecificationGuid = c.Name;
                         spec.SpecificationValue = c.Text;
                         spec.SpecificationName = ManageGearSpecsClass.SpecNameFromSpecGUID(spec.SpecificationGuid);
-                        var ds = global.fad3DataStatus.statusFromDB;
+                        var ds = fad3DataStatus.statusFromDB;
                         if (Enum.TryParse(arr[1], out ds)) spec.DataStatus = ds;
                         spec.SamplingGuid = _samplingGUID;
 

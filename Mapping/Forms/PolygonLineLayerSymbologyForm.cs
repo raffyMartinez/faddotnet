@@ -32,7 +32,7 @@ namespace FAD3.Mapping.Forms
             _mapLayer = mapLayer;
             _options = ((Shapefile)_mapLayer.LayerObject).DefaultDrawingOptions;
             _shpFileType = ((Shapefile)_mapLayer.LayerObject).ShapefileType;
-            LineWidthFix.FixLineWidth(_options);
+            LineWidthFix.FixLineWidth((Shapefile)_mapLayer.LayerObject);
         }
 
         private void OnFormLoad(object sender, EventArgs e)
@@ -199,7 +199,7 @@ namespace FAD3.Mapping.Forms
             // outline
             _options.LineStipple = (tkDashStyle)icbLineStyle.SelectedIndex;
             _options.LineWidth = (float)icbLineWidth.SelectedIndex + 1;
-            LineWidthFix.FixLineWidth(_options);
+            LineWidthFix.FixLineWidth((Shapefile)_mapLayer.LayerObject);
 
             _options.LineVisible = chkOutline.Checked;
             _options.LineColor = Colors.ColorToUInteger(clpOutline.Color);

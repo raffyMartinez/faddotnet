@@ -36,7 +36,7 @@
           <NewMemberFileName>global.cs</NewMemberFileName>
         </TypeIdentifier>
       </Enum>
-      <Enum Name="FAD3.global.fad3DataStatus" Collapsed="true">
+      <Enum Name="FAD3.fad3DataStatus" Collapsed="true">
         <TypeIdentifier>
           <NewMemberFileName>global.cs</NewMemberFileName>
         </TypeIdentifier>
@@ -53,15 +53,15 @@
       </Enum>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>AGaFIRACQMIhMikwggAgohMIAQIgAwAOACMABIMaAgA=</HashCode>
-      <FileName>global.cs</FileName>
+      <HashCode>AGaFIRACQMIhOikwggAgohMIAQIgAwAOACMABIMaAgA=</HashCode>
+      <FileName>GUI\Classes\global.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="FAD3.aoi">
     <Position X="7" Y="13.25" Width="2.75" />
     <TypeIdentifier>
-      <HashCode>AgQAaCAhUAgCAIAEIAIAEALAAEAAAEIAAEAEAgAAAAQ=</HashCode>
-      <FileName>AOI.cs</FileName>
+      <HashCode>AAQAaCAhcggCAIAEIAKAEALAAEEAAEMAAFAEAgAAAAQ=</HashCode>
+      <FileName>Database\Classes\AOI.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="FAD3.sampling">
@@ -88,14 +88,14 @@
     </NestedTypes>
     <TypeIdentifier>
       <HashCode>BAACAAIAAAAAEAAQCABAQAEgQAChAAAIAlAAAKABQCg=</HashCode>
-      <FileName>Sampling.cs</FileName>
+      <FileName>Database\Classes\Sampling.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="FAD3.SamplingForm">
     <Position X="14.25" Y="12.5" Width="2.5" />
     <TypeIdentifier>
-      <HashCode>cCgQpSNkWCAYeJCMwUCEBgUSGGiDgAAGAEJgYIkAYAg=</HashCode>
-      <FileName>SamplingForm.cs</FileName>
+      <HashCode>cCgQpSNkWCAYeJCMw0CEBgUSGGiDgAAGAEJgYIkAYAg=</HashCode>
+      <FileName>Database\Forms\SamplingForm.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="FAD3.FishingGrid">
@@ -141,8 +141,8 @@
       </Struct>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>CDIBAAAQQZLCkABCIAyFIZAQAFSQACAIIAAFoIAGQaA=</HashCode>
-      <FileName>FishingGrid.cs</FileName>
+      <HashCode>CDIBAAAQQZLDkABCIAyFIZAQAFSQICAIICAFoIAGQaA=</HashCode>
+      <FileName>Database\Classes\FishingGrid.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Oware.LatLngUTMConverter">
@@ -164,14 +164,14 @@
     </NestedTypes>
     <TypeIdentifier>
       <HashCode>AAQAAAAAAgAAAIAAAAAAAIAAAAAEAAggIIAAAABAAAA=</HashCode>
-      <FileName>LatLngUTMConverter.cs</FileName>
+      <FileName>Mapping\Classes\LatLngUTMConverter.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="FAD3.gear">
     <Position X="6.75" Y="20.25" Width="3.25" />
     <TypeIdentifier>
-      <HashCode>BqCBggAgJAFSARoABoCQkAAAAIAAcChEwAQgASMkAQg=</HashCode>
-      <FileName>gear.cs</FileName>
+      <HashCode>BqCBggAhJAFSARoABoCQkAAAAIAAcChEwAQgASMkAQg=</HashCode>
+      <FileName>Database\Classes\gear.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="FAD3.mru">
@@ -190,7 +190,7 @@
     </NestedTypes>
     <TypeIdentifier>
       <HashCode>AEBAIAAAAAQIABICAAAAAAAgAACAAAAADEAAAoAABAA=</HashCode>
-      <FileName>mru.cs</FileName>
+      <FileName>GUI\Classes\mru.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="FAD3.ManageGearSpecsClass">
@@ -211,15 +211,15 @@
       </Struct>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>MAAQIQADAAREAAAAQAAgAAAAEQiAABBgIAAAAAAgBAA=</HashCode>
-      <FileName>ManageGearSpecsClass.cs</FileName>
+      <HashCode>cAAQIQADAABEAAQAQAAgAAAAEQiAABBgIAAAAAAgAAA=</HashCode>
+      <FileName>Database\Classes\ManageGearSpecsClass.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="FAD3.names">
     <Position X="10.75" Y="10" Width="2.5" />
     <TypeIdentifier>
       <HashCode>NAAQAAQACEBAAlACgACggAAAAAhIAAAAAEACAQAAQVA=</HashCode>
-      <FileName>names.cs</FileName>
+      <FileName>Database\Classes\names.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="FAD3.ReferenceNumberManager">
@@ -236,14 +236,14 @@
     </NestedTypes>
     <TypeIdentifier>
       <HashCode>AhBAAAAgAICIgAAAAACAAIQAABEESEAABwACIAAAEAA=</HashCode>
-      <FileName>ReferenceNumberManager.cs</FileName>
+      <FileName>Database\Classes\ReferenceNumberManager.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ISO_Classes.Coordinate">
     <Position X="18.75" Y="1.75" Width="2.25" />
     <TypeIdentifier>
       <HashCode>AAAAQAAAAEAAQBAMgCAIAAEACAAAAIBAAABIBAAAAAI=</HashCode>
-      <FileName>Coordinate.cs</FileName>
+      <FileName>Database\Classes\Coordinate.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
@@ -251,7 +251,7 @@
     <Position X="14.75" Y="9" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAABAEAAAAAAEAAAAAAAAAAABIAAAAAAA=</HashCode>
-      <FileName>Coordinate.cs</FileName>
+      <FileName>Database\Classes\Coordinate.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
@@ -259,7 +259,7 @@
     <Position X="13" Y="2.25" Width="2.25" />
     <TypeIdentifier>
       <HashCode>AIAAAAAAAAAAABCAAAGAAAgAAEAAAAAEAAAAIEABAAA=</HashCode>
-      <FileName>Enumerators.cs</FileName>
+      <FileName>Database\SamplingEnumerators\Enumerators.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="FAD3.GMSManager">
@@ -281,7 +281,7 @@
     </NestedTypes>
     <TypeIdentifier>
       <HashCode>AAAABAAAAAQAAAAAIAAAAAAAQAAAAAgAAAAAAAAAUAA=</HashCode>
-      <FileName>GMSManager.cs</FileName>
+      <FileName>Database\Classes\GMSManager.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="FAD3.CatchComposition">
@@ -298,14 +298,14 @@
     </NestedTypes>
     <TypeIdentifier>
       <HashCode>UAAEAAAAAAAAAAAAgAAAAAAAAAAAAACAIABAAAQABAQ=</HashCode>
-      <FileName>CatchComposition.cs</FileName>
+      <FileName>Database\Classes\CatchComposition.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="FAD3.CatchLine">
     <Position X="7" Y="8.5" Width="3" />
     <TypeIdentifier>
       <HashCode>AAAAIAAAAAAQAIAAAAgAAAAAgAAAAAAIgICAiIEggAg=</HashCode>
-      <FileName>CatchLine.cs</FileName>
+      <FileName>Database\Classes\CatchLine.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="FAD3.CatchName">
@@ -314,7 +314,7 @@
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
     <NestedTypes>
-      <Enum Name="FAD3.CatchName.Taxa" Collapsed="true">
+      <Enum Name="FAD3.Taxa" Collapsed="true">
         <TypeIdentifier>
           <NewMemberFileName>CatchName.cs</NewMemberFileName>
         </TypeIdentifier>
@@ -322,7 +322,7 @@
     </NestedTypes>
     <TypeIdentifier>
       <HashCode>ABBkUAABADQAGAAAAgAggAABAAACAAAAAAAAARAABAA=</HashCode>
-      <FileName>CatchName.cs</FileName>
+      <FileName>Database\Classes\CatchName.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="FAD3.Grid25MajorGrid">
@@ -341,7 +341,7 @@
     </NestedTypes>
     <TypeIdentifier>
       <HashCode>gABDwIgAiCBEAEBCNIEhURAZATAQExCIAAhlkJISBAQ=</HashCode>
-      <FileName>Grid25MajorGrid.cs</FileName>
+      <FileName>Mapping\Classes\Grid25MajorGrid.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
@@ -349,7 +349,7 @@
     <Position X="23.75" Y="9.75" Width="2.5" />
     <TypeIdentifier>
       <HashCode>IAChAAAAgCAEAAAQAAAEEAAAAAEQAABBAEgAAQAAgAA=</HashCode>
-      <FileName>Grid25MinorGrid.cs</FileName>
+      <FileName>Mapping\Classes\Grid25MinorGrid.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
@@ -357,15 +357,15 @@
     <Position X="26.5" Y="9.75" Width="2.25" />
     <TypeIdentifier>
       <HashCode>AIAEAAAAISQOAEAAEAETAAAgCAAAIAAAAAIAAAAAAAA=</HashCode>
-      <FileName>Grid25LabelManager.cs</FileName>
+      <FileName>Mapping\Classes\Grid25LabelManager.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="FAD3.MapLayer">
     <Position X="28" Y="0.5" Width="2.25" />
     <TypeIdentifier>
-      <HashCode>AAAgAIAAACAEAEAAAAQQAAQlAAEFAAJYAAgQAABBAQA=</HashCode>
-      <FileName>MapLayer.cs</FileName>
+      <HashCode>AAAgAIAAECAEAEAAAAQQAASlAAEFAAJYAIgQAADBAQA=</HashCode>
+      <FileName>Mapping\Classes\MapLayer.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
@@ -384,8 +384,8 @@
       </Delegate>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>AAKBDAAIAqAESEQCAIAgAQAAAAAAAACAAAEBQMAQQAA=</HashCode>
-      <FileName>MapInterActionHandler.cs</FileName>
+      <HashCode>BAKBDAAIAqAESEQCAIAgAQAAAABAAACAAAEBQMAQQAA=</HashCode>
+      <FileName>Mapping\Classes\MapInterActionHandler.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
@@ -407,10 +407,20 @@
           <NewMemberFileName>MapLayershandler.cs</NewMemberFileName>
         </TypeIdentifier>
       </Delegate>
+      <Delegate Name="FAD3.MapLayersHandler.VisibilityExpressionSet" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Mapping\Classes\MapLayershandler.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+      <Delegate Name="FAD3.MapLayersHandler.LayerNameUpdate" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Mapping\Classes\MapLayershandler.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>RAEYAAAAICBEEASAAABIAIAAEwAgABCDwBgAABUAAxA=</HashCode>
-      <FileName>MapLayershandler.cs</FileName>
+      <HashCode>RAEYAAABIGBFEASACABIALAAkyAgkBCPwBgCABUAAxA=</HashCode>
+      <FileName>Mapping\Classes\MapLayershandler.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
@@ -418,22 +428,22 @@
     <Position X="28" Y="6" Width="2.5" />
     <TypeIdentifier>
       <HashCode>IAAAAAAAACEEAACogAgAAAAAAAAAAACAAAAAAAAAAAA=</HashCode>
-      <FileName>ShapefileLabelHandler.cs</FileName>
+      <FileName>Mapping\Classes\ShapefileLabelHandler.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="FAD3.ShapefileLayerHelper">
-    <Position X="29.5" Y="8.75" Width="2.5" />
+    <Position X="35.5" Y="8.75" Width="2.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAQAAQAAAAAAAAAAAgAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>ShapefileLayerHelper.cs</FileName>
+      <HashCode>AAAAAAAAAAAAQAAQAAAAAAACAAAgAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Mapping\Classes\ShapefileLayerHelper.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="FAD3.FishingGroundMappingHandler">
     <Position X="31.25" Y="4.5" Width="2.75" />
     <TypeIdentifier>
       <HashCode>CAAAAAABAKAEAAAAAQAAAAAAAQAAAAAAAAAAAQAAAAA=</HashCode>
-      <FileName>FishingGroundMappingHandler.cs</FileName>
+      <FileName>Mapping\Classes\FishingGroundMappingHandler.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
@@ -441,14 +451,14 @@
     <Position X="32.5" Y="8.75" Width="2.5" />
     <TypeIdentifier>
       <HashCode>IQAAAEAAEgIAAAAAACAAAAAEAAASgAAgAAAAACQlAAE=</HashCode>
-      <FileName>FolderBrowserLauncher.cs</FileName>
+      <FileName>GUI\Classes\FolderBrowserLauncher.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="FAD3.Graticule">
     <Position X="29.25" Y="10.5" Width="2.25" />
     <TypeIdentifier>
-      <HashCode>gAABCAEBCCBEAAAABSBEgDQACCRAgCIEAACAgECBALA=</HashCode>
-      <FileName>Graticule.cs</FileName>
+      <HashCode>gAABCQEBCCBEAAAABSBEgDQACCRAgCIEAACAgUCBALA=</HashCode>
+      <FileName>Mapping\Classes\Graticule.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
@@ -463,7 +473,14 @@
     </NestedTypes>
     <TypeIdentifier>
       <HashCode>AAIAgAAEQCAhABAAAAgAAAAEAAAgQCEMQAyEAABABAA=</HashCode>
-      <FileName>CreateInlandPointDatabase.cs</FileName>
+      <FileName>Mapping\Classes\CreateInlandPointDatabase.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FAD3.Mapping.Classes.MakeGridFromPoints">
+    <Position X="38.5" Y="8.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AhCABQAGAFQAUCMBSAQAAAAgIAQAUAQAAAAAAEAAJCA=</HashCode>
+      <FileName>Mapping\Classes\MakeGridFromPoints.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Font Name="Segoe UI" Size="9" />

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml;
+using FAD3.GUI.Classes;
 
 namespace FAD3
 {
@@ -18,8 +19,8 @@ namespace FAD3
         private const int CURSORWIDTH = 5;
         private const int GRIDSIZE = 50000;
 
-        private static FishingGrid.fadUTMZone _utmZone =                        //holds the utm zone of the grid
-                                FishingGrid.fadUTMZone.utmZone_Undefined;
+        private static fadUTMZone _utmZone =                                    //holds the utm zone of the grid
+                                fadUTMZone.utmZone_Undefined;
         private AxMap _axMap;                                                   //reference to the map control found in MapForm
         private bool _disposed = false;
         private tkWgs84Projection _Grid25Geoprojection;                         //reference to the map control projection
@@ -241,7 +242,7 @@ namespace FAD3
 
             _axMap.DblClick += OnMapDoubleClick;
             _axMap.CursorMode = tkCursorMode.cmSelection;
-            _utmZone = FishingGrid.fadUTMZone.utmZone51N;
+            _utmZone = fadUTMZone.utmZone51N;
 
             _grid25MinorGrid = new Grid25MinorGrid(_axMap);
         }
@@ -352,10 +353,10 @@ namespace FAD3
         /// </summary>
         /// <param name="startFolderPath"></param>
         /// <param name="utmZone"></param>
-        public void ShowGridBoundaries(string startFolderPath, FishingGrid.fadUTMZone utmZone, Dictionary<string, uint> gridAndLabelProperties)
+        public void ShowGridBoundaries(string startFolderPath, fadUTMZone utmZone, Dictionary<string, uint> gridAndLabelProperties)
         {
             _gridAndLabelProperties = gridAndLabelProperties;
-            var selectedZone = FishingGrid.fadUTMZone.utmZone_Undefined;
+            var selectedZone = fadUTMZone.utmZone_Undefined;
             var mapBoundaries = new List<string>();
             var results = Directory.GetFiles(startFolderPath, "*_gridboundary.shp", SearchOption.AllDirectories);
             for (int n = 0; n < results.Length; n++)
@@ -369,22 +370,22 @@ namespace FAD3
                         switch (s.Substring(8, 21))
                         {
                             case "WGS_1984_UTM_Zone_51N":
-                                selectedZone = FishingGrid.fadUTMZone.utmZone51N;
+                                selectedZone = fadUTMZone.utmZone51N;
                                 break;
 
                             case "WGS_1984_UTM_Zone_50N":
-                                selectedZone = FishingGrid.fadUTMZone.utmZone50N;
+                                selectedZone = fadUTMZone.utmZone50N;
                                 break;
 
                             default:
                                 switch (s.Substring(17, 12))
                                 {
                                     case "UTM zone 51N":
-                                        selectedZone = FishingGrid.fadUTMZone.utmZone51N;
+                                        selectedZone = fadUTMZone.utmZone51N;
                                         break;
 
                                     case "UTM zone 50N":
-                                        selectedZone = FishingGrid.fadUTMZone.utmZone50N;
+                                        selectedZone = fadUTMZone.utmZone50N;
                                         break;
                                 }
                                 break;
@@ -588,7 +589,7 @@ namespace FAD3
         /// <summary>
         /// setsup the UTM zone of the fishing grid
         /// </summary>
-        public FishingGrid.fadUTMZone UTMZone
+        public fadUTMZone UTMZone
         {
             get { return _utmZone; }
             set
@@ -596,11 +597,11 @@ namespace FAD3
                 _utmZone = value;
                 switch (_utmZone)
                 {
-                    case FishingGrid.fadUTMZone.utmZone50N:
+                    case fadUTMZone.utmZone50N:
                         _Grid25Geoprojection = tkWgs84Projection.Wgs84_UTM_zone_50N;
                         break;
 
-                    case FishingGrid.fadUTMZone.utmZone51N:
+                    case fadUTMZone.utmZone51N:
                         _Grid25Geoprojection = tkWgs84Projection.Wgs84_UTM_zone_51N;
                         break;
                 }

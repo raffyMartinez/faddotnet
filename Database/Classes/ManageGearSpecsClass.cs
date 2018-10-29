@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
 using System.Text;
+using FAD3.GUI.Classes;
 
 namespace FAD3
 {
@@ -79,7 +80,7 @@ namespace FAD3
             public string Type { get; set; }
             public string Notes { get; set; }
             public string RowGuid { get; set; }
-            public global.fad3DataStatus DataStatus { get; set; }
+            public fad3DataStatus DataStatus { get; set; }
             public int Sequence { get; set; }
         }
 
@@ -88,8 +89,8 @@ namespace FAD3
         /// </summary>
         public struct SampledGearSpecData
         {
-            private static global.fad3DataStatus _DataStatus;
-            public global.fad3DataStatus DataStatus { get; set; }
+            private static fad3DataStatus _DataStatus;
+            public fad3DataStatus DataStatus { get; set; }
             public string SpecificationGuid { get; set; }
             public string SpecificationName { get; set; }
             public string SamplingGuid { get; set; }
@@ -155,7 +156,7 @@ namespace FAD3
                 foreach (KeyValuePair<string, SampledGearSpecData> kv in _SampledGearSpecs)
                 {
                     sql = "";
-                    if (kv.Value.DataStatus == global.fad3DataStatus.statusNew)
+                    if (kv.Value.DataStatus == fad3DataStatus.statusNew)
                     {
                         sql = $@"Insert into tblSampledGearSpec (RowID, SamplingGUID, SpecID, [Value]) values (
                                 '{kv.Value.RowID}',
@@ -163,14 +164,14 @@ namespace FAD3
                                 '{kv.Value.SpecificationGuid}',
                                 '{kv.Value.SpecificationValue}')";
                     }
-                    else if (kv.Value.DataStatus == global.fad3DataStatus.statusEdited)
+                    else if (kv.Value.DataStatus == fad3DataStatus.statusEdited)
                     {
                         sql = $@"Update tblSampledGearSpec set
                             [Value] = '{kv.Value.SpecificationValue}' where
                             SamplingGUID = {{{kv.Value.SamplingGuid}}} and
                             SpecID = {{{kv.Value.SpecificationGuid}}}";
                     }
-                    else if (kv.Value.DataStatus == global.fad3DataStatus.statusForDeletion)
+                    else if (kv.Value.DataStatus == fad3DataStatus.statusForDeletion)
                     {
                         sql = $"Delete * from tblSampleGearSpec where RowID = {{{kv.Value.RowID}}}";
                     }
@@ -257,7 +258,7 @@ namespace FAD3
                         s.SamplingGuid = _samplingGuid;
                         s.SpecificationGuid = dr["SpecID"].ToString();
                         s.SpecificationName = dr["ElementName"].ToString();
-                        s.DataStatus = global.fad3DataStatus.statusFromDB;
+                        s.DataStatus = fad3DataStatus.statusFromDB;
 
                         _SampledGearSpecs.Add(s.SpecificationGuid, s);
                     }
@@ -290,7 +291,7 @@ namespace FAD3
                         spec.Type = row["ElementType"].ToString();
                         spec.Notes = row["Description"].ToString();
                         spec.RowGuid = row["RowID"].ToString();
-                        spec.DataStatus = global.fad3DataStatus.statusFromDB;
+                        spec.DataStatus = fad3DataStatus.statusFromDB;
                         var seq = 0;
                         if (int.TryParse(row["Sequence"].ToString(), out seq)) spec.Sequence = seq;
                         _GearSpecifications.Add(spec);
@@ -315,7 +316,7 @@ namespace FAD3
                 conn.Open();
                 foreach (ManageGearSpecsClass.GearSpecification spec in specifications)
                 {
-                    if (spec.DataStatus == global.fad3DataStatus.statusEdited)
+                    if (spec.DataStatus == fad3DataStatus.statusEdited)
                     {
                         sql = $@"Update tblGearSpecs set
                               ElementName ='{spec.Property}',
@@ -324,7 +325,7 @@ namespace FAD3
                               Sequence =  {spec.Sequence},
                               Version = '2' where RowID = {{{spec.RowGuid}}}";
                     }
-                    else if (spec.DataStatus == global.fad3DataStatus.statusNew)
+                    else if (spec.DataStatus == fad3DataStatus.statusNew)
                     {
                         sql = $@"Insert into tblGearSpecs (ElementName, ElementType, Description, Sequence, Version, RowId, GearVarGuid)
                               values (
@@ -336,7 +337,7 @@ namespace FAD3
                               {{{Guid.NewGuid().ToString()}}},
                               {{{_gearVarGuid}}})";
                     }
-                    else if (spec.DataStatus == global.fad3DataStatus.statusForDeletion)
+                    else if (spec.DataStatus == fad3DataStatus.statusForDeletion)
                     {
                         sql = $"Delete * from tblGearSpecs where RowID = {{{spec.RowGuid}}}";
                     }

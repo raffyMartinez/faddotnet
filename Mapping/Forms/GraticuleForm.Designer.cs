@@ -31,8 +31,8 @@
             this.btnOk = new System.Windows.Forms.Button();
             this.btnApply = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
-            this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.tabsGraticule = new System.Windows.Forms.TabControl();
+            this.tabConfigureGrid = new System.Windows.Forms.TabPage();
             this.btnRemove = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
             this.txtName = new System.Windows.Forms.TextBox();
@@ -50,23 +50,23 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.tabConfigureText = new System.Windows.Forms.TabPage();
+            this.picPreview = new System.Windows.Forms.PictureBox();
+            this.lnkNote = new System.Windows.Forms.LinkLabel();
+            this.lnkTitle = new System.Windows.Forms.LinkLabel();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.chkTitle = new System.Windows.Forms.CheckBox();
             this.chkNote = new System.Windows.Forms.CheckBox();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.lnkTitle = new System.Windows.Forms.LinkLabel();
-            this.lnkNote = new System.Windows.Forms.LinkLabel();
-            this.tabControl1.SuspendLayout();
-            this.tabPage1.SuspendLayout();
-            this.tabPage2.SuspendLayout();
+            this.tabsGraticule.SuspendLayout();
+            this.tabConfigureGrid.SuspendLayout();
+            this.tabConfigureText.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.picPreview)).BeginInit();
             this.groupBox1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // btnOk
             // 
-            this.btnOk.Location = new System.Drawing.Point(302, 447);
+            this.btnOk.Location = new System.Drawing.Point(306, 497);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(53, 28);
             this.btnOk.TabIndex = 17;
@@ -76,7 +76,7 @@
             // 
             // btnApply
             // 
-            this.btnApply.Location = new System.Drawing.Point(251, 447);
+            this.btnApply.Location = new System.Drawing.Point(255, 497);
             this.btnApply.Name = "btnApply";
             this.btnApply.Size = new System.Drawing.Size(47, 28);
             this.btnApply.TabIndex = 18;
@@ -86,7 +86,7 @@
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(181, 447);
+            this.btnCancel.Location = new System.Drawing.Point(185, 497);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(55, 28);
             this.btnCancel.TabIndex = 19;
@@ -94,42 +94,43 @@
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.OnButton_Click);
             // 
-            // tabControl1
+            // tabsGraticule
             // 
-            this.tabControl1.Controls.Add(this.tabPage1);
-            this.tabControl1.Controls.Add(this.tabPage2);
-            this.tabControl1.Location = new System.Drawing.Point(7, 22);
-            this.tabControl1.Name = "tabControl1";
-            this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(352, 419);
-            this.tabControl1.TabIndex = 21;
+            this.tabsGraticule.Controls.Add(this.tabConfigureGrid);
+            this.tabsGraticule.Controls.Add(this.tabConfigureText);
+            this.tabsGraticule.Location = new System.Drawing.Point(7, 22);
+            this.tabsGraticule.Name = "tabsGraticule";
+            this.tabsGraticule.SelectedIndex = 0;
+            this.tabsGraticule.Size = new System.Drawing.Size(352, 469);
+            this.tabsGraticule.TabIndex = 21;
+            this.tabsGraticule.SelectedIndexChanged += new System.EventHandler(this.OnTabsIndexChanged);
             // 
-            // tabPage1
+            // tabConfigureGrid
             // 
-            this.tabPage1.Controls.Add(this.btnRemove);
-            this.tabPage1.Controls.Add(this.label5);
-            this.tabPage1.Controls.Add(this.txtName);
-            this.tabPage1.Controls.Add(this.chkBold);
-            this.tabPage1.Controls.Add(this.chkBottom);
-            this.tabPage1.Controls.Add(this.chkRight);
-            this.tabPage1.Controls.Add(this.chkTop);
-            this.tabPage1.Controls.Add(this.chkLeft);
-            this.tabPage1.Controls.Add(this.chkShowGrid);
-            this.tabPage1.Controls.Add(this.txtGridlineWidth);
-            this.tabPage1.Controls.Add(this.txtBordeWidth);
-            this.tabPage1.Controls.Add(this.txtNumberOfGridlines);
-            this.tabPage1.Controls.Add(this.txtLabelSize);
-            this.tabPage1.Controls.Add(this.label4);
-            this.tabPage1.Controls.Add(this.label3);
-            this.tabPage1.Controls.Add(this.label2);
-            this.tabPage1.Controls.Add(this.label1);
-            this.tabPage1.Location = new System.Drawing.Point(4, 24);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(344, 391);
-            this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "Graticule";
-            this.tabPage1.UseVisualStyleBackColor = true;
+            this.tabConfigureGrid.Controls.Add(this.btnRemove);
+            this.tabConfigureGrid.Controls.Add(this.label5);
+            this.tabConfigureGrid.Controls.Add(this.txtName);
+            this.tabConfigureGrid.Controls.Add(this.chkBold);
+            this.tabConfigureGrid.Controls.Add(this.chkBottom);
+            this.tabConfigureGrid.Controls.Add(this.chkRight);
+            this.tabConfigureGrid.Controls.Add(this.chkTop);
+            this.tabConfigureGrid.Controls.Add(this.chkLeft);
+            this.tabConfigureGrid.Controls.Add(this.chkShowGrid);
+            this.tabConfigureGrid.Controls.Add(this.txtGridlineWidth);
+            this.tabConfigureGrid.Controls.Add(this.txtBordeWidth);
+            this.tabConfigureGrid.Controls.Add(this.txtNumberOfGridlines);
+            this.tabConfigureGrid.Controls.Add(this.txtLabelSize);
+            this.tabConfigureGrid.Controls.Add(this.label4);
+            this.tabConfigureGrid.Controls.Add(this.label3);
+            this.tabConfigureGrid.Controls.Add(this.label2);
+            this.tabConfigureGrid.Controls.Add(this.label1);
+            this.tabConfigureGrid.Location = new System.Drawing.Point(4, 24);
+            this.tabConfigureGrid.Name = "tabConfigureGrid";
+            this.tabConfigureGrid.Padding = new System.Windows.Forms.Padding(3);
+            this.tabConfigureGrid.Size = new System.Drawing.Size(344, 391);
+            this.tabConfigureGrid.TabIndex = 0;
+            this.tabConfigureGrid.Text = "Graticule";
+            this.tabConfigureGrid.UseVisualStyleBackColor = true;
             // 
             // btnRemove
             // 
@@ -281,27 +282,65 @@
             this.label1.TabIndex = 17;
             this.label1.Text = "Size of coordinate labels";
             // 
-            // tabPage2
+            // tabConfigureText
             // 
-            this.tabPage2.Controls.Add(this.lnkNote);
-            this.tabPage2.Controls.Add(this.lnkTitle);
-            this.tabPage2.Controls.Add(this.groupBox1);
-            this.tabPage2.Controls.Add(this.pictureBox1);
-            this.tabPage2.Location = new System.Drawing.Point(4, 24);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(344, 391);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "Labels";
-            this.tabPage2.UseVisualStyleBackColor = true;
+            this.tabConfigureText.Controls.Add(this.lnkNote);
+            this.tabConfigureText.Controls.Add(this.lnkTitle);
+            this.tabConfigureText.Controls.Add(this.groupBox1);
+            this.tabConfigureText.Controls.Add(this.picPreview);
+            this.tabConfigureText.Location = new System.Drawing.Point(4, 24);
+            this.tabConfigureText.Name = "tabConfigureText";
+            this.tabConfigureText.Padding = new System.Windows.Forms.Padding(3);
+            this.tabConfigureText.Size = new System.Drawing.Size(344, 441);
+            this.tabConfigureText.TabIndex = 1;
+            this.tabConfigureText.Text = "Labels";
+            this.tabConfigureText.UseVisualStyleBackColor = true;
+            // 
+            // picPreview
+            // 
+            this.picPreview.Image = global::FAD3.Properties.Resources.mapPreview;
+            this.picPreview.Location = new System.Drawing.Point(21, 45);
+            this.picPreview.Name = "picPreview";
+            this.picPreview.Size = new System.Drawing.Size(307, 310);
+            this.picPreview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.picPreview.TabIndex = 5;
+            this.picPreview.TabStop = false;
+            // 
+            // lnkNote
+            // 
+            this.lnkNote.AutoSize = true;
+            this.lnkNote.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lnkNote.Location = new System.Drawing.Point(118, 365);
+            this.lnkNote.Name = "lnkNote";
+            this.lnkNote.Size = new System.Drawing.Size(99, 13);
+            this.lnkNote.TabIndex = 9;
+            this.lnkNote.TabStop = true;
+            this.lnkNote.Text = "Configure map note";
+            this.lnkNote.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lnkNote.Visible = false;
+            this.lnkNote.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.OnLinkClick);
+            // 
+            // lnkTitle
+            // 
+            this.lnkTitle.AutoSize = true;
+            this.lnkTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lnkTitle.Location = new System.Drawing.Point(89, 16);
+            this.lnkTitle.Name = "lnkTitle";
+            this.lnkTitle.Size = new System.Drawing.Size(150, 18);
+            this.lnkTitle.TabIndex = 8;
+            this.lnkTitle.TabStop = true;
+            this.lnkTitle.Text = "Configure map title";
+            this.lnkTitle.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.lnkTitle.Visible = false;
+            this.lnkTitle.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.OnLinkClick);
             // 
             // groupBox1
             // 
             this.groupBox1.Controls.Add(this.chkTitle);
             this.groupBox1.Controls.Add(this.chkNote);
-            this.groupBox1.Location = new System.Drawing.Point(85, 328);
+            this.groupBox1.Location = new System.Drawing.Point(85, 391);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(164, 50);
+            this.groupBox1.Size = new System.Drawing.Size(164, 44);
             this.groupBox1.TabIndex = 7;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Elements";
@@ -309,6 +348,7 @@
             // chkTitle
             // 
             this.chkTitle.AutoSize = true;
+            this.chkTitle.Enabled = false;
             this.chkTitle.Location = new System.Drawing.Point(26, 21);
             this.chkTitle.Name = "chkTitle";
             this.chkTitle.Size = new System.Drawing.Size(49, 19);
@@ -320,6 +360,7 @@
             // chkNote
             // 
             this.chkNote.AutoSize = true;
+            this.chkNote.Enabled = false;
             this.chkNote.Location = new System.Drawing.Point(97, 21);
             this.chkNote.Name = "chkNote";
             this.chkNote.Size = new System.Drawing.Size(52, 19);
@@ -328,49 +369,12 @@
             this.chkNote.UseVisualStyleBackColor = true;
             this.chkNote.CheckedChanged += new System.EventHandler(this.OnCheckChange);
             // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Image = global::FAD3.Properties.Resources.mapPreview;
-            this.pictureBox1.Location = new System.Drawing.Point(46, 37);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(256, 254);
-            this.pictureBox1.TabIndex = 5;
-            this.pictureBox1.TabStop = false;
-            // 
-            // lnkTitle
-            // 
-            this.lnkTitle.AutoSize = true;
-            this.lnkTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lnkTitle.Location = new System.Drawing.Point(95, 15);
-            this.lnkTitle.Name = "lnkTitle";
-            this.lnkTitle.Size = new System.Drawing.Size(150, 18);
-            this.lnkTitle.TabIndex = 8;
-            this.lnkTitle.TabStop = true;
-            this.lnkTitle.Text = "Configure map title";
-            this.lnkTitle.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.lnkTitle.Visible = false;
-            this.lnkTitle.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.OnLinkClick);
-            // 
-            // lnkNote
-            // 
-            this.lnkNote.AutoSize = true;
-            this.lnkNote.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lnkNote.Location = new System.Drawing.Point(121, 294);
-            this.lnkNote.Name = "lnkNote";
-            this.lnkNote.Size = new System.Drawing.Size(99, 13);
-            this.lnkNote.TabIndex = 9;
-            this.lnkNote.TabStop = true;
-            this.lnkNote.Text = "Configure map note";
-            this.lnkNote.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lnkNote.Visible = false;
-            this.lnkNote.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.OnLinkClick);
-            // 
             // GraticuleForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(367, 483);
-            this.Controls.Add(this.tabControl1);
+            this.ClientSize = new System.Drawing.Size(367, 537);
+            this.Controls.Add(this.tabsGraticule);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnApply);
             this.Controls.Add(this.btnOk);
@@ -380,14 +384,14 @@
             this.Text = "Graticule";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.GraticuleForm_FormClosed);
             this.Load += new System.EventHandler(this.OnGraticuleForm_Load);
-            this.tabControl1.ResumeLayout(false);
-            this.tabPage1.ResumeLayout(false);
-            this.tabPage1.PerformLayout();
-            this.tabPage2.ResumeLayout(false);
-            this.tabPage2.PerformLayout();
+            this.tabsGraticule.ResumeLayout(false);
+            this.tabConfigureGrid.ResumeLayout(false);
+            this.tabConfigureGrid.PerformLayout();
+            this.tabConfigureText.ResumeLayout(false);
+            this.tabConfigureText.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.picPreview)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -396,8 +400,8 @@
         private System.Windows.Forms.Button btnOk;
         private System.Windows.Forms.Button btnApply;
         private System.Windows.Forms.Button btnCancel;
-        private System.Windows.Forms.TabControl tabControl1;
-        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.TabControl tabsGraticule;
+        private System.Windows.Forms.TabPage tabConfigureGrid;
         private System.Windows.Forms.Button btnRemove;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox txtName;
@@ -415,8 +419,8 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TabPage tabPage2;
-        private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.TabPage tabConfigureText;
+        private System.Windows.Forms.PictureBox picPreview;
         private System.Windows.Forms.CheckBox chkNote;
         private System.Windows.Forms.CheckBox chkTitle;
         private System.Windows.Forms.GroupBox groupBox1;

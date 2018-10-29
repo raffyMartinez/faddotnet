@@ -2,6 +2,7 @@
 using MapWinGIS;
 using System;
 using System.IO;
+using FAD3.GUI.Classes;
 
 namespace FAD3
 {
@@ -17,7 +18,7 @@ namespace FAD3
         public static string FileName { get; set; }
         private static int[] _intersectedMajorGrids;
         private static int[] _withinMinorGrids;
-        public static FishingGrid.fadUTMZone UTMZone { get; set; }
+        public static fadUTMZone UTMZone { get; set; }
         private static int _iFldName;
         private static int _iFldInland;
 

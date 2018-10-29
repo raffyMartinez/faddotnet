@@ -75,7 +75,7 @@ namespace FAD3
 
         private void SetupProvinceComboBox()
         {
-            comboProvince.DataSource = new BindingSource(global.provinceDict, null);
+            comboProvince.DataSource = new BindingSource(global.ProvincesDictionary, null);
             comboProvince.DisplayMember = "Value";
             comboProvince.ValueMember = "Key";
             comboProvince.AutoCompleteMode = AutoCompleteMode.Suggest;
@@ -262,7 +262,7 @@ namespace FAD3
         {
             global.MunicipalitiesFromProvinceNo(ProvNo);
             //comboBox2.Items.Clear();
-            comboMunicipality.DataSource = new BindingSource(global.munDict, null);
+            comboMunicipality.DataSource = new BindingSource(global.MunicipalitiesDictionary, null);
             comboMunicipality.DisplayMember = "Value";
             comboMunicipality.ValueMember = "Key";
             comboMunicipality.AutoCompleteMode = AutoCompleteMode.Suggest;

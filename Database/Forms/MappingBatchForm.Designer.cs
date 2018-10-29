@@ -34,6 +34,7 @@
             this.lblDPI = new System.Windows.Forms.Label();
             this.btnOk = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
+            this.chkCombinedMap = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // btnDirectory
@@ -55,7 +56,7 @@
             // 
             // txtDPI
             // 
-            this.txtDPI.Location = new System.Drawing.Point(25, 126);
+            this.txtDPI.Location = new System.Drawing.Point(25, 103);
             this.txtDPI.Name = "txtDPI";
             this.txtDPI.Size = new System.Drawing.Size(300, 20);
             this.txtDPI.TabIndex = 2;
@@ -64,7 +65,7 @@
             // lblDPI
             // 
             this.lblDPI.AutoSize = true;
-            this.lblDPI.Location = new System.Drawing.Point(22, 110);
+            this.lblDPI.Location = new System.Drawing.Point(22, 87);
             this.lblDPI.Name = "lblDPI";
             this.lblDPI.Size = new System.Drawing.Size(155, 13);
             this.lblDPI.TabIndex = 3;
@@ -90,11 +91,22 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.OnButtonClick);
             // 
+            // chkCombinedMap
+            // 
+            this.chkCombinedMap.AutoSize = true;
+            this.chkCombinedMap.Location = new System.Drawing.Point(25, 144);
+            this.chkCombinedMap.Name = "chkCombinedMap";
+            this.chkCombinedMap.Size = new System.Drawing.Size(163, 17);
+            this.chkCombinedMap.TabIndex = 6;
+            this.chkCombinedMap.Text = "Combine all years in one map";
+            this.chkCombinedMap.UseVisualStyleBackColor = true;
+            // 
             // MappingBatchForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(337, 222);
+            this.Controls.Add(this.chkCombinedMap);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.btnOk);
             this.Controls.Add(this.lblDPI);
@@ -117,5 +129,6 @@
         private System.Windows.Forms.Label lblDPI;
         private System.Windows.Forms.Button btnOk;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.CheckBox chkCombinedMap;
     }
 }

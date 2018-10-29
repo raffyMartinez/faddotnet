@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
+using FAD3.GUI.Classes;
 
 namespace FAD3
 {
@@ -16,9 +17,9 @@ namespace FAD3
         private Grid25MajorGrid _grid25MajorGrid;
         private Dictionary<string, uint> _labelAndGridProperties = new Dictionary<string, uint>();
         private List<LayerEventArg> _savedGridLayers = new List<LayerEventArg>();
-        private FishingGrid.fadUTMZone _utmZone;
+        private fadUTMZone _utmZone;
 
-        public void set_UTMZone(FishingGrid.fadUTMZone utmZone)
+        public void set_UTMZone(fadUTMZone utmZone)
         {
             _utmZone = utmZone;
         }
@@ -181,7 +182,7 @@ namespace FAD3
             CleanUp();
 
             global.SaveFormSettings(this);
-            global.MappingMode = global.fad3MappingMode.defaultMode;
+            global.MappingMode = fad3MappingMode.defaultMode;
             ReviewSavedGridFiles();
             global.Grid25GenerateForm = null;
         }
@@ -289,6 +290,5 @@ namespace FAD3
                     break;
             }
         }
-
     }
 }

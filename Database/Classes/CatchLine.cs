@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using FAD3.GUI.Classes;
 
 namespace FAD3
 {
@@ -13,7 +14,7 @@ namespace FAD3
         public string Name2 { get; set; }
         public string CatchNameGUID { get; set; }
 
-        public global.fad3DataStatus dataStatus
+        public fad3DataStatus dataStatus
         {
             get;
             set;
@@ -32,7 +33,7 @@ namespace FAD3
         public double? CatchSubsampleWt { get; set; }
         public bool FromTotalCatch { get; set; }
         public bool LiveFish { get; set; }
-        public CatchComposition.Identification NameType { get; set; }
+        public Identification NameType { get; set; }
         public int? TaxaNumber { get; set; }
         public int Sequence { get; set; }
 
@@ -58,11 +59,11 @@ namespace FAD3
             CatchSubsampleWt = 0;
             CatchSubsampleCount = 0;
             FromTotalCatch = false;
-            NameType = CatchComposition.Identification.Scientific;
+            NameType = Identification.Scientific;
             LiveFish = false;
             CatchDetailRowGUID = "";
             TaxaNumber = inTaxaNumber;
-            dataStatus = global.fad3DataStatus.statusFromDB;
+            dataStatus = fad3DataStatus.statusFromDB;
         }
 
         public CatchLine(int inSequence, string inName1, string inName2, string inCatchName, string inSamplingGUID,
@@ -81,11 +82,11 @@ namespace FAD3
             CatchSubsampleWt = 0;
             CatchSubsampleCount = 0;
             FromTotalCatch = false;
-            NameType = CatchComposition.Identification.Scientific;
+            NameType = Identification.Scientific;
             LiveFish = false;
             CatchDetailRowGUID = "";
             TaxaNumber = inTaxaNumber;
-            dataStatus = global.fad3DataStatus.statusFromDB;
+            dataStatus = fad3DataStatus.statusFromDB;
         }
     }
 }

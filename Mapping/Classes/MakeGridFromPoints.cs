@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
+using FAD3.GUI.Classes;
 
 namespace FAD3.Mapping.Classes
 {
@@ -293,7 +294,7 @@ namespace FAD3.Mapping.Classes
             }
         }
 
-        public static void MakeUTMPointShapefile(FishingGrid.fadUTMZone zone)
+        public static void MakeUTMPointShapefile(fadUTMZone zone)
         {
             var sf = new Shapefile();
             if (sf.CreateNewWithShapeID("", ShpfileType.SHP_POINT))

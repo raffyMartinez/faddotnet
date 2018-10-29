@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
+using FAD3.GUI.Classes;
 
 namespace FAD3
 {
@@ -14,34 +15,34 @@ namespace FAD3
             get { return _GMSMeasurementRows; }
         }
 
-        public enum FishCrabGMS
-        {
-            AllTaxaNotDetermined,
-            FishJuvenile = 1,
-            FishStg1Immature,
-            FishStg2Maturing,
-            FishStg3Mature,
-            FishStg4Gravid,
-            FishStg5Spent,
-            FemaleCrabImmature = 2,
-            FemaleCrabMature = 4,
-            FemaleCrabBerried,
-        }
+        //public enum FishCrabGMS
+        //{
+        //    AllTaxaNotDetermined,
+        //    FishJuvenile = 1,
+        //    FishStg1Immature,
+        //    FishStg2Maturing,
+        //    FishStg3Mature,
+        //    FishStg4Gravid,
+        //    FishStg5Spent,
+        //    FemaleCrabImmature = 2,
+        //    FemaleCrabMature = 4,
+        //    FemaleCrabBerried,
+        //}
 
-        public enum sex
-        {
-            Juvenile,
-            Male,
-            Female
-        }
+        //public enum sex
+        //{
+        //    Juvenile,
+        //    Male,
+        //    Female
+        //}
 
-        public static Dictionary<FishCrabGMS, string> GMSStages(CatchName.Taxa taxa, ref bool Success)
+        public static Dictionary<FishCrabGMS, string> GMSStages(Taxa taxa, ref bool Success)
         {
             Success = false;
             Dictionary<FishCrabGMS, string> myStages = new Dictionary<FishCrabGMS, string>();
             switch (taxa)
             {
-                case CatchName.Taxa.Fish:
+                case Taxa.Fish:
                     myStages.Add(FishCrabGMS.AllTaxaNotDetermined, "Not determined");
                     myStages.Add(FishCrabGMS.FishJuvenile, "Juvenile");
                     myStages.Add(FishCrabGMS.FishStg1Immature, "Immature");
@@ -52,7 +53,7 @@ namespace FAD3
                     Success = true;
                     break;
 
-                case CatchName.Taxa.Crabs:
+                case Taxa.Crabs:
                     myStages.Add(FishCrabGMS.AllTaxaNotDetermined, "Not determined");
                     myStages.Add(FishCrabGMS.FemaleCrabImmature, "Immature");
                     myStages.Add(FishCrabGMS.FemaleCrabMature, "Mature");
@@ -60,23 +61,23 @@ namespace FAD3
                     Success = true;
                     break;
 
-                case CatchName.Taxa.Lobsters:
-                case CatchName.Taxa.Sea_cucumbers:
-                case CatchName.Taxa.Sea_urchins:
-                case CatchName.Taxa.Shells:
-                case CatchName.Taxa.Shrimps:
-                case CatchName.Taxa.To_be_determined:
+                case Taxa.Lobsters:
+                case Taxa.Sea_cucumbers:
+                case Taxa.Sea_urchins:
+                case Taxa.Shells:
+                case Taxa.Shrimps:
+                case Taxa.To_be_determined:
                     break;
             }
             return myStages;
         }
 
-        public static FishCrabGMS GMSStageFromString(string stage, CatchName.Taxa taxa)
+        public static FishCrabGMS GMSStageFromString(string stage, Taxa taxa)
         {
             FishCrabGMS myStage = FishCrabGMS.AllTaxaNotDetermined;
             switch (taxa)
             {
-                case CatchName.Taxa.Fish:
+                case Taxa.Fish:
                     switch (stage)
                     {
                         case "Not determined":
@@ -109,7 +110,7 @@ namespace FAD3
                     }
                     break;
 
-                case CatchName.Taxa.Crabs:
+                case Taxa.Crabs:
                     switch (stage)
                     {
                         case "Not determined":
@@ -138,7 +139,7 @@ namespace FAD3
             return myStage;
         }
 
-        public static string GMSStageToString(CatchName.Taxa taxa, FishCrabGMS stage)
+        public static string GMSStageToString(Taxa taxa, FishCrabGMS stage)
         {
             string gms_stage = "";
             switch (taxa.ToString())
@@ -246,11 +247,11 @@ namespace FAD3
                     {
                         DataRow dr = dt.Rows[i];
 
-                        GMSManager.FishCrabGMS gms;
+                        FishCrabGMS gms;
                         Enum.TryParse(dr["GMS"].ToString(), out gms);
-                        GMSManager.sex sex;
+                        Sex sex;
                         Enum.TryParse(dr["Sex"].ToString(), out sex);
-                        CatchName.Taxa taxa = CatchName.Taxa.To_be_determined;
+                        Taxa taxa = Taxa.To_be_determined;
                         Enum.TryParse(dr["TaxaNo"].ToString(), out taxa);
                         double? Length = null;
                         double? Weight = null;
@@ -268,7 +269,7 @@ namespace FAD3
 
                         GMSLineClass myGMS = new GMSLineClass(dr["CatchCompRow"].ToString(), dr["RowGUID"].ToString(),
                                     Length, Weight, GonadWeight, sex, gms, dr["Taxa"].ToString(), taxa,
-                                    global.fad3DataStatus.statusFromDB, Sequence);
+                                    fad3DataStatus.statusFromDB, Sequence);
 
                         mydata.Add(dr["RowGUID"].ToString(), myGMS);
                         _GMSMeasurementRows++;
@@ -300,7 +301,7 @@ namespace FAD3
 
                         switch (item.Value.DataStatus)
                         {
-                            case global.fad3DataStatus.statusEdited:
+                            case fad3DataStatus.statusEdited:
                                 sql = $@"Update tblGMS set
                                  Len = {Length},
                                  Wt = {Weight},
@@ -316,7 +317,7 @@ namespace FAD3
 
                                 break;
 
-                            case global.fad3DataStatus.statusNew:
+                            case fad3DataStatus.statusNew:
                                 sql = $@"Insert into tblGMS (Len,Wt,Sex,GMS,GonadWt,CatchCompRow,RowGUID,Sequence) values (
                                  {Length}, {Weight}, {(int)item.Value.Sex}, {(int)item.Value.GMS},
                                  {GonadWeight}, {{{item.Value.CatchRowGUID}}}, {{{item.Value.RowGuid}}},
@@ -329,7 +330,7 @@ namespace FAD3
 
                                 break;
 
-                            case global.fad3DataStatus.statusForDeletion:
+                            case fad3DataStatus.statusForDeletion:
                                 sql = $"Delete * from tblGMS where RowGUID = {{{item.Value.RowGuid}}}";
 
                                 using (OleDbCommand update = new OleDbCommand(sql, conn))

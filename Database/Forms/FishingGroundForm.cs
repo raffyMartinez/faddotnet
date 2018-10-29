@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using FAD3.GUI.Classes;
 
 namespace FAD3
 {
@@ -61,7 +62,7 @@ namespace FAD3
                 o.HeaderStyle = ColumnHeaderStyle.None;
             });
 
-            if (FishingGrid.GridType == FishingGrid.fadGridType.gridTypeGrid25)
+            if (FishingGrid.GridType == fadGridType.gridTypeGrid25)
             {
                 tabFG.TabPages["tabGrid25"].Select();
                 textBoxZone.Text = FishingGrid.UTMZoneName;
@@ -70,7 +71,7 @@ namespace FAD3
                     lvGrids.Items.Add(item).With(o => { o.Name = item; });
                 }
             }
-            else if (FishingGrid.GridType == FishingGrid.fadGridType.gridTypeOther)
+            else if (FishingGrid.GridType == fadGridType.gridTypeOther)
             {
                 tabFG.TabPages["tabGridOther"].Select();
             }
