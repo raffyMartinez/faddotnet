@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
+using FAD3.Database.Classes;
 
 namespace FAD3
 {
@@ -54,6 +55,29 @@ namespace FAD3
                     return (int)getCount.ExecuteScalar();
                 }
             }
+        }
+
+        public static Dictionary<string, string> GetSimilarSoundingLocalNames(NewFisheryObjectName newName)
+        {
+            Dictionary<string, string> similarNames = new Dictionary<string, string>();
+            var key1 = newName.Key1;
+            var key2 = newName.Key2;
+            var sql = $@"SELECT tblBaseLocalNames.NameNo, tblBaseLocalNames.Name
+                         FROM tblBaseLocalNames
+                         WHERE tblBaseLocalNames.MPH1={key1} AND tblBaseLocalNames.MPH2={key2}";
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                var adapter = new OleDbDataAdapter(sql, conn);
+                DataTable dt = new DataTable();
+                adapter.Fill(dt);
+                if (dt.Rows.Count > 0)
+                {
+                    DataRow dr = dt.Rows[0];
+                    similarNames.Add(dr["NameNo"].ToString(), dr["Name"].ToString());
+                }
+            }
+            return similarNames;
         }
 
         public static bool UpdateSpeciesData(fad3DataStatus dataStatus, string nameGuid, string genus, string species, Taxa taxa,
@@ -332,6 +356,26 @@ namespace FAD3
                 }
             }
             return isListed;
+        }
+
+        public static bool SaveNewLocalName(NewFisheryObjectName newName)
+        {
+            var newLocalName = newName.NewName;
+            var key1 = newName.Key1;
+            var key2 = newName.Key2;
+            var guid = newName.ObjectGUID;
+            bool success = false;
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                var sql = $@"Insert into tblBaseLocalNames (Name, NameNo, MPH1,MPH2) values
+                        ('{newLocalName}', {{{guid}}},{key1},{key2})";
+                using (OleDbCommand update = new OleDbCommand(sql, conn))
+                {
+                    success = update.ExecuteNonQuery() > 0;
+                }
+            }
+            return success;
         }
 
         public static void GetLocalNames()

@@ -29,17 +29,19 @@ namespace FAD3.Database.Forms
         private bool _refreshSitioNumbers;
         private string _currentGearInventoryGuid;
 
-        public static GearInventoryForm GetInstance(aoi aoi)
+        public static GearInventoryForm GetInstance(aoi aoi, string inventoryGuid = "")
         {
-            if (_instance == null) return new GearInventoryForm(aoi);
+            if (_instance == null) return new GearInventoryForm(aoi, inventoryGuid);
             return _instance;
         }
 
-        public GearInventoryForm(aoi aoi)
+        public GearInventoryForm(aoi aoi, string inventoryGuid)
         {
             InitializeComponent();
             _aoi = aoi;
             _inventory = new FishingGearInventory(aoi);
+            _inventoryGuid = inventoryGuid;
+            treeInventory.ImageList = global.mainForm.treeImages;
         }
 
         private void OnFormClosed(object sender, FormClosedEventArgs e)
@@ -54,20 +56,19 @@ namespace FAD3.Database.Forms
             lvInventory.FullRowSelect = true;
         }
 
-        public void SetLGULevel(string inventoryGUID, string province = "", string municipality = "", string barangay = "")
-        {
-        }
-
         private void OnFormLoad(object sender, EventArgs e)
         {
+            Text = "Inventory of fishers, fishing vessels and gears";
             SetupListview();
-            var nd = treeInventory.Nodes.Add("root", "Fishing gear inventory");
+            var nd = treeInventory.Nodes.Add("root", "Fishery inventory");
+            nd.ImageKey = "ListFolder";
             nd.Tag = "root";
             foreach (var item in _inventory.Inventories)
             {
                 var subNode = nd.Nodes.Add(item.Key, item.Value.InventoryName);
                 subNode.Tag = "targetAreaInventory";
                 subNode.Nodes.Add("***dummy***");
+                subNode.ImageKey = "LayoutTransform";
             }
             if (nd.Nodes.Count == 0)
             {
@@ -75,27 +76,50 @@ namespace FAD3.Database.Forms
             }
             _treeLevel = nd.Tag.ToString();
             ConfigListView(treeInventory.Nodes["root"]);
-            global.LoadFormSettings(this, true);
+            if (_inventoryGuid.Length > 0)
+            {
+                var subNode = treeInventory.Nodes["root"].Nodes[_inventoryGuid];
+                treeInventory.SelectedNode = subNode;
+                TreeNodeMouseClickEventArgs ee = new TreeNodeMouseClickEventArgs(subNode, MouseButtons.Left, 0, 0, 0);
+                OnNodeClicked(subNode, ee);
+            }
+            global.LoadFormSettings(this);
         }
 
-        public void RefreshSitioLevelInventory(string province, string municipality, string barangay)
+        public void RefreshSitioLevelInventory(string province, string municipality, string barangay, string sitio)
         {
-            TreeViewEventArgs e = new TreeViewEventArgs(_provinceNode.Parent);
+            TreeNode nd = new TreeNode();
+            if (_provinceNode == null)
+            {
+                nd = treeInventory.Nodes["root"].Nodes[_inventoryGuid];
+                //TreeViewEventArgs e = new TreeViewEventArgs(treeInventory.Nodes["root"].Nodes[_inventoryGuid]);
+            }
+            else
+            {
+                nd = _provinceNode.Parent;
+                //TreeViewEventArgs e = new TreeViewEventArgs(_provinceNode.Parent);
+            }
+            TreeViewEventArgs e = new TreeViewEventArgs(nd);
             _refreshSitioNumbers = true;
             OnTreeAfterExpand(null, e);
 
             e.Node.Nodes[province].Expand();
             e.Node.Nodes[province].Nodes[municipality].Expand();
             e.Node.Nodes[province].Nodes[municipality].Nodes[barangay].Expand();
-            treeInventory.SelectedNode = e.Node.Nodes[province].Nodes[municipality].Nodes[barangay];
-            treeInventory.SelectedNode.Tag = "barangay";
+            if (sitio.Length == 0)
+            {
+                sitio = "entireBarangay";
+            }
+            treeInventory.SelectedNode = e.Node.Nodes[province].Nodes[municipality].Nodes[barangay].Nodes[sitio];
+            treeInventory.SelectedNode.Tag = "sitio";
+            treeInventory.SelectedNode.SelectedImageKey = treeInventory.SelectedNode.ImageKey;
             ConfigListView(treeInventory.SelectedNode);
         }
 
         private void OnTreeAfterExpand(object sender, TreeViewEventArgs e)
         {
             _treeLevel = e.Node.Tag.ToString();
-            if (e.Node.FirstNode.Text == "***dummy***" || _refreshSitioNumbers)
+            if (_refreshSitioNumbers || e.Node.FirstNode.Text == "***dummy***")
             {
                 e.Node.Nodes.Clear();
                 switch (_treeLevel)
@@ -120,6 +144,7 @@ namespace FAD3.Database.Forms
                                 provNode = e.Node.Nodes[item.Value.Province];
                             }
                             provNode.Tag = "province";
+                            provNode.ImageKey = "Level04";
 
                             if (!provNode.Nodes.ContainsKey(item.Value.Municipality))
                             {
@@ -130,6 +155,7 @@ namespace FAD3.Database.Forms
                                 munNode = provNode.Nodes[item.Value.Municipality];
                             }
                             munNode.Tag = "municipality";
+                            munNode.ImageKey = "Level03";
 
                             if (!munNode.Nodes.ContainsKey(item.Value.barangay))
                             {
@@ -140,6 +166,7 @@ namespace FAD3.Database.Forms
                                 brgyNode = munNode.Nodes[item.Value.barangay];
                             }
                             brgyNode.Tag = "barangay";
+                            brgyNode.ImageKey = "Level02";
 
                             if (!brgyNode.Nodes.ContainsKey(item.Value.sitio))
                             {
@@ -154,6 +181,7 @@ namespace FAD3.Database.Forms
                                 }
                                 sitioNode.Tag = "sitio";
                                 sitioNode.Nodes.Add("***dummy***");
+                                sitioNode.ImageKey = "Level01";
                             }
                         }
                         if (_refreshSitioNumbers)
@@ -172,23 +200,23 @@ namespace FAD3.Database.Forms
         private void ConfigureContextMenu()
         {
             contextMenu.Items.Clear();
-            var menuItem = contextMenu.Items.Add("Add gear inventory");
+            var menuItem = contextMenu.Items.Add("Add fishery inventory project");
             menuItem.Name = "itemAddInventory";
             menuItem.Enabled = _treeLevel == "root";
 
             if (_treeLevel == "barangay")
             {
-                menuItem = contextMenu.Items.Add("Add sitio");
+                menuItem = contextMenu.Items.Add("Add fisher and fishing boat inventory");
             }
             else
             {
-                menuItem = contextMenu.Items.Add("Add barangay");
+                menuItem = contextMenu.Items.Add("Add fisher and fishing boat inventory");
             }
             menuItem.Name = "itemAddBarangay";
             menuItem.Enabled = _treeLevel == "targetAreaInventory" || _treeLevel == "province"
                                 || _treeLevel == "municipality" || _treeLevel == "barangay";
 
-            menuItem = contextMenu.Items.Add("Add fishing gear");
+            menuItem = contextMenu.Items.Add("Add fishing gear inventory");
             menuItem.Name = "itemAddFishingGear";
             menuItem.Enabled = _treeLevel == "sitio";
         }
@@ -226,18 +254,30 @@ namespace FAD3.Database.Forms
             {
                 ConfigListView(e.Node);
             }
+            e.Node.SelectedImageKey = e.Node.ImageKey;
         }
 
         private void ConfigListViewGear(string variationInventoryGuid)
         {
+            _currentGearInventoryGuid = variationInventoryGuid;
             var item = _inventory.GetGearVariationInventoryData(variationInventoryGuid);
             lvInventory.Clear();
             lvInventory.Columns.Add("Property");
             lvInventory.Columns.Add("Value");
-            lvInventory.Columns.Add("Value unit");
+            lvInventory.Columns.Add("  ");
+            lvInventory.Columns.Add("");
             SizeColumns(lvInventory);
 
-            var lvi = lvInventory.Items.Add("Province");
+            //inventory header and location
+            var lvi = lvInventory.Items.Add("Inventory");
+            lvi.SubItems.Add(item.inventoryName);
+            lvi = lvInventory.Items.Add("Date conducted");
+            lvi.SubItems.Add(string.Format("{0:MMM-dd-yyyy}", item.dateConducted));
+            lvi = lvInventory.Items.Add("");
+
+            lvi = lvInventory.Items.Add("Target area");
+            lvi.SubItems.Add(item.targetArea);
+            lvi = lvInventory.Items.Add("Province");
             lvi.SubItems.Add(item.province);
             lvi = lvInventory.Items.Add("Municipality");
             lvi.SubItems.Add(item.municipality);
@@ -245,11 +285,13 @@ namespace FAD3.Database.Forms
             lvi.SubItems.Add(item.barangay);
             lvi = lvInventory.Items.Add("Sitio");
             lvi.SubItems.Add(item.sitio);
+            lvi = lvInventory.Items.Add("");
+
+            //gear used and local names
             lvi = lvInventory.Items.Add("Gear class");
             lvi.SubItems.Add(item.gearClass);
             lvi = lvInventory.Items.Add("Gear variation");
             lvi.SubItems.Add(item.gearVariation);
-
             var n = 0;
             foreach (var name in item.gearLocalNames)
             {
@@ -264,7 +306,9 @@ namespace FAD3.Database.Forms
                 lvi.SubItems.Add(name);
                 n++;
             }
+            lvi = lvInventory.Items.Add("");
 
+            //gear count
             lvi = lvInventory.Items.Add("Gears used in commercial fishing vessels");
             lvi.SubItems.Add(item.commercialCount.ToString());
             lvi = lvInventory.Items.Add("Gears used in municipal motorized fishing vessels");
@@ -273,7 +317,11 @@ namespace FAD3.Database.Forms
             lvi.SubItems.Add(item.nonMotorizedCount.ToString());
             lvi = lvInventory.Items.Add("No boat gears");
             lvi.SubItems.Add(item.noBoatCount.ToString());
+            lvi = lvInventory.Items.Add("Total number of gears");
+            lvi.SubItems.Add((item.noBoatCount + item.commercialCount + item.motorizedCount + item.nonMotorizedCount).ToString());
+            lvi = lvInventory.Items.Add("");
 
+            //months and seasonality
             for (int m = 1; m < 13; m++)
             {
                 if (m == 1)
@@ -307,6 +355,73 @@ namespace FAD3.Database.Forms
                     lvi.SubItems.Add("x");
                 }
             }
+
+            lvi = lvInventory.Items.Add("Number of days in a month gear is used");
+            lvi.SubItems.Add(item.numberDaysGearUsedPerMonth.ToString());
+            lvi = lvInventory.Items.Add("");
+
+            //CPUE and historical averages
+            var unit = " " + item.cpueUnit;
+            lvi = lvInventory.Items.Add("Maximum reported CPUE");
+            lvi.SubItems.Add(item.cpueRangeMax.ToString() + unit + (item.cpueRangeMax == 1 ? "" : "s"));
+            lvi = lvInventory.Items.Add("Minimum reported CPUE");
+            lvi.SubItems.Add(item.cpueRangeMin.ToString() + unit + (item.cpueRangeMin == 1 ? "" : "s"));
+            lvi = lvInventory.Items.Add("Upper mode of CPUE");
+            lvi.SubItems.Add(item.cpueModeUpper.ToString() + unit + (item.cpueModeUpper == 1 ? "" : "s"));
+            lvi = lvInventory.Items.Add("Lower mode of CPUE");
+            lvi.SubItems.Add(item.cpueModeLower.ToString() + unit + (item.cpueModeLower == 1 ? "" : "s"));
+
+            n = 0;
+            foreach (var hist in item.historicalCPUE)
+            {
+                if (n == 0)
+                {
+                    lvi = lvInventory.Items.Add("Historical CPUE averages");
+                }
+                else
+                {
+                    lvi = lvInventory.Items.Add("");
+                }
+                lvi.SubItems.Add(hist.decade.ToString() + "s: " + hist.cpue.ToString() + " " + hist.unit);
+                n++;
+            }
+            lvi = lvInventory.Items.Add("");
+
+            //catch composition
+            n = 0;
+            foreach (var name in item.dominantCatch)
+            {
+                if (n == 0)
+                {
+                    lvi = lvInventory.Items.Add("Composition of dominant catch");
+                }
+                else
+                {
+                    lvi = lvInventory.Items.Add("");
+                }
+                lvi.SubItems.Add(name);
+                n++;
+            }
+
+            n = 0;
+            foreach (var name in item.nonDominantCatch)
+            {
+                if (n == 0)
+                {
+                    lvi = lvInventory.Items.Add("Composition of non-dominant catch");
+                }
+                else
+                {
+                    lvi = lvInventory.Items.Add("");
+                }
+                lvi.SubItems.Add(name);
+                n++;
+            }
+
+            lvi = lvInventory.Items.Add("Percentage of dominant catch");
+            lvi.SubItems.Add(item.percentageOfDominance.ToString() + "%");
+
+            lblGuide.Text = $"Fishing gear: {item.gearVariation}";
 
             SizeColumns(lvInventory, false);
         }
@@ -375,42 +490,52 @@ namespace FAD3.Database.Forms
             lvInventory.Columns.Add("Value");
             SizeColumns(lvInventory);
             ListViewItem lvi;
+            _treeLevel = node.Tag.ToString();
             switch (_treeLevel)
             {
                 case "root":
-                    lvi = lvInventory.Items.Add("Number of gear inventories");
+                    lvi = lvInventory.Items.Add("Number of fishery inventories");
                     lvi.SubItems.Add(_inventory.Inventories.Count.ToString());
+                    lblGuide.Text = "Fishery inventories";
                     break;
 
                 case "targetAreaInventory":
                     //_inventoryGuid = treeInventory.SelectedNode.Name;
                     _inventoryGuid = node.Name;
                     var values = _inventory.GetLevelSummary(_inventoryGuid);
-                    SetupListSummaryView(values.totalFishers, values.totalCommercial, values.totalMotorized, values.totalNonMotorized, node);
-
+                    var gearLevelDict = _inventory.GetLevelGearsInventory(_inventoryGuid);
+                    SetupListSummaryView(values.totalFishers, values.totalCommercial, values.totalMotorized, values.totalNonMotorized, gearLevelDict, node);
+                    lblGuide.Text = $"Fishery inventory project: {node.Text}";
                     break;
 
                 case "province":
                     _provinceNode = node;
                     values = _inventory.GetLevelSummary(node.Parent.Name, node.Name);
-                    SetupListSummaryView(values.totalFishers, values.totalCommercial, values.totalMotorized, values.totalNonMotorized, node);
+                    gearLevelDict = _inventory.GetLevelGearsInventory(node.Parent.Name, node.Name);
+                    SetupListSummaryView(values.totalFishers, values.totalCommercial, values.totalMotorized, values.totalNonMotorized, gearLevelDict, node);
+                    lblGuide.Text = $"Province: {node.Name}";
                     break;
 
                 case "municipality":
                     _provinceNode = node.Parent;
                     values = _inventory.GetLevelSummary(node.Parent.Parent.Name, node.Parent.Name, node.Name);
-                    SetupListSummaryView(values.totalFishers, values.totalCommercial, values.totalMotorized, values.totalNonMotorized, node);
+                    gearLevelDict = _inventory.GetLevelGearsInventory(node.Parent.Parent.Name, node.Parent.Name, node.Name);
+                    SetupListSummaryView(values.totalFishers, values.totalCommercial, values.totalMotorized, values.totalNonMotorized, gearLevelDict, node);
+                    lblGuide.Text = $"Municipality: {node.Name}, {node.Parent.Name}";
                     break;
 
                 case "barangay":
                     _provinceNode = node.Parent.Parent;
                     values = _inventory.GetLevelSummary(node.Parent.Parent.Parent.Name, node.Parent.Parent.Name, node.Parent.Name, node.Name);
-                    SetupListSummaryView(values.totalFishers, values.totalCommercial, values.totalMotorized, values.totalNonMotorized, node);
+                    gearLevelDict = _inventory.GetLevelGearsInventory(node.Parent.Parent.Parent.Name, node.Parent.Parent.Name, node.Parent.Name, node.Name);
+                    SetupListSummaryView(values.totalFishers, values.totalCommercial, values.totalMotorized, values.totalNonMotorized, gearLevelDict, node);
+                    lblGuide.Text = $"Barangay: {node.Name}, {node.Parent.Name}, {node.Parent.Parent.Name}";
                     break;
 
                 case "sitio":
                     _provinceNode = node.Parent.Parent.Parent;
                     var numbers = _inventory.GetSitioNumbers(node.Parent.Parent.Parent.Parent.Name, node.Parent.Parent.Parent.Name, node.Parent.Parent.Name, node.Parent.Name, node.Name);
+                    gearLevelDict = _inventory.GetLevelGearsInventory(node.Parent.Parent.Parent.Parent.Name, node.Parent.Parent.Parent.Name, node.Parent.Parent.Name, node.Parent.Name, node.Name);
                     _sitioCountCommercial = numbers.commercialCount;
                     _sitioCountFishers = numbers.fisherCount;
                     _sitioCountMunicipalMotorized = numbers.motorizedCount;
@@ -424,35 +549,86 @@ namespace FAD3.Database.Forms
                     lvi = lvInventory.Items.Add("Number of commercial vessels");
                     lvi.SubItems.Add(_sitioCountCommercial.ToString());
 
-                    lvi = lvInventory.Items.Add("Total number of fishing gear types");
-                    lvi = lvInventory.Items.Add("Total number of fishing gears inventoried");
+                    lvi = lvInventory.Items.Add("");
+                    lvi = lvInventory.Items.Add("");
+                    foreach (var item in gearLevelDict)
+                    {
+                        lvi = lvInventory.Items.Add(item.Value.gearClass + "-" + item.Key);
+                        lvi.SubItems.Add(item.Value.total.ToString());
+                    }
 
                     _sitioNode = node;
                     ShowSitioGearInventory(_sitioNode);
+                    if (node.Name == "entireBarangay")
+
+                    {
+                        lblGuide.Text = $"Sitio: {node.Parent.Name}, {node.Parent.Parent.Name}, {node.Parent.Parent.Parent.Name} (Entire barangay)";
+                    }
+                    else
+                    {
+                        lblGuide.Text = $"Sitio: {node.Name}, {node.Parent.Name}, {node.Parent.Parent.Name}, {node.Parent.Parent.Parent.Name}";
+                    }
+
                     break;
             }
             SizeColumns(lvInventory, false);
         }
 
-        public void RefreshSitioGearInventory()
+        public void RefreshMainInventory(string inventoryName)
         {
-            ShowSitioGearInventory(_sitioNode);
+            treeInventory.Nodes["root"].Nodes[_inventoryGuid].Text = inventoryName;
+            TreeNodeMouseClickEventArgs e = new TreeNodeMouseClickEventArgs(treeInventory.Nodes["root"].Nodes[_inventoryGuid], MouseButtons.Left, 0, 0, 0);
+            OnNodeClicked(null, e);
         }
 
-        private void ShowSitioGearInventory(TreeNode node)
+        public void RefreshMainInventory()
         {
-            _barangayInventoryGuid = _inventory.BarangayInventoryGuid(node.Parent.Parent.Parent.Parent.Name, node.Parent.Parent.Parent.Name, node.Parent.Parent.Name, node.Parent.Name, node.Name);
-            foreach (var item in _inventory.ReadSitioGearInventory(_barangayInventoryGuid))
+            _inventory.RefreshInventories(_aoi);
+            foreach (var item in _inventory.Inventories)
             {
-                if (!node.Nodes.ContainsKey(item.variationInventoryGuid))
+                if (!treeInventory.Nodes["root"].Nodes.ContainsKey(item.Key))
                 {
-                    var nd = node.Nodes.Add(item.variationInventoryGuid, item.gearVariation);
-                    nd.Tag = "gearVariation";
+                    treeInventory.Nodes["root"].Expand();
+                    var nd = treeInventory.Nodes["root"].Nodes.Add(item.Key, item.Value.InventoryName);
+                    nd.Tag = "targetAreaInventory";
+                    nd.ImageKey = "LayoutTransform";
+                    treeInventory.SelectedNode = nd;
+                    nd.Nodes.Add("***dummy***");
+                    TreeNodeMouseClickEventArgs e = new TreeNodeMouseClickEventArgs(nd, MouseButtons.Left, 0, 0, 0);
+                    OnNodeClicked(nd, e);
                 }
             }
         }
 
-        private void SetupListSummaryView(int fisherCount, int commercialCount, int motorizedCount, int nonMotorizedCount, TreeNode node = null)
+        public void RefreshSitioGearInventory(string sitioGearInventoryGuid, bool isNew = false)
+        {
+            ShowSitioGearInventory(_sitioNode);
+            var gearNode = _sitioNode.Nodes[sitioGearInventoryGuid];
+            treeInventory.SelectedNode = gearNode;
+            TreeNodeMouseClickEventArgs e = new TreeNodeMouseClickEventArgs(gearNode, MouseButtons.Left, 0, 0, 0);
+            OnNodeClicked(gearNode, e);
+        }
+
+        private void ShowSitioGearInventory(TreeNode node)
+        {
+            _barangayInventoryGuid = _inventory.GetBarangayInventoryGuid(node.Parent.Parent.Parent.Parent.Name, node.Parent.Parent.Parent.Name, node.Parent.Parent.Name, node.Parent.Name, node.Name);
+            foreach (var item in _inventory.ReadSitioGearInventory(_barangayInventoryGuid))
+            {
+                if (!node.Nodes.ContainsKey(item.variationInventoryGuid))
+                {
+                    if (node.Nodes.Count > 0 && node.FirstNode.Text == "***dummy***")
+                    {
+                        node.Nodes.Clear();
+                    }
+                    var nd = node.Nodes.Add(item.variationInventoryGuid, item.gearVariation);
+                    nd.Tag = "gearVariation";
+                    nd.ImageKey = gear.GearClassImageKeyFromGearClasName(item.gearClass);
+                }
+            }
+        }
+
+        private void SetupListSummaryView(int fisherCount, int commercialCount, int motorizedCount, int nonMotorizedCount,
+            Dictionary<string, (string gearClass, int total, int sumCommercial, int sumMotorized, int sumNonMotorized, int sumNoBoat)> gearInventoryDict, TreeNode node = null)
         {
             ListViewItem lvi;
 
@@ -465,6 +641,8 @@ namespace FAD3.Database.Forms
                     lvi.SubItems.Add(node.Text);
                     lvi = lvInventory.Items.Add("Date implemented");
                     lvi.SubItems.Add(string.Format("{0:MMM-dd-yyyy}", _inventory.Inventories[node.Name].DateConducted));
+                    lvi = lvInventory.Items.Add("");
+
                     lvi = lvInventory.Items.Add("Number of provinces");
                     lvi.SubItems.Add(node.Nodes.Count.ToString());
                     var inventoryLevels = _inventory.NumberOfMunicipalitiesBarangays(node.Name);
@@ -504,6 +682,57 @@ namespace FAD3.Database.Forms
             lvi.SubItems.Add(nonMotorizedCount.ToString());
             lvi = lvInventory.Items.Add("Total number of commercial vessels");
             lvi.SubItems.Add(commercialCount.ToString());
+
+            if (_treeLevel == "municipality")
+            {
+                var currentBarangay = "";
+                var currentSitio = "";
+                var list = _inventory.GetBarangaysGearInventory(node.Parent.Parent.Name, node.Parent.Name, node.Name);
+                if (list.Count > 0)
+                {
+                    lvi = lvInventory.Items.Add("");
+                    lvi = lvInventory.Items.Add("");
+                    foreach (var item in list)
+                    {
+                        if (currentBarangay != item.barangay)
+                        {
+                            currentBarangay = item.barangay;
+                            lvi = lvInventory.Items.Add(currentBarangay);
+                        }
+                        if (currentSitio != item.sitio)
+                        {
+                            currentSitio = item.sitio;
+                            if (item.sitio.Length > 0)
+                            {
+                                lvi = lvInventory.Items.Add("   " + currentSitio);
+                            }
+                            else
+                            {
+                                lvi = lvInventory.Items.Add("   Entire barangay");
+                            }
+                        }
+                        lvi = lvInventory.Items.Add("         " + item.gearClass + "-" + item.gearVariation);
+                        lvi.SubItems.Add(item.total.ToString());
+                    }
+                }
+            }
+            else
+            {
+                lvi = lvInventory.Items.Add("");
+                lvi = lvInventory.Items.Add("");
+                foreach (var item in gearInventoryDict)
+                {
+                    lvi = lvInventory.Items.Add(item.Value.gearClass + "-" + item.Key);
+                    lvi.SubItems.Add(item.Value.total.ToString());
+                }
+            }
+        }
+
+        private void AddInventory()
+        {
+            var inventoryEditForm = new GearInventoryEditForm(_treeLevel, _aoi, _inventory, this);
+            inventoryEditForm.AddNewInventory();
+            inventoryEditForm.ShowDialog(this);
         }
 
         private void OnContextMenu_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
@@ -513,7 +742,7 @@ namespace FAD3.Database.Forms
             switch (e.ClickedItem.Name)
             {
                 case "itemAddInventory":
-                    inventoryEditForm.AddNewInventory();
+                    AddInventory();
                     break;
 
                 case "itemAddBarangay":
@@ -536,7 +765,16 @@ namespace FAD3.Database.Forms
                             break;
 
                         case "barangay":
-                            inventoryEditForm.AddNewBarangyInventory(_inventoryGuid, nd.Parent.Parent.Name, nd.Parent.Name, nd.Name);
+                            if (nd.FirstNode.Name == "entireBarangay")
+                            {
+                                MessageBox.Show("Cannot add a new sitio because sitios are already included in 'Entire barangay'",
+                                                "Cannot a new sitio", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                return;
+                            }
+                            else
+                            {
+                                inventoryEditForm.AddNewBarangyInventory(_inventoryGuid, nd.Parent.Parent.Name, nd.Parent.Name, nd.Name);
+                            }
                             break;
                     }
                     //inventoryEditForm.AddNewBarangyInventory(_inventoryGuid);
@@ -547,6 +785,64 @@ namespace FAD3.Database.Forms
                     break;
             }
             inventoryEditForm.ShowDialog(this);
+        }
+
+        private void OnListViewDoubleClick(object sender, EventArgs e)
+        {
+            var inventoryEditForm = new GearInventoryEditForm(_treeLevel, _aoi, _inventory, this);
+            switch (_treeLevel)
+            {
+                case "targetAreaInventory":
+                    inventoryEditForm.EditInventoryLevel(_inventoryGuid, lvInventory.Items[0].SubItems[1].Text, DateTime.Parse(lvInventory.Items[1].SubItems[1].Text));
+                    break;
+
+                case "sitio":
+                    var nd = treeInventory.SelectedNode;
+                    inventoryEditForm.EditInventoryLevel(_barangayInventoryGuid,
+                                                        global.MunicipalityNumberFromString(nd.Parent.Parent.Parent.Text, nd.Parent.Parent.Text), nd.Parent.Text, nd.Text,
+                                                        int.Parse(lvInventory.Items[0].SubItems[1].Text), int.Parse(lvInventory.Items[1].SubItems[1].Text),
+                                                        int.Parse(lvInventory.Items[2].SubItems[1].Text), int.Parse(lvInventory.Items[3].SubItems[1].Text));
+                    break;
+
+                case "gearVariation":
+                    inventoryEditForm.EditInventoryLevel(_currentGearInventoryGuid);
+                    break;
+
+                default:
+                    inventoryEditForm = null;
+                    return;
+            }
+            inventoryEditForm.ShowDialog(this);
+        }
+
+        private void OnToolStripItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+            switch (e.ClickedItem.Name)
+            {
+                case "tsButtonExit":
+                    Close();
+                    break;
+
+                case "tsButtonAddInventory":
+                    if (_treeLevel == "root") AddInventory();
+                    break;
+
+                case "tsButtonAddSitioLevelInventory":
+                    if (_treeLevel != "root" && _treeLevel != "gearVariation" && _treeLevel != "sitio")
+                    {
+                        ToolStripItemClickedEventArgs ee = new ToolStripItemClickedEventArgs(contextMenu.Items["itemAddBarangay"]);
+                        OnContextMenu_ItemClicked(null, ee);
+                    }
+                    break;
+
+                case "tsButtonAddGear":
+                    if (_treeLevel == "sitio")
+                    {
+                        ToolStripItemClickedEventArgs ee = new ToolStripItemClickedEventArgs(contextMenu.Items["itemAddFishingGear"]);
+                        OnContextMenu_ItemClicked(null, ee);
+                    }
+                    break;
+            }
         }
     }
 }

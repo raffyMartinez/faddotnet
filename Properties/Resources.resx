@@ -310,4 +310,55 @@
   <data name="mapPreview" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\mapPreview.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="Large_16x" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Large_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="LayoutTransform_16x" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\LayoutTransform_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lev1" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\lev1.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lev2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\lev2.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lev3" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\lev3.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lev4" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\lev4.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Level01_16x" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Level01_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Level02_16x" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Level02_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Level03_16x" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Level03_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Level04_16x" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Level04_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Level05_16x" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Level05_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Level06_16x" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Level06_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ListFolder_16x" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ListFolder_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Medium_16x" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Medium_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="AddBehavior_16x" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\AddBehavior_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="AddFile_16x" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\AddFile_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="AddFolder_16x" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\AddFolder_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

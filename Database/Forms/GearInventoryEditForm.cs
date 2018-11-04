@@ -18,6 +18,7 @@ namespace FAD3.Database.Forms
         private aoi _aoi;
         private string _inventoryGuid;
         private string _barangayInventoryGuid;
+        private string _gearInventoryGuid;
         private FishingGearInventory _inventory;
         private fad3DataStatus _dataStatus;
         private string _newGUID;
@@ -29,6 +30,22 @@ namespace FAD3.Database.Forms
         private int _countFishers;
         private ListBox _activeCatchCompList;
         private GearInventoryForm _parentForm;
+        private List<string> _sitios = new List<string>();
+
+        public void SelectedSimilarName(string similarName, FisheryObjectNameType localNameType)
+        {
+            if (similarName.Length > 0)
+            {
+                if (localNameType == FisheryObjectNameType.CatchLocalName)
+                {
+                    cboCatchLocalName.Text = similarName;
+                }
+                else if (localNameType == FisheryObjectNameType.GearLocalName)
+                {
+                    cboSelectGearLocalName.Text = similarName;
+                }
+            }
+        }
 
         public string InventoryGUID
         {
@@ -89,6 +106,8 @@ namespace FAD3.Database.Forms
             comboProvince.Text = province;
             comboMunicipality.Text = municipality;
             comboBarangays.Text = barangay;
+            _sitios.Clear();
+            _sitios = _inventory.GetBarangaySitios(province, municipality, barangay);
         }
 
         public void AddNewBarangyInventory(string inventoryGuid, string province, string municipality)
@@ -110,6 +129,20 @@ namespace FAD3.Database.Forms
             _inventoryGuid = inventoryGuid;
             pnlBarangay.Visible = true;
             SetupProvinceComboBox();
+            Text = "Add barangay fisher and fishing boat inventory data";
+        }
+
+        private void FillUpMonths()
+        {
+            //setup the checklistbox of months of gear use and peak season
+            var monthArr = new string[] { "January", "February", "March", "April", "May", "June",
+                                           "July", "August", "September", "October", "November", "December" };
+
+            for (int n = 0; n < monthArr.Length; n++)
+            {
+                chkListBoxMonthsSeason.Items.Add(monthArr[n]);
+                chkListBoxMonthsUsed.Items.Add(monthArr[n]);
+            }
         }
 
         private void SetupGearInventoryUI()
@@ -137,15 +170,7 @@ namespace FAD3.Database.Forms
             listBoxGearLocalNames.DisplayMember = "value";
             listBoxGearLocalNames.ValueMember = "key";
 
-            //setup the checklistbox of months of gear use and peak season
-            var monthArr = new string[] { "January", "February", "March", "April", "May", "June",
-                                           "July", "August", "September", "October", "November", "December" };
-
-            for (int n = 0; n < monthArr.Length; n++)
-            {
-                chkListBoxMonthsSeason.Items.Add(monthArr[n]);
-                chkListBoxMonthsUsed.Items.Add(monthArr[n]);
-            }
+            FillUpMonths();
 
             //setup listview of history of cpue
             SizeColumns(listViewHistoryCpue);
@@ -197,6 +222,7 @@ namespace FAD3.Database.Forms
             _countMunicipalMotorized = countMunicipalMotorized;
             _countMunicipalNonMotorized = countMunicipalNonMotorized;
             SetupGearInventoryUI();
+            Text = "Add fishing gear inventory data";
         }
 
         /// <summary>
@@ -223,6 +249,7 @@ namespace FAD3.Database.Forms
         {
             pnlInventory.Visible = true;
             _dataStatus = fad3DataStatus.statusNew;
+            Text = "Add fishery inventory project";
         }
 
         private bool ValidateGearInventory()
@@ -240,7 +267,7 @@ namespace FAD3.Database.Forms
                 && (txtRangeMax.Text.Length > 0 || txtRangeMin.Text.Length > 0)
                 && (txtModeLower.Text.Length > 0 || txtModeUpper.Text.Length > 0)
                 && listBoxDominantCatch.Items.Count > 0
-                && listBoxOtherCatch.Items.Count > 0
+                //&& listBoxOtherCatch.Items.Count > 0
                 && txtDominantPercentage.Text.Length > 0
                 && IsCatchValuesOK();
 
@@ -320,6 +347,137 @@ namespace FAD3.Database.Forms
             return false;
         }
 
+        public void EditInventoryLevel(string inventoryGuid, string InventoryName, DateTime dateImplemented)
+        {
+            _treeLevel = "root";
+            _inventoryGuid = inventoryGuid;
+            pnlInventory.Visible = true;
+            _dataStatus = fad3DataStatus.statusFromDB;
+
+            txtInventoryName.Text = InventoryName;
+            txtDateImplemented.Text = string.Format("{0:MMM-dd-yyyy}", dateImplemented);
+
+            Text = "Edit fishery inventory project";
+        }
+
+        public void EditInventoryLevel(string sitioGearInventoryGuid)
+        {
+            _treeLevel = "sitio";
+            var gearData = _inventory.GetGearVariationInventoryData(sitioGearInventoryGuid);
+            _gearInventoryGuid = sitioGearInventoryGuid;
+            pnlGear.Visible = true;
+            _dataStatus = fad3DataStatus.statusFromDB;
+            SetupGearInventoryUI();
+
+            cboGearClass.Text = gearData.gearClass;
+            cboGearVariation.Text = gearData.gearVariation;
+
+            foreach (var item in gearData.gearLocalNames)
+            {
+                if (gear.GearLocalNames.Values.Contains(item))
+                {
+                    foreach (var localName in gear.GearLocalNames)
+                    {
+                        if (localName.Value == item)
+                        {
+                            listBoxGearLocalNames.Items.Add(localName);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            txtCommercialUsage.Text = gearData.commercialCount.ToString();
+            txtMunicipalMotorizedUsage.Text = gearData.motorizedCount.ToString();
+            txtMunicipalNonMotorizedUsage.Text = gearData.nonMotorizedCount.ToString();
+            txtNoBoatGears.Text = gearData.noBoatCount.ToString();
+
+            foreach (var item in gearData.monthsInUse)
+            {
+                chkListBoxMonthsUsed.SetItemCheckState(item - 1, CheckState.Checked);
+            }
+            chkListBoxMonthsSeason.Enabled = chkListBoxMonthsUsed.CheckedItems.Count > 0;
+
+            foreach (var item in gearData.peakMonths)
+            {
+                chkListBoxMonthsSeason.SetItemCheckState(item - 1, CheckState.Checked);
+            }
+            txtNumberOfDaysPerMonth.Text = gearData.numberDaysGearUsedPerMonth.ToString();
+
+            cboCatchUnit.Text = gearData.cpueUnit;
+            txtRangeMax.Text = gearData.cpueRangeMax.ToString();
+            txtRangeMin.Text = gearData.cpueRangeMin.ToString();
+            txtModeUpper.Text = gearData.cpueModeUpper.ToString();
+            txtModeLower.Text = gearData.cpueModeLower.ToString();
+
+            foreach (var item in gearData.historicalCPUE)
+            {
+                foreach (ListViewItem lvi in listViewHistoryCpue.Items)
+                {
+                    if (lvi.Text == item.decade.ToString() + "s")
+                    {
+                        lvi.SubItems.Add(item.cpue.ToString());
+                        lvi.SubItems.Add(item.unit);
+                        break;
+                    }
+                }
+            }
+
+            foreach (var item in gearData.dominantCatch)
+            {
+                foreach (var name in names.LocalNameListDict)
+                {
+                    if (name.Value == item)
+                    {
+                        listBoxDominantCatch.Items.Add(name);
+                        break;
+                    }
+                }
+            }
+
+            foreach (var item in gearData.nonDominantCatch)
+            {
+                foreach (var name in names.LocalNameListDict)
+                {
+                    if (name.Value == item)
+                    {
+                        listBoxOtherCatch.Items.Add(name);
+                        break;
+                    }
+                }
+            }
+
+            txtDominantPercentage.Text = gearData.percentageOfDominance.ToString();
+
+            Text = "Edit fishing gear inventory data";
+        }
+
+        public void EditInventoryLevel(string barangayInventoryGuid, int municipalityNumber, string barangay, string sitio,
+                                    int fisherCount, int motorizedCount, int nonMotorizedCount, int commercialCount)
+        {
+            SetupProvinceComboBox();
+            _municipalityNumber = municipalityNumber;
+            _treeLevel = "barangay";
+            _barangayInventoryGuid = barangayInventoryGuid;
+            pnlBarangay.Visible = true;
+            _dataStatus = fad3DataStatus.statusFromDB;
+            txtCountFishers.Text = fisherCount.ToString();
+            txtCountMotorized.Text = motorizedCount.ToString();
+            txtCountNonMotorized.Text = nonMotorizedCount.ToString();
+            txtCountCommercial.Text = commercialCount.ToString();
+
+            var location = global.ProvinceMunicipalityNamesFromMunicipalityNumber(municipalityNumber);
+            comboProvince.Text = location.province;
+            comboMunicipality.Text = location.municipality;
+            comboBarangays.Text = barangay;
+            if (sitio != "Entire barangay")
+            {
+                txtSitio.Text = sitio;
+            }
+
+            Text = "Edit barangay fisher and fishing boat inventory data";
+        }
+
         private void OnButtonClick(object sender, EventArgs e)
         {
             switch (((Button)sender).Name)
@@ -336,18 +494,29 @@ namespace FAD3.Database.Forms
                         switch (_treeLevel)
                         {
                             case "root":
-                                if (_dataStatus == fad3DataStatus.statusFromDB)
+                                if (_dataStatus != fad3DataStatus.statusNew)
                                 {
                                     guid = _inventoryGuid;
                                 }
                                 success = _inventory.SaveFishingGearInventory(_dataStatus, txtInventoryName.Text, DateTime.Parse(txtDateImplemented.Text), guid);
+                                if (success)
+                                {
+                                    if (_dataStatus == fad3DataStatus.statusNew)
+                                    {
+                                        _parentForm.RefreshMainInventory();
+                                    }
+                                    else if (_dataStatus == fad3DataStatus.statusEdited)
+                                    {
+                                        _parentForm.RefreshMainInventory(txtInventoryName.Text);
+                                    }
+                                }
                                 break;
 
                             case "targetAreaInventory":
                             case "province":
                             case "municipality":
                             case "barangay":
-                                if (_dataStatus == fad3DataStatus.statusFromDB)
+                                if (_dataStatus != fad3DataStatus.statusNew)
                                 {
                                     guid = _barangayInventoryGuid;
                                 }
@@ -356,14 +525,14 @@ namespace FAD3.Database.Forms
                                                                            int.Parse(txtCountMotorized.Text), int.Parse(txtCountNonMotorized.Text),
                                                                            guid, txtSitio.Text);
 
-                                _parentForm.RefreshSitioLevelInventory(comboProvince.Text, comboMunicipality.Text, comboBarangays.Text);
+                                if (success) _parentForm.RefreshSitioLevelInventory(comboProvince.Text, comboMunicipality.Text, comboBarangays.Text, txtSitio.Text);
                                 break;
 
                             case "sitio":
 
-                                if (_dataStatus == fad3DataStatus.statusFromDB)
+                                if (_dataStatus != fad3DataStatus.statusNew)
                                 {
-                                    guid = _barangayInventoryGuid;
+                                    guid = _gearInventoryGuid;
                                 }
 
                                 List<string> listGearLocalNameGuids = new List<string>();
@@ -431,7 +600,7 @@ namespace FAD3.Database.Forms
 
                                     && _inventory.SaveSitioGearInventoryHistoricalCPUE(guid, listHistoryCPUE);
 
-                                _parentForm.RefreshSitioGearInventory();
+                                if (success) _parentForm.RefreshSitioGearInventory(guid, _dataStatus == fad3DataStatus.statusNew);
                                 break;
                         }
 
@@ -449,15 +618,18 @@ namespace FAD3.Database.Forms
                 case "btnAddLocalName":
                     if (cboSelectGearLocalName.Text.Length > 0)
                     {
-                        if (!listBoxGearLocalNames.Items.Contains(cboSelectGearLocalName.SelectedItem))
+                        if (cboSelectGearLocalName.SelectedItem != null)
                         {
-                            listBoxGearLocalNames.Items.Add(cboSelectGearLocalName.SelectedItem);
+                            if (!listBoxGearLocalNames.Items.Contains(cboSelectGearLocalName.SelectedItem))
+                            {
+                                listBoxGearLocalNames.Items.Add(cboSelectGearLocalName.SelectedItem);
+                            }
+                            else
+                            {
+                                MessageBox.Show("Item already in the list");
+                            }
+                            cboSelectGearLocalName.SelectedIndex = -1;
                         }
-                        else
-                        {
-                            MessageBox.Show("Item already in the list");
-                        }
-                        cboSelectGearLocalName.SelectedIndex = -1;
                     }
                     break;
 
@@ -548,10 +720,15 @@ namespace FAD3.Database.Forms
                             else if (yearDiff > 1)
                             {
                                 showError = false;
-                                var dialogResult = MessageBox.Show($"Accept this date of more than {yearDiff} year?", "Accept past date", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                                var dialogResult = MessageBox.Show($"This date is more than {yearDiff} {(yearDiff == 1 ? "year" : "years")} ago.\r\nDo you want to accept this date?", "Accept past date", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
                                 e.Cancel = dialogResult != DialogResult.Yes;
                             }
                         }
+                        break;
+
+                    case "txtSitio":
+                        e.Cancel = _sitios.Contains(txtSitio.Text);
+                        msg = "Sitio is already listed";
                         break;
 
                     //all textboxes will receive an int
@@ -580,23 +757,23 @@ namespace FAD3.Database.Forms
                                 e.Cancel = v < 0;
                                 msg = "Cannot accept values less than zero";
 
-                                if (ctlName == "txtCommercialUsage")
-                                {
-                                    e.Cancel = v > _countCommercial;
-                                    msg = $"Gear distribution in commercial vessels ({v}) must not be more than total number of commercial vessels ({_countCommercial})";
-                                }
+                                //if (ctlName == "txtCommercialUsage")
+                                //{
+                                //    e.Cancel = v > _countCommercial;
+                                //    msg = $"Gear distribution in commercial vessels ({v}) must not be more than total number of commercial vessels ({_countCommercial})";
+                                //}
 
-                                if (ctlName == "txtMunicipalMotorizedUsage")
-                                {
-                                    e.Cancel = v > _countMunicipalMotorized;
-                                    msg = $"Gear distribution in municipal motorized vessels ({v}) must not be more than total number of municipal motorized vessels ({_countMunicipalMotorized})";
-                                }
+                                //if (ctlName == "txtMunicipalMotorizedUsage")
+                                //{
+                                //    e.Cancel = v > _countMunicipalMotorized;
+                                //    msg = $"Gear distribution in municipal motorized vessels ({v}) must not be more than total number of municipal motorized vessels ({_countMunicipalMotorized})";
+                                //}
 
-                                if (ctlName == "txtMunicipalNonMotorizedUsage")
-                                {
-                                    e.Cancel = v > _countMunicipalNonMotorized;
-                                    msg = $"Gear distribution in municipal non-motorized vessels ({v}) must not be more than total number of municipal non-motorized vessels ({_countMunicipalNonMotorized})";
-                                }
+                                //if (ctlName == "txtMunicipalNonMotorizedUsage")
+                                //{
+                                //    e.Cancel = v > _countMunicipalNonMotorized;
+                                //    msg = $"Gear distribution in municipal non-motorized vessels ({v}) must not be more than total number of municipal non-motorized vessels ({_countMunicipalNonMotorized})";
+                                //}
                             }
                             else if (ctlName == "txtNumberOfDaysPerMonth")
                             {
@@ -682,14 +859,75 @@ namespace FAD3.Database.Forms
             }
         }
 
+        private bool ComboItemsContains(ComboBox cbo, string itemName)
+        {
+            bool isContaining = false;
+            foreach (KeyValuePair<string, string> kv in cbo.Items)
+            {
+                isContaining = kv.Value == itemName;
+                if (isContaining)
+                {
+                    return isContaining;
+                }
+            }
+            return false;
+        }
+
         private void OnComboValidating(object sender, CancelEventArgs e)
         {
             var s = ((ComboBox)sender).Text;
+            var cbo = (ComboBox)sender;
             var msg = "";
             if (s.Length > 0)
             {
                 switch (((ComboBox)sender).Name)
                 {
+                    case "cboCatchLocalName":
+                        if (!ComboItemsContains(cbo, s))
+                        {
+                            msg = $"{s} is not in the list of catch local names.\r\nDo you want to add a new local name?";
+                            if (MessageBox.Show(msg, "New catch local name", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
+                            {
+                                var result = NewNameForm.Show(s, FisheryObjectNameType.CatchLocalName, this);
+                                e.Cancel = result != DialogResult.OK;
+                            }
+                            else
+                            {
+                                e.Cancel = true;
+                            }
+                        }
+                        break;
+
+                    case "cboSelectGearLocalName":
+                        if (!ComboItemsContains(cbo, s))
+                        {
+                            msg = $"{s} is not in the list of gear local names.\r\nDo you want to add a new local name?";
+                            if (MessageBox.Show(msg, "New gear local name", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
+                            {
+                                NewNameForm nlf = new NewNameForm(s, FisheryObjectNameType.GearLocalName, this);
+                                nlf.ShowDialog(this);
+                            }
+                            else
+                            {
+                                e.Cancel = true;
+                            }
+                        }
+                        break;
+
+                    case "cboGearVariation":
+                        if (!ComboItemsContains(cbo, s))
+                        {
+                            msg = $"{s} is not in the list of gear variations.\r\nDo you want to add a new gear?";
+                            if (MessageBox.Show(msg, "New gear variation", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
+                            {
+                            }
+                            else
+                            {
+                                e.Cancel = true;
+                            }
+                        }
+                        break;
+
                     case "comboBarangays":
                         if (!comboBarangays.Items.Contains(s))
                         {
@@ -705,6 +943,11 @@ namespace FAD3.Database.Forms
                             }
                         }
                         break;
+                }
+                if (!e.Cancel)
+                {
+                    _sitios.Clear();
+                    _sitios = _inventory.GetBarangaySitios(comboProvince.Text, comboMunicipality.Text, s);
                 }
             }
         }
@@ -754,6 +997,7 @@ namespace FAD3.Database.Forms
                 {
                     chkListBoxMonthsUsed.SetItemChecked(n, true);
                 }
+                chkListBoxMonthsSeason.Enabled = true;
             }
         }
 
@@ -769,20 +1013,30 @@ namespace FAD3.Database.Forms
                 case "cboSelectGearLocalName":
                     if (e.KeyData == Keys.Enter && cboSelectGearLocalName.Text.Length > 0)
                     {
-                        OnButtonClick(btnAddLocalName, null);
+                        CancelEventArgs ee = new CancelEventArgs(false);
+                        OnComboValidating(cboSelectGearLocalName, ee);
+                        if (!ee.Cancel)
+                        {
+                            OnButtonClick(btnAddLocalName, null);
+                        }
                     }
                     break;
 
                 case "cboCatchLocalName":
                     if (e.KeyData == Keys.Enter && cboCatchLocalName.Text.Length > 0)
                     {
-                        if (_activeCatchCompList.Name == "listBoxDominantCatch")
+                        CancelEventArgs ee = new CancelEventArgs(false);
+                        OnComboValidating(cboCatchLocalName, ee);
+                        if (!ee.Cancel)
                         {
-                            OnButtonClick(btnAddDominant, null);
-                        }
-                        else
-                        {
-                            OnButtonClick(btnAddOther, null);
+                            if (_activeCatchCompList.Name == "listBoxDominantCatch")
+                            {
+                                OnButtonClick(btnAddDominant, null);
+                            }
+                            else
+                            {
+                                OnButtonClick(btnAddOther, null);
+                            }
                         }
                     }
                     break;
@@ -792,6 +1046,52 @@ namespace FAD3.Database.Forms
         private void OnFormClosed(object sender, FormClosedEventArgs e)
         {
             global.SaveFormSettings(this);
+        }
+
+        private void OnCheckListValidating(object sender, CancelEventArgs e)
+        {
+            switch (((CheckedListBox)sender).Name)
+            {
+                case "chkListBoxMonthsUsed":
+                    break;
+
+                case "chkListBoxMonthsSeason":
+                    if (chkListBoxMonthsSeason.CheckedIndices.Count > 0)
+                    {
+                        var isFound = false;
+                        foreach (int seasonMonth in chkListBoxMonthsSeason.CheckedIndices)
+                        {
+                            isFound = false;
+                            foreach (int fishingMonth in chkListBoxMonthsUsed.CheckedIndices)
+                            {
+                                if (seasonMonth == fishingMonth)
+                                {
+                                    isFound = true;
+                                    break;
+                                }
+                            }
+                            if (!isFound) break;
+                        }
+                        e.Cancel = !isFound;
+                        if (e.Cancel)
+                        {
+                            MessageBox.Show("A peak season month is not found in month(s) of operation", "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                    }
+                    break;
+            }
+        }
+
+        private void OnCheckListMouseUp(object sender, MouseEventArgs e)
+        {
+            chkListBoxMonthsSeason.Enabled = chkListBoxMonthsUsed.CheckedIndices.Count > 0;
+            if (chkListBoxMonthsUsed.CheckedIndices.Count == 0 && chkListBoxMonthsSeason.CheckedIndices.Count > 0)
+            {
+                foreach (int item in chkListBoxMonthsSeason.CheckedIndices)
+                {
+                    chkListBoxMonthsSeason.SetItemChecked(item, false);
+                }
+            }
         }
     }
 }

@@ -18,6 +18,7 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using FAD3.Database.Forms;
+using FAD3.Database.Classes;
 using FAD3.GUI.Classes;
 
 //using dao;
@@ -876,6 +877,20 @@ namespace FAD3
             }
         }
 
+        private void SetInventoryWindow(string inventoryGuid = "")
+        {
+            var gearInventoryForm = GearInventoryForm.GetInstance(_aoi, inventoryGuid);
+
+            if (gearInventoryForm.Visible)
+            {
+                gearInventoryForm.BringToFront();
+            }
+            else
+            {
+                gearInventoryForm.Show(this);
+            }
+        }
+
         private void OnMenuDropDown_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
             var ItemName = e.ClickedItem.Name;
@@ -939,15 +954,16 @@ namespace FAD3
                     break;
 
                 case "menuGearInventory":
-                    var gearInventoryForm = GearInventoryForm.GetInstance(_aoi);
-                    if (gearInventoryForm.Visible)
-                    {
-                        gearInventoryForm.BringToFront();
-                    }
-                    else
-                    {
-                        gearInventoryForm.Show(this);
-                    }
+                    //var gearInventoryForm = GearInventoryForm.GetInstance(_aoi);
+                    //if (gearInventoryForm.Visible)
+                    //{
+                    //    gearInventoryForm.BringToFront();
+                    //}
+                    //else
+                    //{
+                    //    gearInventoryForm.Show(this);
+                    //}
+                    SetInventoryWindow();
                     break;
 
                 case "menuNewTargetArea":
@@ -1249,6 +1265,10 @@ namespace FAD3
                                             var nd = treeMain.SelectedNode.Nodes[item.Name];
                                             treeMain.SelectedNode = nd;
                                             nd.Expand();
+                                        }
+                                        else if (item.Tag.ToString() == "inventory" && item.SubItems[1].Text != "0")
+                                        {
+                                            SetInventoryWindow(item.Name);
                                         }
                                     }
                                     break;
@@ -2290,6 +2310,31 @@ namespace FAD3
                         lvi.Tag = "landingSite";
                         i++;
                     }
+
+                    //add fishery inventories
+                    n = 0;
+                    var inventory = new FishingGearInventory(_aoi);
+                    lvMain.Items.Add("");
+                    lvi = lvMain.Items.Add("Fishery inventories");
+                    if (inventory.Inventories.Count > 0)
+                    {
+                        foreach (var item in inventory.Inventories)
+                        {
+                            if (n > 0)
+                            {
+                                lvi = lvMain.Items.Add("");
+                            }
+                            lvi.Name = item.Key;
+                            lvi.SubItems.Add(item.Value.InventoryName);
+                            lvi.Tag = "inventory";
+                            n++;
+                        }
+                    }
+                    else
+                    {
+                        lvi.SubItems.Add("0");
+                    }
+
                     break;
 
                 case "landing_site":

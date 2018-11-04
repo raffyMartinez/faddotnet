@@ -63,11 +63,13 @@ namespace FAD3
             this.referenceNumberRangeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.coordinateFormatToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.symbolFontsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.showErrorMessagesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.generateInlandDbToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.generateGridMapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.uTMZone50ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.uTMZone51ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.showErrorMessagesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.generateInlandDbToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.cholorophyllGridMappingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.onlineManualToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -84,8 +86,6 @@ namespace FAD3
             this.tsButtonReport = new System.Windows.Forms.ToolStripButton();
             this.tsButtonMap = new System.Windows.Forms.ToolStripButton();
             this.tsButtonExit = new System.Windows.Forms.ToolStripButton();
-            this.cholorophyllGridMappingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -154,7 +154,7 @@ namespace FAD3
             // imageList16
             // 
             this.imageList16.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList16.ImageStream")));
-            this.imageList16.TransparentColor = System.Drawing.Color.Transparent;
+            this.imageList16.TransparentColor = System.Drawing.Color.White;
             this.imageList16.Images.SetKeyName(0, "AOI");
             this.imageList16.Images.SetKeyName(1, "LandingSite");
             this.imageList16.Images.SetKeyName(2, "MonthGear");
@@ -166,6 +166,17 @@ namespace FAD3
             this.imageList16.Images.SetKeyName(8, "seines");
             this.imageList16.Images.SetKeyName(9, "traps");
             this.imageList16.Images.SetKeyName(10, "db");
+            this.imageList16.Images.SetKeyName(11, "lev1");
+            this.imageList16.Images.SetKeyName(12, "lev2");
+            this.imageList16.Images.SetKeyName(13, "lev3");
+            this.imageList16.Images.SetKeyName(14, "lev4");
+            this.imageList16.Images.SetKeyName(15, "Level01");
+            this.imageList16.Images.SetKeyName(16, "Level02");
+            this.imageList16.Images.SetKeyName(17, "Level03");
+            this.imageList16.Images.SetKeyName(18, "Level04");
+            this.imageList16.Images.SetKeyName(19, "Level05");
+            this.imageList16.Images.SetKeyName(20, "LayoutTransform");
+            this.imageList16.Images.SetKeyName(21, "ListFolder");
             // 
             // labelErrorDetail
             // 
@@ -378,6 +389,26 @@ namespace FAD3
             this.symbolFontsToolStripMenuItem.Tag = "symbolFonts";
             this.symbolFontsToolStripMenuItem.Text = "Symbol fonts";
             // 
+            // showErrorMessagesToolStripMenuItem
+            // 
+            this.showErrorMessagesToolStripMenuItem.Name = "showErrorMessagesToolStripMenuItem";
+            this.showErrorMessagesToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
+            this.showErrorMessagesToolStripMenuItem.Tag = "showError";
+            this.showErrorMessagesToolStripMenuItem.Text = "Show error messages";
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(215, 6);
+            // 
+            // generateInlandDbToolStripMenuItem
+            // 
+            this.generateInlandDbToolStripMenuItem.Name = "generateInlandDbToolStripMenuItem";
+            this.generateInlandDbToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
+            this.generateInlandDbToolStripMenuItem.Tag = "createInland";
+            this.generateInlandDbToolStripMenuItem.Text = "Create inland grid database";
+            this.generateInlandDbToolStripMenuItem.ToolTipText = "Creates a database containing minor grids that are located inland";
+            // 
             // generateGridMapToolStripMenuItem
             // 
             this.generateGridMapToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -402,20 +433,13 @@ namespace FAD3
             this.uTMZone51ToolStripMenuItem.Tag = "zone51";
             this.uTMZone51ToolStripMenuItem.Text = "UTM zone 51";
             // 
-            // showErrorMessagesToolStripMenuItem
+            // cholorophyllGridMappingToolStripMenuItem
             // 
-            this.showErrorMessagesToolStripMenuItem.Name = "showErrorMessagesToolStripMenuItem";
-            this.showErrorMessagesToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
-            this.showErrorMessagesToolStripMenuItem.Tag = "showError";
-            this.showErrorMessagesToolStripMenuItem.Text = "Show error messages";
-            // 
-            // generateInlandDbToolStripMenuItem
-            // 
-            this.generateInlandDbToolStripMenuItem.Name = "generateInlandDbToolStripMenuItem";
-            this.generateInlandDbToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
-            this.generateInlandDbToolStripMenuItem.Tag = "createInland";
-            this.generateInlandDbToolStripMenuItem.Text = "Create inland grid database";
-            this.generateInlandDbToolStripMenuItem.ToolTipText = "Creates a database containing minor grids that are located inland";
+            this.cholorophyllGridMappingToolStripMenuItem.Enabled = false;
+            this.cholorophyllGridMappingToolStripMenuItem.Name = "cholorophyllGridMappingToolStripMenuItem";
+            this.cholorophyllGridMappingToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
+            this.cholorophyllGridMappingToolStripMenuItem.Tag = "chlorophyll";
+            this.cholorophyllGridMappingToolStripMenuItem.Text = "Cholorophyll grid mapping";
             // 
             // menuHelp
             // 
@@ -583,19 +607,6 @@ namespace FAD3
             this.tsButtonExit.Size = new System.Drawing.Size(28, 28);
             this.tsButtonExit.Text = "toolStripButton6";
             this.tsButtonExit.ToolTipText = "Exit";
-            // 
-            // cholorophyllGridMappingToolStripMenuItem
-            // 
-            this.cholorophyllGridMappingToolStripMenuItem.Enabled = false;
-            this.cholorophyllGridMappingToolStripMenuItem.Name = "cholorophyllGridMappingToolStripMenuItem";
-            this.cholorophyllGridMappingToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
-            this.cholorophyllGridMappingToolStripMenuItem.Tag = "chlorophyll";
-            this.cholorophyllGridMappingToolStripMenuItem.Text = "Cholorophyll grid mapping";
-            // 
-            // toolStripSeparator2
-            // 
-            this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(215, 6);
             // 
             // MainForm
             // 

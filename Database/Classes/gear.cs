@@ -6,6 +6,7 @@ using System.Data;
 using System.Data.OleDb;
 using System.Windows.Forms;
 using MetaphoneCOM;
+using FAD3.Database.Classes;
 
 namespace FAD3
 {
@@ -59,6 +60,49 @@ namespace FAD3
         {
             get { return _GearVarGUID; }
             set { _GearVarGUID = value; }
+        }
+
+        public static bool SaveNewLocalName(NewFisheryObjectName newName)
+        {
+            bool success = false;
+            var newLocalName = newName.NewName;
+            var key1 = newName.Key1;
+            var key2 = newName.Key2;
+            var guid = newName.ObjectGUID;
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                var sql = $@"Insert into tblBaseLocalNames (LocalName, LocalNameGUID, MPH1,MPH2) values
+                        ('{newLocalName}', {{{guid}}},{key1},{key2})";
+                using (OleDbCommand update = new OleDbCommand(sql, conn))
+                {
+                    success = update.ExecuteNonQuery() > 0;
+                }
+            }
+            return success;
+        }
+
+        public static Dictionary<string, string> GetSimilarSoundingLocalNames(NewFisheryObjectName newName)
+        {
+            var key1 = newName.Key1;
+            var key2 = newName.Key2;
+            Dictionary<string, string> similarNames = new Dictionary<string, string>();
+            var sql = $@"SELECT tblGearLocalNames.LocalNameGUID, tblGearLocalNames.LocalName
+                         FROM tblGearLocalNames
+                         WHERE tblGearLocalNames.MPH1={key1} AND tblGearLocalNames.MPH2={key2}";
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                var adapter = new OleDbDataAdapter(sql, conn);
+                DataTable dt = new DataTable();
+                adapter.Fill(dt);
+                if (dt.Rows.Count > 0)
+                {
+                    DataRow dr = dt.Rows[0];
+                    similarNames.Add(dr["LocalNameGUID"].ToString(), dr["LocalName"].ToString());
+                }
+            }
+            return similarNames;
         }
 
         public static List<(int year, int count)> GearUseCountInTargetArea(string aoiGuid, string gearVarGuid)

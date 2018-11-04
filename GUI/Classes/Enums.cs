@@ -1,5 +1,12 @@
 ﻿namespace FAD3.GUI.Classes
 {
+    public enum FisheryObjectNameType
+    {
+        CatchLocalName,
+        GearLocalName,
+        GearVariationName
+    }
+
     public enum UIControlType
     {
         TextBox,

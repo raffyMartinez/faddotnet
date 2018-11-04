@@ -141,6 +141,7 @@
             // 
             // btnCancel
             // 
+            this.btnCancel.CausesValidation = false;
             this.btnCancel.Location = new System.Drawing.Point(249, 462);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(55, 26);
@@ -180,7 +181,7 @@
             this.txtDateImplemented.Location = new System.Drawing.Point(83, 71);
             this.txtDateImplemented.Name = "txtDateImplemented";
             this.txtDateImplemented.Size = new System.Drawing.Size(105, 20);
-            this.txtDateImplemented.TabIndex = 3;
+            this.txtDateImplemented.TabIndex = 1;
             this.txtDateImplemented.Validating += new System.ComponentModel.CancelEventHandler(this.OnTextBoxValidating);
             // 
             // pnlInventory
@@ -217,11 +218,13 @@
             // 
             // comboBarangays
             // 
+            this.comboBarangays.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.comboBarangays.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.comboBarangays.FormattingEnabled = true;
             this.comboBarangays.Location = new System.Drawing.Point(83, 70);
             this.comboBarangays.Name = "comboBarangays";
             this.comboBarangays.Size = new System.Drawing.Size(161, 21);
-            this.comboBarangays.TabIndex = 16;
+            this.comboBarangays.TabIndex = 2;
             this.comboBarangays.Validating += new System.ComponentModel.CancelEventHandler(this.OnComboValidating);
             // 
             // groupBox1
@@ -271,21 +274,21 @@
             this.txtCountCommercial.Location = new System.Drawing.Point(75, 30);
             this.txtCountCommercial.Name = "txtCountCommercial";
             this.txtCountCommercial.Size = new System.Drawing.Size(68, 20);
-            this.txtCountCommercial.TabIndex = 14;
+            this.txtCountCommercial.TabIndex = 5;
             // 
             // txtCountNonMotorized
             // 
             this.txtCountNonMotorized.Location = new System.Drawing.Point(256, 66);
             this.txtCountNonMotorized.Name = "txtCountNonMotorized";
             this.txtCountNonMotorized.Size = new System.Drawing.Size(68, 20);
-            this.txtCountNonMotorized.TabIndex = 14;
+            this.txtCountNonMotorized.TabIndex = 7;
             // 
             // txtCountMotorized
             // 
             this.txtCountMotorized.Location = new System.Drawing.Point(75, 66);
             this.txtCountMotorized.Name = "txtCountMotorized";
             this.txtCountMotorized.Size = new System.Drawing.Size(68, 20);
-            this.txtCountMotorized.TabIndex = 12;
+            this.txtCountMotorized.TabIndex = 6;
             // 
             // label7
             // 
@@ -300,14 +303,15 @@
             this.txtCountFishers.Location = new System.Drawing.Point(83, 133);
             this.txtCountFishers.Name = "txtCountFishers";
             this.txtCountFishers.Size = new System.Drawing.Size(68, 20);
-            this.txtCountFishers.TabIndex = 10;
+            this.txtCountFishers.TabIndex = 4;
             // 
             // txtSitio
             // 
             this.txtSitio.Location = new System.Drawing.Point(83, 97);
             this.txtSitio.Name = "txtSitio";
             this.txtSitio.Size = new System.Drawing.Size(161, 20);
-            this.txtSitio.TabIndex = 8;
+            this.txtSitio.TabIndex = 3;
+            this.txtSitio.Validating += new System.ComponentModel.CancelEventHandler(this.OnTextBoxValidating);
             // 
             // label6
             // 
@@ -338,11 +342,13 @@
             // 
             // comboMunicipality
             // 
+            this.comboMunicipality.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.comboMunicipality.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.comboMunicipality.FormattingEnabled = true;
             this.comboMunicipality.Location = new System.Drawing.Point(83, 44);
             this.comboMunicipality.Name = "comboMunicipality";
             this.comboMunicipality.Size = new System.Drawing.Size(161, 21);
-            this.comboMunicipality.TabIndex = 3;
+            this.comboMunicipality.TabIndex = 1;
             this.comboMunicipality.SelectedIndexChanged += new System.EventHandler(this.OnComboSelectedIndexChanged);
             // 
             // label3
@@ -356,6 +362,8 @@
             // 
             // comboProvince
             // 
+            this.comboProvince.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.comboProvince.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.comboProvince.FormattingEnabled = true;
             this.comboProvince.Location = new System.Drawing.Point(83, 17);
             this.comboProvince.Name = "comboProvince";
@@ -461,6 +469,7 @@
             this.cboSelectGearLocalName.Size = new System.Drawing.Size(165, 21);
             this.cboSelectGearLocalName.TabIndex = 6;
             this.cboSelectGearLocalName.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnComboKeyDown);
+            this.cboSelectGearLocalName.Validating += new System.ComponentModel.CancelEventHandler(this.OnComboValidating);
             // 
             // tabUsage
             // 
@@ -624,11 +633,13 @@
             // chkListBoxMonthsSeason
             // 
             this.chkListBoxMonthsSeason.CheckOnClick = true;
+            this.chkListBoxMonthsSeason.Enabled = false;
             this.chkListBoxMonthsSeason.FormattingEnabled = true;
             this.chkListBoxMonthsSeason.Location = new System.Drawing.Point(206, 38);
             this.chkListBoxMonthsSeason.Name = "chkListBoxMonthsSeason";
             this.chkListBoxMonthsSeason.Size = new System.Drawing.Size(127, 184);
             this.chkListBoxMonthsSeason.TabIndex = 1;
+            this.chkListBoxMonthsSeason.Validating += new System.ComponentModel.CancelEventHandler(this.OnCheckListValidating);
             // 
             // chkListBoxMonthsUsed
             // 
@@ -638,6 +649,7 @@
             this.chkListBoxMonthsUsed.Name = "chkListBoxMonthsUsed";
             this.chkListBoxMonthsUsed.Size = new System.Drawing.Size(127, 184);
             this.chkListBoxMonthsUsed.TabIndex = 0;
+            this.chkListBoxMonthsUsed.MouseUp += new System.Windows.Forms.MouseEventHandler(this.OnCheckListMouseUp);
             // 
             // tabCPUE
             // 
@@ -666,6 +678,9 @@
             // 
             // cboCatchUnit
             // 
+            this.cboCatchUnit.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.cboCatchUnit.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.cboCatchUnit.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboCatchUnit.FormattingEnabled = true;
             this.cboCatchUnit.Location = new System.Drawing.Point(81, 16);
             this.cboCatchUnit.Name = "cboCatchUnit";
@@ -918,12 +933,15 @@
             // 
             // cboCatchLocalName
             // 
+            this.cboCatchLocalName.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.cboCatchLocalName.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.cboCatchLocalName.FormattingEnabled = true;
             this.cboCatchLocalName.Location = new System.Drawing.Point(121, 14);
             this.cboCatchLocalName.Name = "cboCatchLocalName";
             this.cboCatchLocalName.Size = new System.Drawing.Size(147, 21);
             this.cboCatchLocalName.TabIndex = 11;
             this.cboCatchLocalName.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnComboKeyDown);
+            this.cboCatchLocalName.Validating += new System.ComponentModel.CancelEventHandler(this.OnComboValidating);
             // 
             // listBoxOtherCatch
             // 
@@ -956,12 +974,15 @@
             // 
             // cboGearVariation
             // 
+            this.cboGearVariation.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.cboGearVariation.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.cboGearVariation.FormattingEnabled = true;
             this.cboGearVariation.Location = new System.Drawing.Point(83, 43);
             this.cboGearVariation.Name = "cboGearVariation";
             this.cboGearVariation.Size = new System.Drawing.Size(165, 21);
             this.cboGearVariation.TabIndex = 4;
             this.cboGearVariation.SelectedIndexChanged += new System.EventHandler(this.OnComboSelectedIndexChanged);
+            this.cboGearVariation.Validating += new System.ComponentModel.CancelEventHandler(this.OnComboValidating);
             // 
             // label11
             // 
@@ -974,6 +995,9 @@
             // 
             // cboGearClass
             // 
+            this.cboGearClass.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.cboGearClass.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.cboGearClass.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboGearClass.FormattingEnabled = true;
             this.cboGearClass.Location = new System.Drawing.Point(83, 14);
             this.cboGearClass.Name = "cboGearClass";

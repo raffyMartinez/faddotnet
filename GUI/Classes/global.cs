@@ -611,6 +611,58 @@ namespace FAD3
             }
         }
 
+        public static (string province, string municipality) ProvinceMunicipalityNamesFromMunicipalityNumber(int munNumber)
+        {
+            string province = "";
+            string municipality = "";
+
+            var myDT = new DataTable();
+            using (var conection = new OleDbConnection(_ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    string query = $@"SELECT Provinces.ProvinceName, Municipalities.Municipality
+                                    FROM Provinces INNER JOIN Municipalities ON Provinces.ProvNo = Municipalities.ProvNo
+                                    WHERE Municipalities.MunNo = {munNumber}";
+
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(myDT);
+                    _munDict.Clear();
+
+                    DataRow dr = myDT.Rows[0];
+                    province = dr["ProvinceName"].ToString();
+                    municipality = dr["Municipality"].ToString();
+                }
+                catch (Exception ex) { Logger.Log(ex); }
+            }
+
+            return (province, municipality);
+        }
+
+        public static int MunicipalityNumberFromString(string province, string municipality)
+        {
+            using (var conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                string sql = $@"SELECT Municipalities.MunNo
+                      FROM Provinces INNER JOIN Municipalities ON Provinces.ProvNo = Municipalities.ProvNo
+                      WHERE Provinces.ProvinceName='{province}' AND Municipalities.Municipality='{municipality}'";
+
+                using (OleDbCommand getMunNumber = new OleDbCommand(sql, conn))
+                {
+                    try
+                    {
+                        return (int)getMunNumber.ExecuteScalar();
+                    }
+                    catch
+                    {
+                        return 0;
+                    }
+                }
+            }
+        }
+
         private static void GetVesselTypes()
         {
             _VesselTypeDict.Clear();
