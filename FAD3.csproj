@@ -773,6 +773,12 @@
   <ItemGroup>
     <Content Include="Fatcow-Farm-Fresh-Book-key.ico" />
     <Content Include="Icon1.ico" />
+    <None Include="Resources\netMed.png" />
+    <None Include="Resources\paddle.png" />
+    <None Include="Resources\propMed.png" />
+    <None Include="Resources\propLarge.png" />
+    <None Include="Resources\SmallProp.bmp" />
+    <None Include="Resources\SmallProp.png" />
     <None Include="Resources\ListFolder_16x.png" />
     <None Include="Resources\LayoutTransform_16x.png" />
     <None Include="Resources\Level06_16x.png" />
@@ -813,6 +819,11 @@
     <None Include="Resources\AddFolder_16x.png" />
     <None Include="Resources\AddFile_16x.png" />
     <None Include="Resources\AddBehavior_16x.png" />
+    <None Include="Resources\Actor_16xMD.png" />
+    <None Include="Resources\Actor_16x.png" />
+    <None Include="Resources\Actor_16xSM.png" />
+    <None Include="Resources\BigProp.png" />
+    <Content Include="Resources\BigProp.bmp" />
     <Content Include="Resources\clear_selection.bmp" />
     <None Include="Resources\document-save.bmp" />
     <None Include="Resources\fit.bmp" />

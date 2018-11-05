@@ -28,6 +28,7 @@ namespace FAD3.Database.Forms
         private TreeNode _provinceNode;
         private bool _refreshSitioNumbers;
         private string _currentGearInventoryGuid;
+        private ListViewItem _listTargetHit;
 
         public static GearInventoryForm GetInstance(aoi aoi, string inventoryGuid = "")
         {
@@ -54,6 +55,7 @@ namespace FAD3.Database.Forms
         {
             lvInventory.View = View.Details;
             lvInventory.FullRowSelect = true;
+            lvInventory.SmallImageList = global.mainForm.treeImages;
         }
 
         private void OnFormLoad(object sender, EventArgs e)
@@ -63,6 +65,8 @@ namespace FAD3.Database.Forms
             var nd = treeInventory.Nodes.Add("root", "Fishery inventory");
             nd.ImageKey = "ListFolder";
             nd.Tag = "root";
+            nd.SelectedImageKey = nd.ImageKey;
+
             foreach (var item in _inventory.Inventories)
             {
                 var subNode = nd.Nodes.Add(item.Key, item.Value.InventoryName);
@@ -111,9 +115,12 @@ namespace FAD3.Database.Forms
                 sitio = "entireBarangay";
             }
             treeInventory.SelectedNode = e.Node.Nodes[province].Nodes[municipality].Nodes[barangay].Nodes[sitio];
-            treeInventory.SelectedNode.Tag = "sitio";
-            treeInventory.SelectedNode.SelectedImageKey = treeInventory.SelectedNode.ImageKey;
-            ConfigListView(treeInventory.SelectedNode);
+            if (treeInventory.SelectedNode != null)
+            {
+                treeInventory.SelectedNode.Tag = "sitio";
+                treeInventory.SelectedNode.SelectedImageKey = treeInventory.SelectedNode.ImageKey;
+                ConfigListView(treeInventory.SelectedNode);
+            }
         }
 
         private void OnTreeAfterExpand(object sender, TreeViewEventArgs e)
@@ -542,12 +549,16 @@ namespace FAD3.Database.Forms
                     _sitioCountMunicipalNonMotorized = numbers.nonMotorizedCount;
                     lvi = lvInventory.Items.Add("Number of fishers");
                     lvi.SubItems.Add(_sitioCountFishers.ToString());
+                    lvi.ImageKey = "Actor_16xMD";
                     lvi = lvInventory.Items.Add("Number of municipal motorized vessels");
                     lvi.SubItems.Add(_sitioCountMunicipalMotorized.ToString());
+                    lvi.ImageKey = "propMed";
                     lvi = lvInventory.Items.Add("Number of municipal non-motorized vessels");
                     lvi.SubItems.Add(_sitioCountMunicipalNonMotorized.ToString());
+                    lvi.ImageKey = "paddle";
                     lvi = lvInventory.Items.Add("Number of commercial vessels");
                     lvi.SubItems.Add(_sitioCountCommercial.ToString());
+                    lvi.ImageKey = "propLarge";
 
                     lvi = lvInventory.Items.Add("");
                     lvi = lvInventory.Items.Add("");
@@ -555,6 +566,7 @@ namespace FAD3.Database.Forms
                     {
                         lvi = lvInventory.Items.Add(item.Value.gearClass + "-" + item.Key);
                         lvi.SubItems.Add(item.Value.total.ToString());
+                        lvi.ImageKey = gear.GearClassImageKeyFromGearClasName(item.Value.gearClass);
                     }
 
                     _sitioNode = node;
@@ -641,33 +653,42 @@ namespace FAD3.Database.Forms
                     lvi.SubItems.Add(node.Text);
                     lvi = lvInventory.Items.Add("Date implemented");
                     lvi.SubItems.Add(string.Format("{0:MMM-dd-yyyy}", _inventory.Inventories[node.Name].DateConducted));
+                    lvi = lvInventory.Items.Add("Target area");
+                    lvi.SubItems.Add(_inventory.Inventories[node.Name].TargetArea);
                     lvi = lvInventory.Items.Add("");
 
                     lvi = lvInventory.Items.Add("Number of provinces");
                     lvi.SubItems.Add(node.Nodes.Count.ToString());
+                    lvi.ImageKey = "Level04";
                     var inventoryLevels = _inventory.NumberOfMunicipalitiesBarangays(node.Name);
                     lvi = lvInventory.Items.Add("Number of municipalities");
                     lvi.SubItems.Add(inventoryLevels.municipalityCount.ToString());
+                    lvi.ImageKey = "Level03";
                     lvi = lvInventory.Items.Add("Number of barangays");
                     lvi.SubItems.Add(inventoryLevels.barangayCount.ToString());
+                    lvi.ImageKey = "Level02";
                     break;
 
                 case "province":
                     var provinceLevels = _inventory.NumberOfMunicipalitiesBarangays(node.Parent.Name, node.Name);
                     lvi = lvInventory.Items.Add("Number of municipalities");
+                    lvi.ImageKey = "Level03";
                     lvi.SubItems.Add(provinceLevels.municipalityCount.ToString());
                     lvi = lvInventory.Items.Add("Number of barangays");
                     lvi.SubItems.Add(provinceLevels.barangayCount.ToString());
+                    lvi.ImageKey = "Level02";
                     break;
 
                 case "municipality":
                     lvi = lvInventory.Items.Add("Number of barangays");
                     lvi.SubItems.Add(_inventory.NumberOfBarangays(node.Parent.Parent.Name, node.Parent.Name, node.Name).ToString());
+                    lvi.ImageKey = "Level02";
                     break;
 
                 case "barangay":
                     lvi = lvInventory.Items.Add("Number of sitios");
                     lvi.SubItems.Add(_inventory.NumberOfSitio(node.Parent.Parent.Parent.Name, node.Parent.Parent.Name, node.Parent.Name, node.Name).ToString());
+                    lvi.ImageKey = "Level01";
                     break;
 
                 case "sitio":
@@ -676,43 +697,70 @@ namespace FAD3.Database.Forms
 
             lvi = lvInventory.Items.Add("Total number of fishers");
             lvi.SubItems.Add(fisherCount.ToString());
+            lvi.ImageKey = "Actor_16xMD";
             lvi = lvInventory.Items.Add("Total number of municipal motorized vessels");
             lvi.SubItems.Add(motorizedCount.ToString());
+            lvi.ImageKey = "propMed";
             lvi = lvInventory.Items.Add("Total number of municipal non-motorized vessels");
             lvi.SubItems.Add(nonMotorizedCount.ToString());
+            lvi.ImageKey = "paddle";
             lvi = lvInventory.Items.Add("Total number of commercial vessels");
             lvi.SubItems.Add(commercialCount.ToString());
+            lvi.ImageKey = "propLarge";
 
             if (_treeLevel == "municipality")
             {
+                var ngeCount = 0;
                 var currentBarangay = "";
                 var currentSitio = "";
                 var list = _inventory.GetBarangaysGearInventory(node.Parent.Parent.Name, node.Parent.Name, node.Name);
                 if (list.Count > 0)
                 {
                     lvi = lvInventory.Items.Add("");
-                    lvi = lvInventory.Items.Add("");
                     foreach (var item in list)
                     {
                         if (currentBarangay != item.barangay)
                         {
                             currentBarangay = item.barangay;
+                            lvi = lvInventory.Items.Add("");
                             lvi = lvInventory.Items.Add(currentBarangay);
+                            lvi.Tag = "barangay";
+                            lvi.ImageKey = "Level02";
                         }
                         if (currentSitio != item.sitio)
                         {
                             currentSitio = item.sitio;
                             if (item.sitio.Length > 0)
                             {
-                                lvi = lvInventory.Items.Add("   " + currentSitio);
+                                lvi = lvInventory.Items.Add("  " + currentSitio);
                             }
                             else
                             {
-                                lvi = lvInventory.Items.Add("   Entire barangay");
+                                lvi = lvInventory.Items.Add("  Entire barangay");
                             }
+                            lvi.ImageKey = "Level01";
+                            lvi.Tag = "sitio";
+                            lvi.Name = item.barangayInventoryGUID;
                         }
-                        lvi = lvInventory.Items.Add("         " + item.gearClass + "-" + item.gearVariation);
-                        lvi.SubItems.Add(item.total.ToString());
+                        if (item.gearClass != "" && item.gearVariation != "")
+                        {
+                            lvi = lvInventory.Items.Add("    " + item.gearClass + "-" + item.gearVariation);
+                            lvi.Name = (item.dataGuid);
+                            lvi.SubItems.Add(item.total.ToString());
+                            lvi.ImageKey = gear.GearClassImageKeyFromGearClasName(item.gearClass);
+                            lvi.Tag = "gearVariation";
+                        }
+                        else
+                        {
+                            lvi.SubItems.Add("NGI");
+                            ngeCount++;
+                        }
+                    }
+
+                    if (ngeCount > 0)
+                    {
+                        lvInventory.Items.Add("");
+                        lvInventory.Items.Add("NGI = No gears inventoried");
                     }
                 }
             }
@@ -724,6 +772,7 @@ namespace FAD3.Database.Forms
                 {
                     lvi = lvInventory.Items.Add(item.Value.gearClass + "-" + item.Key);
                     lvi.SubItems.Add(item.Value.total.ToString());
+                    lvi.ImageKey = gear.GearClassImageKeyFromGearClasName(item.Value.gearClass);
                 }
             }
         }
@@ -808,6 +857,21 @@ namespace FAD3.Database.Forms
                     inventoryEditForm.EditInventoryLevel(_currentGearInventoryGuid);
                     break;
 
+                case "municipality":
+                    if (_listTargetHit.Tag != null && _listTargetHit.Tag.ToString() == "gearVariation")
+                    {
+                        inventoryEditForm.EditInventoryLevel(_listTargetHit.Name);
+                    }
+                    else if (_listTargetHit.Tag != null && _listTargetHit.Tag.ToString() == "sitio")
+                    {
+                        return;
+                    }
+                    else
+                    {
+                        return;
+                    }
+                    break;
+
                 default:
                     inventoryEditForm = null;
                     return;
@@ -843,6 +907,11 @@ namespace FAD3.Database.Forms
                     }
                     break;
             }
+        }
+
+        private void OnMouseDown(object sender, MouseEventArgs e)
+        {
+            _listTargetHit = lvInventory.HitTest(e.X, e.Y).Item;
         }
     }
 }

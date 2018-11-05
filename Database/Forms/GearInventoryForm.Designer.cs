@@ -109,6 +109,7 @@
             this.lvInventory.TabIndex = 4;
             this.lvInventory.UseCompatibleStateImageBehavior = false;
             this.lvInventory.DoubleClick += new System.EventHandler(this.OnListViewDoubleClick);
+            this.lvInventory.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnMouseDown);
             // 
             // lblGuide
             // 

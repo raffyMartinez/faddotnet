@@ -12,7 +12,7 @@ namespace FAD3.Database.Classes
     public class FishingGearInventory
     {
         private Dictionary<string, (string Province, string Municipality, string barangay, string sitio)> _barangayInventories = new Dictionary<string, (string Province, string Municipality, string barangay, string sitio)>();
-        private Dictionary<string, (string InventoryName, DateTime DateConducted)> _inventories = new Dictionary<string, (string InventoryName, DateTime DateConducted)>();
+        private Dictionary<string, (string InventoryName, DateTime DateConducted, string TargetArea)> _inventories = new Dictionary<string, (string InventoryName, DateTime DateConducted, string TargetArea)>();
 
         public FishingGearInventory(aoi AOI)
         {
@@ -27,7 +27,7 @@ namespace FAD3.Database.Classes
             get { return _barangayInventories; }
         }
 
-        public Dictionary<string, (string InventoryName, DateTime DateConducted)> Inventories
+        public Dictionary<string, (string InventoryName, DateTime DateConducted, string TargetArea)> Inventories
         {
             get { return _inventories; }
         }
@@ -85,20 +85,60 @@ namespace FAD3.Database.Classes
         /// <param name="provinceName"></param>
         /// <param name="municipalityName"></param>
         /// <returns></returns>
-        public List<(string barangay, string sitio, string gearClass, string gearVariation, int total)> GetBarangaysGearInventory(string inventoryGuid, string provinceName, string municipalityName)
+        public List<(string barangay, string sitio, string gearClass, string gearVariation, string dataGuid, string barangayInventoryGUID, int total)>
+                GetBarangaysGearInventory(string inventoryGuid, string provinceName, string municipalityName)
         {
-            List<(string barangay, string sitio, string gearClass, string gearVariation, int total)> list = new List<(string barangay, string sitio, string gearClass, string gearVariation, int total)>();
-            var sql = $@"SELECT tblGearInventoryBarangay.Barangay, tblGearInventoryBarangay.Sitio, tblGearClass.GearClassName, tblGearVariations.Variation,
-                        Sum([t2].[CountCommercial]+[t2].[CountMunicipalMotorized]+[t2].[CountMunicipalNonMotorized]+[t2].[CountNoBoat]) AS Total
-                        FROM tblGearClass INNER JOIN (tblGearVariations INNER JOIN (((Provinces INNER JOIN Municipalities ON
-                            Provinces.ProvNo = Municipalities.ProvNo) INNER JOIN tblGearInventoryBarangay ON
-                            Municipalities.MunNo = tblGearInventoryBarangay.Municipality) INNER JOIN tblGearInventoryBarangayData AS t2 ON
-                            tblGearInventoryBarangay.BarangayInventoryGuid = t2.BarangayInventoryGUID) ON
-                            tblGearVariations.GearVarGUID = t2.GearVariation) ON tblGearClass.GearClass = tblGearVariations.GearClass
+            var rowsReturned = 0;
+            List<string> listedItems = new List<string>();
+
+            List<(string barangay, string sitio, string gearClass, string gearVariation, string dataGuid, string barangayInventoryGUID, int total)> list =
+                new List<(string barangay, string sitio, string gearClass, string gearVariation, string dataGuid, string barangayInventoryGUID, int total)>();
+
+            var sql = $@"SELECT tblGearInventoryBarangay.Barangay, tblGearInventoryBarangay.Sitio, tblGearClass.GearClassName,
+                           tblGearVariations.Variation, tblGearInventoryBarangay.BarangayInventoryGuid, t2.DataGuid,
+                           Sum([t2].[CountCommercial]+[t2].[CountMunicipalMotorized]+[t2].[CountMunicipalNonMotorized]+[t2].[CountNoBoat]) AS Total
+                        FROM (tblGearClass INNER JOIN tblGearVariations ON tblGearClass.GearClass = tblGearVariations.GearClass)
+                            INNER JOIN (((Provinces INNER JOIN Municipalities ON Provinces.ProvNo = Municipalities.ProvNo)
+                            INNER JOIN tblGearInventoryBarangay ON Municipalities.MunNo = tblGearInventoryBarangay.Municipality)
+                            INNER JOIN tblGearInventoryBarangayData AS t2 ON tblGearInventoryBarangay.BarangayInventoryGuid = t2.BarangayInventoryGUID)
+                            ON tblGearVariations.GearVarGUID = t2.GearVariation
                         WHERE tblGearInventoryBarangay.InventoryGuid={{{inventoryGuid}}}
-                            AND Provinces.ProvinceName='{provinceName}' AND Municipalities.Municipality= '{municipalityName}'
-                        GROUP BY tblGearInventoryBarangay.Barangay, tblGearInventoryBarangay.Sitio, tblGearClass.GearClassName, tblGearVariations.Variation
+                            AND Provinces.ProvinceName='{provinceName}' AND Municipalities.Municipality='{municipalityName}'
+                        GROUP BY tblGearInventoryBarangay.Barangay, tblGearInventoryBarangay.Sitio,
+                            tblGearClass.GearClassName, tblGearVariations.Variation, tblGearInventoryBarangay.BarangayInventoryGuid, t2.DataGuid
                         ORDER BY tblGearInventoryBarangay.Barangay, tblGearInventoryBarangay.Sitio, tblGearClass.GearClassName, tblGearVariations.Variation";
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                var dt = new DataTable();
+
+                try
+                {
+                    conection.Open();
+                    var adapter = new OleDbDataAdapter(sql, conection);
+                    adapter.Fill(dt);
+                    rowsReturned = dt.Rows.Count;
+                    for (int n = 0; n < dt.Rows.Count; n++)
+                    {
+                        DataRow dr = dt.Rows[n];
+                        listedItems.Add(dr["Barangay"].ToString() + dr["Sitio"].ToString());
+                        list.Add((dr["Barangay"].ToString(), dr["Sitio"].ToString(), dr["GearClassName"].ToString(),
+                                  dr["Variation"].ToString(), dr["DataGuid"].ToString(), dr["BarangayInventoryGuid"].ToString(), int.Parse(dr["Total"].ToString())));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex);
+                }
+            }
+
+            sql = $@"SELECT tblGearInventoryBarangay.Barangay, tblGearInventoryBarangay.Sitio,
+                    Sum([t2].[CountCommercial]+[t2].[CountMunicipalMotorized]+[t2].[CountMunicipalNonMotorized]+[t2].[CountNoBoat]) AS Total
+                    FROM ((Provinces INNER JOIN Municipalities ON Provinces.ProvNo = Municipalities.ProvNo) INNER JOIN tblGearInventoryBarangay ON Municipalities.MunNo = tblGearInventoryBarangay.Municipality) LEFT JOIN tblGearInventoryBarangayData AS t2 ON tblGearInventoryBarangay.BarangayInventoryGuid = t2.BarangayInventoryGUID
+                        WHERE tblGearInventoryBarangay.InventoryGuid={{{inventoryGuid}}} AND
+                        Provinces.ProvinceName='{provinceName}' AND Municipalities.Municipality='{municipalityName}'
+                    GROUP BY tblGearInventoryBarangay.Barangay, tblGearInventoryBarangay.Sitio
+                    ORDER BY tblGearInventoryBarangay.Barangay, tblGearInventoryBarangay.Sitio";
+
             using (var conection = new OleDbConnection(global.ConnectionString))
             {
                 var dt = new DataTable();
@@ -111,7 +151,10 @@ namespace FAD3.Database.Classes
                     for (int n = 0; n < dt.Rows.Count; n++)
                     {
                         DataRow dr = dt.Rows[n];
-                        list.Add((dr["Barangay"].ToString(), dr["Sitio"].ToString(), dr["GearClassName"].ToString(), dr["Variation"].ToString(), int.Parse(dr["Total"].ToString())));
+                        if (!listedItems.Contains(dr["Barangay"].ToString() + dr["Sitio"].ToString()))
+                        {
+                            list.Add((dr["Barangay"].ToString(), dr["Sitio"].ToString(), "", "", "", "", 0));
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -119,6 +162,7 @@ namespace FAD3.Database.Classes
                     Logger.Log(ex);
                 }
             }
+
             return list;
         }
 
@@ -1342,14 +1386,16 @@ namespace FAD3.Database.Classes
                 try
                 {
                     conection.Open();
-                    string query = $"SELECT InventoryGuid, InventoryName, DateConducted from tblGearInventories where TargetArea = {{{AOIGuid}}}";
+                    string query = $@"SELECT tblGearInventories.InventoryGuid, tblAOI.AOIName, tblGearInventories.InventoryName, tblGearInventories.DateConducted
+                                      FROM tblAOI INNER JOIN tblGearInventories ON tblAOI.AOIGuid = tblGearInventories.TargetArea
+                                      WHERE tblGearInventories.[TargetArea] ={{{AOIGuid}}}";
 
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
                     for (int i = 0; i < dt.Rows.Count; i++)
                     {
                         DataRow dr = dt.Rows[i];
-                        _inventories.Add(dr["InventoryGuid"].ToString(), (dr["InventoryName"].ToString(), (DateTime)dr["DateConducted"]));
+                        _inventories.Add(dr["InventoryGuid"].ToString(), (dr["InventoryName"].ToString(), (DateTime)dr["DateConducted"], dr["AOIName"].ToString()));
                     }
                 }
                 catch (Exception ex)

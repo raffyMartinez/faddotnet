@@ -161,22 +161,26 @@ namespace FAD3
             this.imageList16.Images.SetKeyName(3, "jigs");
             this.imageList16.Images.SetKeyName(4, "others");
             this.imageList16.Images.SetKeyName(5, "lines");
-            this.imageList16.Images.SetKeyName(6, "nets");
-            this.imageList16.Images.SetKeyName(7, "impound");
-            this.imageList16.Images.SetKeyName(8, "seines");
-            this.imageList16.Images.SetKeyName(9, "traps");
-            this.imageList16.Images.SetKeyName(10, "db");
-            this.imageList16.Images.SetKeyName(11, "lev1");
-            this.imageList16.Images.SetKeyName(12, "lev2");
-            this.imageList16.Images.SetKeyName(13, "lev3");
-            this.imageList16.Images.SetKeyName(14, "lev4");
-            this.imageList16.Images.SetKeyName(15, "Level01");
-            this.imageList16.Images.SetKeyName(16, "Level02");
-            this.imageList16.Images.SetKeyName(17, "Level03");
-            this.imageList16.Images.SetKeyName(18, "Level04");
-            this.imageList16.Images.SetKeyName(19, "Level05");
-            this.imageList16.Images.SetKeyName(20, "LayoutTransform");
-            this.imageList16.Images.SetKeyName(21, "ListFolder");
+            this.imageList16.Images.SetKeyName(6, "impound");
+            this.imageList16.Images.SetKeyName(7, "seines");
+            this.imageList16.Images.SetKeyName(8, "traps");
+            this.imageList16.Images.SetKeyName(9, "db");
+            this.imageList16.Images.SetKeyName(10, "lev1");
+            this.imageList16.Images.SetKeyName(11, "lev2");
+            this.imageList16.Images.SetKeyName(12, "lev3");
+            this.imageList16.Images.SetKeyName(13, "lev4");
+            this.imageList16.Images.SetKeyName(14, "Level01");
+            this.imageList16.Images.SetKeyName(15, "Level02");
+            this.imageList16.Images.SetKeyName(16, "Level03");
+            this.imageList16.Images.SetKeyName(17, "Level04");
+            this.imageList16.Images.SetKeyName(18, "Level05");
+            this.imageList16.Images.SetKeyName(19, "LayoutTransform");
+            this.imageList16.Images.SetKeyName(20, "ListFolder");
+            this.imageList16.Images.SetKeyName(21, "Actor_16xMD");
+            this.imageList16.Images.SetKeyName(22, "propLarge");
+            this.imageList16.Images.SetKeyName(23, "propMed");
+            this.imageList16.Images.SetKeyName(24, "paddle");
+            this.imageList16.Images.SetKeyName(25, "nets");
             // 
             // labelErrorDetail
             // 

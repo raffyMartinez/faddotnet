@@ -63,6 +63,36 @@ namespace FAD3.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Actor_16x {
+            get {
+                object obj = ResourceManager.GetObject("Actor_16x", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Actor_16xMD {
+            get {
+                object obj = ResourceManager.GetObject("Actor_16xMD", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Actor_16xSM {
+            get {
+                object obj = ResourceManager.GetObject("Actor_16xSM", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Add_16xSM {
             get {
                 object obj = ResourceManager.GetObject("Add_16xSM", resourceCulture);
@@ -668,6 +698,16 @@ namespace FAD3.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap netMed {
+            get {
+                object obj = ResourceManager.GetObject("netMed", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap nets {
             get {
                 object obj = ResourceManager.GetObject("nets", resourceCulture);
@@ -718,6 +758,16 @@ namespace FAD3.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap paddle {
+            get {
+                object obj = ResourceManager.GetObject("paddle", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap pan {
             get {
                 object obj = ResourceManager.GetObject("pan", resourceCulture);
@@ -731,6 +781,26 @@ namespace FAD3.Properties {
         internal static System.Drawing.Bitmap ProcedureMissing_16x {
             get {
                 object obj = ResourceManager.GetObject("ProcedureMissing_16x", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap propLarge {
+            get {
+                object obj = ResourceManager.GetObject("propLarge", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap propMed {
+            get {
+                object obj = ResourceManager.GetObject("propMed", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -771,6 +841,16 @@ namespace FAD3.Properties {
         internal static System.Drawing.Bitmap Seines {
             get {
                 object obj = ResourceManager.GetObject("Seines", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap SmallProp {
+            get {
+                object obj = ResourceManager.GetObject("SmallProp", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
