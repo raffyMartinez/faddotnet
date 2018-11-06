@@ -32,6 +32,7 @@ namespace FAD3
         private bool _isNew;
         private aoi _aoi;
         private TextBox _txtVesselDimension = new TextBox();
+        private string _newEngine = "";
 
         private string _vesLength = "";
         private string _vesWidth = "";
@@ -300,6 +301,13 @@ namespace FAD3
                             gear.GetGearClassEx((ComboBox)ctl);
                             break;
 
+                        case "Engine":
+                            foreach (var item in sampling.Engines)
+                            {
+                                ((ComboBox)ctl).Items.Add(item);
+                            }
+                            break;
+
                         case "FishingGear":
                             if (!_isNew)
                             {
@@ -327,8 +335,11 @@ namespace FAD3
                     }
                     ((ComboBox)ctl).With(o =>
                     {
-                        o.DisplayMember = "Value";
-                        o.ValueMember = "Key";
+                        if (e.Key != "Engine")
+                        {
+                            o.DisplayMember = "Value";
+                            o.ValueMember = "Key";
+                        }
                         o.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
                         o.AutoCompleteSource = AutoCompleteSource.ListItems;
                     });
@@ -665,7 +676,7 @@ namespace FAD3
                     {
                         case "ComboBox":
                             var key = "";
-                            if (c.Name != "comboTypeOfVesselUsed")
+                            if (c.Name != "comboTypeOfVesselUsed" && c.Name != "comboEngine")
                             {
                                 if (c.Text.Length > 0)
                                 {
@@ -676,11 +687,20 @@ namespace FAD3
                             {
                                 if (c.Text.Length > 0)
                                 {
-                                    var cbo = ((ComboBox)panelUI.Controls["comboTypeOfVesselUsed"]);
-                                    if (cbo.Items.Count > 0)
+                                    switch (c.Name)
                                     {
-                                        var v = int.Parse(cbo.SelectedValue.ToString());
-                                        key = v.ToString();
+                                        case "comboTypeOfVesselUsed":
+                                            var cbo = ((ComboBox)panelUI.Controls["comboTypeOfVesselUsed"]);
+                                            if (cbo.Items.Count > 0)
+                                            {
+                                                var v = int.Parse(cbo.SelectedValue.ToString());
+                                                key = v.ToString();
+                                            }
+                                            break;
+
+                                        case "comboEngine":
+                                            key = c.Text;
+                                            break;
                                     }
                                 }
                             }
@@ -901,7 +921,8 @@ namespace FAD3
                         {
                             if (IsNew) ReferenceNumberManager.UpdateRefCodeCounter();
                             _parent.RefreshCatchDetail(_samplingGUID, _isNew, _samplingDate, _gearVarGuid, _landingSiteGuid);
-                            this.Close();
+                            if (_newEngine?.Length > 0) sampling.AddEngine(_newEngine);
+                            Close();
                         }
                     }
                     break;
@@ -1259,6 +1280,23 @@ namespace FAD3
                 switch (ui.DataType)
                 {
                     case "string":
+                        if (ui.Key == "Engine")
+                        {
+                            var cbEngine = (ComboBox)panelUI.Controls["combo" + ui.Key];
+                            if (!cbEngine.Items.Contains(v))
+                            {
+                                if (MessageBox.Show($"{v} is not found in the list of engines.\r\nDo you want to add an engine?", "Add a new engine",
+                                                    MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
+                                {
+                                    _newEngine = v;
+                                    cbEngine.Items.Add(v);
+                                }
+                                else
+                                {
+                                    e.Cancel = true;
+                                }
+                            }
+                        }
                         break;
 
                     case "int":

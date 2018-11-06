@@ -117,7 +117,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Database\Classes\FishingGearInventory.cs" />
+    <Compile Include="Database\Classes\SimMetrics\AbstractStringMetric.cs" />
+    <Compile Include="Database\Classes\SimMetrics\AbstractSubstitutionCost.cs" />
+    <Compile Include="Database\Classes\SimMetrics\IStringMetric.cs" />
+    <Compile Include="Database\Classes\SimMetrics\ISubstitutionCost.cs" />
+    <Compile Include="Database\Classes\SimMetrics\Levenstein.cs" />
     <Compile Include="Database\Classes\NewFisheryObjectName.cs" />
+    <Compile Include="Database\Classes\SimMetrics\MathFunctions.cs" />
+    <Compile Include="Database\Classes\SimMetrics\SubCostRange0To1.cs" />
     <Compile Include="Database\Forms\AllSpeciesForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -773,6 +780,9 @@
   <ItemGroup>
     <Content Include="Fatcow-Farm-Fresh-Book-key.ico" />
     <Content Include="Icon1.ico" />
+    <None Include="Resources\prop2a.png" />
+    <None Include="Resources\prop2.png" />
+    <None Include="Resources\prop1.png" />
     <None Include="Resources\netMed.png" />
     <None Include="Resources\paddle.png" />
     <None Include="Resources\propMed.png" />

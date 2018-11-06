@@ -38,18 +38,9 @@ namespace FAD3
 		{
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.treeMain = new System.Windows.Forms.TreeView();
             this.menuDropDown = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.imageList16 = new System.Windows.Forms.ImageList(this.components);
             this.labelErrorDetail = new System.Windows.Forms.Label();
-            this.lblErrorFormOpen = new System.Windows.Forms.Label();
-            this.lblTitle = new System.Windows.Forms.Label();
-            this.panelSamplingButtons = new System.Windows.Forms.Panel();
-            this.buttonMap = new System.Windows.Forms.Button();
-            this.buttonCatch = new System.Windows.Forms.Button();
-            this.buttonOK = new System.Windows.Forms.Button();
-            this.lvMain = new System.Windows.Forms.ListView();
             this.menuMenuBar = new System.Windows.Forms.MenuStrip();
             this.menuFile = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripFileNewMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -86,64 +77,23 @@ namespace FAD3
             this.tsButtonReport = new System.Windows.Forms.ToolStripButton();
             this.tsButtonMap = new System.Windows.Forms.ToolStripButton();
             this.tsButtonExit = new System.Windows.Forms.ToolStripButton();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
-            this.splitContainer1.Panel1.SuspendLayout();
-            this.splitContainer1.Panel2.SuspendLayout();
-            this.splitContainer1.SuspendLayout();
-            this.panelSamplingButtons.SuspendLayout();
+            this.tblLayout = new System.Windows.Forms.TableLayoutPanel();
+            this.treeMain = new System.Windows.Forms.TreeView();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.lblTitle = new System.Windows.Forms.Label();
+            this.lblErrorFormOpen = new System.Windows.Forms.Label();
+            this.panelSamplingButtons = new System.Windows.Forms.Panel();
+            this.buttonMap = new System.Windows.Forms.Button();
+            this.buttonCatch = new System.Windows.Forms.Button();
+            this.buttonOK = new System.Windows.Forms.Button();
+            this.lvMain = new System.Windows.Forms.ListView();
             this.menuMenuBar.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.toolbar.SuspendLayout();
+            this.tblLayout.SuspendLayout();
+            this.panel1.SuspendLayout();
+            this.panelSamplingButtons.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // splitContainer1
-            // 
-            this.splitContainer1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.splitContainer1.Location = new System.Drawing.Point(0, 58);
-            this.splitContainer1.Name = "splitContainer1";
-            // 
-            // splitContainer1.Panel1
-            // 
-            this.splitContainer1.Panel1.Controls.Add(this.treeMain);
-            // 
-            // splitContainer1.Panel2
-            // 
-            this.splitContainer1.Panel2.Controls.Add(this.labelErrorDetail);
-            this.splitContainer1.Panel2.Controls.Add(this.lblErrorFormOpen);
-            this.splitContainer1.Panel2.Controls.Add(this.lblTitle);
-            this.splitContainer1.Panel2.Controls.Add(this.panelSamplingButtons);
-            this.splitContainer1.Panel2.Controls.Add(this.lvMain);
-            this.splitContainer1.Size = new System.Drawing.Size(929, 451);
-            this.splitContainer1.SplitterDistance = 240;
-            this.splitContainer1.TabIndex = 0;
-            // 
-            // treeMain
-            // 
-            this.treeMain.AllowDrop = true;
-            this.treeMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.treeMain.ContextMenuStrip = this.menuDropDown;
-            this.treeMain.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.treeMain.HideSelection = false;
-            this.treeMain.ImageIndex = 0;
-            this.treeMain.ImageList = this.imageList16;
-            this.treeMain.Location = new System.Drawing.Point(3, 3);
-            this.treeMain.Name = "treeMain";
-            this.treeMain.RightToLeftLayout = true;
-            this.treeMain.SelectedImageIndex = 0;
-            this.treeMain.Size = new System.Drawing.Size(234, 445);
-            this.treeMain.TabIndex = 0;
-            this.treeMain.AfterExpand += new System.Windows.Forms.TreeViewEventHandler(this.OntreeMainAfterExpand);
-            this.treeMain.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.OnItemDrag);
-            this.treeMain.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.OnTreeMainAfterSelect);
-            this.treeMain.DragDrop += new System.Windows.Forms.DragEventHandler(this.OnDragDrop);
-            this.treeMain.DragEnter += new System.Windows.Forms.DragEventHandler(this.OnDragEnter);
-            this.treeMain.DragOver += new System.Windows.Forms.DragEventHandler(this.OnDragOver);
-            this.treeMain.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OntreeMain_MouseDown);
-            this.treeMain.MouseUp += new System.Windows.Forms.MouseEventHandler(this.OntreeMain_MouseUp);
             // 
             // menuDropDown
             // 
@@ -177,106 +127,21 @@ namespace FAD3
             this.imageList16.Images.SetKeyName(19, "LayoutTransform");
             this.imageList16.Images.SetKeyName(20, "ListFolder");
             this.imageList16.Images.SetKeyName(21, "Actor_16xMD");
-            this.imageList16.Images.SetKeyName(22, "propLarge");
-            this.imageList16.Images.SetKeyName(23, "propMed");
-            this.imageList16.Images.SetKeyName(24, "paddle");
+            this.imageList16.Images.SetKeyName(22, "propSmall");
+            this.imageList16.Images.SetKeyName(23, "paddle");
+            this.imageList16.Images.SetKeyName(24, "propMed");
             this.imageList16.Images.SetKeyName(25, "nets");
             // 
             // labelErrorDetail
             // 
             this.labelErrorDetail.BackColor = System.Drawing.SystemColors.Window;
             this.labelErrorDetail.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelErrorDetail.Location = new System.Drawing.Point(249, 271);
+            this.labelErrorDetail.Location = new System.Drawing.Point(241, 287);
             this.labelErrorDetail.Name = "labelErrorDetail";
             this.labelErrorDetail.Size = new System.Drawing.Size(284, 108);
             this.labelErrorDetail.TabIndex = 6;
             this.labelErrorDetail.Text = "label1";
             this.labelErrorDetail.Visible = false;
-            // 
-            // lblErrorFormOpen
-            // 
-            this.lblErrorFormOpen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.lblErrorFormOpen.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblErrorFormOpen.Location = new System.Drawing.Point(-1, 179);
-            this.lblErrorFormOpen.Name = "lblErrorFormOpen";
-            this.lblErrorFormOpen.Size = new System.Drawing.Size(683, 92);
-            this.lblErrorFormOpen.TabIndex = 4;
-            this.lblErrorFormOpen.Text = "label1";
-            this.lblErrorFormOpen.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lblErrorFormOpen.Visible = false;
-            // 
-            // lblTitle
-            // 
-            this.lblTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblTitle.Location = new System.Drawing.Point(3, 3);
-            this.lblTitle.Name = "lblTitle";
-            this.lblTitle.Size = new System.Drawing.Size(481, 22);
-            this.lblTitle.TabIndex = 2;
-            // 
-            // panelSamplingButtons
-            // 
-            this.panelSamplingButtons.BackColor = System.Drawing.SystemColors.Window;
-            this.panelSamplingButtons.Controls.Add(this.buttonMap);
-            this.panelSamplingButtons.Controls.Add(this.buttonCatch);
-            this.panelSamplingButtons.Controls.Add(this.buttonOK);
-            this.panelSamplingButtons.Location = new System.Drawing.Point(587, 28);
-            this.panelSamplingButtons.Name = "panelSamplingButtons";
-            this.panelSamplingButtons.Size = new System.Drawing.Size(70, 133);
-            this.panelSamplingButtons.TabIndex = 5;
-            this.panelSamplingButtons.Visible = false;
-            // 
-            // buttonMap
-            // 
-            this.buttonMap.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonMap.Location = new System.Drawing.Point(7, 87);
-            this.buttonMap.Name = "buttonMap";
-            this.buttonMap.Size = new System.Drawing.Size(57, 30);
-            this.buttonMap.TabIndex = 2;
-            this.buttonMap.Text = "Map";
-            this.buttonMap.UseVisualStyleBackColor = true;
-            this.buttonMap.Click += new System.EventHandler(this.OnbuttonSamplingClick);
-            // 
-            // buttonCatch
-            // 
-            this.buttonCatch.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonCatch.Location = new System.Drawing.Point(7, 51);
-            this.buttonCatch.Name = "buttonCatch";
-            this.buttonCatch.Size = new System.Drawing.Size(57, 30);
-            this.buttonCatch.TabIndex = 1;
-            this.buttonCatch.Text = "Catch";
-            this.buttonCatch.UseVisualStyleBackColor = true;
-            this.buttonCatch.Click += new System.EventHandler(this.OnbuttonSamplingClick);
-            // 
-            // buttonOK
-            // 
-            this.buttonOK.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonOK.Location = new System.Drawing.Point(7, 15);
-            this.buttonOK.Name = "buttonOK";
-            this.buttonOK.Size = new System.Drawing.Size(57, 30);
-            this.buttonOK.TabIndex = 0;
-            this.buttonOK.Text = "OK";
-            this.buttonOK.UseVisualStyleBackColor = true;
-            this.buttonOK.Click += new System.EventHandler(this.OnbuttonSamplingClick);
-            // 
-            // lvMain
-            // 
-            this.lvMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.lvMain.ContextMenuStrip = this.menuDropDown;
-            this.lvMain.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lvMain.Location = new System.Drawing.Point(-1, 28);
-            this.lvMain.MultiSelect = false;
-            this.lvMain.Name = "lvMain";
-            this.lvMain.Size = new System.Drawing.Size(683, 415);
-            this.lvMain.TabIndex = 3;
-            this.lvMain.UseCompatibleStateImageBehavior = false;
-            this.lvMain.View = System.Windows.Forms.View.Details;
-            this.lvMain.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.OnlistView_ColumnClick);
-            this.lvMain.DoubleClick += new System.EventHandler(this.OnListView_DoubleClick);
-            this.lvMain.Leave += new System.EventHandler(this.OnListViewLeave);
-            this.lvMain.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnListView_MouseDown);
             // 
             // menuMenuBar
             // 
@@ -286,7 +151,7 @@ namespace FAD3
             this.menuHelp});
             this.menuMenuBar.Location = new System.Drawing.Point(0, 0);
             this.menuMenuBar.Name = "menuMenuBar";
-            this.menuMenuBar.Size = new System.Drawing.Size(929, 24);
+            this.menuMenuBar.Size = new System.Drawing.Size(970, 24);
             this.menuMenuBar.TabIndex = 1;
             this.menuMenuBar.Text = "menuStrip1";
             this.menuMenuBar.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnmenuMenuBar_ItemClicked);
@@ -477,9 +342,9 @@ namespace FAD3
             this.statusPanelTargetArea,
             this.statusPanelLandingSite,
             this.statusPanelGearUsed});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 504);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 539);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(929, 26);
+            this.statusStrip1.Size = new System.Drawing.Size(970, 26);
             this.statusStrip1.TabIndex = 2;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -546,7 +411,7 @@ namespace FAD3
             this.tsButtonExit});
             this.toolbar.Location = new System.Drawing.Point(0, 24);
             this.toolbar.Name = "toolbar";
-            this.toolbar.Size = new System.Drawing.Size(929, 31);
+            this.toolbar.Size = new System.Drawing.Size(970, 31);
             this.toolbar.SuppressHighlighting = true;
             this.toolbar.TabIndex = 3;
             this.toolbar.Text = "toolStripEx1";
@@ -612,14 +477,155 @@ namespace FAD3
             this.tsButtonExit.Text = "toolStripButton6";
             this.tsButtonExit.ToolTipText = "Exit";
             // 
+            // tblLayout
+            // 
+            this.tblLayout.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tblLayout.ColumnCount = 2;
+            this.tblLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 250F));
+            this.tblLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tblLayout.Controls.Add(this.treeMain, 0, 0);
+            this.tblLayout.Controls.Add(this.panel1, 1, 0);
+            this.tblLayout.Location = new System.Drawing.Point(0, 58);
+            this.tblLayout.Name = "tblLayout";
+            this.tblLayout.RowCount = 1;
+            this.tblLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tblLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tblLayout.Size = new System.Drawing.Size(970, 478);
+            this.tblLayout.TabIndex = 4;
+            // 
+            // treeMain
+            // 
+            this.treeMain.AllowDrop = true;
+            this.treeMain.ContextMenuStrip = this.menuDropDown;
+            this.treeMain.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.treeMain.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.treeMain.HideSelection = false;
+            this.treeMain.ImageIndex = 0;
+            this.treeMain.ImageList = this.imageList16;
+            this.treeMain.Location = new System.Drawing.Point(3, 3);
+            this.treeMain.Name = "treeMain";
+            this.treeMain.RightToLeftLayout = true;
+            this.treeMain.SelectedImageIndex = 0;
+            this.treeMain.Size = new System.Drawing.Size(244, 472);
+            this.treeMain.TabIndex = 5;
+            this.treeMain.AfterExpand += new System.Windows.Forms.TreeViewEventHandler(this.OntreeMainAfterExpand);
+            this.treeMain.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.OnItemDrag);
+            this.treeMain.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.OnTreeMainAfterSelect);
+            this.treeMain.DragDrop += new System.Windows.Forms.DragEventHandler(this.OnDragDrop);
+            this.treeMain.DragEnter += new System.Windows.Forms.DragEventHandler(this.OnDragEnter);
+            this.treeMain.DragOver += new System.Windows.Forms.DragEventHandler(this.OnDragOver);
+            this.treeMain.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OntreeMain_MouseDown);
+            this.treeMain.MouseUp += new System.Windows.Forms.MouseEventHandler(this.OntreeMain_MouseUp);
+            // 
+            // panel1
+            // 
+            this.panel1.Controls.Add(this.lblTitle);
+            this.panel1.Controls.Add(this.lblErrorFormOpen);
+            this.panel1.Controls.Add(this.panelSamplingButtons);
+            this.panel1.Controls.Add(this.labelErrorDetail);
+            this.panel1.Controls.Add(this.lvMain);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel1.Location = new System.Drawing.Point(253, 3);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(714, 472);
+            this.panel1.TabIndex = 12;
+            // 
+            // lblTitle
+            // 
+            this.lblTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblTitle.Location = new System.Drawing.Point(0, 0);
+            this.lblTitle.Name = "lblTitle";
+            this.lblTitle.Size = new System.Drawing.Size(629, 27);
+            this.lblTitle.TabIndex = 13;
+            // 
+            // lblErrorFormOpen
+            // 
+            this.lblErrorFormOpen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblErrorFormOpen.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblErrorFormOpen.Location = new System.Drawing.Point(3, 204);
+            this.lblErrorFormOpen.Name = "lblErrorFormOpen";
+            this.lblErrorFormOpen.Size = new System.Drawing.Size(705, 83);
+            this.lblErrorFormOpen.TabIndex = 12;
+            this.lblErrorFormOpen.Text = "label1";
+            this.lblErrorFormOpen.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblErrorFormOpen.Visible = false;
+            // 
+            // panelSamplingButtons
+            // 
+            this.panelSamplingButtons.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.panelSamplingButtons.BackColor = System.Drawing.SystemColors.Window;
+            this.panelSamplingButtons.Controls.Add(this.buttonMap);
+            this.panelSamplingButtons.Controls.Add(this.buttonCatch);
+            this.panelSamplingButtons.Controls.Add(this.buttonOK);
+            this.panelSamplingButtons.Location = new System.Drawing.Point(627, 30);
+            this.panelSamplingButtons.Name = "panelSamplingButtons";
+            this.panelSamplingButtons.Size = new System.Drawing.Size(70, 130);
+            this.panelSamplingButtons.TabIndex = 11;
+            this.panelSamplingButtons.Visible = false;
+            // 
+            // buttonMap
+            // 
+            this.buttonMap.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonMap.Location = new System.Drawing.Point(7, 87);
+            this.buttonMap.Name = "buttonMap";
+            this.buttonMap.Size = new System.Drawing.Size(57, 30);
+            this.buttonMap.TabIndex = 2;
+            this.buttonMap.Text = "Map";
+            this.buttonMap.UseVisualStyleBackColor = true;
+            this.buttonMap.Click += new System.EventHandler(this.OnbuttonSamplingClick);
+            // 
+            // buttonCatch
+            // 
+            this.buttonCatch.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonCatch.Location = new System.Drawing.Point(7, 51);
+            this.buttonCatch.Name = "buttonCatch";
+            this.buttonCatch.Size = new System.Drawing.Size(57, 30);
+            this.buttonCatch.TabIndex = 1;
+            this.buttonCatch.Text = "Catch";
+            this.buttonCatch.UseVisualStyleBackColor = true;
+            this.buttonCatch.Click += new System.EventHandler(this.OnbuttonSamplingClick);
+            // 
+            // buttonOK
+            // 
+            this.buttonOK.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonOK.Location = new System.Drawing.Point(7, 15);
+            this.buttonOK.Name = "buttonOK";
+            this.buttonOK.Size = new System.Drawing.Size(57, 30);
+            this.buttonOK.TabIndex = 0;
+            this.buttonOK.Text = "OK";
+            this.buttonOK.UseVisualStyleBackColor = true;
+            this.buttonOK.Click += new System.EventHandler(this.OnbuttonSamplingClick);
+            // 
+            // lvMain
+            // 
+            this.lvMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lvMain.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.lvMain.ContextMenuStrip = this.menuDropDown;
+            this.lvMain.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lvMain.Location = new System.Drawing.Point(0, 30);
+            this.lvMain.MultiSelect = false;
+            this.lvMain.Name = "lvMain";
+            this.lvMain.Size = new System.Drawing.Size(711, 442);
+            this.lvMain.TabIndex = 11;
+            this.lvMain.UseCompatibleStateImageBehavior = false;
+            this.lvMain.View = System.Windows.Forms.View.Details;
+            this.lvMain.DoubleClick += new System.EventHandler(this.OnListView_DoubleClick);
+            this.lvMain.Leave += new System.EventHandler(this.OnListViewLeave);
+            this.lvMain.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnListView_MouseDown);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(929, 530);
+            this.ClientSize = new System.Drawing.Size(970, 565);
+            this.Controls.Add(this.tblLayout);
             this.Controls.Add(this.toolbar);
             this.Controls.Add(this.statusStrip1);
-            this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.menuMenuBar);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
@@ -630,18 +636,15 @@ namespace FAD3
             this.Activated += new System.EventHandler(this.frmMain_Activated);
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
             this.Load += new System.EventHandler(this.OnMainForm_Load);
-            this.ResizeEnd += new System.EventHandler(this.frmMain_ResizeEnd);
-            this.splitContainer1.Panel1.ResumeLayout(false);
-            this.splitContainer1.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
-            this.splitContainer1.ResumeLayout(false);
-            this.panelSamplingButtons.ResumeLayout(false);
             this.menuMenuBar.ResumeLayout(false);
             this.menuMenuBar.PerformLayout();
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             this.toolbar.ResumeLayout(false);
             this.toolbar.PerformLayout();
+            this.tblLayout.ResumeLayout(false);
+            this.panel1.ResumeLayout(false);
+            this.panelSamplingButtons.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -652,14 +655,12 @@ namespace FAD3
 		private System.Windows.Forms.ToolStripStatusLabel statusPanelDBPath;
 		private System.Windows.Forms.OpenFileDialog openFileDialog1;
 		private System.Windows.Forms.ToolStripMenuItem toolStripFileOpen;
-		private System.Windows.Forms.TreeView treeMain;
 		private System.Windows.Forms.StatusStrip statusStrip1;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
 		private System.Windows.Forms.ToolStripMenuItem toolStripFileNewMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem menuFile;
 		private System.Windows.Forms.MenuStrip menuMenuBar;
-		private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.ToolStripMenuItem toolStripRecentlyOpened;
         private System.Windows.Forms.ToolStripMenuItem testToolStripRecentOpenedList;
         private System.Windows.Forms.ImageList imageList16;
@@ -675,13 +676,6 @@ namespace FAD3
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem onlineManualToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem showErrorMessagesToolStripMenuItem;
-        private System.Windows.Forms.Label lblErrorFormOpen;
-        private System.Windows.Forms.ListView lvMain;
-        private System.Windows.Forms.Label lblTitle;
-        private System.Windows.Forms.Panel panelSamplingButtons;
-        private System.Windows.Forms.Button buttonMap;
-        private System.Windows.Forms.Button buttonCatch;
-        private System.Windows.Forms.Button buttonOK;
         private System.Windows.Forms.ContextMenuStrip menuDropDown;
         private System.Windows.Forms.Label labelErrorDetail;
         private ToolStripExtensions.ToolStripEx toolbar;
@@ -694,5 +688,15 @@ namespace FAD3
         private System.Windows.Forms.ToolStripMenuItem generateInlandDbToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripMenuItem cholorophyllGridMappingToolStripMenuItem;
+        private System.Windows.Forms.TableLayoutPanel tblLayout;
+        private System.Windows.Forms.TreeView treeMain;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Panel panelSamplingButtons;
+        private System.Windows.Forms.Button buttonMap;
+        private System.Windows.Forms.Button buttonCatch;
+        private System.Windows.Forms.Button buttonOK;
+        private System.Windows.Forms.ListView lvMain;
+        private System.Windows.Forms.Label lblErrorFormOpen;
+        private System.Windows.Forms.Label lblTitle;
     }
 }

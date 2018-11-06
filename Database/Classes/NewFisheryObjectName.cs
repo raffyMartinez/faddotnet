@@ -15,6 +15,7 @@ namespace FAD3.Database.Classes
         public FisheryObjectNameType NameType { get; internal set; }
         public short Key1 { get; internal set; }
         public short Key2 { get; internal set; }
+        public string UseThisName { get; set; }
 
         public NewFisheryObjectName(string newName, FisheryObjectNameType nameType)
         {

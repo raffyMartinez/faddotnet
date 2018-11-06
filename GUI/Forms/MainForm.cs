@@ -48,7 +48,7 @@ namespace FAD3
         private mru _mrulist = new mru();
         private bool _newSamplingEntered;
         private string _oldMDB = "";
-        private sampling _Sampling = new sampling();
+        private sampling _sampling;// =  new sampling();
         private string _SamplingGUID = "";
         private string _SamplingMonth = "";
         private double _weightOfCatch;
@@ -154,7 +154,7 @@ namespace FAD3
 
         public sampling Sampling
         {
-            get { return _Sampling; }
+            get { return _sampling; }
         }
 
         public string SamplingGUID
@@ -520,7 +520,7 @@ namespace FAD3
                     tsi.Name = "menuGearsInTargetArea";
                     tsi.Enabled = _treeLevel == "aoi";
 
-                    tsi = menuDropDown.Items.Add("Fishing gear inventory");
+                    tsi = menuDropDown.Items.Add("Inventory of fishers, gears, and vessels");
                     tsi.Name = "menuGearInventory";
                     tsi.Enabled = _treeLevel == "aoi";
 
@@ -713,25 +713,10 @@ namespace FAD3
             CancelButton = buttonOK.Visible ? buttonOK : null;
         }
 
-        private void frmMain_ResizeEnd(object sender, EventArgs e)
-        {
-            splitContainer1.Width = this.Width;
-            lvMain.Width = splitContainer1.Panel2.Width;
-            lvMain.Height = splitContainer1.Panel2.Height;
-        }
-
         private void OnMainForm_Load(object sender, EventArgs e)
         {
-            splitContainer1.Panel1MinSize = 200;
-            splitContainer1.Panel2MinSize = this.Width - (this.splitContainer1.Panel1MinSize + 100);
-            splitContainer1.SplitterWidth = 3;
-
             if (global.AllRequiredFilesExists)
             {
-                sampling.SetUpUIElement();
-
-                _Sampling.OnUIRowRead += new sampling.ReadUIElement(OnUIRowRead);
-
                 toolStripRecentlyOpened.DropDownItems.Clear();
 
                 //setup an MRU that contains 5 items
@@ -754,14 +739,16 @@ namespace FAD3
                         statusPanelDBPath.Text = SavedMDBPath;
                         lblErrorFormOpen.Visible = false;
                         PopulateTree();
+                        _sampling = new sampling();
+                        sampling.SetUpUIElement();
+                        _sampling.OnUIRowRead += new sampling.ReadUIElement(OnUIRowRead);
                     }
                     else
                     {
                         Logger.Log("MDB file saved in registry not found");
                         lblErrorFormOpen.Visible = true;
                         lblTitle.Text = "";
-                        lblErrorFormOpen.Text = @"Please locate the database file where fisheries data is saved.
-                                                 You can use the file open menu";
+                        lblErrorFormOpen.Text = "Please locate the database file where fisheries data is saved.\r\nYou can use the file open menu";
                         LockTheApp(true);
                     }
                 }
@@ -770,8 +757,7 @@ namespace FAD3
                     Logger.Log("Registry entry for mdb path not found");
                     lblErrorFormOpen.Visible = true;
                     lblTitle.Text = "";
-                    lblErrorFormOpen.Text = @"Please locate the database file where fisheries data is saved.
-                                             You can use the file open menu";
+                    lblErrorFormOpen.Text = "Please locate the database file where fisheries data is saved.\r\nYou can use the file open menu";
                     LockTheApp(true);
                 }
             }
@@ -1900,14 +1886,14 @@ namespace FAD3
             {
                 if (_subListExisting)
                 {
-                    splitContainer1.Panel2.Controls["panelSub"].Visible = true;
-                    splitContainer1.Panel2.Controls["lvCatch"].Visible = true;
+                    panel1.Controls["panelSub"].Visible = true;
+                    panel1.Controls["lvCatch"].Visible = true;
                 }
                 else
                 {
                     _subListExisting = true;
                     lvCatch = new ListView();
-                    splitContainer1.Panel2.Controls.Add(lvCatch);
+                    panel1.Controls.Add(lvCatch);
                     lvCatch.With(o =>
                     {
                         o.Name = "lvCatch";
@@ -1935,7 +1921,7 @@ namespace FAD3
                     });
 
                     lvLF_GMS = new ListView();
-                    splitContainer1.Panel2.Controls.Add(lvLF_GMS);
+                    panel1.Controls.Add(lvLF_GMS);
                     lvLF_GMS.With(o =>
                     {
                         o.Name = "lvLF_GMS";
@@ -2004,7 +1990,7 @@ namespace FAD3
                     SubPanel.Controls.Add(btnSubLF);
                     SubPanel.Controls.Add(btnSubGMS);
 
-                    splitContainer1.Panel2.Controls.Add(SubPanel);
+                    panel1.Controls.Add(SubPanel);
                     SubPanel.Location = new Point(panelSamplingButtons.Location.X,
                                                    lvCatch.Top - (lvMain.Top - panelSamplingButtons.Top));
                     btnSubLF.Top = btnSubClose.Top + btnSubClose.Height + 5;
@@ -2016,14 +2002,14 @@ namespace FAD3
             {
                 if (_subListExisting)
                 {
-                    splitContainer1.Panel2.Controls["panelSub"].Visible = false;
-                    ((ListView)splitContainer1.Panel2.Controls["lvCatch"]).With(o =>
+                    panel1.Controls["panelSub"].Visible = false;
+                    ((ListView)panel1.Controls["lvCatch"]).With(o =>
                     {
                         o.Items.Clear();
                         o.Visible = false;
                     });
 
-                    ((ListView)splitContainer1.Panel2.Controls["lvLF_GMS"]).With(o =>
+                    ((ListView)panel1.Controls["lvLF_GMS"]).With(o =>
                     {
                         o.Items.Clear();
                         o.Visible = false;
@@ -2447,8 +2433,7 @@ namespace FAD3
                 Logger.Log("MDB file saved in registry not found");
                 lblErrorFormOpen.Visible = true;
                 lblTitle.Text = "";
-                lblErrorFormOpen.Text = "Please locate the database file where fisheries data is saved.\r\n" +
-                                         "You can use the file open menu";
+                lblErrorFormOpen.Text = "Please locate the database file where fisheries data is saved.\r\nYou can use the file open menu";
                 LockTheApp(true);
                 return false;
             }
@@ -2465,7 +2450,7 @@ namespace FAD3
             int n = 1;
             if (_catchSubRow == fad3CatchSubRow.LF)
             {
-                foreach (KeyValuePair<string, sampling.LFLine> kv in _Sampling.LFData(CatchRowGuid))
+                foreach (KeyValuePair<string, sampling.LFLine> kv in _sampling.LFData(CatchRowGuid))
                 {
                     var lvi = new ListViewItem(new string[]
                     {
@@ -2589,14 +2574,14 @@ namespace FAD3
         private void ShowCatchDetailEx(string SamplingGUID = "")
         {
             lvMain.Items.Clear();
-            _Sampling.ReadUIFromXML();
+            _sampling.ReadUIFromXML();
             var DateEncoded = "";
 
             if (SamplingGUID.Length > 0)
             {
                 //we fill up the list view from the _Sampling class variable.
-                _Sampling.SamplingGUID = SamplingGUID;
-                Dictionary<string, string> effortData = _Sampling.CatchAndEffort();
+                _sampling.SamplingGUID = SamplingGUID;
+                Dictionary<string, string> effortData = _sampling.CatchAndEffort();
 
                 //the array splits the dictionary item from the name [0] and its guid [1]
                 //we make the guid the tag of the listitem
@@ -2682,7 +2667,7 @@ namespace FAD3
         {
             if (taxa != Taxa.To_be_determined)
             {
-                GMSDataEntryForm fgms = new GMSDataEntryForm(isNew, _Sampling,
+                GMSDataEntryForm fgms = new GMSDataEntryForm(isNew, _sampling,
                                           lvCatch.SelectedItems[0].Name,
                                           lvCatch.SelectedItems[0].SubItems[1].Text, _taxa, this);
                 fgms.ShowDialog(this);
@@ -2693,7 +2678,7 @@ namespace FAD3
         {
             LengthFreqForm lff;
 
-            lff = new LengthFreqForm(IsNew, _Sampling,
+            lff = new LengthFreqForm(IsNew, _sampling,
                                       lvCatch.SelectedItems[0].Name,
                                       lvCatch.SelectedItems[0].SubItems[1].Text, this);
 

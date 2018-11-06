@@ -596,9 +596,9 @@ namespace FAD3.Database.Forms
 
                                     && _inventory.SaveSitioGearInventoryFishingMonths(guid, listMonthGearUse, listMonthGearSeason)
 
-                                    && _inventory.SaveSitioGearInventoryCatchComposition(guid, listDominantCatchNameGuid, listNonDominantCatchNameGuid)
+                                    && _inventory.SaveSitioGearInventoryCatchComposition(guid, listDominantCatchNameGuid, listNonDominantCatchNameGuid);
 
-                                    && _inventory.SaveSitioGearInventoryHistoricalCPUE(guid, listHistoryCPUE);
+                                _inventory.SaveSitioGearInventoryHistoricalCPUE(guid, listHistoryCPUE);
 
                                 if (success) _parentForm.RefreshSitioGearInventory(guid, _dataStatus == fad3DataStatus.statusNew);
                                 break;
@@ -634,6 +634,7 @@ namespace FAD3.Database.Forms
                     break;
 
                 case "btnRemoveLocalName":
+                    listBoxGearLocalNames.Items.Remove(listBoxGearLocalNames.SelectedItem);
                     break;
 
                 case "btnAddDominant":
@@ -654,6 +655,7 @@ namespace FAD3.Database.Forms
                     break;
 
                 case "btnRemoveDominant":
+                    listBoxDominantCatch.Items.Remove(listBoxDominantCatch.SelectedItem);
                     break;
 
                 case "btnAddOther":
@@ -674,6 +676,7 @@ namespace FAD3.Database.Forms
                     break;
 
                 case "btnRemoveOther":
+                    listBoxOtherCatch.Items.Remove(listBoxOtherCatch.SelectedItem);
                     break;
             }
         }
@@ -782,8 +785,8 @@ namespace FAD3.Database.Forms
                             }
                             else if (ctlName == "txtDominantPercentage")
                             {
-                                e.Cancel = v < 50 || v > 100;
-                                msg = "Dominant percent value cannot be less than 50 and more than 100";
+                                e.Cancel = v < 51 || v > 100;
+                                msg = "Dominant percent value must be more than 50 but not exceed 100";
                             }
                             else
                             {
@@ -875,51 +878,71 @@ namespace FAD3.Database.Forms
 
         private void OnComboValidating(object sender, CancelEventArgs e)
         {
+            var ctlName = ((ComboBox)sender).Name;
             var s = ((ComboBox)sender).Text;
             var cbo = (ComboBox)sender;
             var msg = "";
+            var gearClass = "";
             if (s.Length > 0)
             {
-                switch (((ComboBox)sender).Name)
+                switch (ctlName)
                 {
                     case "cboCatchLocalName":
-                        if (!ComboItemsContains(cbo, s))
-                        {
-                            msg = $"{s} is not in the list of catch local names.\r\nDo you want to add a new local name?";
-                            if (MessageBox.Show(msg, "New catch local name", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
-                            {
-                                var result = NewNameForm.Show(s, FisheryObjectNameType.CatchLocalName, this);
-                                e.Cancel = result != DialogResult.OK;
-                            }
-                            else
-                            {
-                                e.Cancel = true;
-                            }
-                        }
-                        break;
-
                     case "cboSelectGearLocalName":
-                        if (!ComboItemsContains(cbo, s))
-                        {
-                            msg = $"{s} is not in the list of gear local names.\r\nDo you want to add a new local name?";
-                            if (MessageBox.Show(msg, "New gear local name", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
-                            {
-                                NewNameForm nlf = new NewNameForm(s, FisheryObjectNameType.GearLocalName, this);
-                                nlf.ShowDialog(this);
-                            }
-                            else
-                            {
-                                e.Cancel = true;
-                            }
-                        }
-                        break;
-
                     case "cboGearVariation":
                         if (!ComboItemsContains(cbo, s))
                         {
-                            msg = $"{s} is not in the list of gear variations.\r\nDo you want to add a new gear?";
-                            if (MessageBox.Show(msg, "New gear variation", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
+                            FisheryObjectNameType nameType = FisheryObjectNameType.CatchLocalName;
+                            switch (ctlName)
                             {
+                                case "cboCatchLocalName":
+                                    msg = $"{s} is not in the list of catch local names.\r\nDo you want to add a new local name?";
+                                    break;
+
+                                case "cboSelectGearLocalName":
+                                    msg = $"{s} is not in the list of gear local names.\r\nDo you want to add a new local name?";
+                                    nameType = FisheryObjectNameType.GearLocalName;
+                                    break;
+
+                                case "cboGearVariation":
+                                    msg = $"{s} is not in the list of gear variations.\r\nDo you want to add a new gear variation name?";
+                                    nameType = FisheryObjectNameType.GearVariationName;
+                                    gearClass = ((KeyValuePair<string, string>)cboGearClass.SelectedItem).Key;
+                                    break;
+                            }
+                            var result = MessageBox.Show(msg, "Add new name", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                            if (result == DialogResult.Yes)
+                            {
+                                NewFisheryObjectName newName = new NewFisheryObjectName(s, nameType);
+                                result = NewNameForm.Show(newName, gearClass);
+                                if (result == DialogResult.Cancel && newName.UseThisName != null)
+                                {
+                                    if (newName.UseThisName.Length > 0)
+                                    {
+                                        cbo.Text = newName.UseThisName;
+                                    }
+                                }
+                                else if (result == DialogResult.OK)
+                                {
+                                    KeyValuePair<string, string> kv = new KeyValuePair<string, string>(newName.ObjectGUID, newName.NewName);
+                                    cbo.Items.Add(kv);
+                                    switch (ctlName)
+                                    {
+                                        case "cboCatchLocalName":
+                                            _activeCatchCompList.Items.Add(kv);
+                                            cbo.Text = "";
+                                            break;
+
+                                        case "cboSelectGearLocalName":
+                                            listBoxGearLocalNames.Items.Add(kv);
+                                            cbo.Text = "";
+                                            break;
+
+                                        case "cboGearVariation":
+
+                                            break;
+                                    }
+                                }
                             }
                             else
                             {

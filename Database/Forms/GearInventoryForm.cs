@@ -552,13 +552,13 @@ namespace FAD3.Database.Forms
                     lvi.ImageKey = "Actor_16xMD";
                     lvi = lvInventory.Items.Add("Number of municipal motorized vessels");
                     lvi.SubItems.Add(_sitioCountMunicipalMotorized.ToString());
-                    lvi.ImageKey = "propMed";
+                    lvi.ImageKey = "propSmall";
                     lvi = lvInventory.Items.Add("Number of municipal non-motorized vessels");
                     lvi.SubItems.Add(_sitioCountMunicipalNonMotorized.ToString());
                     lvi.ImageKey = "paddle";
                     lvi = lvInventory.Items.Add("Number of commercial vessels");
                     lvi.SubItems.Add(_sitioCountCommercial.ToString());
-                    lvi.ImageKey = "propLarge";
+                    lvi.ImageKey = "propMed";
 
                     lvi = lvInventory.Items.Add("");
                     lvi = lvInventory.Items.Add("");
@@ -700,13 +700,13 @@ namespace FAD3.Database.Forms
             lvi.ImageKey = "Actor_16xMD";
             lvi = lvInventory.Items.Add("Total number of municipal motorized vessels");
             lvi.SubItems.Add(motorizedCount.ToString());
-            lvi.ImageKey = "propMed";
+            lvi.ImageKey = "propSmall";
             lvi = lvInventory.Items.Add("Total number of municipal non-motorized vessels");
             lvi.SubItems.Add(nonMotorizedCount.ToString());
             lvi.ImageKey = "paddle";
             lvi = lvInventory.Items.Add("Total number of commercial vessels");
             lvi.SubItems.Add(commercialCount.ToString());
-            lvi.ImageKey = "propLarge";
+            lvi.ImageKey = "propMed";
 
             if (_treeLevel == "municipality")
             {
@@ -744,7 +744,7 @@ namespace FAD3.Database.Forms
                         }
                         if (item.gearClass != "" && item.gearVariation != "")
                         {
-                            lvi = lvInventory.Items.Add("    " + item.gearClass + "-" + item.gearVariation);
+                            lvi = lvInventory.Items.Add("       " + item.gearClass + "-" + item.gearVariation);
                             lvi.Name = (item.dataGuid);
                             lvi.SubItems.Add(item.total.ToString());
                             lvi.ImageKey = gear.GearClassImageKeyFromGearClasName(item.gearClass);

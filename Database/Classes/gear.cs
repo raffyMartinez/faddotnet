@@ -72,7 +72,7 @@ namespace FAD3
             using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
             {
                 conn.Open();
-                var sql = $@"Insert into tblBaseLocalNames (LocalName, LocalNameGUID, MPH1,MPH2) values
+                var sql = $@"Insert into tblGearLocalNames (LocalName, LocalNameGUID, MPH1,MPH2) values
                         ('{newLocalName}', {{{guid}}},{key1},{key2})";
                 using (OleDbCommand update = new OleDbCommand(sql, conn))
                 {
@@ -80,6 +80,49 @@ namespace FAD3
                 }
             }
             return success;
+        }
+
+        public static bool SaveNewVariationName(NewFisheryObjectName newName, string gearClassGuid)
+        {
+            bool success = false;
+            var newVariationName = newName.NewName;
+            var key1 = newName.Key1;
+            var key2 = newName.Key2;
+            var guid = newName.ObjectGUID;
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                var sql = $@"Insert into tblGearVariations (Variation, Name2, GearVarGuid, MPH1,MPH2,GearClass) values
+                        ('{newVariationName}', '{newName.NewName.Replace(" ", "")}', {{{guid}}}, {key1}, {key2}, {{{gearClassGuid}}})";
+                using (OleDbCommand update = new OleDbCommand(sql, conn))
+                {
+                    success = update.ExecuteNonQuery() > 0;
+                }
+            }
+            return success;
+        }
+
+        public static Dictionary<string, string> GetSimilarSoundingVariationNames(NewFisheryObjectName newName)
+        {
+            var key1 = newName.Key1;
+            var key2 = newName.Key2;
+            Dictionary<string, string> similarNames = new Dictionary<string, string>();
+            var sql = $@"SELECT tblGearVariations.GearVarGUID, tblGearVariations.Variation
+                         FROM tblGearVariations
+                         WHERE tblGearVariations.MPH1={key1} AND tblGearLocalNames.MPH2={key2}";
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                var adapter = new OleDbDataAdapter(sql, conn);
+                DataTable dt = new DataTable();
+                adapter.Fill(dt);
+                if (dt.Rows.Count > 0)
+                {
+                    DataRow dr = dt.Rows[0];
+                    similarNames.Add(dr["GearVarGUID"].ToString(), dr["Variation"].ToString());
+                }
+            }
+            return similarNames;
         }
 
         public static Dictionary<string, string> GetSimilarSoundingLocalNames(NewFisheryObjectName newName)

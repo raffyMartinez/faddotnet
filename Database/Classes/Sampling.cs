@@ -26,6 +26,21 @@ namespace FAD3
         private int _LFRowsCount;
         private string _RererenceNo = "";
         private string _SamplingGUID = "";
+        private static List<string> _engines = new List<string>();
+        private static bool _engineReadDone = false;
+
+        public static void AddEngine(string engine)
+        {
+            if (!_engines.Contains(engine))
+            {
+                _engines.Add(engine);
+            }
+        }
+
+        public static List<string> Engines
+        {
+            get { return _engines; }
+        }
 
         static sampling()
         {
@@ -39,6 +54,11 @@ namespace FAD3
 
         public sampling()
         {
+            if (!_engineReadDone)
+            {
+                GetEngines();
+                _engineReadDone = true;
+            }
         }
 
         public delegate void ReadUIElement(sampling s, UIRowFromXML e);
@@ -202,6 +222,31 @@ namespace FAD3
                 }
             }
             return Samplings;
+        }
+
+        public static void GetEngines()
+        {
+            var dt = new DataTable();
+            using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
+            {
+                try
+                {
+                    conection.Open();
+                    const string query = "SELECT DISTINCT tblSampling.Engine FROM tblSampling WHERE tblSampling.Engine<>''";
+
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(dt);
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        DataRow dr = dt.Rows[i];
+                        _engines.Add(dr["Engine"].ToString());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex);
+                }
+            }
         }
 
         public static bool DeleteCatchLine(string CatchLineGUID)
