@@ -6,6 +6,7 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using FAD3.GUI.Classes;
+using FAD3.Mapping.Classes;
 
 namespace FAD3
 {
@@ -18,6 +19,9 @@ namespace FAD3
         private Dictionary<string, uint> _labelAndGridProperties = new Dictionary<string, uint>();
         private List<LayerEventArg> _savedGridLayers = new List<LayerEventArg>();
         private fadUTMZone _utmZone;
+        private double _dragWidth;
+        private double _dragHeight;
+        private bool _gridFromFileLoaded;
 
         public void set_UTMZone(fadUTMZone utmZone)
         {
@@ -42,6 +46,12 @@ namespace FAD3
             _grid25MajorGrid = parent.Grid25MajorGrid;
             _grid25MajorGrid.LayerSaved += OnGrid25LayerSaved;
             _grid25MajorGrid.GridRetrieved += OnGrid25GridRetrieved;
+            _grid25MajorGrid.ExtentCreatedInLayer += OnExtentCreated;
+        }
+
+        private void OnExtentCreated(Grid25MajorGrid s, ExtentDraggedBoxEventArgs e)
+        {
+            GridMapStatusUpdate(e.Top, e.Left, e.Right, e.Bottom, e.InDrag);
         }
 
         private void OnGrid25GridRetrieved(Grid25MajorGrid s, LayerEventArg e)
@@ -91,6 +101,41 @@ namespace FAD3
             _labelAndGridProperties.Add("minorGridLineColor", ColorToUInt(shapeMinorGridLineColor.FillColor));
             _labelAndGridProperties.Add("minorGridLabelFontBold", (uint)(chkBold.Checked ? 1 : 0));
             _labelAndGridProperties.Add("minorGridLabelWrapped", (uint)(chkWrapLabels.Checked ? 1 : 0));
+        }
+
+        public void GridMapStatusUpdate(double top, double left, double right, double bottom,
+                     bool inDrag, bool fromFile = false)
+        {
+            _dragWidth = Math.Abs(left - right);
+            _dragHeight = Math.Abs(top - bottom);
+            if (inDrag)
+            {
+                lblGridStatus.Text = "Defining map dimensions:\r\n" +
+                 "Height: " + (_dragHeight / 1000).ToString("N1") + " km\r\n" +
+                 "Width:" + (_dragWidth / 1000).ToString("N1") + " km";
+            }
+            else
+            {
+                if (fromFile)
+                {
+                    _gridFromFileLoaded = true;
+                    lblGridStatus.Text = "Grid map dimension:";
+                }
+                else
+                {
+                    _gridFromFileLoaded = false;
+                    lblGridStatus.Text = "Final map dimension:";
+                }
+                lblGridStatus.Text += "\r\nHeight: " + (_dragHeight / 1000).ToString("N1") + " km" +
+                     "\r\nWidth: " + (_dragWidth / 1000).ToString("N1") + " km";
+            }
+            lblGridStatus.Text += "\r\nRows x Columns : " + ((int)((_dragHeight / 1000) / 2)).ToString("") + " x " + ((int)((_dragWidth / 1000) / 2)).ToString();
+
+            if (_gridFromFileLoaded)
+            {
+                chkWrapLabels.Enabled = false;
+                chkWrapLabels.Checked = false;
+            }
         }
 
         private void RedoGridLabel()

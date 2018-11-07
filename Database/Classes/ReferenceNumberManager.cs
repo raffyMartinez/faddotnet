@@ -125,7 +125,7 @@ namespace FAD3
 
         public static string GetNextReferenceNumber(string GearCode)
         {
-            var AOIcode = aoi.AOICodeFromGuid(_AOIGuid);
+            var AOIcode = TargetArea.TargetAreaCodeFromGuid(_AOIGuid);
             var Year = _SamplingDate.Year.ToString().Substring(2, 2);
             var NextCode = "";
             _AOI_Year_GearCode = AOIcode + Year + "-" + GearCode;

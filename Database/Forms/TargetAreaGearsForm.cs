@@ -14,17 +14,17 @@ namespace FAD3
     public partial class TargetAreaGearsForm : Form
     {
         private static TargetAreaGearsForm _instance;
-        private aoi _aoi;
-        public aoi AOI { get { return _aoi; } }
+        private TargetArea _targetArea;
+        public TargetArea TargetArea { get { return _targetArea; } }
         private bool _isGearMapping;
 
-        public TargetAreaGearsForm(aoi aoi)
+        public TargetAreaGearsForm(TargetArea targetArea)
         {
             InitializeComponent();
-            _aoi = aoi;
+            _targetArea = targetArea;
         }
 
-        public static TargetAreaGearsForm GetInstance(aoi aoi)
+        public static TargetAreaGearsForm GetInstance(TargetArea aoi)
         {
             if (_instance == null) return new TargetAreaGearsForm(aoi);
             return _instance;
@@ -52,7 +52,7 @@ namespace FAD3
 
         private void TargetAreaGearsForm_Load(object sender, EventArgs e)
         {
-            var gearUsedList = aoi.TargetAreaGearsUsed(_aoi.AOIGUID);
+            var gearUsedList = TargetArea.TargetAreaGearsUsed(_targetArea.TargetAreaGuid);
             lvGears.View = View.Details;
             lvGears.Columns.Add("Gear class");
             lvGears.Columns.Add("Variation");
@@ -135,7 +135,7 @@ namespace FAD3
             {
                 mehf.Show(this);
             }
-            mehf.SetUpMapping(_aoi.AOIGUID, lvGears.SelectedItems[0].Tag.ToString(), lvGears.SelectedItems[0].SubItems[1].Text, _aoi.AOIName, MapFirstItemInList = true);
+            mehf.SetUpMapping(_targetArea.TargetAreaGuid, lvGears.SelectedItems[0].Tag.ToString(), lvGears.SelectedItems[0].SubItems[1].Text, _targetArea.TargetAreaName, MapFirstItemInList = true);
         }
 
         private void OnListViewMouseDown(object sender, MouseEventArgs e)

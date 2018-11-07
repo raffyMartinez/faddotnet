@@ -31,9 +31,9 @@ namespace FAD3
     public partial class MainForm : Form
     {
         private MapEffortHelperForm _formEffortMapper;
-        private aoi _aoi = new aoi();
-        private string _aoiGuid = "";
-        private string _aoiName = "";
+        private TargetArea _targetArea = new TargetArea();
+        private string _targetAreaGuid = "";
+        private string _targetAreaName = "";
         private fad3CatchSubRow _catchSubRow;
         private string _gearClassGUID = "";
         private string _gearClassName = "";
@@ -117,33 +117,33 @@ namespace FAD3
             get { return imageList16; }
         }
 
-        public aoi AOI
+        public TargetArea TargetArea
         {
-            get { return _aoi; }
+            get { return _targetArea; }
         }
 
-        public string AOIGUID
+        public string TargetAreaGuid
         {
-            get { return _aoiGuid; }
+            get { return _targetAreaGuid; }
             set
             {
-                if (value != _aoiGuid)
+                if (value != _targetAreaGuid)
                 {
-                    _aoiGuid = value;
-                    _aoi.AOIGUID = _aoiGuid;
-                    FishingGrid.AOIGuid = _aoiGuid;
-                    Enumerators.AOIGuid = _aoiGuid;
+                    _targetAreaGuid = value;
+                    _targetArea.TargetAreaGuid = _targetAreaGuid;
+                    FishingGrid.AOIGuid = _targetAreaGuid;
+                    Enumerators.AOIGuid = _targetAreaGuid;
                 }
             }
         }
 
-        public string AOIName
+        public string TargetAreaName
         {
-            get { return _aoiName; }
+            get { return _targetAreaName; }
             set
             {
-                _aoiName = value;
-                _aoi.AOIName = _aoiName;
+                _targetAreaName = value;
+                _targetArea.TargetAreaName = _targetAreaName;
             }
         }
 
@@ -537,7 +537,7 @@ namespace FAD3
 
                     tsi = menuDropDown.Items.Add("Get landing sites from Google Earth KML");
                     tsi.Name = "menuLandingSiteFromKML";
-                    tsi.Enabled = _treeLevel == "aoi";
+                    tsi.Enabled = _treeLevel == "aoi" && FishingGrid.IsCompleteGrid25;
 
                     tsi = menuDropDown.Items.Add("Show landing sites on map");
                     tsi.Name = "menuShowOnMapLandingSites";
@@ -552,7 +552,7 @@ namespace FAD3
 
                     tsi = menuDropDown.Items.Add("New sampling");
                     tsi.Name = "menuNewSampling";
-                    tsi.Enabled = _treeLevel == "sampling" || _treeLevel == "landing_site" || _treeLevel == "gear";
+                    tsi.Enabled = (_treeLevel == "sampling" || _treeLevel == "landing_site" || _treeLevel == "gear") && FishingGrid.IsCompleteGrid25;
 
                     tsi = menuDropDown.Items.Add("Map fishing effort");
                     tsi.Name = "menuMapEffort";
@@ -865,7 +865,7 @@ namespace FAD3
 
         private void SetInventoryWindow(string inventoryGuid = "")
         {
-            var gearInventoryForm = GearInventoryForm.GetInstance(_aoi, inventoryGuid);
+            var gearInventoryForm = GearInventoryForm.GetInstance(_targetArea, inventoryGuid);
 
             if (gearInventoryForm.Visible)
             {
@@ -892,15 +892,15 @@ namespace FAD3
 
                             if (result == DialogResult.Yes)
                             {
-                                if (aoi.Delete(myTag.Item1))
+                                if (TargetArea.Delete(myTag.Item1))
                                 {
                                     treeMain.Nodes.Remove(treeMain.SelectedNode);
                                 }
                                 else
                                 {
-                                    if (aoi.LastError.Length > 0)
+                                    if (TargetArea.LastError.Length > 0)
                                     {
-                                        MessageBox.Show(aoi.LastError, "Error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                        MessageBox.Show(TargetArea.LastError, "Error", MessageBoxButtons.OK, MessageBoxIcon.Information);
                                     }
                                 }
                             }
@@ -928,7 +928,7 @@ namespace FAD3
                     break;
 
                 case "menuGearsInTargetArea":
-                    var tagf = TargetAreaGearsForm.GetInstance(_aoi);
+                    var tagf = TargetAreaGearsForm.GetInstance(_targetArea);
                     if (tagf.Visible)
                     {
                         tagf.BringToFront();
@@ -958,12 +958,12 @@ namespace FAD3
                     break;
 
                 case "menuNewLandingSite":
-                    LandingSiteForm fls = new LandingSiteForm(_aoi, this, _ls, isNew: true);
+                    LandingSiteForm fls = new LandingSiteForm(_targetArea, this, _ls, isNew: true);
                     fls.ShowDialog(this);
                     break;
 
                 case "menuLandingSiteFromKML":
-                    LandingSiteFromKMLForm lskf = LandingSiteFromKMLForm.GetInstance(_aoi);
+                    LandingSiteFromKMLForm lskf = LandingSiteFromKMLForm.GetInstance(_targetArea);
                     if (!lskf.Visible)
                     {
                         lskf.Show(this);
@@ -975,7 +975,7 @@ namespace FAD3
                     break;
 
                 case "menuShowOnMapLandingSites":
-                    if (!LandingSiteMappingHandler.ShowLandingSitesOnMap(global.MappingForm.MapLayersHandler, _aoiGuid, global.MappingForm.GeoProjection, true))
+                    if (!LandingSiteMappingHandler.ShowLandingSitesOnMap(global.MappingForm.MapLayersHandler, _targetAreaGuid, global.MappingForm.GeoProjection, true))
                     {
                         MessageBox.Show("Landing sites could not be shown on the map.\r\nPlease check landing site coordinates", "Mapping error", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
@@ -984,7 +984,7 @@ namespace FAD3
                 case "menuNewSampling":
                     if (FishingGrid.IsCompleteGrid25)
                     {
-                        if (Enumerators.AOIHaveEnumerators(_aoiGuid))
+                        if (Enumerators.AOIHaveEnumerators(_targetAreaGuid))
                             NewSamplingForm();
                         else
                         {
@@ -1044,11 +1044,11 @@ namespace FAD3
                     {
                         AOIForm.BringToFront();
                     }
-                    AOIForm.AOI = _aoi;
+                    AOIForm.TargetArea = _targetArea;
                     break;
 
                 case "menuLandingSiteProp":
-                    fls = new LandingSiteForm(_aoi, this, _ls);
+                    fls = new LandingSiteForm(_targetArea, this, _ls);
                     fls.Show();
                     break;
 
@@ -1135,11 +1135,11 @@ namespace FAD3
                 GearClassGuid = _gearClassGUID,
                 GearVarGuid = _GearVarGUID,
                 GearVarName = _GearVarName,
-                AOIGuid = AOIGUID,
-                AOIName = AOIName,
+                AOIGuid = TargetAreaGuid,
+                AOIName = TargetAreaName,
                 LandingSiteName = _LandingSiteName,
                 LandingSiteGuid = _LandingSiteGuid,
-                AOI = _aoi
+                AOI = _targetArea
             };
             f3.ListViewSamplingDetail(lvMain);
             f3.Parent_Form = this;
@@ -1228,10 +1228,10 @@ namespace FAD3
                                         if (item.Tag.ToString() == "aoi_data")
                                         {
                                             var myTag = (Tuple<string, string, string>)treeMain.SelectedNode.Tag;
-                                            _aoi.AOIGUID = myTag.Item1;
+                                            _targetArea.TargetAreaGuid = myTag.Item1;
                                             TargetAreaForm f = new TargetAreaForm(this, IsNew: false);
                                             f.Show();
-                                            f.AOI = _aoi;
+                                            f.TargetArea = _targetArea;
                                         }
                                         else if (item.Name == "Enumerators")
                                         {
@@ -1280,7 +1280,7 @@ namespace FAD3
                                         }
                                         else if (item.Tag.ToString() == "landing_site")
                                         {
-                                            LandingSiteForm fls = new LandingSiteForm(_aoi, this, _ls);
+                                            LandingSiteForm fls = new LandingSiteForm(_targetArea, this, _ls);
                                             fls.Show();
                                         }
                                     }
@@ -1451,6 +1451,11 @@ namespace FAD3
                     break;
 
                 case "onlineManual":
+                    var helpFile = $@"{global.ApplicationPath}\FAD3 Manual.chm";
+                    if (File.Exists(helpFile))
+                    {
+                        Help.ShowHelp(this, helpFile);
+                    }
                     break;
             }
         }
@@ -1647,8 +1652,8 @@ namespace FAD3
                 switch (_treeLevel)
                 {
                     case "gear":
-                        _aoiName = treeMain.SelectedNode.Parent.Parent.Text;
-                        this.AOIGUID = treeMain.SelectedNode.Parent.Parent.Name;
+                        _targetAreaName = treeMain.SelectedNode.Parent.Parent.Text;
+                        this.TargetAreaGuid = treeMain.SelectedNode.Parent.Parent.Name;
                         _LandingSiteName = treeMain.SelectedNode.Parent.Text;
                         _LandingSiteGuid = treeMain.SelectedNode.Parent.Name;
                         _GearVarName = treeMain.SelectedNode.Text;
@@ -1661,8 +1666,8 @@ namespace FAD3
                         break;
 
                     case "sampling":
-                        _aoiName = treeMain.SelectedNode.Parent.Parent.Parent.Text;
-                        this.AOIGUID = ((Tuple<string, string, string>)treeMain.SelectedNode.Parent.Parent.Parent.Tag).Item1;
+                        _targetAreaName = treeMain.SelectedNode.Parent.Parent.Parent.Text;
+                        this.TargetAreaGuid = ((Tuple<string, string, string>)treeMain.SelectedNode.Parent.Parent.Parent.Tag).Item1;
                         _LandingSiteName = treeMain.SelectedNode.Parent.Parent.Text;
                         _LandingSiteGuid = myTag.Item1;
                         _GearVarName = treeMain.SelectedNode.Parent.Text;
@@ -1676,8 +1681,8 @@ namespace FAD3
                         break;
 
                     case "aoi":
-                        _aoiName = treeMain.SelectedNode.Text;
-                        this.AOIGUID = treeMain.SelectedNode.Name;
+                        _targetAreaName = treeMain.SelectedNode.Text;
+                        this.TargetAreaGuid = treeMain.SelectedNode.Name;
                         _LandingSiteName = "";
                         _LandingSiteGuid = "";
                         _GearVarName = "";
@@ -1688,8 +1693,8 @@ namespace FAD3
                         break;
 
                     case "landing_site":
-                        _aoiName = treeMain.SelectedNode.Parent.Text;
-                        this.AOIGUID = treeMain.SelectedNode.Parent.Name;
+                        _targetAreaName = treeMain.SelectedNode.Parent.Text;
+                        this.TargetAreaGuid = treeMain.SelectedNode.Parent.Name;
                         _LandingSiteName = treeMain.SelectedNode.Text;
                         _LandingSiteGuid = treeMain.SelectedNode.Name;
                         _GearVarName = "";
@@ -1700,7 +1705,7 @@ namespace FAD3
                 }
 
                 SetUPLV(_treeLevel);
-                statusPanelTargetArea.Text = _aoiName;
+                statusPanelTargetArea.Text = _targetAreaName;
                 statusPanelLandingSite.Text = _LandingSiteName;
                 statusPanelGearUsed.Text = _GearVarName;
                 if (_treeLevel != "root") SetMappingEffortSource();
@@ -2175,7 +2180,7 @@ namespace FAD3
                     //add sampled years with count for entire database
                     lvi = lvMain.Items.Add("");
                     lvi = lvMain.Items.Add("Sampled years");
-                    foreach (string item in _aoi.SampledYears())
+                    foreach (string item in _targetArea.SampledYears())
                     {
                         if (i > 0)
                         {
@@ -2190,7 +2195,7 @@ namespace FAD3
                     lvi = lvMain.Items.Add("AOI");
                     i = 0;
 
-                    foreach (KeyValuePair<string, string> kv in _aoi.AOIWithSamplingCount())
+                    foreach (KeyValuePair<string, string> kv in _targetArea.TargetAreaWithSamplingCount())
                     {
                         if (i > 0)
                         {
@@ -2208,7 +2213,7 @@ namespace FAD3
 
                 case "aoi":
                     //arr = treeMain.SelectedNode.Tag.ToString().Split(',');
-                    myData = _aoi.AOIData();
+                    myData = _targetArea.TargetAreaData();
                     var arr = myData.Split('|');
 
                     //add AOI data for form
@@ -2228,12 +2233,12 @@ namespace FAD3
                     // add no. of samplings for this AOI
                     lvi = lvMain.Items.Add("");
                     lvi = lvMain.Items.Add("No. of samplings");
-                    lvi.SubItems.Add(_aoi.SampleCount().ToString());
+                    lvi.SubItems.Add(_targetArea.SampleCount().ToString());
 
                     //add sampled years with count
                     lvi = lvMain.Items.Add("Years sampling");
                     i = 0;
-                    foreach (KeyValuePair<string, string> item in _aoi.ListYearsWithSamplingCount())
+                    foreach (KeyValuePair<string, string> item in _targetArea.ListYearsWithSamplingCount())
                     {
                         if (i > 0)
                         {
@@ -2248,7 +2253,7 @@ namespace FAD3
                     lvi = lvMain.Items.Add("");
                     lvi = lvMain.Items.Add("Enumerators");
                     i = 0;
-                    foreach (KeyValuePair<string, string> item in Enumerators.EnumeratorsWithCount(_aoiGuid))
+                    foreach (KeyValuePair<string, string> item in Enumerators.EnumeratorsWithCount(_targetAreaGuid))
                     {
                         if (i > 0)
                         {
@@ -2265,7 +2270,7 @@ namespace FAD3
                     // so we just show a simple list
                     if (i == 0)
                     {
-                        foreach (KeyValuePair<string, string> item in Enumerators.AOIEnumeratorsList(_aoiGuid))
+                        foreach (KeyValuePair<string, string> item in Enumerators.AOIEnumeratorsList(_targetAreaGuid))
                         {
                             if (i > 0)
                             {
@@ -2282,7 +2287,7 @@ namespace FAD3
                     lvMain.Items.Add("");
                     lvi = lvMain.Items.Add("Landing sites");
                     i = 0;
-                    foreach (var item in _aoi.ListLandingSiteWithSamplingCount())
+                    foreach (var item in _targetArea.ListLandingSiteWithSamplingCount())
                     {
                         if (i > 0)
                         {
@@ -2299,7 +2304,7 @@ namespace FAD3
 
                     //add fishery inventories
                     n = 0;
-                    var inventory = new FishingGearInventory(_aoi);
+                    var inventory = new FishingGearInventory(_targetArea);
                     lvMain.Items.Add("");
                     lvi = lvMain.Items.Add("Fishery inventories");
                     if (inventory.Inventories.Count > 0)
@@ -2691,8 +2696,8 @@ namespace FAD3
             SamplingForm fs = new SamplingForm();
             fs.SamplingGUID = _SamplingGUID;
             fs.ListViewSamplingDetail(lvMain);
-            fs.AOI = _aoi;
-            fs.AOIGuid = _aoiGuid;
+            fs.AOI = _targetArea;
+            fs.AOIGuid = _targetAreaGuid;
             fs.Parent_Form = this;
             fs.VesselDimension(_vesLength, _vesWidth, _vesHeight);
             fs.Show(this);

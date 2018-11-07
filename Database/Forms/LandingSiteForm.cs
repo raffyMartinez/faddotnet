@@ -20,7 +20,7 @@ namespace FAD3
     /// </summary>
     public partial class LandingSiteForm : Form
     {
-        private aoi _aoi;
+        private TargetArea _targetArea;
         private bool _isNew = false;
         private Landingsite _landingSite;
         private string _lsGUID = "";
@@ -34,10 +34,10 @@ namespace FAD3
         private string _coordinateformat;
         private bool _hasCoordinate;
 
-        public LandingSiteForm(aoi aoi, LandingSiteFromKMLForm kmlParentForm, string name, double xCoord, double yCoord, bool isNew = false, bool definedFromKML = true)
+        public LandingSiteForm(TargetArea targetArea, LandingSiteFromKMLForm kmlParentForm, string name, double xCoord, double yCoord, bool isNew = false, bool definedFromKML = true)
         {
             InitializeComponent();
-            _aoi = aoi;
+            _targetArea = targetArea;
             _landingSiteName = name;
             _xCoordinate = xCoord;
             _yCoordinate = yCoord;
@@ -47,7 +47,7 @@ namespace FAD3
             _parentKMLForm = kmlParentForm;
         }
 
-        public LandingSiteForm(aoi aoi, MainForm parent, Landingsite landingSite, bool isNew = false)
+        public LandingSiteForm(TargetArea targetArea, MainForm parent, Landingsite landingSite, bool isNew = false)
         {
             //
             // The InitializeComponent() call is required for Windows Forms designer support.
@@ -57,7 +57,7 @@ namespace FAD3
             //
             // TODO: Add constructor code after the InitializeComponent() call.
             //
-            _aoi = aoi;
+            _targetArea = targetArea;
             _parentForm = parent;
             _isNew = isNew;
             _landingSite = landingSite;
@@ -130,7 +130,7 @@ namespace FAD3
         {
             if (textLandingSiteName.Text.Length > 0 && comboMunicipality.Text.Length > 0 && comboProvince.Text.Length > 0)
             {
-                if (aoi.LandingSiteFromName(textLandingSiteName.Text, _aoi.AOIGUID) == null)
+                if (TargetArea.LandingSiteFromName(textLandingSiteName.Text, _targetArea.TargetAreaGuid) == null)
                 {
                     return true;
                 }
@@ -157,7 +157,7 @@ namespace FAD3
                             LSData.Add("LSName", textLandingSiteName.Text);
                             LSData.Add("MunNo", _municipalityNumber.ToString());
                             LSData.Add("HasCoordinate", (textCoord.Text.Length > 0).ToString());
-                            LSData.Add("AOIGuid", _aoi.AOIGUID);
+                            LSData.Add("AOIGuid", _targetArea.TargetAreaGuid);
                             if (_isNew)
                             {
                                 myGUID = Guid.NewGuid().ToString();

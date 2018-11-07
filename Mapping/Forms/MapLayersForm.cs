@@ -17,6 +17,7 @@ namespace FAD3
         private int _rowIndexOfItemUnderMouseToDrop;
         private int _layerRow;
         private int _layerCol;
+        private int _layerHandle;
 
         private void OnLayerGrid_MouseMove(object sender, MouseEventArgs e)
         {
@@ -246,18 +247,21 @@ namespace FAD3
 
         private void OnCellClick(object sender, DataGridViewCellEventArgs e)
         {
+            _layerHandle = (int)layerGrid[0, e.RowIndex].Tag;
             if (e.ColumnIndex == 0)
             {
                 bool isVisible = (bool)layerGrid[0, e.RowIndex].Value;
                 layerGrid[0, e.RowIndex].Value = !isVisible;
-                var h = (int)layerGrid[0, e.RowIndex].Tag;
+                //var h = (int)layerGrid[0, e.RowIndex].Tag;
                 var layerName = layerGrid[e.ColumnIndex + 1, e.RowIndex].Value.ToString();
-                _mapLayersHandler.EditLayer(h, layerName, !isVisible);
+                //_mapLayersHandler.EditLayer(h, layerName, !isVisible);
+                _mapLayersHandler.EditLayer(_layerHandle, layerName, !isVisible);
             }
             if (e.ColumnIndex == 1)
             {
                 MarkCurrentLayerName(e.RowIndex);
-                _mapLayersHandler.set_MapLayer((int)layerGrid[0, e.RowIndex].Tag);
+                //_mapLayersHandler.set_MapLayer((int)layerGrid[0, e.RowIndex].Tag);
+                _mapLayersHandler.set_MapLayer(_layerHandle);
                 itemConvertToGrid25.Enabled = false;
                 if (global.MappingMode == fad3MappingMode.grid25Mode && _mapLayersHandler.CurrentMapLayer.LayerType == "ShapefileClass")
                 {
@@ -294,6 +298,15 @@ namespace FAD3
                     break;
 
                 case "itemLayerProperty":
+                    var sfa = ShapefileAttributesForm.GetInstance(global.MappingForm, global.MappingForm.MapInterActionHandler);
+                    if (!sfa.Visible)
+                    {
+                        sfa.Show(this);
+                    }
+                    else
+                    {
+                        sfa.BringToFront();
+                    }
                     break;
 
                 case "itemLayerExport":
@@ -338,6 +351,36 @@ namespace FAD3
 
                     //var sf = ShapefileLayerHelper.ConvertToGrid25((Shapefile)_mapLayersHandler.CurrentMapLayer.LayerObject, global.MappingForm.UTMZone);
                     //global.MappingForm.MapLayersHandler.AddLayer(sf, "Converted");
+                    break;
+            }
+        }
+
+        private void OnToolbarItemClick(object sender, ToolStripItemClickedEventArgs e)
+        {
+            switch (e.ClickedItem.Name)
+            {
+                case "buttonAddLayer":
+                    _parentForm.OpenFileDialog();
+                    break;
+
+                case "buttonRemoveLayer":
+                    MapLayers.RemoveLayer((int)layerGrid[0, _rowIndexFromMouseDown].Tag);
+                    break;
+
+                case "buttonAttributes":
+                    var sfa = ShapefileAttributesForm.GetInstance(global.MappingForm, global.MappingForm.MapInterActionHandler);
+                    if (!sfa.Visible)
+                    {
+                        sfa.Show(this);
+                    }
+                    else
+                    {
+                        sfa.BringToFront();
+                    }
+                    break;
+
+                case "buttonZoomToLayer":
+                    _mapLayersHandler.ZoomToLayer(_layerHandle);
                     break;
             }
         }

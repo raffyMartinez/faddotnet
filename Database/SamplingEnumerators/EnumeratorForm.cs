@@ -23,7 +23,7 @@ namespace FAD3
     /// </summary>
     public partial class EnumeratorForm : Form
     {
-        private aoi _AOI = new aoi();
+        private TargetArea _AOI = new TargetArea();
         private string _enumeratorGuid = "";
         private string _enumeratorName = "";
         private bool _IsNew = false;
@@ -125,7 +125,7 @@ namespace FAD3
             }
         }
 
-        public aoi AOI
+        public TargetArea AOI
         {
             get { return _AOI; }
             set { _AOI = value; }
@@ -134,7 +134,7 @@ namespace FAD3
         public void AddNew()
         {
             _IsNew = true;
-            this.Text = "Add a new enumerator for " + _AOI.AOIName;
+            this.Text = "Add a new enumerator for " + _AOI.TargetAreaName;
         }
 
         protected bool CheckDate(String date)

@@ -131,6 +131,7 @@ namespace FAD3
             this.imageList16.Images.SetKeyName(23, "paddle");
             this.imageList16.Images.SetKeyName(24, "propMed");
             this.imageList16.Images.SetKeyName(25, "nets");
+            this.imageList16.Images.SetKeyName(26, "label_add");
             // 
             // labelErrorDetail
             // 

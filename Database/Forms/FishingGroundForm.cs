@@ -264,7 +264,7 @@ namespace FAD3
                     break;
 
                 case "buttonGrids":
-                    FishingGroundExtentsForm fgf = new FishingGroundExtentsForm(_parent_form.Parent_Form.AOIGUID);
+                    FishingGroundExtentsForm fgf = new FishingGroundExtentsForm(_parent_form.Parent_Form.TargetAreaGuid);
                     fgf.Show(this);
                     break;
             }

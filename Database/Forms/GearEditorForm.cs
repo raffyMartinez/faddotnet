@@ -140,12 +140,12 @@ namespace FAD3
 
                 case fad3GearEditAction.addAOI:
                 case fad3GearEditAction.addLocalName:
-                    aoi AOI = new aoi();
+                    TargetArea AOI = new TargetArea();
 
                     ((ComboBox)comboBox).With(o =>
                     {
                         if (_action == fad3GearEditAction.addAOI)
-                            o.DataSource = new BindingSource(AOI.AOIs, null);
+                            o.DataSource = new BindingSource(AOI.TargetAreas, null);
                         else
                             o.DataSource = new BindingSource(gear.GearLocalNames, null); ;
 

@@ -41,8 +41,14 @@
             this.itemLayerExport = new System.Windows.Forms.ToolStripMenuItem();
             this.itemOptions = new System.Windows.Forms.ToolStripMenuItem();
             this.itemConvertToGrid25 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolBar = new System.Windows.Forms.ToolStrip();
+            this.buttonAddLayer = new System.Windows.Forms.ToolStripButton();
+            this.buttonRemoveLayer = new System.Windows.Forms.ToolStripButton();
+            this.buttonAttributes = new System.Windows.Forms.ToolStripButton();
+            this.buttonZoomToLayer = new System.Windows.Forms.ToolStripButton();
             ((System.ComponentModel.ISupportInitialize)(this.layerGrid)).BeginInit();
             this.menuLayers.SuspendLayout();
+            this.toolBar.SuspendLayout();
             this.SuspendLayout();
             // 
             // layerGrid
@@ -153,14 +159,65 @@
             // itemConvertToGrid25
             // 
             this.itemConvertToGrid25.Name = "itemConvertToGrid25";
-            this.itemConvertToGrid25.Size = new System.Drawing.Size(180, 22);
+            this.itemConvertToGrid25.Size = new System.Drawing.Size(167, 22);
             this.itemConvertToGrid25.Text = "Convert to Grid25";
+            // 
+            // toolBar
+            // 
+            this.toolBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.buttonAddLayer,
+            this.buttonRemoveLayer,
+            this.buttonAttributes,
+            this.buttonZoomToLayer});
+            this.toolBar.Location = new System.Drawing.Point(0, 0);
+            this.toolBar.Name = "toolBar";
+            this.toolBar.Size = new System.Drawing.Size(334, 25);
+            this.toolBar.TabIndex = 2;
+            this.toolBar.Text = "toolStrip1";
+            this.toolBar.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnToolbarItemClick);
+            // 
+            // buttonAddLayer
+            // 
+            this.buttonAddLayer.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.buttonAddLayer.Image = global::FAD3.Properties.Resources.layerAdd;
+            this.buttonAddLayer.ImageTransparentColor = System.Drawing.Color.White;
+            this.buttonAddLayer.Name = "buttonAddLayer";
+            this.buttonAddLayer.Size = new System.Drawing.Size(23, 22);
+            this.buttonAddLayer.Text = "toolStripButton1";
+            // 
+            // buttonRemoveLayer
+            // 
+            this.buttonRemoveLayer.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.buttonRemoveLayer.Image = global::FAD3.Properties.Resources.layerRemove;
+            this.buttonRemoveLayer.ImageTransparentColor = System.Drawing.Color.White;
+            this.buttonRemoveLayer.Name = "buttonRemoveLayer";
+            this.buttonRemoveLayer.Size = new System.Drawing.Size(23, 22);
+            this.buttonRemoveLayer.Text = "toolStripButton2";
+            // 
+            // buttonAttributes
+            // 
+            this.buttonAttributes.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.buttonAttributes.Image = global::FAD3.Properties.Resources.attrib;
+            this.buttonAttributes.ImageTransparentColor = System.Drawing.Color.White;
+            this.buttonAttributes.Name = "buttonAttributes";
+            this.buttonAttributes.Size = new System.Drawing.Size(23, 22);
+            this.buttonAttributes.Text = "toolStripButton3";
+            // 
+            // buttonZoomToLayer
+            // 
+            this.buttonZoomToLayer.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.buttonZoomToLayer.Image = global::FAD3.Properties.Resources.zoomSelection;
+            this.buttonZoomToLayer.ImageTransparentColor = System.Drawing.Color.White;
+            this.buttonZoomToLayer.Name = "buttonZoomToLayer";
+            this.buttonZoomToLayer.Size = new System.Drawing.Size(23, 22);
+            this.buttonZoomToLayer.Text = "toolStripButton4";
             // 
             // MapLayersForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(334, 366);
+            this.Controls.Add(this.toolBar);
             this.Controls.Add(this.buttonOK);
             this.Controls.Add(this.layerGrid);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
@@ -171,7 +228,10 @@
             this.Resize += new System.EventHandler(this.MapLayersForm_Resize);
             ((System.ComponentModel.ISupportInitialize)(this.layerGrid)).EndInit();
             this.menuLayers.ResumeLayout(false);
+            this.toolBar.ResumeLayout(false);
+            this.toolBar.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -189,5 +249,10 @@
         private System.Windows.Forms.ToolStripMenuItem itemLayerExport;
         private System.Windows.Forms.ToolStripMenuItem itemOptions;
         private System.Windows.Forms.ToolStripMenuItem itemConvertToGrid25;
+        private System.Windows.Forms.ToolStrip toolBar;
+        private System.Windows.Forms.ToolStripButton buttonAddLayer;
+        private System.Windows.Forms.ToolStripButton buttonRemoveLayer;
+        private System.Windows.Forms.ToolStripButton buttonAttributes;
+        private System.Windows.Forms.ToolStripButton buttonZoomToLayer;
     }
 }

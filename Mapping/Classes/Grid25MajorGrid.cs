@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 using FAD3.GUI.Classes;
+using FAD3.Mapping.Classes;
 
 namespace FAD3
 {
@@ -55,6 +56,9 @@ namespace FAD3
 
         public delegate void FishingGridRetrievedHandler(Grid25MajorGrid s, LayerEventArg e);              //event raised when a layer is selected from the list found in the layers form
         public event FishingGridRetrievedHandler GridRetrieved;
+
+        public delegate void MapExtentCreated(Grid25MajorGrid s, ExtentDraggedBoxEventArgs e);                          //event raised when an extent is created
+        public event MapExtentCreated ExtentCreatedInLayer;
 
         private static List<string> _filesToDeleteOnClose = new List<string>();
 
@@ -235,16 +239,33 @@ namespace FAD3
             _axMap.SendMouseUp = true;
             _axMap.SendMouseDown = true;
             _axMap.SendSelectBoxFinal = true;
+            _axMap.SendSelectBoxDrag = true;
 
             _axMap.MouseUpEvent += OnMapMouseUp;
             _axMap.MouseDownEvent += OnMapMouseDown;
             _axMap.SelectBoxFinal += OnMapSelectBoxFinal;
+            _axMap.SelectBoxDrag += OnSelectBoxDrag;
 
             _axMap.DblClick += OnMapDoubleClick;
             _axMap.CursorMode = tkCursorMode.cmSelection;
             _utmZone = fadUTMZone.utmZone51N;
 
             _grid25MinorGrid = new Grid25MinorGrid(_axMap);
+        }
+
+        private void OnSelectBoxDrag(object sender, _DMapEvents_SelectBoxDragEvent e)
+        {
+            double pLeft = 0;
+            double pRight = 0;
+            double pTop = 0;
+            double pBottom = 0;
+            _axMap.PixelToProj(e.left, e.top, ref pLeft, ref pTop);
+            _axMap.PixelToProj(e.right, e.bottom, ref pRight, ref pBottom);
+            if (ExtentCreatedInLayer != null)
+            {
+                ExtentDraggedBoxEventArgs arg = new ExtentDraggedBoxEventArgs(pTop, pBottom, pLeft, pRight, true);
+                ExtentCreatedInLayer(this, arg);
+            }
         }
 
         /// <summary>
@@ -1156,6 +1177,12 @@ namespace FAD3
 
                                     _completeFishingGrid = true;
                                     ApplyGridSymbology();
+
+                                    if (ExtentCreatedInLayer != null)
+                                    {
+                                        ExtentDraggedBoxEventArgs arg = new ExtentDraggedBoxEventArgs(_shapefileBoundingRectangle.Extents.yMax, _shapefileBoundingRectangle.Extents.yMin, _shapefileBoundingRectangle.Extents.xMin, _shapefileBoundingRectangle.Extents.xMax, false);
+                                        ExtentCreatedInLayer(this, arg);
+                                    }
                                 }
                                 _axMap.MapCursor = tkCursor.crsrMapDefault;
                             }

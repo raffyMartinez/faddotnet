@@ -15,7 +15,7 @@ namespace FAD3.Database.Forms
     public partial class GearInventoryEditForm : Form
     {
         private string _treeLevel;
-        private aoi _aoi;
+        private TargetArea _aoi;
         private string _inventoryGuid;
         private string _barangayInventoryGuid;
         private string _gearInventoryGuid;
@@ -63,7 +63,7 @@ namespace FAD3.Database.Forms
             }
         }
 
-        public GearInventoryEditForm(string treeLevel, aoi aoi, FishingGearInventory inventory, GearInventoryForm parent)
+        public GearInventoryEditForm(string treeLevel, TargetArea aoi, FishingGearInventory inventory, GearInventoryForm parent)
         {
             InitializeComponent();
             _treeLevel = treeLevel;

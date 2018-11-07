@@ -81,6 +81,11 @@ namespace FAD3
             return ((IEnumerable)_mapLayerDictionary.Values).GetEnumerator();
         }
 
+        public void ZoomToLayer(int layerHandle)
+        {
+            _axmap.ZoomToLayer(layerHandle);
+        }
+
         public void SaveLayerSettingsToXML()
         {
             foreach (var item in _mapLayerDictionary)

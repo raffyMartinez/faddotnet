@@ -19,8 +19,8 @@ namespace FAD3
     /// </summary>
     public partial class TargetAreaForm : Form
     {
-        private aoi _aoi = new aoi();
-        private bool _IsNew = false;
+        private TargetArea _targetArea = new TargetArea();
+        private bool _isNew = false;
         private static TargetAreaForm _instance;
         private MainForm _parent_form;
         private int _MouseX;
@@ -56,25 +56,25 @@ namespace FAD3
             return _instance;
         }
 
-        public aoi AOI
+        public TargetArea TargetArea
         {
-            get { return _aoi; }
+            get { return _targetArea; }
             set
             {
-                _aoi = value;
+                _targetArea = value;
                 ShowAOIProps();
             }
         }
 
         public void AddNew()
         {
-            _IsNew = true;
+            _isNew = true;
         }
 
         public TargetAreaForm(MainForm Parent, bool IsNew = false)
         {
             InitializeComponent();
-            _IsNew = IsNew;
+            _isNew = IsNew;
             _parent_form = Parent;
         }
 
@@ -82,11 +82,12 @@ namespace FAD3
         {
             textBoxOtherGrid.Text = "";
 
-            var myAOIdata = _aoi.AOIDataEx();
+            var myAOIdata = _targetArea.TargetAreaDataEx();
             if (myAOIdata.Count > 0)
             {
-                txtName.Text = myAOIdata["AOIName"].ToString();
-                txtCode.Text = myAOIdata["Code"].ToString();
+                txtName.Text = myAOIdata["AOIName"];
+                txtCode.Text = myAOIdata["Code"];
+                lblTitle.Text = $"Properties of {txtName.Text} target area";
                 var tabPageName = "";
                 switch (FishingGrid.GridType)
                 {
@@ -116,6 +117,11 @@ namespace FAD3
 
         private void OnFormLoad(object sender, EventArgs e)
         {
+            if (_isNew)
+            {
+                lblTitle.Text = "Add new target area";
+            }
+
             txtName.Focus();
             var lv = (ListView)tabAOI.TabPages["tabGrid25"].Controls["lvMaps"];
 
@@ -142,7 +148,7 @@ namespace FAD3
 
             comboUTMZone.SelectedIndex = -1;
             comboSubGrid.SelectedIndex = -1;
-            if (_IsNew)
+            if (_isNew)
             {
                 comboUTMZone.SelectedIndex = 0;
                 comboSubGrid.SelectedIndex = 0;
@@ -171,7 +177,7 @@ namespace FAD3
             if (txtName.Text.Length > 0 && txtCode.Text.Length > 0)
             {
                 var tabPage = tabAOI.SelectedTab.Name;
-                if (_IsNew)
+                if (_isNew)
                 {
                     if (tabPage == "tabGrid25")
                     {
@@ -229,20 +235,20 @@ namespace FAD3
             var Success = false;
             var tabPage = tabAOI.SelectedTab.Name;
 
-            if (_IsNew)
+            if (_isNew)
             {
-                _aoi.AOIGUID = Guid.NewGuid().ToString();
+                _targetArea.TargetAreaGuid = Guid.NewGuid().ToString();
             }
 
             Dictionary<string, string> TargetAreaData = new Dictionary<string, string>();
             TargetAreaData.Add("AOIName", txtName.Text);
             TargetAreaData.Add("Letter", txtCode.Text);
-            TargetAreaData.Add("AOIGUID", _aoi.AOIGUID);
-            TargetAreaData.Add("DataStatus", _IsNew ?
+            TargetAreaData.Add("AOIGUID", _targetArea.TargetAreaGuid);
+            TargetAreaData.Add("DataStatus", _isNew ?
                                               fad3DataStatus.statusNew.ToString() :
                                               fad3DataStatus.statusEdited.ToString());
 
-            if (aoi.UpdateData(TargetAreaData))
+            if (TargetArea.UpdateData(TargetAreaData))
             {
                 var Maps = new Dictionary<string, (string MapName, string ULGrid, string LRGrid)>();
                 var FirstMap = "";
@@ -268,7 +274,7 @@ namespace FAD3
                     //save other grid data
                     Maps = null;
                 }
-                Success = FishingGrid.SaveTargetAreaGrid25(_aoi.AOIGUID, UseGrid25: tabPage == "tabGrid25",
+                Success = FishingGrid.SaveTargetAreaGrid25(_targetArea.TargetAreaGuid, UseGrid25: tabPage == "tabGrid25",
                                 Zone, SubGridStyle, Maps, FirstMap);
             }
             return Success;
@@ -283,9 +289,9 @@ namespace FAD3
                     {
                         if (SaveTargetArea())
                         {
-                            if (_IsNew)
+                            if (_isNew)
                             {
-                                _parent_form.NewTargetArea(txtName.Text, _aoi.AOIGUID);
+                                _parent_form.NewTargetArea(txtName.Text, _targetArea.TargetAreaGuid);
                             }
                             else
                             {
@@ -384,7 +390,7 @@ namespace FAD3
 
                 case "buttonRemoveMap":
                     var itemText = lvMaps.SelectedItems[0].Text;
-                    if (FishingGrid.DeleteFishingGroundMap(itemText, _aoi.AOIGUID))
+                    if (FishingGrid.DeleteFishingGroundMap(itemText, _targetArea.TargetAreaGuid))
                     {
                         lvMaps.Items.RemoveByKey(itemText);
                     }
@@ -402,7 +408,7 @@ namespace FAD3
                     switch (o.Name)
                     {
                         case "txtName":
-                            if (_IsNew && o.Text.Length < 4)
+                            if (_isNew && o.Text.Length < 4)
                             {
                                 msg = "Target area name must be at least 5 letters long";
                                 e.Cancel = true;

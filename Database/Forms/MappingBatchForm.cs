@@ -68,7 +68,7 @@ namespace FAD3.Database.Forms
                                         var mehf = MapEffortHelperForm.GetInstance();
                                         mehf.BatchMode = true;
                                         mehf.CombineYearsInOneMap = chkCombinedMap.Checked;
-                                        mehf.SetUpMapping(f.AOI.AOIGUID, item.Tag.ToString(), item.SubItems[1].Text, f.AOI.AOIName);
+                                        mehf.SetUpMapping(f.TargetArea.TargetAreaGuid, item.Tag.ToString(), item.SubItems[1].Text, f.TargetArea.TargetAreaName);
                                         mehf.MapTargetAreaGearFishingGroundBatch(this);
                                         //var file = $@"{FishingGearMapping.SaveMapFolder}\{item.Text}-{item.SubItems[1].Text}.tif";
                                         //global.MappingForm.SaveMapImage(int.Parse(txtDPI.Text), file, false);

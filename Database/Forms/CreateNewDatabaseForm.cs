@@ -26,7 +26,7 @@ namespace FAD3
         {
             global.LoadFormSettings(this, true);
             group2.Visible = false;
-            Size = new Size(group1.Width + (group1.Left * 2), Height);
+            Size = new Size(group1.Width + (group1.Left * 5), Height);
         }
 
         private void Onbutton_Click(object sender, EventArgs e)
@@ -84,6 +84,7 @@ namespace FAD3
                         checkSciNames.Checked = true;
                         checkFishLocalNames.Checked = true;
                         checkEnumerators.Checked = true;
+                        checkInventory.Checked = true;
 
                         _requiredTables.Add("FBSpecies");
                         _requiredTables.Add("Provinces");
@@ -204,6 +205,41 @@ namespace FAD3
                 qd.Execute();
             }
 
+            if (checkAOI.Checked && checkGearLocalNames.Checked && checkFishLocalNames.Checked && checkInventory.Checked)
+            {
+                sql = $"Insert Into tblGearInventories In '{_newMDBFile}' Select {TableFieldList("tblGearInventories")} from tblGearInventories";
+                qd = dbData.CreateQueryDef("", sql);
+                qd.Execute();
+
+                sql = $"Insert Into tblGearInventoryBarangay In '{_newMDBFile}' Select {TableFieldList("tblGearInventoryBarangay")} from tblGearInventoryBarangay";
+                qd = dbData.CreateQueryDef("", sql);
+                qd.Execute();
+
+                sql = $"Insert Into tblGearInventoryBarangayData In '{_newMDBFile}' Select {TableFieldList("tblGearInventoryBarangayData")} from tblGearInventoryBarangayData";
+                qd = dbData.CreateQueryDef("", sql);
+                qd.Execute();
+
+                sql = $"Insert Into tblGearInventoryCatchComposition In '{_newMDBFile}' Select {TableFieldList("tblGearInventoryCatchComposition")} from tblGearInventoryCatchComposition";
+                qd = dbData.CreateQueryDef("", sql);
+                qd.Execute();
+
+                sql = $"Insert Into tblGearInventoryCPUEHistorical In '{_newMDBFile}' Select {TableFieldList("tblGearInventoryCPUEHistorical")} from tblGearInventoryCPUEHistorical";
+                qd = dbData.CreateQueryDef("", sql);
+                qd.Execute();
+
+                sql = $"Insert Into tblGearInventoryGearLocalNames In '{_newMDBFile}' Select {TableFieldList("tblGearInventoryGearLocalNames")} from tblGearInventoryGearLocalNames";
+                qd = dbData.CreateQueryDef("", sql);
+                qd.Execute();
+
+                sql = $"Insert Into tblGearInventoryMonthsUsed In '{_newMDBFile}' Select {TableFieldList("tblGearInventoryMonthsUsed")} from tblGearInventoryMonthsUsed";
+                qd = dbData.CreateQueryDef("", sql);
+                qd.Execute();
+
+                sql = $"Insert Into tblGearInventoryPeakMonths In '{_newMDBFile}' Select {TableFieldList("tblGearInventoryPeakMonths")} from tblGearInventoryPeakMonths";
+                qd = dbData.CreateQueryDef("", sql);
+                qd.Execute();
+            }
+
             qd.Close();
             qd = null;
 
@@ -217,10 +253,41 @@ namespace FAD3
 
         private void checkAOI_CheckedChanged(object sender, EventArgs e)
         {
-            if (checkAOI.Checked == false)
+            if (!checkAOI.Checked)
             {
                 checkLandingSites.Checked = false;
                 checkEnumerators.Checked = false;
+                checkInventory.Checked = false;
+
+                checkLandingSites.Enabled = false;
+                checkEnumerators.Enabled = false;
+                checkInventory.Enabled = false;
+            }
+            else
+            {
+                checkLandingSites.Enabled = true;
+                checkEnumerators.Enabled = true;
+                checkInventory.Enabled = true;
+            }
+
+            if (!checkGearLocalNames.Checked)
+            {
+                checkInventory.Checked = false;
+                checkInventory.Enabled = false;
+            }
+            else
+            {
+                if (checkInventory.Enabled) checkInventory.Enabled = true;
+            }
+
+            if (!checkFishLocalNames.Checked)
+            {
+                checkInventory.Checked = false;
+                checkInventory.Enabled = false;
+            }
+            else
+            {
+                if (checkInventory.Enabled) checkInventory.Enabled = true;
             }
         }
 

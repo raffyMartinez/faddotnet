@@ -33,8 +33,9 @@
             this.txtMapTitle = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.groupLabels = new System.Windows.Forms.GroupBox();
-            this.buttonLabel = new System.Windows.Forms.Button();
+            this.btnLabelsFromKML = new System.Windows.Forms.Button();
             this.imList = new System.Windows.Forms.ImageList(this.components);
+            this.buttonLabel = new System.Windows.Forms.Button();
             this.label12 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
@@ -74,6 +75,7 @@
             this.tsButtonMBRs = new System.Windows.Forms.ToolStripButton();
             this.tsButtonRetrieve = new System.Windows.Forms.ToolStripButton();
             this.tsButtonExit = new System.Windows.Forms.ToolStripButton();
+            this.lblGridStatus = new System.Windows.Forms.Label();
             this.groupLabels.SuspendLayout();
             this.toolbar.SuspendLayout();
             this.SuspendLayout();
@@ -97,6 +99,7 @@
             // 
             // groupLabels
             // 
+            this.groupLabels.Controls.Add(this.btnLabelsFromKML);
             this.groupLabels.Controls.Add(this.buttonLabel);
             this.groupLabels.Controls.Add(this.label12);
             this.groupLabels.Controls.Add(this.label11);
@@ -129,6 +132,25 @@
             this.groupLabels.TabStop = false;
             this.groupLabels.Text = "Labels";
             // 
+            // btnLabelsFromKML
+            // 
+            this.btnLabelsFromKML.ImageKey = "label_add";
+            this.btnLabelsFromKML.ImageList = this.imList;
+            this.btnLabelsFromKML.Location = new System.Drawing.Point(172, 323);
+            this.btnLabelsFromKML.Name = "btnLabelsFromKML";
+            this.btnLabelsFromKML.Size = new System.Drawing.Size(23, 23);
+            this.btnLabelsFromKML.TabIndex = 27;
+            this.btnLabelsFromKML.UseVisualStyleBackColor = true;
+            // 
+            // imList
+            // 
+            this.imList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imList.ImageStream")));
+            this.imList.TransparentColor = System.Drawing.Color.White;
+            this.imList.Images.SetKeyName(0, "gridCursor");
+            this.imList.Images.SetKeyName(1, "clearSelection");
+            this.imList.Images.SetKeyName(2, "label");
+            this.imList.Images.SetKeyName(3, "label_add");
+            // 
             // buttonLabel
             // 
             this.buttonLabel.ImageKey = "label";
@@ -139,14 +161,6 @@
             this.buttonLabel.TabIndex = 26;
             this.buttonLabel.UseVisualStyleBackColor = true;
             this.buttonLabel.Click += new System.EventHandler(this.OnButtons_Click);
-            // 
-            // imList
-            // 
-            this.imList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imList.ImageStream")));
-            this.imList.TransparentColor = System.Drawing.Color.White;
-            this.imList.Images.SetKeyName(0, "gridCursor");
-            this.imList.Images.SetKeyName(1, "clearSelection");
-            this.imList.Images.SetKeyName(2, "label");
             // 
             // label12
             // 
@@ -404,7 +418,7 @@
             // 
             // buttonClose
             // 
-            this.buttonClose.Location = new System.Drawing.Point(229, 457);
+            this.buttonClose.Location = new System.Drawing.Point(225, 480);
             this.buttonClose.Name = "buttonClose";
             this.buttonClose.Size = new System.Drawing.Size(48, 28);
             this.buttonClose.TabIndex = 5;
@@ -512,11 +526,20 @@
             this.tsButtonExit.Text = "toolStripButton1";
             this.tsButtonExit.ToolTipText = "Close";
             // 
+            // lblGridStatus
+            // 
+            this.lblGridStatus.Location = new System.Drawing.Point(4, 455);
+            this.lblGridStatus.Name = "lblGridStatus";
+            this.lblGridStatus.Size = new System.Drawing.Size(215, 68);
+            this.lblGridStatus.TabIndex = 8;
+            this.lblGridStatus.Text = "Grid status:";
+            // 
             // Grid25GenerateForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(285, 494);
+            this.ClientSize = new System.Drawing.Size(285, 532);
+            this.Controls.Add(this.lblGridStatus);
             this.Controls.Add(this.toolbar);
             this.Controls.Add(this.buttonClose);
             this.Controls.Add(this.groupLabels);
@@ -586,5 +609,7 @@
         private System.Windows.Forms.ToolStripButton tsButtonMBRs;
         private System.Windows.Forms.ToolStripButton tsButtonRetrieve;
         private System.Windows.Forms.ToolStripButton tsButtonExit;
+        private System.Windows.Forms.Button btnLabelsFromKML;
+        private System.Windows.Forms.Label lblGridStatus;
     }
 }

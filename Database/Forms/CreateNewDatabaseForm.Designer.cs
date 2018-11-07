@@ -41,6 +41,7 @@
             this.checkGearVar = new System.Windows.Forms.CheckBox();
             this.checkLandingSites = new System.Windows.Forms.CheckBox();
             this.checkAOI = new System.Windows.Forms.CheckBox();
+            this.checkInventory = new System.Windows.Forms.CheckBox();
             this.group1.SuspendLayout();
             this.group2.SuspendLayout();
             this.SuspendLayout();
@@ -59,7 +60,7 @@
             // 
             // buttonOk
             // 
-            this.buttonOk.Location = new System.Drawing.Point(300, 384);
+            this.buttonOk.Location = new System.Drawing.Point(290, 378);
             this.buttonOk.Margin = new System.Windows.Forms.Padding(4);
             this.buttonOk.Name = "buttonOk";
             this.buttonOk.Size = new System.Drawing.Size(66, 28);
@@ -70,7 +71,7 @@
             // 
             // buttonCancel
             // 
-            this.buttonCancel.Location = new System.Drawing.Point(228, 384);
+            this.buttonCancel.Location = new System.Drawing.Point(218, 378);
             this.buttonCancel.Margin = new System.Windows.Forms.Padding(4);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(66, 28);
@@ -104,6 +105,7 @@
             // 
             // group2
             // 
+            this.group2.Controls.Add(this.checkInventory);
             this.group2.Controls.Add(this.checkGearLocalNames);
             this.group2.Controls.Add(this.checkEnumerators);
             this.group2.Controls.Add(this.checkFishLocalNames);
@@ -130,6 +132,7 @@
             this.checkGearLocalNames.TabIndex = 6;
             this.checkGearLocalNames.Text = "Local names of fishing gears";
             this.checkGearLocalNames.UseVisualStyleBackColor = true;
+            this.checkGearLocalNames.CheckedChanged += new System.EventHandler(this.checkAOI_CheckedChanged);
             // 
             // checkEnumerators
             // 
@@ -152,6 +155,7 @@
             this.checkFishLocalNames.TabIndex = 4;
             this.checkFishLocalNames.Text = "Local names of fish";
             this.checkFishLocalNames.UseVisualStyleBackColor = true;
+            this.checkFishLocalNames.CheckedChanged += new System.EventHandler(this.checkAOI_CheckedChanged);
             // 
             // checkSciNames
             // 
@@ -198,6 +202,17 @@
             this.checkAOI.UseVisualStyleBackColor = true;
             this.checkAOI.CheckedChanged += new System.EventHandler(this.checkAOI_CheckedChanged);
             // 
+            // checkInventory
+            // 
+            this.checkInventory.AutoSize = true;
+            this.checkInventory.Location = new System.Drawing.Point(29, 214);
+            this.checkInventory.Margin = new System.Windows.Forms.Padding(4);
+            this.checkInventory.Name = "checkInventory";
+            this.checkInventory.Size = new System.Drawing.Size(116, 19);
+            this.checkInventory.TabIndex = 7;
+            this.checkInventory.Text = "Fishery inventory";
+            this.checkInventory.UseVisualStyleBackColor = true;
+            // 
             // CreateNewDatabaseForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -237,5 +252,6 @@
         private System.Windows.Forms.CheckBox checkAOI;
         private System.Windows.Forms.CheckBox checkEnumerators;
         private System.Windows.Forms.CheckBox checkGearLocalNames;
+        private System.Windows.Forms.CheckBox checkInventory;
     }
 }

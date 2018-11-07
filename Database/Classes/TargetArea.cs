@@ -19,13 +19,13 @@ namespace FAD3
     /// <summary>
     /// Description of AOI.
     /// </summary>
-    public class aoi
+    public class TargetArea
     {
-        private string _AOIGUID = "";
-        private string _AOIName = "";
-        private string _AOILetter = "";
-        private string _MajorGrids = "";
-        private Dictionary<string, string> _aois = new Dictionary<string, string>();
+        private string _targetAreaGuid = "";
+        private string _targetAreaName = "";
+        private string _targetAreaLetter = "";
+        private string _majorGrids = "";
+        private Dictionary<string, string> _targetAreas = new Dictionary<string, string>();
         private Dictionary<string, string> _landingSites = new Dictionary<string, string>();
         private static string _lastError;
 
@@ -37,7 +37,7 @@ namespace FAD3
         public bool LandingSiteExists(string landingSiteName)
         {
             bool exists = false;
-            getLandingSites();
+            GetLandingSites();
             if (_landingSites.ContainsValue(landingSiteName))
             {
                 exists = true;
@@ -48,49 +48,49 @@ namespace FAD3
 
         public string MajorGrids
         {
-            get { return _MajorGrids; }
+            get { return _majorGrids; }
         }
 
         public Dictionary<string, string> LandingSites
         {
             get
             {
-                getLandingSites();
+                GetLandingSites();
                 return _landingSites;
             }
         }
 
-        public Dictionary<string, string> AOIs
+        public Dictionary<string, string> TargetAreas
         {
             get
             {
-                getAOIs();
-                return _aois;
+                getTargetAreas();
+                return _targetAreas;
             }
         }
 
-        public string AOILetter
+        public string TargetAreaLetter
         {
-            get { return _AOILetter; }
+            get { return _targetAreaLetter; }
         }
 
-        public string AOIName
+        public string TargetAreaName
         {
-            get { return _AOIName; }
-            set { _AOIName = value; }
+            get { return _targetAreaName; }
+            set { _targetAreaName = value; }
         }
 
-        public string AOIGUID
+        public string TargetAreaGuid
         {
-            get { return _AOIGUID; }
+            get { return _targetAreaGuid; }
             set
             {
-                _AOIGUID = value;
-                _AOIName = GetAOIName(_AOIGUID);
+                _targetAreaGuid = value;
+                _targetAreaName = GetTargetAreaName(_targetAreaGuid);
             }
         }
 
-        public aoi()
+        public TargetArea()
         {
             //default constructor
         }
@@ -132,7 +132,7 @@ namespace FAD3
                     conection.Open();
                     string query = $@"SELECT Year([SamplingDate]) AS SamplingYear, Count(tblLandingSites.LSGUID) AS n
                                       FROM tblLandingSites INNER JOIN tblSampling ON tblLandingSites.LSGUID = tblSampling.LSGUID
-                                      WHERE tblLandingSites.AOIGuid={{{_AOIGUID}}} GROUP BY Year([SamplingDate])";
+                                      WHERE tblLandingSites.AOIGuid={{{_targetAreaGuid}}} GROUP BY Year([SamplingDate])";
 
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
@@ -176,7 +176,7 @@ namespace FAD3
             }
         }
 
-        public string GetAOIName(string AOIGUID)
+        public string GetTargetAreaName(string AOIGUID)
         {
             string myName = "";
             using (var conection = new OleDbConnection(global.ConnectionString))
@@ -184,14 +184,14 @@ namespace FAD3
                 try
                 {
                     conection.Open();
-                    string query = $"SELECT AOIName, Letter, MajorGridList from tblAOI WHERE AOIGuid= '{{{_AOIGUID}}}'";
+                    string query = $"SELECT AOIName, Letter, MajorGridList from tblAOI WHERE AOIGuid= '{{{_targetAreaGuid}}}'";
                     var command = new OleDbCommand(query, conection);
                     var reader = command.ExecuteReader();
                     if (reader.Read())
                     {
                         myName = reader["AOIName"].ToString();
-                        _AOILetter = reader["Letter"].ToString();
-                        _MajorGrids = reader["MajorGridList"].ToString();
+                        _targetAreaLetter = reader["Letter"].ToString();
+                        _majorGrids = reader["MajorGridList"].ToString();
                     }
                 }
                 catch (Exception ex)
@@ -202,7 +202,7 @@ namespace FAD3
             }
         }
 
-        public static Dictionary<string, string> getAOIsEx(ComboBox c = null)
+        public static Dictionary<string, string> GetTargetAreasEx(ComboBox c = null)
         {
             var myList = new Dictionary<string, string>();
             DataTable dt = new DataTable();
@@ -233,9 +233,9 @@ namespace FAD3
             }
         }
 
-        private void getAOIs()
+        private void getTargetAreas()
         {
-            _aois.Clear();
+            _targetAreas.Clear();
             DataTable dt = new DataTable();
             using (var conection = new OleDbConnection(global.ConnectionString))
             {
@@ -248,7 +248,7 @@ namespace FAD3
                     for (int i = 0; i < dt.Rows.Count; i++)
                     {
                         DataRow dr = dt.Rows[i];
-                        _aois.Add(dr["AOIGuid"].ToString(), dr["AOIName"].ToString());
+                        _targetAreas.Add(dr["AOIGuid"].ToString(), dr["AOIName"].ToString());
                     }
                 }
                 catch (Exception ex)
@@ -291,7 +291,7 @@ namespace FAD3
             return landingSite;
         }
 
-        public static Dictionary<string, string> LandingSitesFromAOI(string AOIguid, ComboBox c = null)
+        public static Dictionary<string, string> LandingSitesFromTargetArea(string targetAreaGuid, ComboBox c = null)
         {
             Dictionary<string, string> LandingSites = new Dictionary<string, string>();
             DataTable dt = new DataTable();
@@ -300,7 +300,7 @@ namespace FAD3
                 try
                 {
                     conection.Open();
-                    string query = $"SELECT LSGUID, LSName FROM tblLandingSites WHERE AOIGuid= {{{AOIguid}}} order by LSName";
+                    string query = $"SELECT LSGUID, LSName FROM tblLandingSites WHERE AOIGuid= {{{targetAreaGuid}}} order by LSName";
                     using (var adapter = new OleDbDataAdapter(query, conection))
                     {
                         adapter.Fill(dt);
@@ -323,9 +323,9 @@ namespace FAD3
             return LandingSites;
         }
 
-        public aoi(string AOIGUID)
+        public TargetArea(string AOIGUID)
         {
-            _AOIGUID = AOIGUID;
+            _targetAreaGuid = AOIGUID;
         }
 
         public long SampleCount()
@@ -336,7 +336,7 @@ namespace FAD3
                 try
                 {
                     conection.Open();
-                    string query = $"SELECT Count(SamplingGUID) AS n FROM tblSampling WHERE AOI= {{{_AOIGUID}}}";
+                    string query = $"SELECT Count(SamplingGUID) AS n FROM tblSampling WHERE AOI= {{{_targetAreaGuid}}}";
 
                     var command = new OleDbCommand(query, conection);
                     var reader = command.ExecuteReader();
@@ -354,7 +354,7 @@ namespace FAD3
             return myCount;
         }
 
-        public Dictionary<string, string> AOIWithSamplingCount()
+        public Dictionary<string, string> TargetAreaWithSamplingCount()
         {
             Dictionary<string, string> myDict = new Dictionary<string, string>();
             DataTable dt = new DataTable();
@@ -393,7 +393,7 @@ namespace FAD3
                     conection.Open();
                     string query = $@"SELECT tblLandingSites.LSGUID, tblLandingSites.LSName, Count(tblSampling.SamplingGUID) AS n
                                    FROM tblLandingSites LEFT JOIN tblSampling ON tblLandingSites.LSGUID = tblSampling.LSGUID
-                                   WHERE tblLandingSites.AOIGuid = {{{_AOIGUID}}} GROUP BY tblLandingSites.LSGUID, tblLandingSites.LSName";
+                                   WHERE tblLandingSites.AOIGuid = {{{_targetAreaGuid}}} GROUP BY tblLandingSites.LSGUID, tblLandingSites.LSName";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
                     for (int i = 0; i < dt.Rows.Count; i++)
@@ -411,7 +411,7 @@ namespace FAD3
             return myLandingSites;
         }
 
-        private void getLandingSites()
+        private void GetLandingSites()
         {
             _landingSites.Clear();
             DataTable dt = new DataTable();
@@ -420,7 +420,7 @@ namespace FAD3
                 try
                 {
                     conection.Open();
-                    string query = $"SELECT LSGUID, LSName FROM tblLandingSites WHERE AOIGuid= {{{_AOIGUID}}} order by LSName";
+                    string query = $"SELECT LSGUID, LSName FROM tblLandingSites WHERE AOIGuid= {{{_targetAreaGuid}}} order by LSName";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
                     for (int i = 0; i < dt.Rows.Count; i++)
@@ -515,7 +515,7 @@ namespace FAD3
             return Success;
         }
 
-        public Dictionary<string, string> AOIDataEx()
+        public Dictionary<string, string> TargetAreaDataEx()
         {
             Dictionary<string, string> myData = new Dictionary<string, string>();
             var dt = new DataTable();
@@ -524,7 +524,7 @@ namespace FAD3
                 try
                 {
                     conection.Open();
-                    string query = $"Select AOIName, Letter from tblAOI where AOIGuid = {{{_AOIGUID}}}";
+                    string query = $"Select AOIName, Letter from tblAOI where AOIGuid = {{{_targetAreaGuid}}}";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
                     for (int i = 0; i < dt.Rows.Count; i++)
@@ -542,7 +542,7 @@ namespace FAD3
             return myData;
         }
 
-        public string AOIData()
+        public string TargetAreaData()
         {
             string rv = "";
             var myDT = new DataTable();
@@ -552,7 +552,7 @@ namespace FAD3
                 {
                     conection.Open();
 
-                    string query = $"Select AOIName, Letter, MajorGridList from tblAOI where AOIGuid = {{{_AOIGUID}}}";
+                    string query = $"Select AOIName, Letter, MajorGridList from tblAOI where AOIGuid = {{{_targetAreaGuid}}}";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(myDT);
                     DataRow dr = myDT.Rows[0];
@@ -586,7 +586,7 @@ namespace FAD3
                 {
                     conection.Open();
                     string query = $@"SELECT Year([SamplingDate]) AS sYear, Count(tblSampling.SamplingGUID) AS n
-                                      FROM tblSampling WHERE AOI= {{{_AOIGUID}}} GROUP BY Year([SamplingDate])";
+                                      FROM tblSampling WHERE AOI= {{{_targetAreaGuid}}} GROUP BY Year([SamplingDate])";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(myDT);
                     for (int i = 0; i < myDT.Rows.Count; i++)
@@ -603,7 +603,7 @@ namespace FAD3
             return myYears;
         }
 
-        public static string AOICodeFromGuid(string AOIGuid)
+        public static string TargetAreaCodeFromGuid(string AOIGuid)
         {
             var code = "";
             using (var con = new OleDbConnection(global.ConnectionString))

@@ -14,7 +14,7 @@ namespace FAD3.Database.Forms
     public partial class GearInventoryForm : Form
     {
         private static GearInventoryForm _instance;
-        private aoi _aoi;
+        private TargetArea _aoi;
         private FishingGearInventory _inventory;
         private string _treeLevel;
         private string _inventoryGuid;
@@ -30,13 +30,13 @@ namespace FAD3.Database.Forms
         private string _currentGearInventoryGuid;
         private ListViewItem _listTargetHit;
 
-        public static GearInventoryForm GetInstance(aoi aoi, string inventoryGuid = "")
+        public static GearInventoryForm GetInstance(TargetArea aoi, string inventoryGuid = "")
         {
             if (_instance == null) return new GearInventoryForm(aoi, inventoryGuid);
             return _instance;
         }
 
-        public GearInventoryForm(aoi aoi, string inventoryGuid)
+        public GearInventoryForm(TargetArea aoi, string inventoryGuid)
         {
             InitializeComponent();
             _aoi = aoi;

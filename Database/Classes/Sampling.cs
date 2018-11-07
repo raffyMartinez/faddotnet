@@ -29,14 +29,6 @@ namespace FAD3
         private static List<string> _engines = new List<string>();
         private static bool _engineReadDone = false;
 
-        public static void AddEngine(string engine)
-        {
-            if (!_engines.Contains(engine))
-            {
-                _engines.Add(engine);
-            }
-        }
-
         public static List<string> Engines
         {
             get { return _engines; }
@@ -851,6 +843,7 @@ namespace FAD3
         {
             bool Success = false;
             string updateQuery = "";
+            string engine = "";
             using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
             {
                 try
@@ -859,7 +852,7 @@ namespace FAD3
                     var hp = EffortData["EngineHorsepower"].Length == 0 ? "null" : EffortData["EngineHorsepower"];
                     var wtSample = EffortData["WeightOfSample"].Length == 0 ? "null" : EffortData["WeightOfSample"];
                     var wtCatch = EffortData["WeightOfCatch"].Length == 0 ? "null" : EffortData["WeightOfCatch"];
-                    var engine = EffortData["Engine"].Length == 0 ? "" : EffortData["Engine"];
+                    engine = EffortData["Engine"].Length == 0 ? "" : EffortData["Engine"];
                     var vesL = string.IsNullOrWhiteSpace(EffortData["VesLength"]) ? "null" : EffortData["VesLength"];
                     var vesH = string.IsNullOrWhiteSpace(EffortData["VesHeight"]) ? "null" : EffortData["VesHeight"];
                     var vesW = string.IsNullOrWhiteSpace(EffortData["VesWidth"]) ? "null" : EffortData["VesWidth"];
@@ -949,7 +942,13 @@ namespace FAD3
                     Logger.Log(ex);
                 }
             }
-
+            if (Success)
+            {
+                if (!_engines.Contains(engine))
+                {
+                    _engines.Add(engine);
+                }
+            }
             return Success;
         }
 

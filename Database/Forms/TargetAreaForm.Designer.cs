@@ -56,6 +56,7 @@ namespace FAD3
             this.buttonDefine = new System.Windows.Forms.Button();
             this.textBoxOtherGrid = new System.Windows.Forms.TextBox();
             this.tabMBR = new System.Windows.Forms.TabPage();
+            this.lblTitle = new System.Windows.Forms.Label();
             this.tabAOI.SuspendLayout();
             this.tabGrid25.SuspendLayout();
             this.tabOtherGrid.SuspendLayout();
@@ -64,7 +65,7 @@ namespace FAD3
             // txtName
             // 
             this.txtName.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtName.Location = new System.Drawing.Point(128, 23);
+            this.txtName.Location = new System.Drawing.Point(119, 54);
             this.txtName.Name = "txtName";
             this.txtName.Size = new System.Drawing.Size(252, 21);
             this.txtName.TabIndex = 0;
@@ -73,7 +74,7 @@ namespace FAD3
             // txtCode
             // 
             this.txtCode.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtCode.Location = new System.Drawing.Point(128, 53);
+            this.txtCode.Location = new System.Drawing.Point(119, 84);
             this.txtCode.Name = "txtCode";
             this.txtCode.Size = new System.Drawing.Size(252, 21);
             this.txtCode.TabIndex = 1;
@@ -82,7 +83,7 @@ namespace FAD3
             // buttonOK
             // 
             this.buttonOK.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonOK.Location = new System.Drawing.Point(319, 497);
+            this.buttonOK.Location = new System.Drawing.Point(309, 495);
             this.buttonOK.Name = "buttonOK";
             this.buttonOK.Size = new System.Drawing.Size(61, 26);
             this.buttonOK.TabIndex = 3;
@@ -95,7 +96,7 @@ namespace FAD3
             this.buttonCancel.CausesValidation = false;
             this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.buttonCancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonCancel.Location = new System.Drawing.Point(248, 497);
+            this.buttonCancel.Location = new System.Drawing.Point(238, 495);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(64, 26);
             this.buttonCancel.TabIndex = 4;
@@ -106,7 +107,7 @@ namespace FAD3
             // label1
             // 
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(10, 23);
+            this.label1.Location = new System.Drawing.Point(1, 54);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(111, 22);
             this.label1.TabIndex = 5;
@@ -115,7 +116,7 @@ namespace FAD3
             // label2
             // 
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(11, 53);
+            this.label2.Location = new System.Drawing.Point(2, 84);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(111, 22);
             this.label2.TabIndex = 6;
@@ -127,10 +128,10 @@ namespace FAD3
             this.tabAOI.Controls.Add(this.tabOtherGrid);
             this.tabAOI.Controls.Add(this.tabMBR);
             this.tabAOI.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.tabAOI.Location = new System.Drawing.Point(13, 92);
+            this.tabAOI.Location = new System.Drawing.Point(4, 123);
             this.tabAOI.Name = "tabAOI";
             this.tabAOI.SelectedIndex = 0;
-            this.tabAOI.Size = new System.Drawing.Size(370, 396);
+            this.tabAOI.Size = new System.Drawing.Size(370, 357);
             this.tabAOI.TabIndex = 8;
             this.tabAOI.SelectedIndexChanged += new System.EventHandler(this.tabAOI_SelectedIndexChanged);
             this.tabAOI.TabIndexChanged += new System.EventHandler(this.tabAOI_TabIndexChanged);
@@ -149,7 +150,7 @@ namespace FAD3
             this.tabGrid25.Location = new System.Drawing.Point(4, 25);
             this.tabGrid25.Name = "tabGrid25";
             this.tabGrid25.Padding = new System.Windows.Forms.Padding(3);
-            this.tabGrid25.Size = new System.Drawing.Size(362, 367);
+            this.tabGrid25.Size = new System.Drawing.Size(362, 328);
             this.tabGrid25.TabIndex = 0;
             this.tabGrid25.Text = "Grid25";
             this.tabGrid25.UseVisualStyleBackColor = true;
@@ -174,7 +175,7 @@ namespace FAD3
             // buttonRemoveMap
             // 
             this.buttonRemoveMap.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonRemoveMap.Location = new System.Drawing.Point(252, 318);
+            this.buttonRemoveMap.Location = new System.Drawing.Point(250, 285);
             this.buttonRemoveMap.Name = "buttonRemoveMap";
             this.buttonRemoveMap.Size = new System.Drawing.Size(45, 31);
             this.buttonRemoveMap.TabIndex = 9;
@@ -185,7 +186,7 @@ namespace FAD3
             // buttonAddMap
             // 
             this.buttonAddMap.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonAddMap.Location = new System.Drawing.Point(304, 318);
+            this.buttonAddMap.Location = new System.Drawing.Point(302, 285);
             this.buttonAddMap.Name = "buttonAddMap";
             this.buttonAddMap.Size = new System.Drawing.Size(45, 31);
             this.buttonAddMap.TabIndex = 8;
@@ -207,7 +208,7 @@ namespace FAD3
             this.lvMaps.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lvMaps.Location = new System.Drawing.Point(7, 115);
             this.lvMaps.Name = "lvMaps";
-            this.lvMaps.Size = new System.Drawing.Size(342, 187);
+            this.lvMaps.Size = new System.Drawing.Size(342, 155);
             this.lvMaps.TabIndex = 6;
             this.lvMaps.UseCompatibleStateImageBehavior = false;
             this.lvMaps.DoubleClick += new System.EventHandler(this.lvMaps_DoubleClick);
@@ -237,7 +238,7 @@ namespace FAD3
             this.tabOtherGrid.Location = new System.Drawing.Point(4, 25);
             this.tabOtherGrid.Name = "tabOtherGrid";
             this.tabOtherGrid.Padding = new System.Windows.Forms.Padding(3);
-            this.tabOtherGrid.Size = new System.Drawing.Size(362, 367);
+            this.tabOtherGrid.Size = new System.Drawing.Size(362, 328);
             this.tabOtherGrid.TabIndex = 1;
             this.tabOtherGrid.Text = "Other grid";
             this.tabOtherGrid.UseVisualStyleBackColor = true;
@@ -267,17 +268,28 @@ namespace FAD3
             this.tabMBR.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tabMBR.Location = new System.Drawing.Point(4, 25);
             this.tabMBR.Name = "tabMBR";
-            this.tabMBR.Size = new System.Drawing.Size(362, 367);
+            this.tabMBR.Size = new System.Drawing.Size(362, 328);
             this.tabMBR.TabIndex = 2;
             this.tabMBR.Text = "MBR";
             this.tabMBR.UseVisualStyleBackColor = true;
+            // 
+            // lblTitle
+            // 
+            this.lblTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblTitle.Location = new System.Drawing.Point(4, 16);
+            this.lblTitle.Name = "lblTitle";
+            this.lblTitle.Size = new System.Drawing.Size(370, 22);
+            this.lblTitle.TabIndex = 9;
+            this.lblTitle.Text = "Title";
+            this.lblTitle.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // TargetAreaForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCancel;
-            this.ClientSize = new System.Drawing.Size(388, 533);
+            this.ClientSize = new System.Drawing.Size(377, 533);
+            this.Controls.Add(this.lblTitle);
             this.Controls.Add(this.tabAOI);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
@@ -320,5 +332,6 @@ namespace FAD3
         private System.Windows.Forms.ComboBox comboUTMZone;
         private System.Windows.Forms.ComboBox comboSubGrid;
         private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label lblTitle;
     }
 }

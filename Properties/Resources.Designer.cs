@@ -478,6 +478,16 @@ namespace FAD3.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap label_add {
+            get {
+                object obj = ResourceManager.GetObject("label_add", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap landingSite {
             get {
                 object obj = ResourceManager.GetObject("landingSite", resourceCulture);
@@ -511,6 +521,16 @@ namespace FAD3.Properties {
         internal static System.Drawing.Bitmap layerAdd {
             get {
                 object obj = ResourceManager.GetObject("layerAdd", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap layerRemove {
+            get {
+                object obj = ResourceManager.GetObject("layerRemove", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

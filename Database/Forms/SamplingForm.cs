@@ -20,7 +20,7 @@ namespace FAD3
         private int _widestLabel = 0;
         private int _controlWidth = 175;
         private int _yPos;
-        private string _AOIName = "";
+        private string _aoiName = "";
         private string _landingSiteName = "";
         private string _landingSiteGuid = "";
         private string _gearClassName = "";
@@ -30,9 +30,8 @@ namespace FAD3
         private string _gearRefCode = "";
         private MainForm _parent;
         private bool _isNew;
-        private aoi _aoi;
+        private TargetArea _aoi;
         private TextBox _txtVesselDimension = new TextBox();
-        private string _newEngine = "";
 
         private string _vesLength = "";
         private string _vesWidth = "";
@@ -125,8 +124,8 @@ namespace FAD3
 
         public string AOIName
         {
-            get { return _AOIName; }
-            set { _AOIName = value; }
+            get { return _aoiName; }
+            set { _aoiName = value; }
         }
 
         public string AOIGuid
@@ -171,7 +170,7 @@ namespace FAD3
             set { _gearVarGuid = value; }
         }
 
-        public aoi AOI
+        public TargetArea AOI
         {
             get { return _aoi; }
             set { _aoi = value; }
@@ -290,11 +289,11 @@ namespace FAD3
                             break;
 
                         case "TargetArea":
-                            aoi.getAOIsEx((ComboBox)ctl);
+                            TargetArea.GetTargetAreasEx((ComboBox)ctl);
                             break;
 
                         case "LandingSite":
-                            aoi.LandingSitesFromAOI(_AOIGuid, (ComboBox)ctl);
+                            TargetArea.LandingSitesFromTargetArea(_AOIGuid, (ComboBox)ctl);
                             break;
 
                         case "GearClass":
@@ -442,7 +441,7 @@ namespace FAD3
                                 break;
 
                             case "TargetArea":
-                                _AOIName = ctl.Text;
+                                _aoiName = ctl.Text;
                                 _AOIGuid = ((KeyValuePair<string, string>)((ComboBox)ctl).SelectedItem).Key;
                                 break;
 
@@ -469,7 +468,7 @@ namespace FAD3
                             break;
 
                         case "TargetArea":
-                            ctl.Text = _AOIName;
+                            ctl.Text = _aoiName;
                             break;
 
                         case "LandingSite":
@@ -767,7 +766,7 @@ namespace FAD3
                     {
                         o.GearRefCode = _gearRefCode;
                         o.Parent_Form = this;
-                        o.TargetArea(_AOIName, _AOIGuid);
+                        o.TargetArea(_aoiName, _AOIGuid);
                         o.GearVariation(_gearVarName, _gearVarGuid);
                     });
                     if (!form.Visible)
@@ -921,7 +920,6 @@ namespace FAD3
                         {
                             if (IsNew) ReferenceNumberManager.UpdateRefCodeCounter();
                             _parent.RefreshCatchDetail(_samplingGUID, _isNew, _samplingDate, _gearVarGuid, _landingSiteGuid);
-                            if (_newEngine?.Length > 0) sampling.AddEngine(_newEngine);
                             Close();
                         }
                     }
@@ -1182,7 +1180,7 @@ namespace FAD3
                             {
                                 case "comboTargetArea":
                                     targetCombo = (ComboBox)panelUI.Controls["comboLandingSite"];
-                                    comboItems = aoi.LandingSitesFromAOI(key);
+                                    comboItems = TargetArea.LandingSitesFromTargetArea(key);
                                     ChangeComboDataSource(targetCombo, comboItems);
 
                                     targetCombo = (ComboBox)panelUI.Controls["comboEnumerator"];
@@ -1273,9 +1271,9 @@ namespace FAD3
             //we want to get the UserInterfaceStructure element specified in the tag of the control to validate
             sampling.UserInterfaceStructure ui = sampling.uis[((Control)sender).Tag.ToString()];
 
-            string v = ((Control)sender).Text;
+            string comboText = ((Control)sender).Text;
             string msg = "";
-            if (!ui.ReadOnly && v.Length > 0)
+            if (!ui.ReadOnly && comboText.Length > 0)
             {
                 switch (ui.DataType)
                 {
@@ -1283,13 +1281,12 @@ namespace FAD3
                         if (ui.Key == "Engine")
                         {
                             var cbEngine = (ComboBox)panelUI.Controls["combo" + ui.Key];
-                            if (!cbEngine.Items.Contains(v))
+                            if (!cbEngine.Items.Contains(comboText))
                             {
-                                if (MessageBox.Show($"{v} is not found in the list of engines.\r\nDo you want to add an engine?", "Add a new engine",
+                                if (MessageBox.Show($"{comboText} is not found in the list of engines.\r\nDo you want to add an engine?", "Add a new engine",
                                                     MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
                                 {
-                                    _newEngine = v;
-                                    cbEngine.Items.Add(v);
+                                    cbEngine.Items.Add(comboText);
                                 }
                                 else
                                 {
@@ -1302,7 +1299,7 @@ namespace FAD3
                     case "int":
                         try
                         {
-                            int x = int.Parse(v);
+                            int x = int.Parse(comboText);
                             if (x < 0)
                             {
                                 msg = "Expected value is a whole number greater than zero";
@@ -1318,7 +1315,7 @@ namespace FAD3
                         DateTime myDateTime;
                         try
                         {
-                            myDateTime = DateTime.Parse(v);
+                            myDateTime = DateTime.Parse(comboText);
                             if (ui.Control.ToString() == "DateMask")
                             {
                                 if (myDateTime > DateTime.Now)
@@ -1328,7 +1325,7 @@ namespace FAD3
                             }
                             else
                             {
-                                if (v.Length != 5)
+                                if (comboText.Length != 5)
                                 {
                                     msg = "Expected time value should be in a 24 hour format";
                                 }
@@ -1336,7 +1333,7 @@ namespace FAD3
                         }
                         catch
                         {
-                            if (v != _datePrompt && v != _timePrompt)
+                            if (comboText != _datePrompt && comboText != _timePrompt)
                             {
                                 if (ui.Control.ToString() == "DateMask")
                                 {
@@ -1363,7 +1360,7 @@ namespace FAD3
                                     msg = "Cannot use the selected target area because it does not have enumerators";
                                 else
                                 {
-                                    _AOIName = cbo.Text;
+                                    _aoiName = cbo.Text;
                                     _AOIGuid = key;
                                 }
 
@@ -1382,7 +1379,7 @@ namespace FAD3
                     case "double":
                         try
                         {
-                            double x = double.Parse(v);
+                            double x = double.Parse(comboText);
                             if (x <= 0)
                             {
                                 if (ui.Key == "WeightOfCatch")

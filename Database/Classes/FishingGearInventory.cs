@@ -14,13 +14,13 @@ namespace FAD3.Database.Classes
         private Dictionary<string, (string Province, string Municipality, string barangay, string sitio)> _barangayInventories = new Dictionary<string, (string Province, string Municipality, string barangay, string sitio)>();
         private Dictionary<string, (string InventoryName, DateTime DateConducted, string TargetArea)> _inventories = new Dictionary<string, (string InventoryName, DateTime DateConducted, string TargetArea)>();
 
-        public FishingGearInventory(aoi AOI)
+        public FishingGearInventory(TargetArea targetArea)
         {
-            this.AOI = AOI;
-            ReadInventoriesInTargetArea(AOI.AOIGUID);
+            this.TargetArea = targetArea;
+            ReadInventoriesInTargetArea(TargetArea.TargetAreaGuid);
         }
 
-        public aoi AOI { get; }
+        public TargetArea TargetArea { get; }
 
         public Dictionary<string, (string Province, string Municipality, string barangay, string sitio)> BarangayInventories
         {
@@ -959,9 +959,9 @@ namespace FAD3.Database.Classes
             return myList;
         }
 
-        public void RefreshInventories(aoi AOI)
+        public void RefreshInventories(TargetArea targetArea)
         {
-            ReadInventoriesInTargetArea(AOI.AOIGUID);
+            ReadInventoriesInTargetArea(TargetArea.TargetAreaGuid);
         }
 
         /// <summary>
@@ -1041,7 +1041,7 @@ namespace FAD3.Database.Classes
                     if (dataStatus == fad3DataStatus.statusNew)
                     {
                         updateQuery = $@"Insert into tblGearInventories (InventoryGuid, InventoryName, DateConducted, TargetArea) values (
-                                      {{{inventoryGuid}}}, '{name}', '{dateConducted}', {{{AOI.AOIGUID}}})";
+                                      {{{inventoryGuid}}}, '{name}', '{dateConducted}', {{{TargetArea.TargetAreaGuid}}})";
                     }
                     else
                     {

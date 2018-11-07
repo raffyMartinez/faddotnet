@@ -14,23 +14,23 @@ namespace FAD3
     public partial class LandingSiteFromKMLForm : Form
     {
         private static LandingSiteFromKMLForm _instance;
-        private aoi _aoi;
+        private TargetArea _targetArea;
         private LandingSiteFromKML _landingSiteFromKML;
         public string LandingSiteName { get; set; }
         public int LandingSiteMunicipalityNumber { get; set; }
         public string LandingSiteMunicipalityName { get; set; }
         private Dictionary<int, (string LSName, string Municipality, string Province, int MunicipalityNumber)> _lsDictionary = new Dictionary<int, (string, string, string, int)>();
 
-        public static LandingSiteFromKMLForm GetInstance(aoi aoi)
+        public static LandingSiteFromKMLForm GetInstance(TargetArea targetArea)
         {
-            if (_instance == null) return new LandingSiteFromKMLForm(aoi);
+            if (_instance == null) return new LandingSiteFromKMLForm(targetArea);
             return _instance;
         }
 
-        public LandingSiteFromKMLForm(aoi aoi)
+        public LandingSiteFromKMLForm(TargetArea targetArea)
         {
             InitializeComponent();
-            _aoi = aoi;
+            _targetArea = targetArea;
             _landingSiteFromKML = new LandingSiteFromKML();
             _landingSiteFromKML.OnLandingSiteRetrieved += OnLandingSiteRetrieved;
         }
@@ -80,11 +80,11 @@ namespace FAD3
                             LSData.Clear();
                             LSData.Add("LSName", landingSiteName);
                             LSData.Add("MunNo", item.SubItems[1].Tag.ToString());
-                            LSData.Add("AOIGuid", _aoi.AOIGUID);
-                            if (_aoi.LandingSiteExists(landingSiteName))
+                            LSData.Add("AOIGuid", _targetArea.TargetAreaGuid);
+                            if (_targetArea.LandingSiteExists(landingSiteName))
                             {
                                 isNew = false;
-                                landingSite = aoi.LandingSiteFromName(LandingSiteName, _aoi.AOIGUID);
+                                landingSite = TargetArea.LandingSiteFromName(LandingSiteName, _targetArea.TargetAreaGuid);
                                 LSData.Add("LSGUID", landingSite.LandingSiteGUID);
                                 //landingSite
                             }
@@ -100,7 +100,7 @@ namespace FAD3
                             {
                                 if (isNew)
                                 {
-                                    global.mainForm.NewLandingSite(LSData["LSName"], LSData["LSGUID"], _aoi.AOIGUID);
+                                    global.mainForm.NewLandingSite(LSData["LSName"], LSData["LSGUID"], _targetArea.TargetAreaGuid);
                                 }
                                 else
                                 {
@@ -127,9 +127,9 @@ namespace FAD3
                     fileOpen.ShowDialog();
                     if (fileOpen.FileName.Length > 0)
                     {
-                        _landingSiteFromKML.aoi = _aoi;
+                        _landingSiteFromKML.TargetArea = _targetArea;
                         _lsDictionary.Clear();
-                        _lsDictionary = Landingsite.LandingSiteDictionary(_aoi.AOIGUID);
+                        _lsDictionary = Landingsite.LandingSiteDictionary(_targetArea.TargetAreaGuid);
                         _landingSiteFromKML.KMLFile = fileOpen.FileName;
                         _landingSiteFromKML.ParseLandingSites();
                         SizeColumns(false);
@@ -188,7 +188,7 @@ namespace FAD3
 
         private void OnContextMenuClick(object sender, ToolStripItemClickedEventArgs e)
         {
-            var lsForm = new LandingSiteForm(_aoi, this, lvLS.SelectedItems[0].Text, double.Parse(lvLS.SelectedItems[0].SubItems[2].Tag.ToString()), double.Parse(lvLS.SelectedItems[0].SubItems[3].Tag.ToString()), false, true);
+            var lsForm = new LandingSiteForm(_targetArea, this, lvLS.SelectedItems[0].Text, double.Parse(lvLS.SelectedItems[0].SubItems[2].Tag.ToString()), double.Parse(lvLS.SelectedItems[0].SubItems[3].Tag.ToString()), false, true);
             lsForm.ShowDialog(this);
             lvLS.SelectedItems[0].SubItems[1].Text = LandingSiteMunicipalityName;
             lvLS.SelectedItems[0].SubItems[1].Tag = LandingSiteMunicipalityNumber;

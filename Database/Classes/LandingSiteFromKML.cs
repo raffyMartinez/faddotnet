@@ -6,7 +6,7 @@ namespace FAD3
     public class LandingSiteFromKML
     {
         public string KMLFile { get; set; }
-        public aoi aoi { get; set; }
+        public TargetArea TargetArea { get; set; }
         public delegate void LandingSiteRetrieved(LandingSiteFromKML s, Landingsite e);
         public event LandingSiteRetrieved OnLandingSiteRetrieved;
 
@@ -24,9 +24,9 @@ namespace FAD3
 
         public void ParseLandingSites()
         {
-            if (aoi != null && File.Exists(KMLFile))
+            if (TargetArea != null && File.Exists(KMLFile))
             {
-                FishingGrid.AOIGuid = aoi.AOIGUID;
+                FishingGrid.AOIGuid = TargetArea.TargetAreaGuid;
                 var grid25 = FishingGrid.Grid25;
                 var doc = new XmlDocument();
                 var inLandingSiteFolder = false;

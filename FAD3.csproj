@@ -131,7 +131,7 @@
     <Compile Include="Database\Forms\AllSpeciesForm.Designer.cs">
       <DependentUpon>AllSpeciesForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Database\Classes\AOI.cs" />
+    <Compile Include="Database\Classes\TargetArea.cs" />
     <Compile Include="Database\Classes\CatchComposition.cs" />
     <Compile Include="Database\Forms\CatchCompositionForm.cs">
       <SubType>Form</SubType>
@@ -174,6 +174,7 @@
     <Compile Include="GUI\Classes\Enums.cs" />
     <Compile Include="Mapping\Classes\Colors.cs" />
     <Compile Include="Mapping\Classes\ColorSchemes.cs" />
+    <Compile Include="Mapping\Classes\ExtentDraggedBoxEventArgs.cs" />
     <Compile Include="Mapping\Classes\MapTextGraticuleHelper.cs" />
     <Compile Include="Mapping\Classes\Discretizer.cs" />
     <Compile Include="Mapping\Classes\FishingGearMapping.cs" />
@@ -780,6 +781,8 @@
   <ItemGroup>
     <Content Include="Fatcow-Farm-Fresh-Book-key.ico" />
     <Content Include="Icon1.ico" />
+    <None Include="Resources\label_add.bmp" />
+    <None Include="Resources\layerRemove.bmp" />
     <None Include="Resources\prop2a.png" />
     <None Include="Resources\prop2.png" />
     <None Include="Resources\prop1.png" />
