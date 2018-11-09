@@ -146,7 +146,7 @@ namespace FAD3
                     o.Font = Font;
                     o.Name = "cboGenus";
                     o.Location = new Point(0, 0);
-                    foreach (var item in names.GenusList)
+                    foreach (var item in Names.GenusList)
                     {
                         o.Items.Add(item);
                     }
@@ -179,7 +179,7 @@ namespace FAD3
                     o.Name = "cboLocalName";
                     o.Location = new Point(0, 0);
 
-                    foreach (var item in names.LocalNameListDict)
+                    foreach (var item in Names.LocalNameListDict)
                     {
                         o.Items.Add(item);
                     }
@@ -755,7 +755,7 @@ namespace FAD3
         private void FillSpeciesComboBox()
         {
             _comboSpecies.Items.Clear();
-            foreach (var item in names.speciesList)
+            foreach (var item in Names.speciesList)
             {
                 _comboSpecies.Items.Add(item);
             }
@@ -1135,7 +1135,7 @@ namespace FAD3
                 {
                     if (_newGenus.Length == 0)
                     {
-                        names.Genus = _CatchCompositionData[_currentRow].Name1;
+                        Names.Genus = _CatchCompositionData[_currentRow].Name1;
                         FillSpeciesComboBox();
                     }
                     else

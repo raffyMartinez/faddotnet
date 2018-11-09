@@ -1,48 +1,47 @@
 ﻿//using ADOX;
-using dao;
+using FAD3.Database.Classes;
+using MetaphoneCOM;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
 using System.Windows.Forms;
-using MetaphoneCOM;
-using FAD3.Database.Classes;
 
 namespace FAD3
 {
-    public static class gear
+    public static class Gear
     {
-        private static Dictionary<string, string> _GearClass = new Dictionary<string, string>();
-        private static Dictionary<string, string> _GearClassLetterCodes = new Dictionary<string, string>();
-        private static string _GearClassUsed = "";
-        private static Dictionary<string, string> _GearLocalNameListDict = new Dictionary<string, string>();
-        private static Dictionary<string, string> _GearVar = new Dictionary<string, string>();
+        private static Dictionary<string, string> _gearClass = new Dictionary<string, string>();
+        private static Dictionary<string, string> _gearClassLetterCodes = new Dictionary<string, string>();
+        private static string _gearClassUsed = "";
+        private static Dictionary<string, string> _gearLocalNameListDict = new Dictionary<string, string>();
+        private static Dictionary<string, string> _gearVar = new Dictionary<string, string>();
         private static string _GearVarGUID = "";
-        private static Dictionary<string, string> _GearVariationsUsage = new Dictionary<string, string>();
+        private static Dictionary<string, string> _gearVariationsUsage = new Dictionary<string, string>();
 
         //TODO: Change the default names of the items in the tuple from Item1, Item2, Item3 to more descriptive names
-        private static List<Tuple<string, string, bool>> _GearVariationsWithSpecs = new List<Tuple<string, string, bool>>();
+        private static List<Tuple<string, string, bool>> _gearVariationsWithSpecs = new List<Tuple<string, string, bool>>();
 
-        static gear()
+        static Gear()
         {
         }
 
         public static Dictionary<string, string> GearClass
         {
-            get { return _GearClass; }
+            get { return _gearClass; }
         }
 
         public static Dictionary<string, string> GearClassLetterCodes
         {
-            get { return _GearClassLetterCodes; }
+            get { return _gearClassLetterCodes; }
         }
 
         public static string GearClassUsed
         {
-            get { return _GearClassUsed; }
+            get { return _gearClassUsed; }
             set
             {
-                _GearClassUsed = value;
+                _gearClassUsed = value;
                 GetGearVariations();
             }
         }
@@ -52,7 +51,7 @@ namespace FAD3
             get
             {
                 GetGearLocalNames();
-                return _GearLocalNameListDict;
+                return _gearLocalNameListDict;
             }
         }
 
@@ -255,7 +254,7 @@ namespace FAD3
         public static string ClassCode(string ClassName)
         {
             string myCode = "";
-            foreach (KeyValuePair<string, string> kv in _GearClassLetterCodes)
+            foreach (KeyValuePair<string, string> kv in _gearClassLetterCodes)
             {
                 if (kv.Key == ClassName)
                 {
@@ -285,7 +284,7 @@ namespace FAD3
                                    tblGearVariations.GearClass WHERE tblGearVariations.GearVarGUID={{{varGUID}}}";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
-                    _GearVar.Clear();
+                    _gearVar.Clear();
                     DataRow dr = dt.Rows[0];
                     myClass = new KeyValuePair<string, string>(dr["GearClass"].ToString(), dr["GearClassName"].ToString());
                 }
@@ -544,25 +543,25 @@ namespace FAD3
         public static Dictionary<string, string> GearVariationsUsage(string GearClassGUID)
         {
             getGearVariationsUsage(GearClassGUID);
-            return _GearVariationsUsage;
+            return _gearVariationsUsage;
         }
 
         public static Dictionary<string, string> GearVariationsUsage(string GearClassGUID, string AOIGUID)
         {
             getGearVariationsUsage(GearClassGUID, AOIGUID);
-            return _GearVariationsUsage;
+            return _gearVariationsUsage;
         }
 
         public static Dictionary<string, string> GearVariationsUsage(string GearClassGUID, string AOIGUID, ComboBox c)
         {
             getGearVariationsUsage(GearClassGUID, AOIGUID, c);
-            return _GearVariationsUsage;
+            return _gearVariationsUsage;
         }
 
         public static List<Tuple<string, string, bool>> GearVariationsWithSpecs(string GearClassGuid, string AOIGuid = "")
         {
             getGearVariationsUsage(GearClassGuid, AOIGuid, c: null, IncludeSpecsFlag: true);
-            return _GearVariationsWithSpecs;
+            return _gearVariationsWithSpecs;
         }
 
         public static string GearVarNameFromGearGuid(string GearVarGuid)
@@ -986,8 +985,8 @@ namespace FAD3
 
         private static void GetGearClass()
         {
-            _GearClass.Clear();
-            _GearClassLetterCodes.Clear();
+            _gearClass.Clear();
+            _gearClassLetterCodes.Clear();
             var myDT = new DataTable();
             using (var conection = new OleDbConnection(global.ConnectionString))
             {
@@ -1000,8 +999,8 @@ namespace FAD3
                     for (int i = 0; i < myDT.Rows.Count; i++)
                     {
                         DataRow dr = myDT.Rows[i];
-                        _GearClass.Add(dr["GearClass"].ToString(), dr["GearClassName"].ToString());
-                        _GearClassLetterCodes.Add(dr["GearClassName"].ToString(), dr["GearLetter"].ToString());
+                        _gearClass.Add(dr["GearClass"].ToString(), dr["GearClassName"].ToString());
+                        _gearClassLetterCodes.Add(dr["GearClassName"].ToString(), dr["GearLetter"].ToString());
                     }
                 }
                 catch (Exception ex)
@@ -1026,7 +1025,7 @@ namespace FAD3
                     for (int i = 0; i < dt.Rows.Count; i++)
                     {
                         DataRow dr = dt.Rows[i];
-                        _GearLocalNameListDict.Add(dr["LocalNameGUID"].ToString(), dr["LocalName"].ToString());
+                        _gearLocalNameListDict.Add(dr["LocalNameGUID"].ToString(), dr["LocalName"].ToString());
                     }
                 }
                 catch (Exception ex)
@@ -1038,7 +1037,7 @@ namespace FAD3
 
         private static void GetGearVariations()
         {
-            _GearVar.Clear();
+            _gearVar.Clear();
             var dt = new DataTable();
             using (var conection = new OleDbConnection(global.ConnectionString))
             {
@@ -1048,11 +1047,11 @@ namespace FAD3
                     string query = $"SELECT GearVarGUID, Variation FROM tblGearVariations WHERE GearClass= '{GearClassUsed}' order by Variation";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
-                    _GearVar.Clear();
+                    _gearVar.Clear();
                     for (int i = 0; i < dt.Rows.Count; i++)
                     {
                         DataRow dr = dt.Rows[i];
-                        _GearVar.Add(dr["GearVarGUID"].ToString(), dr["Variation"].ToString());
+                        _gearVar.Add(dr["GearVarGUID"].ToString(), dr["Variation"].ToString());
                     }
                 }
                 catch (Exception ex)
@@ -1064,8 +1063,8 @@ namespace FAD3
 
         private static void getGearVariationsUsage(string GearClassGUID, string AOIGUID = "", ComboBox c = null, bool IncludeSpecsFlag = false)
         {
-            _GearVariationsUsage.Clear();
-            _GearVariationsWithSpecs.Clear();
+            _gearVariationsUsage.Clear();
+            _gearVariationsWithSpecs.Clear();
             var dt = new DataTable();
             var query = "";
             var GearVarGuid = "";
@@ -1103,11 +1102,11 @@ namespace FAD3
                             {
                                 var HasGearSpecs = GearVarHasSpecsTemplate(GearVarGuid);
                                 var t = new Tuple<string, string, bool>(GearVarGuid, dr["Variation"].ToString(), HasGearSpecs);
-                                _GearVariationsWithSpecs.Add(t);
+                                _gearVariationsWithSpecs.Add(t);
                             }
                             else
                             {
-                                _GearVariationsUsage.Add(GearVarGuid, dr["Variation"].ToString());
+                                _gearVariationsUsage.Add(GearVarGuid, dr["Variation"].ToString());
                             }
                         }
                     }

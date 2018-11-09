@@ -131,12 +131,12 @@ namespace FAD3.Database.Classes
                 }
             }
 
-            sql = $@"SELECT tblGearInventoryBarangay.Barangay, tblGearInventoryBarangay.Sitio,
+            sql = $@"SELECT tblGearInventoryBarangay.Barangay, tblGearInventoryBarangay.Sitio, tblGearInventoryBarangay.BarangayInventoryGuid,
                     Sum([t2].[CountCommercial]+[t2].[CountMunicipalMotorized]+[t2].[CountMunicipalNonMotorized]+[t2].[CountNoBoat]) AS Total
                     FROM ((Provinces INNER JOIN Municipalities ON Provinces.ProvNo = Municipalities.ProvNo) INNER JOIN tblGearInventoryBarangay ON Municipalities.MunNo = tblGearInventoryBarangay.Municipality) LEFT JOIN tblGearInventoryBarangayData AS t2 ON tblGearInventoryBarangay.BarangayInventoryGuid = t2.BarangayInventoryGUID
                         WHERE tblGearInventoryBarangay.InventoryGuid={{{inventoryGuid}}} AND
                         Provinces.ProvinceName='{provinceName}' AND Municipalities.Municipality='{municipalityName}'
-                    GROUP BY tblGearInventoryBarangay.Barangay, tblGearInventoryBarangay.Sitio
+                    GROUP BY tblGearInventoryBarangay.Barangay, tblGearInventoryBarangay.Sitio ,tblGearInventoryBarangay.BarangayInventoryGuid
                     ORDER BY tblGearInventoryBarangay.Barangay, tblGearInventoryBarangay.Sitio";
 
             using (var conection = new OleDbConnection(global.ConnectionString))
@@ -153,7 +153,7 @@ namespace FAD3.Database.Classes
                         DataRow dr = dt.Rows[n];
                         if (!listedItems.Contains(dr["Barangay"].ToString() + dr["Sitio"].ToString()))
                         {
-                            list.Add((dr["Barangay"].ToString(), dr["Sitio"].ToString(), "", "", "", "", 0));
+                            list.Add((dr["Barangay"].ToString(), dr["Sitio"].ToString(), "", "", "", dr["BarangayInventoryGuid"].ToString(), 0));
                         }
                     }
                 }
@@ -164,6 +164,110 @@ namespace FAD3.Database.Classes
             }
 
             return list;
+        }
+
+        public bool IsGearInInventory(string barangayInventoryGuid, string gearVariationGuid)
+        {
+            var dt = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    string query = $@"SELECT tblGearInventoryBarangayData.GearVariation
+                                      FROM tblGearInventoryBarangayData
+                                      WHERE tblGearInventoryBarangayData.BarangayInventoryGUID= {{{barangayInventoryGuid}}}";
+
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(dt);
+
+                    for (int n = 0; n < dt.Rows.Count; n++)
+                    {
+                        DataRow dr = dt.Rows[n];
+                        if (dr["GearVariation"].ToString() == gearVariationGuid)
+                        {
+                            return true;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex);
+                }
+            }
+            return false;
+        }
+
+        public (string province, string municipality, string barangay, string sitio) GetMunicipalityBrangaySitioFromBarangayInventory(string barangayInventory)
+        {
+            var dt = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    string query = $@"SELECT Provinces.ProvinceName,
+                                        Municipalities.Municipality AS MunicipalityName,
+                                        tblGearInventoryBarangay.Barangay,
+                                        tblGearInventoryBarangay.Sitio
+                                    FROM Provinces INNER JOIN (Municipalities INNER JOIN tblGearInventoryBarangay ON
+                                        Municipalities.MunNo = tblGearInventoryBarangay.Municipality) ON
+                                        Provinces.ProvNo = Municipalities.ProvNo
+                                    WHERE tblGearInventoryBarangay.BarangayInventoryGuid = {{{barangayInventory}}}";
+
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(dt);
+
+                    DataRow dr = dt.Rows[0];
+                    return (dr["ProvinceName"].ToString(),
+                            dr["MunicipalityName"].ToString(),
+                            dr["Barangay"].ToString(),
+                            dr["Sitio"].ToString());
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex);
+                }
+            }
+            return ("", "", "", "");
+        }
+
+        public (string province, string municipality, string municipalityGuid, string barangay, string sitio) GetMunicipalityBrangaySitioFromGearInventory(string gearLevelInventory)
+        {
+            var dt = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    string query = $@"SELECT Provinces.ProvinceName,
+                                        Municipalities.Municipality AS MunicipalityName,
+                                        tblGearInventoryBarangay.Municipality AS MunicipalityGuid,
+                                        tblGearInventoryBarangay.Barangay,
+                                        tblGearInventoryBarangay.Sitio
+                                    FROM Provinces INNER JOIN (Municipalities INNER JOIN
+                                        (tblGearInventoryBarangay INNER JOIN tblGearInventoryBarangayData ON
+                                        tblGearInventoryBarangay.BarangayInventoryGuid = tblGearInventoryBarangayData.BarangayInventoryGUID) ON
+                                        Municipalities.MunNo = tblGearInventoryBarangay.Municipality) ON
+                                        Provinces.ProvNo = Municipalities.ProvNo
+                                    WHERE tblGearInventoryBarangayData.DataGuid={{{gearLevelInventory}}}";
+
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(dt);
+
+                    DataRow dr = dt.Rows[0];
+                    return (dr["ProvinceName"].ToString(),
+                            dr["MunicipalityName"].ToString(),
+                            dr["MunicipalityGuid"].ToString(),
+                            dr["Barangay"].ToString(),
+                            dr["Sitio"].ToString());
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex);
+                }
+            }
+            return ("", "", "", "", "");
         }
 
         /// <summary>

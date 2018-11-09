@@ -1,8 +1,8 @@
 ﻿using AxMapWinGIS;
+using FAD3.GUI.Classes;
 using MapWinGIS;
 using System;
 using System.Windows.Forms;
-using FAD3.GUI.Classes;
 
 namespace FAD3
 {
@@ -197,7 +197,7 @@ namespace FAD3
         /// <param name="e"></param>
         private void OnMapSelectBoxFinal(object sender, _DMapEvents_SelectBoxFinalEvent e)
         {
-            if (EnableMapInteraction)
+            if (EnableMapInteraction && _axMap.CursorMode == tkCursorMode.cmSelection)
             {
                 var extL = 0D;
                 var extR = 0D;

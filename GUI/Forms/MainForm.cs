@@ -734,8 +734,8 @@ namespace FAD3
                     {
                         _oldMDB = SavedMDBPath;
                         global.mdbPath = SavedMDBPath;
-                        names.GetGenus_LocalNames();
-                        names.GetLocalNames();
+                        Names.GetGenus_LocalNames();
+                        Names.GetLocalNames();
                         statusPanelDBPath.Text = SavedMDBPath;
                         lblErrorFormOpen.Visible = false;
                         PopulateTree();
@@ -1503,6 +1503,24 @@ namespace FAD3
                         chForm.Show(this);
                     }
                     break;
+
+                case "importSpecies":
+                    OpenFileDialog ofd = new OpenFileDialog()
+                    {
+                        Filter = "text file|*.txt|all files|*.*",
+                        FilterIndex = 1,
+                        Title = "Open text file"
+                    };
+                    ofd.ShowDialog();
+                    if (ofd.FileName.Length > 0)
+                    {
+                        var result = Names.ImportLocalNamesFromFile(ofd.FileName);
+                        MessageBox.Show($"{result} names were added to the database", "Finished importing names", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    break;
+
+                case "localNames":
+                    break;
             }
         }
 
@@ -1596,7 +1614,7 @@ namespace FAD3
 
                         nd1.Tag = Tuple.Create(item.LandingSiteGuid, item.GearVariationGuid, "gear");
                         nd1.Name = $"{item.LandingSiteGuid}|{item.GearVariationGuid}";
-                        nd1.ImageKey = gear.GearClassImageKeyFromGearClasName(item.GearClassName);
+                        nd1.ImageKey = Gear.GearClassImageKeyFromGearClasName(item.GearClassName);
                     }
                     else if (myTag.Item3 == "gear")
                     {
@@ -1658,7 +1676,7 @@ namespace FAD3
                         _LandingSiteGuid = treeMain.SelectedNode.Parent.Name;
                         _GearVarName = treeMain.SelectedNode.Text;
                         _GearVarGUID = myTag.Item2;
-                        var rv = gear.GearClassGuidNameFromGearVarGuid(_GearVarGUID);
+                        var rv = Gear.GearClassGuidNameFromGearVarGuid(_GearVarGUID);
                         _gearClassName = rv.Value;
                         _gearClassGUID = rv.Key;
                         _LSNode = e.Node.Parent;
@@ -1672,7 +1690,7 @@ namespace FAD3
                         _LandingSiteGuid = myTag.Item1;
                         _GearVarName = treeMain.SelectedNode.Parent.Text;
                         _GearVarGUID = myTag.Item2;
-                        rv = gear.GearClassGuidNameFromGearVarGuid(_GearVarGUID);
+                        rv = Gear.GearClassGuidNameFromGearVarGuid(_GearVarGUID);
                         _gearClassName = rv.Value;
                         _gearClassGUID = rv.Key;
                         _LSNode = e.Node.Parent.Parent;
@@ -1809,9 +1827,9 @@ namespace FAD3
 
                 var gearNode = new TreeNode();
                 gearNode.Name = $"{LandingSiteGuid}|{GearVarGuid}";
-                gearNode.Text = gear.GearVarNameFromGearGuid(GearVarGuid);
+                gearNode.Text = Gear.GearVarNameFromGearGuid(GearVarGuid);
                 gearNode.Tag = Tuple.Create(LandingSiteGuid, GearVarGuid, "gear");
-                gearNode.ImageKey = gear.GearVarNodeImageKeyFromGearVar(GearVarGuid);
+                gearNode.ImageKey = Gear.GearVarNodeImageKeyFromGearVar(GearVarGuid);
 
                 var samplingMonthNode = new TreeNode(MonthYear);
                 samplingMonthNode.Name = $"{LandingSiteGuid}|{GearVarGuid}|{MonthYear}";
@@ -2153,10 +2171,10 @@ namespace FAD3
 
                 case "gear":
                     var myTag = (Tuple<string, string, string>)treeMain.SelectedNode.Tag;
-                    gear.GearVarGUID = myTag.Item2;
+                    Gear.GearVarGUID = myTag.Item2;
                     var n = 0;
                     lvi = lvMain.Items.Add("Months sampled");
-                    foreach (var item in gear.MonthsSampledByGear(myTag.Item1))
+                    foreach (var item in Gear.MonthsSampledByGear(myTag.Item1))
                     {
                         if (n > 0)
                         {
@@ -2192,7 +2210,7 @@ namespace FAD3
 
                     //add AOI with count for entire database
                     lvi = lvMain.Items.Add("");
-                    lvi = lvMain.Items.Add("AOI");
+                    lvi = lvMain.Items.Add("Target areas");
                     i = 0;
 
                     foreach (KeyValuePair<string, string> kv in _targetArea.TargetAreaWithSamplingCount())
@@ -2427,8 +2445,8 @@ namespace FAD3
                 rk.SetValue("mdbPath", MDBFile, RegistryValueKind.String);
                 rk.Close();
                 lblErrorFormOpen.Visible = false;
-                names.GetGenus_LocalNames();
-                names.GetLocalNames();
+                Names.GetGenus_LocalNames();
+                Names.GetLocalNames();
                 PopulateTree();
                 statusPanelDBPath.Text = MDBFile;
                 return true;
@@ -2831,7 +2849,7 @@ namespace FAD3
                     var node = landingSiteNode.Nodes.Add(item.gearVariationGuid, item.gearVariationName);
                     node.Tag = Tuple.Create(tag.Item1, item.gearVariationGuid, "gear");
                     node.Name = $"{tag.Item1}|{item.gearVariationGuid}";
-                    node.ImageKey = gear.GearClassImageKeyFromGearClasName(item.gearClassName);
+                    node.ImageKey = Gear.GearClassImageKeyFromGearClasName(item.gearClassName);
                     node.Nodes.Add("*dummy*");
                 }
             }
@@ -2880,6 +2898,32 @@ namespace FAD3
         private void OntreeMain_MouseUp(object sender, MouseEventArgs e)
         {
             treeMain.Cursor = Cursors.Default;
+        }
+
+        private void OnMenuLocalNameItemClick(object sender, ToolStripItemClickedEventArgs e)
+        {
+            e.ClickedItem.OwnerItem.Owner.Hide();
+            Identification idType = Identification.LocalName;
+            switch (e.ClickedItem.Name)
+            {
+                case "itemViewBySciName":
+                    idType = Identification.Scientific;
+                    break;
+
+                case "itemViewByLocalName":
+                    idType = Identification.LocalName;
+                    break;
+            }
+
+            CatchLocalNamesForm clnf = new CatchLocalNamesForm(idType);
+            if (clnf.Visible)
+            {
+                clnf.BringToFront();
+            }
+            else
+            {
+                clnf.Show(this);
+            }
         }
     }
 }

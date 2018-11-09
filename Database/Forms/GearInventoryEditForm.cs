@@ -148,7 +148,7 @@ namespace FAD3.Database.Forms
         private void SetupGearInventoryUI()
         {
             //setup the gearclass combo box
-            cboGearClass.DataSource = new BindingSource(gear.GearClass, null);
+            cboGearClass.DataSource = new BindingSource(Gear.GearClass, null);
             cboGearClass.DisplayMember = "Value";
             cboGearClass.ValueMember = "Key";
             cboGearClass.AutoCompleteMode = AutoCompleteMode.Suggest;
@@ -156,7 +156,7 @@ namespace FAD3.Database.Forms
 
             //setup the combobox of gear local names
             cboSelectGearLocalName.Items.Clear();
-            foreach (var item in gear.GearLocalNames)
+            foreach (var item in Gear.GearLocalNames)
             {
                 cboSelectGearLocalName.Items.Add(item);
             }
@@ -184,7 +184,7 @@ namespace FAD3.Database.Forms
 
             //setup combobox of catch local names
             cboCatchLocalName.Items.Clear();
-            foreach (var item in names.LocalNameListDict)
+            foreach (var item in Names.LocalNameListDict)
             {
                 cboCatchLocalName.Items.Add(item);
             }
@@ -214,6 +214,7 @@ namespace FAD3.Database.Forms
 
         public void AddNewGearInventory(string barangayInventoryGuid, int countCommercial, int countMunicipalMotorized, int countMunicipalNonMotorized, int countFishers)
         {
+            var item = _inventory.GetMunicipalityBrangaySitioFromBarangayInventory(barangayInventoryGuid);
             _dataStatus = fad3DataStatus.statusNew;
             _barangayInventoryGuid = barangayInventoryGuid;
             pnlGear.Visible = true;
@@ -222,7 +223,9 @@ namespace FAD3.Database.Forms
             _countMunicipalMotorized = countMunicipalMotorized;
             _countMunicipalNonMotorized = countMunicipalNonMotorized;
             SetupGearInventoryUI();
+            var sitio = item.sitio.Length > 0 ? item.sitio : "Entire barangay";
             Text = "Add fishing gear inventory data";
+            lblLocation.Text = $"{sitio}, {item.barangay}, {item.municipality}, {item.province}";
         }
 
         /// <summary>
@@ -374,9 +377,9 @@ namespace FAD3.Database.Forms
 
             foreach (var item in gearData.gearLocalNames)
             {
-                if (gear.GearLocalNames.Values.Contains(item))
+                if (Gear.GearLocalNames.Values.Contains(item))
                 {
-                    foreach (var localName in gear.GearLocalNames)
+                    foreach (var localName in Gear.GearLocalNames)
                     {
                         if (localName.Value == item)
                         {
@@ -425,7 +428,7 @@ namespace FAD3.Database.Forms
 
             foreach (var item in gearData.dominantCatch)
             {
-                foreach (var name in names.LocalNameListDict)
+                foreach (var name in Names.LocalNameListDict)
                 {
                     if (name.Value == item)
                     {
@@ -437,7 +440,7 @@ namespace FAD3.Database.Forms
 
             foreach (var item in gearData.nonDominantCatch)
             {
-                foreach (var name in names.LocalNameListDict)
+                foreach (var name in Names.LocalNameListDict)
                 {
                     if (name.Value == item)
                     {
@@ -450,6 +453,9 @@ namespace FAD3.Database.Forms
             txtDominantPercentage.Text = gearData.percentageOfDominance.ToString();
 
             Text = "Edit fishing gear inventory data";
+            var location = _inventory.GetMunicipalityBrangaySitioFromGearInventory(sitioGearInventoryGuid);
+            var sitio = location.sitio.Length > 0 ? location.sitio : "Entire barangay";
+            lblLocation.Text = $"{sitio}, {location.barangay}, {location.municipality}, {location.province}";
         }
 
         public void EditInventoryLevel(string barangayInventoryGuid, int municipalityNumber, string barangay, string sitio,
@@ -823,7 +829,7 @@ namespace FAD3.Database.Forms
         private void SetGearVariationsCombo(string gearKey)
         {
             cboGearVariation.Items.Clear();
-            foreach (var item in gear.GearVariationsUsage(gearKey))
+            foreach (var item in Gear.GearVariationsUsage(gearKey))
             {
                 cboGearVariation.Items.Add(item);
             }
@@ -890,7 +896,20 @@ namespace FAD3.Database.Forms
                     case "cboCatchLocalName":
                     case "cboSelectGearLocalName":
                     case "cboGearVariation":
-                        if (!ComboItemsContains(cbo, s))
+                        if (ComboItemsContains(cbo, s))
+                        {
+                            if (ctlName == "cboGearVariation")
+                            {
+                                //we check database if gear variation is already in the inventory then cancel if true
+                                if (_dataStatus == fad3DataStatus.statusNew && _inventory.IsGearInInventory(_barangayInventoryGuid, _gearVariationKey))
+                                {
+                                    msg = "Cannot accept selected gear\r\nbecause it has been inventoried";
+                                    MessageBox.Show(msg, "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                    e.Cancel = true;
+                                }
+                            }
+                        }
+                        else
                         {
                             FisheryObjectNameType nameType = FisheryObjectNameType.CatchLocalName;
                             switch (ctlName)
@@ -982,6 +1001,10 @@ namespace FAD3.Database.Forms
 
             Width = (pnlInventory.Left * 8) + pnlInventory.Width;
             global.LoadFormSettings(this, true);
+            if (pnlGear.Visible)
+            {
+                cboGearVariation.Focus();
+            }
         }
 
         private void OnListViewDblClick(object sender, EventArgs e)

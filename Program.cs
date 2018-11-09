@@ -27,7 +27,6 @@ namespace FAD3
             Application.SetCompatibleTextRenderingDefault(false);
 
             global.TestRequiredFilesExists();
-            Logger.Log("will open main form");
             try
             {
                 Application.Run(new MainForm());

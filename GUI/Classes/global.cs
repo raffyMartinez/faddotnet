@@ -511,9 +511,19 @@ namespace FAD3
         {
             short k1 = 0;
             short k2 = 0;
-            MetaphoneCOM.DoubleMetaphoneShort mph = new MetaphoneCOM.DoubleMetaphoneShort();
-            mph.ComputeMetaphoneKeys("test", out k1, out k2);
-            _hasMPH = k1 > 0;
+            try
+            {
+                MetaphoneCOM.DoubleMetaphoneShort mph = new MetaphoneCOM.DoubleMetaphoneShort();
+                mph.ComputeMetaphoneKeys("test", out k1, out k2);
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message);
+            }
+            finally
+            {
+                _hasMPH = k1 > 0;
+            }
         }
 
         public static bool ShowErrorMessage
@@ -602,10 +612,10 @@ namespace FAD3
                 {
                     _mdbPath = value;
                     _ConnectionString = "Provider=Microsoft.JET.OLEDB.4.0;data source=" + _mdbPath;
-                    names.MakeAllNames();
+                    Names.MakeAllNames();
                     FishingVessel.MakeVesselTypeTable();
                     GetProvinces();
-                    gear.FillGearClasses();
+                    Gear.FillGearClasses();
                     GetVesselTypes();
                 }
             }

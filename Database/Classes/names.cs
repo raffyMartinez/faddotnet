@@ -1,47 +1,50 @@
 ﻿//using ADOX;
 using dao;
+using FAD3.Database.Classes;
 using FAD3.GUI.Classes;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
-using FAD3.Database.Classes;
+using System.IO;
+using System.Text;
+using MetaphoneCOM;
 
 namespace FAD3
 {
-    internal static class names
+    internal static class Names
     {
-        private static List<string> _GenusList = new List<string>();
-        private static List<string> _LocalNameList = new List<string>();
-        private static Dictionary<string, string> _LocalNameListDict = new Dictionary<string, string>();
+        private static List<string> _genusList = new List<string>();
+        private static List<string> _localNameList = new List<string>();
+        private static Dictionary<string, string> _localNameListDict = new Dictionary<string, string>();
         private static Dictionary<string, string> _speciesList = new Dictionary<string, string>();
-        private static string _Genus = "";
-        private static long _LocalNamesCount = 0;
-        private static long _SciNamesCount = 0;
+        private static string _genus = "";
+        private static long _localNamesCount = 0;
+        private static long _sciNamesCount = 0;
 
         public static string Genus
         {
-            get { return _Genus; }
+            get { return _genus; }
             set
             {
-                _Genus = value;
+                _genus = value;
                 GetSpecies();
             }
         }
 
         public static long NamesCount
         {
-            get { return _LocalNamesCount + _SciNamesCount; }
+            get { return _localNamesCount + _sciNamesCount; }
         }
 
         public static long LocalNamesCount
         {
-            get { return _LocalNamesCount; }
+            get { return _localNamesCount; }
         }
 
         public static long SciNamesCount
         {
-            get { return _SciNamesCount; }
+            get { return _sciNamesCount; }
         }
 
         public static int CatchCompositionRecordCount(string nameGuid)
@@ -55,6 +58,61 @@ namespace FAD3
                     return (int)getCount.ExecuteScalar();
                 }
             }
+        }
+
+        public static int ImportLocalNamesFromFile(string fileName)
+        {
+            var n = 0;
+            const Int32 BufferSize = 512;
+            using (var fileStream = File.OpenRead(fileName))
+            {
+                using (var streamReader = new StreamReader(fileStream, Encoding.UTF8, true, BufferSize))
+                {
+                    String line;
+                    var spList = ListFishSpecies();
+                    while ((line = streamReader.ReadLine()) != null)
+                    {
+                        var arr = line.Split('\t');
+                        var genus = arr[0];
+                        var species = arr[1];
+                        if (!spList.Contains($"{genus} {species}"))
+                        {
+                            short genusKey1 = 0;
+                            short genusKey2 = 0;
+                            short speciesKey1 = 0;
+                            short speciesKey2 = 0;
+                            int? spNumber = GetFishBaseSpeciesNumber(genus, species);
+                            var mph = new DoubleMetaphoneShort();
+                            mph.ComputeMetaphoneKeys(genus, out genusKey1, out genusKey2);
+                            mph.ComputeMetaphoneKeys(species, out speciesKey1, out speciesKey2);
+                            if (UpdateSpeciesData(fad3DataStatus.statusNew, Guid.NewGuid().ToString(), genus, species, Taxa.Fish, genusKey1, genusKey2, speciesKey1, speciesKey2, true, spNumber, ""))
+                            {
+                                n++;
+                            }
+                        }
+                    }
+                }
+            }
+            return n;
+        }
+
+        private static List<string> ListFishSpecies()
+        {
+            List<string> species = new List<string>();
+            var sql = $"SELECT Genus, species from tblAllSpecies where TaxaNo = {(int)Taxa.Fish}";
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                var adapter = new OleDbDataAdapter(sql, conn);
+                DataTable dt = new DataTable();
+                adapter.Fill(dt);
+                for (int n = 0; n < dt.Rows.Count; n++)
+                {
+                    DataRow dr = dt.Rows[n];
+                    species.Add(dr["Genus"].ToString() + " " + dr["species"].ToString());
+                }
+            }
+            return species;
         }
 
         public static Dictionary<string, string> GetSimilarSoundingLocalNames(NewFisheryObjectName newName)
@@ -94,12 +152,19 @@ namespace FAD3
                     sql = $@"Insert into tblAllSpecies
                            (Genus, species, ListedFB, FBSpNo, Notes, TaxaNo, SpeciesGUID,
                             MPHG1, MPHG2, MPHS1, MPHS2) values (
-                            '{genus}', '{species}', {inFishbase}, {fbNo}, '{notes}', {(int)taxa}, {nameGuid},
+                            '{genus}', '{species}', {inFishbase}, {fbNo}, '{notes}', {(int)taxa}, {{{nameGuid}}},
                              {genusMPH1}, {genusMPH2}, {speciesMPH1}, {speciesMPH2})";
 
                     using (OleDbCommand update = new OleDbCommand(sql, conn))
                     {
-                        Success = update.ExecuteNonQuery() > 0;
+                        try
+                        {
+                            Success = update.ExecuteNonQuery() > 0;
+                        }
+                        catch
+                        {
+                            //ignore
+                        }
                     }
                 }
                 else if (dataStatus == fad3DataStatus.statusEdited)
@@ -269,6 +334,19 @@ namespace FAD3
             return list;
         }
 
+        public static int? GetFishBaseSpeciesNumber(string genus, string species)
+        {
+            var sql = $"Select SpecCode from FBSpecies where Genus = '{genus}' AND Species = '{species}'";
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                using (OleDbCommand spNumber = new OleDbCommand(sql, conn))
+                {
+                    return (int?)spNumber.ExecuteScalar();
+                }
+            }
+        }
+
         public static (bool isFound, bool inFishbase, int? fishBaseNo, string notes,
             short? genusKey1, short? genusKey2, short? speciesKey1, short? speciesKey2, Taxa taxa)
             RetrieveSpeciesData(string speciesGuid)
@@ -318,7 +396,7 @@ namespace FAD3
                 {
                     conection.Open();
                     string query = $@"SELECT Name2, NameNo FROM temp_AllNames
-                                      WHERE Name1 = '{_Genus}'  ORDER BY Name2";
+                                      WHERE Name1 = '{_genus}'  ORDER BY Name2";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
                     _speciesList.Clear();
@@ -380,7 +458,7 @@ namespace FAD3
 
         public static void GetLocalNames()
         {
-            _LocalNameListDict.Clear();
+            _localNameListDict.Clear();
             DataTable dt = new DataTable();
             using (var conection = new OleDbConnection(global.ConnectionString))
             {
@@ -394,7 +472,7 @@ namespace FAD3
                     for (int i = 0; i < dt.Rows.Count; i++)
                     {
                         DataRow dr = dt.Rows[i];
-                        _LocalNameListDict.Add(dr["NameNo"].ToString(), dr["Name1"].ToString());
+                        _localNameListDict.Add(dr["NameNo"].ToString(), dr["Name1"].ToString());
                     }
                 }
                 catch (Exception ex)
@@ -449,8 +527,8 @@ namespace FAD3
 
         public static void GetGenus_LocalNames()
         {
-            _LocalNameList.Clear();
-            _GenusList.Clear();
+            _localNameList.Clear();
+            _genusList.Clear();
             DataTable dt = new DataTable();
             using (var conection = new OleDbConnection(global.ConnectionString))
             {
@@ -466,11 +544,11 @@ namespace FAD3
                         DataRow dr = dt.Rows[i];
                         if (dr["Identification"].ToString() == "Local names")
                         {
-                            _LocalNameList.Add(dr["Name1"].ToString());
+                            _localNameList.Add(dr["Name1"].ToString());
                         }
                         else
                         {
-                            _GenusList.Add(dr["Name1"].ToString());
+                            _genusList.Add(dr["Name1"].ToString());
                         }
                     }
                 }
@@ -488,7 +566,7 @@ namespace FAD3
 
         public static List<string> GenusList
         {
-            get { return _GenusList; }
+            get { return _genusList; }
         }
 
         public static Dictionary<string, string> LocalNameListDict
@@ -496,13 +574,13 @@ namespace FAD3
             get
             {
                 GetLocalNames();
-                return _LocalNameListDict;
+                return _localNameListDict;
             }
         }
 
         public static List<string> LocalNameList
         {
-            get { return _LocalNameList; }
+            get { return _localNameList; }
         }
     }
 }

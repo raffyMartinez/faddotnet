@@ -72,7 +72,7 @@ namespace FAD3
             string myAOIGUID = ((KeyValuePair<string, string>)((ComboBox)panelUI.Controls["comboTargetArea"]).SelectedItem).Key;
             key = ((KeyValuePair<string, string>)((ComboBox)panelUI.Controls["comboGearClass"]).SelectedItem).Key;
             targetCombo = (ComboBox)panelUI.Controls["comboFishingGear"];
-            comboItems = gear.GearVariationsUsage(key, myAOIGUID);
+            comboItems = Gear.GearVariationsUsage(key, myAOIGUID);
             ChangeComboDataSource(targetCombo, comboItems);
         }
 
@@ -297,7 +297,7 @@ namespace FAD3
                             break;
 
                         case "GearClass":
-                            gear.GetGearClassEx((ComboBox)ctl);
+                            Gear.GetGearClassEx((ComboBox)ctl);
                             break;
 
                         case "Engine":
@@ -310,7 +310,7 @@ namespace FAD3
                         case "FishingGear":
                             if (!_isNew)
                             {
-                                gear.GearClassUsed = _lv.Items["GearClass"].Tag.ToString();
+                                Gear.GearClassUsed = _lv.Items["GearClass"].Tag.ToString();
                             }
 
                             if (_gearClassGuid.Length == 0)
@@ -321,11 +321,11 @@ namespace FAD3
                                 }
                                 else
                                 {
-                                    _gearClassGuid = gear.GearClassUsed;
+                                    _gearClassGuid = Gear.GearClassUsed;
                                 }
                             }
 
-                            gear.GearVariationsUsage(_gearClassGuid, _AOIGuid, (ComboBox)ctl);
+                            Gear.GearVariationsUsage(_gearClassGuid, _AOIGuid, (ComboBox)ctl);
                             break;
 
                         case "TypeOfVesselUsed":
@@ -1189,7 +1189,7 @@ namespace FAD3
 
                                     targetCombo = (ComboBox)panelUI.Controls["comboFishingGear"];
                                     string myGearClassGUID = ((KeyValuePair<string, string>)((ComboBox)panelUI.Controls["comboGearClass"]).SelectedItem).Key;
-                                    comboItems = gear.GearVariationsUsage(myGearClassGUID, key);
+                                    comboItems = Gear.GearVariationsUsage(myGearClassGUID, key);
                                     ChangeComboDataSource(targetCombo, comboItems);
 
                                     break;

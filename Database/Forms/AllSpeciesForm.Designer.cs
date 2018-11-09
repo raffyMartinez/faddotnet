@@ -49,9 +49,9 @@
             // lvNames
             // 
             this.lvNames.ContextMenuStrip = this.dropDownMenu;
-            this.lvNames.Location = new System.Drawing.Point(185, 31);
+            this.lvNames.Location = new System.Drawing.Point(199, 31);
             this.lvNames.Name = "lvNames";
-            this.lvNames.Size = new System.Drawing.Size(610, 339);
+            this.lvNames.Size = new System.Drawing.Size(596, 339);
             this.lvNames.TabIndex = 0;
             this.lvNames.UseCompatibleStateImageBehavior = false;
             this.lvNames.DoubleClick += new System.EventHandler(this.OnlvNames_DoubleClick);
@@ -76,7 +76,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(182, 13);
+            this.label2.Location = new System.Drawing.Point(196, 13);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(125, 15);
             this.label2.TabIndex = 4;
@@ -84,32 +84,32 @@
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.chkShowWithRecords);
+            this.groupBox1.Controls.Add(this.listBoxFilter);
             this.groupBox1.Controls.Add(this.buttonReset);
             this.groupBox1.Controls.Add(this.buttonApply);
-            this.groupBox1.Controls.Add(this.listBoxFilter);
+            this.groupBox1.Controls.Add(this.chkShowWithRecords);
             this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Controls.Add(this.txtSearch);
             this.groupBox1.Location = new System.Drawing.Point(10, 24);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(169, 314);
+            this.groupBox1.Size = new System.Drawing.Size(180, 343);
             this.groupBox1.TabIndex = 14;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Filter";
             // 
             // chkShowWithRecords
             // 
-            this.chkShowWithRecords.Location = new System.Drawing.Point(10, 240);
+            this.chkShowWithRecords.Location = new System.Drawing.Point(10, 253);
             this.chkShowWithRecords.Name = "chkShowWithRecords";
-            this.chkShowWithRecords.Size = new System.Drawing.Size(153, 39);
+            this.chkShowWithRecords.Size = new System.Drawing.Size(164, 55);
             this.chkShowWithRecords.TabIndex = 20;
             this.chkShowWithRecords.Text = "Show only those with records in the database";
             this.chkShowWithRecords.UseVisualStyleBackColor = true;
             // 
             // buttonReset
             // 
-            this.buttonReset.Location = new System.Drawing.Point(55, 283);
+            this.buttonReset.Location = new System.Drawing.Point(27, 303);
             this.buttonReset.Name = "buttonReset";
             this.buttonReset.Size = new System.Drawing.Size(50, 24);
             this.buttonReset.TabIndex = 19;
@@ -119,7 +119,7 @@
             // 
             // buttonApply
             // 
-            this.buttonApply.Location = new System.Drawing.Point(110, 284);
+            this.buttonApply.Location = new System.Drawing.Point(82, 304);
             this.buttonApply.Name = "buttonApply";
             this.buttonApply.Size = new System.Drawing.Size(50, 24);
             this.buttonApply.TabIndex = 18;
@@ -133,7 +133,7 @@
             this.listBoxFilter.FormattingEnabled = true;
             this.listBoxFilter.Location = new System.Drawing.Point(8, 91);
             this.listBoxFilter.Name = "listBoxFilter";
-            this.listBoxFilter.Size = new System.Drawing.Size(153, 132);
+            this.listBoxFilter.Size = new System.Drawing.Size(153, 164);
             this.listBoxFilter.TabIndex = 17;
             // 
             // label3
@@ -163,7 +163,7 @@
             // 
             // buttonAdd
             // 
-            this.buttonAdd.Location = new System.Drawing.Point(93, 359);
+            this.buttonAdd.Location = new System.Drawing.Point(92, 373);
             this.buttonAdd.Name = "buttonAdd";
             this.buttonAdd.Size = new System.Drawing.Size(50, 24);
             this.buttonAdd.TabIndex = 20;
@@ -173,7 +173,7 @@
             // 
             // buttonEdit
             // 
-            this.buttonEdit.Location = new System.Drawing.Point(38, 359);
+            this.buttonEdit.Location = new System.Drawing.Point(37, 373);
             this.buttonEdit.Name = "buttonEdit";
             this.buttonEdit.Size = new System.Drawing.Size(50, 24);
             this.buttonEdit.TabIndex = 21;

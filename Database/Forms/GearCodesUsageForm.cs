@@ -77,7 +77,7 @@ namespace FAD3
             foreach (ListViewItem lvi in lv.Items)
             {
                 lvi.SubItems.Add("");
-                if (gear.GearVarHasSpecsTemplate(lvi.Name))
+                if (Gear.GearVarHasSpecsTemplate(lvi.Name))
                     lvi.SubItems[1].Text = "x";
             }
         }
@@ -208,7 +208,7 @@ namespace FAD3
         private void FillLocalNames()
         {
             listViewLocalNames.Items.Clear();
-            var list = gear.GearLocalName_TargetArea(_gearRefCode, _targetAreaGuid);
+            var list = Gear.GearLocalName_TargetArea(_gearRefCode, _targetAreaGuid);
             foreach (var i in list)
             {
                 var lvi = new ListViewItem
@@ -224,7 +224,7 @@ namespace FAD3
         private void FillRefCodeUsage()
         {
             listViewWhereUsed.Items.Clear();
-            var list = gear.TargetAreaUsed_RefCode(_gearRefCode);
+            var list = Gear.TargetAreaUsed_RefCode(_gearRefCode);
             foreach (var i in list)
             {
                 var lvi = new ListViewItem
@@ -240,7 +240,7 @@ namespace FAD3
         private void FillRefCodeList()
         {
             listViewCodes.Items.Clear();
-            var list = gear.GearSubVariations(_gearVarGuid);
+            var list = Gear.GearSubVariations(_gearVarGuid);
             foreach (KeyValuePair<string, bool> kv in list)
             {
                 var lvi = new ListViewItem
@@ -257,7 +257,7 @@ namespace FAD3
         {
             listViewVariations.Items.Clear();
             var key = ((KeyValuePair<string, string>)comboClass.SelectedItem).Key;
-            var list = gear.GearVariationsWithSpecs(key);
+            var list = Gear.GearVariationsWithSpecs(key);
             foreach (var item in list)
             {
                 var lvi = new ListViewItem
@@ -274,7 +274,7 @@ namespace FAD3
         {
             comboClass.With(o =>
             {
-                o.DataSource = new BindingSource(gear.GearClass, null);
+                o.DataSource = new BindingSource(Gear.GearClass, null);
                 o.DisplayMember = "Value";
                 o.ValueMember = "Key";
                 o.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
@@ -547,7 +547,7 @@ namespace FAD3
                                         "Confirmation needed", MessageBoxButtons.OKCancel,
                                         MessageBoxIcon.Exclamation) == DialogResult.OK)
                     {
-                        var result = gear.DeleteTargetAreaUsage(RowNumberForDeletion);
+                        var result = Gear.DeleteTargetAreaUsage(RowNumberForDeletion);
                         if (result.success)
                         {
                             listViewWhereUsed.Items.Remove(listViewWhereUsed.SelectedItems[0]);
@@ -565,7 +565,7 @@ namespace FAD3
                                         "Confirmation needed", MessageBoxButtons.OKCancel,
                                         MessageBoxIcon.Exclamation) == DialogResult.OK)
                     {
-                        if (gear.DeleteLocalNameUsage(RowNumberForDeletion))
+                        if (Gear.DeleteLocalNameUsage(RowNumberForDeletion))
                         {
                             listViewLocalNames.Items.Remove(listViewLocalNames.SelectedItems[0]);
                         }
@@ -580,7 +580,7 @@ namespace FAD3
                                             "Confirmation needed", MessageBoxButtons.OKCancel,
                                             MessageBoxIcon.Exclamation) == DialogResult.OK)
                         {
-                            var result = gear.DeleteGearVariation(_gearVarGuid);
+                            var result = Gear.DeleteGearVariation(_gearVarGuid);
                             if (!result.success)
                             {
                                 var reason = result.reason;
@@ -639,7 +639,7 @@ namespace FAD3
 
             if (_gearRefCode.Length > 0 && _targetAreaGuid.Length > 0)
             {
-                var result = gear.AddGearCodeUsageTargetArea(_gearRefCode, _targetAreaGuid);
+                var result = Gear.AddGearCodeUsageTargetArea(_gearRefCode, _targetAreaGuid);
                 if (result.Success)
                 {
                     var newLVI = listViewWhereUsed.Items.Add(_targetAreaGuid, _targetAreaName, null);
@@ -659,7 +659,7 @@ namespace FAD3
 
             if (_gearRefCode.Length > 0 && _targetAreaGuid.Length > 0 && _localNameGuid.Length > 0 && _targetAreaUsageRow.Length > 0)
             {
-                var result = gear.AddUsageLocalName(_targetAreaUsageRow, _localNameGuid);
+                var result = Gear.AddUsageLocalName(_targetAreaUsageRow, _localNameGuid);
                 if (result.Success)
                 {
                     var newLVI = listViewLocalNames.Items.Add(_localNameGuid, _localName, null);
@@ -673,7 +673,7 @@ namespace FAD3
             _gearRefCode = gearCode;
             if (_gearVarGuid.Length > 0)
             {
-                if (gear.AddGearVariationReferenceCode(_gearRefCode, _gearVarGuid, isVariation))
+                if (Gear.AddGearVariationReferenceCode(_gearRefCode, _gearVarGuid, isVariation))
                 {
                     var lvi = listViewCodes.Items.Add(_gearRefCode, _gearRefCode, null);
                     lvi.SubItems.Add(isVariation.ToString());
@@ -688,7 +688,7 @@ namespace FAD3
             {
                 var dms = new DoubleMetaphoneShort();
                 dms.ComputeMetaphoneKeys(gearVariationName, out short key1, out short key2);
-                var similarNames = gear.GearSoundsLike(key1, key2);
+                var similarNames = Gear.GearSoundsLike(key1, key2);
                 var proceed = true;
 
                 var sb = new StringBuilder();
@@ -710,7 +710,7 @@ namespace FAD3
 
                 if (proceed)
                 {
-                    var result = gear.AddGearVariation(_gearClassGuid, gearVariationName);
+                    var result = Gear.AddGearVariation(_gearClassGuid, gearVariationName);
                     if (result.success)
                     {
                         _gearVarGuid = result.newGuid;

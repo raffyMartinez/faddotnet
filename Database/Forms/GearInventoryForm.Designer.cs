@@ -102,6 +102,7 @@
             // 
             // lvInventory
             // 
+            this.lvInventory.ContextMenuStrip = this.contextMenu;
             this.lvInventory.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lvInventory.Location = new System.Drawing.Point(3, 23);
             this.lvInventory.Name = "lvInventory";

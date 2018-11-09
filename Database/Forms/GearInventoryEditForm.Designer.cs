@@ -115,6 +115,7 @@
             this.cboGearVariation = new System.Windows.Forms.ComboBox();
             this.label11 = new System.Windows.Forms.Label();
             this.cboGearClass = new System.Windows.Forms.ComboBox();
+            this.lblLocation = new System.Windows.Forms.Label();
             this.pnlInventory.SuspendLayout();
             this.pnlBarangay.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -131,7 +132,7 @@
             // 
             // btnOk
             // 
-            this.btnOk.Location = new System.Drawing.Point(310, 462);
+            this.btnOk.Location = new System.Drawing.Point(306, 467);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(55, 26);
             this.btnOk.TabIndex = 1;
@@ -142,7 +143,7 @@
             // btnCancel
             // 
             this.btnCancel.CausesValidation = false;
-            this.btnCancel.Location = new System.Drawing.Point(249, 462);
+            this.btnCancel.Location = new System.Drawing.Point(245, 467);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(55, 26);
             this.btnCancel.TabIndex = 2;
@@ -152,7 +153,7 @@
             // 
             // txtInventoryName
             // 
-            this.txtInventoryName.Location = new System.Drawing.Point(83, 32);
+            this.txtInventoryName.Location = new System.Drawing.Point(83, 16);
             this.txtInventoryName.Name = "txtInventoryName";
             this.txtInventoryName.Size = new System.Drawing.Size(262, 20);
             this.txtInventoryName.TabIndex = 0;
@@ -161,7 +162,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(14, 35);
+            this.label1.Location = new System.Drawing.Point(14, 19);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(35, 13);
             this.label1.TabIndex = 1;
@@ -170,7 +171,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(14, 74);
+            this.label2.Location = new System.Drawing.Point(14, 58);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(53, 13);
             this.label2.TabIndex = 2;
@@ -178,7 +179,7 @@
             // 
             // txtDateImplemented
             // 
-            this.txtDateImplemented.Location = new System.Drawing.Point(83, 71);
+            this.txtDateImplemented.Location = new System.Drawing.Point(83, 55);
             this.txtDateImplemented.Name = "txtDateImplemented";
             this.txtDateImplemented.Size = new System.Drawing.Size(105, 20);
             this.txtDateImplemented.TabIndex = 1;
@@ -191,9 +192,9 @@
             this.pnlInventory.Controls.Add(this.txtDateImplemented);
             this.pnlInventory.Controls.Add(this.label1);
             this.pnlInventory.Controls.Add(this.label2);
-            this.pnlInventory.Location = new System.Drawing.Point(2, 26);
+            this.pnlInventory.Location = new System.Drawing.Point(2, 17);
             this.pnlInventory.Name = "pnlInventory";
-            this.pnlInventory.Size = new System.Drawing.Size(373, 108);
+            this.pnlInventory.Size = new System.Drawing.Size(373, 97);
             this.pnlInventory.TabIndex = 4;
             this.pnlInventory.Visible = false;
             // 
@@ -210,9 +211,9 @@
             this.pnlBarangay.Controls.Add(this.comboMunicipality);
             this.pnlBarangay.Controls.Add(this.label3);
             this.pnlBarangay.Controls.Add(this.comboProvince);
-            this.pnlBarangay.Location = new System.Drawing.Point(2, 140);
+            this.pnlBarangay.Location = new System.Drawing.Point(2, 154);
             this.pnlBarangay.Name = "pnlBarangay";
-            this.pnlBarangay.Size = new System.Drawing.Size(373, 316);
+            this.pnlBarangay.Size = new System.Drawing.Size(373, 294);
             this.pnlBarangay.TabIndex = 5;
             this.pnlBarangay.Visible = false;
             // 
@@ -373,14 +374,15 @@
             // 
             // pnlGear
             // 
+            this.pnlGear.Controls.Add(this.lblLocation);
             this.pnlGear.Controls.Add(this.tabsGear);
             this.pnlGear.Controls.Add(this.label12);
             this.pnlGear.Controls.Add(this.cboGearVariation);
             this.pnlGear.Controls.Add(this.label11);
             this.pnlGear.Controls.Add(this.cboGearClass);
-            this.pnlGear.Location = new System.Drawing.Point(397, 28);
+            this.pnlGear.Location = new System.Drawing.Point(394, 17);
             this.pnlGear.Name = "pnlGear";
-            this.pnlGear.Size = new System.Drawing.Size(373, 427);
+            this.pnlGear.Size = new System.Drawing.Size(381, 445);
             this.pnlGear.TabIndex = 6;
             this.pnlGear.Visible = false;
             // 
@@ -391,10 +393,10 @@
             this.tabsGear.Controls.Add(this.tabSeasonality);
             this.tabsGear.Controls.Add(this.tabCPUE);
             this.tabsGear.Controls.Add(this.tabComposition);
-            this.tabsGear.Location = new System.Drawing.Point(3, 84);
+            this.tabsGear.Location = new System.Drawing.Point(3, 118);
             this.tabsGear.Name = "tabsGear";
             this.tabsGear.SelectedIndex = 0;
-            this.tabsGear.Size = new System.Drawing.Size(367, 340);
+            this.tabsGear.Size = new System.Drawing.Size(367, 322);
             this.tabsGear.TabIndex = 7;
             // 
             // tabLocalNames
@@ -662,7 +664,7 @@
             this.tabCPUE.Location = new System.Drawing.Point(4, 22);
             this.tabCPUE.Name = "tabCPUE";
             this.tabCPUE.Padding = new System.Windows.Forms.Padding(3);
-            this.tabCPUE.Size = new System.Drawing.Size(359, 314);
+            this.tabCPUE.Size = new System.Drawing.Size(359, 305);
             this.tabCPUE.TabIndex = 2;
             this.tabCPUE.Text = "CPUE";
             this.tabCPUE.UseVisualStyleBackColor = true;
@@ -705,7 +707,7 @@
             this.listViewHistoryCpue.FullRowSelect = true;
             this.listViewHistoryCpue.Location = new System.Drawing.Point(15, 181);
             this.listViewHistoryCpue.Name = "listViewHistoryCpue";
-            this.listViewHistoryCpue.Size = new System.Drawing.Size(330, 120);
+            this.listViewHistoryCpue.Size = new System.Drawing.Size(330, 109);
             this.listViewHistoryCpue.TabIndex = 2;
             this.listViewHistoryCpue.UseCompatibleStateImageBehavior = false;
             this.listViewHistoryCpue.View = System.Windows.Forms.View.Details;
@@ -834,7 +836,7 @@
             this.tabComposition.Location = new System.Drawing.Point(4, 22);
             this.tabComposition.Name = "tabComposition";
             this.tabComposition.Padding = new System.Windows.Forms.Padding(3);
-            this.tabComposition.Size = new System.Drawing.Size(359, 314);
+            this.tabComposition.Size = new System.Drawing.Size(359, 296);
             this.tabComposition.TabIndex = 4;
             this.tabComposition.Text = "Catch composition";
             this.tabComposition.UseVisualStyleBackColor = true;
@@ -859,7 +861,7 @@
             // 
             // txtDominantPercentage
             // 
-            this.txtDominantPercentage.Location = new System.Drawing.Point(11, 287);
+            this.txtDominantPercentage.Location = new System.Drawing.Point(11, 266);
             this.txtDominantPercentage.Name = "txtDominantPercentage";
             this.txtDominantPercentage.Size = new System.Drawing.Size(147, 20);
             this.txtDominantPercentage.TabIndex = 23;
@@ -868,7 +870,7 @@
             // label29
             // 
             this.label29.AutoSize = true;
-            this.label29.Location = new System.Drawing.Point(8, 269);
+            this.label29.Location = new System.Drawing.Point(8, 248);
             this.label29.Name = "label29";
             this.label29.Size = new System.Drawing.Size(150, 13);
             this.label29.TabIndex = 22;
@@ -949,7 +951,7 @@
             this.listBoxOtherCatch.FormattingEnabled = true;
             this.listBoxOtherCatch.Location = new System.Drawing.Point(194, 99);
             this.listBoxOtherCatch.Name = "listBoxOtherCatch";
-            this.listBoxOtherCatch.Size = new System.Drawing.Size(154, 147);
+            this.listBoxOtherCatch.Size = new System.Drawing.Size(154, 134);
             this.listBoxOtherCatch.TabIndex = 10;
             this.listBoxOtherCatch.Enter += new System.EventHandler(this.OnListBoxEnter);
             // 
@@ -959,14 +961,14 @@
             this.listBoxDominantCatch.FormattingEnabled = true;
             this.listBoxDominantCatch.Location = new System.Drawing.Point(11, 99);
             this.listBoxDominantCatch.Name = "listBoxDominantCatch";
-            this.listBoxDominantCatch.Size = new System.Drawing.Size(154, 147);
+            this.listBoxDominantCatch.Size = new System.Drawing.Size(154, 134);
             this.listBoxDominantCatch.TabIndex = 9;
             this.listBoxDominantCatch.Enter += new System.EventHandler(this.OnListBoxEnter);
             // 
             // label12
             // 
             this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(14, 46);
+            this.label12.Location = new System.Drawing.Point(15, 80);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(48, 13);
             this.label12.TabIndex = 5;
@@ -977,7 +979,7 @@
             this.cboGearVariation.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
             this.cboGearVariation.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.cboGearVariation.FormattingEnabled = true;
-            this.cboGearVariation.Location = new System.Drawing.Point(83, 43);
+            this.cboGearVariation.Location = new System.Drawing.Point(83, 77);
             this.cboGearVariation.Name = "cboGearVariation";
             this.cboGearVariation.Size = new System.Drawing.Size(165, 21);
             this.cboGearVariation.TabIndex = 4;
@@ -987,7 +989,7 @@
             // label11
             // 
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(14, 17);
+            this.label11.Location = new System.Drawing.Point(15, 51);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(57, 13);
             this.label11.TabIndex = 3;
@@ -999,17 +1001,26 @@
             this.cboGearClass.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.cboGearClass.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboGearClass.FormattingEnabled = true;
-            this.cboGearClass.Location = new System.Drawing.Point(83, 14);
+            this.cboGearClass.Location = new System.Drawing.Point(83, 48);
             this.cboGearClass.Name = "cboGearClass";
             this.cboGearClass.Size = new System.Drawing.Size(165, 21);
             this.cboGearClass.TabIndex = 0;
             this.cboGearClass.SelectedIndexChanged += new System.EventHandler(this.OnComboSelectedIndexChanged);
             // 
+            // lblLocation
+            // 
+            this.lblLocation.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblLocation.Location = new System.Drawing.Point(7, 1);
+            this.lblLocation.Name = "lblLocation";
+            this.lblLocation.Size = new System.Drawing.Size(359, 36);
+            this.lblLocation.TabIndex = 8;
+            this.lblLocation.Text = "This, is text.";
+            // 
             // GearInventoryEditForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(779, 496);
+            this.ClientSize = new System.Drawing.Size(779, 505);
             this.Controls.Add(this.pnlGear);
             this.Controls.Add(this.pnlBarangay);
             this.Controls.Add(this.pnlInventory);
@@ -1135,5 +1146,6 @@
         private System.Windows.Forms.ComboBox cboCatchUnit;
         private System.Windows.Forms.Label label32;
         private System.Windows.Forms.Label label31;
+        private System.Windows.Forms.Label lblLocation;
     }
 }

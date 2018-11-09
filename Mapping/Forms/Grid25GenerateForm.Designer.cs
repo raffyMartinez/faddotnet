@@ -553,7 +553,7 @@
             this.Name = "Grid25GenerateForm";
             this.Text = "Grid 25";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Grid25GenerateForm_FormClosed);
-            this.Load += new System.EventHandler(this.Grid25GenerateForm_Load);
+            this.Load += new System.EventHandler(this.OnFormLoad);
             this.groupLabels.ResumeLayout(false);
             this.groupLabels.PerformLayout();
             this.toolbar.ResumeLayout(false);

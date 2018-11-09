@@ -1,12 +1,12 @@
 ﻿using AxMapWinGIS;
-using MapWinGIS;
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.IO;
-using System.Xml;
 using FAD3.GUI.Classes;
 using FAD3.Mapping.Classes;
+using MapWinGIS;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Xml;
 
 namespace FAD3
 {
@@ -1108,7 +1108,7 @@ namespace FAD3
         private void OnMapSelectBoxFinal(object sender, _DMapEvents_SelectBoxFinalEvent e)
         {
             _completeFishingGrid = false;
-            if (_enableMapInteraction)
+            if (_enableMapInteraction && _axMap.CursorMode == tkCursorMode.cmSelection)
             {
                 var extL = 0D;
                 var extR = 0D;

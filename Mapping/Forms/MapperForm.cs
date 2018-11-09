@@ -1,11 +1,10 @@
 ﻿using AxMapWinGIS;
+using FAD3.GUI.Classes;
+using FAD3.Mapping.Classes;
 using MapWinGIS;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
-using System.IO;
-using FAD3.Mapping.Classes;
-using FAD3.GUI.Classes;
 
 namespace FAD3
 {
@@ -18,6 +17,7 @@ namespace FAD3
         private Graticule _graticule;                                               //handles map graticule
         private SaveMapImage _saveMapImage;                                         //handles saving of map image
         private Form _parentForm;
+        private tkCursorMode _cursorMode;
         private MapLayer _currentMapLayer;
         public event EventHandler MapperClosed;
 
@@ -149,9 +149,10 @@ namespace FAD3
             global.LoadFormSettings(this);
             _mapLayersHandler = new MapLayersHandler(axMap);
             _mapLayersHandler.CurrentLayer += OnCurrentMapLayer;
-            _mapInterActionHandler = new MapInterActionHandler(axMap, _mapLayersHandler);
-            _mapInterActionHandler.MapContextMenuStrip = menuDropDown;
-            SetCursorToSelect();
+            _mapInterActionHandler = new MapInterActionHandler(axMap, _mapLayersHandler)
+            {
+                MapContextMenuStrip = menuDropDown
+            };
 
             if (global.MappingMode == fad3MappingMode.defaultMode)
             {
@@ -162,6 +163,7 @@ namespace FAD3
                 tsButtonSave.Enabled = false;
             }
             ConfigureMapControl();
+            SetCursor(tkCursorMode.cmSelection);
         }
 
         private void OnCurrentMapLayer(MapLayersHandler s, LayerEventArg e)
@@ -169,12 +171,45 @@ namespace FAD3
             _currentMapLayer = _mapLayersHandler.get_MapLayer(e.LayerHandle);
         }
 
-        public void SetCursorToSelect()
+        public void SetCursor(tkCursorMode cursorMode)
         {
+            Bitmap b = new Bitmap(Properties.Resources.pan);
+            switch (cursorMode)
+            {
+                case tkCursorMode.cmPan:
+                    axMap.CursorMode = tkCursorMode.cmPan;
+                    break;
+
+                case tkCursorMode.cmSelection:
+                    b = new Bitmap(Properties.Resources.arrow32);
+                    axMap.CursorMode = tkCursorMode.cmSelection;
+                    break;
+            }
+
+            b.MakeTransparent(b.GetPixel(0, 0));
+            Graphics g = Graphics.FromImage(b);
+            IntPtr ptr = b.GetHicon();
             axMap.MapCursor = tkCursor.crsrUserDefined;
-            axMap.UDCursorHandle = (int)((Bitmap)ilCursors.Images["arrow32"]).GetHicon();
-            axMap.CursorMode = tkCursorMode.cmSelection;
+            axMap.UDCursorHandle = (int)ptr;
         }
+
+        //public void SetCursorToPan()
+        //{
+        //    axMap.MapCursor = tkCursor.crsrUserDefined;
+        //    Bitmap b = new Bitmap(Properties.Resources.pan);
+        //    b.MakeTransparent(b.GetPixel(0, 0));
+        //    Graphics g = Graphics.FromImage(b);
+        //    IntPtr ptr = b.GetHicon();
+        //    axMap.UDCursorHandle = (int)ptr;
+        //    axMap.CursorMode = tkCursorMode.cmPan;
+        //}
+
+        //public void SetCursorToSelect()
+        //{
+        //    axMap.MapCursor = tkCursor.crsrUserDefined;
+        //    axMap.UDCursorHandle = (int)((Bitmap)ilCursors.Images["arrow32"]).GetHicon();
+        //    axMap.CursorMode = tkCursorMode.cmSelection;
+        //}
 
         private void OnMapperForm_Closed(object sender, FormClosedEventArgs e)
         {
@@ -277,10 +312,12 @@ namespace FAD3
                         mlf.BringToFront();
                         mlf.Focus();
                     }
+
                     break;
 
                 case "tsButtonLayerAdd":
                     OpenFileDialog();
+
                     break;
 
                 case "tsButtonAttributes":
@@ -320,13 +357,13 @@ namespace FAD3
                     break;
 
                 case "tsButtonPan":
-                    axMap.MapCursor = tkCursor.crsrUserDefined;
-                    axMap.UDCursorHandle = (int)((Bitmap)e.ClickedItem.Image).GetHicon();
-                    axMap.CursorMode = tkCursorMode.cmPan;
+                    //SetCursorToPan();
+                    SetCursor(tkCursorMode.cmPan);
                     break;
 
                 case "tsButtonBlackArrow":
-                    SetCursorToSelect();
+                    //SetCursorToSelect();
+                    SetCursor(tkCursorMode.cmSelection);
                     break;
 
                 case "tsButtonMeasure":
@@ -367,6 +404,21 @@ namespace FAD3
 
                 case "tsButtonCloseMap":
                     Close();
+                    return;
+            }
+
+            switch (axMap.CursorMode)
+            {
+                case tkCursorMode.cmSelection:
+                    SetCursor(tkCursorMode.cmSelection);
+                    break;
+
+                case tkCursorMode.cmPan:
+                    SetCursor(tkCursorMode.cmPan);
+                    break;
+
+                default:
+
                     break;
             }
         }

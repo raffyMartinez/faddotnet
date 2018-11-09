@@ -232,9 +232,6 @@
   <data name="arrow" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\arrow.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="arrow32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\arrow32.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="attrib" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\attrib.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -393,5 +390,11 @@
   </data>
   <data name="label_add" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\label_add.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="FAD3" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\FAD3.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="arrow32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\arrow32.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

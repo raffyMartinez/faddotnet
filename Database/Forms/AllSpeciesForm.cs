@@ -109,7 +109,7 @@ namespace FAD3
         {
             lvNames.Items.Clear();
             int n = 1;
-            foreach (var item in names.RetrieveScientificNames(filters, OnlyWithRecords))
+            foreach (var item in Names.RetrieveScientificNames(filters, OnlyWithRecords))
             {
                 var inFishBase = item.Value.inFishBase ? "x" : "";
                 var recordCount = item.Value.catchCompositionRecordCount == 0 ? "" : item.Value.catchCompositionRecordCount.ToString();

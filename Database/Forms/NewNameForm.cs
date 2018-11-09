@@ -46,14 +46,14 @@ namespace FAD3.Database.Forms
             {
                 case FisheryObjectNameType.CatchLocalName:
                     Text = "New catch local name";
-                    _similarNames = names.GetSimilarSoundingLocalNames(_newObjectName);
+                    _similarNames = Names.GetSimilarSoundingLocalNames(_newObjectName);
                     lblNewType.Text = "New catch local name";
                     lblTitle.Text = " Add new catch local name";
                     break;
 
                 case FisheryObjectNameType.GearLocalName:
                     Text = "New gear local name";
-                    _similarNames = gear.GetSimilarSoundingLocalNames(_newObjectName);
+                    _similarNames = Gear.GetSimilarSoundingLocalNames(_newObjectName);
                     lblNewType.Text = "New gear local name";
                     lblTitle.Text = "Add new fishing gear local name";
                     break;
@@ -85,12 +85,12 @@ namespace FAD3.Database.Forms
             {
                 case FisheryObjectNameType.CatchLocalName:
                     Text = "New catch local name";
-                    _similarNames = names.GetSimilarSoundingLocalNames(_newObjectName);
+                    _similarNames = Names.GetSimilarSoundingLocalNames(_newObjectName);
                     break;
 
                 case FisheryObjectNameType.GearLocalName:
                     Text = "New gear local name";
-                    _similarNames = gear.GetSimilarSoundingLocalNames(_newObjectName);
+                    _similarNames = Gear.GetSimilarSoundingLocalNames(_newObjectName);
                     break;
             }
             txtLocalName.Text = newName;
@@ -111,15 +111,15 @@ namespace FAD3.Database.Forms
                     switch (_newObjectName.NameType)
                     {
                         case FisheryObjectNameType.CatchLocalName:
-                            success = names.SaveNewLocalName(_newObjectName);
+                            success = Names.SaveNewLocalName(_newObjectName);
                             break;
 
                         case FisheryObjectNameType.GearLocalName:
-                            success = gear.SaveNewLocalName(_newObjectName);
+                            success = Gear.SaveNewLocalName(_newObjectName);
                             break;
 
                         case FisheryObjectNameType.GearVariationName:
-                            success = gear.SaveNewVariationName(_newObjectName, _gearClassGuid);
+                            success = Gear.SaveNewVariationName(_newObjectName, _gearClassGuid);
                             break;
                     }
 
@@ -139,7 +139,7 @@ namespace FAD3.Database.Forms
             switch (_newObjectName.NameType)
             {
                 case FisheryObjectNameType.CatchLocalName:
-                    var localNameList = names.LocalNameList;
+                    var localNameList = Names.LocalNameList;
                     foreach (var item in localNameList)
                     {
                         var similarity = lev.GetSimilarity(_newObjectName.NewName, item);

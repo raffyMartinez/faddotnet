@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using MapWinGIS;
-using AxMapWinGIS;
-using System.Data.OleDb;
-using System.Data;
+﻿using AxMapWinGIS;
 using FAD3.GUI.Classes;
+using MapWinGIS;
+using System;
+using System.Data;
+using System.Data.OleDb;
 
 namespace FAD3
 {
@@ -50,6 +47,12 @@ namespace FAD3
             }
         }
 
+        /// <summary>
+        /// Map a single fishing ground when coming from a selected sampling
+        /// </summary>
+        /// <param name="fishingGround"></param>
+        /// <param name="utmZone"></param>
+        /// <returns></returns>
         public bool MapFishingGround(string fishingGround, fadUTMZone utmZone)
         {
             var sf = new Shapefile();
@@ -74,6 +77,9 @@ namespace FAD3
                     {
                         MapLayersHandler.RemoveLayer("Fishing ground");
                         sf.GeoProjection = _geoProjection;
+                        sf.DefaultDrawingOptions.PointShape = tkPointShapeType.ptShapeCircle;
+                        sf.DefaultDrawingOptions.FillColor = new Utils().ColorByName(tkMapColor.Red);
+                        sf.DefaultDrawingOptions.PointSize = 9;
                         success = MapLayersHandler.AddLayer(sf, "Fishing ground", true, true) >= 0;
                     }
                 }
@@ -81,6 +87,16 @@ namespace FAD3
             return success;
         }
 
+        /// <summary>
+        /// maps fishing grounds belonging to a target area, landing site, or type of gear gear
+        /// </summary>
+        /// <param name="aoiGUID"></param>
+        /// <param name="samplingYears"></param>
+        /// <param name="utmZone"></param>
+        /// <param name="Aggregated"></param>
+        /// <param name="notInclude1"></param>
+        /// <param name="landingSiteGuid"></param>
+        /// <param name="gearVariationGuid"></param>
         public void MapFishingGrounds(string aoiGUID, string samplingYears, fadUTMZone utmZone,
             bool Aggregated = true, bool notInclude1 = false, string landingSiteGuid = "",
             string gearVariationGuid = "")

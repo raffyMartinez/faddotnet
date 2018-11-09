@@ -1,12 +1,11 @@
-﻿using Microsoft.VisualBasic.PowerPacks;
-using Microsoft.Win32;
+﻿using FAD3.GUI.Classes;
+using FAD3.Mapping.Classes;
+using Microsoft.VisualBasic.PowerPacks;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
-using FAD3.GUI.Classes;
-using FAD3.Mapping.Classes;
 
 namespace FAD3
 {
@@ -183,7 +182,8 @@ namespace FAD3
 
                 case "buttonClear":
                     _grid25MajorGrid.ClearSelectedGrids();
-                    _parentForm.SetCursorToSelect();
+                    //_parentForm.SetCursorToSelect();
+                    _parentForm.SetCursor(MapWinGIS.tkCursorMode.cmSelection);
                     break;
 
                 case "buttonClose":
@@ -259,7 +259,7 @@ namespace FAD3
             }
         }
 
-        private void Grid25GenerateForm_Load(object sender, EventArgs e)
+        private void OnFormLoad(object sender, EventArgs e)
         {
             txtMinorGridLabelDistance.Text = "1000";
             txtMinorGridLabelSize.Text = "8";

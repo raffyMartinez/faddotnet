@@ -61,7 +61,7 @@
     <SignManifests>false</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Fatcow-Farm-Fresh-Book-key.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\FAD3.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>FAD3.Program</StartupObject>
@@ -141,6 +141,12 @@
     </Compile>
     <Compile Include="Database\Classes\CatchLine.cs" />
     <Compile Include="Database\Classes\CatchName.cs" />
+    <Compile Include="Database\Forms\CatchLocalNamesForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Database\Forms\CatchLocalNamesForm.Designer.cs">
+      <DependentUpon>CatchLocalNamesForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Database\Forms\CPUEHistoricalForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -448,7 +454,7 @@
     <Compile Include="Database\Forms\VesselDimensionForm.Designer.cs">
       <DependentUpon>VesselDimensionForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Database\Classes\gear.cs" />
+    <Compile Include="Database\Classes\Gear.cs" />
     <Compile Include="Database\Forms\ReferenceNumberForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -484,7 +490,7 @@
       <DependentUpon>ManageMRUForm.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\Classes\mru.cs" />
-    <Compile Include="Database\Classes\names.cs" />
+    <Compile Include="Database\Classes\Names.cs" />
     <Compile Include="Mapping\UserControls\CharacterControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -545,6 +551,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Database\Forms\CatchCompositionForm.resx">
       <DependentUpon>CatchCompositionForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Database\Forms\CatchLocalNamesForm.resx">
+      <DependentUpon>CatchLocalNamesForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Database\Forms\CPUEHistoricalForm.resx">
       <DependentUpon>CPUEHistoricalForm.cs</DependentUpon>
@@ -779,8 +788,7 @@
     <None Include="Resources\ColumnChart_16x.png" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Fatcow-Farm-Fresh-Book-key.ico" />
-    <Content Include="Icon1.ico" />
+    <Content Include="FAD3.ico" />
     <None Include="Resources\label_add.bmp" />
     <None Include="Resources\layerRemove.bmp" />
     <None Include="Resources\prop2a.png" />
@@ -845,6 +853,8 @@
     <None Include="Resources\graticule.bmp" />
     <Content Include="Resources\colorschemes.xml" />
     <None Include="Resources\down.png" />
+    <None Include="Resources\fad.ico" />
+    <None Include="Resources\FAD3.ico" />
     <Content Include="Resources\internet-web-browser.png" />
     <None Include="Resources\system-file-manager.png" />
     <None Include="Resources\layerAdd.bmp" />

@@ -54,7 +54,7 @@ namespace FAD3
             }
             else if (_parentForm.GetType().Name == "GearCodesUsageForm")
             {
-                _samplings = gear.gearSamplings(_itemNameGuid);
+                _samplings = Gear.gearSamplings(_itemNameGuid);
             }
 
             if (_samplings.Count > 0)
@@ -85,7 +85,7 @@ namespace FAD3
                             }
                             else
                             {
-                                imageKey = gear.GearClassImageKeyFromGearClasName(item.Value.gearClassName);
+                                imageKey = Gear.GearClassImageKeyFromGearClasName(item.Value.gearClassName);
                                 nodeGear = nodeLandingSite.Nodes.Add(item.Value.gear, item.Value.gear, imageKey);
                                 nodeGear.Tag = "gear";
                                 samplingMonth = string.Format("{0:MMM-yyyy}", item.Value.samplingDate);
@@ -97,7 +97,7 @@ namespace FAD3
                         {
                             nodeLandingSite = nodeTargetArea.Nodes.Add(item.Value.landingSite, item.Value.landingSite, "LandingSite");
                             nodeLandingSite.Tag = "landingSite";
-                            imageKey = gear.GearClassImageKeyFromGearClasName(item.Value.gearClassName);
+                            imageKey = Gear.GearClassImageKeyFromGearClasName(item.Value.gearClassName);
                             nodeGear = nodeLandingSite.Nodes.Add(item.Value.gear, item.Value.gear, imageKey);
                             nodeGear.Tag = "gear";
                             samplingMonth = string.Format("{0:MMM-yyyy}", item.Value.samplingDate);
@@ -111,7 +111,7 @@ namespace FAD3
                         nodeTargetArea.Tag = "aoi";
                         nodeLandingSite = nodeTargetArea.Nodes.Add(item.Value.landingSite, item.Value.landingSite, "LandingSite");
                         nodeLandingSite.Tag = "landingSite";
-                        imageKey = gear.GearClassImageKeyFromGearClasName(item.Value.gearClassName);
+                        imageKey = Gear.GearClassImageKeyFromGearClasName(item.Value.gearClassName);
                         nodeGear = nodeLandingSite.Nodes.Add(item.Value.gear, item.Value.gear, imageKey);
                         nodeGear.Tag = "gear";
                         samplingMonth = string.Format("{0:MMM-yyyy}", item.Value.samplingDate);

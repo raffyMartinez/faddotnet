@@ -77,7 +77,7 @@ namespace FAD3
 
             if (_dataStatus != fad3DataStatus.statusNew)
             {
-                var speciesData = names.RetrieveSpeciesData(_nameGuid);
+                var speciesData = Names.RetrieveSpeciesData(_nameGuid);
                 _taxaName = cboTaxa.Text = CatchName.TaxaNameFromTaxa(speciesData.taxa);
                 _inFishBase = chkInFishbase.Checked = speciesData.inFishbase;
                 _fishBaseSpeciesNumber = speciesData.fishBaseNo;
@@ -86,7 +86,7 @@ namespace FAD3
                 _genusMPH2 = speciesData.genusKey2 ?? default;
                 _speciesMPH1 = speciesData.speciesKey1 ?? default;
                 _speciesMPH2 = speciesData.speciesKey2 ?? default;
-                _catchCompositionRecordCount = names.CatchCompositionRecordCount(_nameGuid);
+                _catchCompositionRecordCount = Names.CatchCompositionRecordCount(_nameGuid);
                 labelRecordCount.Text = _catchCompositionRecordCount.ToString();
 
                 if (_catchCompositionRecordCount == 0)
@@ -101,7 +101,7 @@ namespace FAD3
 
                 if (_genus.Length > 0 && _species.Length > 0)
                 {
-                    var speciesFishBaseData = names.NameInFishBaseEx(_genus, _species);
+                    var speciesFishBaseData = Names.NameInFishBaseEx(_genus, _species);
                     _inFishBase = chkInFishbase.Checked = speciesFishBaseData.inFishBase;
                     _fishBaseSpeciesNumber = speciesFishBaseData.fishBaseSpeciesNo;
 
@@ -116,7 +116,7 @@ namespace FAD3
                     _speciesMPH1 = k1;
                     _speciesMPH2 = k2;
 
-                    var SimilarSoundingList = names.RetrieveSpeciesWithSimilarMetaPhone(_genusMPH1, _genusMPH2, _speciesMPH1, _speciesMPH2);
+                    var SimilarSoundingList = Names.RetrieveSpeciesWithSimilarMetaPhone(_genusMPH1, _genusMPH2, _speciesMPH1, _speciesMPH2);
                     if (SimilarSoundingList.Count > 0)
                     {
                         Width = (int)(Width * 2);
@@ -187,7 +187,7 @@ namespace FAD3
                         }
                         else
                         {
-                            if (names.UpdateSpeciesData(_dataStatus, _nameGuid, _genus, _species, _taxa,
+                            if (Names.UpdateSpeciesData(_dataStatus, _nameGuid, _genus, _species, _taxa,
                                 _genusMPH1, _genusMPH2, _speciesMPH1, _speciesMPH2, _inFishBase, _fishBaseSpeciesNumber, _notes))
                             {
                                 willClose = true;
@@ -288,7 +288,7 @@ namespace FAD3
 
             if (_taxa == Taxa.Fish)
             {
-                var fbData = names.NameInFishBaseEx(_genus, _species);
+                var fbData = Names.NameInFishBaseEx(_genus, _species);
                 chkInFishbase.Checked = _inFishBase = fbData.inFishBase;
                 _fishBaseSpeciesNumber = fbData.fishBaseSpeciesNo;
             }

@@ -20,6 +20,9 @@ namespace FAD3
         ExpressionTargetShape
     }
 
+    /// <summary>
+    /// Manages layers
+    /// </summary>
     public class MapLayersHandler : IDisposable, IEnumerable<MapLayer>
     {
         private string _fileMapState;
@@ -29,12 +32,6 @@ namespace FAD3
         private MapLayer _currentMapLayer;                                                          //the current layer selected in the map layers form
         private ShapefileLabelHandler _sfLabelHandler;
         private PointLayerSymbologyHandler _sfSymbologyHandler;
-        //private ColorSchemes _layerColors;
-
-        //public ColorSchemes LayerColors
-        //{
-        //    get { return _layerColors; }
-        //}
 
         public ColorSchemes LayerColors;
 

@@ -122,7 +122,7 @@ namespace FAD3
             switch (_action)
             {
                 case fad3GearEditAction.addGearVariation:
-                    _List = gear.AllGearVariationNames();
+                    _List = Gear.AllGearVariationNames();
                     foreach (var item in _List)
                     {
                         listBox.Items.Add(item);
@@ -130,12 +130,12 @@ namespace FAD3
                     break;
 
                 case fad3GearEditAction.addGearCode:
-                    foreach (var item in gear.GearCodesByClass(_GearClassGuid))
+                    foreach (var item in Gear.GearCodesByClass(_GearClassGuid))
                     {
                         listBox.Items.Add(item);
                     }
 
-                    labelCode.Text = gear.GearLetterFromGearClass(_GearClassGuid);
+                    labelCode.Text = Gear.GearLetterFromGearClass(_GearClassGuid);
                     break;
 
                 case fad3GearEditAction.addAOI:
@@ -147,7 +147,7 @@ namespace FAD3
                         if (_action == fad3GearEditAction.addAOI)
                             o.DataSource = new BindingSource(AOI.TargetAreas, null);
                         else
-                            o.DataSource = new BindingSource(gear.GearLocalNames, null); ;
+                            o.DataSource = new BindingSource(Gear.GearLocalNames, null); ;
 
                         o.DisplayMember = "Value";
                         o.ValueMember = "Key";

@@ -194,7 +194,7 @@ namespace FAD3
         /// <param name="gearVariationGuid"></param>
         public void SetUpMapping(string targetAreaGuid, string gearVariationGuid, string gearVariationName, string targetArea, bool MapFirstItemInList = false, bool RemoveInlandPoints = false)
         {
-            FillUpSampledYears(gear.GearUseCountInTargetArea(targetAreaGuid, gearVariationGuid));
+            FillUpSampledYears(Gear.GearUseCountInTargetArea(targetAreaGuid, gearVariationGuid));
             labelTitle.Text = $"Mapping of fishing grounds of {gearVariationName} in {targetArea}";
 
             _gearVariationGuid = gearVariationGuid;
