@@ -1,5 +1,12 @@
 ﻿namespace FAD3.GUI.Classes
 {
+    public enum CatchNameDataType
+    {
+        CatchSpeciesName,
+        CatchLocalName,
+        CatchSpeciesLocalNamePair
+    }
+
     public enum FisheryObjectNameType
     {
         CatchLocalName,

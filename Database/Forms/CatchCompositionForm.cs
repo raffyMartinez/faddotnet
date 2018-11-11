@@ -755,7 +755,7 @@ namespace FAD3
         private void FillSpeciesComboBox()
         {
             _comboSpecies.Items.Clear();
-            foreach (var item in Names.speciesList)
+            foreach (var item in Names.SpeciesList)
             {
                 _comboSpecies.Items.Add(item);
             }

@@ -19,6 +19,7 @@ namespace FAD3
             var dbe = new DBEngine();
             var dbTemplate = dbe.OpenDatabase(global.ApplicationPath + "\\template.mdb");
             var dbData = dbe.OpenDatabase(mdbPath);
+            var tdName = "";
 
             foreach (TableDef td in dbData.TableDefs)
             {
@@ -30,6 +31,7 @@ namespace FAD3
             {
                 if (tdTemplate.Name.Substring(0, 4) != "MSys" && tdTemplate.Name.Substring(0, 5) != "temp_")
                 {
+                    tdName = tdTemplate.Name;
                     if (!tableList.Contains(tdTemplate.Name))
                     {
                         var sql = $@"SELECT [{tdTemplate.Name}].* INTO
@@ -111,6 +113,15 @@ namespace FAD3
                                 o.Indexes.Append(dataIndex);
                                 o.Indexes.Refresh();
                             });
+                        }
+                        else
+                        {
+                            foreach (Index i in dbData.TableDefs[tdTemplate.Name].Indexes)
+                            {
+                                if (i.Name == templateIndex.Name)
+                                {
+                                }
+                            }
                         }
                     }
                 }

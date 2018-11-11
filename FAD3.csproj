@@ -80,6 +80,9 @@
     <Reference Include="DynamicInterop, Version=0.7.4.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\DynamicInterop.0.7.4\lib\net40\DynamicInterop.dll</HintPath>
     </Reference>
+    <Reference Include="HtmlAgilityPack, Version=1.8.10.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>packages\HtmlAgilityPack.1.8.10\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <HintPath>packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
@@ -141,6 +144,12 @@
     </Compile>
     <Compile Include="Database\Classes\CatchLine.cs" />
     <Compile Include="Database\Classes\CatchName.cs" />
+    <Compile Include="Database\Forms\CatchLocalNameSelectedForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Database\Forms\CatchLocalNameSelectedForm.Designer.cs">
+      <DependentUpon>CatchLocalNameSelectedForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Database\Forms\CatchLocalNamesForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -164,6 +173,18 @@
     </Compile>
     <Compile Include="Database\Forms\GearInventoryForm.Designer.cs">
       <DependentUpon>GearInventoryForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Database\Forms\HTMLTableSelectColumnsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Database\Forms\HTMLTableSelectColumnsForm.Designer.cs">
+      <DependentUpon>HTMLTableSelectColumnsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Database\Forms\LocalNameSciNameEditForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Database\Forms\LocalNameSciNameEditForm.Designer.cs">
+      <DependentUpon>LocalNameSciNameEditForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Database\Forms\MappingBatchForm.cs">
       <SubType>Form</SubType>
@@ -552,6 +573,9 @@
     <EmbeddedResource Include="Database\Forms\CatchCompositionForm.resx">
       <DependentUpon>CatchCompositionForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Database\Forms\CatchLocalNameSelectedForm.resx">
+      <DependentUpon>CatchLocalNameSelectedForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Database\Forms\CatchLocalNamesForm.resx">
       <DependentUpon>CatchLocalNamesForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -563,6 +587,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Database\Forms\GearInventoryForm.resx">
       <DependentUpon>GearInventoryForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Database\Forms\HTMLTableSelectColumnsForm.resx">
+      <DependentUpon>HTMLTableSelectColumnsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Database\Forms\LocalNameSciNameEditForm.resx">
+      <DependentUpon>LocalNameSciNameEditForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Database\Forms\MappingBatchForm.resx">
       <DependentUpon>MappingBatchForm.cs</DependentUpon>
@@ -855,6 +885,7 @@
     <None Include="Resources\down.png" />
     <None Include="Resources\fad.ico" />
     <None Include="Resources\FAD3.ico" />
+    <None Include="Resources\Import_16x.png" />
     <Content Include="Resources\internet-web-browser.png" />
     <None Include="Resources\system-file-manager.png" />
     <None Include="Resources\layerAdd.bmp" />

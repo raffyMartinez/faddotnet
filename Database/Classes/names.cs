@@ -9,6 +9,7 @@ using System.Data.OleDb;
 using System.IO;
 using System.Text;
 using MetaphoneCOM;
+using HtmlAgilityPack;
 
 namespace FAD3
 {
@@ -21,6 +22,36 @@ namespace FAD3
         private static string _genus = "";
         private static long _localNamesCount = 0;
         private static long _sciNamesCount = 0;
+        private static Dictionary<string, string> _languages = new Dictionary<string, string>();
+        private static Dictionary<string, string> _allSpeciesDictionary = new Dictionary<string, string>();
+        private static Dictionary<string, string> _allSpeciesDictionaryReverse = new Dictionary<string, string>();
+        private static Dictionary<string, string> _localNameListDictReverse = new Dictionary<string, string>();
+        private static Dictionary<string, string> _languageDictReverse = new Dictionary<string, string>();
+        private static List<string> _listSpeciesNames = new List<string>();
+
+        public static Dictionary<string, string> AllSpeciesDictionary
+        {
+            get
+            {
+                if (_allSpeciesDictionary.Count == 0)
+                {
+                    GetAllSpecies();
+                }
+                return _allSpeciesDictionary;
+            }
+        }
+
+        public static Dictionary<string, string> Languages
+        {
+            get
+            {
+                if (_languages.Count == 0)
+                {
+                    GetLanguages();
+                }
+                return _languages;
+            }
+        }
 
         public static string Genus
         {
@@ -60,7 +91,471 @@ namespace FAD3
             }
         }
 
-        public static int ImportLocalNamesFromFile(string fileName)
+        private static bool DeleteAllCatchLocalNames()
+        {
+            var nameCount = 0;
+            var namesDeleted = 0;
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                string sql = "SELECT Count(tblBaseLocalNames.Name) AS n FROM tblBaseLocalNames";
+                using (OleDbCommand getCount = new OleDbCommand(sql, conn))
+                {
+                    nameCount = (int)getCount.ExecuteScalar();
+                }
+
+                sql = "Delete * from tblBaseLocalNames";
+                using (OleDbCommand delete = new OleDbCommand(sql, conn))
+                {
+                    try
+                    {
+                        namesDeleted = delete.ExecuteNonQuery();
+                    }
+                    catch
+                    {
+                        //ignore
+                    }
+                }
+            }
+
+            return nameCount == namesDeleted;
+        }
+
+        private static void RefreshLocalNamesList()
+        {
+            _localNameList.Clear();
+            const string sql = "Select Name from tblBaseLocalNames order by Name";
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                var adapter = new OleDbDataAdapter(sql, conn);
+                DataTable dt = new DataTable();
+                adapter.Fill(dt);
+                for (int n = 0; n < dt.Rows.Count; n++)
+                {
+                    DataRow dr = dt.Rows[n];
+                    _localNameList.Add(dr["Name"].ToString());
+                }
+            }
+        }
+
+        public static int ImportLocalNamesFromFile(string fileName, bool replaceAll = false, bool isHTML = false)
+        {
+            bool allNamesDeleted = false;
+            if (replaceAll)
+            {
+                allNamesDeleted = DeleteAllCatchLocalNames();
+                RefreshLocalNamesList();
+            }
+            var n = 0;
+            const Int32 BufferSize = 512;
+            using (var fileStream = File.OpenRead(fileName))
+            {
+                using (var streamReader = new StreamReader(fileStream, Encoding.UTF8, true, BufferSize))
+                {
+                    String line;
+                    while ((line = streamReader.ReadLine()) != null)
+                    {
+                        if (!_localNameList.Contains(line))
+                        {
+                            NewFisheryObjectName nfon = new NewFisheryObjectName(line, FisheryObjectNameType.CatchLocalName);
+                            SaveNewLocalName(nfon, false);
+                            n++;
+                        }
+                    }
+                }
+            }
+
+            if (n > 0)
+            {
+                MakeAllNames();
+            }
+            return n;
+        }
+
+        public static List<string> GetLocalNameFromSpeciesNameLanguage(string speciesNameGuid, string languageGuid)
+        {
+            List<string> list = new List<string>();
+            string sql = $@"SELECT tblBaseLocalNames.Name
+                            FROM tblBaseLocalNames INNER JOIN
+                              tblLocalNamesScientific ON
+                              tblBaseLocalNames.NameNo = tblLocalNamesScientific.LocalNameGuid
+                            WHERE tblLocalNamesScientific.ScientificNameGuid={{{speciesNameGuid}}} AND
+                              tblLocalNamesScientific.LanguageGuid={{{languageGuid}}}";
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                var adapter = new OleDbDataAdapter(sql, conn);
+                DataTable dt = new DataTable();
+                adapter.Fill(dt);
+                for (int n = 0; n < dt.Rows.Count; n++)
+                {
+                    DataRow dr = dt.Rows[n];
+                    list.Add(dr["Name"].ToString());
+                }
+            }
+
+            return list;
+        }
+
+        public static List<(string genus, string species)> GetSpeciesNameFromLocalNameLanguage(string localNameGuid, string languageGuid)
+        {
+            List<(string genus, string species)> list = new List<(string genus, string species)>();
+            string sql = $@"SELECT tblAllSpecies.Genus, tblAllSpecies.species
+                            FROM tblAllSpecies
+                              INNER JOIN tblLocalNamesScientific ON
+                              tblAllSpecies.SpeciesGUID = tblLocalNamesScientific.ScientificNameGuid
+                            WHERE tblLocalNamesScientific.LocalNameGuid={{{localNameGuid}}} AND
+                              tblLocalNamesScientific.LanguageGuid={{{languageGuid}}}
+                            Order by tblAllSpecies.Genus, tblAllSpecies.species";
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                var adapter = new OleDbDataAdapter(sql, conn);
+                DataTable dt = new DataTable();
+                adapter.Fill(dt);
+                for (int n = 0; n < dt.Rows.Count; n++)
+                {
+                    DataRow dr = dt.Rows[n];
+                    list.Add((dr["Genus"].ToString(), dr["species"].ToString()));
+                }
+            }
+
+            return list;
+        }
+
+        public static int ImportFromHTMLLocalNamestoScientificNames(string fileName, int speciesColumn, int localNameColumn, int languageColumn)
+        {
+            GetLanguages();
+            var speciesName = "";
+            var localName = "";
+            var language = "";
+            HtmlDocument doc = new HtmlDocument();
+            int col = 0;
+            int savedCount = 0;
+            doc.Load(fileName);
+            foreach (HtmlNode table in doc.DocumentNode.SelectNodes("//table"))
+            {
+                foreach (HtmlNode body in table.SelectNodes("tbody"))
+                {
+                    foreach (HtmlNode row in body.SelectNodes("tr"))
+                    {
+                        col = 0;
+                        speciesName = "";
+                        localName = "";
+                        language = "";
+                        foreach (HtmlNode cell in row.SelectNodes("th|td"))
+                        {
+                            if (col == speciesColumn)
+                            {
+                                speciesName = cell.InnerText.Trim(new char[] { ' ', '\r', '\n', '\t' });
+                            }
+                            else if (col == localNameColumn)
+                            {
+                                localName = cell.InnerText.Trim(new char[] { ' ', '\r', '\n', '\t' });
+                            }
+                            else if (col == languageColumn)
+                            {
+                                language = cell.InnerText.Trim(new char[] { ' ', '\r', '\n', '\t' });
+                            }
+                            if (speciesName.Length > 0
+                                && language.Length > 0
+                                && localName.Length > 0)
+                            {
+                                if (!_allSpeciesDictionaryReverse.ContainsKey(speciesName))
+                                {
+                                    var arr = speciesName.Split(' ');
+                                    var genus = "";
+                                    var species = "";
+                                    for (int n = 0; n < arr.Length; n++)
+                                    {
+                                        if (n == 0)
+                                        {
+                                            genus = arr[n];
+                                        }
+                                        else
+                                        {
+                                            species += arr[n] + " ";
+                                        }
+                                    }
+                                    species = species.Trim();
+                                    SaveNewFishSpeciesName(genus, species);
+                                }
+
+                                if (!_languageDictReverse.ContainsKey(language))
+                                {
+                                    SaveNewLanguage(language);
+                                }
+
+                                localName = localName.ToLower();
+                                if (!_localNameListDictReverse.ContainsKey(localName))
+                                {
+                                    NewFisheryObjectName nfo = new NewFisheryObjectName(localName, FisheryObjectNameType.CatchLocalName);
+                                    SaveNewLocalName(nfo);
+                                }
+
+                                if (SaveNewLocalSpeciesNameLanguage(_allSpeciesDictionaryReverse[speciesName], _languageDictReverse[language], _localNameListDictReverse[localName]))
+                                {
+                                    savedCount++;
+                                }
+                                break;
+                            }
+                            else
+                            {
+                                col++;
+                            }
+                        }
+                    }
+                }
+            }
+            MakeAllNames();
+            return savedCount;
+        }
+
+        public static bool SaveNewLanguage(string language)
+        {
+            string sql;
+            bool success = false;
+            string guid = Guid.NewGuid().ToString();
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+
+                sql = $@"Insert into tblLanguages
+                           (LanguageUsedGuid, LanguageUsed) values (
+                            {{{guid}}}, '{language}')";
+
+                using (OleDbCommand update = new OleDbCommand(sql, conn))
+                {
+                    try
+                    {
+                        success = update.ExecuteNonQuery() > 0;
+                        if (success)
+                        {
+                            _languages.Add(guid, language);
+                            _languageDictReverse.Add(language, guid);
+                        }
+                    }
+                    catch
+                    {
+                        //ignore
+                    }
+                }
+            }
+            return success;
+        }
+
+        public static int ImportLocalNamestoScientificNames(string fileName, ref int fail, bool isHTML = false)
+        {
+            Logger.Log("import local names - species name pair begin " + DateTime.Now.ToLongTimeString());
+            var n = 0;
+            var f = 0;
+            const Int32 BufferSize = 1024;
+            var speciesKey = "";
+            var languageKey = "";
+            var localNameKey = "";
+            using (var fileStream = File.OpenRead(fileName))
+            {
+                using (var streamReader = new StreamReader(fileStream, Encoding.UTF8, true, BufferSize))
+                {
+                    String line;
+                    if (AllSpeciesDictionary.Count > 0 && Languages.Count > 0 && LocalNameListDict.Count > 0)
+                    {
+                        while ((line = streamReader.ReadLine()) != null)
+                        {
+                            var arr = line.Split('\t');
+                            var localName = arr[0].Trim();
+                            var language = arr[1].Trim();
+                            var species = arr[2];
+                            localNameKey = "";
+                            speciesKey = "";
+                            languageKey = "";
+                            if (_localNameListDictReverse.ContainsKey(localName))
+                            {
+                                localNameKey = _localNameListDictReverse[localName];
+                            }
+                            if (_allSpeciesDictionaryReverse.ContainsKey(species))
+                            {
+                                speciesKey = _allSpeciesDictionaryReverse[species];
+                            }
+                            languageKey = _languageDictReverse[language];
+
+                            if (speciesKey.Length > 0 && localNameKey.Length > 0 && languageKey.Length > 0
+                                && SaveNewLocalSpeciesNameLanguage(speciesKey, languageKey, localNameKey))
+                            {
+                                n++;
+                            }
+                            else
+                            {
+                                f++;
+                            }
+                        }
+                    }
+                }
+            }
+            Logger.Log("import local names - species name pair end " + DateTime.Now.ToLongTimeString());
+            fail = f;
+            return n;
+        }
+
+        public static void RefreshLanguages()
+        {
+            GetLanguages();
+        }
+
+        public static bool SaveNewLocalSpeciesNameLanguage(string speciesNameGuid, string languageGuid, string localNameGuid)
+        {
+            bool success = false;
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                var sql = $@"Insert into tblLocalNamesScientific (LocalNameGuid, LanguageGuid, ScientificNameGuid,RowId) values
+                        ({{{localNameGuid}}}, {{{languageGuid}}},{{{speciesNameGuid}}},{{{Guid.NewGuid().ToString()}}})";
+                using (OleDbCommand update = new OleDbCommand(sql, conn))
+                {
+                    try
+                    {
+                        success = update.ExecuteNonQuery() > 0;
+                    }
+                    catch
+                    {
+                        // ignore success = false;
+                    }
+                }
+            }
+            return success;
+        }
+
+        private static Dictionary<string, string> GetLanguages()
+        {
+            _languages.Clear();
+            _languageDictReverse.Clear();
+            const string sql = "Select LanguageUsedGuid, LanguageUsed from tblLanguages Order By LanguageUsed";
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                var adapter = new OleDbDataAdapter(sql, conn);
+                DataTable dt = new DataTable();
+                adapter.Fill(dt);
+                for (int n = 0; n < dt.Rows.Count; n++)
+                {
+                    DataRow dr = dt.Rows[n];
+                    _languages.Add(dr["LanguageUsedGuid"].ToString().Trim(), dr["LanguageUsed"].ToString().Trim());
+                    _languageDictReverse.Add(dr["LanguageUsed"].ToString().Trim(), dr["LanguageUsedGuid"].ToString().Trim());
+                }
+            }
+
+            return _languages;
+        }
+
+        public static List<String> LocalNamesFromSpeciesNameLanguage(string genus, string species, string languageUsed)
+        {
+            List<string> list = new List<string>();
+            string sql = $@"SELECT tblBaseLocalNames.Name
+                            FROM tblAllSpecies INNER JOIN
+                                (tblLanguages INNER JOIN
+                                (tblBaseLocalNames INNER JOIN
+                                tblLocalNamesScientific ON
+                                tblBaseLocalNames.NameNo = tblLocalNamesScientific.LocalNameGuid) ON
+                                tblLanguages.LanguageUsedGuid = tblLocalNamesScientific.LanguageGuid) ON
+                                tblAllSpecies.SpeciesGUID = tblLocalNamesScientific.ScientificNameGuid
+                            WHERE tblLanguages.LanguageUsed='{languageUsed}' AND
+                                tblAllSpecies.Genus='{genus}' AND tblAllSpecies.species = '{species}'";
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                var adapter = new OleDbDataAdapter(sql, conn);
+                DataTable dt = new DataTable();
+                adapter.Fill(dt);
+                for (int n = 0; n < dt.Rows.Count; n++)
+                {
+                    DataRow dr = dt.Rows[n];
+                    list.Add(dr["Name"].ToString().Trim());
+                }
+            }
+            return list;
+        }
+
+        public static List<String> ScientificNamesFromLocalNameLanguage(string localName, string languageUsed)
+        {
+            List<string> list = new List<string>();
+            string sql = $@"SELECT tblAllSpecies.Genus, tblAllSpecies.species
+                            FROM tblAllSpecies INNER JOIN
+                                (tblLanguages INNER JOIN (tblBaseLocalNames INNER JOIN
+                                tblLocalNamesScientific ON tblBaseLocalNames.NameNo = tblLocalNamesScientific.LocalNameGuid) ON
+                                tblLanguages.LanguageUsedGuid = tblLocalNamesScientific.LanguageGuid) ON
+                                tblAllSpecies.SpeciesGUID = tblLocalNamesScientific.ScientificNameGuid
+                            WHERE tblLanguages.LanguageUsed='{languageUsed}' AND tblBaseLocalNames.Name='{localName}'
+                            Order by Genus, species";
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                var adapter = new OleDbDataAdapter(sql, conn);
+                DataTable dt = new DataTable();
+                adapter.Fill(dt);
+                for (int n = 0; n < dt.Rows.Count; n++)
+                {
+                    DataRow dr = dt.Rows[n];
+                    list.Add(dr["Genus"].ToString().Trim() + " " + dr["species"].ToString().Trim());
+                }
+            }
+            return list;
+        }
+
+        public static int ImportSpeciesNamesFromHTML(string filename, int speciesColumn)
+        {
+            GetAllSpecies();
+            var k = 0;
+            var genus = "";
+            var species = "";
+            ListFishSpecies();
+            HtmlDocument doc = new HtmlDocument();
+            int col = 0;
+            doc.Load(filename);
+            foreach (HtmlNode table in doc.DocumentNode.SelectNodes("//table"))
+            {
+                foreach (HtmlNode body in table.SelectNodes("tbody"))
+                {
+                    foreach (HtmlNode row in body.SelectNodes("tr"))
+                    {
+                        col = 0;
+                        foreach (HtmlNode cell in row.SelectNodes("th|td"))
+                        {
+                            if (col == speciesColumn)
+                            {
+                                var arr = cell.InnerText.Split(' ');
+                                genus = "";
+                                species = "";
+                                for (int n = 0; n < arr.Length; n++)
+                                {
+                                    if (n == 0)
+                                    {
+                                        genus = arr[n];
+                                    }
+                                    else
+                                    {
+                                        species += arr[n] + " ";
+                                    }
+                                }
+                                species = species.Trim(' ');
+
+                                if (!_allSpeciesDictionaryReverse.ContainsKey($"{genus} {species}")
+                                    && SaveNewFishSpeciesName(genus, species))
+                                {
+                                    k++;
+                                }
+                                break;
+                            }
+                            col++;
+                        }
+                    }
+                }
+            }
+            MakeAllNames();
+            return k;
+        }
+
+        public static int ImportSpeciesNamesFromFile(string fileName)
         {
             var n = 0;
             const Int32 BufferSize = 512;
@@ -98,7 +593,6 @@ namespace FAD3
 
         private static List<string> ListFishSpecies()
         {
-            List<string> species = new List<string>();
             var sql = $"SELECT Genus, species from tblAllSpecies where TaxaNo = {(int)Taxa.Fish}";
             using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
             {
@@ -109,10 +603,10 @@ namespace FAD3
                 for (int n = 0; n < dt.Rows.Count; n++)
                 {
                     DataRow dr = dt.Rows[n];
-                    species.Add(dr["Genus"].ToString() + " " + dr["species"].ToString());
+                    _listSpeciesNames.Add(dr["Genus"].ToString() + " " + dr["species"].ToString());
                 }
             }
-            return species;
+            return _listSpeciesNames;
         }
 
         public static Dictionary<string, string> GetSimilarSoundingLocalNames(NewFisheryObjectName newName)
@@ -138,6 +632,50 @@ namespace FAD3
             return similarNames;
         }
 
+        private static bool SaveNewFishSpeciesName(string genus, string species)
+        {
+            bool success = false;
+            DoubleMetaphoneShort mph = new DoubleMetaphoneShort();
+            short spKey1 = 0;
+            short spKey2 = 0;
+            short gnKey1 = 0;
+            short gnKey2 = 0;
+            string guid = Guid.NewGuid().ToString();
+            var notes = "";
+            int? spNumber = GetFishBaseSpeciesNumber(genus, species);
+            var fbNo = spNumber == null ? "null" : spNumber.ToString();
+            mph.ComputeMetaphoneKeys(genus, out gnKey1, out gnKey2);
+            mph.ComputeMetaphoneKeys(species, out spKey1, out spKey2);
+
+            var sql = $@"Insert into tblAllSpecies
+                           (Genus, species, ListedFB, FBSpNo, Notes, TaxaNo, SpeciesGUID,
+                            MPHG1, MPHG2, MPHS1, MPHS2) values (
+                            '{genus}', '{species}', {true}, {fbNo}, '{notes}', {(int)Taxa.Fish}, {{{guid}}},
+                             {gnKey1}, {gnKey2}, {spKey1}, {spKey2})";
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                using (OleDbCommand update = new OleDbCommand(sql, conn))
+                {
+                    try
+                    {
+                        success = update.ExecuteNonQuery() > 0;
+                        if (success)
+                        {
+                            _listSpeciesNames.Add(genus + " " + species);
+                            _allSpeciesDictionary.Add(guid, genus + " " + species);
+                            _allSpeciesDictionaryReverse.Add(genus + " " + species, guid);
+                        }
+                    }
+                    catch
+                    {
+                        //ignore
+                    }
+                }
+            }
+            return success;
+        }
+
         public static bool UpdateSpeciesData(fad3DataStatus dataStatus, string nameGuid, string genus, string species, Taxa taxa,
                               short genusMPH1, short genusMPH2, short speciesMPH1, short speciesMPH2, bool inFishbase, int? fishBaseSpeciesNo, string notes)
         {
@@ -160,6 +698,10 @@ namespace FAD3
                         try
                         {
                             Success = update.ExecuteNonQuery() > 0;
+                            if (Success)
+                            {
+                                _listSpeciesNames.Add(genus + " " + species);
+                            }
                         }
                         catch
                         {
@@ -387,6 +929,40 @@ namespace FAD3
             }
         }
 
+        private static void GetAllSpecies()
+        {
+            DataTable dt = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    const string query = "SELECT Genus, species, SpeciesGUID FROM tblAllSpecies Order by Genus, species";
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(dt);
+                    _allSpeciesDictionary.Clear();
+                    _allSpeciesDictionaryReverse.Clear();
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        DataRow dr = dt.Rows[i];
+                        try
+                        {
+                            _allSpeciesDictionary.Add(dr["SpeciesGUID"].ToString(), dr["Genus"].ToString().Trim(' ') + " " + dr["species"].ToString().Trim(' '));
+                            _allSpeciesDictionaryReverse.Add(dr["Genus"].ToString().Trim(' ') + " " + dr["species"].ToString().Trim(' '), dr["SpeciesGUID"].ToString());
+                        }
+                        catch (Exception ex1)
+                        {
+                            Logger.Log(ex1);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex);
+                }
+            }
+        }
+
         private static void GetSpecies()
         {
             DataTable dt = new DataTable();
@@ -436,9 +1012,9 @@ namespace FAD3
             return isListed;
         }
 
-        public static bool SaveNewLocalName(NewFisheryObjectName newName)
+        public static bool SaveNewLocalName(NewFisheryObjectName newName, bool UpdateAllNamesTable = true)
         {
-            var newLocalName = newName.NewName;
+            var newLocalName = newName.NewName.Trim();
             var key1 = newName.Key1;
             var key2 = newName.Key2;
             var guid = newName.ObjectGUID;
@@ -447,10 +1023,36 @@ namespace FAD3
             {
                 conn.Open();
                 var sql = $@"Insert into tblBaseLocalNames (Name, NameNo, MPH1,MPH2) values
-                        ('{newLocalName}', {{{guid}}},{key1},{key2})";
+                        (""{newLocalName}"", {{{guid}}},{key1},{key2})";
                 using (OleDbCommand update = new OleDbCommand(sql, conn))
                 {
-                    success = update.ExecuteNonQuery() > 0;
+                    if (!_localNameList.Contains(newLocalName))
+                    {
+                        try
+                        {
+                            success = update.ExecuteNonQuery() > 0;
+                        }
+                        catch
+                        {
+                            //ignore
+                        }
+                        if (success)
+                        {
+                            _localNameList.Add(newLocalName);
+                            _localNameListDict.Add(guid, newLocalName);
+                            _localNameListDictReverse.Add(newLocalName, guid);
+                        }
+                    }
+                }
+
+                if (success && UpdateAllNamesTable)
+                {
+                    sql = $@"Insert into temp_AllNames (Name1,NameNo,Identification) values
+                          (""{newLocalName}"", {{{guid}}}, 'Local names')";
+                    using (OleDbCommand update = new OleDbCommand(sql, conn))
+                    {
+                        success = update.ExecuteNonQuery() > 0;
+                    }
                 }
             }
             return success;
@@ -459,6 +1061,7 @@ namespace FAD3
         public static void GetLocalNames()
         {
             _localNameListDict.Clear();
+            _localNameListDictReverse.Clear();
             DataTable dt = new DataTable();
             using (var conection = new OleDbConnection(global.ConnectionString))
             {
@@ -473,6 +1076,7 @@ namespace FAD3
                     {
                         DataRow dr = dt.Rows[i];
                         _localNameListDict.Add(dr["NameNo"].ToString(), dr["Name1"].ToString());
+                        _localNameListDictReverse.Add(dr["Name1"].ToString(), dr["NameNo"].ToString());
                     }
                 }
                 catch (Exception ex)
@@ -559,7 +1163,7 @@ namespace FAD3
             }
         }
 
-        public static Dictionary<string, string> speciesList
+        public static Dictionary<string, string> SpeciesList
         {
             get { return _speciesList; }
         }

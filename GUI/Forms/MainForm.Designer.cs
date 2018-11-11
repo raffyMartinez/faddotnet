@@ -62,7 +62,10 @@ namespace FAD3
             this.uTMZone51ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cholorophyllGridMappingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importFishbaseSpecies = new System.Windows.Forms.ToolStripMenuItem();
+            this.importFishbaseCommonlocalNamesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.localNames = new System.Windows.Forms.ToolStripMenuItem();
+            this.itemViewBySciName = new System.Windows.Forms.ToolStripMenuItem();
+            this.itemViewByLocalName = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.onlineManualToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -89,8 +92,6 @@ namespace FAD3
             this.tsButtonReport = new System.Windows.Forms.ToolStripButton();
             this.tsButtonMap = new System.Windows.Forms.ToolStripButton();
             this.tsButtonExit = new System.Windows.Forms.ToolStripButton();
-            this.itemViewBySciName = new System.Windows.Forms.ToolStripMenuItem();
-            this.itemViewByLocalName = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMenuBar.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.tblLayout.SuspendLayout();
@@ -231,6 +232,7 @@ namespace FAD3
             this.generateGridMapToolStripMenuItem,
             this.cholorophyllGridMappingToolStripMenuItem,
             this.importFishbaseSpecies,
+            this.importFishbaseCommonlocalNamesToolStripMenuItem,
             this.localNames});
             this.menuTools.Name = "menuTools";
             this.menuTools.Size = new System.Drawing.Size(48, 20);
@@ -240,47 +242,47 @@ namespace FAD3
             // resetReferenceNumbersToolStripMenuItem
             // 
             this.resetReferenceNumbersToolStripMenuItem.Name = "resetReferenceNumbersToolStripMenuItem";
-            this.resetReferenceNumbersToolStripMenuItem.Size = new System.Drawing.Size(235, 22);
+            this.resetReferenceNumbersToolStripMenuItem.Size = new System.Drawing.Size(278, 22);
             this.resetReferenceNumbersToolStripMenuItem.Tag = "resetRefNos";
             this.resetReferenceNumbersToolStripMenuItem.Text = "Reset reference numbers";
             // 
             // referenceNumberRangeToolStripMenuItem
             // 
             this.referenceNumberRangeToolStripMenuItem.Name = "referenceNumberRangeToolStripMenuItem";
-            this.referenceNumberRangeToolStripMenuItem.Size = new System.Drawing.Size(235, 22);
+            this.referenceNumberRangeToolStripMenuItem.Size = new System.Drawing.Size(278, 22);
             this.referenceNumberRangeToolStripMenuItem.Tag = "refNoRange";
             this.referenceNumberRangeToolStripMenuItem.Text = "Reference number range";
             // 
             // coordinateFormatToolStripMenuItem
             // 
             this.coordinateFormatToolStripMenuItem.Name = "coordinateFormatToolStripMenuItem";
-            this.coordinateFormatToolStripMenuItem.Size = new System.Drawing.Size(235, 22);
+            this.coordinateFormatToolStripMenuItem.Size = new System.Drawing.Size(278, 22);
             this.coordinateFormatToolStripMenuItem.Tag = "coordFormat";
             this.coordinateFormatToolStripMenuItem.Text = "Coordinate format";
             // 
             // symbolFontsToolStripMenuItem
             // 
             this.symbolFontsToolStripMenuItem.Name = "symbolFontsToolStripMenuItem";
-            this.symbolFontsToolStripMenuItem.Size = new System.Drawing.Size(235, 22);
+            this.symbolFontsToolStripMenuItem.Size = new System.Drawing.Size(278, 22);
             this.symbolFontsToolStripMenuItem.Tag = "symbolFonts";
             this.symbolFontsToolStripMenuItem.Text = "Symbol fonts";
             // 
             // showErrorMessagesToolStripMenuItem
             // 
             this.showErrorMessagesToolStripMenuItem.Name = "showErrorMessagesToolStripMenuItem";
-            this.showErrorMessagesToolStripMenuItem.Size = new System.Drawing.Size(235, 22);
+            this.showErrorMessagesToolStripMenuItem.Size = new System.Drawing.Size(278, 22);
             this.showErrorMessagesToolStripMenuItem.Tag = "showError";
             this.showErrorMessagesToolStripMenuItem.Text = "Show error messages";
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(232, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(275, 6);
             // 
             // generateInlandDbToolStripMenuItem
             // 
             this.generateInlandDbToolStripMenuItem.Name = "generateInlandDbToolStripMenuItem";
-            this.generateInlandDbToolStripMenuItem.Size = new System.Drawing.Size(235, 22);
+            this.generateInlandDbToolStripMenuItem.Size = new System.Drawing.Size(278, 22);
             this.generateInlandDbToolStripMenuItem.Tag = "createInland";
             this.generateInlandDbToolStripMenuItem.Text = "Create inland grid database";
             this.generateInlandDbToolStripMenuItem.ToolTipText = "Creates a database containing minor grids that are located inland";
@@ -291,21 +293,21 @@ namespace FAD3
             this.uTMZone50ToolStripMenuItem,
             this.uTMZone51ToolStripMenuItem});
             this.generateGridMapToolStripMenuItem.Name = "generateGridMapToolStripMenuItem";
-            this.generateGridMapToolStripMenuItem.Size = new System.Drawing.Size(235, 22);
+            this.generateGridMapToolStripMenuItem.Size = new System.Drawing.Size(278, 22);
             this.generateGridMapToolStripMenuItem.Text = "Generate grid map";
             this.generateGridMapToolStripMenuItem.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnGenerateGridMapToolStripMenuItem_DropDownItemClicked);
             // 
             // uTMZone50ToolStripMenuItem
             // 
             this.uTMZone50ToolStripMenuItem.Name = "uTMZone50ToolStripMenuItem";
-            this.uTMZone50ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.uTMZone50ToolStripMenuItem.Size = new System.Drawing.Size(143, 22);
             this.uTMZone50ToolStripMenuItem.Tag = "zone50";
             this.uTMZone50ToolStripMenuItem.Text = "UTM zone 50";
             // 
             // uTMZone51ToolStripMenuItem
             // 
             this.uTMZone51ToolStripMenuItem.Name = "uTMZone51ToolStripMenuItem";
-            this.uTMZone51ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.uTMZone51ToolStripMenuItem.Size = new System.Drawing.Size(143, 22);
             this.uTMZone51ToolStripMenuItem.Tag = "zone51";
             this.uTMZone51ToolStripMenuItem.Text = "UTM zone 51";
             // 
@@ -313,16 +315,23 @@ namespace FAD3
             // 
             this.cholorophyllGridMappingToolStripMenuItem.Enabled = false;
             this.cholorophyllGridMappingToolStripMenuItem.Name = "cholorophyllGridMappingToolStripMenuItem";
-            this.cholorophyllGridMappingToolStripMenuItem.Size = new System.Drawing.Size(235, 22);
+            this.cholorophyllGridMappingToolStripMenuItem.Size = new System.Drawing.Size(278, 22);
             this.cholorophyllGridMappingToolStripMenuItem.Tag = "chlorophyll";
             this.cholorophyllGridMappingToolStripMenuItem.Text = "Cholorophyll grid mapping";
             // 
             // importFishbaseSpecies
             // 
             this.importFishbaseSpecies.Name = "importFishbaseSpecies";
-            this.importFishbaseSpecies.Size = new System.Drawing.Size(235, 22);
+            this.importFishbaseSpecies.Size = new System.Drawing.Size(278, 22);
             this.importFishbaseSpecies.Tag = "importSpecies";
-            this.importFishbaseSpecies.Text = "Import fishbase species names";
+            this.importFishbaseSpecies.Text = "Import Fishbase species names";
+            // 
+            // importFishbaseCommonlocalNamesToolStripMenuItem
+            // 
+            this.importFishbaseCommonlocalNamesToolStripMenuItem.Name = "importFishbaseCommonlocalNamesToolStripMenuItem";
+            this.importFishbaseCommonlocalNamesToolStripMenuItem.Size = new System.Drawing.Size(278, 22);
+            this.importFishbaseCommonlocalNamesToolStripMenuItem.Tag = "importLocalCommon";
+            this.importFishbaseCommonlocalNamesToolStripMenuItem.Text = "Import Fishbase common/local names";
             // 
             // localNames
             // 
@@ -330,10 +339,22 @@ namespace FAD3
             this.itemViewBySciName,
             this.itemViewByLocalName});
             this.localNames.Name = "localNames";
-            this.localNames.Size = new System.Drawing.Size(235, 22);
-            this.localNames.Tag = "localNames";
-            this.localNames.Text = "Local names of catch";
+            this.localNames.Size = new System.Drawing.Size(278, 22);
+            this.localNames.Tag = "localNamesToSciNames";
+            this.localNames.Text = "Local/common names of catch";
             this.localNames.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnMenuLocalNameItemClick);
+            // 
+            // itemViewBySciName
+            // 
+            this.itemViewBySciName.Name = "itemViewBySciName";
+            this.itemViewBySciName.Size = new System.Drawing.Size(230, 22);
+            this.itemViewBySciName.Text = "View by species name";
+            // 
+            // itemViewByLocalName
+            // 
+            this.itemViewByLocalName.Name = "itemViewByLocalName";
+            this.itemViewByLocalName.Size = new System.Drawing.Size(230, 22);
+            this.itemViewByLocalName.Text = "View by local/common name";
             // 
             // menuHelp
             // 
@@ -643,18 +664,6 @@ namespace FAD3
             this.tsButtonExit.Text = "toolStripButton6";
             this.tsButtonExit.ToolTipText = "Exit";
             // 
-            // itemViewBySciName
-            // 
-            this.itemViewBySciName.Name = "itemViewBySciName";
-            this.itemViewBySciName.Size = new System.Drawing.Size(189, 22);
-            this.itemViewBySciName.Text = "View by species name";
-            // 
-            // itemViewByLocalName
-            // 
-            this.itemViewByLocalName.Name = "itemViewByLocalName";
-            this.itemViewByLocalName.Size = new System.Drawing.Size(189, 22);
-            this.itemViewByLocalName.Text = "View by local name";
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -739,5 +748,6 @@ namespace FAD3
         private System.Windows.Forms.ToolStripMenuItem localNames;
         private System.Windows.Forms.ToolStripMenuItem itemViewBySciName;
         private System.Windows.Forms.ToolStripMenuItem itemViewByLocalName;
+        private System.Windows.Forms.ToolStripMenuItem importFishbaseCommonlocalNamesToolStripMenuItem;
     }
 }

@@ -1507,19 +1507,74 @@ namespace FAD3
                 case "importSpecies":
                     OpenFileDialog ofd = new OpenFileDialog()
                     {
-                        Filter = "text file|*.txt|all files|*.*",
+                        Filter = "text file|*.txt|html file|*.htm;*.html|all files|*.*",
                         FilterIndex = 1,
-                        Title = "Open text file"
+                        Title = "Open species names file"
                     };
                     ofd.ShowDialog();
                     if (ofd.FileName.Length > 0)
                     {
-                        var result = Names.ImportLocalNamesFromFile(ofd.FileName);
+                        var result = 0;
+                        switch (Path.GetExtension(ofd.FileName))
+                        {
+                            case ".txt":
+                                result = Names.ImportSpeciesNamesFromFile(ofd.FileName);
+                                break;
+
+                            case ".htm":
+                            case ".html":
+                                HTMLTableSelectColumnsForm htmlColForm = new HTMLTableSelectColumnsForm(ofd.FileName, CatchNameDataType.CatchSpeciesName);
+                                htmlColForm.ShowDialog(this);
+
+                                break;
+                        }
+
                         MessageBox.Show($"{result} names were added to the database", "Finished importing names", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     break;
 
-                case "localNames":
+                case "localNamesToSciNames":
+                    break;
+
+                case "importLocalCommon":
+                    ofd = new OpenFileDialog()
+                    {
+                        Filter = "text file|*.txt|html file|*.htm;*.html|all files|*.*",
+                        FilterIndex = 1,
+                        Title = "Open local/common names file"
+                    };
+                    ofd.ShowDialog();
+                    switch (Path.GetExtension(ofd.FileName))
+                    {
+                        case ".txt":
+                            DialogResult dr = MessageBox.Show("Do you want to delete all previously saved local name records in the\r\n" +
+                                                               "database and replace them with the names that you will import?",
+                                                               "Replace all previously saved records",
+                                                               MessageBoxButtons.YesNoCancel, MessageBoxIcon.Exclamation);
+                            if (dr != DialogResult.Cancel)
+                            {
+                                var result = Names.ImportLocalNamesFromFile(ofd.FileName, replaceAll: dr == DialogResult.Yes);
+                            }
+
+                            break;
+
+                        case ".htm":
+                        case ".html":
+                            HTMLTableSelectColumnsForm htmlColForm = new HTMLTableSelectColumnsForm(ofd.FileName, CatchNameDataType.CatchLocalName);
+                            htmlColForm.ShowDialog(this);
+
+                            break;
+                    }
+                    //if (ofd.FileName.Length > 0)
+                    //{
+                    //    DialogResult dr = MessageBox.Show("Do you want to delete all previously saved local name records in the\r\n" +
+                    //                                       "database and replace them with the names that you will import?",
+                    //                                       "Replace all previously saved records",
+                    //                                       MessageBoxButtons.YesNo,
+                    //                                       MessageBoxIcon.Exclamation);
+                    //    var result = Names.ImportLocalNamesFromFile(ofd.FileName, replaceAll: dr == DialogResult.Yes);
+                    //    MessageBox.Show($"{result} names were added to the database", "Finished importing names", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    //}
                     break;
             }
         }
