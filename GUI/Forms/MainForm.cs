@@ -1505,6 +1505,7 @@ namespace FAD3
                     break;
 
                 case "importSpecies":
+                case "importNonFishSpecies":
                     OpenFileDialog ofd = new OpenFileDialog()
                     {
                         Filter = "text file|*.txt|html file|*.htm;*.html|all files|*.*",
@@ -1518,7 +1519,14 @@ namespace FAD3
                         switch (Path.GetExtension(ofd.FileName))
                         {
                             case ".txt":
-                                result = Names.ImportSpeciesNamesFromFile(ofd.FileName);
+                                if (tsi.Tag.ToString() == "importSpecies")
+                                {
+                                    result = Names.ImportSpeciesNamesFromFile(ofd.FileName);
+                                }
+                                else if (tsi.Tag.ToString() == "importNonFishSpecies")
+                                {
+                                    result = Names.ImportSpeciesNamesFromFile(ofd.FileName, true);
+                                }
                                 break;
 
                             case ".htm":
@@ -1547,14 +1555,8 @@ namespace FAD3
                     switch (Path.GetExtension(ofd.FileName))
                     {
                         case ".txt":
-                            DialogResult dr = MessageBox.Show("Do you want to delete all previously saved local name records in the\r\n" +
-                                                               "database and replace them with the names that you will import?",
-                                                               "Replace all previously saved records",
-                                                               MessageBoxButtons.YesNoCancel, MessageBoxIcon.Exclamation);
-                            if (dr != DialogResult.Cancel)
-                            {
-                                var result = Names.ImportLocalNamesFromFile(ofd.FileName, replaceAll: dr == DialogResult.Yes);
-                            }
+
+                            var result = Names.ImportLocalNamesFromFile(ofd.FileName);
 
                             break;
 
@@ -1565,16 +1567,6 @@ namespace FAD3
 
                             break;
                     }
-                    //if (ofd.FileName.Length > 0)
-                    //{
-                    //    DialogResult dr = MessageBox.Show("Do you want to delete all previously saved local name records in the\r\n" +
-                    //                                       "database and replace them with the names that you will import?",
-                    //                                       "Replace all previously saved records",
-                    //                                       MessageBoxButtons.YesNo,
-                    //                                       MessageBoxIcon.Exclamation);
-                    //    var result = Names.ImportLocalNamesFromFile(ofd.FileName, replaceAll: dr == DialogResult.Yes);
-                    //    MessageBox.Show($"{result} names were added to the database", "Finished importing names", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    //}
                     break;
             }
         }
@@ -2970,10 +2962,11 @@ namespace FAD3
                     break;
             }
 
-            CatchLocalNamesForm clnf = new CatchLocalNamesForm(idType);
+            CatchLocalNamesForm clnf = CatchLocalNamesForm.GetInstance(idType);
             if (clnf.Visible)
             {
                 clnf.BringToFront();
+                clnf.IDType = idType;
             }
             else
             {

@@ -162,6 +162,12 @@
     <Compile Include="Database\Forms\CPUEHistoricalForm.Designer.cs">
       <DependentUpon>CPUEHistoricalForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Database\Forms\EditSelectedLocalNameForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Database\Forms\EditSelectedLocalNameForm.Designer.cs">
+      <DependentUpon>EditSelectedLocalNameForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Database\Forms\GearInventoryEditForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -581,6 +587,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Database\Forms\CPUEHistoricalForm.resx">
       <DependentUpon>CPUEHistoricalForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Database\Forms\EditSelectedLocalNameForm.resx">
+      <DependentUpon>EditSelectedLocalNameForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Database\Forms\GearInventoryEditForm.resx">
       <DependentUpon>GearInventoryEditForm.cs</DependentUpon>

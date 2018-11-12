@@ -61,7 +61,7 @@ namespace FAD3
             set { _GearVarGUID = value; }
         }
 
-        public static bool SaveNewLocalName(NewFisheryObjectName newName)
+        public static (bool success, string newGuid) SaveNewLocalName(NewFisheryObjectName newName)
         {
             bool success = false;
             var newLocalName = newName.NewName;
@@ -78,10 +78,10 @@ namespace FAD3
                     success = update.ExecuteNonQuery() > 0;
                 }
             }
-            return success;
+            return (success, guid);
         }
 
-        public static bool SaveNewVariationName(NewFisheryObjectName newName, string gearClassGuid)
+        public static (bool success, string newGuid) SaveNewVariationName(NewFisheryObjectName newName, string gearClassGuid)
         {
             bool success = false;
             var newVariationName = newName.NewName;
@@ -98,7 +98,7 @@ namespace FAD3
                     success = update.ExecuteNonQuery() > 0;
                 }
             }
-            return success;
+            return (success, guid);
         }
 
         public static Dictionary<string, string> GetSimilarSoundingVariationNames(NewFisheryObjectName newName)

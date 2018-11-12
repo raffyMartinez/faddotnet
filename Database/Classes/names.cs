@@ -29,6 +29,11 @@ namespace FAD3
         private static Dictionary<string, string> _languageDictReverse = new Dictionary<string, string>();
         private static List<string> _listSpeciesNames = new List<string>();
 
+        public static Dictionary<string, string> LocalNamesReverseDictionary
+        {
+            get { return _localNameListDictReverse; }
+        }
+
         public static Dictionary<string, string> AllSpeciesDictionary
         {
             get
@@ -39,6 +44,28 @@ namespace FAD3
                 }
                 return _allSpeciesDictionary;
             }
+        }
+
+        public static bool DeleteLocalNameSpeciesNamePair(string localName, string speciesName, string language)
+        {
+            string languageGUID = _languageDictReverse[language];
+            string speciesGUID = _allSpeciesDictionaryReverse[speciesName];
+            string localNameGuid = _localNameListDictReverse[localName];
+            var success = false;
+            using (var conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                var sql = $@"Delete * from tblLocalNamesScientific where
+                             LocalNameGuid = {{{localNameGuid}}} AND
+                             LanguageGuid = {{{languageGUID}}} AND
+                             ScientificNameGuid = {{{speciesGUID}}}";
+
+                using (OleDbCommand deleteOther = new OleDbCommand(sql, conn))
+                {
+                    success = deleteOther.ExecuteNonQuery() > 0;
+                }
+            }
+            return success;
         }
 
         public static Dictionary<string, string> Languages
@@ -139,14 +166,9 @@ namespace FAD3
             }
         }
 
-        public static int ImportLocalNamesFromFile(string fileName, bool replaceAll = false, bool isHTML = false)
+        public static int ImportLocalNamesFromFile(string fileName)
         {
-            bool allNamesDeleted = false;
-            if (replaceAll)
-            {
-                allNamesDeleted = DeleteAllCatchLocalNames();
-                RefreshLocalNamesList();
-            }
+            GetLocalNames();
             var n = 0;
             const Int32 BufferSize = 512;
             using (var fileStream = File.OpenRead(fileName))
@@ -156,10 +178,10 @@ namespace FAD3
                     String line;
                     while ((line = streamReader.ReadLine()) != null)
                     {
-                        if (!_localNameList.Contains(line))
+                        if (!_localNameListDictReverse.ContainsKey(line))
                         {
                             NewFisheryObjectName nfon = new NewFisheryObjectName(line, FisheryObjectNameType.CatchLocalName);
-                            SaveNewLocalName(nfon, false);
+                            SaveNewLocalName(nfon);
                             n++;
                         }
                     }
@@ -312,7 +334,7 @@ namespace FAD3
             return savedCount;
         }
 
-        public static bool SaveNewLanguage(string language)
+        public static (bool success, string guid) SaveNewLanguage(string language)
         {
             string sql;
             bool success = false;
@@ -342,7 +364,7 @@ namespace FAD3
                     }
                 }
             }
-            return success;
+            return (success, guid);
         }
 
         public static int ImportLocalNamestoScientificNames(string fileName, ref int fail, bool isHTML = false)
@@ -403,6 +425,15 @@ namespace FAD3
             GetLanguages();
         }
 
+        public static void SaveNewLocalSpeciesNameLanguage(string speciesName, string language, string localName, out bool success)
+        {
+            string languageGUID = _languageDictReverse[language];
+            string speciesGUID = _allSpeciesDictionaryReverse[speciesName];
+            string localNameGuid = _localNameListDictReverse[localName];
+
+            success = SaveNewLocalSpeciesNameLanguage(speciesGUID, languageGUID, localNameGuid);
+        }
+
         public static bool SaveNewLocalSpeciesNameLanguage(string speciesNameGuid, string languageGuid, string localNameGuid)
         {
             bool success = false;
@@ -448,10 +479,10 @@ namespace FAD3
             return _languages;
         }
 
-        public static List<String> LocalNamesFromSpeciesNameLanguage(string genus, string species, string languageUsed)
+        public static Dictionary<string, string> LocalNamesFromSpeciesNameLanguage(string genus, string species, string languageUsed)
         {
-            List<string> list = new List<string>();
-            string sql = $@"SELECT tblBaseLocalNames.Name
+            Dictionary<string, string> dict = new Dictionary<string, string>();
+            string sql = $@"SELECT tblBaseLocalNames.Name, tblBaseLocalNames.NameNo
                             FROM tblAllSpecies INNER JOIN
                                 (tblLanguages INNER JOIN
                                 (tblBaseLocalNames INNER JOIN
@@ -470,10 +501,49 @@ namespace FAD3
                 for (int n = 0; n < dt.Rows.Count; n++)
                 {
                     DataRow dr = dt.Rows[n];
-                    list.Add(dr["Name"].ToString().Trim());
+                    dict.Add(dr["NameNo"].ToString().Trim(), dr["Name"].ToString().Trim());
                 }
             }
-            return list;
+            return dict;
+        }
+
+        public static bool UpdateLocalName(string editedName, string nameGuid)
+        {
+            bool success = false;
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+
+                string sql = $@"Update tblBaseLocalNames set [Name] = ""{editedName}"" where NameNo = {{{nameGuid}}}";
+
+                using (OleDbCommand update = new OleDbCommand(sql, conn))
+                {
+                    try
+                    {
+                        success = update.ExecuteNonQuery() > 0;
+                        if (success)
+                        {
+                            sql = $@"Update temp_AllNames set Name1 = ""{editedName}"" where NameNo = {{{nameGuid}}}";
+                            using (OleDbCommand updateAllNames = new OleDbCommand(sql, conn))
+                            {
+                                try
+                                {
+                                    success = updateAllNames.ExecuteNonQuery() > 0;
+                                }
+                                catch
+                                {
+                                    success = false;
+                                }
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        //ignore
+                    }
+                }
+            }
+            return success;
         }
 
         public static List<String> ScientificNamesFromLocalNameLanguage(string localName, string languageUsed)
@@ -555,32 +625,60 @@ namespace FAD3
             return k;
         }
 
-        public static int ImportSpeciesNamesFromFile(string fileName)
+        public static int ImportSpeciesNamesFromFile(string fileName, bool withTaxa = false)
         {
             var n = 0;
             const Int32 BufferSize = 512;
+            Taxa speciesTaxa;
+
             using (var fileStream = File.OpenRead(fileName))
             {
                 using (var streamReader = new StreamReader(fileStream, Encoding.UTF8, true, BufferSize))
                 {
                     String line;
-                    var spList = ListFishSpecies();
+                    //var spList = ListFishSpecies();
+                    GetAllSpecies();
                     while ((line = streamReader.ReadLine()) != null)
                     {
                         var arr = line.Split('\t');
-                        var genus = arr[0];
-                        var species = arr[1];
-                        if (!spList.Contains($"{genus} {species}"))
+                        var genus = arr[0].Trim();
+                        var species = arr[1].Trim();
+                        var taxa = "";
+                        Taxa myTaxa = Taxa.Fish;
+                        if (withTaxa)
+                        {
+                            taxa = arr[2].Trim();
+                            if (!Enum.TryParse(taxa, true, out myTaxa))
+                            {
+                                myTaxa = Taxa.To_be_determined;
+                            }
+                        }
+                        if (!_allSpeciesDictionaryReverse.ContainsKey($"{genus} {species}"))
                         {
                             short genusKey1 = 0;
                             short genusKey2 = 0;
                             short speciesKey1 = 0;
                             short speciesKey2 = 0;
-                            int? spNumber = GetFishBaseSpeciesNumber(genus, species);
+                            int? spNumberFishbase = null;
+                            if (myTaxa == Taxa.Fish)
+                            {
+                                spNumberFishbase = GetFishBaseSpeciesNumber(genus, species);
+                            }
                             var mph = new DoubleMetaphoneShort();
                             mph.ComputeMetaphoneKeys(genus, out genusKey1, out genusKey2);
                             mph.ComputeMetaphoneKeys(species, out speciesKey1, out speciesKey2);
-                            if (UpdateSpeciesData(fad3DataStatus.statusNew, Guid.NewGuid().ToString(), genus, species, Taxa.Fish, genusKey1, genusKey2, speciesKey1, speciesKey2, true, spNumber, ""))
+                            if (UpdateSpeciesData(fad3DataStatus.statusNew,
+                                                  Guid.NewGuid().ToString(),
+                                                  genus,
+                                                  species,
+                                                  myTaxa,
+                                                  genusKey1,
+                                                  genusKey2,
+                                                  speciesKey1,
+                                                  speciesKey2,
+                                                  myTaxa != Taxa.Fish ? false : spNumberFishbase != null,
+                                                  spNumberFishbase,
+                                                  ""))
                             {
                                 n++;
                             }
@@ -701,6 +799,8 @@ namespace FAD3
                             if (Success)
                             {
                                 _listSpeciesNames.Add(genus + " " + species);
+                                _allSpeciesDictionaryReverse.Add(genus + " " + species, nameGuid);
+                                _allSpeciesDictionary.Add(nameGuid, genus + " " + species);
                             }
                         }
                         catch
@@ -929,7 +1029,7 @@ namespace FAD3
             }
         }
 
-        private static void GetAllSpecies()
+        public static void GetAllSpecies()
         {
             DataTable dt = new DataTable();
             using (var conection = new OleDbConnection(global.ConnectionString))
@@ -1012,7 +1112,7 @@ namespace FAD3
             return isListed;
         }
 
-        public static bool SaveNewLocalName(NewFisheryObjectName newName, bool UpdateAllNamesTable = true)
+        public static (bool success, string newGuid) SaveNewLocalName(NewFisheryObjectName newName)
         {
             var newLocalName = newName.NewName.Trim();
             var key1 = newName.Key1;
@@ -1026,7 +1126,7 @@ namespace FAD3
                         (""{newLocalName}"", {{{guid}}},{key1},{key2})";
                 using (OleDbCommand update = new OleDbCommand(sql, conn))
                 {
-                    if (!_localNameList.Contains(newLocalName))
+                    if (!_localNameListDictReverse.ContainsKey(newLocalName))
                     {
                         try
                         {
@@ -1044,18 +1144,8 @@ namespace FAD3
                         }
                     }
                 }
-
-                if (success && UpdateAllNamesTable)
-                {
-                    sql = $@"Insert into temp_AllNames (Name1,NameNo,Identification) values
-                          (""{newLocalName}"", {{{guid}}}, 'Local names')";
-                    using (OleDbCommand update = new OleDbCommand(sql, conn))
-                    {
-                        success = update.ExecuteNonQuery() > 0;
-                    }
-                }
             }
-            return success;
+            return (success, guid);
         }
 
         public static void GetLocalNames()

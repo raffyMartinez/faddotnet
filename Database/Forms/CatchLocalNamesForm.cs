@@ -17,11 +17,28 @@ namespace FAD3.Database.Forms
     {
         private static CatchLocalNamesForm _instance;
         private Identification _idType;
+        private String _listTitle;
 
         public static CatchLocalNamesForm GetInstance(Identification identification)
         {
-            if (_instance == null) return new CatchLocalNamesForm(identification);
+            if (_instance == null) _instance = new CatchLocalNamesForm(identification);
             return _instance;
+        }
+
+        public Identification IDType
+        {
+            get { return _idType; }
+            set
+            {
+                bool willSetUI = _idType != value;
+                _idType = value;
+
+                if (willSetUI)
+                {
+                    treeView.Nodes.Clear();
+                    SetUI();
+                }
+            }
         }
 
         public CatchLocalNamesForm(Identification identification)
@@ -35,6 +52,7 @@ namespace FAD3.Database.Forms
             switch (((Button)sender).Name)
             {
                 case "btnImport":
+
                     OpenFileDialog ofd = new OpenFileDialog()
                     {
                         Filter = "text file|*.txt|html file|*.htm;*.html|all files|*.*",
@@ -66,22 +84,22 @@ namespace FAD3.Database.Forms
                                 break;
                         }
                     }
-                    //if (ofd.FileName.Length > 0)
-                    //{
-                    //    int fail = 0;
-                    //    var result = Names.ImportLocalNamestoScientificNames(ofd.FileName, ref fail);
-                    //    var msg = $"{result} local names to scientific name pairs were added to the database";
-                    //    if (fail > 0)
-                    //    {
-                    //        msg += $"\r\n There were also {fail} records not saved because of key violations";
-                    //    }
-                    //    MessageBox.Show(msg, "Fininshed importing local name - scientific name pairs", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    //}
+
                     break;
 
                 case "btnAdd":
-                    LocalNameSciNameEditForm lnsef = new LocalNameSciNameEditForm();
-                    lnsef.ShowDialog(this);
+                    if (treeView.SelectedNode.Name != "root")
+                    {
+                        LocalNameSciNameEditForm lnsef = LocalNameSciNameEditForm.GetInstance(treeView.SelectedNode.Text, treeView.SelectedNode.Name, _idType, this);
+                        if (lnsef.Visible)
+                        {
+                            lnsef.BringToFront();
+                        }
+                        else
+                        {
+                            lnsef.Show(this);
+                        }
+                    }
                     break;
 
                 case "btnRemove":
@@ -96,14 +114,27 @@ namespace FAD3.Database.Forms
             }
         }
 
-        private void OnFormLoad(object sender, EventArgs e)
+        public void RefreshLists()
         {
+            TreeNodeMouseClickEventArgs e = new TreeNodeMouseClickEventArgs(treeView.SelectedNode, MouseButtons.Left, 0, 0, 0);
+            OnNodeClick(treeView.SelectedNode, e);
+        }
+
+        private void SetUI()
+        {
+            listView.Items.Clear();
+            foreach (var item in Names.Languages)
+            {
+                var lvi = listView.Items.Add(item.Key, item.Value, null);
+            }
             SizeColumns(listView);
+
             switch (_idType)
             {
                 case Identification.LocalName:
+                    cboSelectId.Text = "";
                     lblTree.Text = "Local/common names";
-                    lblList.Text = "Scientific names";
+                    lblList.Text = "Species names";
                     Text = "Species name equivalents of local/common names";
                     var treeNode = treeView.Nodes.Add("root", "Local names");
                     treeNode.Tag = "root";
@@ -115,6 +146,7 @@ namespace FAD3.Database.Forms
                             treeNode = treeView.Nodes["root"].Nodes.Add(item.Key, item.Value);
                             treeNode.Tag = "name";
                         }
+                        treeView.Nodes["root"].Expand();
                     }
                     else
                     {
@@ -123,11 +155,13 @@ namespace FAD3.Database.Forms
                     break;
 
                 case Identification.Scientific:
-                    lblTree.Text = "Scientific names";
+                    cboSelectId.Text = "Species names";
+                    lblTree.Text = "Species names";
                     lblList.Text = "Local/common names";
                     Text = "Local name/common name equivalents of species names";
                     treeNode = treeView.Nodes.Add("root", "Scientific names");
                     treeNode.Tag = "root";
+                    Names.GetAllSpecies();
                     if (Names.AllSpeciesDictionary.Count > 0)
                     {
                         foreach (var item in Names.AllSpeciesDictionary)
@@ -135,6 +169,7 @@ namespace FAD3.Database.Forms
                             treeNode = treeView.Nodes["root"].Nodes.Add(item.Key, item.Value);
                             treeNode.Tag = "name";
                         }
+                        treeView.Nodes["root"].Expand();
                     }
                     else
                     {
@@ -142,7 +177,14 @@ namespace FAD3.Database.Forms
                     }
                     break;
             }
+        }
+
+        private void OnFormLoad(object sender, EventArgs e)
+        {
+            SizeColumns(listView);
+            SetUI();
             global.LoadFormSettings(this);
+            _listTitle = lblList.Text;
         }
 
         private void OnFormClose(object sender, FormClosedEventArgs e)
@@ -181,8 +223,19 @@ namespace FAD3.Database.Forms
                     nameItems = nameItems.Trim(new char[] { ',', ' ' });
                     lvi.SubItems.Add(nameItems);
                 }
+
+                LocalNameSciNameEditForm lne = LocalNameSciNameEditForm.GetInstance();
+                if (lne != null)
+                {
+                    lne.SetSelectedName(e.Node.Text, e.Node.Name, _idType);
+                }
             }
             SizeColumns(listView, false);
+
+            if (e.Node.Name != "root")
+                lblList.Text = _listTitle + " of " + e.Node.Text;
+            else
+                lblList.Text = _listTitle;
         }
 
         /// <summary>
@@ -207,14 +260,17 @@ namespace FAD3.Database.Forms
 
         private void OnListViewDblClick(object sender, EventArgs e)
         {
-            CatchLocalNameSelectedForm clnsf = CatchLocalNameSelectedForm.GetInstance(_idType, listView.SelectedItems[0].Text, treeView.SelectedNode.Text);
-            if (clnsf.Visible)
+            if (listView.SelectedItems.Count > 0)
             {
-                clnsf.BringToFront();
-            }
-            else
-            {
-                clnsf.Show(this);
+                CatchLocalNameSelectedForm clnsf = CatchLocalNameSelectedForm.GetInstance(_idType, listView.SelectedItems[0].Text, treeView.SelectedNode.Text, this);
+                if (clnsf.Visible)
+                {
+                    clnsf.BringToFront();
+                }
+                else
+                {
+                    clnsf.Show(this);
+                }
             }
         }
 
@@ -223,6 +279,42 @@ namespace FAD3.Database.Forms
             if (e.Node.FirstNode.Text == "***dummy***")
             {
                 e.Node.Nodes.Clear();
+            }
+        }
+
+        private void OnKeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.F2 && _idType == Identification.LocalName)
+
+            {
+                treeView.LabelEdit = true;
+                treeView.SelectedNode.BeginEdit();
+            }
+        }
+
+        private void afterAfterEdit(TreeNode node)
+        {
+            Names.UpdateLocalName(node.Text, node.Name);
+            treeView.LabelEdit = false;
+            lblList.Text = _listTitle + " of " + node.Text;
+        }
+
+        private void OnAfterLabelEdit(object sender, NodeLabelEditEventArgs e)
+        {
+            BeginInvoke(new Action(() => afterAfterEdit(e.Node)));
+        }
+
+        private void OnIndexChanged(object sender, EventArgs e)
+        {
+            switch (cboSelectId.Text)
+            {
+                case "Local/common names":
+                    IDType = Identification.LocalName;
+                    break;
+
+                case "Species names":
+                    IDType = Identification.Scientific;
+                    break;
             }
         }
     }

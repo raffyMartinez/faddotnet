@@ -92,6 +92,7 @@ namespace FAD3
             this.tsButtonReport = new System.Windows.Forms.ToolStripButton();
             this.tsButtonMap = new System.Windows.Forms.ToolStripButton();
             this.tsButtonExit = new System.Windows.Forms.ToolStripButton();
+            this.importNonfishSpeciesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMenuBar.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.tblLayout.SuspendLayout();
@@ -232,6 +233,7 @@ namespace FAD3
             this.generateGridMapToolStripMenuItem,
             this.cholorophyllGridMappingToolStripMenuItem,
             this.importFishbaseSpecies,
+            this.importNonfishSpeciesToolStripMenuItem,
             this.importFishbaseCommonlocalNamesToolStripMenuItem,
             this.localNames});
             this.menuTools.Name = "menuTools";
@@ -664,6 +666,13 @@ namespace FAD3
             this.tsButtonExit.Text = "toolStripButton6";
             this.tsButtonExit.ToolTipText = "Exit";
             // 
+            // importNonfishSpeciesToolStripMenuItem
+            // 
+            this.importNonfishSpeciesToolStripMenuItem.Name = "importNonfishSpeciesToolStripMenuItem";
+            this.importNonfishSpeciesToolStripMenuItem.Size = new System.Drawing.Size(278, 22);
+            this.importNonfishSpeciesToolStripMenuItem.Tag = "importNonFishSpecies";
+            this.importNonfishSpeciesToolStripMenuItem.Text = "Import non-fish species";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -749,5 +758,6 @@ namespace FAD3
         private System.Windows.Forms.ToolStripMenuItem itemViewBySciName;
         private System.Windows.Forms.ToolStripMenuItem itemViewByLocalName;
         private System.Windows.Forms.ToolStripMenuItem importFishbaseCommonlocalNamesToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem importNonfishSpeciesToolStripMenuItem;
     }
 }

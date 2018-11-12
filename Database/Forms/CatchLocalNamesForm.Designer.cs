@@ -39,6 +39,7 @@
             this.listView = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.cboSelectId = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // treeView
@@ -50,8 +51,10 @@
             this.treeView.Name = "treeView";
             this.treeView.Size = new System.Drawing.Size(224, 313);
             this.treeView.TabIndex = 0;
+            this.treeView.AfterLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.OnAfterLabelEdit);
             this.treeView.AfterExpand += new System.Windows.Forms.TreeViewEventHandler(this.OnAfterExpand);
             this.treeView.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.OnNodeClick);
+            this.treeView.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OnKeyUp);
             // 
             // lblList
             // 
@@ -159,11 +162,26 @@
             // 
             this.columnHeader2.Text = "Species names";
             // 
+            // cboSelectId
+            // 
+            this.cboSelectId.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.cboSelectId.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cboSelectId.FormattingEnabled = true;
+            this.cboSelectId.Items.AddRange(new object[] {
+            "Local/common names",
+            "Species names"});
+            this.cboSelectId.Location = new System.Drawing.Point(1, 356);
+            this.cboSelectId.Name = "cboSelectId";
+            this.cboSelectId.Size = new System.Drawing.Size(224, 21);
+            this.cboSelectId.TabIndex = 10;
+            this.cboSelectId.SelectedIndexChanged += new System.EventHandler(this.OnIndexChanged);
+            // 
             // CatchLocalNamesForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(699, 385);
+            this.Controls.Add(this.cboSelectId);
             this.Controls.Add(this.listView);
             this.Controls.Add(this.btnImport);
             this.Controls.Add(this.btnRemove);
@@ -196,5 +214,6 @@
         private System.Windows.Forms.ListView listView;
         private System.Windows.Forms.ColumnHeader columnHeader1;
         private System.Windows.Forms.ColumnHeader columnHeader2;
+        private System.Windows.Forms.ComboBox cboSelectId;
     }
 }

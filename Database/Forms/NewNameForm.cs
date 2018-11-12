@@ -107,23 +107,23 @@ namespace FAD3.Database.Forms
             switch (((Button)sender).Name)
             {
                 case "btnOk":
-                    bool success = false;
+                    (bool success, string guid) result = (false, "");
                     switch (_newObjectName.NameType)
                     {
                         case FisheryObjectNameType.CatchLocalName:
-                            success = Names.SaveNewLocalName(_newObjectName);
+                            result = Names.SaveNewLocalName(_newObjectName);
                             break;
 
                         case FisheryObjectNameType.GearLocalName:
-                            success = Gear.SaveNewLocalName(_newObjectName);
+                            result = Gear.SaveNewLocalName(_newObjectName);
                             break;
 
                         case FisheryObjectNameType.GearVariationName:
-                            success = Gear.SaveNewVariationName(_newObjectName, _gearClassGuid);
+                            result = Gear.SaveNewVariationName(_newObjectName, _gearClassGuid);
                             break;
                     }
 
-                    if (success) DialogResult = DialogResult.OK;
+                    if (result.success) DialogResult = DialogResult.OK;
                     break;
 
                 case "btnCancel":
