@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using FAD3.Database.Classes;
 using FAD3.GUI.Classes;
 using System.IO;
+using System.Diagnostics;
 
 namespace FAD3.Database.Forms
 {
@@ -18,6 +19,25 @@ namespace FAD3.Database.Forms
         private static CatchLocalNamesForm _instance;
         private Identification _idType;
         private String _listTitle;
+
+        public void SetTreeItem(string itemName)
+        {
+            foreach (TreeNode item in treeView.Nodes["root"].Nodes)
+            {
+                if (item.Text == itemName)
+                {
+                    treeView.SelectedNode = item;
+                    TreeNodeMouseClickEventArgs e = new TreeNodeMouseClickEventArgs(item, MouseButtons.Left, 0, 0, 0);
+                    OnNodeClick(item, e);
+                    break;
+                }
+            }
+        }
+
+        public ComboBox SwichViewCombo
+        {
+            get { return cboSelectId; }
+        }
 
         public static CatchLocalNamesForm GetInstance(Identification identification)
         {
@@ -51,6 +71,11 @@ namespace FAD3.Database.Forms
         {
             switch (((Button)sender).Name)
             {
+                case "btnExport":
+                    ExportDialogForm edf = new ExportDialogForm(ExportDataType.ExportDataSelect);
+                    edf.ShowDialog(this);
+                    break;
+
                 case "btnImport":
 
                     OpenFileDialog ofd = new OpenFileDialog()
@@ -132,8 +157,7 @@ namespace FAD3.Database.Forms
             switch (_idType)
             {
                 case Identification.LocalName:
-                    cboSelectId.Text = "";
-                    lblTree.Text = "Local/common names";
+                    cboSelectId.Text = "Local/common names";
                     lblList.Text = "Species names";
                     Text = "Species name equivalents of local/common names";
                     var treeNode = treeView.Nodes.Add("root", "Local names");
@@ -152,11 +176,11 @@ namespace FAD3.Database.Forms
                     {
                         treeView.Nodes["root"].Nodes.Add("***dummy***");
                     }
+                    lblTree.Text = $"Local/common names: ({treeView.Nodes["root"].Nodes.Count} items)";
                     break;
 
                 case Identification.Scientific:
                     cboSelectId.Text = "Species names";
-                    lblTree.Text = "Species names";
                     lblList.Text = "Local/common names";
                     Text = "Local name/common name equivalents of species names";
                     treeNode = treeView.Nodes.Add("root", "Scientific names");
@@ -175,12 +199,30 @@ namespace FAD3.Database.Forms
                     {
                         treeView.Nodes["root"].Nodes.Add("***dummy***");
                     }
+                    lblTree.Text = $"Species names: ({treeView.Nodes["root"].Nodes.Count} items)";
                     break;
             }
+            _listTitle = lblList.Text;
         }
 
         private void OnFormLoad(object sender, EventArgs e)
         {
+            cboSelectId.Items.Add("Species names");
+            cboSelectId.Items.Add("Local/common names");
+            listView.View = View.Details;
+            listView.FullRowSelect = true;
+            listView.Columns.Add("Language");
+            switch (_idType)
+            {
+                case Identification.LocalName:
+                    listView.Columns.Add("Equivalent species names");
+                    break;
+
+                case Identification.Scientific:
+                    listView.Columns.Add("Equivalent local/common names");
+                    break;
+            }
+            listView.Columns.Add("");
             SizeColumns(listView);
             SetUI();
             global.LoadFormSettings(this);
@@ -195,12 +237,15 @@ namespace FAD3.Database.Forms
 
         private void OnNodeClick(object sender, TreeNodeMouseClickEventArgs e)
         {
+            var count = 0;
             var nameGuid = e.Node.Name;
             if (e.Node.Tag.ToString() == "name")
             {
                 listView.Items.Clear();
                 foreach (var item in Names.Languages)
                 {
+                    var items = 0;
+                    StringBuilder sb = new StringBuilder();
                     var lvi = listView.Items.Add(item.Key, item.Value, null);
                     var nameItems = "";
                     switch (_idType)
@@ -208,20 +253,33 @@ namespace FAD3.Database.Forms
                         case Identification.LocalName:
                             foreach (var names in Names.GetSpeciesNameFromLocalNameLanguage(e.Node.Name, lvi.Name))
                             {
-                                nameItems += names.genus + " " + names.species + ", ";
+                                //nameItems += names.genus + " " + names.species + ", ";
+                                sb.Append(names.genus);
+                                sb.Append(" ");
+                                sb.Append(names.species);
+                                sb.Append(", ");
+
+                                count++;
+                                items++;
                             }
                             break;
 
                         case Identification.Scientific:
                             foreach (var names in Names.GetLocalNameFromSpeciesNameLanguage(e.Node.Name, lvi.Name))
                             {
-                                nameItems += names + ", ";
+                                //nameItems += names + ", ";
+                                sb.Append(names);
+                                sb.Append(", ");
+                                count++;
+                                items++;
                             }
                             break;
                     }
 
-                    nameItems = nameItems.Trim(new char[] { ',', ' ' });
+                    //nameItems = nameItems.Trim(new char[] { ',', ' ' });
+                    nameItems = sb.ToString().Trim(new char[] { ',', ' ' });
                     lvi.SubItems.Add(nameItems);
+                    lvi.Tag = items;
                 }
 
                 LocalNameSciNameEditForm lne = LocalNameSciNameEditForm.GetInstance();
@@ -233,7 +291,7 @@ namespace FAD3.Database.Forms
             SizeColumns(listView, false);
 
             if (e.Node.Name != "root")
-                lblList.Text = _listTitle + " of " + e.Node.Text;
+                lblList.Text = $"{_listTitle} of  {e.Node.Text} ({count})";
             else
                 lblList.Text = _listTitle;
         }
@@ -265,6 +323,7 @@ namespace FAD3.Database.Forms
                 CatchLocalNameSelectedForm clnsf = CatchLocalNameSelectedForm.GetInstance(_idType, listView.SelectedItems[0].Text, treeView.SelectedNode.Text, this);
                 if (clnsf.Visible)
                 {
+                    clnsf.NewSelection(_idType, listView.SelectedItems[0].Text, treeView.SelectedNode.Text);
                     clnsf.BringToFront();
                 }
                 else
@@ -316,6 +375,68 @@ namespace FAD3.Database.Forms
                     IDType = Identification.Scientific;
                     break;
             }
+        }
+
+        private void OnContextMenuClick(object sender, ToolStripItemClickedEventArgs e)
+        {
+            e.ClickedItem.Owner.Hide();
+            var itemCount = (int)listView.SelectedItems[0].Tag;
+            switch (e.ClickedItem.Name)
+            {
+                case "itemLocateOnNavigationTree":
+
+                    if (itemCount == 1)
+                    {
+                        var itemText = listView.SelectedItems[0].SubItems[1].Text;
+                        switch (_idType)
+                        {
+                            case Identification.LocalName:
+                                cboSelectId.SelectedIndex = 0;
+                                break;
+
+                            case Identification.Scientific:
+                                cboSelectId.SelectedIndex = 1;
+                                break;
+                        }
+
+                        foreach (TreeNode item in treeView.Nodes["root"].Nodes)
+                        {
+                            if (item.Text == itemText)
+                            {
+                                treeView.SelectedNode = item;
+                                TreeNodeMouseClickEventArgs ee = new TreeNodeMouseClickEventArgs(item, MouseButtons.Left, 0, 0, 0);
+                                OnNodeClick(item, ee);
+                                break;
+                            }
+                        }
+                    }
+                    else if (itemCount > 1)
+                    {
+                        OnListViewDblClick(null, null);
+                    }
+                    break;
+            }
+        }
+
+        private void OnWWWDropDownClick(object sender, ToolStripItemClickedEventArgs e)
+        {
+            e.ClickedItem.OwnerItem.Owner.Hide();
+            if (_idType == Identification.LocalName)
+            {
+                CatchNameURLGenerator.CatchName = listView.SelectedItems[0].SubItems[1].Text;
+            }
+            else
+            {
+                CatchNameURLGenerator.CatchName = treeView.SelectedNode.Text;
+            }
+            var urls = CatchNameURLGenerator.URLS;
+            itemWiki.Tag = urls["Wikipaedia"];
+            itemFishBase.Tag = urls["FishBase"];
+            Process.Start(e.ClickedItem.Tag.ToString());
+        }
+
+        private void OnControlEnter(object sender, EventArgs e)
+        {
         }
     }
 }

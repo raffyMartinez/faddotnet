@@ -21,7 +21,7 @@ namespace FAD3.Mapping.Forms
 
         public static PolygonLineLayerSymbologyForm GetInstance(LayerPropertyForm parent, MapLayer mapLayer)
         {
-            if (_instance == null) return new PolygonLineLayerSymbologyForm(parent, mapLayer);
+            if (_instance == null) _instance = new PolygonLineLayerSymbologyForm(parent, mapLayer);
             return _instance;
         }
 

@@ -13,7 +13,7 @@ using HtmlAgilityPack;
 
 namespace FAD3
 {
-    internal static class Names
+    public static class Names
     {
         private static List<string> _genusList = new List<string>();
         private static List<string> _localNameList = new List<string>();
@@ -46,10 +46,22 @@ namespace FAD3
             }
         }
 
+        public static Dictionary<string, string> AllSpeciesReverseDictionary
+        {
+            get
+            {
+                if (_allSpeciesDictionaryReverse.Count == 0)
+                {
+                    GetAllSpecies();
+                }
+                return _allSpeciesDictionaryReverse;
+            }
+        }
+
         public static bool DeleteLocalNameSpeciesNamePair(string localName, string speciesName, string language)
         {
             string languageGUID = _languageDictReverse[language];
-            string speciesGUID = _allSpeciesDictionaryReverse[speciesName];
+            string speciesGUID = AllSpeciesReverseDictionary[speciesName];
             string localNameGuid = _localNameListDictReverse[localName];
             var success = false;
             using (var conn = new OleDbConnection(global.ConnectionString))
@@ -388,13 +400,19 @@ namespace FAD3
                             var arr = line.Split('\t');
                             var localName = arr[0].Trim();
                             var language = arr[1].Trim();
-                            var species = arr[2];
+                            var species = arr[2].Trim();
                             localNameKey = "";
                             speciesKey = "";
                             languageKey = "";
                             if (_localNameListDictReverse.ContainsKey(localName))
                             {
                                 localNameKey = _localNameListDictReverse[localName];
+                            }
+                            else
+                            {
+                                NewFisheryObjectName nfo = new NewFisheryObjectName(localName, FisheryObjectNameType.CatchLocalName);
+                                var result = SaveNewLocalName(nfo);
+                                if (result.success) localNameKey = result.newGuid;
                             }
                             if (_allSpeciesDictionaryReverse.ContainsKey(species))
                             {
@@ -555,7 +573,7 @@ namespace FAD3
                                 tblLocalNamesScientific ON tblBaseLocalNames.NameNo = tblLocalNamesScientific.LocalNameGuid) ON
                                 tblLanguages.LanguageUsedGuid = tblLocalNamesScientific.LanguageGuid) ON
                                 tblAllSpecies.SpeciesGUID = tblLocalNamesScientific.ScientificNameGuid
-                            WHERE tblLanguages.LanguageUsed='{languageUsed}' AND tblBaseLocalNames.Name='{localName}'
+                            WHERE tblLanguages.LanguageUsed='{languageUsed}' AND tblBaseLocalNames.Name=""{localName}""
                             Order by Genus, species";
             using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
             {

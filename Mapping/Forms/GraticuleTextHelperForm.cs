@@ -19,7 +19,7 @@ namespace FAD3.Mapping.Forms
 
         public static GraticuleTextHelperForm GetInstance(fadMapTextType mapText, GraticuleForm parentForm)
         {
-            if (_instance == null) return new GraticuleTextHelperForm(mapText, parentForm);
+            if (_instance == null) _instance = new GraticuleTextHelperForm(mapText, parentForm);
             return _instance;
         }
 

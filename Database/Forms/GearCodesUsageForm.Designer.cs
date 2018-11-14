@@ -41,6 +41,7 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
+            this.btnExport = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // listViewVariations
@@ -162,12 +163,23 @@
             this.label5.TabIndex = 10;
             this.label5.Text = "Class of gear";
             // 
+            // btnExport
+            // 
+            this.btnExport.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.btnExport.Location = new System.Drawing.Point(673, 353);
+            this.btnExport.Name = "btnExport";
+            this.btnExport.Size = new System.Drawing.Size(57, 25);
+            this.btnExport.TabIndex = 11;
+            this.btnExport.Text = "Export";
+            this.btnExport.UseVisualStyleBackColor = true;
+            // 
             // GearCodesUsageForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonOk;
             this.ClientSize = new System.Drawing.Size(803, 390);
+            this.Controls.Add(this.btnExport);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
@@ -205,5 +217,6 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.ContextMenuStrip dropDownMenu;
+        private System.Windows.Forms.Button btnExport;
     }
 }

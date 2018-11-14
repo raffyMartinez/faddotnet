@@ -29,6 +29,7 @@ namespace FAD3
         private string _notes = "";
         private Form _parentForm = new Form();
         private int _catchCompositionRecordCount;
+        public bool ReadOnly { get; set; }
 
         public SpeciesNameForm(Form Parent)
         {
@@ -36,6 +37,27 @@ namespace FAD3
             _dataStatus = fad3DataStatus.statusNew;
             _dialogTitle = "New species";
             _parentForm = Parent;
+        }
+
+        public SpeciesNameForm(string speciesName, Form parent)
+        {
+            InitializeComponent();
+            var arr = speciesName.Split(' ');
+            for (int n = 0; n < arr.Length; n++)
+            {
+                if (n == 0)
+                {
+                    _genus = arr[n];
+                }
+                else
+                {
+                    _species = arr[n] + " ";
+                }
+            }
+            _species = _species.Trim(' ');
+            _taxa = CatchName.TaxaFromCatchName(_genus, _species);
+            _nameGuid = Names.AllSpeciesReverseDictionary[_genus + " " + _species];
+            _parentForm = parent;
         }
 
         public SpeciesNameForm(string genus, string species, Form Parent)
@@ -174,55 +196,62 @@ namespace FAD3
 
         private void Onbutton_Click(object sender, EventArgs e)
         {
-            var btn = (Button)sender;
-            switch (btn.Name)
+            if (ReadOnly)
             {
-                case "buttonOK":
-                    if (ValidateForm())
-                    {
-                        var willClose = false;
-                        if (_dataStatus == fad3DataStatus.statusFromDB)
+                Close();
+            }
+            else
+            {
+                var btn = (Button)sender;
+                switch (btn.Name)
+                {
+                    case "buttonOK":
+                        if (ValidateForm())
                         {
-                            willClose = true;
-                        }
-                        else
-                        {
-                            if (Names.UpdateSpeciesData(_dataStatus, _nameGuid, _genus, _species, _taxa,
-                                _genusMPH1, _genusMPH2, _speciesMPH1, _speciesMPH2, _inFishBase, _fishBaseSpeciesNumber, _notes))
+                            var willClose = false;
+                            if (_dataStatus == fad3DataStatus.statusFromDB)
                             {
                                 willClose = true;
                             }
-                        }
-
-                        if (_parentForm.GetType().Name != "AllSpeciesForm")
-                        {
-                            if (_dataStatus == fad3DataStatus.statusNew)
-                            {
-                                ((CatchCompositionForm)_parentForm).NewName(Accepted: true, _genus, _species, _nameGuid);
-                            }
                             else
                             {
-                                ((CatchCompositionForm)_parentForm).NewName(Accepted: true, _genus, _species);
+                                if (Names.UpdateSpeciesData(_dataStatus, _nameGuid, _genus, _species, _taxa,
+                                    _genusMPH1, _genusMPH2, _speciesMPH1, _speciesMPH2, _inFishBase, _fishBaseSpeciesNumber, _notes))
+                                {
+                                    willClose = true;
+                                }
                             }
+
+                            if (_parentForm.GetType().Name != "AllSpeciesForm")
+                            {
+                                if (_dataStatus == fad3DataStatus.statusNew)
+                                {
+                                    ((CatchCompositionForm)_parentForm).NewName(Accepted: true, _genus, _species, _nameGuid);
+                                }
+                                else
+                                {
+                                    ((CatchCompositionForm)_parentForm).NewName(Accepted: true, _genus, _species);
+                                }
+                            }
+
+                            if (willClose) Close();
                         }
+                        break;
 
-                        if (willClose) Close();
-                    }
-                    break;
+                    case "buttonCancel":
+                        if (_parentForm.GetType().Name != "AllSpeciesForm") ((CatchCompositionForm)_parentForm).NewName(Accepted: false);
+                        Close();
+                        break;
 
-                case "buttonCancel":
-                    if (_parentForm.GetType().Name != "AllSpeciesForm") ((CatchCompositionForm)_parentForm).NewName(Accepted: false);
-                    Close();
-                    break;
-
-                case "buttonEdit":
-                    if (btn.Text == "Edit")
-                    {
-                    }
-                    else if (btn.Text == "Delete")
-                    {
-                    }
-                    break;
+                    case "buttonEdit":
+                        if (btn.Text == "Edit")
+                        {
+                        }
+                        else if (btn.Text == "Delete")
+                        {
+                        }
+                        break;
+                }
             }
         }
 

@@ -19,7 +19,7 @@ namespace FAD3
 
         public static ConvertToGrid25Form GetInstance()
         {
-            if (_instance == null) return new ConvertToGrid25Form();
+            if (_instance == null) _instance = new ConvertToGrid25Form();
             return _instance;
         }
 

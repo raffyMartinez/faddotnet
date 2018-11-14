@@ -35,7 +35,7 @@ namespace FAD3.Database.Forms
         //function to ensure that only one instance of the form is open
         public static GearInventoryForm GetInstance(TargetArea aoi, string inventoryGuid = "")
         {
-            if (_instance == null) return new GearInventoryForm(aoi, inventoryGuid);
+            if (_instance == null) _instance = new GearInventoryForm(aoi, inventoryGuid);
             return _instance;
         }
 

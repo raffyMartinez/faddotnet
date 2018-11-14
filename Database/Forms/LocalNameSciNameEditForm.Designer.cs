@@ -36,12 +36,13 @@
             this.cboLanguage = new System.Windows.Forms.ComboBox();
             this.btnOk = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
+            this.lblTitle = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // cboLocalName
             // 
             this.cboLocalName.FormattingEnabled = true;
-            this.cboLocalName.Location = new System.Drawing.Point(88, 53);
+            this.cboLocalName.Location = new System.Drawing.Point(88, 60);
             this.cboLocalName.Name = "cboLocalName";
             this.cboLocalName.Size = new System.Drawing.Size(192, 21);
             this.cboLocalName.TabIndex = 0;
@@ -49,7 +50,7 @@
             // 
             // label1
             // 
-            this.label1.Location = new System.Drawing.Point(6, 50);
+            this.label1.Location = new System.Drawing.Point(6, 57);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(84, 28);
             this.label1.TabIndex = 1;
@@ -58,7 +59,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(6, 93);
+            this.label2.Location = new System.Drawing.Point(6, 100);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(74, 13);
             this.label2.TabIndex = 3;
@@ -67,7 +68,7 @@
             // cboSpeciesName
             // 
             this.cboSpeciesName.FormattingEnabled = true;
-            this.cboSpeciesName.Location = new System.Drawing.Point(88, 90);
+            this.cboSpeciesName.Location = new System.Drawing.Point(88, 97);
             this.cboSpeciesName.Name = "cboSpeciesName";
             this.cboSpeciesName.Size = new System.Drawing.Size(192, 21);
             this.cboSpeciesName.TabIndex = 2;
@@ -75,7 +76,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(6, 130);
+            this.label3.Location = new System.Drawing.Point(6, 137);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(55, 13);
             this.label3.TabIndex = 5;
@@ -83,10 +84,9 @@
             // 
             // cboLanguage
             // 
-            this.cboLanguage.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this.cboLanguage.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.cboLanguage.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.FileSystem;
             this.cboLanguage.FormattingEnabled = true;
-            this.cboLanguage.Location = new System.Drawing.Point(88, 127);
+            this.cboLanguage.Location = new System.Drawing.Point(88, 134);
             this.cboLanguage.Name = "cboLanguage";
             this.cboLanguage.Size = new System.Drawing.Size(192, 21);
             this.cboLanguage.TabIndex = 4;
@@ -112,11 +112,21 @@
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.OnButtonClick);
             // 
+            // lblTitle
+            // 
+            this.lblTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblTitle.Location = new System.Drawing.Point(9, 9);
+            this.lblTitle.Name = "lblTitle";
+            this.lblTitle.Size = new System.Drawing.Size(271, 41);
+            this.lblTitle.TabIndex = 8;
+            this.lblTitle.Text = "Species name";
+            // 
             // LocalNameSciNameEditForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(289, 207);
+            this.Controls.Add(this.lblTitle);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnOk);
             this.Controls.Add(this.label3);
@@ -145,5 +155,6 @@
         private System.Windows.Forms.ComboBox cboLanguage;
         private System.Windows.Forms.Button btnOk;
         private System.Windows.Forms.Button btnCancel;
+        private System.Windows.Forms.Label lblTitle;
     }
 }

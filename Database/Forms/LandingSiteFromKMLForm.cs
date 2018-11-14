@@ -23,7 +23,7 @@ namespace FAD3
 
         public static LandingSiteFromKMLForm GetInstance(TargetArea targetArea)
         {
-            if (_instance == null) return new LandingSiteFromKMLForm(targetArea);
+            if (_instance == null) _instance = new LandingSiteFromKMLForm(targetArea);
             return _instance;
         }
 

@@ -19,6 +19,7 @@ namespace FAD3.Database.Forms
         private Identification _idType;
         private string _language;
         private string _namePair;
+        private EditActionType _editActionType;
 
         public EditSelectedLocalNameForm(string selectedName, string nameGuid, CatchLocalNameSelectedForm parentForm)
         {
@@ -26,6 +27,7 @@ namespace FAD3.Database.Forms
             _selectedName = selectedName;
             _nameGuid = nameGuid;
             _parentForm = parentForm;
+            _editActionType = EditActionType.ActionTypeEdit;
         }
 
         public EditSelectedLocalNameForm(Identification idType, string language, string namePair, CatchLocalNameSelectedForm parentForm)
@@ -42,6 +44,7 @@ namespace FAD3.Database.Forms
                     comboBox.Items.Add(item);
                 }
                 lblEdit.Text = "Select a species name";
+                Text = "Provide a species name";
             }
             else if (_idType == Identification.Scientific)
             {
@@ -50,6 +53,7 @@ namespace FAD3.Database.Forms
                     comboBox.Items.Add(item);
                 }
                 lblEdit.Text = "Select a local/common name";
+                Text = "Provide a local name";
             }
             comboBox.ValueMember = "Key";
             comboBox.DisplayMember = "Value";
@@ -59,6 +63,7 @@ namespace FAD3.Database.Forms
             txtLocalName.Visible = false;
             comboBox.Location = txtLocalName.Location;
             comboBox.Size = txtLocalName.Size;
+            _editActionType = EditActionType.ActionTypeAdd;
         }
 
         private void OnButtonClick(object sender, EventArgs e)
@@ -66,11 +71,40 @@ namespace FAD3.Database.Forms
             switch (((Button)sender).Name)
             {
                 case "btnOk":
-                    if (Names.UpdateLocalName(txtLocalName.Text, _nameGuid))
+                    switch (_editActionType)
                     {
-                        Close();
-                        _parentForm.UpdateList(txtLocalName.Text);
+                        case EditActionType.ActionTypeEdit:
+                            if (Names.UpdateLocalName(txtLocalName.Text, _nameGuid))
+                            {
+                                Close();
+                                _parentForm.UpdateList(_idType);
+                            }
+                            break;
+
+                        case EditActionType.ActionTypeAdd:
+                            bool success = false;
+                            var sn = "";
+                            var ln = "";
+                            if (_idType == Identification.LocalName)
+                            {
+                                sn = comboBox.Text;
+                                ln = _namePair;
+                            }
+                            else
+                            {
+                                sn = _namePair;
+                                ln = comboBox.Text;
+                            }
+                            Names.SaveNewLocalSpeciesNameLanguage(sn, _language, ln, out success);
+                            if (success)
+                            {
+                                Close();
+                                _parentForm.UpdateList(_idType);
+                            }
+
+                            break;
                     }
+
                     break;
 
                 case "btnCancel":

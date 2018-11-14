@@ -585,6 +585,31 @@ namespace FAD3
                     tsi = menuDropDown.Items.Add("Edit catch composition");
                     tsi.Name = "menuEditCatchComposition";
                     tsi.Visible = ((ListView)Source).Items.Count > 0;
+
+                    //only show browse submenu if catch name is scientific name
+                    if (((ListView)Source).SelectedItems[0].Tag.ToString() == "Scientific")
+                    {
+                        tsi = menuDropDown.Items.Add("Species details");
+                        tsi.Name = "menuSpeciesDetail";
+                        tsi.Tag = ((ListView)Source).SelectedItems[0].SubItems[1].Text;
+
+                        ToolStripMenuItem subMenu = new ToolStripMenuItem();
+                        subMenu.Text = "Browse on WWW";
+
+                        CatchNameURLGenerator.CatchName = ((ListView)Source).SelectedItems[0].SubItems[1].Text;
+
+                        foreach (var url in CatchNameURLGenerator.URLS)
+                        {
+                            ToolStripMenuItem subItem = new ToolStripMenuItem();
+                            subItem.Text = url.Key;
+                            subItem.Tag = url.Value;
+                            subMenu.DropDownItems.Add(subItem);
+                        }
+
+                        subMenu.DropDownItemClicked += OnSubMenuDropDownClick;
+
+                        menuDropDown.Items.Add(subMenu);
+                    }
                     break;
 
                 case "lvLF_GMS":
@@ -621,6 +646,12 @@ namespace FAD3
                     tsi.Name = MenuName;
                     break;
             }
+        }
+
+        private void OnSubMenuDropDownClick(object sender, ToolStripItemClickedEventArgs e)
+        {
+            e.ClickedItem.OwnerItem.Owner.Hide();
+            Process.Start(e.ClickedItem.Tag.ToString());
         }
 
         private string DatabaseSummary(string SummaryTopic)
@@ -1089,6 +1120,15 @@ namespace FAD3
                     }
                     break;
 
+                case "menuSpeciesDetail":
+                    lvi = lvCatch.SelectedItems[0];
+
+                    SpeciesNameForm snf = new SpeciesNameForm(lvi.SubItems[1].Text, this);
+                    snf.ReadOnly = true;
+                    snf.ShowDialog(this);
+
+                    break;
+
                 case "menuDeleteSampling":
                     DeleteSampling();
                     break;
@@ -1502,6 +1542,9 @@ namespace FAD3
                     {
                         chForm.Show(this);
                     }
+                    break;
+
+                case "importLanguages":
                     break;
 
                 case "importSpecies":
@@ -2584,6 +2627,7 @@ namespace FAD3
                         kv.Value.TaxaNumber.ToString()
                     });
                     lvi.Name = kv.Key;
+                    lvi.Tag = kv.Value.NameType.ToString();
                     lvCatch.Items.Add(lvi);
                     n++;
                 }

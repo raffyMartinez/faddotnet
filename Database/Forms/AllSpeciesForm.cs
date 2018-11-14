@@ -7,6 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using FAD3.GUI.Classes;
+using FAD3.Database.Classes;
+using System.Diagnostics;
+using FAD3.Database.Forms;
 
 namespace FAD3
 {
@@ -51,10 +54,14 @@ namespace FAD3
             global.LoadFormSettings(this, true);
             dropDownMenu.ItemClicked += OnDropDownMenuItemClicked;
             Text = "List of all species in catch composition of sampled landings";
+            //lvTaxa.Columns.Add("");
+            lvTaxa.View = View.List;
+            //SizeColumns(lvTaxa);
             foreach (var item in CatchName.RetrieveTaxaDictionary())
             {
-                listBoxFilter.Items.Add(item.Value);
+                lvTaxa.Items.Add(item.Key.ToString(), item.Value, null);
             }
+            //SizeColumns(lvTaxa, false);
 
             lvNames.With(o =>
                 {
@@ -134,9 +141,9 @@ namespace FAD3
 
                     //process taxa select
                     var selectedTaxa = "";
-                    foreach (var item in listBoxFilter.CheckedItems)
+                    foreach (ListViewItem item in lvTaxa.CheckedItems)
                     {
-                        var taxaNo = (int)CatchName.TaxaFromTaxaName(item.ToString());
+                        var taxaNo = int.Parse(item.Name);
                         selectedTaxa += $"{taxaNo.ToString()},";
                     }
                     selectedTaxa = selectedTaxa.Trim(',');
@@ -182,6 +189,21 @@ namespace FAD3
                     snf.ShowDialog(this);
                     break;
 
+                case "btnExport":
+                    var taxaCSV = "";
+                    if (lvTaxa.CheckedItems.Count > 0)
+                    {
+                        foreach (ListViewItem checkedItem in lvTaxa.CheckedItems)
+                        {
+                            taxaCSV += ((Taxa)int.Parse(checkedItem.Name)).ToString() + ",";
+                        }
+                        taxaCSV.Trim(',');
+                    }
+                    ExportDialogForm edf = new ExportDialogForm(ExportDataType.ExportDataSpecies);
+                    edf.TaxaCSV = "";
+                    edf.ShowDialog(this);
+                    break;
+
                 case "buttonSearch":
 
                     break;
@@ -212,7 +234,7 @@ namespace FAD3
 
         private void lvNames_MouseDown(object sender, MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Right)
+            if (e.Button == MouseButtons.Right && lvNames.SelectedItems.Count > 0)
             {
                 dropDownMenu.Items.Clear();
                 var item = dropDownMenu.Items.Add("View samplings");
@@ -223,7 +245,31 @@ namespace FAD3
 
                 item = dropDownMenu.Items.Add("Edit catch name");
                 item.Name = "menuEditName";
+
+                ToolStripMenuItem subMenu = new ToolStripMenuItem();
+                subMenu.Text = "Browse on WWW";
+
+                CatchNameURLGenerator.CatchName = lvNames.SelectedItems[0].SubItems[1].Text + " " + lvNames.SelectedItems[0].SubItems[2].Text;
+                var urls = CatchNameURLGenerator.URLS;
+
+                foreach (var url in urls)
+                {
+                    ToolStripMenuItem subItem = new ToolStripMenuItem();
+                    subItem.Text = url.Key;
+                    subItem.Tag = url.Value;
+                    subMenu.DropDownItems.Add(subItem);
+                }
+
+                subMenu.DropDownItemClicked += OnSubMenuDropDownClick;
+
+                dropDownMenu.Items.Add(subMenu);
             }
+        }
+
+        private void OnSubMenuDropDownClick(object sender, ToolStripItemClickedEventArgs e)
+        {
+            e.ClickedItem.OwnerItem.Owner.Hide();
+            Process.Start(e.ClickedItem.Tag.ToString());
         }
 
         private void AllSpeciesForm_FormClosing(object sender, FormClosingEventArgs e)

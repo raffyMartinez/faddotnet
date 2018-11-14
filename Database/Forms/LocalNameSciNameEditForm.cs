@@ -65,8 +65,11 @@ namespace FAD3.Database.Forms
             {
                 cboLanguage.Items.Add(item);
             }
-            cboLanguage.ValueMember = "key";
-            cboLanguage.DisplayMember = "value";
+            cboLanguage.DropDownStyle = ComboBoxStyle.DropDown;
+            cboLanguage.DisplayMember = "Value";
+            cboLanguage.ValueMember = "Key";
+            cboLanguage.AutoCompleteSource = AutoCompleteSource.ListItems;
+            cboLanguage.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
 
             switch (_idType)
             {
@@ -83,6 +86,7 @@ namespace FAD3.Database.Forms
 
                     cboLocalName.Text = _selectedName;
                     cboLocalName.Enabled = false;
+                    lblTitle.Text = $"Provide species name and language for {_selectedName}";
                     break;
 
                 case Identification.Scientific:
@@ -99,6 +103,7 @@ namespace FAD3.Database.Forms
 
                     cboSpeciesName.Text = _selectedName;
                     cboSpeciesName.Enabled = false;
+                    lblTitle.Text = $"Provide local/common name and language for {_selectedName}";
                     break;
             }
         }

@@ -119,6 +119,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Database\Classes\CatchNameURLGenerator.cs" />
     <Compile Include="Database\Classes\FishingGearInventory.cs" />
     <Compile Include="Database\Classes\SimMetrics\AbstractStringMetric.cs" />
     <Compile Include="Database\Classes\SimMetrics\AbstractSubstitutionCost.cs" />
@@ -167,6 +168,12 @@
     </Compile>
     <Compile Include="Database\Forms\EditSelectedLocalNameForm.Designer.cs">
       <DependentUpon>EditSelectedLocalNameForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Database\Forms\ExportDialogForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Database\Forms\ExportDialogForm.Designer.cs">
+      <DependentUpon>ExportDialogForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Database\Forms\GearInventoryEditForm.cs">
       <SubType>Form</SubType>
@@ -591,6 +598,9 @@
     <EmbeddedResource Include="Database\Forms\EditSelectedLocalNameForm.resx">
       <DependentUpon>EditSelectedLocalNameForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Database\Forms\ExportDialogForm.resx">
+      <DependentUpon>ExportDialogForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Database\Forms\GearInventoryEditForm.resx">
       <DependentUpon>GearInventoryEditForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -895,6 +905,7 @@
     <None Include="Resources\fad.ico" />
     <None Include="Resources\FAD3.ico" />
     <None Include="Resources\Import_16x.png" />
+    <None Include="Resources\Export_16x.png" />
     <Content Include="Resources\internet-web-browser.png" />
     <None Include="Resources\system-file-manager.png" />
     <None Include="Resources\layerAdd.bmp" />

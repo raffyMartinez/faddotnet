@@ -1,5 +1,22 @@
 ﻿namespace FAD3.GUI.Classes
 {
+    public enum ExportDataType
+    {
+        ExportDataSpecies,
+        ExportDataGears,
+        ExportDataLanguages,
+        ExportDataCatchLocalNames,
+        ExportDataCatchLocalNameSpecies,
+        ExportDataSelect
+    }
+
+    public enum EditActionType
+    {
+        ActionTypeNone,
+        ActionTypeEdit,
+        ActionTypeAdd
+    }
+
     public enum CatchNameDataType
     {
         CatchSpeciesName,

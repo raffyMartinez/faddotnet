@@ -26,7 +26,7 @@ namespace FAD3
 
         public static TargetAreaGearsForm GetInstance(TargetArea aoi)
         {
-            if (_instance == null) return new TargetAreaGearsForm(aoi);
+            if (_instance == null) _instance = new TargetAreaGearsForm(aoi);
             return _instance;
         }
 

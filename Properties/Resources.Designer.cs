@@ -278,6 +278,16 @@ namespace FAD3.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Export_16x {
+            get {
+                object obj = ResourceManager.GetObject("Export_16x", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap ExportFile_16x {
             get {
                 object obj = ResourceManager.GetObject("ExportFile_16x", resourceCulture);

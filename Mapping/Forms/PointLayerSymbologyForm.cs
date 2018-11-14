@@ -25,7 +25,7 @@ namespace FAD3
 
         public static PointLayerSymbologyForm GetInstance(LayerPropertyForm parent, MapLayer mapLayer)
         {
-            if (_instance == null) return new PointLayerSymbologyForm(parent, mapLayer);
+            if (_instance == null) _instance = new PointLayerSymbologyForm(parent, mapLayer);
             return _instance;
         }
 

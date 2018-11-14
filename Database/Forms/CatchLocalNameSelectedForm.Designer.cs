@@ -30,25 +30,29 @@
         {
             this.components = new System.ComponentModel.Container();
             this.listBox = new System.Windows.Forms.ListBox();
+            this.dropDownMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.lblList = new System.Windows.Forms.Label();
             this.btnOk = new System.Windows.Forms.Button();
             this.lblTitle = new System.Windows.Forms.Label();
-            this.contextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.addToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.detailsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.contextMenuStrip.SuspendLayout();
+            this.lblCount = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // listBox
             // 
-            this.listBox.ContextMenuStrip = this.contextMenuStrip;
+            this.listBox.ContextMenuStrip = this.dropDownMenu;
             this.listBox.FormattingEnabled = true;
             this.listBox.Location = new System.Drawing.Point(6, 84);
             this.listBox.Name = "listBox";
             this.listBox.Size = new System.Drawing.Size(253, 290);
             this.listBox.TabIndex = 0;
             this.listBox.DoubleClick += new System.EventHandler(this.OnListBoxDblClick);
+            this.listBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnListBoxMouseDown);
+            // 
+            // dropDownMenu
+            // 
+            this.dropDownMenu.Name = "contextMenuStrip";
+            this.dropDownMenu.Size = new System.Drawing.Size(181, 26);
+            this.dropDownMenu.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnContextMenuItemClick);
             // 
             // lblList
             // 
@@ -78,39 +82,21 @@
             this.lblTitle.TabIndex = 3;
             this.lblTitle.Text = "Local names in language";
             // 
-            // contextMenuStrip
+            // lblCount
             // 
-            this.contextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.deleteToolStripMenuItem,
-            this.addToolStripMenuItem,
-            this.detailsToolStripMenuItem});
-            this.contextMenuStrip.Name = "contextMenuStrip";
-            this.contextMenuStrip.Size = new System.Drawing.Size(181, 92);
-            this.contextMenuStrip.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnContextMenuItemClick);
-            // 
-            // deleteToolStripMenuItem
-            // 
-            this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.deleteToolStripMenuItem.Text = "Delete";
-            // 
-            // addToolStripMenuItem
-            // 
-            this.addToolStripMenuItem.Name = "addToolStripMenuItem";
-            this.addToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.addToolStripMenuItem.Text = "Add";
-            // 
-            // detailsToolStripMenuItem
-            // 
-            this.detailsToolStripMenuItem.Name = "detailsToolStripMenuItem";
-            this.detailsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.detailsToolStripMenuItem.Text = "Details";
+            this.lblCount.AutoSize = true;
+            this.lblCount.Location = new System.Drawing.Point(6, 381);
+            this.lblCount.Name = "lblCount";
+            this.lblCount.Size = new System.Drawing.Size(90, 13);
+            this.lblCount.TabIndex = 4;
+            this.lblCount.Text = "Number of names";
             // 
             // CatchLocalNameSelectedForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(264, 423);
+            this.Controls.Add(this.lblCount);
             this.Controls.Add(this.lblTitle);
             this.Controls.Add(this.btnOk);
             this.Controls.Add(this.lblList);
@@ -120,7 +106,6 @@
             this.Text = "CatchLocalNameSelectedForm";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnFormClose);
             this.Load += new System.EventHandler(this.OnFormLoad);
-            this.contextMenuStrip.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -132,9 +117,7 @@
         private System.Windows.Forms.Label lblList;
         private System.Windows.Forms.Button btnOk;
         private System.Windows.Forms.Label lblTitle;
-        private System.Windows.Forms.ContextMenuStrip contextMenuStrip;
-        private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem addToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem detailsToolStripMenuItem;
+        private System.Windows.Forms.ContextMenuStrip dropDownMenu;
+        private System.Windows.Forms.Label lblCount;
     }
 }

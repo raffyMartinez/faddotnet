@@ -21,7 +21,7 @@ namespace FAD3
 
         public static LabelsForm GetInstance(MapLayersHandler layersHandler)
         {
-            if (_instance == null) return new LabelsForm(layersHandler);
+            if (_instance == null) _instance = new LabelsForm(layersHandler);
             return _instance;
         }
 

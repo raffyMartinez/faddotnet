@@ -66,6 +66,29 @@ namespace FAD3
             }
         }
 
+        public static Taxa TaxaFromCatchName(string genus, string species)
+        {
+            Taxa taxa = Taxa.To_be_determined;
+            var dt = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    string query = $"Select TaxaNo from tblAllSpecies where Genus = '{genus}' and species = '{species}'";
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(dt);
+                    DataRow dr = dt.Rows[0];
+                    taxa = (Taxa)int.Parse(dr["TaxaNo"].ToString());
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex);
+                }
+                return taxa;
+            }
+        }
+
         public static Dictionary<int, string> RetrieveTaxaDictionary()
         {
             var taxaDictionary = new Dictionary<int, string>();

@@ -34,15 +34,16 @@
             this.buttonOK = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.chkShowWithRecords = new System.Windows.Forms.CheckBox();
             this.buttonReset = new System.Windows.Forms.Button();
             this.buttonApply = new System.Windows.Forms.Button();
-            this.listBoxFilter = new System.Windows.Forms.CheckedListBox();
+            this.chkShowWithRecords = new System.Windows.Forms.CheckBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.txtSearch = new System.Windows.Forms.TextBox();
             this.buttonAdd = new System.Windows.Forms.Button();
             this.buttonEdit = new System.Windows.Forms.Button();
+            this.btnExport = new System.Windows.Forms.Button();
+            this.lvTaxa = new System.Windows.Forms.ListView();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -51,7 +52,7 @@
             this.lvNames.ContextMenuStrip = this.dropDownMenu;
             this.lvNames.Location = new System.Drawing.Point(199, 31);
             this.lvNames.Name = "lvNames";
-            this.lvNames.Size = new System.Drawing.Size(596, 339);
+            this.lvNames.Size = new System.Drawing.Size(596, 426);
             this.lvNames.TabIndex = 0;
             this.lvNames.UseCompatibleStateImageBehavior = false;
             this.lvNames.DoubleClick += new System.EventHandler(this.OnlvNames_DoubleClick);
@@ -65,7 +66,7 @@
             // buttonOK
             // 
             this.buttonOK.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.buttonOK.Location = new System.Drawing.Point(743, 375);
+            this.buttonOK.Location = new System.Drawing.Point(743, 463);
             this.buttonOK.Name = "buttonOK";
             this.buttonOK.Size = new System.Drawing.Size(51, 24);
             this.buttonOK.TabIndex = 1;
@@ -84,7 +85,7 @@
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.listBoxFilter);
+            this.groupBox1.Controls.Add(this.lvTaxa);
             this.groupBox1.Controls.Add(this.buttonReset);
             this.groupBox1.Controls.Add(this.buttonApply);
             this.groupBox1.Controls.Add(this.chkShowWithRecords);
@@ -93,23 +94,14 @@
             this.groupBox1.Controls.Add(this.txtSearch);
             this.groupBox1.Location = new System.Drawing.Point(10, 24);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(180, 343);
+            this.groupBox1.Size = new System.Drawing.Size(180, 431);
             this.groupBox1.TabIndex = 14;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Filter";
             // 
-            // chkShowWithRecords
-            // 
-            this.chkShowWithRecords.Location = new System.Drawing.Point(10, 253);
-            this.chkShowWithRecords.Name = "chkShowWithRecords";
-            this.chkShowWithRecords.Size = new System.Drawing.Size(164, 55);
-            this.chkShowWithRecords.TabIndex = 20;
-            this.chkShowWithRecords.Text = "Show only those with records in the database";
-            this.chkShowWithRecords.UseVisualStyleBackColor = true;
-            // 
             // buttonReset
             // 
-            this.buttonReset.Location = new System.Drawing.Point(27, 303);
+            this.buttonReset.Location = new System.Drawing.Point(27, 397);
             this.buttonReset.Name = "buttonReset";
             this.buttonReset.Size = new System.Drawing.Size(50, 24);
             this.buttonReset.TabIndex = 19;
@@ -119,7 +111,7 @@
             // 
             // buttonApply
             // 
-            this.buttonApply.Location = new System.Drawing.Point(82, 304);
+            this.buttonApply.Location = new System.Drawing.Point(82, 398);
             this.buttonApply.Name = "buttonApply";
             this.buttonApply.Size = new System.Drawing.Size(50, 24);
             this.buttonApply.TabIndex = 18;
@@ -127,14 +119,14 @@
             this.buttonApply.UseVisualStyleBackColor = true;
             this.buttonApply.Click += new System.EventHandler(this.OnButton_Click);
             // 
-            // listBoxFilter
+            // chkShowWithRecords
             // 
-            this.listBoxFilter.CheckOnClick = true;
-            this.listBoxFilter.FormattingEnabled = true;
-            this.listBoxFilter.Location = new System.Drawing.Point(8, 91);
-            this.listBoxFilter.Name = "listBoxFilter";
-            this.listBoxFilter.Size = new System.Drawing.Size(153, 164);
-            this.listBoxFilter.TabIndex = 17;
+            this.chkShowWithRecords.Location = new System.Drawing.Point(10, 347);
+            this.chkShowWithRecords.Name = "chkShowWithRecords";
+            this.chkShowWithRecords.Size = new System.Drawing.Size(164, 55);
+            this.chkShowWithRecords.TabIndex = 20;
+            this.chkShowWithRecords.Text = "Show only those with records in the database";
+            this.chkShowWithRecords.UseVisualStyleBackColor = true;
             // 
             // label3
             // 
@@ -163,7 +155,7 @@
             // 
             // buttonAdd
             // 
-            this.buttonAdd.Location = new System.Drawing.Point(92, 373);
+            this.buttonAdd.Location = new System.Drawing.Point(129, 461);
             this.buttonAdd.Name = "buttonAdd";
             this.buttonAdd.Size = new System.Drawing.Size(50, 24);
             this.buttonAdd.TabIndex = 20;
@@ -173,7 +165,7 @@
             // 
             // buttonEdit
             // 
-            this.buttonEdit.Location = new System.Drawing.Point(37, 373);
+            this.buttonEdit.Location = new System.Drawing.Point(74, 461);
             this.buttonEdit.Name = "buttonEdit";
             this.buttonEdit.Size = new System.Drawing.Size(50, 24);
             this.buttonEdit.TabIndex = 21;
@@ -181,12 +173,33 @@
             this.buttonEdit.UseVisualStyleBackColor = true;
             this.buttonEdit.Click += new System.EventHandler(this.OnButton_Click);
             // 
+            // btnExport
+            // 
+            this.btnExport.Location = new System.Drawing.Point(18, 461);
+            this.btnExport.Name = "btnExport";
+            this.btnExport.Size = new System.Drawing.Size(50, 24);
+            this.btnExport.TabIndex = 22;
+            this.btnExport.Text = "Export";
+            this.btnExport.UseVisualStyleBackColor = true;
+            this.btnExport.Click += new System.EventHandler(this.OnButton_Click);
+            // 
+            // lvTaxa
+            // 
+            this.lvTaxa.CheckBoxes = true;
+            this.lvTaxa.Location = new System.Drawing.Point(8, 92);
+            this.lvTaxa.Name = "lvTaxa";
+            this.lvTaxa.Size = new System.Drawing.Size(166, 258);
+            this.lvTaxa.TabIndex = 21;
+            this.lvTaxa.UseCompatibleStateImageBehavior = false;
+            this.lvTaxa.View = System.Windows.Forms.View.List;
+            // 
             // AllSpeciesForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonOK;
-            this.ClientSize = new System.Drawing.Size(802, 409);
+            this.ClientSize = new System.Drawing.Size(802, 495);
+            this.Controls.Add(this.btnExport);
             this.Controls.Add(this.buttonEdit);
             this.Controls.Add(this.buttonAdd);
             this.Controls.Add(this.groupBox1);
@@ -213,7 +226,6 @@
         private System.Windows.Forms.Button buttonOK;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.CheckedListBox listBoxFilter;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox txtSearch;
@@ -223,5 +235,7 @@
         private System.Windows.Forms.Button buttonAdd;
         private System.Windows.Forms.Button buttonEdit;
         private System.Windows.Forms.ContextMenuStrip dropDownMenu;
+        private System.Windows.Forms.Button btnExport;
+        private System.Windows.Forms.ListView lvTaxa;
     }
 }
