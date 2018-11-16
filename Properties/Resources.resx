@@ -403,4 +403,61 @@
   <data name="Export_16x" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Export_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="close_document" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\close document.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="fish_blue28" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\fish blue28.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="fish_blue_close28" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\fish blue close28.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="fish_blue_document28" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\fish blue document28.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="fish_blue_help28" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\fish blue help28.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="fish_blue_map28" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\fish blue map28.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="fish_document" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\fish document.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="fish_document2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\fish document2.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="fish_document3" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\fish document3.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="fish_hook_blue28" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\fish hook blue28.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="fish_hook_document" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\fish hook document.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="fish_map_document" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\fish map document.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="fish_report_blue28" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\fish report blue28.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="help_document" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\help document.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="report_document" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\report document.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Edit_16xMD" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Edit_16xMD.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="fish_list" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\fish list.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImportFile_16x" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ImportFile_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="BigProp" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\BigProp.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

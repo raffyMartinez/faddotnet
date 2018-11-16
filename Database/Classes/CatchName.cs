@@ -5,6 +5,8 @@ using System.Data.OleDb;
 using System.Linq;
 using System.Text;
 using FAD3.GUI.Classes;
+using System.Xml;
+using System.IO;
 
 namespace FAD3
 {

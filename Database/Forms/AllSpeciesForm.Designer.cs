@@ -34,25 +34,29 @@
             this.buttonOK = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.lvTaxa = new System.Windows.Forms.ListView();
             this.buttonReset = new System.Windows.Forms.Button();
             this.buttonApply = new System.Windows.Forms.Button();
             this.chkShowWithRecords = new System.Windows.Forms.CheckBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.txtSearch = new System.Windows.Forms.TextBox();
-            this.buttonAdd = new System.Windows.Forms.Button();
-            this.buttonEdit = new System.Windows.Forms.Button();
-            this.btnExport = new System.Windows.Forms.Button();
-            this.lvTaxa = new System.Windows.Forms.ListView();
+            this.toolBar = new System.Windows.Forms.ToolStrip();
+            this.tbAdd = new System.Windows.Forms.ToolStripButton();
+            this.tbRemove = new System.Windows.Forms.ToolStripButton();
+            this.tbEdit = new System.Windows.Forms.ToolStripButton();
+            this.tbExport = new System.Windows.Forms.ToolStripButton();
+            this.tbImport = new System.Windows.Forms.ToolStripButton();
             this.groupBox1.SuspendLayout();
+            this.toolBar.SuspendLayout();
             this.SuspendLayout();
             // 
             // lvNames
             // 
             this.lvNames.ContextMenuStrip = this.dropDownMenu;
-            this.lvNames.Location = new System.Drawing.Point(199, 31);
+            this.lvNames.Location = new System.Drawing.Point(199, 46);
             this.lvNames.Name = "lvNames";
-            this.lvNames.Size = new System.Drawing.Size(596, 426);
+            this.lvNames.Size = new System.Drawing.Size(596, 411);
             this.lvNames.TabIndex = 0;
             this.lvNames.UseCompatibleStateImageBehavior = false;
             this.lvNames.DoubleClick += new System.EventHandler(this.OnlvNames_DoubleClick);
@@ -77,7 +81,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(196, 13);
+            this.label2.Location = new System.Drawing.Point(196, 28);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(125, 15);
             this.label2.TabIndex = 4;
@@ -92,16 +96,26 @@
             this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Controls.Add(this.txtSearch);
-            this.groupBox1.Location = new System.Drawing.Point(10, 24);
+            this.groupBox1.Location = new System.Drawing.Point(10, 39);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(180, 431);
+            this.groupBox1.Size = new System.Drawing.Size(180, 418);
             this.groupBox1.TabIndex = 14;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Filter";
             // 
+            // lvTaxa
+            // 
+            this.lvTaxa.CheckBoxes = true;
+            this.lvTaxa.Location = new System.Drawing.Point(8, 103);
+            this.lvTaxa.Name = "lvTaxa";
+            this.lvTaxa.Size = new System.Drawing.Size(166, 218);
+            this.lvTaxa.TabIndex = 21;
+            this.lvTaxa.UseCompatibleStateImageBehavior = false;
+            this.lvTaxa.View = System.Windows.Forms.View.List;
+            // 
             // buttonReset
             // 
-            this.buttonReset.Location = new System.Drawing.Point(27, 397);
+            this.buttonReset.Location = new System.Drawing.Point(27, 375);
             this.buttonReset.Name = "buttonReset";
             this.buttonReset.Size = new System.Drawing.Size(50, 24);
             this.buttonReset.TabIndex = 19;
@@ -111,7 +125,7 @@
             // 
             // buttonApply
             // 
-            this.buttonApply.Location = new System.Drawing.Point(82, 398);
+            this.buttonApply.Location = new System.Drawing.Point(82, 376);
             this.buttonApply.Name = "buttonApply";
             this.buttonApply.Size = new System.Drawing.Size(50, 24);
             this.buttonApply.TabIndex = 18;
@@ -121,7 +135,7 @@
             // 
             // chkShowWithRecords
             // 
-            this.chkShowWithRecords.Location = new System.Drawing.Point(10, 347);
+            this.chkShowWithRecords.Location = new System.Drawing.Point(10, 325);
             this.chkShowWithRecords.Name = "chkShowWithRecords";
             this.chkShowWithRecords.Size = new System.Drawing.Size(164, 55);
             this.chkShowWithRecords.TabIndex = 20;
@@ -131,7 +145,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(8, 73);
+            this.label3.Location = new System.Drawing.Point(7, 85);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(75, 15);
             this.label3.TabIndex = 16;
@@ -140,7 +154,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(8, 22);
+            this.label1.Location = new System.Drawing.Point(10, 34);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(46, 15);
             this.label1.TabIndex = 15;
@@ -148,50 +162,75 @@
             // 
             // txtSearch
             // 
-            this.txtSearch.Location = new System.Drawing.Point(8, 40);
+            this.txtSearch.Location = new System.Drawing.Point(10, 52);
             this.txtSearch.Name = "txtSearch";
             this.txtSearch.Size = new System.Drawing.Size(153, 21);
             this.txtSearch.TabIndex = 14;
             // 
-            // buttonAdd
+            // toolBar
             // 
-            this.buttonAdd.Location = new System.Drawing.Point(129, 461);
-            this.buttonAdd.Name = "buttonAdd";
-            this.buttonAdd.Size = new System.Drawing.Size(50, 24);
-            this.buttonAdd.TabIndex = 20;
-            this.buttonAdd.Text = "Add";
-            this.buttonAdd.UseVisualStyleBackColor = true;
-            this.buttonAdd.Click += new System.EventHandler(this.OnButton_Click);
+            this.toolBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tbAdd,
+            this.tbRemove,
+            this.tbEdit,
+            this.tbExport,
+            this.tbImport});
+            this.toolBar.Location = new System.Drawing.Point(0, 0);
+            this.toolBar.Name = "toolBar";
+            this.toolBar.Size = new System.Drawing.Size(802, 25);
+            this.toolBar.TabIndex = 23;
+            this.toolBar.Text = "toolStrip1";
+            this.toolBar.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnToolBarItemClick);
             // 
-            // buttonEdit
+            // tbAdd
             // 
-            this.buttonEdit.Location = new System.Drawing.Point(74, 461);
-            this.buttonEdit.Name = "buttonEdit";
-            this.buttonEdit.Size = new System.Drawing.Size(50, 24);
-            this.buttonEdit.TabIndex = 21;
-            this.buttonEdit.Text = "Edit";
-            this.buttonEdit.UseVisualStyleBackColor = true;
-            this.buttonEdit.Click += new System.EventHandler(this.OnButton_Click);
+            this.tbAdd.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tbAdd.Image = global::FAD3.Properties.Resources.Add_16xSM;
+            this.tbAdd.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tbAdd.Name = "tbAdd";
+            this.tbAdd.Size = new System.Drawing.Size(23, 22);
+            this.tbAdd.Text = "toolStripButton1";
+            this.tbAdd.ToolTipText = "Add species";
             // 
-            // btnExport
+            // tbRemove
             // 
-            this.btnExport.Location = new System.Drawing.Point(18, 461);
-            this.btnExport.Name = "btnExport";
-            this.btnExport.Size = new System.Drawing.Size(50, 24);
-            this.btnExport.TabIndex = 22;
-            this.btnExport.Text = "Export";
-            this.btnExport.UseVisualStyleBackColor = true;
-            this.btnExport.Click += new System.EventHandler(this.OnButton_Click);
+            this.tbRemove.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tbRemove.Image = global::FAD3.Properties.Resources.Remove_16xSM;
+            this.tbRemove.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tbRemove.Name = "tbRemove";
+            this.tbRemove.Size = new System.Drawing.Size(23, 22);
+            this.tbRemove.Text = "toolStripButton2";
+            this.tbRemove.ToolTipText = "Remove species";
             // 
-            // lvTaxa
+            // tbEdit
             // 
-            this.lvTaxa.CheckBoxes = true;
-            this.lvTaxa.Location = new System.Drawing.Point(8, 92);
-            this.lvTaxa.Name = "lvTaxa";
-            this.lvTaxa.Size = new System.Drawing.Size(166, 258);
-            this.lvTaxa.TabIndex = 21;
-            this.lvTaxa.UseCompatibleStateImageBehavior = false;
-            this.lvTaxa.View = System.Windows.Forms.View.List;
+            this.tbEdit.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tbEdit.Image = global::FAD3.Properties.Resources.Edit_16xMD;
+            this.tbEdit.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tbEdit.Name = "tbEdit";
+            this.tbEdit.Size = new System.Drawing.Size(23, 22);
+            this.tbEdit.Text = "toolStripButton3";
+            this.tbEdit.ToolTipText = "Edit species";
+            // 
+            // tbExport
+            // 
+            this.tbExport.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tbExport.Image = global::FAD3.Properties.Resources.ExportFile_16x;
+            this.tbExport.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tbExport.Name = "tbExport";
+            this.tbExport.Size = new System.Drawing.Size(23, 22);
+            this.tbExport.Text = "toolStripButton4";
+            this.tbExport.ToolTipText = "Export species list";
+            // 
+            // tbImport
+            // 
+            this.tbImport.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tbImport.Image = global::FAD3.Properties.Resources.ImportFile_16x;
+            this.tbImport.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tbImport.Name = "tbImport";
+            this.tbImport.Size = new System.Drawing.Size(23, 22);
+            this.tbImport.Text = "toolStripButton5";
+            this.tbImport.ToolTipText = "Import species list";
             // 
             // AllSpeciesForm
             // 
@@ -199,9 +238,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonOK;
             this.ClientSize = new System.Drawing.Size(802, 495);
-            this.Controls.Add(this.btnExport);
-            this.Controls.Add(this.buttonEdit);
-            this.Controls.Add(this.buttonAdd);
+            this.Controls.Add(this.toolBar);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.buttonOK);
@@ -215,6 +252,8 @@
             this.Load += new System.EventHandler(this.AllSpeciesForm_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            this.toolBar.ResumeLayout(false);
+            this.toolBar.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -232,10 +271,13 @@
         private System.Windows.Forms.Button buttonReset;
         private System.Windows.Forms.Button buttonApply;
         private System.Windows.Forms.CheckBox chkShowWithRecords;
-        private System.Windows.Forms.Button buttonAdd;
-        private System.Windows.Forms.Button buttonEdit;
         private System.Windows.Forms.ContextMenuStrip dropDownMenu;
-        private System.Windows.Forms.Button btnExport;
         private System.Windows.Forms.ListView lvTaxa;
+        private System.Windows.Forms.ToolStrip toolBar;
+        private System.Windows.Forms.ToolStripButton tbAdd;
+        private System.Windows.Forms.ToolStripButton tbRemove;
+        private System.Windows.Forms.ToolStripButton tbEdit;
+        private System.Windows.Forms.ToolStripButton tbExport;
+        private System.Windows.Forms.ToolStripButton tbImport;
     }
 }

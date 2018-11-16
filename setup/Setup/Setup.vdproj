@@ -69,6 +69,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_374B6D0B30459AA84A80099478ABAB8C"
+        "OwnerKey" = "8:_2D8D7F9F8D2848B59928476736B21088"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_3B9CF9196F3B4DE3B6DAC28B6EF7A486"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -225,6 +231,18 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_DC67815199399F802A8D56B73928EA39"
+        "OwnerKey" = "8:_2D8D7F9F8D2848B59928476736B21088"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_DC67815199399F802A8D56B73928EA39"
+        "OwnerKey" = "8:_374B6D0B30459AA84A80099478ABAB8C"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_E0623AEEF5C62A312C370CBF00FF49DE"
         "OwnerKey" = "8:_2D8D7F9F8D2848B59928476736B21088"
         "MsmSig" = "8:_UNDEFINED"
@@ -280,6 +298,12 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_374B6D0B30459AA84A80099478ABAB8C"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_3DB35E6B29A4C7E61120D1D549486836"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -305,6 +329,12 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_3EBA3C9E992CA3E626D1008916EA5218"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_DC67815199399F802A8D56B73928EA39"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -412,7 +442,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Owf.Controls.Office2007ColorPicker, Version=1.0.6885.34573, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Owf.Controls.Office2007ColorPicker, Version=1.0.6892.24411, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_059AB449DD051886E35C5F5AA11F0EDE"
@@ -599,6 +629,37 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_374B6D0B30459AA84A80099478ABAB8C"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:HtmlAgilityPack, Version=1.8.10.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_374B6D0B30459AA84A80099478ABAB8C"
+                    {
+                    "Name" = "8:HtmlAgilityPack.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:HtmlAgilityPack.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_294D09F47B1E4BEC9A6B0F2F033191E9"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3B9CF9196F3B4DE3B6DAC28B6EF7A486"
@@ -1138,6 +1199,37 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_DC67815199399F802A8D56B73928EA39"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:System.Net.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
+                "ScatterAssemblies"
+                {
+                    "_DC67815199399F802A8D56B73928EA39"
+                    {
+                    "Name" = "8:System.Net.Http.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:System.Net.Http.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_294D09F47B1E4BEC9A6B0F2F033191E9"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_E0623AEEF5C62A312C370CBF00FF49DE"
             {
             "AssemblyRegister" = "3:1"
@@ -1301,7 +1393,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Fisheries Assessment Database"
         "ProductCode" = "8:{85D290DB-DFE6-4B6C-B04C-5B36FA09DB91}"
-        "PackageCode" = "8:{634420E0-9FE5-4649-922C-89AA1AE7F3BA}"
+        "PackageCode" = "8:{E0D62B0B-7D94-448F-9D13-AC25FCED307B}"
         "UpgradeCode" = "8:{60988C37-38EC-41CE-B9B2-C691852182A4}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"

@@ -1,6 +1,6 @@
 ﻿namespace FAD3.Database.Forms
 {
-    partial class ExportDialogForm
+    partial class ExportImportDialogForm
     {
         /// <summary>
         /// Required designer variable.
@@ -56,14 +56,14 @@
             // checkBox1
             // 
             this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(46, 39);
+            this.checkBox1.Location = new System.Drawing.Point(12, 12);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(80, 17);
             this.checkBox1.TabIndex = 3;
             this.checkBox1.Text = "checkBox1";
             this.checkBox1.UseVisualStyleBackColor = true;
             // 
-            // ExportDialogForm
+            // ExportImportDialogForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -72,7 +72,7 @@
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnOk);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
-            this.Name = "ExportDialogForm";
+            this.Name = "ExportImportDialogForm";
             this.Text = "Export";
             this.Load += new System.EventHandler(this.OnFormLoad);
             this.ResumeLayout(false);

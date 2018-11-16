@@ -10,6 +10,7 @@ using System.IO;
 using System.Text;
 using MetaphoneCOM;
 using HtmlAgilityPack;
+using System.Xml;
 
 namespace FAD3
 {
@@ -44,6 +45,239 @@ namespace FAD3
                 }
                 return _allSpeciesDictionary;
             }
+        }
+
+        public static Dictionary<string, (string genus, string species, Taxa taxa, bool inFishbase, int? fishBaseSpeciesNo)> GetSpeciesDict()
+        {
+            Dictionary<string, (string genus, string species, Taxa taxa, bool inFishbase, int? fishBaseSpeciesNo)> dict = new Dictionary<string, (string genus, string species, Taxa taxa, bool inFishbase, int? fishBaseSpeciesNo)>();
+            const string sql = "SELECT SpeciesGUID, Genus, species, TaxaNo, ListedFB, FBSpNo FROM tblAllSpecies";
+            using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
+            {
+                conection.Open();
+                var adapter = new OleDbDataAdapter(sql, conection);
+                var dt = new DataTable();
+                adapter.Fill(dt);
+                foreach (DataRow dr in dt.Rows)
+                {
+                    int? fbNo = null;
+                    if (int.TryParse(dr["FBSpNo"].ToString(), out int spNo))
+                    {
+                        fbNo = spNo;
+                    }
+                    dict.Add(dr["SpeciesGUID"].ToString(), (dr["Genus"].ToString(), dr["species"].ToString(), (Taxa)dr["TaxaNo"], (bool)dr["ListedFB"], fbNo));
+                }
+            }
+            return dict;
+        }
+
+        public static bool DeleteLocalName(string localNameGuid, string localName)
+        {
+            bool success = false;
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                var sql = $"Delete * from tblBaseLocalNames where NameNo={{{localNameGuid}}}";
+                using (OleDbCommand delete = new OleDbCommand(sql, conn))
+                {
+                    try
+                    {
+                        success = delete.ExecuteNonQuery() > 0;
+                        if (success)
+                        {
+                            _localNameList.Remove(localName);
+                            _localNameListDict.Remove(localNameGuid);
+                            _localNameListDictReverse.Remove(localName);
+                            sql = $"Delete * from temp_AllNames where NameNo={{{localNameGuid}}}";
+                            using (OleDbCommand deleteFromTemp = new OleDbCommand(sql, conn))
+                            {
+                                deleteFromTemp.ExecuteNonQuery();
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        //ignore
+                    }
+                }
+            }
+
+            return success;
+        }
+
+        public static int ImportLocalNames(string fileName)
+        {
+            var saveCounter = 0;
+            var elementCounter = 0;
+            var proceed = false;
+            switch (Path.GetExtension(fileName))
+            {
+                case ".txt":
+                    break;
+
+                case ".xml":
+                case ".XML":
+                    XmlTextReader xmlReader = new XmlTextReader(fileName);
+                    var localName = "";
+                    var localNameGuid = "";
+                    while ((elementCounter == 0 || (elementCounter > 0 && proceed)) && xmlReader.Read())
+                    {
+                        switch (xmlReader.NodeType)
+                        {
+                            case XmlNodeType.Element:
+                                if (elementCounter == 0 && xmlReader.Name == "LocalNames")
+                                {
+                                    proceed = true;
+                                }
+                                if (xmlReader.Name == "LocalName")
+                                {
+                                    localNameGuid = xmlReader.GetAttribute("guid");
+                                    elementCounter++;
+                                }
+
+                                break;
+
+                            case XmlNodeType.Text:
+                                localName = xmlReader.Value;
+                                break;
+                        }
+
+                        if (localName?.Length > 0 && localNameGuid?.Length > 0)
+                        {
+                            if (SaveNewLocalName(localName, localNameGuid))
+                            {
+                                saveCounter++;
+                            }
+                            localName = "";
+                            localNameGuid = "";
+                        }
+                    }
+
+                    break;
+            }
+            return saveCounter;
+        }
+
+        public static int ImportSpeciesNames(string fileName)
+        {
+            var saveCounter = 0;
+            var elementCounter = 0;
+            var proceed = false;
+            switch (Path.GetExtension(fileName))
+            {
+                case ".txt":
+                    break;
+
+                case ".xml":
+                case ".XML":
+                    XmlTextReader xmlReader = new XmlTextReader(fileName);
+                    var genus = "";
+                    var species = "";
+                    var speciesGuid = "";
+                    Taxa taxa = Taxa.Fish;
+                    bool inFisbase = false;
+                    int? fbSPNo = null;
+                    while ((elementCounter == 0 || (elementCounter > 0 && proceed)) && xmlReader.Read())
+                    {
+                        switch (xmlReader.NodeType)
+                        {
+                            case XmlNodeType.Element:
+                                if (elementCounter == 0 && xmlReader.Name == "SpeciesNames")
+                                {
+                                    proceed = true;
+                                }
+                                if (xmlReader.Name == "SpeciesName")
+                                {
+                                    speciesGuid = xmlReader.GetAttribute("guid");
+                                    genus = xmlReader.GetAttribute("genus");
+                                    species = xmlReader.GetAttribute("species");
+                                    taxa = (Taxa)Enum.Parse(typeof(Taxa), xmlReader.GetAttribute("taxa"));
+                                    inFisbase = bool.Parse(xmlReader.GetAttribute("inFishbase"));
+                                    fbSPNo = null;
+                                    if (int.TryParse(xmlReader.GetAttribute("fishBaseSpNo"), out int spNo))
+                                    {
+                                        fbSPNo = spNo;
+                                    }
+                                    elementCounter++;
+                                }
+
+                                break;
+                        }
+
+                        if (genus?.Length > 0 && species?.Length > 0 && speciesGuid.Length > 0)
+                        {
+                            var mph = new DoubleMetaphoneShort();
+                            short spKey1 = 0;
+                            short spKey2 = 0;
+                            short gnKey1 = 0;
+                            short gnKey2 = 0;
+                            mph.ComputeMetaphoneKeys(genus, out gnKey1, out gnKey2);
+                            mph.ComputeMetaphoneKeys(species, out spKey1, out spKey2);
+                            if (UpdateSpeciesData(fad3DataStatus.statusNew, speciesGuid, genus, species, taxa, gnKey1, gnKey2, spKey1, spKey2, inFisbase, fbSPNo, ""))
+                            {
+                                saveCounter++;
+                            }
+                            genus = "";
+                            species = "";
+                            speciesGuid = "";
+                        }
+                    }
+
+                    break;
+            }
+            return saveCounter;
+        }
+
+        public static int ImportLanguages(string fileName)
+        {
+            var saveCounter = 0;
+            var elementCounter = 0;
+            var proceed = false;
+            switch (Path.GetExtension(fileName))
+            {
+                case ".txt":
+                    break;
+
+                case ".xml":
+                case ".XML":
+                    XmlTextReader xmlReader = new XmlTextReader(fileName);
+                    var language = "";
+                    var languageGuid = "";
+                    while ((elementCounter == 0 || (elementCounter > 0 && proceed)) && xmlReader.Read())
+                    {
+                        switch (xmlReader.NodeType)
+                        {
+                            case XmlNodeType.Element:
+                                if (elementCounter == 0 && xmlReader.Name == "Languages")
+                                {
+                                    proceed = true;
+                                }
+                                if (xmlReader.Name == "Language")
+                                {
+                                    languageGuid = xmlReader.GetAttribute("guid");
+                                    elementCounter++;
+                                }
+
+                                break;
+
+                            case XmlNodeType.Text:
+                                language = xmlReader.Value;
+                                break;
+                        }
+
+                        if (language?.Length > 0 && languageGuid?.Length > 0)
+                        {
+                            if (SaveNewLanguage(language, languageGuid))
+                            {
+                                saveCounter++;
+                            }
+                            language = "";
+                            languageGuid = "";
+                        }
+                    }
+
+                    break;
+            }
+            return saveCounter;
         }
 
         public static Dictionary<string, string> AllSpeciesReverseDictionary
@@ -344,6 +578,38 @@ namespace FAD3
             }
             MakeAllNames();
             return savedCount;
+        }
+
+        public static bool SaveNewLanguage(string language, string languageGuid)
+        {
+            string sql;
+            bool success = false;
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+
+                sql = $@"Insert into tblLanguages
+                           (LanguageUsedGuid, LanguageUsed) values (
+                            {{{languageGuid}}}, '{language}')";
+
+                using (OleDbCommand update = new OleDbCommand(sql, conn))
+                {
+                    try
+                    {
+                        success = update.ExecuteNonQuery() > 0;
+                        if (success)
+                        {
+                            _languages.Add(languageGuid, language);
+                            _languageDictReverse.Add(language, languageGuid);
+                        }
+                    }
+                    catch
+                    {
+                        //ignore
+                    }
+                }
+            }
+            return success;
         }
 
         public static (bool success, string guid) SaveNewLanguage(string language)
@@ -1130,12 +1396,22 @@ namespace FAD3
             return isListed;
         }
 
-        public static (bool success, string newGuid) SaveNewLocalName(NewFisheryObjectName newName)
+        public static bool SaveNewLocalName(string newName, string guid)
+        {
+            NewFisheryObjectName nfo = new NewFisheryObjectName(newName, FisheryObjectNameType.CatchLocalName);
+            var result = SaveNewLocalName(nfo, guid);
+            return result.success;
+        }
+
+        public static (bool success, string newGuid) SaveNewLocalName(NewFisheryObjectName newName, string guid = "")
         {
             var newLocalName = newName.NewName.Trim();
             var key1 = newName.Key1;
             var key2 = newName.Key2;
-            var guid = newName.ObjectGUID;
+            if (guid.Length == 0)
+            {
+                guid = newName.ObjectGUID;
+            }
             bool success = false;
             using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
             {
@@ -1159,6 +1435,13 @@ namespace FAD3
                             _localNameList.Add(newLocalName);
                             _localNameListDict.Add(guid, newLocalName);
                             _localNameListDictReverse.Add(newLocalName, guid);
+
+                            sql = $@"Insert into temp_AllNames (Name1,NameNo,Identification) values (
+                                '{newLocalName}', {{{guid}}}, 'Local names')";
+                            using (OleDbCommand updateTemp = new OleDbCommand(sql, conn))
+                            {
+                                updateTemp.ExecuteNonQuery();
+                            }
                         }
                     }
                 }

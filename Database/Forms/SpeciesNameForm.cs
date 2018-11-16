@@ -175,6 +175,11 @@ namespace FAD3
 
                 buttonEdit.Enabled = false;
             }
+            if (ReadOnly)
+            {
+                buttonCancel.Visible = false;
+                buttonOK.Text = "Close";
+            }
         }
 
         private void OnListViewDoubleClick(object sender, EventArgs e)

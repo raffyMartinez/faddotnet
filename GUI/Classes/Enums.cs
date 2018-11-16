@@ -1,13 +1,38 @@
 ﻿namespace FAD3.GUI.Classes
 {
-    public enum ExportDataType
+    public enum ExportImportAction
     {
-        ExportDataSpecies,
-        ExportDataGears,
-        ExportDataLanguages,
-        ExportDataCatchLocalNames,
-        ExportDataCatchLocalNameSpecies,
-        ExportDataSelect
+        ActionExport,
+        ActionImport
+    }
+
+    public enum DataFileType
+    {
+        None = 0,
+        Text = 1,
+        HTML = 2,
+        XML = 4,
+        Excel = 8,
+        CSV = 16
+    }
+
+    public enum FileDialogType
+    {
+        FileOpen,
+        FileSave
+    }
+
+    public enum ExportImportDataType
+    {
+        None = 0,
+        SpeciesNames = 1,
+        GearsVariation = 2,
+        GearsLocalName = 4,
+        LocalNameLanguages = 8,
+        CatchLocalNames = 16,
+        CatchLocalNameSpeciesNamePair = 32,
+        CatchNametDataSelect = 64,
+        GearNameDataSelect = 128
     }
 
     public enum EditActionType

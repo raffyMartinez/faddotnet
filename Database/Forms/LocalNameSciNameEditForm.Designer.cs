@@ -137,7 +137,7 @@
             this.Controls.Add(this.cboLocalName);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "LocalNameSciNameEditForm";
-            this.Text = "Edit local/common name - species name pair";
+            this.Text = "Add local/common name - species name pair";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnFormClosed);
             this.Load += new System.EventHandler(this.OnFormLoad);
             this.ResumeLayout(false);

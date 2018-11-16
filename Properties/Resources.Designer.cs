@@ -173,6 +173,16 @@ namespace FAD3.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap BigProp {
+            get {
+                object obj = ResourceManager.GetObject("BigProp", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap BLD {
             get {
                 object obj = ResourceManager.GetObject("BLD", resourceCulture);
@@ -206,6 +216,16 @@ namespace FAD3.Properties {
         internal static System.Drawing.Bitmap Close_16x {
             get {
                 object obj = ResourceManager.GetObject("Close_16x", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap close_document {
+            get {
+                object obj = ResourceManager.GetObject("close_document", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -278,6 +298,16 @@ namespace FAD3.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Edit_16xMD {
+            get {
+                object obj = ResourceManager.GetObject("Edit_16xMD", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Export_16x {
             get {
                 object obj = ResourceManager.GetObject("Export_16x", resourceCulture);
@@ -302,6 +332,136 @@ namespace FAD3.Properties {
             get {
                 object obj = ResourceManager.GetObject("FAD3", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap fish_blue_close28 {
+            get {
+                object obj = ResourceManager.GetObject("fish_blue_close28", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap fish_blue_document28 {
+            get {
+                object obj = ResourceManager.GetObject("fish_blue_document28", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap fish_blue_help28 {
+            get {
+                object obj = ResourceManager.GetObject("fish_blue_help28", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap fish_blue_map28 {
+            get {
+                object obj = ResourceManager.GetObject("fish_blue_map28", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap fish_blue28 {
+            get {
+                object obj = ResourceManager.GetObject("fish_blue28", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap fish_document {
+            get {
+                object obj = ResourceManager.GetObject("fish_document", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap fish_document2 {
+            get {
+                object obj = ResourceManager.GetObject("fish_document2", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap fish_document3 {
+            get {
+                object obj = ResourceManager.GetObject("fish_document3", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap fish_hook_blue28 {
+            get {
+                object obj = ResourceManager.GetObject("fish_hook_blue28", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap fish_hook_document {
+            get {
+                object obj = ResourceManager.GetObject("fish_hook_document", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap fish_list {
+            get {
+                object obj = ResourceManager.GetObject("fish_list", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap fish_map_document {
+            get {
+                object obj = ResourceManager.GetObject("fish_map_document", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap fish_report_blue28 {
+            get {
+                object obj = ResourceManager.GetObject("fish_report_blue28", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
@@ -361,6 +521,16 @@ namespace FAD3.Properties {
         internal static System.Drawing.Bitmap help_browser {
             get {
                 object obj = ResourceManager.GetObject("help_browser", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap help_document {
+            get {
+                object obj = ResourceManager.GetObject("help_document", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -441,6 +611,16 @@ namespace FAD3.Properties {
         internal static System.Drawing.Bitmap Import_16x {
             get {
                 object obj = ResourceManager.GetObject("Import_16x", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ImportFile_16x {
+            get {
+                object obj = ResourceManager.GetObject("ImportFile_16x", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -871,6 +1051,16 @@ namespace FAD3.Properties {
         internal static System.Drawing.Bitmap Remove_16xSM {
             get {
                 object obj = ResourceManager.GetObject("Remove_16xSM", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap report_document {
+            get {
+                object obj = ResourceManager.GetObject("report_document", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

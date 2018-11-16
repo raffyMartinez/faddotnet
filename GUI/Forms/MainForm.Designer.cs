@@ -61,12 +61,6 @@ namespace FAD3
             this.uTMZone50ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.uTMZone51ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cholorophyllGridMappingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.importFishbaseSpecies = new System.Windows.Forms.ToolStripMenuItem();
-            this.importNonfishSpeciesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.importFishbaseCommonlocalNamesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.localNames = new System.Windows.Forms.ToolStripMenuItem();
-            this.itemViewBySciName = new System.Windows.Forms.ToolStripMenuItem();
-            this.itemViewByLocalName = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.onlineManualToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -90,10 +84,10 @@ namespace FAD3
             this.tsButtonAbout = new System.Windows.Forms.ToolStripButton();
             this.tsButtonGear = new System.Windows.Forms.ToolStripButton();
             this.tsButtonFish = new System.Windows.Forms.ToolStripButton();
+            this.tsButtonLN2SN = new System.Windows.Forms.ToolStripButton();
             this.tsButtonReport = new System.Windows.Forms.ToolStripButton();
             this.tsButtonMap = new System.Windows.Forms.ToolStripButton();
             this.tsButtonExit = new System.Windows.Forms.ToolStripButton();
-            this.importLanguagesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMenuBar.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.tblLayout.SuspendLayout();
@@ -232,12 +226,7 @@ namespace FAD3
             this.toolStripSeparator2,
             this.generateInlandDbToolStripMenuItem,
             this.generateGridMapToolStripMenuItem,
-            this.cholorophyllGridMappingToolStripMenuItem,
-            this.importLanguagesToolStripMenuItem,
-            this.importFishbaseSpecies,
-            this.importNonfishSpeciesToolStripMenuItem,
-            this.importFishbaseCommonlocalNamesToolStripMenuItem,
-            this.localNames});
+            this.cholorophyllGridMappingToolStripMenuItem});
             this.menuTools.Name = "menuTools";
             this.menuTools.Size = new System.Drawing.Size(48, 20);
             this.menuTools.Text = "Tools";
@@ -246,47 +235,47 @@ namespace FAD3
             // resetReferenceNumbersToolStripMenuItem
             // 
             this.resetReferenceNumbersToolStripMenuItem.Name = "resetReferenceNumbersToolStripMenuItem";
-            this.resetReferenceNumbersToolStripMenuItem.Size = new System.Drawing.Size(281, 22);
+            this.resetReferenceNumbersToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
             this.resetReferenceNumbersToolStripMenuItem.Tag = "resetRefNos";
             this.resetReferenceNumbersToolStripMenuItem.Text = "Reset reference numbers";
             // 
             // referenceNumberRangeToolStripMenuItem
             // 
             this.referenceNumberRangeToolStripMenuItem.Name = "referenceNumberRangeToolStripMenuItem";
-            this.referenceNumberRangeToolStripMenuItem.Size = new System.Drawing.Size(281, 22);
+            this.referenceNumberRangeToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
             this.referenceNumberRangeToolStripMenuItem.Tag = "refNoRange";
             this.referenceNumberRangeToolStripMenuItem.Text = "Reference number range";
             // 
             // coordinateFormatToolStripMenuItem
             // 
             this.coordinateFormatToolStripMenuItem.Name = "coordinateFormatToolStripMenuItem";
-            this.coordinateFormatToolStripMenuItem.Size = new System.Drawing.Size(281, 22);
+            this.coordinateFormatToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
             this.coordinateFormatToolStripMenuItem.Tag = "coordFormat";
             this.coordinateFormatToolStripMenuItem.Text = "Coordinate format";
             // 
             // symbolFontsToolStripMenuItem
             // 
             this.symbolFontsToolStripMenuItem.Name = "symbolFontsToolStripMenuItem";
-            this.symbolFontsToolStripMenuItem.Size = new System.Drawing.Size(281, 22);
+            this.symbolFontsToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
             this.symbolFontsToolStripMenuItem.Tag = "symbolFonts";
             this.symbolFontsToolStripMenuItem.Text = "Symbol fonts";
             // 
             // showErrorMessagesToolStripMenuItem
             // 
             this.showErrorMessagesToolStripMenuItem.Name = "showErrorMessagesToolStripMenuItem";
-            this.showErrorMessagesToolStripMenuItem.Size = new System.Drawing.Size(281, 22);
+            this.showErrorMessagesToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
             this.showErrorMessagesToolStripMenuItem.Tag = "showError";
             this.showErrorMessagesToolStripMenuItem.Text = "Show error messages";
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(278, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(215, 6);
             // 
             // generateInlandDbToolStripMenuItem
             // 
             this.generateInlandDbToolStripMenuItem.Name = "generateInlandDbToolStripMenuItem";
-            this.generateInlandDbToolStripMenuItem.Size = new System.Drawing.Size(281, 22);
+            this.generateInlandDbToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
             this.generateInlandDbToolStripMenuItem.Tag = "createInland";
             this.generateInlandDbToolStripMenuItem.Text = "Create inland grid database";
             this.generateInlandDbToolStripMenuItem.ToolTipText = "Creates a database containing minor grids that are located inland";
@@ -297,7 +286,7 @@ namespace FAD3
             this.uTMZone50ToolStripMenuItem,
             this.uTMZone51ToolStripMenuItem});
             this.generateGridMapToolStripMenuItem.Name = "generateGridMapToolStripMenuItem";
-            this.generateGridMapToolStripMenuItem.Size = new System.Drawing.Size(281, 22);
+            this.generateGridMapToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
             this.generateGridMapToolStripMenuItem.Text = "Generate grid map";
             this.generateGridMapToolStripMenuItem.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnGenerateGridMapToolStripMenuItem_DropDownItemClicked);
             // 
@@ -319,53 +308,9 @@ namespace FAD3
             // 
             this.cholorophyllGridMappingToolStripMenuItem.Enabled = false;
             this.cholorophyllGridMappingToolStripMenuItem.Name = "cholorophyllGridMappingToolStripMenuItem";
-            this.cholorophyllGridMappingToolStripMenuItem.Size = new System.Drawing.Size(281, 22);
+            this.cholorophyllGridMappingToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
             this.cholorophyllGridMappingToolStripMenuItem.Tag = "chlorophyll";
             this.cholorophyllGridMappingToolStripMenuItem.Text = "Cholorophyll grid mapping";
-            // 
-            // importFishbaseSpecies
-            // 
-            this.importFishbaseSpecies.Name = "importFishbaseSpecies";
-            this.importFishbaseSpecies.Size = new System.Drawing.Size(281, 22);
-            this.importFishbaseSpecies.Tag = "importSpecies";
-            this.importFishbaseSpecies.Text = "Import Fishbase species names";
-            // 
-            // importNonfishSpeciesToolStripMenuItem
-            // 
-            this.importNonfishSpeciesToolStripMenuItem.Name = "importNonfishSpeciesToolStripMenuItem";
-            this.importNonfishSpeciesToolStripMenuItem.Size = new System.Drawing.Size(281, 22);
-            this.importNonfishSpeciesToolStripMenuItem.Tag = "importNonFishSpecies";
-            this.importNonfishSpeciesToolStripMenuItem.Text = "Import non-fish species";
-            // 
-            // importFishbaseCommonlocalNamesToolStripMenuItem
-            // 
-            this.importFishbaseCommonlocalNamesToolStripMenuItem.Name = "importFishbaseCommonlocalNamesToolStripMenuItem";
-            this.importFishbaseCommonlocalNamesToolStripMenuItem.Size = new System.Drawing.Size(281, 22);
-            this.importFishbaseCommonlocalNamesToolStripMenuItem.Tag = "importLocalCommon";
-            this.importFishbaseCommonlocalNamesToolStripMenuItem.Text = "Import Fishbase common/local names";
-            // 
-            // localNames
-            // 
-            this.localNames.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.itemViewBySciName,
-            this.itemViewByLocalName});
-            this.localNames.Name = "localNames";
-            this.localNames.Size = new System.Drawing.Size(281, 22);
-            this.localNames.Tag = "localNamesToSciNames";
-            this.localNames.Text = "Local/common names - species names";
-            this.localNames.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnMenuLocalNameItemClick);
-            // 
-            // itemViewBySciName
-            // 
-            this.itemViewBySciName.Name = "itemViewBySciName";
-            this.itemViewBySciName.Size = new System.Drawing.Size(230, 22);
-            this.itemViewBySciName.Text = "View by species name";
-            // 
-            // itemViewByLocalName
-            // 
-            this.itemViewByLocalName.Name = "itemViewByLocalName";
-            this.itemViewByLocalName.Size = new System.Drawing.Size(230, 22);
-            this.itemViewByLocalName.Text = "View by local/common name";
             // 
             // menuHelp
             // 
@@ -599,17 +544,18 @@ namespace FAD3
             // toolbar
             // 
             this.toolbar.ClickThrough = true;
-            this.toolbar.ImageScalingSize = new System.Drawing.Size(24, 24);
+            this.toolbar.ImageScalingSize = new System.Drawing.Size(28, 28);
             this.toolbar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tsButtonAbout,
             this.tsButtonGear,
             this.tsButtonFish,
+            this.tsButtonLN2SN,
             this.tsButtonReport,
             this.tsButtonMap,
             this.tsButtonExit});
             this.toolbar.Location = new System.Drawing.Point(0, 24);
             this.toolbar.Name = "toolbar";
-            this.toolbar.Size = new System.Drawing.Size(970, 31);
+            this.toolbar.Size = new System.Drawing.Size(970, 35);
             this.toolbar.SuppressHighlighting = true;
             this.toolbar.TabIndex = 3;
             this.toolbar.Text = "toolStripEx1";
@@ -621,7 +567,7 @@ namespace FAD3
             this.tsButtonAbout.Image = global::FAD3.Properties.Resources.help_browser;
             this.tsButtonAbout.ImageTransparentColor = System.Drawing.Color.White;
             this.tsButtonAbout.Name = "tsButtonAbout";
-            this.tsButtonAbout.Size = new System.Drawing.Size(28, 28);
+            this.tsButtonAbout.Size = new System.Drawing.Size(32, 32);
             this.tsButtonAbout.Text = "toolStripButton1";
             this.tsButtonAbout.ToolTipText = "About FAD3";
             // 
@@ -631,7 +577,7 @@ namespace FAD3
             this.tsButtonGear.Image = global::FAD3.Properties.Resources.imHook;
             this.tsButtonGear.ImageTransparentColor = System.Drawing.Color.White;
             this.tsButtonGear.Name = "tsButtonGear";
-            this.tsButtonGear.Size = new System.Drawing.Size(28, 28);
+            this.tsButtonGear.Size = new System.Drawing.Size(32, 32);
             this.tsButtonGear.Text = "toolStripButton2";
             this.tsButtonGear.ToolTipText = "Fishing gears";
             // 
@@ -641,9 +587,20 @@ namespace FAD3
             this.tsButtonFish.Image = global::FAD3.Properties.Resources.fish2;
             this.tsButtonFish.ImageTransparentColor = System.Drawing.Color.White;
             this.tsButtonFish.Name = "tsButtonFish";
-            this.tsButtonFish.Size = new System.Drawing.Size(28, 28);
+            this.tsButtonFish.Size = new System.Drawing.Size(32, 32);
             this.tsButtonFish.Text = "toolStripButton3";
             this.tsButtonFish.ToolTipText = "Species";
+            // 
+            // tsButtonLN2SN
+            // 
+            this.tsButtonLN2SN.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsButtonLN2SN.Image = global::FAD3.Properties.Resources.fish_list;
+            this.tsButtonLN2SN.ImageTransparentColor = System.Drawing.Color.White;
+            this.tsButtonLN2SN.Name = "tsButtonLN2SN";
+            this.tsButtonLN2SN.Size = new System.Drawing.Size(32, 32);
+            this.tsButtonLN2SN.Text = "toolStripButton1";
+            this.tsButtonLN2SN.TextImageRelation = System.Windows.Forms.TextImageRelation.TextAboveImage;
+            this.tsButtonLN2SN.ToolTipText = "Local names to species names";
             // 
             // tsButtonReport
             // 
@@ -651,7 +608,7 @@ namespace FAD3
             this.tsButtonReport.Image = global::FAD3.Properties.Resources.system_file_manager;
             this.tsButtonReport.ImageTransparentColor = System.Drawing.Color.White;
             this.tsButtonReport.Name = "tsButtonReport";
-            this.tsButtonReport.Size = new System.Drawing.Size(28, 28);
+            this.tsButtonReport.Size = new System.Drawing.Size(32, 32);
             this.tsButtonReport.Text = "toolStripButton4";
             this.tsButtonReport.ToolTipText = "Reports";
             // 
@@ -661,7 +618,7 @@ namespace FAD3
             this.tsButtonMap.Image = global::FAD3.Properties.Resources.internet_web_browser;
             this.tsButtonMap.ImageTransparentColor = System.Drawing.Color.White;
             this.tsButtonMap.Name = "tsButtonMap";
-            this.tsButtonMap.Size = new System.Drawing.Size(28, 28);
+            this.tsButtonMap.Size = new System.Drawing.Size(32, 32);
             this.tsButtonMap.Text = "toolStripButton5";
             this.tsButtonMap.ToolTipText = "Map";
             // 
@@ -671,16 +628,9 @@ namespace FAD3
             this.tsButtonExit.Image = global::FAD3.Properties.Resources.im_exit;
             this.tsButtonExit.ImageTransparentColor = System.Drawing.Color.White;
             this.tsButtonExit.Name = "tsButtonExit";
-            this.tsButtonExit.Size = new System.Drawing.Size(28, 28);
+            this.tsButtonExit.Size = new System.Drawing.Size(32, 32);
             this.tsButtonExit.Text = "toolStripButton6";
             this.tsButtonExit.ToolTipText = "Exit";
-            // 
-            // importLanguagesToolStripMenuItem
-            // 
-            this.importLanguagesToolStripMenuItem.Name = "importLanguagesToolStripMenuItem";
-            this.importLanguagesToolStripMenuItem.Size = new System.Drawing.Size(281, 22);
-            this.importLanguagesToolStripMenuItem.Tag = "importLanguages";
-            this.importLanguagesToolStripMenuItem.Text = "Import languages";
             // 
             // MainForm
             // 
@@ -762,12 +712,6 @@ namespace FAD3
         private System.Windows.Forms.ListView lvMain;
         private System.Windows.Forms.Label lblErrorFormOpen;
         private System.Windows.Forms.Label lblTitle;
-        private System.Windows.Forms.ToolStripMenuItem importFishbaseSpecies;
-        private System.Windows.Forms.ToolStripMenuItem localNames;
-        private System.Windows.Forms.ToolStripMenuItem itemViewBySciName;
-        private System.Windows.Forms.ToolStripMenuItem itemViewByLocalName;
-        private System.Windows.Forms.ToolStripMenuItem importFishbaseCommonlocalNamesToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem importNonfishSpeciesToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem importLanguagesToolStripMenuItem;
+        private System.Windows.Forms.ToolStripButton tsButtonLN2SN;
     }
 }

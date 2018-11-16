@@ -1646,6 +1646,18 @@ namespace FAD3
                     asf.ShowDialog(this);
                     break;
 
+                case "tsButtonLN2SN":
+                    CatchLocalNamesForm clnf = CatchLocalNamesForm.GetInstance(Identification.Scientific);
+                    if (clnf.Visible)
+                    {
+                        clnf.BringToFront();
+                    }
+                    else
+                    {
+                        clnf.Show(this);
+                    }
+                    break;
+
                 case "tsButtonReport":
 
                     break;

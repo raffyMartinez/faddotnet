@@ -8,6 +8,8 @@ using System.Text;
 using System.Windows.Forms;
 using MetaphoneCOM;
 using FAD3.GUI.Classes;
+using FAD3.Database.Classes;
+using FAD3.Database.Forms;
 
 namespace FAD3
 {
@@ -24,6 +26,7 @@ namespace FAD3
         private string _localNameGuid = "";
         private string _localName;
         private fad3GearEditAction _action;
+        private string _currentList;
 
         private SamplingForm _parentForm;
         private static GearCodesUsageForm _instance;
@@ -395,15 +398,12 @@ namespace FAD3
             }
         }
 
-        private void OnlistView_MouseClick(object sender, MouseEventArgs e)
-        {
-        }
-
         private void OnListView_MouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
                 var lv = (ListView)sender;
+                _currentList = lv.Name;
                 ListViewHitTestInfo info = lv.HitTest(e.X, e.Y);
                 if (info.Item != null)
                 {
@@ -717,6 +717,43 @@ namespace FAD3
                         listViewVariations.Items.Add(_gearVarGuid, gearVariationName, null);
                     }
                 }
+            }
+        }
+
+        private void OnToolbarItemClick(object sender, ToolStripItemClickedEventArgs e)
+        {
+            switch (e.ClickedItem.Name)
+            {
+                case "tbAdd":
+                    break;
+
+                case "tbRemove":
+                    break;
+
+                case "tbEdit":
+                    break;
+
+                case "tbExport":
+                    using (ExportImportDialogForm eidf = new ExportImportDialogForm(ExportImportDataType.GearNameDataSelect, ExportImportAction.ActionExport))
+                    {
+                        eidf.ShowDialog(this);
+                        if (eidf.DialogResult == DialogResult.OK)
+                        {
+                            var result = eidf.Selection;
+                        }
+                    }
+                    break;
+
+                case "tbImport":
+                    using (ExportImportDialogForm eidf = new ExportImportDialogForm(ExportImportDataType.GearNameDataSelect, ExportImportAction.ActionImport))
+                    {
+                        eidf.ShowDialog(this);
+                        if (eidf.DialogResult == DialogResult.OK)
+                        {
+                            var result = eidf.Selection;
+                        }
+                    }
+                    break;
             }
         }
     }

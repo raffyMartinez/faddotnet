@@ -213,33 +213,41 @@ namespace FAD3.Database.Forms
 
                 item = dropDownMenu.Items.Add("Delete");
                 item.Name = "menuDelete";
+                item.Enabled = listBox.Text.Length > 0;
 
                 item = dropDownMenu.Items.Add("Edit");
                 item.Name = "menuEdit";
+                item.Enabled = listBox.Text.Length > 0;
 
                 item = dropDownMenu.Items.Add("Details");
                 item.Name = "menuDetails";
+                item.Enabled = listBox.Text.Length > 0 && _idType == Identification.LocalName;
 
                 dropDownMenu.Items.Add("-");
 
                 item = dropDownMenu.Items.Add("Show on navigation tree");
                 item.Name = "menuShowNavigation";
+                item.Enabled = listBox.Text.Length > 0;
 
-                ToolStripMenuItem subMenu = new ToolStripMenuItem();
-                subMenu.Text = "Browse on WWW";
-
-                CatchNameURLGenerator.CatchName = listBox.Text;
-                foreach (var url in CatchNameURLGenerator.URLS)
+                if (listBox.Text.Length > 0 && _idType == Identification.LocalName)
                 {
-                    ToolStripMenuItem subItem = new ToolStripMenuItem();
-                    subItem.Text = url.Key;
-                    subItem.Tag = url.Value;
-                    subMenu.DropDownItems.Add(subItem);
+                    ToolStripMenuItem subMenu = new ToolStripMenuItem();
+                    subMenu.Text = "Browse on WWW";
+
+                    CatchNameURLGenerator.CatchName = listBox.Text;
+                    foreach (var url in CatchNameURLGenerator.URLS)
+                    {
+                        ToolStripMenuItem subItem = new ToolStripMenuItem();
+                        subItem.Text = url.Key;
+                        subItem.Tag = url.Value;
+                        subMenu.DropDownItems.Add(subItem);
+                        subMenu.Enabled = listBox.Text.Length > 0;
+                    }
+
+                    subMenu.DropDownItemClicked += OnSubMenuDropDownClick;
+
+                    dropDownMenu.Items.Add(subMenu);
                 }
-
-                subMenu.DropDownItemClicked += OnSubMenuDropDownClick;
-
-                dropDownMenu.Items.Add(subMenu);
             }
         }
 
