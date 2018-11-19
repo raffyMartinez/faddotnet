@@ -7,3 +7,8 @@ The installer for the software is now available. [Download the FAD3 installer zi
 Fisheries Assessment Database allows visualization of fishing effort, species distribution, and other maps. Make sure to install the free and awesomwe [MapWindows mapping component](https://github.com/raffyMartinez/fad3_vb6/blob/master/FAD3setup_3.0.211.exe) to enable mapping.
 
 Visit their [github page](https://github.com/MapWindow) to know more about MapWindows mapping software.
+
+New features of FAD
+* 1. Inventory of fishers, fishing vessels, and gears.
+* 2. Database of local names and equivalent species names in different languages/dialects. 
+* 3. Import and export datasets using html and xml formats.
