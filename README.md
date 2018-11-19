@@ -9,6 +9,6 @@ Fisheries Assessment Database allows visualization of fishing effort, species di
 Visit their [github page](https://github.com/MapWindow) to know more about MapWindows mapping software.
 
 New features of FAD
-* 1. Inventory of fishers, fishing vessels, and gears.
-* 2. Database of local names and equivalent species names in different languages/dialects. 
-* 3. Import and export datasets using html and xml formats.
+1. Inventory of fishers, fishing vessels, and gears.
+2. Database of local names and equivalent species names in different languages/dialects. 
+3. Import and export datasets using html and xml formats.
