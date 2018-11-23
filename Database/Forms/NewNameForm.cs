@@ -64,6 +64,18 @@ namespace FAD3.Database.Forms
                     lblTitle.Text = "Add new gear variation name";
                     _gearClassGuid = gearClassGuid;
                     break;
+
+                case FisheryObjectNameType.FishingAccessory:
+                    Text = "New fishing accessory";
+                    lblNewType.Text = "New accessory name";
+                    lblTitle.Text = "Add new fishing accessory";
+                    break;
+
+                case FisheryObjectNameType.FishingExpense:
+                    Text = "New fishing expense";
+                    lblNewType.Text = "New expense category";
+                    lblTitle.Text = "Add new fishing expense";
+                    break;
             }
             //DoLevenstein();
             txtLocalName.Text = _newObjectName.NewName;
@@ -120,6 +132,14 @@ namespace FAD3.Database.Forms
 
                         case FisheryObjectNameType.GearVariationName:
                             result = Gear.SaveNewVariationName(_newObjectName, _gearClassGuid);
+                            break;
+
+                        case FisheryObjectNameType.FishingAccessory:
+                            result.success = Gear.AddAccessory(_newObjectName.NewName);
+                            break;
+
+                        case FisheryObjectNameType.FishingExpense:
+                            result.success = Gear.AddExpense(_newObjectName.NewName);
                             break;
                     }
 

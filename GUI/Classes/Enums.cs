@@ -6,6 +6,24 @@
         ActionImport
     }
 
+    public enum OccurenceDataType
+    {
+        Species,
+        Gear
+    }
+
+    public enum FisheriesInventoryLevel
+    {
+        Project,
+        TargetArea,
+        Province,
+        Municipality,
+        Barangay,
+        Sitio,
+        FisherVessel,
+        Gear
+    }
+
     public enum DataFileType
     {
         None = 0,
@@ -28,11 +46,12 @@
         SpeciesNames = 1,
         GearsVariation = 2,
         GearsLocalName = 4,
-        LocalNameLanguages = 8,
-        CatchLocalNames = 16,
-        CatchLocalNameSpeciesNamePair = 32,
-        CatchNametDataSelect = 64,
-        GearNameDataSelect = 128
+        GearsClass = 8,
+        LocalNameLanguages = 16,
+        CatchLocalNames = 32,
+        CatchLocalNameSpeciesNamePair = 64,
+        CatchNametDataSelect = 128,
+        GearNameDataSelect = 256
     }
 
     public enum EditActionType
@@ -53,7 +72,9 @@
     {
         CatchLocalName,
         GearLocalName,
-        GearVariationName
+        GearVariationName,
+        FishingAccessory,
+        FishingExpense
     }
 
     public enum UIControlType
@@ -165,7 +186,13 @@
         defaultMode,
         grid25Mode,
         thematicPointMode,
-        fishingGroundMappingMode
+        fishingGroundMappingMode,
+        occurenceMappingGear,
+        occurenceMappingSpecies,
+        occurenceMappingGearAggregated,
+        occurenceMappingSpeciesAggregated,
+        effortMappingAggregated,
+        efforMapping
     }
 
     public enum ExtentCompare

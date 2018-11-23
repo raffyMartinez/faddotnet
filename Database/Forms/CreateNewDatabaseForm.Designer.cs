@@ -34,6 +34,7 @@
             this.group1 = new System.Windows.Forms.GroupBox();
             this.buttonFileName = new System.Windows.Forms.Button();
             this.group2 = new System.Windows.Forms.GroupBox();
+            this.checkInventory = new System.Windows.Forms.CheckBox();
             this.checkGearLocalNames = new System.Windows.Forms.CheckBox();
             this.checkEnumerators = new System.Windows.Forms.CheckBox();
             this.checkFishLocalNames = new System.Windows.Forms.CheckBox();
@@ -41,7 +42,7 @@
             this.checkGearVar = new System.Windows.Forms.CheckBox();
             this.checkLandingSites = new System.Windows.Forms.CheckBox();
             this.checkAOI = new System.Windows.Forms.CheckBox();
-            this.checkInventory = new System.Windows.Forms.CheckBox();
+            this.checkLocalNameToSpeciesName = new System.Windows.Forms.CheckBox();
             this.group1.SuspendLayout();
             this.group2.SuspendLayout();
             this.SuspendLayout();
@@ -105,6 +106,7 @@
             // 
             // group2
             // 
+            this.group2.Controls.Add(this.checkLocalNameToSpeciesName);
             this.group2.Controls.Add(this.checkInventory);
             this.group2.Controls.Add(this.checkGearLocalNames);
             this.group2.Controls.Add(this.checkEnumerators);
@@ -122,6 +124,17 @@
             this.group2.TabStop = false;
             this.group2.Text = "Select data to retain";
             // 
+            // checkInventory
+            // 
+            this.checkInventory.AutoSize = true;
+            this.checkInventory.Location = new System.Drawing.Point(27, 241);
+            this.checkInventory.Margin = new System.Windows.Forms.Padding(4);
+            this.checkInventory.Name = "checkInventory";
+            this.checkInventory.Size = new System.Drawing.Size(116, 19);
+            this.checkInventory.TabIndex = 7;
+            this.checkInventory.Text = "Fishery inventory";
+            this.checkInventory.UseVisualStyleBackColor = true;
+            // 
             // checkGearLocalNames
             // 
             this.checkGearLocalNames.AutoSize = true;
@@ -137,7 +150,7 @@
             // checkEnumerators
             // 
             this.checkEnumerators.AutoSize = true;
-            this.checkEnumerators.Location = new System.Drawing.Point(29, 187);
+            this.checkEnumerators.Location = new System.Drawing.Point(27, 214);
             this.checkEnumerators.Margin = new System.Windows.Forms.Padding(4);
             this.checkEnumerators.Name = "checkEnumerators";
             this.checkEnumerators.Size = new System.Drawing.Size(97, 19);
@@ -202,16 +215,16 @@
             this.checkAOI.UseVisualStyleBackColor = true;
             this.checkAOI.CheckedChanged += new System.EventHandler(this.checkAOI_CheckedChanged);
             // 
-            // checkInventory
+            // checkLocalNameToSpeciesName
             // 
-            this.checkInventory.AutoSize = true;
-            this.checkInventory.Location = new System.Drawing.Point(29, 214);
-            this.checkInventory.Margin = new System.Windows.Forms.Padding(4);
-            this.checkInventory.Name = "checkInventory";
-            this.checkInventory.Size = new System.Drawing.Size(116, 19);
-            this.checkInventory.TabIndex = 7;
-            this.checkInventory.Text = "Fishery inventory";
-            this.checkInventory.UseVisualStyleBackColor = true;
+            this.checkLocalNameToSpeciesName.AutoSize = true;
+            this.checkLocalNameToSpeciesName.Location = new System.Drawing.Point(29, 187);
+            this.checkLocalNameToSpeciesName.Margin = new System.Windows.Forms.Padding(4);
+            this.checkLocalNameToSpeciesName.Name = "checkLocalNameToSpeciesName";
+            this.checkLocalNameToSpeciesName.Size = new System.Drawing.Size(318, 19);
+            this.checkLocalNameToSpeciesName.TabIndex = 8;
+            this.checkLocalNameToSpeciesName.Text = "Local/common names to species names by language";
+            this.checkLocalNameToSpeciesName.UseVisualStyleBackColor = true;
             // 
             // CreateNewDatabaseForm
             // 
@@ -253,5 +266,6 @@
         private System.Windows.Forms.CheckBox checkEnumerators;
         private System.Windows.Forms.CheckBox checkGearLocalNames;
         private System.Windows.Forms.CheckBox checkInventory;
+        private System.Windows.Forms.CheckBox checkLocalNameToSpeciesName;
     }
 }

@@ -28,31 +28,32 @@ namespace FAD3.Database.Forms
 
         private void OnFormLoad(object sender, EventArgs e)
         {
-            checkBox1.Visible = false;
-            CheckBox checkBox2 = new CheckBox();
-            CheckBox checkBox3 = new CheckBox();
+            rdButton.Visible = false;
+            RadioButton rdButton1 = new RadioButton();
+            RadioButton rdButton2 = new RadioButton();
+            CheckBox chkBox = new CheckBox();
             var spacing = 4;
             switch (_dataType)
             {
                 case ExportImportDataType.SpeciesNames:
-                    checkBox1.Visible = true;
-                    checkBox1.Text = "Export species names of catch";
+                    rdButton.Visible = true;
+                    rdButton.Text = "Export species names of catch";
                     if (_action == ExportImportAction.ActionImport)
                     {
-                        checkBox1.Text = "Import species names of catch";
+                        rdButton.Text = "Import species names of catch";
                     }
 
-                    checkBox1.Tag = ExportImportDataType.SpeciesNames;
-                    if (TaxaCSV.Length > 0)
+                    rdButton.Tag = ExportImportDataType.SpeciesNames;
+                    if (TaxaCSV?.Length > 0)
                     {
                         //checkBox2 = new CheckBox();
-                        checkBox2.Name = "chkExportSelected";
-                        checkBox2.Text = "Export selected taxa only";
-                        checkBox2.Left = checkBox1.Left;
-                        checkBox2.AutoSize = true;
-                        checkBox2.Top = checkBox1.Top + checkBox1.Height + spacing;
-                        checkBox2.Enabled = false;
-                        Controls.Add(checkBox2);
+                        chkBox.Name = "chkExportSelected";
+                        chkBox.Text = "Export selected taxa only";
+                        chkBox.Left = rdButton.Left;
+                        chkBox.AutoSize = true;
+                        chkBox.Top = rdButton.Top + rdButton.Height + spacing;
+                        chkBox.Enabled = false;
+                        Controls.Add(chkBox);
                     }
                     break;
 
@@ -72,23 +73,33 @@ namespace FAD3.Database.Forms
                 case ExportImportDataType.GearNameDataSelect:
                     var gearVarCaption = "Export gear variations";
                     var gearLocalNameCaption = "Export gear local names";
+                    var gearClassCaption = "Export gear classes";
                     if (_action == ExportImportAction.ActionImport)
                     {
                         gearVarCaption = "Import gear variations";
                         gearLocalNameCaption = "Import gear local names";
+                        gearClassCaption = "Import gear classes";
                     }
-
-                    checkBox1.Text = gearVarCaption;
-                    checkBox1.Tag = ExportImportDataType.GearsVariation;
-                    checkBox1.Visible = true;
+                    rdButton.Top = 20;
+                    rdButton.Text = gearVarCaption;
+                    rdButton.Tag = ExportImportDataType.GearsVariation;
+                    rdButton.Visible = true;
 
                     //checkBox2 = new CheckBox();
-                    checkBox2.Text = gearLocalNameCaption;
-                    checkBox2.Left = checkBox1.Left;
-                    checkBox2.Top = checkBox1.Top + checkBox1.Height + spacing;
-                    checkBox2.Tag = ExportImportDataType.GearsLocalName;
-                    checkBox2.AutoSize = true;
-                    Controls.Add(checkBox2);
+                    rdButton1.Text = gearLocalNameCaption;
+                    rdButton1.Left = rdButton.Left;
+                    rdButton1.Top = rdButton.Top + rdButton.Height + spacing;
+                    rdButton1.Tag = ExportImportDataType.GearsLocalName;
+                    rdButton1.AutoSize = true;
+                    Controls.Add(rdButton1);
+
+                    rdButton2.Text = gearClassCaption;
+                    rdButton2.Left = rdButton.Left;
+                    rdButton2.Top = rdButton1.Top + rdButton1.Height + spacing;
+                    rdButton2.Tag = ExportImportDataType.GearsClass;
+                    rdButton2.AutoSize = true;
+                    Controls.Add(rdButton2);
+
                     break;
 
                 case ExportImportDataType.CatchNametDataSelect:
@@ -101,49 +112,57 @@ namespace FAD3.Database.Forms
                         localNamesCaption = "Import local names";
                         namePairCaption = "Import local name - scientific name pairs";
                     }
-
-                    checkBox1.Text = languageCaption;
-                    checkBox1.Tag = ExportImportDataType.LocalNameLanguages;
-                    checkBox1.Visible = true;
+                    rdButton.Top = 20;
+                    rdButton.Left = 10;
+                    rdButton.Text = languageCaption;
+                    rdButton.Tag = ExportImportDataType.LocalNameLanguages;
+                    rdButton.Visible = true;
 
                     //checkBox2 = new CheckBox();
-                    checkBox2.Text = localNamesCaption;
-                    checkBox2.Left = checkBox1.Left;
-                    checkBox2.Top = checkBox1.Top + checkBox1.Height + spacing;
-                    checkBox2.Tag = ExportImportDataType.CatchLocalNames;
-                    checkBox2.AutoSize = true;
-                    Controls.Add(checkBox2);
+                    rdButton1.Text = localNamesCaption;
+                    rdButton1.Left = rdButton.Left;
+                    rdButton1.Top = rdButton.Top + rdButton.Height + spacing;
+                    rdButton1.Tag = ExportImportDataType.CatchLocalNames;
+                    rdButton1.AutoSize = true;
+                    Controls.Add(rdButton1);
 
                     //checkBox3 = new CheckBox();
-                    checkBox3.Text = namePairCaption;
-                    checkBox3.Left = checkBox1.Left;
-                    checkBox3.Top = checkBox2.Top + checkBox2.Height + spacing;
-                    checkBox3.Tag = ExportImportDataType.CatchLocalNameSpeciesNamePair;
-                    checkBox3.AutoSize = true;
-                    Controls.Add(checkBox3);
+                    rdButton2.Text = namePairCaption;
+                    rdButton2.Left = rdButton.Left;
+                    rdButton2.Top = rdButton1.Top + rdButton1.Height + spacing;
+                    rdButton2.Tag = ExportImportDataType.CatchLocalNameSpeciesNamePair;
+                    rdButton2.AutoSize = true;
+                    Controls.Add(rdButton2);
                     break;
             }
-            checkBox1.CheckedChanged += OnCheckBoxCheckChanged;
+            rdButton.CheckedChanged += OnCheckChanged;
+            chkBox.CheckedChanged += OnCheckChanged;
         }
 
-        private void OnCheckBoxCheckChanged(object sender, EventArgs e)
+        private void OnCheckChanged(object sender, EventArgs e)
         {
-            CheckBox chk = (CheckBox)sender;
-            switch (chk.Name)
+            if (sender.GetType().Name == "RadioButton")
             {
-                case "checkBox1":
-                    if (_dataType == ExportImportDataType.SpeciesNames)
-                    {
-                        try
+                RadioButton rdb = (RadioButton)sender;
+                switch (rdb.Name)
+                {
+                    case "rdButton":
+                        if (_dataType == ExportImportDataType.SpeciesNames)
                         {
-                            Controls["chkExportSelected"].Enabled = checkBox1.Checked;
+                            try
+                            {
+                                Controls["chkExportSelected"].Enabled = rdButton.Checked;
+                            }
+                            catch
+                            {
+                                //ignore
+                            }
                         }
-                        catch
-                        {
-                            //ignore
-                        }
-                    }
-                    break;
+                        break;
+                }
+            }
+            else if (sender.GetType().Name == "CheckBox")
+            {
             }
         }
 
@@ -155,7 +174,7 @@ namespace FAD3.Database.Forms
                     Selection = ExportImportDataType.None;
                     foreach (Control c in Controls)
                     {
-                        if (c.GetType().Name == "CheckBox" && c.Tag != null && ((CheckBox)c).Checked)
+                        if (c.GetType().Name == "RadioButton" && c.Tag != null && ((RadioButton)c).Checked)
                         {
                             Selection |= (ExportImportDataType)c.Tag;
                         }

@@ -94,7 +94,7 @@ namespace FAD3
         public static Dictionary<int, string> RetrieveTaxaDictionary()
         {
             var taxaDictionary = new Dictionary<int, string>();
-            using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
+            using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.MDBPath))
             {
                 conection.Open();
 
@@ -136,7 +136,7 @@ namespace FAD3
                         ON tblEnumerators.EnumeratorID = tblSampling.Enumerator WHERE tblCatchComp.NameGUID= {{{catchGuid}}}
                         ORDER BY tblAOI.AOIName, tblLandingSites.LSName, tblGearClass.GearClassName, tblGearVariations.Variation, tblSampling.RefNo";
 
-            using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
+            using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.MDBPath))
             {
                 conection.Open();
                 var adapter = new OleDbDataAdapter(sql, conection);

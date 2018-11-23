@@ -21,6 +21,105 @@ namespace FAD3
 
         //TODO: Change the default names of the items in the tuple from Item1, Item2, Item3 to more descriptive names
         private static List<Tuple<string, string, bool>> _gearVariationsWithSpecs = new List<Tuple<string, string, bool>>();
+        public static List<string> Accessories { get; internal set; }
+        public static List<string> ExpenseItems { get; internal set; }
+        public static List<string> PaymentSources { get; internal set; }
+
+        public static bool AddPaymentSource(string source)
+        {
+            PaymentSources.Add(source);
+            return true;
+        }
+
+        public static bool AddAccessory(string accessory)
+        {
+            Accessories.Add(accessory);
+            return true;
+        }
+
+        public static bool AddExpense(string expense)
+        {
+            ExpenseItems.Add(expense);
+            return true;
+        }
+
+        public static void GetPaymentSources()
+        {
+            PaymentSources = new List<string>();
+            var dt = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    string query = "SELECT DISTINCT Source from tblGearInventoryExpense Order By Source ";
+
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(dt);
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        DataRow dr = dt.Rows[i];
+                        PaymentSources.Add(dr["Source"].ToString());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex);
+                }
+            }
+        }
+
+        public static void GetExpenses()
+        {
+            ExpenseItems = new List<string>();
+            var dt = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    string query = "SELECT DISTINCT ExpenseItem from tblGearInventoryExpense Order By ExpenseItem ";
+
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(dt);
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        DataRow dr = dt.Rows[i];
+                        ExpenseItems.Add(dr["ExpenseItem"].ToString());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex);
+                }
+            }
+        }
+
+        public static void GetAccessories()
+        {
+            Accessories = new List<string>();
+            var dt = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    string query = "SELECT DISTINCT Accessory from tblGearInventoryAccessories Order By Accessory ";
+
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(dt);
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        DataRow dr = dt.Rows[i];
+                        Accessories.Add(dr["Accessory"].ToString());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex);
+                }
+            }
+        }
 
         static Gear()
         {
@@ -189,14 +288,34 @@ namespace FAD3
             using (var conection = new OleDbConnection(global.ConnectionString))
             {
                 conection.Open();
-                string query = $@"SELECT tblSampling.SamplingGUID, tblAOI.AOIName, tblLandingSites.LSGUID, tblLandingSites.LSName,
-                                tblGearClass.GearClassName, tblGearVariations.GearVarGUID, tblGearVariations.Variation, tblSampling.SamplingDate,
-                                tblSampling.FishingGround, tblSampling.WtCatch, tblSampling.RefNo, tblSampling.VesType, tblEnumerators.EnumeratorName
-                                FROM (tblAOI INNER JOIN tblLandingSites ON tblAOI.AOIGuid = tblLandingSites.AOIGuid) INNER JOIN (tblEnumerators INNER JOIN
-                                (tblGearClass INNER JOIN (tblGearVariations INNER JOIN tblSampling ON tblGearVariations.GearVarGUID = tblSampling.GearVarGUID)
-                                ON tblGearClass.GearClass = tblGearVariations.GearClass) ON tblEnumerators.EnumeratorID = tblSampling.Enumerator)
-                                ON tblLandingSites.LSGUID = tblSampling.LSGUID WHERE tblGearVariations.GearVarGUID= {{{gearVarGuid}}}
-                                ORDER BY tblAOI.AOIName, tblLandingSites.LSName, tblGearVariations.Variation, tblSampling.SamplingDate";
+                string query = $@"SELECT tblSampling.SamplingGUID,
+                                    tblAOI.AOIName,
+                                    tblLandingSites.LSGUID,
+                                    tblLandingSites.LSName,
+                                    tblGearClass.GearClassName,
+                                    tblGearVariations.GearVarGUID,
+                                    tblGearVariations.Variation,
+                                    tblSampling.SamplingDate,
+                                    tblSampling.FishingGround,
+                                    tblSampling.WtCatch,
+                                    tblSampling.RefNo,
+                                    tblSampling.VesType,
+                                    tblEnumerators.EnumeratorName
+                                FROM (tblAOI INNER JOIN
+                                    tblLandingSites ON
+                                    tblAOI.AOIGuid = tblLandingSites.AOIGuid) INNER JOIN
+                                    ((tblGearClass INNER JOIN
+                                    tblGearVariations ON
+                                    tblGearClass.GearClass = tblGearVariations.GearClass) INNER JOIN
+                                    (tblEnumerators RIGHT JOIN
+                                    tblSampling ON tblEnumerators.EnumeratorID = tblSampling.Enumerator) ON
+                                    tblGearVariations.GearVarGUID = tblSampling.GearVarGUID) ON
+                                    tblLandingSites.LSGUID = tblSampling.LSGUID
+                                WHERE tblGearVariations.GearVarGUID= {{{gearVarGuid}}}
+                                ORDER BY tblAOI.AOIName,
+                                    tblLandingSites.LSName,
+                                    tblGearVariations.Variation,
+                                    tblSampling.SamplingDate";
 
                 DataTable dt = new DataTable();
                 var adapter = new OleDbDataAdapter(query, conection);
@@ -268,6 +387,34 @@ namespace FAD3
         public static void FillGearClasses()
         {
             GetGearClass();
+        }
+
+        public static Dictionary<string, (string gearClassName, string gearCode)> GetGearClassDictionary()
+        {
+            Dictionary<string, (string gearClassName, string gearCode)> dict = new Dictionary<string, (string gearClassName, string gearCode)>();
+            var myDT = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    const string query = "Select GearClass, GearLetter, GearClassName from tblGearClass order by GearClassName";
+                    using (var adapter = new OleDbDataAdapter(query, conection))
+                    {
+                        adapter.Fill(myDT);
+                        for (int i = 0; i < myDT.Rows.Count; i++)
+                        {
+                            DataRow dr = myDT.Rows[i];
+                            dict.Add(dr["GearClass"].ToString(), (dr["gearClassName"].ToString(), dr["GearLetter"].ToString()));
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex);
+                }
+            }
+            return dict;
         }
 
         public static KeyValuePair<string, string> GearClassFromGearVar(string varGUID)

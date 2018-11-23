@@ -11,8 +11,8 @@ namespace FAD3
 {
     public partial class SamplingForm : Form
     {
-        private Dictionary<string, sampling.UserInterfaceStructure> _uis = new Dictionary<string, sampling.UserInterfaceStructure>();
-        private sampling _sampling;
+        private Dictionary<string, Sampling.UserInterfaceStructure> _uis = new Dictionary<string, Sampling.UserInterfaceStructure>();
+        private Sampling _sampling;
         private string _samplingGUID = "";
         private ListView _lv;
         private Control _topControl;
@@ -301,7 +301,7 @@ namespace FAD3
                             break;
 
                         case "Engine":
-                            foreach (var item in sampling.Engines)
+                            foreach (var item in Sampling.Engines)
                             {
                                 ((ComboBox)ctl).Items.Add(item);
                             }
@@ -602,8 +602,8 @@ namespace FAD3
         {
             this.Size = new Size(Width, _lv.Height);
             global.LoadFormSettings(this, true);
-            _sampling = new sampling();
-            _sampling.OnUIRowRead += new sampling.ReadUIElement(OnUIRowRead);
+            _sampling = new Sampling();
+            _sampling.OnUIRowRead += new Sampling.ReadUIElement(OnUIRowRead);
 
             panelUI.SuspendLayout();
             _sampling.ReadUIFromXML();
@@ -938,7 +938,7 @@ namespace FAD3
             {
                 if (c.Name.Substring(0, 8) == "errLabel")
                 {
-                    sampling.UserInterfaceStructure ui = sampling.uis[c.Tag.ToString()];
+                    Sampling.UserInterfaceStructure ui = Sampling.uis[c.Tag.ToString()];
                     c.Visible = ui.Required && Visible;
                 }
             }
@@ -994,7 +994,7 @@ namespace FAD3
                 {
                     //we want to get the UserInterfaceStructure element specified
                     //in the tag of the control
-                    sampling.UserInterfaceStructure ui = sampling.uis[c.Tag.ToString()];
+                    Sampling.UserInterfaceStructure ui = Sampling.uis[c.Tag.ToString()];
 
                     if (ui.Required && c.Text.Length == 0)
                     {
@@ -1269,7 +1269,7 @@ namespace FAD3
         private void OnFieldValidate(object sender, CancelEventArgs e)
         {
             //we want to get the UserInterfaceStructure element specified in the tag of the control to validate
-            sampling.UserInterfaceStructure ui = sampling.uis[((Control)sender).Tag.ToString()];
+            Sampling.UserInterfaceStructure ui = Sampling.uis[((Control)sender).Tag.ToString()];
 
             string comboText = ((Control)sender).Text;
             string msg = "";

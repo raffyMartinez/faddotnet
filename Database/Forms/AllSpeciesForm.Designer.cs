@@ -32,7 +32,7 @@
             this.lvNames = new System.Windows.Forms.ListView();
             this.dropDownMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.buttonOK = new System.Windows.Forms.Button();
-            this.label2 = new System.Windows.Forms.Label();
+            this.lblListViewLabel = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.lvTaxa = new System.Windows.Forms.ListView();
             this.buttonReset = new System.Windows.Forms.Button();
@@ -47,12 +47,16 @@
             this.tbEdit = new System.Windows.Forms.ToolStripButton();
             this.tbExport = new System.Windows.Forms.ToolStripButton();
             this.tbImport = new System.Windows.Forms.ToolStripButton();
+            this.tbClose = new System.Windows.Forms.ToolStripButton();
             this.groupBox1.SuspendLayout();
             this.toolBar.SuspendLayout();
             this.SuspendLayout();
             // 
             // lvNames
             // 
+            this.lvNames.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.lvNames.ContextMenuStrip = this.dropDownMenu;
             this.lvNames.Location = new System.Drawing.Point(199, 46);
             this.lvNames.Name = "lvNames";
@@ -60,7 +64,8 @@
             this.lvNames.TabIndex = 0;
             this.lvNames.UseCompatibleStateImageBehavior = false;
             this.lvNames.DoubleClick += new System.EventHandler(this.OnlvNames_DoubleClick);
-            this.lvNames.MouseDown += new System.Windows.Forms.MouseEventHandler(this.lvNames_MouseDown);
+            this.lvNames.MouseClick += new System.Windows.Forms.MouseEventHandler(this.OnListViewMouseClick);
+            this.lvNames.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnlvNames_MouseDown);
             // 
             // dropDownMenu
             // 
@@ -69,6 +74,7 @@
             // 
             // buttonOK
             // 
+            this.buttonOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonOK.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.buttonOK.Location = new System.Drawing.Point(743, 463);
             this.buttonOK.Name = "buttonOK";
@@ -78,14 +84,14 @@
             this.buttonOK.UseVisualStyleBackColor = true;
             this.buttonOK.Click += new System.EventHandler(this.OnButtonOK_Click);
             // 
-            // label2
+            // lblListViewLabel
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(196, 28);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(125, 15);
-            this.label2.TabIndex = 4;
-            this.label2.Text = "List of species names";
+            this.lblListViewLabel.AutoSize = true;
+            this.lblListViewLabel.Location = new System.Drawing.Point(196, 28);
+            this.lblListViewLabel.Name = "lblListViewLabel";
+            this.lblListViewLabel.Size = new System.Drawing.Size(125, 15);
+            this.lblListViewLabel.TabIndex = 4;
+            this.lblListViewLabel.Text = "List of species names";
             // 
             // groupBox1
             // 
@@ -174,10 +180,11 @@
             this.tbRemove,
             this.tbEdit,
             this.tbExport,
-            this.tbImport});
+            this.tbImport,
+            this.tbClose});
             this.toolBar.Location = new System.Drawing.Point(0, 0);
             this.toolBar.Name = "toolBar";
-            this.toolBar.Size = new System.Drawing.Size(802, 25);
+            this.toolBar.Size = new System.Drawing.Size(800, 25);
             this.toolBar.TabIndex = 23;
             this.toolBar.Text = "toolStrip1";
             this.toolBar.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnToolBarItemClick);
@@ -232,24 +239,34 @@
             this.tbImport.Text = "toolStripButton5";
             this.tbImport.ToolTipText = "Import species list";
             // 
+            // tbClose
+            // 
+            this.tbClose.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tbClose.Image = global::FAD3.Properties.Resources.im_exit;
+            this.tbClose.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tbClose.Name = "tbClose";
+            this.tbClose.Size = new System.Drawing.Size(23, 22);
+            this.tbClose.Text = "toolStripButton1";
+            this.tbClose.ToolTipText = "Close window";
+            // 
             // AllSpeciesForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonOK;
-            this.ClientSize = new System.Drawing.Size(802, 495);
+            this.ClientSize = new System.Drawing.Size(800, 492);
             this.Controls.Add(this.toolBar);
             this.Controls.Add(this.groupBox1);
-            this.Controls.Add(this.label2);
+            this.Controls.Add(this.lblListViewLabel);
             this.Controls.Add(this.buttonOK);
             this.Controls.Add(this.lvNames);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "AllSpeciesForm";
             this.Text = "AllSpeciesForm";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.AllSpeciesForm_FormClosing);
-            this.Load += new System.EventHandler(this.AllSpeciesForm_Load);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.OnFormClosing);
+            this.Load += new System.EventHandler(this.OnForm_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.toolBar.ResumeLayout(false);
@@ -263,7 +280,7 @@
 
         private System.Windows.Forms.ListView lvNames;
         private System.Windows.Forms.Button buttonOK;
-        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label lblListViewLabel;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label1;
@@ -279,5 +296,6 @@
         private System.Windows.Forms.ToolStripButton tbEdit;
         private System.Windows.Forms.ToolStripButton tbExport;
         private System.Windows.Forms.ToolStripButton tbImport;
+        private System.Windows.Forms.ToolStripButton tbClose;
     }
 }

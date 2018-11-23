@@ -268,12 +268,12 @@ namespace FAD3
                 _samplings = Enumerators.GetEnumeratorSamplings();
                 ConfigureTree();
                 PopulateList(tree.Nodes["root"]);
-                SizeColumns(lvEnumerators, false);
+                //SizeColumns(lvEnumerators, false);
                 Text = "Enumerator data and sampling list";
             }
         }
 
-        private void tree_AfterSelect(object sender, TreeViewEventArgs e)
+        private void OnTreeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
             lvEnumerators.Items.Clear();
             e.Node.SelectedImageKey = e.Node.ImageKey;
@@ -282,6 +282,7 @@ namespace FAD3
 
         private void PopulateList(TreeNode node)
         {
+            lvEnumerators.Visible = false;
             lvEnumerators.Items.Clear();
             node.With(nd =>
             {
@@ -336,6 +337,8 @@ namespace FAD3
                 }
             });
             labelSamplings.Text = $"Samplings enumerated:{lvEnumerators.Items.Count}";
+            SizeColumns(lvEnumerators, false);
+            lvEnumerators.Visible = true;
         }
 
         private void ConfigureTree()

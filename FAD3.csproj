@@ -122,6 +122,8 @@
     <Compile Include="Database\Classes\CatchNameURLGenerator.cs" />
     <Compile Include="Database\Classes\FileDialogHelper.cs" />
     <Compile Include="Database\Classes\FishingGearInventory.cs" />
+    <Compile Include="Database\Classes\FisheriesInventoryImportEventArg.cs" />
+    <Compile Include="Database\Classes\ImportRowsFromFileEventArgs.cs" />
     <Compile Include="Database\Classes\SimMetrics\AbstractStringMetric.cs" />
     <Compile Include="Database\Classes\SimMetrics\AbstractSubstitutionCost.cs" />
     <Compile Include="Database\Classes\SimMetrics\IStringMetric.cs" />
@@ -176,6 +178,12 @@
     <Compile Include="Database\Forms\ExportImportDialogForm.Designer.cs">
       <DependentUpon>ExportImportDialogForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Database\Forms\FishingExpenseForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Database\Forms\FishingExpenseForm.Designer.cs">
+      <DependentUpon>FishingExpenseForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Database\Forms\GearInventoryEditForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -213,14 +221,22 @@
       <DependentUpon>NewNameForm.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\Classes\Enums.cs" />
+    <Compile Include="GUI\Forms\AboutFADForm2.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Forms\AboutFADForm2.Designer.cs">
+      <DependentUpon>AboutFADForm2.cs</DependentUpon>
+    </Compile>
     <Compile Include="Mapping\Classes\Colors.cs" />
     <Compile Include="Mapping\Classes\ColorSchemes.cs" />
     <Compile Include="Mapping\Classes\ExtentDraggedBoxEventArgs.cs" />
+    <Compile Include="Mapping\Classes\OccurenceMapping.cs" />
     <Compile Include="Mapping\Classes\MapTextGraticuleHelper.cs" />
     <Compile Include="Mapping\Classes\Discretizer.cs" />
     <Compile Include="Mapping\Classes\FishingGearMapping.cs" />
     <Compile Include="Mapping\Classes\JenksFisher.cs" />
     <Compile Include="Mapping\Classes\MakeGridFromPoints.cs" />
+    <Compile Include="Mapping\Classes\OccurenceMapEventArgs.cs" />
     <Compile Include="Mapping\Forms\ChlorophyllForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -291,6 +307,12 @@
     </Compile>
     <Compile Include="Mapping\Forms\InstructionsForm.Designer.cs">
       <DependentUpon>InstructionsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Mapping\Forms\OccurenceMappingForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Mapping\Forms\OccurenceMappingForm.Designer.cs">
+      <DependentUpon>OccurenceMappingForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Mapping\Forms\PolygonLineLayerSymbologyForm.cs">
       <SubType>Form</SubType>
@@ -602,6 +624,9 @@
     <EmbeddedResource Include="Database\Forms\ExportImportDialogForm.resx">
       <DependentUpon>ExportImportDialogForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Database\Forms\FishingExpenseForm.resx">
+      <DependentUpon>FishingExpenseForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Database\Forms\GearInventoryEditForm.resx">
       <DependentUpon>GearInventoryEditForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -619,6 +644,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Database\Forms\NewNameForm.resx">
       <DependentUpon>NewNameForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Forms\AboutFADForm2.resx">
+      <DependentUpon>AboutFADForm2.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Mapping\Forms\ChlorophyllForm.resx">
       <DependentUpon>ChlorophyllForm.cs</DependentUpon>
@@ -676,6 +704,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Database\Forms\LandingSiteFromKMLForm.resx">
       <DependentUpon>LandingSiteFromKMLForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Mapping\Forms\OccurenceMappingForm.resx">
+      <DependentUpon>OccurenceMappingForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Mapping\Forms\PointLayerSymbologyForm.resx">
       <DependentUpon>PointLayerSymbologyForm.cs</DependentUpon>

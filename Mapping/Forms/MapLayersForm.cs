@@ -382,6 +382,10 @@ namespace FAD3
                 case "buttonZoomToLayer":
                     _mapLayersHandler.ZoomToLayer(_layerHandle);
                     break;
+
+                case "buttonClose":
+                    Close();
+                    break;
             }
         }
     }

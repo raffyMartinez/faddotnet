@@ -71,6 +71,8 @@ namespace FAD3
                 Shapefile sf = _currentMapLayer.LayerObject as Shapefile;
                 sf.SelectNone();
                 sf.ShapeSelected[_selectedShapeIndex] = true;
+
+                //set default appearance mode
                 if (sf.Categories.Count > 0)
                 {
                     sf.SelectionAppearance = tkSelectionAppearance.saSelectionColor;
@@ -79,6 +81,32 @@ namespace FAD3
                 {
                     sf.SelectionAppearance = tkSelectionAppearance.saDrawingOptions;
                 }
+
+                //appearance mode depending on shapefile type
+                switch (sf.ShapefileType)
+                {
+                    case ShpfileType.SHP_POINT:
+                        if (sf.Categories.Count > 0)
+                        {
+                            //sf.SelectionAppearance = tkSelectionAppearance.saSelectionColor;
+                        }
+                        else
+                        {
+                            sf.SelectionAppearance = tkSelectionAppearance.saDrawingOptions;
+                            sf.SelectionDrawingOptions.PointSize = sf.DefaultDrawingOptions.PointSize;
+                            sf.SelectionDrawingOptions.PointRotation = sf.DefaultDrawingOptions.PointRotation;
+                            sf.SelectionDrawingOptions.PointShape = sf.DefaultDrawingOptions.PointShape;
+                        }
+                        break;
+
+                    case ShpfileType.SHP_POLYGON:
+                        break;
+
+                    case ShpfileType.SHP_POLYLINE:
+
+                        break;
+                }
+
                 _axMap.Redraw();
             }
         }
@@ -236,6 +264,17 @@ namespace FAD3
                         switch (sf.ShapefileType)
                         {
                             case ShpfileType.SHP_POINT:
+                                if (sf.Categories.Count > 0)
+                                {
+                                    sf.SelectionAppearance = tkSelectionAppearance.saSelectionColor;
+                                }
+                                else
+                                {
+                                    sf.SelectionAppearance = tkSelectionAppearance.saDrawingOptions;
+                                    sf.SelectionDrawingOptions.PointSize = sf.DefaultDrawingOptions.PointSize;
+                                    sf.SelectionDrawingOptions.PointRotation = sf.DefaultDrawingOptions.PointRotation;
+                                    sf.SelectionDrawingOptions.PointShape = sf.DefaultDrawingOptions.PointShape;
+                                }
                                 break;
 
                             case ShpfileType.SHP_POLYGON:

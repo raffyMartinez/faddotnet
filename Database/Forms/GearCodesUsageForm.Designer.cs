@@ -65,7 +65,7 @@
             // 
             this.dropDownMenu.Name = "dropDownMenu";
             this.dropDownMenu.Size = new System.Drawing.Size(61, 4);
-            this.dropDownMenu.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.dropDownMenu_ItemClicked);
+            this.dropDownMenu.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnDropDownMenu_ItemClicked);
             // 
             // listViewCodes
             // 
@@ -118,7 +118,8 @@
             this.comboClass.Name = "comboClass";
             this.comboClass.Size = new System.Drawing.Size(193, 23);
             this.comboClass.TabIndex = 5;
-            this.comboClass.Validated += new System.EventHandler(this.comboClass_Validated);
+            this.comboClass.SelectedIndexChanged += new System.EventHandler(this.OnComboSelectedIndexChanged);
+            this.comboClass.Validated += new System.EventHandler(this.OnComboClass_Validated);
             // 
             // label1
             // 

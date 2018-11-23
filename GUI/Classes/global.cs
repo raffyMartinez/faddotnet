@@ -46,6 +46,12 @@ namespace FAD3
         private static CoordinateDisplayFormat _CoordDisplayFormat = CoordinateDisplayFormat.DegreeDecimal;
         private static Color _MissingFieldBackColor = global.MissingFieldBackColor;
         private static List<string> _tempFiles = new List<string>();
+        private static bool _isMapComponentRegistered;
+
+        public static bool IsMapComponentRegistered
+        {
+            get { return _isMapComponentRegistered; }
+        }
 
         public static Grid25GenerateForm Grid25GenerateForm { get; set; }
 
@@ -63,6 +69,19 @@ namespace FAD3
                 s += _InlandGridDBFileExists ? "" : "\r\n- grid25inland.mdb";
 
                 return s;
+            }
+        }
+
+        private static void IsMapWinGISRegistered()
+        {
+            try
+            {
+                var key = Registry.ClassesRoot.OpenSubKey("MapWinGIS.Shapefile");
+                _isMapComponentRegistered = key.Name.Length > 0;
+            }
+            catch
+            {
+                _isMapComponentRegistered = false;
             }
         }
 
@@ -158,7 +177,7 @@ namespace FAD3
             {
                 try
                 {
-                    using (var conection = new OleDbConnection($"Provider=Microsoft.JET.OLEDB.4.0;data source={global.mdbPath}"))
+                    using (var conection = new OleDbConnection($"Provider=Microsoft.JET.OLEDB.4.0;data source={global.MDBPath}"))
                     {
                         conection.Open();
 
@@ -229,7 +248,7 @@ namespace FAD3
             {
                 try
                 {
-                    using (var conection = new OleDbConnection($"Provider=Microsoft.JET.OLEDB.4.0;data source={global.mdbPath}"))
+                    using (var conection = new OleDbConnection($"Provider=Microsoft.JET.OLEDB.4.0;data source={global.MDBPath}"))
                     {
                         conection.Open();
 
@@ -298,11 +317,6 @@ namespace FAD3
             }
         }
 
-        public static string MDBPath
-        {
-            get { return _mdbPath; }
-        }
-
         /// <summary>
         /// Boolean. returns a boolean if all files required by the application are present
         /// </summary>
@@ -348,6 +362,7 @@ namespace FAD3
         /// </summary>
         static global()
         {
+            IsMapWinGISRegistered();
             _AppPath = Application.StartupPath.ToString();
             MappingMode = fad3MappingMode.defaultMode;
             GetAppPreferences();
@@ -600,10 +615,15 @@ namespace FAD3
             get { return _provinceDict; }
         }
 
+        //public static string MDBPath
+        //{
+        //    get { return _mdbPath; }
+        //}
+
         /// <summary>
         /// getter and setter for the path to the mdb. After setting, some variables are filled up
         /// </summary>
-        public static string mdbPath
+        public static string MDBPath
         {
             get { return _mdbPath; }
             set
@@ -616,6 +636,9 @@ namespace FAD3
                     FishingVessel.MakeVesselTypeTable();
                     GetProvinces();
                     Gear.FillGearClasses();
+                    Gear.GetAccessories();
+                    Gear.GetExpenses();
+                    Gear.GetPaymentSources();
                     GetVesselTypes();
                 }
             }

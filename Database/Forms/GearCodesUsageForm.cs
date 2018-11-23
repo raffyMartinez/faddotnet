@@ -10,6 +10,10 @@ using MetaphoneCOM;
 using FAD3.GUI.Classes;
 using FAD3.Database.Classes;
 using FAD3.Database.Forms;
+using System.IO;
+using System.Xml;
+using FAD3.Mapping.Forms;
+using FAD3.Mapping.Classes;
 
 namespace FAD3
 {
@@ -117,9 +121,9 @@ namespace FAD3
 
             //fill this listview with gear variations belonging to a class
             var lv = listViewVariations;
-            lv.Columns.Add("Variation");
-            lv.Columns.Add("Specs");
-            SizeColumns(lv);
+            //lv.Columns.Add("Variation");
+            //lv.Columns.Add("Specs");
+            //SizeColumns(lv);
             FillVariationsList();
             if (_gearVarGuid.Length > 0)
                 lv.Items[_gearVarGuid].Selected = true;
@@ -205,6 +209,10 @@ namespace FAD3
 
         private void OnFormLoad(object sender, EventArgs e)
         {
+            var lv = listViewVariations;
+            lv.Columns.Add("Variation");
+            lv.Columns.Add("Specs");
+            SizeColumns(lv);
             PopulateLists();
         }
 
@@ -285,43 +293,43 @@ namespace FAD3
             });
         }
 
-        private void comboClass_Validated(object sender, EventArgs e)
+        private void OnComboClass_Validated(object sender, EventArgs e)
         {
-            var cbo = (ComboBox)sender;
+            //var cbo = (ComboBox)sender;
 
-            switch (cbo.Name)
-            {
-                case "comboClass":
+            //switch (cbo.Name)
+            //{
+            //    case "comboClass":
 
-                    listViewCodes.Items.Clear();
-                    listViewWhereUsed.Items.Clear();
-                    listViewLocalNames.Items.Clear();
-                    listViewVariations.Items.Clear();
+            //        listViewCodes.Items.Clear();
+            //        listViewWhereUsed.Items.Clear();
+            //        listViewLocalNames.Items.Clear();
+            //        listViewVariations.Items.Clear();
 
-                    FillVariationsList();
-                    var ch = listViewVariations.Columns[0];
-                    var cw = ch.Width;
-                    ch.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
-                    if (ch.Width < cw) ch.Width = cw;
-                    FillGearVarSpecsColumn(listViewVariations);
+            //        FillVariationsList();
+            //        var ch = listViewVariations.Columns[0];
+            //        var cw = ch.Width;
+            //        ch.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+            //        if (ch.Width < cw) ch.Width = cw;
+            //        FillGearVarSpecsColumn(listViewVariations);
 
-                    if (listViewVariations.Items.Count > 0)
-                    {
-                        if (listViewVariations.Items.ContainsKey(_gearVarGuid))
-                        {
-                            listViewVariations.Items[_gearVarGuid].Selected = true;
-                        }
-                        else
-                        {
-                            listViewVariations.Items[0].Selected = true;
-                            _gearVarGuid = listViewVariations.Items[0].Name;
-                        }
+            //        if (listViewVariations.Items.Count > 0)
+            //        {
+            //            if (listViewVariations.Items.ContainsKey(_gearVarGuid))
+            //            {
+            //                listViewVariations.Items[_gearVarGuid].Selected = true;
+            //            }
+            //            else
+            //            {
+            //                listViewVariations.Items[0].Selected = true;
+            //                _gearVarGuid = listViewVariations.Items[0].Name;
+            //            }
 
-                        EventArgs ea = new EventArgs();
-                        OnlistView_Click(listViewVariations, ea);
-                    }
-                    break;
-            }
+            //            EventArgs ea = new EventArgs();
+            //            OnlistView_Click(listViewVariations, ea);
+            //        }
+            //        break;
+            //}
         }
 
         private void OnButtonClick(object sender, EventArgs e)
@@ -400,11 +408,11 @@ namespace FAD3
 
         private void OnListView_MouseDown(object sender, MouseEventArgs e)
         {
+            var lv = (ListView)sender;
+            _currentList = lv.Name;
+            ListViewHitTestInfo info = lv.HitTest(e.X, e.Y);
             if (e.Button == MouseButtons.Left)
             {
-                var lv = (ListView)sender;
-                _currentList = lv.Name;
-                ListViewHitTestInfo info = lv.HitTest(e.X, e.Y);
                 if (info.Item != null)
                 {
                     switch (lv.Name)
@@ -430,10 +438,9 @@ namespace FAD3
             else if (e.Button == MouseButtons.Right)
             {
                 dropDownMenu.Items.Clear();
-                var lv = (ListView)sender;
-                ListViewHitTestInfo info = lv.HitTest(e.X, e.Y);
+                //ListViewHitTestInfo info = lv.HitTest(e.X, e.Y);
 
-                switch (lv.Name)
+                switch (_currentList)
                 {
                     case "listViewWhereUsed":
                         var tsi = dropDownMenu.Items.Add("Add target area where used");
@@ -443,6 +450,13 @@ namespace FAD3
                         tsi = dropDownMenu.Items.Add("Delete target area");
                         tsi.Name = "itemDeleteTargetArea";
                         tsi.Enabled = info.Item != null;
+
+                        dropDownMenu.Items.Add("-");
+
+                        tsi = dropDownMenu.Items.Add("Map fishing ground");
+                        tsi.Name = "itemMapGearFishingGround";
+                        tsi.Enabled = global.MapIsOpen;
+
                         break;
 
                     case "listViewVariations":
@@ -462,9 +476,16 @@ namespace FAD3
                         tsi.Enabled = info.Item != null;
 
                         dropDownMenu.Items.Add("-");
+
                         tsi = dropDownMenu.Items.Add("Gear specs");
                         tsi.Name = "itemManageGearSpecs";
                         tsi.Enabled = info.Item != null;
+
+                        dropDownMenu.Items.Add("-");
+
+                        tsi = dropDownMenu.Items.Add("Map fishing ground");
+                        tsi.Name = "itemMapGearFishingGround";
+                        tsi.Enabled = global.MapIsOpen;
                         break;
 
                     case "listViewLocalNames":
@@ -490,7 +511,7 @@ namespace FAD3
             }
         }
 
-        private void dropDownMenu_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        private void OnDropDownMenu_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
             var myList = new List<string>();
             e.ClickedItem.Owner.Hide();
@@ -597,6 +618,26 @@ namespace FAD3
                         }
                     }
                     break;
+
+                case "itemMapGearFishingGround":
+                    var targetAreaGuid = "";
+                    switch (_currentList)
+                    {
+                        case "listViewWhereUsed":
+                            targetAreaGuid = listViewWhereUsed.SelectedItems[0].Name;
+                            break;
+
+                        case "listViewVariations":
+                            break;
+                    }
+                    OccurenceMapping mso = new OccurenceMapping(OccurenceDataType.Gear, _gearVarName, global.MappingForm.MapControl)
+                    {
+                        MapLayersHandler = global.MappingForm.MapLayersHandler,
+                        MapInteractionHandler = global.MappingForm.MapInterActionHandler
+                    };
+                    mso.RequestOccurenceInfo += OnRequestOccurenceInfo;
+                    mso.MapOccurence();
+                    break;
             }
 
             switch (e.ClickedItem.Name)
@@ -624,6 +665,41 @@ namespace FAD3
                     //refresh the list to show new changes
                     FillVariationsList();
                     break;
+            }
+        }
+
+        private void OnRequestOccurenceInfo(object sender, OccurenceMapEventArgs e)
+        {
+            if (e.OccurenceDataType == OccurenceDataType.Gear)
+            {
+                var nameToMap = _gearVarName;
+                var gearVarGuid = _gearVarGuid;
+                using (OccurenceMappingForm omf = new OccurenceMappingForm(e.OccurenceDataType, this))
+                {
+                    if (_currentList == "listViewVariations")
+                    {
+                        omf.SelectedTargetAreaGuid = "";
+                    }
+                    else
+                    {
+                        omf.SelectedTargetAreaGuid = _targetAreaGuid;
+                    }
+                    omf.GearToMap(nameToMap, gearVarGuid);
+                    omf.ShowDialog(this);
+                    if (omf.DialogResult == DialogResult.OK)
+                    {
+                        e.Aggregate = omf.Aggregate;
+                        e.ExcludeOne = omf.ExcludeOne;
+                        e.MapInSelectedTargetArea = omf.MapInSelectedTargetArea;
+                        e.SelectedTargetAreaGuid = omf.SelectedTargetAreaGuid;
+                        e.SamplingYears = omf.SamplingYears;
+                        e.ItemToMapGuid = gearVarGuid;
+                    }
+                    else
+                    {
+                        e.Cancel = true;
+                    }
+                }
             }
         }
 
@@ -720,6 +796,106 @@ namespace FAD3
             }
         }
 
+        private void Export(ExportImportDataType whatToExport)
+        {
+            FileDialogHelper.Title = "Provide file name for exported data";
+            FileDialogHelper.DialogType = FileDialogType.FileSave;
+            FileDialogHelper.DataFileType = DataFileType.Text | DataFileType.XML | DataFileType.CSV;
+            FileDialogHelper.ShowDialog();
+            var fileName = FileDialogHelper.FileName;
+            if (fileName.Length > 0)
+            {
+                switch (Path.GetExtension(fileName))
+                {
+                    case ".txt":
+                        break;
+
+                    case ".csv":
+                        break;
+
+                    case ".xml":
+                    case ".XML":
+                        switch (whatToExport)
+                        {
+                            case ExportImportDataType.GearsVariation:
+                                var count = Names.Languages.Count;
+
+                                if (count > 0)
+                                {
+                                    var n = 0;
+                                    XmlWriter writer = XmlWriter.Create(fileName);
+                                    writer.WriteStartDocument();
+                                    writer.WriteStartElement("Languages");
+                                    foreach (var language in Names.Languages)
+                                    {
+                                        writer.WriteStartElement("Language");
+                                        writer.WriteAttributeString("guid", language.Key);
+                                        writer.WriteString(language.Value);
+                                        if (count == 1)
+                                        {
+                                            writer.WriteEndDocument();
+                                        }
+                                        else
+                                        {
+                                            if (n < (count - 1))
+                                            {
+                                                writer.WriteEndElement();
+                                            }
+                                            else
+                                            {
+                                                writer.WriteEndDocument();
+                                            }
+                                        }
+                                        n++;
+                                    }
+                                    writer.Close();
+                                    if (n > 0 && count > 0)
+                                    {
+                                        MessageBox.Show($"Succesfully exported {count} languages", "Export successful");
+                                    }
+                                }
+                                break;
+
+                            case ExportImportDataType.GearsLocalName:
+                                break;
+                        }
+                        break;
+                }
+            }
+        }
+
+        private void Import(ExportImportDataType whatToImport)
+        {
+            FileDialogHelper.Title = "Select file to import";
+            FileDialogHelper.DialogType = FileDialogType.FileOpen;
+            FileDialogHelper.DataFileType = DataFileType.Text | DataFileType.XML | DataFileType.CSV;
+            FileDialogHelper.ShowDialog();
+            var fileName = FileDialogHelper.FileName;
+            if (fileName.Length > 0)
+            {
+                switch (Path.GetExtension(fileName))
+                {
+                    case ".txt":
+                        break;
+
+                    case ".csv":
+                        break;
+
+                    case ".xml":
+                    case ".XML":
+                        switch (whatToImport)
+                        {
+                            case ExportImportDataType.GearsVariation:
+                                break;
+
+                            case ExportImportDataType.GearsLocalName:
+                                break;
+                        }
+                        break;
+                }
+            }
+        }
+
         private void OnToolbarItemClick(object sender, ToolStripItemClickedEventArgs e)
         {
             switch (e.ClickedItem.Name)
@@ -752,6 +928,45 @@ namespace FAD3
                         {
                             var result = eidf.Selection;
                         }
+                    }
+                    break;
+            }
+        }
+
+        private void OnComboSelectedIndexChanged(object sender, EventArgs e)
+        {
+            var cbo = (ComboBox)sender;
+
+            switch (cbo.Name)
+            {
+                case "comboClass":
+
+                    listViewCodes.Items.Clear();
+                    listViewWhereUsed.Items.Clear();
+                    listViewLocalNames.Items.Clear();
+                    listViewVariations.Items.Clear();
+
+                    FillVariationsList();
+                    var ch = listViewVariations.Columns[0];
+                    var cw = ch.Width;
+                    ch.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+                    if (ch.Width < cw) ch.Width = cw;
+                    FillGearVarSpecsColumn(listViewVariations);
+
+                    if (listViewVariations.Items.Count > 0)
+                    {
+                        if (listViewVariations.Items.ContainsKey(_gearVarGuid))
+                        {
+                            listViewVariations.Items[_gearVarGuid].Selected = true;
+                        }
+                        else
+                        {
+                            listViewVariations.Items[0].Selected = true;
+                            _gearVarGuid = listViewVariations.Items[0].Name;
+                        }
+
+                        EventArgs ea = new EventArgs();
+                        OnlistView_Click(listViewVariations, ea);
                     }
                     break;
             }

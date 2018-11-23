@@ -123,6 +123,27 @@ namespace FAD3
             else
             {
                 MessageBox.Show("There are no sampling records to show", "No samplings", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                Close();
+            }
+        }
+
+        /// <summary>
+        /// Sizes all columns so that it fits the widest column content or the column header content
+        /// </summary>
+        private void SizeColumns(ListView lv, bool init = true)
+        {
+            foreach (ColumnHeader c in lv.Columns)
+            {
+                if (init)
+                {
+                    c.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
+                    c.Tag = c.Width;
+                }
+                else
+                {
+                    c.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+                    c.Width = c.Width > (int)c.Tag ? c.Width : (int)c.Tag;
+                }
             }
         }
 
@@ -151,15 +172,17 @@ namespace FAD3
                 o.Columns.Add("Type of vessel used");
                 o.Columns.Add("Name of enumerator");
 
-                foreach (ColumnHeader c in lvSamplings.Columns)
-                {
-                    c.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
-                }
+                //foreach (ColumnHeader c in lvSamplings.Columns)
+                //{
+                //    c.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
+                //}
             });
+            SizeColumns(lvSamplings);
         }
 
         private void PopulateList(TreeNode node)
         {
+            lvSamplings.Visible = false;
             node.With(nd =>
             {
                 bool Proceed = false;
@@ -212,9 +235,11 @@ namespace FAD3
                     }
                 }
             });
+            SizeColumns(lvSamplings, false);
+            lvSamplings.Visible = true;
         }
 
-        private void treeList_AfterSelect(object sender, TreeViewEventArgs e)
+        private void OnTreeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
             lvSamplings.Items.Clear();
             e.Node.SelectedImageKey = e.Node.ImageKey;

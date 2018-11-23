@@ -124,7 +124,7 @@ namespace FAD3
         {
             if (pic.Image != null) pic.Image.Dispose();
             Rectangle rect = pic.ClientRectangle;
-            int w = rect.Width / 4;
+            int w = rect.Width / 2;
             int h = (rect.Height / 4) * 3;
 
             Bitmap bmp = new Bitmap(rect.Width, rect.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
@@ -607,7 +607,7 @@ namespace FAD3
         /// </summary>
         /// <param name="sf"></param>
         /// <returns></returns>
-        public int AddLayer(Shapefile sf, string layerName = "", bool isVisible = true, bool uniqueLayer = false)
+        public int AddLayer(Shapefile sf, string layerName = "", bool isVisible = true, bool uniqueLayer = false, fad3MappingMode mappingMode = fad3MappingMode.defaultMode)
         {
             if (uniqueLayer)
             {
@@ -622,13 +622,14 @@ namespace FAD3
                 }
                 _axmap.set_LayerName(h, layerName);
                 _currentMapLayer = SetMapLayer(h, layerName, isVisible, true, sf.GeoProjection, "ShapefileClass", sf.Filename);
+                _currentMapLayer.MappingMode = mappingMode;
 
                 if (LayerRead != null)
                 {
                     LayerEventArg lp = new LayerEventArg(h, layerName, true, true, _currentMapLayer.LayerType);
                     LayerRead(this, lp);
                 }
-                Mapping.LineWidthFix.FixLineWidth(sf);
+                LineWidthFix.FixLineWidth(sf);
             }
             return h;
         }
@@ -669,7 +670,7 @@ namespace FAD3
         /// <param name="showInLayerUI"></param>
         /// <param name="layerHandle"></param>
         /// <returns></returns>
-        public int AddLayer(object layer, string layerName, bool visible, bool showInLayerUI, string fileName = "")
+        public int AddLayer(object layer, string layerName, bool visible, bool showInLayerUI, string fileName = "", fad3MappingMode mappingMode = fad3MappingMode.defaultMode)
         {
             int h = 0;
             GeoProjection gp = new GeoProjection();
@@ -681,7 +682,7 @@ namespace FAD3
                 case "ShapefileClass":
                     h = _axmap.AddLayer((Shapefile)layer, visible);
                     gp = ((Shapefile)layer).GeoProjection;
-                    Mapping.LineWidthFix.FixLineWidth((Shapefile)layer);
+                    LineWidthFix.FixLineWidth((Shapefile)layer);
                     break;
 
                 case "ImageClass":
@@ -697,6 +698,7 @@ namespace FAD3
 
             _axmap.set_LayerName(h, layerName);
             _currentMapLayer = SetMapLayer(h, layerName, visible, showInLayerUI, gp, layerType, fileName);
+            _currentMapLayer.MappingMode = mappingMode;
 
             if (LayerRead != null)
             {

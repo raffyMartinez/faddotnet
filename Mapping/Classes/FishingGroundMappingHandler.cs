@@ -298,7 +298,7 @@ namespace FAD3
                     }
                 }
 
-                using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
+                using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.MDBPath))
                 {
                     conection.Open();
                     using (var adapter = new OleDbDataAdapter(query, conection))

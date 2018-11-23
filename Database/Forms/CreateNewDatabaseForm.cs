@@ -57,13 +57,13 @@ namespace FAD3
                 case "buttonFileName":
                     SaveFileDialog sfd = new SaveFileDialog();
                     sfd.Title = "Provide filename of new database";
-                    if (global.mdbPath.Length == 0)
+                    if (global.MDBPath.Length == 0)
                     {
                         sfd.InitialDirectory = Path.GetDirectoryName(Application.ExecutablePath);
                     }
                     else
                     {
-                        sfd.InitialDirectory = global.mdbPath;
+                        sfd.InitialDirectory = global.MDBPath;
                     }
                     //ofd.InitialDirectory = Path.GetDirectoryName(Application.ExecutablePath);
                     sfd.Filter = "Microsoft Access Data File (.mdb)|*.mdb";
@@ -114,7 +114,7 @@ namespace FAD3
         private bool UpdateNewMDB()
         {
             var dbe = new DBEngine();
-            var dbData = dbe.OpenDatabase(global.mdbPath);
+            var dbData = dbe.OpenDatabase(global.MDBPath);
             var dbTemplate = dbe.OpenDatabase(global.TemplateMDBFile);
             var sql = "";
             var qd = new dao.QueryDef();
@@ -194,6 +194,13 @@ namespace FAD3
             if (checkFishLocalNames.Checked)
             {
                 sql = $"Insert Into tblBaseLocalNames In '{_newMDBFile}' Select {TableFieldList("tblBaseLocalNames")}  from tblBaseLocalNames";
+                qd = dbData.CreateQueryDef("", sql);
+                qd.Execute();
+            }
+
+            if(checkLocalNameToSpeciesName.Checked && checkFishLocalNames.Checked && checkSciNames.Checked)
+            {
+                sql = $"Insert Into tblLocalNamesScientific In '{_newMDBFile}' Select {TableFieldList("tblLocalNamesScientific")}  from tblLocalNamesScientific";
                 qd = dbData.CreateQueryDef("", sql);
                 qd.Execute();
             }

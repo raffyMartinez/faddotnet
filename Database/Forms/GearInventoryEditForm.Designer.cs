@@ -28,6 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem("Fuel");
+            System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem("Food");
+            System.Windows.Forms.ListViewItem listViewItem3 = new System.Windows.Forms.ListViewItem("Ice");
+            System.Windows.Forms.ListViewItem listViewItem4 = new System.Windows.Forms.ListViewItem("");
             this.btnOk = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.txtInventoryName = new System.Windows.Forms.TextBox();
@@ -54,6 +58,7 @@
             this.label3 = new System.Windows.Forms.Label();
             this.comboProvince = new System.Windows.Forms.ComboBox();
             this.pnlGear = new System.Windows.Forms.Panel();
+            this.lblLocation = new System.Windows.Forms.Label();
             this.tabsGear = new System.Windows.Forms.TabControl();
             this.tabLocalNames = new System.Windows.Forms.TabPage();
             this.btnRemoveLocalName = new System.Windows.Forms.Button();
@@ -115,7 +120,24 @@
             this.cboGearVariation = new System.Windows.Forms.ComboBox();
             this.label11 = new System.Windows.Forms.Label();
             this.cboGearClass = new System.Windows.Forms.ComboBox();
-            this.lblLocation = new System.Windows.Forms.Label();
+            this.tabAccesories = new System.Windows.Forms.TabPage();
+            this.tabCosts = new System.Windows.Forms.TabPage();
+            this.tabNotes = new System.Windows.Forms.TabPage();
+            this.button1 = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
+            this.listBoxAccessories = new System.Windows.Forms.ListBox();
+            this.cboSelectAccessory = new System.Windows.Forms.ComboBox();
+            this.label33 = new System.Windows.Forms.Label();
+            this.label34 = new System.Windows.Forms.Label();
+            this.txtNotes = new System.Windows.Forms.TextBox();
+            this.listViewExpenses = new System.Windows.Forms.ListView();
+            this.label35 = new System.Windows.Forms.Label();
+            this.btnRemoveExpense = new System.Windows.Forms.Button();
+            this.btnAddExpense = new System.Windows.Forms.Button();
+            this.colExpens = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.Cost = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colSource = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colNotes = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.pnlInventory.SuspendLayout();
             this.pnlBarangay.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -128,11 +150,14 @@
             this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.tabComposition.SuspendLayout();
+            this.tabAccesories.SuspendLayout();
+            this.tabCosts.SuspendLayout();
+            this.tabNotes.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnOk
             // 
-            this.btnOk.Location = new System.Drawing.Point(306, 467);
+            this.btnOk.Location = new System.Drawing.Point(307, 502);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(55, 26);
             this.btnOk.TabIndex = 1;
@@ -143,7 +168,7 @@
             // btnCancel
             // 
             this.btnCancel.CausesValidation = false;
-            this.btnCancel.Location = new System.Drawing.Point(245, 467);
+            this.btnCancel.Location = new System.Drawing.Point(246, 502);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(55, 26);
             this.btnCancel.TabIndex = 2;
@@ -382,9 +407,18 @@
             this.pnlGear.Controls.Add(this.cboGearClass);
             this.pnlGear.Location = new System.Drawing.Point(394, 17);
             this.pnlGear.Name = "pnlGear";
-            this.pnlGear.Size = new System.Drawing.Size(381, 445);
+            this.pnlGear.Size = new System.Drawing.Size(367, 475);
             this.pnlGear.TabIndex = 6;
             this.pnlGear.Visible = false;
+            // 
+            // lblLocation
+            // 
+            this.lblLocation.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblLocation.Location = new System.Drawing.Point(7, 1);
+            this.lblLocation.Name = "lblLocation";
+            this.lblLocation.Size = new System.Drawing.Size(359, 36);
+            this.lblLocation.TabIndex = 8;
+            this.lblLocation.Text = "This, is text.";
             // 
             // tabsGear
             // 
@@ -393,11 +427,16 @@
             this.tabsGear.Controls.Add(this.tabSeasonality);
             this.tabsGear.Controls.Add(this.tabCPUE);
             this.tabsGear.Controls.Add(this.tabComposition);
+            this.tabsGear.Controls.Add(this.tabAccesories);
+            this.tabsGear.Controls.Add(this.tabCosts);
+            this.tabsGear.Controls.Add(this.tabNotes);
             this.tabsGear.Location = new System.Drawing.Point(3, 118);
+            this.tabsGear.Multiline = true;
             this.tabsGear.Name = "tabsGear";
             this.tabsGear.SelectedIndex = 0;
-            this.tabsGear.Size = new System.Drawing.Size(367, 322);
+            this.tabsGear.Size = new System.Drawing.Size(363, 354);
             this.tabsGear.TabIndex = 7;
+            this.tabsGear.Validating += new System.ComponentModel.CancelEventHandler(this.OnComboValidating);
             // 
             // tabLocalNames
             // 
@@ -407,12 +446,12 @@
             this.tabLocalNames.Controls.Add(this.listBoxGearLocalNames);
             this.tabLocalNames.Controls.Add(this.label26);
             this.tabLocalNames.Controls.Add(this.cboSelectGearLocalName);
-            this.tabLocalNames.Location = new System.Drawing.Point(4, 22);
+            this.tabLocalNames.Location = new System.Drawing.Point(4, 40);
             this.tabLocalNames.Name = "tabLocalNames";
             this.tabLocalNames.Padding = new System.Windows.Forms.Padding(3);
-            this.tabLocalNames.Size = new System.Drawing.Size(359, 314);
+            this.tabLocalNames.Size = new System.Drawing.Size(355, 310);
             this.tabLocalNames.TabIndex = 3;
-            this.tabLocalNames.Text = "Local names";
+            this.tabLocalNames.Text = "Local names of gear";
             this.tabLocalNames.UseVisualStyleBackColor = true;
             // 
             // btnRemoveLocalName
@@ -485,10 +524,10 @@
             this.tabUsage.Controls.Add(this.label13);
             this.tabUsage.Controls.Add(this.label14);
             this.tabUsage.Controls.Add(this.label15);
-            this.tabUsage.Location = new System.Drawing.Point(4, 22);
+            this.tabUsage.Location = new System.Drawing.Point(4, 40);
             this.tabUsage.Name = "tabUsage";
             this.tabUsage.Padding = new System.Windows.Forms.Padding(3);
-            this.tabUsage.Size = new System.Drawing.Size(359, 314);
+            this.tabUsage.Size = new System.Drawing.Size(355, 310);
             this.tabUsage.TabIndex = 0;
             this.tabUsage.Text = "Usage count";
             // 
@@ -578,10 +617,10 @@
             this.tabSeasonality.Controls.Add(this.txtNumberOfDaysPerMonth);
             this.tabSeasonality.Controls.Add(this.chkListBoxMonthsSeason);
             this.tabSeasonality.Controls.Add(this.chkListBoxMonthsUsed);
-            this.tabSeasonality.Location = new System.Drawing.Point(4, 22);
+            this.tabSeasonality.Location = new System.Drawing.Point(4, 40);
             this.tabSeasonality.Name = "tabSeasonality";
             this.tabSeasonality.Padding = new System.Windows.Forms.Padding(3);
-            this.tabSeasonality.Size = new System.Drawing.Size(359, 314);
+            this.tabSeasonality.Size = new System.Drawing.Size(355, 310);
             this.tabSeasonality.TabIndex = 1;
             this.tabSeasonality.Text = "Seasonality";
             this.tabSeasonality.UseVisualStyleBackColor = true;
@@ -661,10 +700,10 @@
             this.tabCPUE.Controls.Add(this.listViewHistoryCpue);
             this.tabCPUE.Controls.Add(this.groupBox3);
             this.tabCPUE.Controls.Add(this.groupBox2);
-            this.tabCPUE.Location = new System.Drawing.Point(4, 22);
+            this.tabCPUE.Location = new System.Drawing.Point(4, 40);
             this.tabCPUE.Name = "tabCPUE";
             this.tabCPUE.Padding = new System.Windows.Forms.Padding(3);
-            this.tabCPUE.Size = new System.Drawing.Size(359, 305);
+            this.tabCPUE.Size = new System.Drawing.Size(355, 310);
             this.tabCPUE.TabIndex = 2;
             this.tabCPUE.Text = "CPUE";
             this.tabCPUE.UseVisualStyleBackColor = true;
@@ -833,10 +872,10 @@
             this.tabComposition.Controls.Add(this.cboCatchLocalName);
             this.tabComposition.Controls.Add(this.listBoxOtherCatch);
             this.tabComposition.Controls.Add(this.listBoxDominantCatch);
-            this.tabComposition.Location = new System.Drawing.Point(4, 22);
+            this.tabComposition.Location = new System.Drawing.Point(4, 40);
             this.tabComposition.Name = "tabComposition";
             this.tabComposition.Padding = new System.Windows.Forms.Padding(3);
-            this.tabComposition.Size = new System.Drawing.Size(359, 296);
+            this.tabComposition.Size = new System.Drawing.Size(355, 310);
             this.tabComposition.TabIndex = 4;
             this.tabComposition.Text = "Catch composition";
             this.tabComposition.UseVisualStyleBackColor = true;
@@ -1007,20 +1046,183 @@
             this.cboGearClass.TabIndex = 0;
             this.cboGearClass.SelectedIndexChanged += new System.EventHandler(this.OnComboSelectedIndexChanged);
             // 
-            // lblLocation
+            // tabAccesories
             // 
-            this.lblLocation.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblLocation.Location = new System.Drawing.Point(7, 1);
-            this.lblLocation.Name = "lblLocation";
-            this.lblLocation.Size = new System.Drawing.Size(359, 36);
-            this.lblLocation.TabIndex = 8;
-            this.lblLocation.Text = "This, is text.";
+            this.tabAccesories.Controls.Add(this.label33);
+            this.tabAccesories.Controls.Add(this.label34);
+            this.tabAccesories.Controls.Add(this.button1);
+            this.tabAccesories.Controls.Add(this.button2);
+            this.tabAccesories.Controls.Add(this.listBoxAccessories);
+            this.tabAccesories.Controls.Add(this.cboSelectAccessory);
+            this.tabAccesories.Location = new System.Drawing.Point(4, 40);
+            this.tabAccesories.Name = "tabAccesories";
+            this.tabAccesories.Padding = new System.Windows.Forms.Padding(3);
+            this.tabAccesories.Size = new System.Drawing.Size(355, 310);
+            this.tabAccesories.TabIndex = 5;
+            this.tabAccesories.Text = "Accessories";
+            this.tabAccesories.UseVisualStyleBackColor = true;
+            // 
+            // tabCosts
+            // 
+            this.tabCosts.Controls.Add(this.btnRemoveExpense);
+            this.tabCosts.Controls.Add(this.btnAddExpense);
+            this.tabCosts.Controls.Add(this.label35);
+            this.tabCosts.Controls.Add(this.listViewExpenses);
+            this.tabCosts.Location = new System.Drawing.Point(4, 40);
+            this.tabCosts.Name = "tabCosts";
+            this.tabCosts.Padding = new System.Windows.Forms.Padding(3);
+            this.tabCosts.Size = new System.Drawing.Size(355, 310);
+            this.tabCosts.TabIndex = 6;
+            this.tabCosts.Text = "Expenses";
+            this.tabCosts.UseVisualStyleBackColor = true;
+            // 
+            // tabNotes
+            // 
+            this.tabNotes.Controls.Add(this.txtNotes);
+            this.tabNotes.Location = new System.Drawing.Point(4, 40);
+            this.tabNotes.Name = "tabNotes";
+            this.tabNotes.Padding = new System.Windows.Forms.Padding(3);
+            this.tabNotes.Size = new System.Drawing.Size(355, 310);
+            this.tabNotes.TabIndex = 7;
+            this.tabNotes.Text = "Notes";
+            this.tabNotes.UseVisualStyleBackColor = true;
+            // 
+            // button1
+            // 
+            this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button1.Location = new System.Drawing.Point(250, 135);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(28, 26);
+            this.button1.TabIndex = 15;
+            this.button1.Text = "-";
+            this.button1.UseVisualStyleBackColor = true;
+            // 
+            // button2
+            // 
+            this.button2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button2.Location = new System.Drawing.Point(250, 103);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(28, 26);
+            this.button2.TabIndex = 14;
+            this.button2.Text = "+";
+            this.button2.UseVisualStyleBackColor = true;
+            // 
+            // listBoxAccessories
+            // 
+            this.listBoxAccessories.FormattingEnabled = true;
+            this.listBoxAccessories.Location = new System.Drawing.Point(80, 103);
+            this.listBoxAccessories.Name = "listBoxAccessories";
+            this.listBoxAccessories.Size = new System.Drawing.Size(164, 160);
+            this.listBoxAccessories.TabIndex = 13;
+            // 
+            // cboSelectAccessory
+            // 
+            this.cboSelectAccessory.FormattingEnabled = true;
+            this.cboSelectAccessory.Location = new System.Drawing.Point(80, 48);
+            this.cboSelectAccessory.Name = "cboSelectAccessory";
+            this.cboSelectAccessory.Size = new System.Drawing.Size(165, 21);
+            this.cboSelectAccessory.TabIndex = 12;
+            this.cboSelectAccessory.Validating += new System.ComponentModel.CancelEventHandler(this.OnComboValidating);
+            // 
+            // label33
+            // 
+            this.label33.AutoSize = true;
+            this.label33.Location = new System.Drawing.Point(79, 86);
+            this.label33.Name = "label33";
+            this.label33.Size = new System.Drawing.Size(64, 13);
+            this.label33.TabIndex = 17;
+            this.label33.Text = "Accessories";
+            // 
+            // label34
+            // 
+            this.label34.AutoSize = true;
+            this.label34.Location = new System.Drawing.Point(79, 31);
+            this.label34.Name = "label34";
+            this.label34.Size = new System.Drawing.Size(88, 13);
+            this.label34.TabIndex = 16;
+            this.label34.Text = "Select accessory";
+            // 
+            // txtNotes
+            // 
+            this.txtNotes.Location = new System.Drawing.Point(20, 38);
+            this.txtNotes.Multiline = true;
+            this.txtNotes.Name = "txtNotes";
+            this.txtNotes.Size = new System.Drawing.Size(317, 235);
+            this.txtNotes.TabIndex = 5;
+            // 
+            // listViewExpenses
+            // 
+            this.listViewExpenses.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.colExpens,
+            this.Cost,
+            this.colSource,
+            this.colNotes});
+            this.listViewExpenses.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
+            listViewItem1,
+            listViewItem2,
+            listViewItem3,
+            listViewItem4});
+            this.listViewExpenses.Location = new System.Drawing.Point(9, 52);
+            this.listViewExpenses.Name = "listViewExpenses";
+            this.listViewExpenses.Size = new System.Drawing.Size(340, 202);
+            this.listViewExpenses.TabIndex = 0;
+            this.listViewExpenses.UseCompatibleStateImageBehavior = false;
+            this.listViewExpenses.View = System.Windows.Forms.View.Details;
+            this.listViewExpenses.DoubleClick += new System.EventHandler(this.OnListViewDblClick);
+            this.listViewExpenses.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnListViewMouseDown);
+            // 
+            // label35
+            // 
+            this.label35.AutoSize = true;
+            this.label35.Location = new System.Drawing.Point(12, 31);
+            this.label35.Name = "label35";
+            this.label35.Size = new System.Drawing.Size(53, 13);
+            this.label35.TabIndex = 3;
+            this.label35.Text = "Expenses";
+            // 
+            // btnRemoveExpense
+            // 
+            this.btnRemoveExpense.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnRemoveExpense.Location = new System.Drawing.Point(312, 23);
+            this.btnRemoveExpense.Name = "btnRemoveExpense";
+            this.btnRemoveExpense.Size = new System.Drawing.Size(28, 26);
+            this.btnRemoveExpense.TabIndex = 13;
+            this.btnRemoveExpense.Text = "-";
+            this.btnRemoveExpense.UseVisualStyleBackColor = true;
+            this.btnRemoveExpense.Click += new System.EventHandler(this.OnButtonClick);
+            // 
+            // btnAddExpense
+            // 
+            this.btnAddExpense.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnAddExpense.Location = new System.Drawing.Point(278, 23);
+            this.btnAddExpense.Name = "btnAddExpense";
+            this.btnAddExpense.Size = new System.Drawing.Size(28, 26);
+            this.btnAddExpense.TabIndex = 12;
+            this.btnAddExpense.Text = "+";
+            this.btnAddExpense.UseVisualStyleBackColor = true;
+            this.btnAddExpense.Click += new System.EventHandler(this.OnButtonClick);
+            // 
+            // colExpens
+            // 
+            this.colExpens.Text = "Expense item";
+            // 
+            // Cost
+            // 
+            this.Cost.Text = "Cost";
+            // 
+            // colSource
+            // 
+            this.colSource.Text = "Source";
+            // 
+            // colNotes
+            // 
+            this.colNotes.Text = "Notes";
             // 
             // GearInventoryEditForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(779, 505);
+            this.ClientSize = new System.Drawing.Size(764, 533);
             this.Controls.Add(this.pnlGear);
             this.Controls.Add(this.pnlBarangay);
             this.Controls.Add(this.pnlInventory);
@@ -1054,6 +1256,12 @@
             this.groupBox2.PerformLayout();
             this.tabComposition.ResumeLayout(false);
             this.tabComposition.PerformLayout();
+            this.tabAccesories.ResumeLayout(false);
+            this.tabAccesories.PerformLayout();
+            this.tabCosts.ResumeLayout(false);
+            this.tabCosts.PerformLayout();
+            this.tabNotes.ResumeLayout(false);
+            this.tabNotes.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -1147,5 +1355,23 @@
         private System.Windows.Forms.Label label32;
         private System.Windows.Forms.Label label31;
         private System.Windows.Forms.Label lblLocation;
+        private System.Windows.Forms.TabPage tabAccesories;
+        private System.Windows.Forms.TabPage tabCosts;
+        private System.Windows.Forms.TabPage tabNotes;
+        private System.Windows.Forms.Label label33;
+        private System.Windows.Forms.Label label34;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.ListBox listBoxAccessories;
+        private System.Windows.Forms.ComboBox cboSelectAccessory;
+        private System.Windows.Forms.TextBox txtNotes;
+        private System.Windows.Forms.Button btnRemoveExpense;
+        private System.Windows.Forms.Button btnAddExpense;
+        private System.Windows.Forms.Label label35;
+        private System.Windows.Forms.ListView listViewExpenses;
+        private System.Windows.Forms.ColumnHeader colExpens;
+        private System.Windows.Forms.ColumnHeader Cost;
+        private System.Windows.Forms.ColumnHeader colSource;
+        private System.Windows.Forms.ColumnHeader colNotes;
     }
 }

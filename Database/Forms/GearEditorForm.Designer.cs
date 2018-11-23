@@ -80,7 +80,7 @@
             // 
             this.buttonOk.Location = new System.Drawing.Point(206, 486);
             this.buttonOk.Name = "buttonOk";
-            this.buttonOk.Size = new System.Drawing.Size(56, 22);
+            this.buttonOk.Size = new System.Drawing.Size(56, 25);
             this.buttonOk.TabIndex = 5;
             this.buttonOk.Text = "OK";
             this.buttonOk.UseVisualStyleBackColor = true;
@@ -92,7 +92,7 @@
             this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.buttonCancel.Location = new System.Drawing.Point(145, 486);
             this.buttonCancel.Name = "buttonCancel";
-            this.buttonCancel.Size = new System.Drawing.Size(56, 22);
+            this.buttonCancel.Size = new System.Drawing.Size(56, 25);
             this.buttonCancel.TabIndex = 6;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = true;
@@ -126,7 +126,7 @@
             this.labelCode.Text = "G";
             this.labelCode.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // GearEditoForm
+            // GearEditorForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -144,7 +144,7 @@
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Margin = new System.Windows.Forms.Padding(4);
-            this.Name = "GearEditoForm";
+            this.Name = "GearEditorForm";
             this.Text = "Gear editor";
             this.Load += new System.EventHandler(this.OnFormLoad);
             this.ResumeLayout(false);

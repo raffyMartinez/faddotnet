@@ -40,7 +40,7 @@
             this.treeList.Name = "treeList";
             this.treeList.Size = new System.Drawing.Size(227, 599);
             this.treeList.TabIndex = 0;
-            this.treeList.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeList_AfterSelect);
+            this.treeList.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.OnTreeView_AfterSelect);
             // 
             // lvSamplings
             // 

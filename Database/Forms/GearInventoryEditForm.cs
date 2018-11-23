@@ -31,6 +31,7 @@ namespace FAD3.Database.Forms
         private ListBox _activeCatchCompList;
         private GearInventoryForm _parentForm;
         private List<string> _sitios = new List<string>();
+        private ListViewItem _hitItem;
 
         public void SelectedSimilarName(string similarName, FisheryObjectNameType localNameType)
         {
@@ -210,6 +211,17 @@ namespace FAD3.Database.Forms
             cboCatchUnit.Items.Add("banyera");
             cboCatchUnit.Items.Add("ice box");
             cboCatchUnit.SelectedIndex = 0;
+
+            cboSelectAccessory.Items.Clear();
+            foreach (var item in Gear.Accessories)
+            {
+                cboSelectAccessory.Items.Add(item);
+            }
+            cboSelectAccessory.AutoCompleteSource = AutoCompleteSource.ListItems;
+            cboSelectAccessory.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            cboSelectAccessory.Sorted = true;
+
+            listViewExpenses.Items.Clear();
         }
 
         public void AddNewGearInventory(string barangayInventoryGuid, int countCommercial, int countMunicipalMotorized, int countMunicipalNonMotorized, int countFishers)
@@ -270,15 +282,39 @@ namespace FAD3.Database.Forms
                 && (txtRangeMax.Text.Length > 0 || txtRangeMin.Text.Length > 0)
                 && (txtModeLower.Text.Length > 0 || txtModeUpper.Text.Length > 0)
                 && listBoxDominantCatch.Items.Count > 0
-                //&& listBoxOtherCatch.Items.Count > 0
                 && txtDominantPercentage.Text.Length > 0
                 && IsCatchValuesOK();
 
-            if (proceed && listViewHistoryCpue.Items.Count == 0)
+            if (proceed && (listBoxAccessories.Items.Count == 0 || listViewExpenses.Items.Count == 0 || listViewHistoryCpue.Items.Count == 0))
             {
-                proceed = MessageBox.Show("No entry found for historical CPUE\r\nDo you still want to proceed?",
+                var n = 0;
+                var msg = "";
+                if (listBoxAccessories.Items.Count == 0)
+                {
+                    msg += "Fishing accessories\r\n";
+                    n++;
+                }
+                if (listViewExpenses.Items.Count == 0)
+                {
+                    msg += "Expenses\r\n";
+                    n++;
+                }
+                if (listViewHistoryCpue.Items.Count == 0)
+                {
+                    msg += "CPUE history";
+                    n++;
+                }
+                msg = $"The following {(n == 1 ? "item is " : "items are")} not filled up:\r\n{msg}";
+
+                proceed = MessageBox.Show($"{msg}\r\nDo you still want to proceed?",
                     "Confirmation needed", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes;
             }
+
+            //if (proceed)
+            //{
+            //    proceed = MessageBox.Show("List of accessories or expenses is not filled up\r\nDo you still want to proceed?",
+            //        "Confirmation needed", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes;
+            //}
 
             return proceed;
         }
@@ -684,7 +720,17 @@ namespace FAD3.Database.Forms
                 case "btnRemoveOther":
                     listBoxOtherCatch.Items.Remove(listBoxOtherCatch.SelectedItem);
                     break;
+
+                case "btnAddExpense":
+                    AddExpense();
+                    break;
             }
+        }
+
+        private void AddExpense()
+        {
+            FishingExpenseForm fef = new FishingExpenseForm(this);
+            fef.ShowDialog(this);
         }
 
         private void SetActiveCatchCompositionListBox(ListBox lBox)
@@ -871,12 +917,26 @@ namespace FAD3.Database.Forms
         private bool ComboItemsContains(ComboBox cbo, string itemName)
         {
             bool isContaining = false;
-            foreach (KeyValuePair<string, string> kv in cbo.Items)
+            if (cbo.Name == "cboSelectAccessory")
             {
-                isContaining = kv.Value == itemName;
-                if (isContaining)
+                foreach (string item in cbo.Items)
                 {
-                    return isContaining;
+                    isContaining = item == itemName;
+                    if (isContaining)
+                    {
+                        return isContaining;
+                    }
+                }
+            }
+            else
+            {
+                foreach (KeyValuePair<string, string> kv in cbo.Items)
+                {
+                    isContaining = kv.Value == itemName;
+                    if (isContaining)
+                    {
+                        return isContaining;
+                    }
                 }
             }
             return false;
@@ -884,112 +944,164 @@ namespace FAD3.Database.Forms
 
         private void OnComboValidating(object sender, CancelEventArgs e)
         {
-            var ctlName = ((ComboBox)sender).Name;
-            var s = ((ComboBox)sender).Text;
-            var cbo = (ComboBox)sender;
-            var msg = "";
-            var gearClass = "";
-            if (s.Length > 0)
+            if (sender.GetType().Name == "ComboBox")
             {
-                switch (ctlName)
+                var ctlName = ((ComboBox)sender).Name;
+                var s = ((ComboBox)sender).Text;
+                var cbo = (ComboBox)sender;
+                var msg = "";
+                var gearClass = "";
+                if (s.Length > 0)
                 {
-                    case "cboCatchLocalName":
-                    case "cboSelectGearLocalName":
-                    case "cboGearVariation":
-                        if (ComboItemsContains(cbo, s))
-                        {
-                            if (ctlName == "cboGearVariation")
+                    switch (ctlName)
+                    {
+                        case "cboCatchLocalName":
+                        case "cboSelectGearLocalName":
+                        case "cboGearVariation":
+                        case "cboSelectAccessory":
+                            if (ComboItemsContains(cbo, s))
                             {
-                                //we check database if gear variation is already in the inventory then cancel if true
-                                if (_dataStatus == fad3DataStatus.statusNew && _inventory.IsGearInInventory(_barangayInventoryGuid, _gearVariationKey))
+                                if (ctlName == "cboGearVariation")
                                 {
-                                    msg = "Cannot accept selected gear\r\nbecause it has been inventoried";
-                                    MessageBox.Show(msg, "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                    //we check database if gear variation is already in the inventory then cancel if true
+                                    if (_dataStatus == fad3DataStatus.statusNew && _inventory.IsGearInInventory(_barangayInventoryGuid, _gearVariationKey))
+                                    {
+                                        msg = "Cannot accept selected gear\r\nbecause it has been inventoried";
+                                        MessageBox.Show(msg, "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                        e.Cancel = true;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                FisheryObjectNameType nameType = FisheryObjectNameType.CatchLocalName;
+                                switch (ctlName)
+                                {
+                                    case "cboSelectAccessory":
+                                        msg = $"{s} is not in the list of accessories.\r\nDo you want to add a new accessory?";
+                                        nameType = FisheryObjectNameType.FishingAccessory;
+                                        break;
+
+                                    case "cboCatchLocalName":
+                                        msg = $"{s} is not in the list of catch local names.\r\nDo you want to add a new local name?";
+                                        break;
+
+                                    case "cboSelectGearLocalName":
+                                        msg = $"{s} is not in the list of gear local names.\r\nDo you want to add a new local name?";
+                                        nameType = FisheryObjectNameType.GearLocalName;
+                                        break;
+
+                                    case "cboGearVariation":
+                                        msg = $"{s} is not in the list of gear variations.\r\nDo you want to add a new gear variation name?";
+                                        nameType = FisheryObjectNameType.GearVariationName;
+                                        gearClass = ((KeyValuePair<string, string>)cboGearClass.SelectedItem).Key;
+                                        break;
+                                }
+                                var result = MessageBox.Show(msg, "Add new name", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                                if (result == DialogResult.Yes)
+                                {
+                                    NewFisheryObjectName newName = new NewFisheryObjectName(s, nameType);
+                                    using (NewNameForm nmf = new NewNameForm(newName, gearClass))
+                                    {
+                                        nmf.ShowDialog(this);
+                                        if (nmf.DialogResult == DialogResult.OK)
+                                        {
+                                            if (ctlName == "cboSelectAccessory")
+                                            {
+                                                cboSelectAccessory.Items.Add(newName.NewName);
+                                                listBoxAccessories.Items.Add(newName.NewName);
+                                                cbo.Text = "";
+                                            }
+                                            else
+                                            {
+                                                KeyValuePair<string, string> kv = new KeyValuePair<string, string>(newName.ObjectGUID, newName.NewName);
+                                                cbo.Items.Add(kv);
+                                                switch (ctlName)
+                                                {
+                                                    case "cboCatchLocalName":
+                                                        _activeCatchCompList.Items.Add(kv);
+                                                        cbo.Text = "";
+                                                        break;
+
+                                                    case "cboSelectGearLocalName":
+                                                        listBoxGearLocalNames.Items.Add(kv);
+                                                        cbo.Text = "";
+                                                        break;
+
+                                                    case "cboGearVariation":
+
+                                                        break;
+                                                }
+                                            }
+                                        }
+                                        else if (nmf.DialogResult == DialogResult.Cancel && newName.UseThisName != null)
+                                        {
+                                            cbo.Text = newName.UseThisName;
+                                        }
+                                    }
+                                    //result = NewNameForm.Show(newName, gearClass);
+                                    //if (result == DialogResult.Cancel && newName.UseThisName != null)
+                                    //{
+                                    //    if (newName.UseThisName.Length > 0)
+                                    //    {
+                                    //        cbo.Text = newName.UseThisName;
+                                    //    }
+                                    //}
+                                    //else if (result == DialogResult.OK)
+                                    //{
+                                    //    KeyValuePair<string, string> kv = new KeyValuePair<string, string>(newName.ObjectGUID, newName.NewName);
+                                    //    cbo.Items.Add(kv);
+                                    //    switch (ctlName)
+                                    //    {
+                                    //        case "cboCatchLocalName":
+                                    //            _activeCatchCompList.Items.Add(kv);
+                                    //            cbo.Text = "";
+                                    //            break;
+
+                                    //        case "cboSelectGearLocalName":
+                                    //            listBoxGearLocalNames.Items.Add(kv);
+                                    //            cbo.Text = "";
+                                    //            break;
+
+                                    //        case "cboGearVariation":
+
+                                    //            break;
+
+                                    //        case "cboSelectAccessory":
+                                    //            listBoxAccessories.Items.Add(kv.Value);
+                                    //            cbo.Text = "";
+                                    //            break;
+                                    //    }
+                                    //}
+                                }
+                                else
+                                {
                                     e.Cancel = true;
                                 }
                             }
-                        }
-                        else
-                        {
-                            FisheryObjectNameType nameType = FisheryObjectNameType.CatchLocalName;
-                            switch (ctlName)
-                            {
-                                case "cboCatchLocalName":
-                                    msg = $"{s} is not in the list of catch local names.\r\nDo you want to add a new local name?";
-                                    break;
+                            break;
 
-                                case "cboSelectGearLocalName":
-                                    msg = $"{s} is not in the list of gear local names.\r\nDo you want to add a new local name?";
-                                    nameType = FisheryObjectNameType.GearLocalName;
-                                    break;
-
-                                case "cboGearVariation":
-                                    msg = $"{s} is not in the list of gear variations.\r\nDo you want to add a new gear variation name?";
-                                    nameType = FisheryObjectNameType.GearVariationName;
-                                    gearClass = ((KeyValuePair<string, string>)cboGearClass.SelectedItem).Key;
-                                    break;
-                            }
-                            var result = MessageBox.Show(msg, "Add new name", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
-                            if (result == DialogResult.Yes)
+                        case "comboBarangays":
+                            if (!comboBarangays.Items.Contains(s))
                             {
-                                NewFisheryObjectName newName = new NewFisheryObjectName(s, nameType);
-                                result = NewNameForm.Show(newName, gearClass);
-                                if (result == DialogResult.Cancel && newName.UseThisName != null)
+                                msg = $"'{s}' is not in list of barangays\r\nDo you want to add a new barangay?";
+                                var result = MessageBox.Show(msg, "Create new barangay", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                                if (result == DialogResult.Yes)
                                 {
-                                    if (newName.UseThisName.Length > 0)
-                                    {
-                                        cbo.Text = newName.UseThisName;
-                                    }
+                                    comboBarangays.Items.Add(s);
                                 }
-                                else if (result == DialogResult.OK)
+                                else
                                 {
-                                    KeyValuePair<string, string> kv = new KeyValuePair<string, string>(newName.ObjectGUID, newName.NewName);
-                                    cbo.Items.Add(kv);
-                                    switch (ctlName)
-                                    {
-                                        case "cboCatchLocalName":
-                                            _activeCatchCompList.Items.Add(kv);
-                                            cbo.Text = "";
-                                            break;
-
-                                        case "cboSelectGearLocalName":
-                                            listBoxGearLocalNames.Items.Add(kv);
-                                            cbo.Text = "";
-                                            break;
-
-                                        case "cboGearVariation":
-
-                                            break;
-                                    }
+                                    e.Cancel = true;
                                 }
                             }
-                            else
-                            {
-                                e.Cancel = true;
-                            }
-                        }
-                        break;
-
-                    case "comboBarangays":
-                        if (!comboBarangays.Items.Contains(s))
-                        {
-                            msg = $"'{s}' is not in list of barangays\r\nDo you want to add a new barangay?";
-                            var result = MessageBox.Show(msg, "Create new barangay", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
-                            if (result == DialogResult.Yes)
-                            {
-                                comboBarangays.Items.Add(s);
-                            }
-                            else
-                            {
-                                e.Cancel = true;
-                            }
-                        }
-                        break;
-                }
-                if (!e.Cancel)
-                {
-                    _sitios.Clear();
-                    _sitios = _inventory.GetBarangaySitios(comboProvince.Text, comboMunicipality.Text, s);
+                            break;
+                    }
+                    if (!e.Cancel)
+                    {
+                        _sitios.Clear();
+                        _sitios = _inventory.GetBarangaySitios(comboProvince.Text, comboMunicipality.Text, s);
+                    }
                 }
             }
         }
@@ -1009,15 +1121,35 @@ namespace FAD3.Database.Forms
 
         private void OnListViewDblClick(object sender, EventArgs e)
         {
-            var historicalCPUEForm = new CPUEHistoricalForm(this, listViewHistoryCpue.SelectedItems[0].Text);
-            if (listViewHistoryCpue.SelectedItems[0].SubItems.Count > 1
-                && listViewHistoryCpue.SelectedItems[0].SubItems[1].Text.Length > 0
-                && listViewHistoryCpue.SelectedItems[0].SubItems[2].Text.Length > 0)
+            switch (((ListView)sender).Name)
             {
-                historicalCPUEForm.CatchValue(int.Parse(listViewHistoryCpue.SelectedItems[0].SubItems[1].Text),
-                                              listViewHistoryCpue.SelectedItems[0].SubItems[2].Text);
+                case "listViewHistoryCpue":
+
+                    var historicalCPUEForm = new CPUEHistoricalForm(this, listViewHistoryCpue.SelectedItems[0].Text);
+                    if (listViewHistoryCpue.SelectedItems[0].SubItems.Count > 1
+                        && listViewHistoryCpue.SelectedItems[0].SubItems[1].Text.Length > 0
+                        && listViewHistoryCpue.SelectedItems[0].SubItems[2].Text.Length > 0)
+                    {
+                        historicalCPUEForm.CatchValue(int.Parse(listViewHistoryCpue.SelectedItems[0].SubItems[1].Text),
+                                                      listViewHistoryCpue.SelectedItems[0].SubItems[2].Text);
+                    }
+                    historicalCPUEForm.ShowDialog(this);
+                    break;
+
+                case "listViewExpenses":
+                    if (_hitItem == null)
+                    {
+                        FishingExpenseForm fef = new FishingExpenseForm(this);
+                        fef.ShowDialog(this);
+                    }
+                    else
+                    {
+                        FishingExpenseForm fef = new FishingExpenseForm(this, _hitItem.Text, double.Parse(_hitItem.SubItems[1].Text), _hitItem.SubItems[2].Text, _hitItem.SubItems[3].Text);
+                        fef.ShowDialog(this);
+                    }
+
+                    break;
             }
-            historicalCPUEForm.ShowDialog(this);
         }
 
         public void HistoricalCPUE(int catchWeight, string unit)
@@ -1137,6 +1269,17 @@ namespace FAD3.Database.Forms
                 {
                     chkListBoxMonthsSeason.SetItemChecked(item, false);
                 }
+            }
+        }
+
+        private void OnListViewMouseDown(object sender, MouseEventArgs e)
+        {
+            var lv = (ListView)sender;
+            switch (lv.Name)
+            {
+                case "listViewExpenses":
+                    _hitItem = lv.HitTest(e.X, e.Y).Item;
+                    break;
             }
         }
     }

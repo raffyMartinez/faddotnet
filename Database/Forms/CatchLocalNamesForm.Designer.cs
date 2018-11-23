@@ -47,8 +47,9 @@
             this.tbExport = new System.Windows.Forms.ToolStripButton();
             this.tbImport = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
+            this.tbComboLabel = new System.Windows.Forms.ToolStripLabel();
             this.tbCombo = new System.Windows.Forms.ToolStripComboBox();
+            this.tbClose = new System.Windows.Forms.ToolStripButton();
             this.contextMenu.SuspendLayout();
             this.toolBar.SuspendLayout();
             this.SuspendLayout();
@@ -164,8 +165,9 @@
             this.tbExport,
             this.tbImport,
             this.toolStripSeparator1,
-            this.toolStripLabel1,
-            this.tbCombo});
+            this.tbComboLabel,
+            this.tbCombo,
+            this.tbClose});
             this.toolBar.Location = new System.Drawing.Point(0, 0);
             this.toolBar.Name = "toolBar";
             this.toolBar.Size = new System.Drawing.Size(694, 25);
@@ -228,11 +230,11 @@
             this.toolStripSeparator1.Name = "toolStripSeparator1";
             this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
             // 
-            // toolStripLabel1
+            // tbComboLabel
             // 
-            this.toolStripLabel1.Name = "toolStripLabel1";
-            this.toolStripLabel1.Size = new System.Drawing.Size(32, 22);
-            this.toolStripLabel1.Text = "View";
+            this.tbComboLabel.Name = "tbComboLabel";
+            this.tbComboLabel.Size = new System.Drawing.Size(32, 22);
+            this.tbComboLabel.Text = "View";
             // 
             // tbCombo
             // 
@@ -245,6 +247,16 @@
             this.tbCombo.Name = "tbCombo";
             this.tbCombo.Size = new System.Drawing.Size(121, 23);
             this.tbCombo.SelectedIndexChanged += new System.EventHandler(this.OnToolBarComboSelectedIndexChange);
+            // 
+            // tbClose
+            // 
+            this.tbClose.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tbClose.Image = global::FAD3.Properties.Resources.im_exit;
+            this.tbClose.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tbClose.Name = "tbClose";
+            this.tbClose.Size = new System.Drawing.Size(23, 22);
+            this.tbClose.Text = "toolStripButton1";
+            this.tbClose.ToolTipText = "Close window";
             // 
             // CatchLocalNamesForm
             // 
@@ -293,6 +305,7 @@
         private System.Windows.Forms.ToolStripButton tbImport;
         private System.Windows.Forms.ToolStripComboBox tbCombo;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-        private System.Windows.Forms.ToolStripLabel toolStripLabel1;
+        private System.Windows.Forms.ToolStripLabel tbComboLabel;
+        private System.Windows.Forms.ToolStripButton tbClose;
     }
 }

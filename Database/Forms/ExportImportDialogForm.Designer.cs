@@ -30,7 +30,7 @@
         {
             this.btnOk = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.rdButton = new System.Windows.Forms.RadioButton();
             this.SuspendLayout();
             // 
             // btnOk
@@ -53,22 +53,23 @@
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.OnButtonClick);
             // 
-            // checkBox1
+            // rdButton
             // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(12, 12);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(80, 17);
-            this.checkBox1.TabIndex = 3;
-            this.checkBox1.Text = "checkBox1";
-            this.checkBox1.UseVisualStyleBackColor = true;
+            this.rdButton.AutoSize = true;
+            this.rdButton.Location = new System.Drawing.Point(27, 34);
+            this.rdButton.Name = "rdButton";
+            this.rdButton.Size = new System.Drawing.Size(85, 17);
+            this.rdButton.TabIndex = 4;
+            this.rdButton.TabStop = true;
+            this.rdButton.Text = "radioButton1";
+            this.rdButton.UseVisualStyleBackColor = true;
             // 
             // ExportImportDialogForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(223, 126);
-            this.Controls.Add(this.checkBox1);
+            this.Controls.Add(this.rdButton);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnOk);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
@@ -83,6 +84,6 @@
         #endregion
         private System.Windows.Forms.Button btnOk;
         private System.Windows.Forms.Button btnCancel;
-        private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.RadioButton rdButton;
     }
 }

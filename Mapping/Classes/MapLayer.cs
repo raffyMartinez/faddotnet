@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using MapWinGIS;
+using FAD3.GUI.Classes;
 
 namespace FAD3
 {
@@ -31,6 +32,7 @@ namespace FAD3
         public string LabelSettingsXML { get; internal set; }
         public string SymbolSettinsXML { get; internal set; }
         public Labels Labels { get; internal set; }
+        public fad3MappingMode MappingMode { get; set; }
 
         public void RestoreSettingsFromXML()
         {

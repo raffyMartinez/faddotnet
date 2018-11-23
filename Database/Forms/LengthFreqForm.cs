@@ -17,7 +17,7 @@ namespace FAD3
         private TextBox _LastFreq;
         private TextBox _LastLen;
         private int _row = 1;
-        private sampling _sampling;
+        private Sampling _sampling;
         private int _spacer = 3;
         private bool _UpdateSequence = false;
         private int _y = 5;
@@ -26,7 +26,7 @@ namespace FAD3
         private double _OldLength;
         private MainForm _parent_form;
 
-        public LengthFreqForm(bool IsNew, sampling sampling, string CatchRowGuid, string CatchName, MainForm Parent)
+        public LengthFreqForm(bool IsNew, Sampling sampling, string CatchRowGuid, string CatchName, MainForm Parent)
         {
             InitializeComponent();
             _CatchRowGuid = CatchRowGuid;
@@ -312,7 +312,7 @@ namespace FAD3
             }
             else
             {
-                foreach (KeyValuePair<string, sampling.LFLine> kv in _sampling.LFData(_CatchRowGuid))
+                foreach (KeyValuePair<string, Sampling.LFLine> kv in _sampling.LFData(_CatchRowGuid))
                 {
                     //if Sequence is -1, it means that the sequence field in the source
                     //database is null, so we set the _UpdateSequence flag to true.
@@ -341,7 +341,7 @@ namespace FAD3
         /// <returns></returns>
         private bool SaveLFData()
         {
-            var LFDict = new Dictionary<string, sampling.LFLine>();
+            var LFDict = new Dictionary<string, Sampling.LFLine>();
             foreach (Control c in panelUI.Controls)
             {
                 if (c.GetType().Name == "TextBox")
@@ -350,7 +350,7 @@ namespace FAD3
                     {
                         var s = o.Text;
                         var thisTag = (Tuple<int, string, fad3DataStatus>)o.Tag;
-                        var myLF = new sampling.LFLine();
+                        var myLF = new Sampling.LFLine();
                         switch (o.Name)
                         {
                             case "textLen":

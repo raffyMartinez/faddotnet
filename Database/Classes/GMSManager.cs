@@ -227,7 +227,7 @@ namespace FAD3
             _GMSMeasurementRows = 0;
             Dictionary<string, GMSLineClass> mydata = new Dictionary<string, GMSLineClass>();
             var dt = new DataTable();
-            using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
+            using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.MDBPath))
             {
                 try
                 {

@@ -240,7 +240,7 @@ namespace FAD3
 
         private void OnListViewDoubleClick(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            MessageBox.Show("To be implemented!");
         }
 
         /// <summary>

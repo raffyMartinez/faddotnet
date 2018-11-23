@@ -20,6 +20,7 @@ using System.Windows.Forms;
 using FAD3.Database.Forms;
 using FAD3.Database.Classes;
 using FAD3.GUI.Classes;
+using FAD3.GUI.Forms;
 
 //using dao;
 
@@ -48,7 +49,7 @@ namespace FAD3
         private mru _mrulist = new mru();
         private bool _newSamplingEntered;
         private string _oldMDB = "";
-        private sampling _sampling;// =  new sampling();
+        private Sampling _sampling;// =  new sampling();
         private string _SamplingGUID = "";
         private string _SamplingMonth = "";
         private double _weightOfCatch;
@@ -130,9 +131,12 @@ namespace FAD3
                 if (value != _targetAreaGuid)
                 {
                     _targetAreaGuid = value;
-                    _targetArea.TargetAreaGuid = _targetAreaGuid;
-                    FishingGrid.AOIGuid = _targetAreaGuid;
-                    Enumerators.AOIGuid = _targetAreaGuid;
+                    if (value.Length > 0)
+                    {
+                        _targetArea.TargetAreaGuid = _targetAreaGuid;
+                        FishingGrid.AOIGuid = _targetAreaGuid;
+                        Enumerators.AOIGuid = _targetAreaGuid;
+                    }
                 }
             }
         }
@@ -143,7 +147,10 @@ namespace FAD3
             set
             {
                 _targetAreaName = value;
-                _targetArea.TargetAreaName = _targetAreaName;
+                if (value.Length > 0)
+                {
+                    _targetArea.TargetAreaName = _targetAreaName;
+                }
             }
         }
 
@@ -152,7 +159,7 @@ namespace FAD3
             get { return _mrulist; }
         }
 
-        public sampling Sampling
+        public Sampling Sampling
         {
             get { return _sampling; }
         }
@@ -667,7 +674,7 @@ namespace FAD3
             {
                 if (lvMain.Tag.ToString() == "sampling")
                 {
-                    if (sampling.DeleteSampling(SamplingGUID))
+                    if (Sampling.DeleteSampling(SamplingGUID))
                     {
                         lvMain.Items.Remove(lvMain.Items[SamplingGUID]);
                         if (lvMain.Items.Count >= 1)
@@ -704,8 +711,9 @@ namespace FAD3
         ///
         private void FillLVSamplingSummary(string LSGUID, string GearGUID, string SamplingMonth)
         {
+            SizeColumns(lvMain);
             var CompleteGrid25 = FishingGrid.IsCompleteGrid25;
-            foreach (var item in sampling.SamplingSummaryForMonth(LSGUID, GearGUID, SamplingMonth))
+            foreach (var item in Sampling.SamplingSummaryForMonth(LSGUID, GearGUID, SamplingMonth))
             {
                 var row = lvMain.Items.Add(item.Key, item.Value.RefNo, null);                           //reference number
                 DateTime dt = (DateTime)item.Value.SamplingDate;
@@ -737,6 +745,7 @@ namespace FAD3
                 row.Tag = item.Key;                                                                   //sampling guid
                 row.Name = item.Key;
             }
+            SizeColumns(lvMain, false);
         }
 
         private void frmMain_Activated(object sender, EventArgs e)
@@ -764,15 +773,15 @@ namespace FAD3
                     if (SavedMDBPath != "NULL" && File.Exists(SavedMDBPath))
                     {
                         _oldMDB = SavedMDBPath;
-                        global.mdbPath = SavedMDBPath;
+                        global.MDBPath = SavedMDBPath;
                         Names.GetGenus_LocalNames();
                         Names.GetLocalNames();
                         statusPanelDBPath.Text = SavedMDBPath;
                         lblErrorFormOpen.Visible = false;
                         PopulateTree();
-                        _sampling = new sampling();
-                        sampling.SetUpUIElement();
-                        _sampling.OnUIRowRead += new sampling.ReadUIElement(OnUIRowRead);
+                        _sampling = new Sampling();
+                        Sampling.SetUpUIElement();
+                        _sampling.OnUIRowRead += new Sampling.ReadUIElement(OnUIRowRead);
                     }
                     else
                     {
@@ -815,12 +824,15 @@ namespace FAD3
 
             ConfigDropDownMenu(treeMain);
             SetupSamplingButtonFrame(false);
+            menuItemZone50.Enabled = global.IsMapComponentRegistered;
+            menuItemZone51.Enabled = global.IsMapComponentRegistered;
             global.mainForm = this;
         }
 
         private void OnGenerateGridMapToolStripMenuItem_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
             e.ClickedItem.OwnerItem.Owner.Hide();
+
             global.MappingMode = fad3MappingMode.grid25Mode;
             var mf = MapperForm.GetInstance(this);
             if (!mf.Visible)
@@ -1241,7 +1253,7 @@ namespace FAD3
 
         private void OnListView_DoubleClick(object sender, EventArgs e)
         {
-            ((ListView)sender).With(o =>
+            ((ListView)sender).With((Action<ListView>)(o =>
             {
                 switch (o.Name)
                 {
@@ -1302,7 +1314,7 @@ namespace FAD3
                                 case "database":
                                     if (item.Text == "Database path")
                                     {
-                                        Process.Start(Path.GetDirectoryName(global.mdbPath));
+                                        Process.Start(Path.GetDirectoryName((string)global.MDBPath));
                                     }
                                     break;
 
@@ -1380,7 +1392,7 @@ namespace FAD3
                             ShowGMSForm(_taxa);
                         break;
                 }
-            });
+            }));
         }
 
         private void OnListView_MouseDown(object sender, MouseEventArgs e)
@@ -1543,74 +1555,6 @@ namespace FAD3
                         chForm.Show(this);
                     }
                     break;
-
-                case "importLanguages":
-                    break;
-
-                case "importSpecies":
-                case "importNonFishSpecies":
-                    OpenFileDialog ofd = new OpenFileDialog()
-                    {
-                        Filter = "text file|*.txt|html file|*.htm;*.html|all files|*.*",
-                        FilterIndex = 1,
-                        Title = "Open species names file"
-                    };
-                    ofd.ShowDialog();
-                    if (ofd.FileName.Length > 0)
-                    {
-                        var result = 0;
-                        switch (Path.GetExtension(ofd.FileName))
-                        {
-                            case ".txt":
-                                if (tsi.Tag.ToString() == "importSpecies")
-                                {
-                                    result = Names.ImportSpeciesNamesFromFile(ofd.FileName);
-                                }
-                                else if (tsi.Tag.ToString() == "importNonFishSpecies")
-                                {
-                                    result = Names.ImportSpeciesNamesFromFile(ofd.FileName, true);
-                                }
-                                break;
-
-                            case ".htm":
-                            case ".html":
-                                HTMLTableSelectColumnsForm htmlColForm = new HTMLTableSelectColumnsForm(ofd.FileName, CatchNameDataType.CatchSpeciesName);
-                                htmlColForm.ShowDialog(this);
-
-                                break;
-                        }
-
-                        MessageBox.Show($"{result} names were added to the database", "Finished importing names", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                    break;
-
-                case "localNamesToSciNames":
-                    break;
-
-                case "importLocalCommon":
-                    ofd = new OpenFileDialog()
-                    {
-                        Filter = "text file|*.txt|html file|*.htm;*.html|all files|*.*",
-                        FilterIndex = 1,
-                        Title = "Open local/common names file"
-                    };
-                    ofd.ShowDialog();
-                    switch (Path.GetExtension(ofd.FileName))
-                    {
-                        case ".txt":
-
-                            var result = Names.ImportLocalNamesFromFile(ofd.FileName);
-
-                            break;
-
-                        case ".htm":
-                        case ".html":
-                            HTMLTableSelectColumnsForm htmlColForm = new HTMLTableSelectColumnsForm(ofd.FileName, CatchNameDataType.CatchLocalName);
-                            htmlColForm.ShowDialog(this);
-
-                            break;
-                    }
-                    break;
             }
         }
 
@@ -1625,8 +1569,16 @@ namespace FAD3
             switch (tsi.Name)
             {
                 case "tsButtonAbout":
-                    AboutFadForm f = new AboutFadForm();
-                    f.ShowDialog(this);
+                    if (global.IsMapComponentRegistered)
+                    {
+                        AboutFadForm f = new AboutFadForm();
+                        f.ShowDialog(this);
+                    }
+                    else
+                    {
+                        AboutFADForm2 f = new AboutFADForm2();
+                        f.ShowDialog(this);
+                    }
                     break;
 
                 case "tsButtonGear":
@@ -1642,8 +1594,15 @@ namespace FAD3
                     break;
 
                 case "tsButtonFish":
-                    AllSpeciesForm asf = new AllSpeciesForm(parent: this);
-                    asf.ShowDialog(this);
+                    AllSpeciesForm asf = AllSpeciesForm.GetInstance(this);
+                    if (asf.Visible)
+                    {
+                        asf.BringToFront();
+                    }
+                    else
+                    {
+                        asf.Show(this);
+                    }
                     break;
 
                 case "tsButtonLN2SN":
@@ -1663,17 +1622,26 @@ namespace FAD3
                     break;
 
                 case "tsButtonMap":
-                    var mf = MapperForm.GetInstance(this);
-                    if (!mf.Visible)
+                    if (global.IsMapComponentRegistered)
                     {
-                        mf.Show(this);
+                        var mf = MapperForm.GetInstance(this);
+                        if (!mf.Visible)
+                        {
+                            mf.Show(this);
+                        }
+                        else
+                        {
+                            mf.BringToFront();
+                            mf.Focus();
+                        }
+                        SetMapDependendMenus();
                     }
                     else
                     {
-                        mf.BringToFront();
-                        mf.Focus();
+                        MessageBox.Show("Mapwindows mapping component is not installed\r\n" +
+                                         "You will not be able to use the map", "Mapping component is not installed",
+                                         MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
-                    SetMapDependendMenus();
                     break;
 
                 case "tsButtonExit":
@@ -1760,6 +1728,8 @@ namespace FAD3
                 _LandingSiteGuid = "";
                 _GearVarGUID = "";
                 _gearClassGUID = "";
+                TargetAreaGuid = "";
+                TargetAreaName = "";
 
                 TreeNode nd = treeMain.SelectedNode;
                 ResetTheBackColor(treeMain);
@@ -1898,13 +1868,13 @@ namespace FAD3
             string filename = "";
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Title = "Open an existing fisheries database file";
-            if (global.mdbPath.Length == 0)
+            if (global.MDBPath.Length == 0)
             {
                 ofd.InitialDirectory = Path.GetDirectoryName(Application.ExecutablePath);
             }
             else
             {
-                ofd.InitialDirectory = global.mdbPath;
+                ofd.InitialDirectory = global.MDBPath;
             }
             ofd.Filter = "Microsoft Access Data File (.mdb)|*.mdb";
             ofd.ShowDialog();
@@ -2202,7 +2172,9 @@ namespace FAD3
         /// <param name="TreeLevel"></param>
         private void SetUPLV(string TreeLevel)
         {
+            lvMain.Visible = false;
             var savedColWidthExist = true;
+            var colWidthAdjusted = false;
             lvMain.SuspendLayout();
 
             int i = 0;
@@ -2266,6 +2238,7 @@ namespace FAD3
             {
                 case "sampling":
                     FillLVSamplingSummary(_LandingSiteGuid, _GearVarGUID, _SamplingMonth);
+                    colWidthAdjusted = true;
                     break;
 
                 case "samplingDetail":
@@ -2294,7 +2267,7 @@ namespace FAD3
 
                 case "root":
                     lvi = lvMain.Items.Add("Database path");
-                    lvi.SubItems.Add(global.mdbPath);
+                    lvi.SubItems.Add(global.MDBPath);
                     lvi.Tag = "databasePath";
 
                     //add sampled years with count for entire database
@@ -2510,12 +2483,14 @@ namespace FAD3
                     }
                     break;
             }
-            if (!savedColWidthExist)
+
+            if (!colWidthAdjusted && !savedColWidthExist)
             {
                 SizeColumns(lvMain, false);
                 SaveColumnWidthToRegistry();
             }
             lvMain.ResumeLayout();
+            lvMain.Visible = true;
         }
 
         /// <summary>
@@ -2542,7 +2517,7 @@ namespace FAD3
         {
             if (File.Exists(MDBFile))
             {
-                global.mdbPath = MDBFile;
+                global.MDBPath = MDBFile;
                 RegistryKey rk = Registry.CurrentUser.CreateSubKey("SOFTWARE\\FAD3");
                 rk.SetValue("mdbPath", MDBFile, RegistryValueKind.String);
                 rk.Close();
@@ -2575,7 +2550,7 @@ namespace FAD3
             int n = 1;
             if (_catchSubRow == fad3CatchSubRow.LF)
             {
-                foreach (KeyValuePair<string, sampling.LFLine> kv in _sampling.LFData(CatchRowGuid))
+                foreach (KeyValuePair<string, Sampling.LFLine> kv in _sampling.LFData(CatchRowGuid))
                 {
                     var lvi = new ListViewItem(new string[]
                     {
@@ -2826,7 +2801,7 @@ namespace FAD3
 
         private void statusPanelDBPath_DoubleClick(object sender, EventArgs e)
         {
-            Process.Start(Path.GetDirectoryName(global.mdbPath));
+            Process.Start(Path.GetDirectoryName(global.MDBPath));
         }
 
         private void TraverseTreeAndResetColor(TreeNodeCollection nodes)

@@ -58,8 +58,8 @@ namespace FAD3
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.generateInlandDbToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.generateGridMapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.uTMZone50ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.uTMZone51ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemZone50 = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemZone51 = new System.Windows.Forms.ToolStripMenuItem();
             this.cholorophyllGridMappingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -283,26 +283,26 @@ namespace FAD3
             // generateGridMapToolStripMenuItem
             // 
             this.generateGridMapToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.uTMZone50ToolStripMenuItem,
-            this.uTMZone51ToolStripMenuItem});
+            this.menuItemZone50,
+            this.menuItemZone51});
             this.generateGridMapToolStripMenuItem.Name = "generateGridMapToolStripMenuItem";
             this.generateGridMapToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
             this.generateGridMapToolStripMenuItem.Text = "Generate grid map";
             this.generateGridMapToolStripMenuItem.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnGenerateGridMapToolStripMenuItem_DropDownItemClicked);
             // 
-            // uTMZone50ToolStripMenuItem
+            // menuItemZone50
             // 
-            this.uTMZone50ToolStripMenuItem.Name = "uTMZone50ToolStripMenuItem";
-            this.uTMZone50ToolStripMenuItem.Size = new System.Drawing.Size(143, 22);
-            this.uTMZone50ToolStripMenuItem.Tag = "zone50";
-            this.uTMZone50ToolStripMenuItem.Text = "UTM zone 50";
+            this.menuItemZone50.Name = "menuItemZone50";
+            this.menuItemZone50.Size = new System.Drawing.Size(180, 22);
+            this.menuItemZone50.Tag = "zone50";
+            this.menuItemZone50.Text = "UTM zone 50";
             // 
-            // uTMZone51ToolStripMenuItem
+            // menuItemZone51
             // 
-            this.uTMZone51ToolStripMenuItem.Name = "uTMZone51ToolStripMenuItem";
-            this.uTMZone51ToolStripMenuItem.Size = new System.Drawing.Size(143, 22);
-            this.uTMZone51ToolStripMenuItem.Tag = "zone51";
-            this.uTMZone51ToolStripMenuItem.Text = "UTM zone 51";
+            this.menuItemZone51.Name = "menuItemZone51";
+            this.menuItemZone51.Size = new System.Drawing.Size(180, 22);
+            this.menuItemZone51.Tag = "zone51";
+            this.menuItemZone51.Text = "UTM zone 51";
             // 
             // cholorophyllGridMappingToolStripMenuItem
             // 
@@ -684,8 +684,8 @@ namespace FAD3
         private System.Windows.Forms.ToolStripMenuItem coordinateFormatToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem symbolFontsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem generateGridMapToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem uTMZone50ToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem uTMZone51ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem menuItemZone50;
+        private System.Windows.Forms.ToolStripMenuItem menuItemZone51;
         private System.Windows.Forms.ToolStripMenuItem menuHelp;
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem onlineManualToolStripMenuItem;

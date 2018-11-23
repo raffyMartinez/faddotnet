@@ -19,7 +19,7 @@ namespace FAD3
     /// <summary>
     /// Description of Sampling.
     /// </summary>
-    public class sampling
+    public class Sampling
     {
         private static Dictionary<string, UserInterfaceStructure> _uis = new Dictionary<string, UserInterfaceStructure>();
         private long _CatchAndEffortPropertyCount = 0;
@@ -34,17 +34,17 @@ namespace FAD3
             get { return _engines; }
         }
 
-        static sampling()
+        static Sampling()
         {
             //SetUpUIElement();
         }
 
-        public sampling(string SamplingGUID)
+        public Sampling(string SamplingGUID)
         {
             _SamplingGUID = SamplingGUID;
         }
 
-        public sampling()
+        public Sampling()
         {
             if (!_engineReadDone)
             {
@@ -53,7 +53,7 @@ namespace FAD3
             }
         }
 
-        public delegate void ReadUIElement(sampling s, UIRowFromXML e);
+        public delegate void ReadUIElement(Sampling s, UIRowFromXML e);
 
         public event ReadUIElement OnUIRowRead;
 
@@ -167,7 +167,7 @@ namespace FAD3
             {
                 try
                 {
-                    using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
+                    using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.MDBPath))
                     {
                         conection.Open();
 
@@ -216,10 +216,51 @@ namespace FAD3
             return Samplings;
         }
 
+        public static List<int> GetSamplingYears(string targetAreaGuid = "")
+        {
+            List<int> sampledYears = new List<int>();
+            var sql = "";
+            if (targetAreaGuid.Length == 0)
+            {
+                sql = @"SELECT Year([SamplingDate]) AS samplingYear,
+                         Count(tblSampling.SamplingGUID) AS n
+                       FROM tblSampling
+                       GROUP BY Year([SamplingDate])";
+            }
+            else
+            {
+                sql = $@"SELECT Year([SamplingDate]) AS samplingYear,
+                            Count(tblSampling.SamplingGUID) AS n
+                         FROM tblSampling
+                         WHERE tblSampling.AOI = {{{targetAreaGuid}}}
+                         GROUP BY Year([SamplingDate])";
+            }
+            var dt = new DataTable();
+            try
+            {
+                using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.MDBPath))
+                {
+                    conection.Open();
+                    var adapter = new OleDbDataAdapter(sql, conection);
+                    adapter.Fill(dt);
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        DataRow dr = dt.Rows[i];
+                        sampledYears.Add(int.Parse(dr["samplingYear"].ToString()));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message, "Sampling", "GetSamplingYears");
+            }
+            return sampledYears;
+        }
+
         public static void GetEngines()
         {
             var dt = new DataTable();
-            using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
+            using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.MDBPath))
             {
                 try
                 {
@@ -468,7 +509,7 @@ namespace FAD3
             string VesType = "";
             try
             {
-                using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
+                using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.MDBPath))
                 {
                     conection.Open();
                     string query =
@@ -616,7 +657,7 @@ namespace FAD3
         {
             Dictionary<string, string> myList = new Dictionary<string, string>();
             var dt = new DataTable();
-            using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
+            using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.MDBPath))
             {
                 try
                 {
@@ -652,7 +693,7 @@ namespace FAD3
             _LFRowsCount = 0;
             Dictionary<string, LFLine> mydata = new Dictionary<string, LFLine>();
             var dt = new DataTable();
-            using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
+            using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.MDBPath))
             {
                 try
                 {
@@ -690,7 +731,7 @@ namespace FAD3
         {
             List<string> myList = new List<string>();
             var dt = new DataTable();
-            using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
+            using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.MDBPath))
             {
                 try
                 {
@@ -720,7 +761,7 @@ namespace FAD3
         {
             List<string> myList = new List<string>();
             var dt = new DataTable();
-            using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.mdbPath))
+            using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.MDBPath))
             {
                 try
                 {

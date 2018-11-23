@@ -12,6 +12,10 @@ using System.Diagnostics;
 using FAD3.Database.Forms;
 using System.Xml;
 using System.IO;
+using FAD3.Mapping.Classes;
+using FAD3.Mapping.Forms;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace FAD3
 {
@@ -19,6 +23,16 @@ namespace FAD3
     {
         private MainForm _parent;
         private Dictionary<string, string> _filters = new Dictionary<string, string>();
+        private int _rowsImported;
+        private static AllSpeciesForm _instance;
+        private CatchLocalNamesForm _localNamesForm;
+        private string _speciesName;
+
+        public static AllSpeciesForm GetInstance(MainForm parent)
+        {
+            if (_instance == null) _instance = new AllSpeciesForm(parent);
+            return _instance;
+        }
 
         public MainForm parentForm
         {
@@ -29,6 +43,29 @@ namespace FAD3
         {
             InitializeComponent();
             _parent = parent;
+            Names.RowsImported += OnNamesImportRows;
+        }
+
+        private void OnNamesImportRows(object sender, ImportRowsFromFileEventArgs e)
+        {
+            if (e.DataType == ExportImportDataType.SpeciesNames)
+            {
+                _rowsImported = e.RowsImported;
+                if (e.IsComplete)
+                {
+                    lblListViewLabel.Invoke((MethodInvoker)delegate
+                    {
+                        lblListViewLabel.Text = $"Finished importing species names: {_rowsImported} names imported";
+                    });
+                }
+                else
+                {
+                    lblListViewLabel.Invoke((MethodInvoker)delegate
+                    {
+                        lblListViewLabel.Text = $"Importing species names: {_rowsImported} names imported";
+                    });
+                }
+            }
         }
 
         /// <summary>
@@ -51,9 +88,9 @@ namespace FAD3
             }
         }
 
-        private void AllSpeciesForm_Load(object sender, EventArgs e)
+        private void OnForm_Load(object sender, EventArgs e)
         {
-            global.LoadFormSettings(this, true);
+            global.LoadFormSettings(this, false);
             dropDownMenu.ItemClicked += OnDropDownMenuItemClicked;
             Text = "List of all species in catch composition of sampled landings";
             //lvTaxa.Columns.Add("");
@@ -79,8 +116,9 @@ namespace FAD3
                     o.HideSelection = false;
                 });
             SizeColumns(lvNames);
-            FillListNames();
-            SizeColumns(lvNames, false);
+            //FillListNames();
+            GetSpeciesNames();
+            //SizeColumns(lvNames, false);
         }
 
         private void OnDropDownMenuItemClicked(object sender, ToolStripItemClickedEventArgs e)
@@ -103,6 +141,17 @@ namespace FAD3
 
                     break;
 
+                case "menuMapOccurence":
+                    var spName = lvNames.SelectedItems[0].SubItems[1].Text + " " + lvNames.SelectedItems[0].SubItems[2].Text;
+                    OccurenceMapping mso = new OccurenceMapping(OccurenceDataType.Species, spName, global.MappingForm.MapControl)
+                    {
+                        MapLayersHandler = global.MappingForm.MapLayersHandler,
+                        MapInteractionHandler = global.MappingForm.MapInterActionHandler
+                    };
+                    mso.RequestOccurenceInfo += OnRequestOccurenceInfo;
+                    mso.MapOccurence();
+                    break;
+
                 case "menuAddNewName":
                     SpeciesNameForm snf = new SpeciesNameForm(this);
                     snf.ShowDialog(this);
@@ -111,12 +160,74 @@ namespace FAD3
                 case "menuEditName":
                     ShowNameDetail();
                     break;
+
+                case "menuLocalNames":
+                    ShowLocalNames(lvNames.SelectedItems[0].Name);
+                    break;
             }
         }
 
-        private void FillListNames(Dictionary<string, string> filters = null, bool OnlyWithRecords = false)
+        public void LocalNameClosed()
         {
+            _localNamesForm = null;
+        }
+
+        private void ShowLocalNames(string speciesGuid)
+        {
+            CatchLocalNamesForm clnf = CatchLocalNamesForm.GetInstance(speciesGuid, this);
+            if (clnf.Visible)
+            {
+                clnf.BringToFront();
+            }
+            else
+            {
+                clnf.SpeciesName = _speciesName;
+                clnf.Show(this);
+                _localNamesForm = clnf;
+            }
+        }
+
+        private void OnRequestOccurenceInfo(object sender, OccurenceMapEventArgs e)
+        {
+            var nameToMap = lvNames.SelectedItems[0].SubItems[1].Text + " " + lvNames.SelectedItems[0].SubItems[2].Text;
+            var speciesGuid = lvNames.SelectedItems[0].Name;
+            using (OccurenceMappingForm omf = new OccurenceMappingForm(e.OccurenceDataType, this))
+            {
+                omf.SpeciesToMap(nameToMap, speciesGuid);
+                omf.ShowDialog(this);
+                if (omf.DialogResult == DialogResult.OK)
+                {
+                    e.Aggregate = omf.Aggregate;
+                    e.ExcludeOne = omf.ExcludeOne;
+                    e.MapInSelectedTargetArea = omf.MapInSelectedTargetArea;
+                    e.SelectedTargetAreaGuid = omf.SelectedTargetAreaGuid;
+                    e.SamplingYears = omf.SamplingYears;
+                    e.ItemToMapGuid = speciesGuid;
+                }
+                else
+                {
+                    e.Cancel = true;
+                }
+            }
+        }
+
+        private async void GetSpeciesNames(Dictionary<string, string> filters = null, bool OnlyWithRecords = false)
+        {
+            lvNames.Visible = false;
             lvNames.Items.Clear();
+            await FillListNamesAsync(filters, OnlyWithRecords);
+            SizeColumns(lvNames, false);
+            lvNames.Visible = true;
+        }
+
+        private Task<int> FillListNamesAsync(Dictionary<string, string> filters = null, bool OnlyWithRecords = false)
+        {
+            return Task.Run(() => FillListNames(filters, OnlyWithRecords));
+        }
+
+        private int FillListNames(Dictionary<string, string> filters = null, bool OnlyWithRecords = false)
+        {
+            //lvNames.Items.Clear();
             int n = 1;
             foreach (var item in Names.RetrieveScientificNames(filters, OnlyWithRecords))
             {
@@ -124,8 +235,25 @@ namespace FAD3
                 var recordCount = item.Value.catchCompositionRecordCount == 0 ? "" : item.Value.catchCompositionRecordCount.ToString();
                 var lvi = new ListViewItem(new string[] { n.ToString(), item.Value.genus, item.Value.species, item.Value.taxaName, inFishBase, recordCount, item.Value.Notes });
                 lvi.Name = item.Value.catchNameGuid;
-                lvNames.Items.Add(lvi);
+                //lvNames.Items.Add(lvi);
+                AddItem(lvi);
                 n++;
+            }
+            return n;
+        }
+
+        private delegate void AddItemCallback(object o);
+
+        private void AddItem(object o)
+        {
+            if (lvNames.InvokeRequired)
+            {
+                AddItemCallback d = new AddItemCallback(AddItem);
+                this.Invoke(d, new object[] { o });
+            }
+            else
+            {
+                lvNames.Items.Add(o as ListViewItem);
             }
         }
 
@@ -175,11 +303,14 @@ namespace FAD3
                         _filters.Remove("search");
                     }
 
-                    FillListNames(_filters, chkShowWithRecords.Checked);
+                    //FillListNames(_filters, chkShowWithRecords.Checked);
+                    GetSpeciesNames(_filters, chkShowWithRecords.Checked);
 
                     break;
 
                 case "buttonReset":
+                    chkShowWithRecords.Checked = false;
+                    GetSpeciesNames();
                     break;
 
                 case "buttonSearch":
@@ -210,13 +341,20 @@ namespace FAD3
             ShowNameDetail();
         }
 
-        private void lvNames_MouseDown(object sender, MouseEventArgs e)
+        private void OnlvNames_MouseDown(object sender, MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Right && lvNames.SelectedItems.Count > 0)
+            if (e.Button == MouseButtons.Left)
+            {
+            }
+            else if (e.Button == MouseButtons.Right && lvNames.SelectedItems.Count > 0)
             {
                 dropDownMenu.Items.Clear();
                 var item = dropDownMenu.Items.Add("View samplings");
                 item.Name = "menuViewSamplings";
+
+                item = dropDownMenu.Items.Add("Map species occurence");
+                item.Name = "menuMapOccurence";
+                item.Enabled = global.MapIsOpen && lvNames.SelectedItems[0].SubItems[5].Text.Length > 0;
 
                 item = dropDownMenu.Items.Add("Add new catch name");
                 item.Name = "menuAddNewName";
@@ -224,10 +362,15 @@ namespace FAD3
                 item = dropDownMenu.Items.Add("Edit catch name");
                 item.Name = "menuEditName";
 
+                item = dropDownMenu.Items.Add("Local names");
+                item.Name = "menuLocalNames";
+
+                dropDownMenu.Items.Add("-");
+
                 ToolStripMenuItem subMenu = new ToolStripMenuItem();
                 subMenu.Text = "Browse on WWW";
 
-                CatchNameURLGenerator.CatchName = lvNames.SelectedItems[0].SubItems[1].Text + " " + lvNames.SelectedItems[0].SubItems[2].Text;
+                CatchNameURLGenerator.CatchName = _speciesName;
                 var urls = CatchNameURLGenerator.URLS;
 
                 foreach (var url in urls)
@@ -250,15 +393,20 @@ namespace FAD3
             Process.Start(e.ClickedItem.Tag.ToString());
         }
 
-        private void AllSpeciesForm_FormClosing(object sender, FormClosingEventArgs e)
+        private void OnFormClosing(object sender, FormClosingEventArgs e)
         {
             global.SaveFormSettings(this);
+            _instance = null;
         }
 
         private void OnToolBarItemClick(object sender, ToolStripItemClickedEventArgs e)
         {
             switch (e.ClickedItem.Name)
             {
+                case "tbClose":
+                    Close();
+                    break;
+
                 case "tbAdd":
                     SpeciesNameForm snf = new SpeciesNameForm(this);
                     snf.ShowDialog(this);
@@ -373,15 +521,51 @@ namespace FAD3
                                 var fileName = FileDialogHelper.FileName;
                                 if (fileName.Length > 0)
                                 {
-                                    var importCount = Names.ImportSpeciesNames(fileName);
-                                    FillListNames();
-                                    SizeColumns(lvNames, false);
-                                    MessageBox.Show($"Finished importing {importCount} species names to the database", "Finished importing", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                    if (Path.GetExtension(fileName) == ".htm" || Path.GetExtension(fileName) == ".html")
+                                    {
+                                        using (HTMLTableSelectColumnsForm htmlColForm = new HTMLTableSelectColumnsForm(fileName, CatchNameDataType.CatchSpeciesName))
+                                        {
+                                            DialogResult dr = htmlColForm.ShowDialog(this);
+
+                                            if (dr == DialogResult.OK)
+                                            {
+                                                GetImportedRows(fileName, htmlColForm.SpeciesNameColumn);
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        //var importCount = Names.ImportSpeciesNames(fileName, null);
+                                        //FillListNames();
+                                        //SizeColumns(lvNames, false);
+                                        //MessageBox.Show($"Finished importing {importCount} species names to the database", "Finished importing", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                        GetImportedRows(fileName, null);
+                                    }
                                 }
                             }
                         }
                     }
                     break;
+            }
+        }
+
+        private async void GetImportedRows(string fileName, int? speciesColumn)
+        {
+            int result = await Names.ImportSpeciesNamesAsync(fileName, speciesColumn);
+            //FillListNames();
+            GetSpeciesNames();
+            //SizeColumns(lvNames, false);
+            lblListViewLabel.Text = "List of species names";
+            MessageBox.Show($"{_rowsImported} species names were saved to the database", "Import successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void OnListViewMouseClick(object sender, MouseEventArgs e)
+        {
+            _speciesName = $"{lvNames.SelectedItems[0].SubItems[1].Text} {lvNames.SelectedItems[0].SubItems[2].Text}";
+            if (_localNamesForm != null)
+            {
+                _localNamesForm.SpeciesName = _speciesName;
+                _localNamesForm.SpeciesGuid = lvNames.SelectedItems[0].Name;
             }
         }
     }

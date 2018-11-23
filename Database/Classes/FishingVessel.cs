@@ -11,7 +11,7 @@ namespace FAD3
         public static void MakeVesselTypeTable()
         {
             var dbe = new DBEngine();
-            var dbData = dbe.OpenDatabase(global.mdbPath);
+            var dbData = dbe.OpenDatabase(global.MDBPath);
 
             try
             {

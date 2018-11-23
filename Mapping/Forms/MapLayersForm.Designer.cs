@@ -30,10 +30,6 @@
         {
             this.components = new System.ComponentModel.Container();
             this.layerGrid = new System.Windows.Forms.DataGridView();
-            this.Visible = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.Layer = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Symbol = new System.Windows.Forms.DataGridViewImageColumn();
-            this.buttonOK = new System.Windows.Forms.Button();
             this.menuLayers = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.itemAddLayer = new System.Windows.Forms.ToolStripMenuItem();
             this.itemRemoveLayer = new System.Windows.Forms.ToolStripMenuItem();
@@ -46,6 +42,10 @@
             this.buttonRemoveLayer = new System.Windows.Forms.ToolStripButton();
             this.buttonAttributes = new System.Windows.Forms.ToolStripButton();
             this.buttonZoomToLayer = new System.Windows.Forms.ToolStripButton();
+            this.buttonClose = new System.Windows.Forms.ToolStripButton();
+            this.Visible = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.Layer = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Symbol = new System.Windows.Forms.DataGridViewImageColumn();
             ((System.ComponentModel.ISupportInitialize)(this.layerGrid)).BeginInit();
             this.menuLayers.SuspendLayout();
             this.toolBar.SuspendLayout();
@@ -73,43 +73,12 @@
             this.Symbol});
             this.layerGrid.Cursor = System.Windows.Forms.Cursors.Default;
             this.layerGrid.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
-            this.layerGrid.Location = new System.Drawing.Point(0, 37);
+            this.layerGrid.Location = new System.Drawing.Point(0, 28);
             this.layerGrid.Name = "layerGrid";
             this.layerGrid.RowHeadersVisible = false;
             this.layerGrid.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.layerGrid.Size = new System.Drawing.Size(331, 281);
+            this.layerGrid.Size = new System.Drawing.Size(331, 332);
             this.layerGrid.TabIndex = 0;
-            // 
-            // Visible
-            // 
-            this.Visible.HeaderText = "V";
-            this.Visible.Name = "Visible";
-            this.Visible.Width = 20;
-            // 
-            // Layer
-            // 
-            this.Layer.HeaderText = "Name";
-            this.Layer.Name = "Layer";
-            this.Layer.Width = 228;
-            // 
-            // Symbol
-            // 
-            this.Symbol.HeaderText = "Symbol";
-            this.Symbol.Name = "Symbol";
-            this.Symbol.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.Symbol.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            this.Symbol.Width = 80;
-            // 
-            // buttonOK
-            // 
-            this.buttonOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonOK.Location = new System.Drawing.Point(271, 329);
-            this.buttonOK.Name = "buttonOK";
-            this.buttonOK.Size = new System.Drawing.Size(51, 25);
-            this.buttonOK.TabIndex = 1;
-            this.buttonOK.Text = "OK";
-            this.buttonOK.UseVisualStyleBackColor = true;
-            this.buttonOK.Click += new System.EventHandler(this.OnButtonClick);
             // 
             // menuLayers
             // 
@@ -168,7 +137,8 @@
             this.buttonAddLayer,
             this.buttonRemoveLayer,
             this.buttonAttributes,
-            this.buttonZoomToLayer});
+            this.buttonZoomToLayer,
+            this.buttonClose});
             this.toolBar.Location = new System.Drawing.Point(0, 0);
             this.toolBar.Name = "toolBar";
             this.toolBar.Size = new System.Drawing.Size(334, 25);
@@ -183,7 +153,7 @@
             this.buttonAddLayer.ImageTransparentColor = System.Drawing.Color.White;
             this.buttonAddLayer.Name = "buttonAddLayer";
             this.buttonAddLayer.Size = new System.Drawing.Size(23, 22);
-            this.buttonAddLayer.Text = "toolStripButton1";
+            this.buttonAddLayer.Text = "Add layer";
             // 
             // buttonRemoveLayer
             // 
@@ -192,7 +162,7 @@
             this.buttonRemoveLayer.ImageTransparentColor = System.Drawing.Color.White;
             this.buttonRemoveLayer.Name = "buttonRemoveLayer";
             this.buttonRemoveLayer.Size = new System.Drawing.Size(23, 22);
-            this.buttonRemoveLayer.Text = "toolStripButton2";
+            this.buttonRemoveLayer.Text = "Remove layer";
             // 
             // buttonAttributes
             // 
@@ -202,6 +172,7 @@
             this.buttonAttributes.Name = "buttonAttributes";
             this.buttonAttributes.Size = new System.Drawing.Size(23, 22);
             this.buttonAttributes.Text = "toolStripButton3";
+            this.buttonAttributes.ToolTipText = "Layer attributes";
             // 
             // buttonZoomToLayer
             // 
@@ -211,18 +182,48 @@
             this.buttonZoomToLayer.Name = "buttonZoomToLayer";
             this.buttonZoomToLayer.Size = new System.Drawing.Size(23, 22);
             this.buttonZoomToLayer.Text = "toolStripButton4";
+            this.buttonZoomToLayer.ToolTipText = "Zoom to layer";
+            // 
+            // buttonClose
+            // 
+            this.buttonClose.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.buttonClose.Image = global::FAD3.Properties.Resources.im_exit;
+            this.buttonClose.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonClose.Name = "buttonClose";
+            this.buttonClose.Size = new System.Drawing.Size(23, 22);
+            this.buttonClose.Text = "toolStripButton1";
+            this.buttonClose.ToolTipText = "Close layers";
+            // 
+            // Visible
+            // 
+            this.Visible.HeaderText = "V";
+            this.Visible.Name = "Visible";
+            this.Visible.Width = 20;
+            // 
+            // Layer
+            // 
+            this.Layer.HeaderText = "Name";
+            this.Layer.Name = "Layer";
+            this.Layer.Width = 228;
+            // 
+            // Symbol
+            // 
+            this.Symbol.HeaderText = "Symbol";
+            this.Symbol.Name = "Symbol";
+            this.Symbol.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.Symbol.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            this.Symbol.Width = 50;
             // 
             // MapLayersForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(334, 366);
+            this.ClientSize = new System.Drawing.Size(334, 361);
             this.Controls.Add(this.toolBar);
-            this.Controls.Add(this.buttonOK);
             this.Controls.Add(this.layerGrid);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Name = "MapLayersForm";
-            this.Text = "MapLayersForm";
+            this.Text = "Layers";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MapLayersForm_FormClosed);
             this.Load += new System.EventHandler(this.OnMapLayersForm_Load);
             this.Resize += new System.EventHandler(this.MapLayersForm_Resize);
@@ -238,10 +239,6 @@
         #endregion
 
         private System.Windows.Forms.DataGridView layerGrid;
-        private System.Windows.Forms.Button buttonOK;
-        private System.Windows.Forms.DataGridViewCheckBoxColumn Visible;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Layer;
-        private System.Windows.Forms.DataGridViewImageColumn Symbol;
         private System.Windows.Forms.ContextMenuStrip menuLayers;
         private System.Windows.Forms.ToolStripMenuItem itemAddLayer;
         private System.Windows.Forms.ToolStripMenuItem itemRemoveLayer;
@@ -254,5 +251,9 @@
         private System.Windows.Forms.ToolStripButton buttonRemoveLayer;
         private System.Windows.Forms.ToolStripButton buttonAttributes;
         private System.Windows.Forms.ToolStripButton buttonZoomToLayer;
+        private System.Windows.Forms.ToolStripButton buttonClose;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn Visible;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Layer;
+        private System.Windows.Forms.DataGridViewImageColumn Symbol;
     }
 }

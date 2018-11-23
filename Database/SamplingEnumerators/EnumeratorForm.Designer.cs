@@ -106,7 +106,7 @@ namespace FAD3
             this.tree.Name = "tree";
             this.tree.Size = new System.Drawing.Size(227, 170);
             this.tree.TabIndex = 10;
-            this.tree.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.tree_AfterSelect);
+            this.tree.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.OnTreeView_AfterSelect);
             // 
             // panelTop
             // 

@@ -16,6 +16,12 @@ namespace FAD3.Database.Forms
     {
         private string _htmlFile;
         private CatchNameDataType _catchNameDataType;
+        private int _resultImport;
+        public int SpeciesNameColumn { get; internal set; }
+        public int LanguageColumn { get; internal set; }
+        public int LocalNameColumn { get; internal set; }
+
+        public int RowsImported { get; internal set; }
 
         public HTMLTableSelectColumnsForm(string htmlFile, CatchNameDataType catchNameDataType)
         {
@@ -85,13 +91,13 @@ namespace FAD3.Database.Forms
             switch (((Button)sender).Name)
             {
                 case "btnOk":
-                    int result = 0;
                     string msg = string.Empty;
                     switch (_catchNameDataType)
                     {
                         case CatchNameDataType.CatchLocalName:
                             if (cboLocalName.Text.Length > 0)
                             {
+                                LocalNameColumn = cboLocalName.SelectedIndex;
                             }
                             else
                             {
@@ -104,7 +110,9 @@ namespace FAD3.Database.Forms
                                 && cboLanguage.Text.Length > 0
                                 && cboSpName.Text.Length > 0)
                             {
-                                Names.ImportFromHTMLLocalNamestoScientificNames(_htmlFile, cboSpName.SelectedIndex, cboLocalName.SelectedIndex, cboLanguage.SelectedIndex);
+                                LocalNameColumn = cboLocalName.SelectedIndex;
+                                SpeciesNameColumn = cboSpName.SelectedIndex;
+                                LanguageColumn = cboLanguage.SelectedIndex;
                             }
                             else
                             {
@@ -115,7 +123,7 @@ namespace FAD3.Database.Forms
                         case CatchNameDataType.CatchSpeciesName:
                             if (cboSpName.Text.Length > 0)
                             {
-                                result = Names.ImportSpeciesNamesFromHTML(_htmlFile, cboSpName.SelectedIndex);
+                                SpeciesNameColumn = cboSpName.SelectedIndex;
                             }
                             else
                             {
@@ -127,15 +135,15 @@ namespace FAD3.Database.Forms
                     {
                         MessageBox.Show(msg, "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
-                    else if (result > 0)
+                    else
                     {
-                        Close();
+                        DialogResult = DialogResult.OK;
                     }
 
                     break;
 
                 case "btnCancel":
-                    Close();
+                    DialogResult = DialogResult.Cancel;
                     break;
             }
         }

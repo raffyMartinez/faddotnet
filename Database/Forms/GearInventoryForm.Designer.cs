@@ -40,6 +40,8 @@
             this.tsButtonAddSitioLevelInventory = new System.Windows.Forms.ToolStripButton();
             this.tsButtonAddGear = new System.Windows.Forms.ToolStripButton();
             this.tsButtonExit = new System.Windows.Forms.ToolStripButton();
+            this.tsButtonExport = new System.Windows.Forms.ToolStripButton();
+            this.tsButtonImport = new System.Windows.Forms.ToolStripButton();
             ((System.ComponentModel.ISupportInitialize)(this.split)).BeginInit();
             this.split.Panel1.SuspendLayout();
             this.split.Panel2.SuspendLayout();
@@ -129,6 +131,8 @@
             this.tsButtonAddInventory,
             this.tsButtonAddSitioLevelInventory,
             this.tsButtonAddGear,
+            this.tsButtonExport,
+            this.tsButtonImport,
             this.tsButtonExit});
             this.toolStrip.Location = new System.Drawing.Point(0, 0);
             this.toolStrip.Name = "toolStrip";
@@ -177,6 +181,26 @@
             this.tsButtonExit.Text = "toolStripButton1";
             this.tsButtonExit.ToolTipText = "Exit";
             // 
+            // tsButtonExport
+            // 
+            this.tsButtonExport.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsButtonExport.Image = global::FAD3.Properties.Resources.ExportFile_16x;
+            this.tsButtonExport.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsButtonExport.Name = "tsButtonExport";
+            this.tsButtonExport.Size = new System.Drawing.Size(23, 22);
+            this.tsButtonExport.Text = "toolStripButton1";
+            this.tsButtonExport.ToolTipText = "Export inventory";
+            // 
+            // tsButtonImport
+            // 
+            this.tsButtonImport.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsButtonImport.Image = global::FAD3.Properties.Resources.ImportFile_16x;
+            this.tsButtonImport.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsButtonImport.Name = "tsButtonImport";
+            this.tsButtonImport.Size = new System.Drawing.Size(23, 22);
+            this.tsButtonImport.Text = "toolStripButton2";
+            this.tsButtonImport.ToolTipText = "Import inventory";
+            // 
             // GearInventoryForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -214,5 +238,7 @@
         private System.Windows.Forms.ToolStripButton tsButtonAddInventory;
         private System.Windows.Forms.ToolStripButton tsButtonAddSitioLevelInventory;
         private System.Windows.Forms.ToolStripButton tsButtonAddGear;
+        private System.Windows.Forms.ToolStripButton tsButtonExport;
+        private System.Windows.Forms.ToolStripButton tsButtonImport;
     }
 }

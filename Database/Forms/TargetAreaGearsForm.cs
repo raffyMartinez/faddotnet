@@ -141,14 +141,14 @@ namespace FAD3
         private void OnListViewMouseDown(object sender, MouseEventArgs e)
         {
             mnuMapThisGear.Enabled = FishingGrid.IsCompleteGrid25 && global.MapIsOpen;
+            if (e.Button == MouseButtons.Right && _isGearMapping)
+            {
+                MapTargetAreaGear(MapFirstItemInList: true);
+            }
         }
 
         private void OnListViewMouseClick(object sender, MouseEventArgs e)
         {
-            if (_isGearMapping)
-            {
-                MapTargetAreaGear(MapFirstItemInList: true);
-            }
         }
     }
 }
