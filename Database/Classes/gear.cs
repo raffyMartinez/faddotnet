@@ -25,6 +25,14 @@ namespace FAD3
         public static List<string> ExpenseItems { get; internal set; }
         public static List<string> PaymentSources { get; internal set; }
 
+        public static void GetLists()
+        {
+            GetGearClass();
+            GetPaymentSources();
+            GetExpenses();
+            GetAccessories();
+        }
+
         public static bool AddPaymentSource(string source)
         {
             PaymentSources.Add(source);
@@ -43,7 +51,7 @@ namespace FAD3
             return true;
         }
 
-        public static void GetPaymentSources()
+        private static void GetPaymentSources()
         {
             PaymentSources = new List<string>();
             var dt = new DataTable();
@@ -69,7 +77,7 @@ namespace FAD3
             }
         }
 
-        public static void GetExpenses()
+        private static void GetExpenses()
         {
             ExpenseItems = new List<string>();
             var dt = new DataTable();
@@ -95,7 +103,7 @@ namespace FAD3
             }
         }
 
-        public static void GetAccessories()
+        private static void GetAccessories()
         {
             Accessories = new List<string>();
             var dt = new DataTable();
@@ -104,7 +112,7 @@ namespace FAD3
                 try
                 {
                     conection.Open();
-                    string query = "SELECT DISTINCT Accessory from tblGearInventoryAccessories Order By Accessory ";
+                    string query = "SELECT DISTINCT Accessory from tblGearInventoryAccesories Order By Accessory ";
 
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
@@ -382,11 +390,6 @@ namespace FAD3
                 }
             }
             return myCode;
-        }
-
-        public static void FillGearClasses()
-        {
-            GetGearClass();
         }
 
         public static Dictionary<string, (string gearClassName, string gearCode)> GetGearClassDictionary()

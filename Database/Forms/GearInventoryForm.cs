@@ -549,6 +549,50 @@ namespace FAD3.Database.Forms
 
             lvi = lvInventory.Items.Add("Percentage of dominant catch");
             lvi.SubItems.Add(item.percentageOfDominance.ToString() + "%");
+            lvInventory.Items.Add("");
+
+            //accessories
+            if (item.accessories.Count > 0)
+            {
+                n = 0;
+                foreach (var accessory in item.accessories)
+                {
+                    if (n == 0)
+                    {
+                        lvi = lvInventory.Items.Add("Accessories used");
+                    }
+                    else
+                    {
+                        lvi = lvInventory.Items.Add("");
+                    }
+                    lvi.SubItems.Add(accessory);
+                    n++;
+                }
+                lvInventory.Items.Add("");
+            }
+
+            if (item.expenses.Count > 0)
+            {
+                //expense items
+                n = 0;
+                foreach (var expense in item.expenses)
+                {
+                    if (n == 0)
+                    {
+                        lvi = lvInventory.Items.Add("Expenses");
+                    }
+                    else
+                    {
+                        lvi = lvInventory.Items.Add("");
+                    }
+                    lvi.SubItems.Add($"{expense.expense}: PhP{expense.cost}, source:{expense.source}, notes:{expense.notes}");
+                    n++;
+                }
+                lvInventory.Items.Add("");
+            }
+
+            lvi = lvInventory.Items.Add("Notes");
+            lvi.SubItems.Add(item.notes);
 
             lblGuide.Text = $"Fishing gear: {item.gearVariation}";
 
@@ -755,10 +799,19 @@ namespace FAD3.Database.Forms
         {
             if (!_clickFromTree)
             {
-                var item = _inventory.GetMunicipalityBrangaySitioFromGearInventory(sitioGearInventoryGuid);
-                treeInventory.SelectedNode.Expand();
-                treeInventory.SelectedNode.Nodes[item.barangay].Expand();
-                _sitioNode = treeInventory.SelectedNode.Nodes[item.barangay].Nodes[item.sitio];
+                switch (treeInventory.SelectedNode.Tag)
+                {
+                    case "gearVariation":
+                        _sitioNode = treeInventory.SelectedNode.Parent;
+                        break;
+
+                    default:
+                        var item = _inventory.GetMunicipalityBrangaySitioFromGearInventory(sitioGearInventoryGuid);
+                        treeInventory.SelectedNode.Expand();
+                        treeInventory.SelectedNode.Nodes[item.barangay].Expand();
+                        _sitioNode = treeInventory.SelectedNode.Nodes[item.barangay].Nodes[item.sitio];
+                        break;
+                }
             }
 
             ShowSitioGearInventory(_sitioNode);
@@ -1236,30 +1289,65 @@ namespace FAD3.Database.Forms
                                     //catch composition
                                     {
                                         writer.WriteStartElement("CatchComposition");
-                                        writer.WriteAttributeString("PercentageOFDominance", gearDetail.percentageOfDominance.ToString());
-
-                                        //Dominant catch
-                                        writer.WriteStartElement("DominantCatch");
-                                        foreach (var dCatch in gearDetail.dominantCatch)
+                                        writer.WriteAttributeString("PercentageOfDominance", gearDetail.percentageOfDominance.ToString());
                                         {
-                                            writer.WriteStartElement("Name");
-                                            writer.WriteAttributeString("Value", dCatch.Value);
-                                            writer.WriteAttributeString("guid", dCatch.Key);
+                                            //Dominant catch
+                                            writer.WriteStartElement("DominantCatch");
+                                            foreach (var dCatch in gearDetail.dominantCatch)
+                                            {
+                                                writer.WriteStartElement("Name");
+                                                writer.WriteAttributeString("Value", dCatch.Value);
+                                                writer.WriteAttributeString("guid", dCatch.Key);
+                                                writer.WriteEndElement();
+                                            }
+                                            writer.WriteEndElement();
+
+                                            //Non-dominant catch
+                                            writer.WriteStartElement("NonDominantCatch");
+                                            foreach (var ndCatch in gearDetail.nonDominantCatch)
+                                            {
+                                                writer.WriteStartElement("Name");
+                                                writer.WriteAttributeString("Value", ndCatch.Value);
+                                                writer.WriteAttributeString("guid", ndCatch.Key);
+                                                writer.WriteEndElement();
+                                            }
+                                            writer.WriteEndElement();
+                                        }
+
+                                        writer.WriteEndElement();
+                                    }
+
+                                    //accessories
+                                    {
+                                        writer.WriteStartElement("Accessories");
+                                        foreach (string accessory in gearDetail.accessories)
+                                        {
+                                            writer.WriteStartElement("Accessory");
+                                            writer.WriteAttributeString("Name", accessory);
                                             writer.WriteEndElement();
                                         }
                                         writer.WriteEndElement();
+                                    }
 
-                                        //Non-dominant catch
-                                        writer.WriteStartElement("NonDominantCatch");
-                                        foreach (var ndCatch in gearDetail.nonDominantCatch)
+                                    //expenses
+                                    {
+                                        writer.WriteStartElement("Expenses");
+                                        foreach (var expense in gearDetail.expenses)
                                         {
-                                            writer.WriteStartElement("Name");
-                                            writer.WriteAttributeString("Value", ndCatch.Value);
-                                            writer.WriteAttributeString("guid", ndCatch.Key);
+                                            writer.WriteStartElement("Expense");
+                                            writer.WriteAttributeString("Name", expense.expense);
+                                            writer.WriteAttributeString("Cost", expense.cost.ToString());
+                                            writer.WriteAttributeString("SourceOfFunds", expense.source);
+                                            writer.WriteAttributeString("Notes", expense.notes);
                                             writer.WriteEndElement();
                                         }
                                         writer.WriteEndElement();
+                                    }
 
+                                    //final notes
+                                    {
+                                        writer.WriteStartElement("Notes");
+                                        writer.WriteAttributeString("Value", gearDetail.notes);
                                         writer.WriteEndElement();
                                     }
                                 }
@@ -1272,6 +1360,7 @@ namespace FAD3.Database.Forms
                         writer.WriteEndElement();
                         writer.WriteEndDocument();
                         writer.Close();
+                        MessageBox.Show("Fishing gear inventory was exported to XML", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         break;
                 }
             }

@@ -373,12 +373,13 @@ namespace FAD3.Database.Classes
         }
 
         public (string gearClass, string gearVariation, Dictionary<string, string> gearLocalNames,
-        int commercialCount, int motorizedCount, int nonMotorizedCount, int noBoatCount,
-        List<int> monthsInUse, List<int> peakMonths, int numberDaysGearUsedPerMonth,
-        int cpueRangeMax, int cpueRangeMin, int cpueModeUpper, int cpueModeLower, string cpueUnit,
-        List<(int decade, int cpue, string unit)> historicalCPUE,
-        Dictionary<string, string> dominantCatch, Dictionary<string, string> nonDominantCatch, int percentageOfDominance)
-            GetGearVariationInventoryDataEx(string gearInventoryGuid)
+            int commercialCount, int motorizedCount, int nonMotorizedCount, int noBoatCount,
+            List<int> monthsInUse, List<int> peakMonths, int numberDaysGearUsedPerMonth,
+            int cpueRangeMax, int cpueRangeMin, int cpueModeUpper, int cpueModeLower, string cpueUnit,
+            List<(int decade, int cpue, string unit)> historicalCPUE,
+            Dictionary<string, string> dominantCatch, Dictionary<string, string> nonDominantCatch, int percentageOfDominance,
+            string notes, List<string> accessories, List<(string expense, double cost, string source, string notes)> expenses)
+          GetGearVariationInventoryDataEx(string gearInventoryGuid)
         {
             Dictionary<string, string> gearLocalNames = new Dictionary<string, string>();
             List<int> monthsInUse = new List<int>();
@@ -386,6 +387,9 @@ namespace FAD3.Database.Classes
             List<(int decade, int cpue, string unit)> historicalCPUE = new List<(int decade, int cpue, string unit)>();
             Dictionary<string, string> dominantCatch = new Dictionary<string, string>();
             Dictionary<string, string> nonDominantCatch = new Dictionary<string, string>();
+            List<string> accessories = new List<string>();
+            List<(string expense, double cost, string source, string notes)> expenses = new List<(string expense, double cost, string spurce, string notes)>();
+            string notes = "";
             string gearClass = "";
             string gearVariation = "";
             int commercialCount = 0;
@@ -433,6 +437,7 @@ namespace FAD3.Database.Classes
                     cpueModeLower = (int)dr["ModeLower"];
                     cpueUnit = dr["CPUEUnit"].ToString();
                     percentageOfDominance = (int)dr["DominantCatchPercent"];
+                    notes = dr["Notes"].ToString();
                 }
                 catch (Exception ex)
                 {
@@ -491,6 +496,7 @@ namespace FAD3.Database.Classes
                     Logger.Log(ex);
                 }
             }
+
             //peak months
             sql = $@"SELECT tblGearInventoryPeakMonths.PeakSeasonMonthNumber
                     FROM tblGearInventoryPeakMonths
@@ -566,6 +572,7 @@ namespace FAD3.Database.Classes
                     Logger.Log(ex);
                 }
             }
+
             //and we put non-dominant catch in another list
             sql = $@"SELECT tblBaseLocalNames.Name, tblBaseLocalNames.NameNo
                     FROM tblBaseLocalNames INNER JOIN tblGearInventoryCatchComposition ON
@@ -592,11 +599,64 @@ namespace FAD3.Database.Classes
                 }
             }
 
+            //get list of accessories
+            sql = $@"SELECT Accessory
+                    FROM tblGearInventoryAccesories
+                    WHERE InventoryDataGuid={{{gearInventoryGuid}}}
+                    ORDER BY Accessory";
+            dt = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    var adapter = new OleDbDataAdapter(sql, conection);
+                    adapter.Fill(dt);
+                    for (int n = 0; n < dt.Rows.Count; n++)
+                    {
+                        DataRow dr = dt.Rows[n];
+                        accessories.Add(dr["Accessory"].ToString());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex);
+                }
+            }
+
+            //get list of expenses
+            sql = $@"SELECT ExpenseItem,
+                        Cost,
+                        Source,
+                        Notes
+                    FROM tblGearInventoryExpense
+                    WHERE InventoryDataGuid={{{gearInventoryGuid}}}
+                    ORDER BY ExpenseItem";
+            dt = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    var adapter = new OleDbDataAdapter(sql, conection);
+                    adapter.Fill(dt);
+                    for (int n = 0; n < dt.Rows.Count; n++)
+                    {
+                        DataRow dr = dt.Rows[n];
+                        expenses.Add((dr["ExpenseItem"].ToString(), (double)dr["Cost"], dr["Source"].ToString(), dr["Notes"].ToString()));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex);
+                }
+            }
+
             //we return all the values in a value tuple, hooray very convenient indeed.
             return (gearClass, gearVariation, gearLocalNames, commercialCount, motorizedCount, nonMotorizedCount,
                     noBoatCount, monthsInUse, peakMonths, numberDaysGearUsedPerMonth,
                     cpueRangeMax, cpueRangeMin, cpueModeUpper, cpueModeLower, cpueUnit, historicalCPUE,
-                    dominantCatch, nonDominantCatch, percentageOfDominance);
+                    dominantCatch, nonDominantCatch, percentageOfDominance, notes, accessories, expenses);
         }
 
         /// <summary>
@@ -610,7 +670,8 @@ namespace FAD3.Database.Classes
             List<int> monthsInUse, List<int> peakMonths, int numberDaysGearUsedPerMonth,
             int cpueRangeMax, int cpueRangeMin, int cpueModeUpper, int cpueModeLower, string cpueUnit,
             List<(int decade, int cpue, string unit)> historicalCPUE,
-            List<string> dominantCatch, List<string> nonDominantCatch, int percentageOfDominance) GetGearVariationInventoryData(string inventoryGuid)
+            List<string> dominantCatch, List<string> nonDominantCatch, int percentageOfDominance,
+            string notes, List<string> accessories, List<(string expense, double cost, string source, string notes)> expenses) GetGearVariationInventoryData(string inventoryGuid)
         {
             List<string> gearLocalNames = new List<string>();
             List<int> monthsInUse = new List<int>();
@@ -618,6 +679,9 @@ namespace FAD3.Database.Classes
             List<(int decade, int cpue, string unit)> historicalCPUE = new List<(int decade, int cpue, string unit)>();
             List<string> dominantCatch = new List<string>();
             List<string> nonDominantCatch = new List<string>();
+            List<string> accessories = new List<string>();
+            List<(string expense, double cost, string source, string notes)> expenses = new List<(string expense, double cost, string spurce, string notes)>();
+            string notes = "";
             string inventoryName = "";
             DateTime dateConducted = DateTime.Now;
             string targetArea = "";
@@ -682,6 +746,7 @@ namespace FAD3.Database.Classes
                     cpueModeLower = (int)dr["ModeLower"];
                     cpueUnit = dr["CPUEUnit"].ToString();
                     percentageOfDominance = (int)dr["DominantCatchPercent"];
+                    notes = dr["Notes"].ToString();
                 }
                 catch (Exception ex)
                 {
@@ -788,7 +853,7 @@ namespace FAD3.Database.Classes
                 }
             }
 
-            //finally, we get the catch composition, we put dominant catch in one list
+            //we get the catch composition, we put dominant catch in one list
             sql = $@"SELECT tblBaseLocalNames.Name
                     FROM tblBaseLocalNames INNER JOIN tblGearInventoryCatchComposition ON
                       tblBaseLocalNames.NameNo = tblGearInventoryCatchComposition.NameOfCatch
@@ -839,12 +904,65 @@ namespace FAD3.Database.Classes
                 }
             }
 
+            //get list of accessories
+            sql = $@"SELECT Accessory
+                    FROM tblGearInventoryAccesories
+                    WHERE InventoryDataGuid={{{inventoryGuid}}}
+                    ORDER BY Accessory";
+            dt = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    var adapter = new OleDbDataAdapter(sql, conection);
+                    adapter.Fill(dt);
+                    for (int n = 0; n < dt.Rows.Count; n++)
+                    {
+                        DataRow dr = dt.Rows[n];
+                        accessories.Add(dr["Accessory"].ToString());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex);
+                }
+            }
+
+            //get list of expenses
+            sql = $@"SELECT ExpenseItem,
+                        Cost,
+                        Source,
+                        Notes
+                    FROM tblGearInventoryExpense
+                    WHERE InventoryDataGuid={{{inventoryGuid}}}
+                    ORDER BY ExpenseItem";
+            dt = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    var adapter = new OleDbDataAdapter(sql, conection);
+                    adapter.Fill(dt);
+                    for (int n = 0; n < dt.Rows.Count; n++)
+                    {
+                        DataRow dr = dt.Rows[n];
+                        expenses.Add((dr["ExpenseItem"].ToString(), (double)dr["Cost"], dr["Source"].ToString(), dr["Notes"].ToString()));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex);
+                }
+            }
+
             //we return all the values in a value tuple, hooray very convenient indeed.
             return (inventoryName, dateConducted, targetArea, province, municipality, barangay, sitio,
                     gearClass, gearVariation, gearLocalNames, commercialCount, motorizedCount, nonMotorizedCount,
                     noBoatCount, monthsInUse, peakMonths, numberDaysGearUsedPerMonth,
                     cpueRangeMax, cpueRangeMin, cpueModeUpper, cpueModeLower, cpueUnit, historicalCPUE,
-                    dominantCatch, nonDominantCatch, percentageOfDominance);
+                    dominantCatch, nonDominantCatch, percentageOfDominance, notes, accessories, expenses);
         }
 
         /// <summary>
@@ -1693,6 +1811,42 @@ namespace FAD3.Database.Classes
             return n > 0;
         }
 
+        public bool SaveSitioGearInventoryAccessories(string sitioGearInventoryGuid, List<string> accessories)
+
+        {
+            int n = 0;
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    string sql = $"Delete * from tblGearInventoryAccesories where InventoryDataGuid = {{{sitioGearInventoryGuid}}}";
+
+                    using (OleDbCommand update = new OleDbCommand(sql, conn))
+                    {
+                        update.ExecuteNonQuery();
+                    }
+
+                    foreach (var item in accessories)
+                    {
+                        sql = $@"Insert into tblGearInventoryAccesories (InventoryDataGuid, Accessory, RowGuid) values ({{{sitioGearInventoryGuid}}}, ""{item}"", {{{Guid.NewGuid().ToString()}}})";
+                        using (OleDbCommand update = new OleDbCommand(sql, conn))
+                        {
+                            if (update.ExecuteNonQuery() > 0) n++;
+                        }
+                    }
+
+                    conn.Close();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log($"{ex.Message}\r\n{ex.Source}");
+                }
+            }
+
+            return n > 0;
+        }
+
         /// <summary>
         /// saves historical CPUE (by decade) of a fishing gear included in a fishery inventory
         /// </summary>
@@ -1735,6 +1889,55 @@ namespace FAD3.Database.Classes
             return n > 0;
         }
 
+        public bool SaveSitioGearInventoryExpenses(string sitioGearInventoryGuid, List<(string expenseItem, double cost, string source, string notes)> expenseItems)
+        {
+            int n = 0;
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    string sql = $"Delete * from tblGearInventoryExpense where InventoryDataGuid = {{{sitioGearInventoryGuid}}}";
+
+                    using (OleDbCommand update = new OleDbCommand(sql, conn))
+                    {
+                        update.ExecuteNonQuery();
+                    }
+
+                    foreach (var item in expenseItems)
+                    {
+                        sql = $@"Insert into tblGearInventoryExpense (
+                                    InventoryDataGuid,
+                                    RowGuid,
+                                    ExpenseItem,
+                                    Cost,
+                                    Source,
+                                    Notes
+                                ) VALUES (
+                                    {{{sitioGearInventoryGuid}}},
+                                    {{{Guid.NewGuid().ToString()}}},
+                                    ""{item.expenseItem}"",
+                                    {item.cost},
+                                    ""{item.source}"",
+                                    ""{item.notes}""
+                                    )";
+                        using (OleDbCommand update = new OleDbCommand(sql, conn))
+                        {
+                            if (update.ExecuteNonQuery() > 0) n++;
+                        }
+                    }
+
+                    conn.Close();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log($"{ex.Message}\r\n{ex.Source}");
+                }
+            }
+
+            return n > 0;
+        }
+
         /// <summary>
         /// saves main data of a fishing gear included in a fishery inventory
         /// </summary>
@@ -1757,7 +1960,7 @@ namespace FAD3.Database.Classes
         public bool SaveSitioGearInventoryMain(string barangayInventoryGuid, string gearVariationGuid, int countCommercialUsage,
                         int countMunicipalMotorizedUsage, int countMunicipalNonMotorizedUsage, int countNoBoatGears,
                         int countDaysPerMonthUse, string cpueUnit, int percentageDominantCatch, string guid, fad3DataStatus dataStatus,
-                        int? rangeCPUEMax, int? rangeCPUEMin, int? modeCPUEUpper, int? modeCPUELower)
+                        int? rangeCPUEMax, int? rangeCPUEMin, int? modeCPUEUpper, int? modeCPUELower, string notes)
         {
             bool Success = false;
             string updateQuery = "";
@@ -1771,14 +1974,14 @@ namespace FAD3.Database.Classes
                                         (BarangayInventoryGUID, GearVariation, CountCommercial,
                                          CountMunicipalMotorized, CountMunicipalNonMotorized,
                                          CountNoBoat, NumberDaysPerMonth, MaxCPUE, MinCPUE,
-                                         ModeUpper, ModeLower, CPUEUnit, DataGuid, DominantCatchPercent)
+                                         ModeUpper, ModeLower, CPUEUnit, DataGuid, DominantCatchPercent,notes)
                                          values
                                          ({{{barangayInventoryGuid}}}, {{{gearVariationGuid}}},
                                           {countCommercialUsage}, {countMunicipalMotorizedUsage},
                                           {countMunicipalNonMotorizedUsage}, {countNoBoatGears},
                                           {countDaysPerMonthUse},{rangeCPUEMax}, {rangeCPUEMin},
                                           {modeCPUEUpper},{modeCPUELower},'{cpueUnit}',{{{guid}}},
-                                          {percentageDominantCatch})";
+                                          {percentageDominantCatch},""{notes}"")";
                     }
                     else
                     {
@@ -1793,8 +1996,9 @@ namespace FAD3.Database.Classes
                                        MinCPUE = {rangeCPUEMin},
                                        ModeUpper = {modeCPUEUpper},
                                        ModeLower = {modeCPUELower},
-                                       CPUEUnit = '{cpueUnit}',
-                                       DominantCatchPercent = {percentageDominantCatch}
+                                       CPUEUnit = ""{cpueUnit}"",
+                                       DominantCatchPercent = {percentageDominantCatch},
+                                       Notes = ""{notes}""
                                        WHERE DataGuid = {{{guid}}}";
                     }
                     conn.Open();

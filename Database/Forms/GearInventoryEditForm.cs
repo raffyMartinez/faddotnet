@@ -222,6 +222,8 @@ namespace FAD3.Database.Forms
             cboSelectAccessory.Sorted = true;
 
             listViewExpenses.Items.Clear();
+            listViewExpenses.FullRowSelect = true;
+            SizeColumns(listViewExpenses);
         }
 
         public void AddNewGearInventory(string barangayInventoryGuid, int countCommercial, int countMunicipalMotorized, int countMunicipalNonMotorized, int countFishers)
@@ -486,6 +488,19 @@ namespace FAD3.Database.Forms
                 }
             }
 
+            foreach (var item in gearData.accessories)
+            {
+                listBoxAccessories.Items.Add(item);
+            }
+
+            foreach (var item in gearData.expenses)
+            {
+                var lvi = listViewExpenses.Items.Add(item.expense, item.expense, null);
+                lvi.SubItems.Add(item.cost.ToString());
+                lvi.SubItems.Add(item.source);
+                lvi.SubItems.Add(item.notes);
+            }
+            txtNotes.Text = gearData.notes;
             txtDominantPercentage.Text = gearData.percentageOfDominance.ToString();
 
             Text = "Edit fishing gear inventory data";
@@ -616,6 +631,21 @@ namespace FAD3.Database.Forms
                                     listNonDominantCatchNameGuid.Add(((KeyValuePair<string, string>)item).Key);
                                 }
 
+                                List<string> listAccessories = new List<string>();
+                                foreach (string item in listBoxAccessories.Items)
+                                {
+                                    listAccessories.Add(item);
+                                }
+
+                                List<(string expenseItem, double cost, string source, string notes)> listExpenses = new List<(string expenseItem, double cost, string source, string notes)>();
+                                foreach (ListViewItem item in listViewExpenses.Items)
+                                {
+                                    if (item.SubItems.Count > 1)
+                                    {
+                                        listExpenses.Add((item.Text, double.Parse(item.SubItems[1].Text), item.SubItems[2].Text, item.SubItems[3].Text));
+                                    }
+                                }
+
                                 int? rangeCPUEMax = null;
                                 if (int.TryParse(txtRangeMax.Text, out int v)) rangeCPUEMax = v;
 
@@ -632,7 +662,7 @@ namespace FAD3.Database.Forms
                                     int.Parse(txtCommercialUsage.Text), int.Parse(txtMunicipalMotorizedUsage.Text),
                                     int.Parse(txtMunicipalNonMotorizedUsage.Text), int.Parse(txtNoBoatGears.Text),
                                     int.Parse(txtNumberOfDaysPerMonth.Text), cboCatchUnit.Text, int.Parse(txtDominantPercentage.Text),
-                                    guid, _dataStatus, rangeCPUEMax, rangeCPUEMin, modeCPUEUpper, modeCPUELower)
+                                    guid, _dataStatus, rangeCPUEMax, rangeCPUEMin, modeCPUEUpper, modeCPUELower, txtNotes.Text)
 
                                     && _inventory.SaveSitioGearInventoryGearLocalNames(guid, listGearLocalNameGuids)
 
@@ -640,6 +670,8 @@ namespace FAD3.Database.Forms
 
                                     && _inventory.SaveSitioGearInventoryCatchComposition(guid, listDominantCatchNameGuid, listNonDominantCatchNameGuid);
 
+                                _inventory.SaveSitioGearInventoryAccessories(guid, listAccessories);
+                                _inventory.SaveSitioGearInventoryExpenses(guid, listExpenses);
                                 _inventory.SaveSitioGearInventoryHistoricalCPUE(guid, listHistoryCPUE);
 
                                 if (success) _parentForm.RefreshSitioGearInventory(guid, _dataStatus == fad3DataStatus.statusNew);
@@ -721,16 +753,91 @@ namespace FAD3.Database.Forms
                     listBoxOtherCatch.Items.Remove(listBoxOtherCatch.SelectedItem);
                     break;
 
+                case "btnAddAccessory":
+                    if (cboSelectAccessory.Text.Length > 0)
+                    {
+                        if (!listBoxAccessories.Items.Contains(cboSelectAccessory.Text))
+                        {
+                            listBoxAccessories.Items.Add(cboSelectAccessory.Text);
+                        }
+                        else
+                        {
+                            MessageBox.Show("Item already in the list");
+                        }
+                        cboSelectAccessory.SelectedIndex = -1;
+                    }
+                    break;
+
+                case "btnRemoveAccessory":
+                    listBoxAccessories.Items.Remove(listBoxAccessories.SelectedItem);
+                    break;
+
                 case "btnAddExpense":
                     AddExpense();
                     break;
             }
         }
 
-        private void AddExpense()
+        private void AddExpense(ListViewItem lvi = null)
         {
-            FishingExpenseForm fef = new FishingExpenseForm(this);
-            fef.ShowDialog(this);
+            using (FishingExpenseForm fef = new FishingExpenseForm(this))
+            {
+                if (lvi != null)
+                {
+                    fef.ExpenseItem = lvi.Text;
+                    fef.Cost = double.Parse(lvi.SubItems[1].Text);
+                    fef.Source = lvi.SubItems[2].Text;
+                    fef.Notes = lvi.SubItems[3].Text;
+                }
+                fef.ShowDialog(this);
+                if (fef.DialogResult == DialogResult.OK)
+                {
+                    if (lvi == null)
+                    {
+                        var item = listViewExpenses.Items.Add(fef.ExpenseItem, fef.ExpenseItem, null);
+                        item.SubItems.Add(fef.Cost.ToString());
+                        item.SubItems.Add(fef.Source);
+                        item.SubItems.Add(fef.Notes);
+                    }
+                    else
+                    {
+                        var item = listViewExpenses.Items[lvi.Text];
+                        item.Text = fef.ExpenseItem;
+                        item.SubItems[1].Text = fef.Cost.ToString();
+                        item.SubItems[2].Text = fef.Source;
+                        item.SubItems[3].Text = fef.Notes;
+                    }
+                    SizeColumns(listViewExpenses, false);
+                }
+            }
+        }
+
+        public void RefreshFishingExpense(string oldExpenseItem, string expenseItem, double cost, string source, string notes)
+        {
+            if (listViewExpenses.Items.Count == 0)
+            {
+                AddNewExpenseItem(expenseItem, cost, source, notes);
+            }
+            else if (listViewExpenses.Items.ContainsKey(oldExpenseItem))
+            {
+                var lvi = listViewExpenses.Items[oldExpenseItem];
+                lvi.Text = expenseItem;
+                lvi.SubItems[1].Text = cost.ToString();
+                lvi.SubItems[2].Text = source;
+                lvi.SubItems[3].Text = notes;
+            }
+            else
+            {
+                AddNewExpenseItem(expenseItem, cost, source, notes);
+            }
+        }
+
+        private void AddNewExpenseItem(string expenseItem, double cost, string source, string notes)
+        {
+            var item = listViewExpenses.Items.Add(expenseItem, expenseItem, null);
+            item.SubItems.Add(cost.ToString());
+            item.SubItems.Add(source);
+            item.SubItems.Add(notes);
         }
 
         private void SetActiveCatchCompositionListBox(ListBox lBox)
@@ -1089,6 +1196,8 @@ namespace FAD3.Database.Forms
                                 if (result == DialogResult.Yes)
                                 {
                                     comboBarangays.Items.Add(s);
+                                    _sitios.Clear();
+                                    _sitios = _inventory.GetBarangaySitios(comboProvince.Text, comboMunicipality.Text, s);
                                 }
                                 else
                                 {
@@ -1096,11 +1205,6 @@ namespace FAD3.Database.Forms
                                 }
                             }
                             break;
-                    }
-                    if (!e.Cancel)
-                    {
-                        _sitios.Clear();
-                        _sitios = _inventory.GetBarangaySitios(comboProvince.Text, comboMunicipality.Text, s);
                     }
                 }
             }
@@ -1137,16 +1241,8 @@ namespace FAD3.Database.Forms
                     break;
 
                 case "listViewExpenses":
-                    if (_hitItem == null)
-                    {
-                        FishingExpenseForm fef = new FishingExpenseForm(this);
-                        fef.ShowDialog(this);
-                    }
-                    else
-                    {
-                        FishingExpenseForm fef = new FishingExpenseForm(this, _hitItem.Text, double.Parse(_hitItem.SubItems[1].Text), _hitItem.SubItems[2].Text, _hitItem.SubItems[3].Text);
-                        fef.ShowDialog(this);
-                    }
+
+                    AddExpense(listViewExpenses.SelectedItems[0]);
 
                     break;
             }
@@ -1196,6 +1292,18 @@ namespace FAD3.Database.Forms
                         if (!ee.Cancel)
                         {
                             OnButtonClick(btnAddLocalName, null);
+                        }
+                    }
+                    break;
+
+                case "cboSelectAccessory":
+                    if (e.KeyData == Keys.Enter && cboSelectAccessory.Text.Length > 0)
+                    {
+                        CancelEventArgs ee = new CancelEventArgs(false);
+                        OnComboValidating(cboSelectAccessory, ee);
+                        if (!ee.Cancel)
+                        {
+                            OnButtonClick(btnAddAccessory, null);
                         }
                     }
                     break;
@@ -1275,11 +1383,24 @@ namespace FAD3.Database.Forms
         private void OnListViewMouseDown(object sender, MouseEventArgs e)
         {
             var lv = (ListView)sender;
-            switch (lv.Name)
+            _hitItem = lv.HitTest(e.X, e.Y).Item;
+            if (e.Clicks == 1)
             {
-                case "listViewExpenses":
-                    _hitItem = lv.HitTest(e.X, e.Y).Item;
-                    break;
+                switch (lv.Name)
+                {
+                    case "listViewExpenses":
+
+                        break;
+                }
+            }
+            else if (e.Clicks == 2)
+            {
+                switch (lv.Name)
+                {
+                    case "listViewExpenses":
+                        AddExpense(_hitItem);
+                        break;
+                }
             }
         }
     }

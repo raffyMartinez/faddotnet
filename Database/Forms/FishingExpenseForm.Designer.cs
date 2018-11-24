@@ -54,7 +54,7 @@
             this.txtCost.Location = new System.Drawing.Point(82, 41);
             this.txtCost.Name = "txtCost";
             this.txtCost.Size = new System.Drawing.Size(94, 20);
-            this.txtCost.TabIndex = 1;
+            this.txtCost.TabIndex = 2;
             this.txtCost.Validating += new System.ComponentModel.CancelEventHandler(this.OnFieldValidating);
             // 
             // cboExpenseItem
@@ -63,7 +63,7 @@
             this.cboExpenseItem.Location = new System.Drawing.Point(82, 14);
             this.cboExpenseItem.Name = "cboExpenseItem";
             this.cboExpenseItem.Size = new System.Drawing.Size(162, 21);
-            this.cboExpenseItem.TabIndex = 2;
+            this.cboExpenseItem.TabIndex = 1;
             this.cboExpenseItem.Validating += new System.ComponentModel.CancelEventHandler(this.OnFieldValidating);
             // 
             // label2
@@ -81,7 +81,7 @@
             this.cboSource.Location = new System.Drawing.Point(82, 67);
             this.cboSource.Name = "cboSource";
             this.cboSource.Size = new System.Drawing.Size(162, 21);
-            this.cboSource.TabIndex = 5;
+            this.cboSource.TabIndex = 3;
             this.cboSource.Validating += new System.ComponentModel.CancelEventHandler(this.OnFieldValidating);
             // 
             // label3
@@ -108,14 +108,14 @@
             this.txtNotes.Multiline = true;
             this.txtNotes.Name = "txtNotes";
             this.txtNotes.Size = new System.Drawing.Size(162, 57);
-            this.txtNotes.TabIndex = 6;
+            this.txtNotes.TabIndex = 4;
             // 
             // btnOk
             // 
             this.btnOk.Location = new System.Drawing.Point(273, 12);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(48, 25);
-            this.btnOk.TabIndex = 8;
+            this.btnOk.TabIndex = 5;
             this.btnOk.Text = "Ok";
             this.btnOk.UseVisualStyleBackColor = true;
             this.btnOk.Click += new System.EventHandler(this.OnButtonClick);
@@ -125,7 +125,7 @@
             this.btnCancel.Location = new System.Drawing.Point(273, 43);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(48, 25);
-            this.btnCancel.TabIndex = 9;
+            this.btnCancel.TabIndex = 6;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.OnButtonClick);

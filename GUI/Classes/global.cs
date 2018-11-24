@@ -635,10 +635,7 @@ namespace FAD3
                     Names.MakeAllNames();
                     FishingVessel.MakeVesselTypeTable();
                     GetProvinces();
-                    Gear.FillGearClasses();
-                    Gear.GetAccessories();
-                    Gear.GetExpenses();
-                    Gear.GetPaymentSources();
+                    Gear.GetLists();
                     GetVesselTypes();
                 }
             }
