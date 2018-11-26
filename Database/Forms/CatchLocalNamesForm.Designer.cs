@@ -272,6 +272,7 @@
             this.Controls.Add(this.treeView);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Name = "CatchLocalNamesForm";
+            this.ShowInTaskbar = false;
             this.Text = "CatchLocalNamesForm";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnFormClose);
             this.Load += new System.EventHandler(this.OnFormLoad);

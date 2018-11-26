@@ -1146,40 +1146,6 @@ namespace FAD3.Database.Forms
                                             cbo.Text = newName.UseThisName;
                                         }
                                     }
-                                    //result = NewNameForm.Show(newName, gearClass);
-                                    //if (result == DialogResult.Cancel && newName.UseThisName != null)
-                                    //{
-                                    //    if (newName.UseThisName.Length > 0)
-                                    //    {
-                                    //        cbo.Text = newName.UseThisName;
-                                    //    }
-                                    //}
-                                    //else if (result == DialogResult.OK)
-                                    //{
-                                    //    KeyValuePair<string, string> kv = new KeyValuePair<string, string>(newName.ObjectGUID, newName.NewName);
-                                    //    cbo.Items.Add(kv);
-                                    //    switch (ctlName)
-                                    //    {
-                                    //        case "cboCatchLocalName":
-                                    //            _activeCatchCompList.Items.Add(kv);
-                                    //            cbo.Text = "";
-                                    //            break;
-
-                                    //        case "cboSelectGearLocalName":
-                                    //            listBoxGearLocalNames.Items.Add(kv);
-                                    //            cbo.Text = "";
-                                    //            break;
-
-                                    //        case "cboGearVariation":
-
-                                    //            break;
-
-                                    //        case "cboSelectAccessory":
-                                    //            listBoxAccessories.Items.Add(kv.Value);
-                                    //            cbo.Text = "";
-                                    //            break;
-                                    //    }
-                                    //}
                                 }
                                 else
                                 {

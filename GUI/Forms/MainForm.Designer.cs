@@ -293,14 +293,14 @@ namespace FAD3
             // menuItemZone50
             // 
             this.menuItemZone50.Name = "menuItemZone50";
-            this.menuItemZone50.Size = new System.Drawing.Size(180, 22);
+            this.menuItemZone50.Size = new System.Drawing.Size(143, 22);
             this.menuItemZone50.Tag = "zone50";
             this.menuItemZone50.Text = "UTM zone 50";
             // 
             // menuItemZone51
             // 
             this.menuItemZone51.Name = "menuItemZone51";
-            this.menuItemZone51.Size = new System.Drawing.Size(180, 22);
+            this.menuItemZone51.Size = new System.Drawing.Size(143, 22);
             this.menuItemZone51.Tag = "zone51";
             this.menuItemZone51.Text = "UTM zone 51";
             // 

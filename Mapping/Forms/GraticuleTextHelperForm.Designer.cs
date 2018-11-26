@@ -145,6 +145,7 @@
             this.Controls.Add(this.txtText);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "GraticuleTextHelperForm";
+            this.ShowInTaskbar = false;
             this.Text = "ConfigureMapTextForm";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnGraticuleTextHelperForm_Closed);
             this.Load += new System.EventHandler(this.OnGraticuleTextHelperForm_Load);

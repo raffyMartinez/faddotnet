@@ -141,6 +141,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "MapEffortHelperForm";
+            this.ShowInTaskbar = false;
             this.Text = "MapEffortHelperForm";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnMapForm_FormClosed);
             this.Load += new System.EventHandler(this.MapEffortHelperForm_Load);

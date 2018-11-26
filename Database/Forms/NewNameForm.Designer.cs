@@ -118,6 +118,7 @@
             this.Controls.Add(this.lblNewType);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "NewNameForm";
+            this.ShowInTaskbar = false;
             this.Text = "NewCatchLocalNameForm";
             this.Load += new System.EventHandler(this.OnFormLoad);
             this.ResumeLayout(false);

@@ -130,6 +130,7 @@
             this.Controls.Add(this.btnOk);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "HTMLTableSelectColumnsForm";
+            this.ShowInTaskbar = false;
             this.Text = "HTMLTableSelectColumnsForm";
             this.Load += new System.EventHandler(this.OnFormLoad);
             this.ResumeLayout(false);

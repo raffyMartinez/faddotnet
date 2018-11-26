@@ -100,6 +100,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "ReferenceNumberForm";
+            this.ShowInTaskbar = false;
             this.Text = "GenerateRefNumberForm";
             this.Load += new System.EventHandler(this.OnForm_Load);
             this.ResumeLayout(false);

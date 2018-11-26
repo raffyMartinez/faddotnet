@@ -380,6 +380,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "LayerPropertyForm";
+            this.ShowInTaskbar = false;
             this.Text = "LayerPropertyForm";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.LayerPropertyForm_FormClosed);
             this.Load += new System.EventHandler(this.LayerPropertyForm_Load);

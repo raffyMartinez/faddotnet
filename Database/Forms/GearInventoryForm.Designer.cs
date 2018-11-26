@@ -39,9 +39,9 @@
             this.tsButtonAddInventory = new System.Windows.Forms.ToolStripButton();
             this.tsButtonAddSitioLevelInventory = new System.Windows.Forms.ToolStripButton();
             this.tsButtonAddGear = new System.Windows.Forms.ToolStripButton();
-            this.tsButtonExit = new System.Windows.Forms.ToolStripButton();
             this.tsButtonExport = new System.Windows.Forms.ToolStripButton();
             this.tsButtonImport = new System.Windows.Forms.ToolStripButton();
+            this.tsButtonExit = new System.Windows.Forms.ToolStripButton();
             ((System.ComponentModel.ISupportInitialize)(this.split)).BeginInit();
             this.split.Panel1.SuspendLayout();
             this.split.Panel2.SuspendLayout();
@@ -171,16 +171,6 @@
             this.tsButtonAddGear.Text = "toolStripButton1";
             this.tsButtonAddGear.ToolTipText = "Add fishing gear inventory";
             // 
-            // tsButtonExit
-            // 
-            this.tsButtonExit.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsButtonExit.Image = global::FAD3.Properties.Resources.im_exit;
-            this.tsButtonExit.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tsButtonExit.Name = "tsButtonExit";
-            this.tsButtonExit.Size = new System.Drawing.Size(23, 22);
-            this.tsButtonExit.Text = "toolStripButton1";
-            this.tsButtonExit.ToolTipText = "Exit";
-            // 
             // tsButtonExport
             // 
             this.tsButtonExport.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -201,6 +191,16 @@
             this.tsButtonImport.Text = "toolStripButton2";
             this.tsButtonImport.ToolTipText = "Import inventory";
             // 
+            // tsButtonExit
+            // 
+            this.tsButtonExit.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsButtonExit.Image = global::FAD3.Properties.Resources.im_exit;
+            this.tsButtonExit.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsButtonExit.Name = "tsButtonExit";
+            this.tsButtonExit.Size = new System.Drawing.Size(23, 22);
+            this.tsButtonExit.Text = "toolStripButton1";
+            this.tsButtonExit.ToolTipText = "Exit";
+            // 
             // GearInventoryForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -210,6 +210,7 @@
             this.Controls.Add(this.split);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Name = "GearInventoryForm";
+            this.ShowInTaskbar = false;
             this.Text = "GearInventoryForm";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnFormClosed);
             this.Load += new System.EventHandler(this.OnFormLoad);

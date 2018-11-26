@@ -551,6 +551,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Grid25GenerateForm";
+            this.ShowInTaskbar = false;
             this.Text = "Grid 25";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Grid25GenerateForm_FormClosed);
             this.Load += new System.EventHandler(this.OnFormLoad);

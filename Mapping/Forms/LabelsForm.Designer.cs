@@ -1442,6 +1442,7 @@
             this.Controls.Add(this.tabsLabelProperties);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "LabelsForm";
+            this.ShowInTaskbar = false;
             this.Text = "LabelsForm";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnFormClosed);
             this.Load += new System.EventHandler(this.OnFormLoad);

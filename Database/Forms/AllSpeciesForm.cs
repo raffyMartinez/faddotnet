@@ -311,6 +311,7 @@ namespace FAD3
                 case "buttonReset":
                     chkShowWithRecords.Checked = false;
                     GetSpeciesNames();
+                    txtSearch.Text = "";
                     break;
 
                 case "buttonSearch":
@@ -330,8 +331,33 @@ namespace FAD3
                     var taxaName = o.SubItems[3].Text;
                     var nameGuid = o.Name;
 
-                    SpeciesNameForm snf = new SpeciesNameForm(genus, species, nameGuid, taxaName, this);
-                    snf.ShowDialog(this);
+                    using (SpeciesNameForm snf = new SpeciesNameForm(genus, species, nameGuid, taxaName, this))
+                    {
+                        snf.ShowDialog(this);
+                        if (snf.DialogResult == DialogResult.OK)
+                        {
+                            if (snf.DeleteSuccess)
+                            {
+                                lvNames.Items.Remove(lvNames.SelectedItems[0]);
+                            }
+                            else
+                            {
+                                var lvi = lvNames.SelectedItems[0];
+                                lvi.SubItems[1].Text = snf.Genus;
+                                lvi.SubItems[2].Text = snf.Species;
+                                lvi.SubItems[3].Text = snf.TaxaName;
+                                if (snf.InFIshBase)
+                                {
+                                    lvi.SubItems[4].Text = "x";
+                                }
+                                else
+                                {
+                                    lvi.SubItems[4].Text = "";
+                                }
+                                lvi.SubItems[6].Text = snf.Notes;
+                            }
+                        }
+                    }
                 });
             }
         }

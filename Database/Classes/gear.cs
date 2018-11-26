@@ -133,6 +133,60 @@ namespace FAD3
         {
         }
 
+        public static bool EditGearLocalName(string localName, string oldLocalName)
+        {
+            bool success = false;
+            short key1 = 0;
+            short key2 = 0;
+            DoubleMetaphoneShort mph = new DoubleMetaphoneShort();
+            mph.ComputeMetaphoneKeys(localName, out key1, out key2);
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                var sql = $@"Update tblGearLocalNames set
+                                LocalName = ""{localName}"",
+                                MPH1 = {key1},
+                                MPH2 = {key2}
+                            WHERE LocalName=""{oldLocalName}"" ";
+                using (OleDbCommand update = new OleDbCommand(sql, conn))
+                {
+                    success = update.ExecuteNonQuery() > 0;
+                }
+            }
+            return success;
+        }
+
+        public static bool EditGearVariationName(string variationName, string oldVariationName)
+        {
+            bool success = false;
+            short key1 = 0;
+            short key2 = 0;
+            DoubleMetaphoneShort mph = new DoubleMetaphoneShort();
+            mph.ComputeMetaphoneKeys(variationName, out key1, out key2);
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                var sql = $@"Update tblGearVariations set
+                                Variation = ""{variationName}"",
+                                Name2 = ""{variationName.Replace(" ", "")}"",
+                                MPH1 = {key1},
+                                MPH2 = {key2}
+                            WHERE Variation=""{oldVariationName}"" ";
+                using (OleDbCommand update = new OleDbCommand(sql, conn))
+                {
+                    try
+                    {
+                        success = update.ExecuteNonQuery() > 0;
+                    }
+                    catch
+                    {
+                        //ignore
+                    }
+                }
+            }
+            return success;
+        }
+
         public static Dictionary<string, string> GearClass
         {
             get { return _gearClass; }
@@ -159,6 +213,28 @@ namespace FAD3
             {
                 GetGearLocalNames();
                 return _gearLocalNameListDict;
+            }
+        }
+
+        public static List<string> AllGearVariationsList
+        {
+            get
+            {
+                List<string> allVariations = new List<string>();
+                const string sql = "SELECT Variation from tblGearVariations";
+                using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+                {
+                    conn.Open();
+                    var adapter = new OleDbDataAdapter(sql, conn);
+                    DataTable dt = new DataTable();
+                    adapter.Fill(dt);
+                    for (int n = 0; n < dt.Rows.Count; n++)
+                    {
+                        DataRow dr = dt.Rows[n];
+                        allVariations.Add(dr["Variation"].ToString().ToLower());
+                    }
+                }
+                return allVariations;
             }
         }
 

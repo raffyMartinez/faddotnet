@@ -202,6 +202,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "ManageGearSpecsForm";
+            this.ShowInTaskbar = false;
             this.Text = "Manage gear specifications";
             this.Load += new System.EventHandler(this.ManageGearSpecs_Load);
             this.ResumeLayout(false);

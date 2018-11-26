@@ -33,10 +33,15 @@
             this.btnCancel = new System.Windows.Forms.Button();
             this.tabSettings = new System.Windows.Forms.TabControl();
             this.tabPointSymbol = new System.Windows.Forms.TabPage();
+            this.udSideRatio = new MWLite.Symbology.Controls.NumericUpDownExt(this.components);
+            this.udNumberOfSides = new MWLite.Symbology.Controls.NumericUpDownExt(this.components);
             this.label5 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
+            this.comboPointType = new FAD3.Mapping.UserControls.ImageCombo();
+            this.symbolControl1 = new FAD3.Mapping.UserControls.SymbolControl();
             this.tabFontSymbol = new System.Windows.Forms.TabPage();
+            this.characterControl1 = new FAD3.Mapping.UserControls.CharacterControl();
             this.lblFont = new System.Windows.Forms.Label();
             this.comboCharacterFont = new System.Windows.Forms.ComboBox();
             this.tabOptions = new System.Windows.Forms.TabPage();
@@ -57,19 +62,14 @@
             this.transpFillColor = new FAD3.Mapping.UserControls.TransparencyControl();
             this.comboLineWidth = new FAD3.Mapping.UserControls.ImageCombo();
             this.udRotation = new MWLite.Symbology.Controls.NumericUpDownExt(this.components);
-            this.udSideRatio = new MWLite.Symbology.Controls.NumericUpDownExt(this.components);
-            this.udNumberOfSides = new MWLite.Symbology.Controls.NumericUpDownExt(this.components);
-            this.comboPointType = new FAD3.Mapping.UserControls.ImageCombo();
-            this.symbolControl1 = new FAD3.Mapping.UserControls.SymbolControl();
-            this.characterControl1 = new FAD3.Mapping.UserControls.CharacterControl();
             this.udSize = new MWLite.Symbology.Controls.NumericUpDownExt(this.components);
             this.tabSettings.SuspendLayout();
             this.tabPointSymbol.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.udSideRatio)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.udNumberOfSides)).BeginInit();
             this.tabFontSymbol.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picPreview)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.udRotation)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.udSideRatio)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.udNumberOfSides)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.udSize)).BeginInit();
             this.SuspendLayout();
             // 
@@ -121,6 +121,22 @@
             this.tabPointSymbol.Text = "Point symbol";
             this.tabPointSymbol.UseVisualStyleBackColor = true;
             // 
+            // udSideRatio
+            // 
+            this.udSideRatio.Location = new System.Drawing.Point(173, 118);
+            this.udSideRatio.Name = "udSideRatio";
+            this.udSideRatio.Size = new System.Drawing.Size(49, 20);
+            this.udSideRatio.TabIndex = 15;
+            this.udSideRatio.ValueChanged += new System.EventHandler(this.ApplyOptionsToGUI);
+            // 
+            // udNumberOfSides
+            // 
+            this.udNumberOfSides.Location = new System.Drawing.Point(173, 80);
+            this.udNumberOfSides.Name = "udNumberOfSides";
+            this.udNumberOfSides.Size = new System.Drawing.Size(49, 20);
+            this.udNumberOfSides.TabIndex = 14;
+            this.udNumberOfSides.ValueChanged += new System.EventHandler(this.ApplyOptionsToGUI);
+            // 
             // label5
             // 
             this.label5.AutoSize = true;
@@ -148,6 +164,38 @@
             this.label6.TabIndex = 7;
             this.label6.Text = "Number of sides";
             // 
+            // comboPointType
+            // 
+            this.comboPointType.Color1 = System.Drawing.Color.Gray;
+            this.comboPointType.Color2 = System.Drawing.Color.Gray;
+            this.comboPointType.ColorSchemes = null;
+            this.comboPointType.ComboStyle = FAD3.Mapping.UserControls.ImageComboStyle.Common;
+            this.comboPointType.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.comboPointType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboPointType.FormattingEnabled = true;
+            this.comboPointType.Location = new System.Drawing.Point(173, 31);
+            this.comboPointType.Name = "comboPointType";
+            this.comboPointType.OutlineColor = System.Drawing.Color.Black;
+            this.comboPointType.Size = new System.Drawing.Size(143, 21);
+            this.comboPointType.TabIndex = 12;
+            // 
+            // symbolControl1
+            // 
+            this.symbolControl1.BackColor = System.Drawing.Color.Transparent;
+            this.symbolControl1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.symbolControl1.CellHeight = 24;
+            this.symbolControl1.CellWidth = 24;
+            this.symbolControl1.Font = new System.Drawing.Font("Arial", 25.6F);
+            this.symbolControl1.GridColor = System.Drawing.Color.Black;
+            this.symbolControl1.GridVisible = false;
+            this.symbolControl1.ItemCount = 17;
+            this.symbolControl1.Location = new System.Drawing.Point(52, 184);
+            this.symbolControl1.Margin = new System.Windows.Forms.Padding(10, 9, 10, 9);
+            this.symbolControl1.Name = "symbolControl1";
+            this.symbolControl1.SelectedIndex = -1;
+            this.symbolControl1.Size = new System.Drawing.Size(276, 97);
+            this.symbolControl1.TabIndex = 0;
+            // 
             // tabFontSymbol
             // 
             this.tabFontSymbol.Controls.Add(this.characterControl1);
@@ -160,6 +208,23 @@
             this.tabFontSymbol.TabIndex = 1;
             this.tabFontSymbol.Text = "Character symbols";
             this.tabFontSymbol.UseVisualStyleBackColor = true;
+            // 
+            // characterControl1
+            // 
+            this.characterControl1.BackColor = System.Drawing.Color.Transparent;
+            this.characterControl1.CellHeight = 32;
+            this.characterControl1.CellWidth = 32;
+            this.characterControl1.Font = new System.Drawing.Font("Arial", 25.6F);
+            this.characterControl1.GridColor = System.Drawing.Color.Black;
+            this.characterControl1.GridVisible = true;
+            this.characterControl1.ItemCount = 224;
+            this.characterControl1.Location = new System.Drawing.Point(10, 40);
+            this.characterControl1.Margin = new System.Windows.Forms.Padding(10, 9, 10, 9);
+            this.characterControl1.Name = "characterControl1";
+            this.characterControl1.SelectedCharacterCode = ((byte)(0));
+            this.characterControl1.SelectedIndex = -1;
+            this.characterControl1.Size = new System.Drawing.Size(356, 262);
+            this.characterControl1.TabIndex = 3;
             // 
             // lblFont
             // 
@@ -363,71 +428,6 @@
             this.udRotation.TabIndex = 17;
             this.udRotation.ValueChanged += new System.EventHandler(this.ApplyOptionsToGUI);
             // 
-            // udSideRatio
-            // 
-            this.udSideRatio.Location = new System.Drawing.Point(173, 118);
-            this.udSideRatio.Name = "udSideRatio";
-            this.udSideRatio.Size = new System.Drawing.Size(49, 20);
-            this.udSideRatio.TabIndex = 15;
-            this.udSideRatio.ValueChanged += new System.EventHandler(this.ApplyOptionsToGUI);
-            // 
-            // udNumberOfSides
-            // 
-            this.udNumberOfSides.Location = new System.Drawing.Point(173, 80);
-            this.udNumberOfSides.Name = "udNumberOfSides";
-            this.udNumberOfSides.Size = new System.Drawing.Size(49, 20);
-            this.udNumberOfSides.TabIndex = 14;
-            this.udNumberOfSides.ValueChanged += new System.EventHandler(this.ApplyOptionsToGUI);
-            // 
-            // comboPointType
-            // 
-            this.comboPointType.Color1 = System.Drawing.Color.Gray;
-            this.comboPointType.Color2 = System.Drawing.Color.Gray;
-            this.comboPointType.ColorSchemes = null;
-            this.comboPointType.ComboStyle = FAD3.Mapping.UserControls.ImageComboStyle.Common;
-            this.comboPointType.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-            this.comboPointType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboPointType.FormattingEnabled = true;
-            this.comboPointType.Location = new System.Drawing.Point(173, 31);
-            this.comboPointType.Name = "comboPointType";
-            this.comboPointType.OutlineColor = System.Drawing.Color.Black;
-            this.comboPointType.Size = new System.Drawing.Size(143, 21);
-            this.comboPointType.TabIndex = 12;
-            // 
-            // symbolControl1
-            // 
-            this.symbolControl1.BackColor = System.Drawing.Color.Transparent;
-            this.symbolControl1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.symbolControl1.CellHeight = 24;
-            this.symbolControl1.CellWidth = 24;
-            this.symbolControl1.Font = new System.Drawing.Font("Arial", 25.6F);
-            this.symbolControl1.GridColor = System.Drawing.Color.Black;
-            this.symbolControl1.GridVisible = false;
-            this.symbolControl1.ItemCount = 17;
-            this.symbolControl1.Location = new System.Drawing.Point(52, 184);
-            this.symbolControl1.Margin = new System.Windows.Forms.Padding(10, 9, 10, 9);
-            this.symbolControl1.Name = "symbolControl1";
-            this.symbolControl1.SelectedIndex = -1;
-            this.symbolControl1.Size = new System.Drawing.Size(276, 97);
-            this.symbolControl1.TabIndex = 0;
-            // 
-            // characterControl1
-            // 
-            this.characterControl1.BackColor = System.Drawing.Color.Transparent;
-            this.characterControl1.CellHeight = 32;
-            this.characterControl1.CellWidth = 32;
-            this.characterControl1.Font = new System.Drawing.Font("Arial", 25.6F);
-            this.characterControl1.GridColor = System.Drawing.Color.Black;
-            this.characterControl1.GridVisible = true;
-            this.characterControl1.ItemCount = 224;
-            this.characterControl1.Location = new System.Drawing.Point(10, 40);
-            this.characterControl1.Margin = new System.Windows.Forms.Padding(10, 9, 10, 9);
-            this.characterControl1.Name = "characterControl1";
-            this.characterControl1.SelectedCharacterCode = ((byte)(0));
-            this.characterControl1.SelectedIndex = -1;
-            this.characterControl1.Size = new System.Drawing.Size(356, 262);
-            this.characterControl1.TabIndex = 3;
-            // 
             // udSize
             // 
             this.udSize.Location = new System.Drawing.Point(90, 130);
@@ -472,18 +472,19 @@
             this.Controls.Add(this.shapeContainer1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "PointLayerSymbologyForm";
+            this.ShowInTaskbar = false;
             this.Text = "LayerSymbologyForm";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnFormClosed);
             this.Load += new System.EventHandler(this.OnFormLoad);
             this.tabSettings.ResumeLayout(false);
             this.tabPointSymbol.ResumeLayout(false);
             this.tabPointSymbol.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.udSideRatio)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.udNumberOfSides)).EndInit();
             this.tabFontSymbol.ResumeLayout(false);
             this.tabFontSymbol.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picPreview)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.udRotation)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.udSideRatio)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.udNumberOfSides)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.udSize)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

@@ -28,7 +28,7 @@ namespace FAD3
         private string _gearVarName = "";
         private string _gearVarGuid = "";
         private string _gearRefCode = "";
-        private MainForm _parent;
+        private MainForm _parentForm;
         private bool _isNew;
         private TargetArea _aoi;
         private TextBox _txtVesselDimension = new TextBox();
@@ -178,8 +178,17 @@ namespace FAD3
 
         public MainForm Parent_Form
         {
-            get { return _parent; }
-            set { _parent = value; }
+            get { return _parentForm; }
+            set
+            {
+                _parentForm = value;
+                _parentForm.SamplingDetailClosed += OnSamplingDetailClosed;
+            }
+        }
+
+        private void OnSamplingDetailClosed(object sender, EventArgs e)
+        {
+            Close();
         }
 
         public bool IsNew
@@ -208,7 +217,7 @@ namespace FAD3
         {
             global.SaveFormSettings(this);
             ManageGearSpecsClass.SampledGearSpecs.Clear();
-            if (IsNew) _parent.NewSamplingDataEntryCancelled();
+            if (IsNew) _parentForm.NewSamplingDataEntryCancelled();
         }
 
         private void OnUIRowRead(object sender, UIRowFromXML e)
@@ -427,7 +436,10 @@ namespace FAD3
                         switch (e.Key)
                         {
                             case "Enumerator":
-                                _enumeratorGuid = ((KeyValuePair<string, string>)((ComboBox)ctl).SelectedItem).Key;
+                                if (((ComboBox)ctl).SelectedItem != null)
+                                {
+                                    _enumeratorGuid = ((KeyValuePair<string, string>)((ComboBox)ctl).SelectedItem).Key;
+                                }
                                 break;
 
                             case "FishingGear":
@@ -823,10 +835,19 @@ namespace FAD3
                     break;
 
                 case "btnFishingGround":
-                    PopulateFGList();
-                    FishingGroundForm fg = new FishingGroundForm(_AOIGuid, this);
-                    fg.FishingGrounds = _fishingGrounds;
-                    fg.Show(this);
+                    if (FishingGrid.IsCompleteGrid25)
+                    {
+                        PopulateFGList();
+                        FishingGroundForm fg = new FishingGroundForm(_AOIGuid, this);
+                        fg.FishingGrounds = _fishingGrounds;
+                        fg.Show(this);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Cannot specify fishing ground because\r\n" +
+                                        "target area is not setup for Grid25", "Grid25 is not setup",
+                                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
                     break;
             }
         }
@@ -919,14 +940,14 @@ namespace FAD3
                         if (SaveEdits())
                         {
                             if (IsNew) ReferenceNumberManager.UpdateRefCodeCounter();
-                            _parent.RefreshCatchDetail(_samplingGUID, _isNew, _samplingDate, _gearVarGuid, _landingSiteGuid);
+                            _parentForm.RefreshCatchDetail(_samplingGUID, _isNew, _samplingDate, _gearVarGuid, _landingSiteGuid);
                             Close();
                         }
                     }
                     break;
 
                 case "buttonCancel":
-                    if (IsNew) _parent.NewSamplingDataEntryCancelled();
+                    if (IsNew) _parentForm.NewSamplingDataEntryCancelled();
                     this.Close();
                     break;
             }

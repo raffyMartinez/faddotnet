@@ -43,7 +43,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(18, 17);
+            this.label1.Location = new System.Drawing.Point(15, 17);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(48, 13);
             this.label1.TabIndex = 0;
@@ -69,7 +69,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(18, 44);
+            this.label2.Location = new System.Drawing.Point(15, 44);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(28, 13);
             this.label2.TabIndex = 3;
@@ -86,17 +86,16 @@
             // 
             // label3
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(18, 70);
+            this.label3.Location = new System.Drawing.Point(15, 64);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(41, 13);
+            this.label3.Size = new System.Drawing.Size(58, 27);
             this.label3.TabIndex = 4;
-            this.label3.Text = "Source";
+            this.label3.Text = "Source of funds";
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(18, 97);
+            this.label4.Location = new System.Drawing.Point(15, 97);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(35, 13);
             this.label4.TabIndex = 7;
@@ -112,7 +111,7 @@
             // 
             // btnOk
             // 
-            this.btnOk.Location = new System.Drawing.Point(273, 12);
+            this.btnOk.Location = new System.Drawing.Point(261, 12);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(48, 25);
             this.btnOk.TabIndex = 5;
@@ -122,7 +121,7 @@
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(273, 43);
+            this.btnCancel.Location = new System.Drawing.Point(261, 43);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(48, 25);
             this.btnCancel.TabIndex = 6;
@@ -134,7 +133,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(334, 163);
+            this.ClientSize = new System.Drawing.Size(320, 163);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnOk);
             this.Controls.Add(this.label4);
@@ -147,6 +146,7 @@
             this.Controls.Add(this.label1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "FishingExpenseForm";
+            this.ShowInTaskbar = false;
             this.Text = "Expense";
             this.Load += new System.EventHandler(this.OnFormLoad);
             this.ResumeLayout(false);

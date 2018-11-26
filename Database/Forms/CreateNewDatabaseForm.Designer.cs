@@ -34,6 +34,7 @@
             this.group1 = new System.Windows.Forms.GroupBox();
             this.buttonFileName = new System.Windows.Forms.Button();
             this.group2 = new System.Windows.Forms.GroupBox();
+            this.checkLocalNameToSpeciesName = new System.Windows.Forms.CheckBox();
             this.checkInventory = new System.Windows.Forms.CheckBox();
             this.checkGearLocalNames = new System.Windows.Forms.CheckBox();
             this.checkEnumerators = new System.Windows.Forms.CheckBox();
@@ -42,7 +43,6 @@
             this.checkGearVar = new System.Windows.Forms.CheckBox();
             this.checkLandingSites = new System.Windows.Forms.CheckBox();
             this.checkAOI = new System.Windows.Forms.CheckBox();
-            this.checkLocalNameToSpeciesName = new System.Windows.Forms.CheckBox();
             this.group1.SuspendLayout();
             this.group2.SuspendLayout();
             this.SuspendLayout();
@@ -123,6 +123,17 @@
             this.group2.TabIndex = 5;
             this.group2.TabStop = false;
             this.group2.Text = "Select data to retain";
+            // 
+            // checkLocalNameToSpeciesName
+            // 
+            this.checkLocalNameToSpeciesName.AutoSize = true;
+            this.checkLocalNameToSpeciesName.Location = new System.Drawing.Point(29, 187);
+            this.checkLocalNameToSpeciesName.Margin = new System.Windows.Forms.Padding(4);
+            this.checkLocalNameToSpeciesName.Name = "checkLocalNameToSpeciesName";
+            this.checkLocalNameToSpeciesName.Size = new System.Drawing.Size(318, 19);
+            this.checkLocalNameToSpeciesName.TabIndex = 8;
+            this.checkLocalNameToSpeciesName.Text = "Local/common names to species names by language";
+            this.checkLocalNameToSpeciesName.UseVisualStyleBackColor = true;
             // 
             // checkInventory
             // 
@@ -215,17 +226,6 @@
             this.checkAOI.UseVisualStyleBackColor = true;
             this.checkAOI.CheckedChanged += new System.EventHandler(this.checkAOI_CheckedChanged);
             // 
-            // checkLocalNameToSpeciesName
-            // 
-            this.checkLocalNameToSpeciesName.AutoSize = true;
-            this.checkLocalNameToSpeciesName.Location = new System.Drawing.Point(29, 187);
-            this.checkLocalNameToSpeciesName.Margin = new System.Windows.Forms.Padding(4);
-            this.checkLocalNameToSpeciesName.Name = "checkLocalNameToSpeciesName";
-            this.checkLocalNameToSpeciesName.Size = new System.Drawing.Size(318, 19);
-            this.checkLocalNameToSpeciesName.TabIndex = 8;
-            this.checkLocalNameToSpeciesName.Text = "Local/common names to species names by language";
-            this.checkLocalNameToSpeciesName.UseVisualStyleBackColor = true;
-            // 
             // CreateNewDatabaseForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -240,6 +240,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "CreateNewDatabaseForm";
+            this.ShowInTaskbar = false;
             this.Text = "Make a new database ";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnFormClosed);
             this.Load += new System.EventHandler(this.OnFormLoad);

@@ -43,9 +43,9 @@
             this.groupRadio.Controls.Add(this.radioButtonDMS);
             this.groupRadio.Controls.Add(this.radioButtonDM);
             this.groupRadio.Controls.Add(this.radioButtonDD);
-            this.groupRadio.Location = new System.Drawing.Point(4, 11);
+            this.groupRadio.Location = new System.Drawing.Point(3, 10);
             this.groupRadio.Name = "groupRadio";
-            this.groupRadio.Size = new System.Drawing.Size(172, 165);
+            this.groupRadio.Size = new System.Drawing.Size(147, 143);
             this.groupRadio.TabIndex = 0;
             this.groupRadio.TabStop = false;
             this.groupRadio.Text = "Select format";
@@ -53,9 +53,9 @@
             // radioButtonUTM
             // 
             this.radioButtonUTM.AutoSize = true;
-            this.radioButtonUTM.Location = new System.Drawing.Point(10, 127);
+            this.radioButtonUTM.Location = new System.Drawing.Point(9, 110);
             this.radioButtonUTM.Name = "radioButtonUTM";
-            this.radioButtonUTM.Size = new System.Drawing.Size(95, 19);
+            this.radioButtonUTM.Size = new System.Drawing.Size(85, 17);
             this.radioButtonUTM.TabIndex = 3;
             this.radioButtonUTM.TabStop = true;
             this.radioButtonUTM.Text = "UTM (Meter)";
@@ -64,9 +64,9 @@
             // radioButtonDMS
             // 
             this.radioButtonDMS.AutoSize = true;
-            this.radioButtonDMS.Location = new System.Drawing.Point(10, 97);
+            this.radioButtonDMS.Location = new System.Drawing.Point(9, 84);
             this.radioButtonDMS.Name = "radioButtonDMS";
-            this.radioButtonDMS.Size = new System.Drawing.Size(152, 19);
+            this.radioButtonDMS.Size = new System.Drawing.Size(135, 17);
             this.radioButtonDMS.TabIndex = 2;
             this.radioButtonDMS.TabStop = true;
             this.radioButtonDMS.Text = "Degree Minute Second";
@@ -75,9 +75,9 @@
             // radioButtonDM
             // 
             this.radioButtonDM.AutoSize = true;
-            this.radioButtonDM.Location = new System.Drawing.Point(10, 67);
+            this.radioButtonDM.Location = new System.Drawing.Point(9, 58);
             this.radioButtonDM.Name = "radioButtonDM";
-            this.radioButtonDM.Size = new System.Drawing.Size(107, 19);
+            this.radioButtonDM.Size = new System.Drawing.Size(95, 17);
             this.radioButtonDM.TabIndex = 1;
             this.radioButtonDM.TabStop = true;
             this.radioButtonDM.Text = "Degree Minute";
@@ -86,9 +86,9 @@
             // radioButtonDD
             // 
             this.radioButtonDD.AutoSize = true;
-            this.radioButtonDD.Location = new System.Drawing.Point(10, 37);
+            this.radioButtonDD.Location = new System.Drawing.Point(9, 32);
             this.radioButtonDD.Name = "radioButtonDD";
-            this.radioButtonDD.Size = new System.Drawing.Size(115, 19);
+            this.radioButtonDD.Size = new System.Drawing.Size(101, 17);
             this.radioButtonDD.TabIndex = 0;
             this.radioButtonDD.TabStop = true;
             this.radioButtonDD.Text = "Degree Decimal";
@@ -96,9 +96,9 @@
             // 
             // buttonOK
             // 
-            this.buttonOK.Location = new System.Drawing.Point(131, 188);
+            this.buttonOK.Location = new System.Drawing.Point(112, 163);
             this.buttonOK.Name = "buttonOK";
-            this.buttonOK.Size = new System.Drawing.Size(40, 28);
+            this.buttonOK.Size = new System.Drawing.Size(34, 24);
             this.buttonOK.TabIndex = 1;
             this.buttonOK.Text = "OK";
             this.buttonOK.UseVisualStyleBackColor = true;
@@ -106,15 +106,15 @@
             // 
             // CoordinateFormatSelectForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(178, 227);
+            this.ClientSize = new System.Drawing.Size(153, 197);
             this.Controls.Add(this.buttonOK);
             this.Controls.Add(this.groupRadio);
-            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
-            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "CoordinateFormatSelectForm";
+            this.ShowInTaskbar = false;
             this.Text = "Coordinate format";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnFormClosed);
             this.Load += new System.EventHandler(this.CoordinateFormatSelectForm_Load);

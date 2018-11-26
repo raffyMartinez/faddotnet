@@ -92,6 +92,7 @@
             this.Controls.Add(this.txtLocalName);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "EditSelectedLocalNameForm";
+            this.ShowInTaskbar = false;
             this.Text = "Edit selected local name";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnFormClosed);
             this.Load += new System.EventHandler(this.OnFormLoad);

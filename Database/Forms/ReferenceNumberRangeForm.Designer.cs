@@ -131,6 +131,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "ReferenceNumberRangeForm";
+            this.ShowInTaskbar = false;
             this.Text = "Reference number range";
             this.Load += new System.EventHandler(this.frmRefNoRange_Load);
             this.ResumeLayout(false);

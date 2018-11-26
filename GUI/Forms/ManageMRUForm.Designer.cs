@@ -114,6 +114,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "ManageMRUForm";
+            this.ShowInTaskbar = false;
             this.Text = "Manage recently opened files";
             this.dropDownMenu.ResumeLayout(false);
             this.ResumeLayout(false);

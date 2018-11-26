@@ -75,6 +75,7 @@
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "ShapefileAttributesForm";
+            this.ShowInTaskbar = false;
             this.Text = "ShapefileAttributesForm";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.ShapefileAttributesForm_FormClosed);
             this.Load += new System.EventHandler(this.ShapefileAttributesForm_Load);

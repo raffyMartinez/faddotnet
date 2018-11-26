@@ -63,6 +63,7 @@
             this.Controls.Add(this.richTextBox1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "InstructionsForm";
+            this.ShowInTaskbar = false;
             this.Text = "GridSurfaceMapInstructionsForm";
             this.ResumeLayout(false);
 

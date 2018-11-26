@@ -77,7 +77,7 @@
             // 
             this.txtGenus.Location = new System.Drawing.Point(73, 37);
             this.txtGenus.Name = "txtGenus";
-            this.txtGenus.Size = new System.Drawing.Size(151, 21);
+            this.txtGenus.Size = new System.Drawing.Size(180, 21);
             this.txtGenus.TabIndex = 3;
             this.txtGenus.Validating += new System.ComponentModel.CancelEventHandler(this.OnTextBoxes_Validating);
             // 
@@ -85,7 +85,7 @@
             // 
             this.txtSpecies.Location = new System.Drawing.Point(73, 63);
             this.txtSpecies.Name = "txtSpecies";
-            this.txtSpecies.Size = new System.Drawing.Size(151, 21);
+            this.txtSpecies.Size = new System.Drawing.Size(180, 21);
             this.txtSpecies.TabIndex = 4;
             this.txtSpecies.Validating += new System.ComponentModel.CancelEventHandler(this.OnTextBoxes_Validating);
             // 
@@ -94,9 +94,9 @@
             this.cboTaxa.FormattingEnabled = true;
             this.cboTaxa.Location = new System.Drawing.Point(73, 89);
             this.cboTaxa.Name = "cboTaxa";
-            this.cboTaxa.Size = new System.Drawing.Size(151, 23);
+            this.cboTaxa.Size = new System.Drawing.Size(180, 23);
             this.cboTaxa.TabIndex = 5;
-            this.cboTaxa.Validating += new System.ComponentModel.CancelEventHandler(this.OncboTaxa_Validating);
+            this.cboTaxa.SelectedIndexChanged += new System.EventHandler(this.OnTaxaIndexChanged);
             // 
             // label4
             // 
@@ -109,7 +109,6 @@
             // chkInFishbase
             // 
             this.chkInFishbase.AutoSize = true;
-            this.chkInFishbase.Enabled = false;
             this.chkInFishbase.Location = new System.Drawing.Point(79, 132);
             this.chkInFishbase.Name = "chkInFishbase";
             this.chkInFishbase.Size = new System.Drawing.Size(15, 14);
@@ -130,7 +129,7 @@
             this.txtNotes.Location = new System.Drawing.Point(73, 178);
             this.txtNotes.Multiline = true;
             this.txtNotes.Name = "txtNotes";
-            this.txtNotes.Size = new System.Drawing.Size(151, 67);
+            this.txtNotes.Size = new System.Drawing.Size(180, 67);
             this.txtNotes.TabIndex = 9;
             this.txtNotes.Validating += new System.ComponentModel.CancelEventHandler(this.OnTextBoxes_Validating);
             // 
@@ -139,7 +138,7 @@
             this.buttonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonCancel.CausesValidation = false;
             this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.buttonCancel.Location = new System.Drawing.Point(106, 361);
+            this.buttonCancel.Location = new System.Drawing.Point(137, 361);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(56, 24);
             this.buttonCancel.TabIndex = 12;
@@ -150,7 +149,7 @@
             // buttonOK
             // 
             this.buttonOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonOK.Location = new System.Drawing.Point(167, 361);
+            this.buttonOK.Location = new System.Drawing.Point(198, 361);
             this.buttonOK.Name = "buttonOK";
             this.buttonOK.Size = new System.Drawing.Size(56, 24);
             this.buttonOK.TabIndex = 13;
@@ -164,14 +163,14 @@
             this.groupBox1.Controls.Add(this.labelRecordCount);
             this.groupBox1.Location = new System.Drawing.Point(73, 255);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(150, 91);
+            this.groupBox1.Size = new System.Drawing.Size(180, 91);
             this.groupBox1.TabIndex = 14;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Records";
             // 
             // buttonEdit
             // 
-            this.buttonEdit.Location = new System.Drawing.Point(48, 51);
+            this.buttonEdit.Location = new System.Drawing.Point(64, 50);
             this.buttonEdit.Name = "buttonEdit";
             this.buttonEdit.Size = new System.Drawing.Size(56, 24);
             this.buttonEdit.TabIndex = 16;
@@ -184,7 +183,7 @@
             this.labelRecordCount.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelRecordCount.Location = new System.Drawing.Point(8, 22);
             this.labelRecordCount.Name = "labelRecordCount";
-            this.labelRecordCount.Size = new System.Drawing.Size(137, 22);
+            this.labelRecordCount.Size = new System.Drawing.Size(166, 22);
             this.labelRecordCount.TabIndex = 15;
             this.labelRecordCount.Text = "0000";
             this.labelRecordCount.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -195,7 +194,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCancel;
-            this.ClientSize = new System.Drawing.Size(234, 391);
+            this.ClientSize = new System.Drawing.Size(265, 391);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.buttonOK);
             this.Controls.Add(this.buttonCancel);
@@ -213,7 +212,9 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "SpeciesNameForm";
+            this.ShowInTaskbar = false;
             this.Text = "Species name";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnFormClosed);
             this.Load += new System.EventHandler(this.SpeciesNameForm_Load);
             this.groupBox1.ResumeLayout(false);
             this.ResumeLayout(false);

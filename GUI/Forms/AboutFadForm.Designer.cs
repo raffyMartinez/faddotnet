@@ -88,6 +88,7 @@
             this.Controls.Add(this.button1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "AboutFadForm";
+            this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "About FAD";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.AboutFadForm_FormClosed);

@@ -68,7 +68,11 @@ namespace FAD3
                 textBoxZone.Text = FishingGrid.UTMZoneName;
                 foreach (var item in _FishingGrounds)
                 {
-                    lvGrids.Items.Add(item).With(o => { o.Name = item; });
+                    lvGrids.Items.Add(item, item, null);
+                    if (global.MapIsOpen)
+                    {
+                        global.MappingForm.MapFishingGround(item, FishingGrid.UTMZone);
+                    }
                 }
             }
             else if (FishingGrid.GridType == fadGridType.gridTypeOther)
@@ -77,6 +81,15 @@ namespace FAD3
             }
 
             global.LoadFormSettings(this, true);
+            global.MapperOpen += OnMapperOpened;
+        }
+
+        private void OnMapperOpened(object sender, EventArgs e)
+        {
+            foreach (ListViewItem item in lvGrids.Items)
+            {
+                global.MappingForm.MapFishingGround(item.Text, FishingGrid.UTMZone);
+            }
         }
 
         private void FromListViewToTextBox(string lvText)
@@ -161,7 +174,7 @@ namespace FAD3
         private void OnbuttonGrid25_Click(object sender, EventArgs e)
         {
             var msg = "";
-            var GridName = "";
+            var gridName = "";
             switch (((Button)sender).Name)
             {
                 case "buttonAdd":
@@ -169,28 +182,62 @@ namespace FAD3
                         textBoxGridNo.Text.Length > 0 &&
                         textBoxRow.Text.Length > 0)
                     {
-                        GridName = textBoxGridNo.Text + "-" + textBoxColumn.Text + textBoxRow.Text;
+                        gridName = textBoxGridNo.Text + "-" + textBoxColumn.Text + textBoxRow.Text;
 
-                        if (lvGrids.Items.ContainsKey(GridName))
+                        if (lvGrids.Items.ContainsKey(gridName))
                         {
                             msg = "Grid name already exists. Please use another";
                         }
                         else
                         {
-                            if (FishingGrid.MinorGridIsInland(GridName))
-                                msg = "Inputted grid is inland";
+                            if (FishingGrid.MinorGridIsInland(gridName))
+                            {
+                                if (global.MapIsOpen)
+                                {
+                                    global.MappingForm.MapFishingGround(gridName, FishingGrid.UTMZone, gridName, true);
+                                    DialogResult dr = MessageBox.Show($"{gridName} is located inland\r\n\r\n" +
+
+                                        "Accept this location?",
+                                          "Verify fishing ground location",
+                                          MessageBoxButtons.YesNo,
+                                          MessageBoxIcon.Information);
+
+                                    if (dr == DialogResult.Yes)
+                                    {
+                                        var lvi = lvGrids.Items.Add(gridName, gridName, null);
+                                        lvi.Tag = "new";
+                                        textBoxColumn.Text = "";
+                                        textBoxRow.Text = "";
+                                        textBoxGridNo.Text = "";
+                                        textBoxGridNo.Select();
+                                    }
+                                    else
+                                    {
+                                        global.MappingForm.MapLayersHandler.RemoveLayer(gridName);
+                                    }
+                                }
+                                else
+                                {
+                                    msg = $"{gridName} is not accepted because it is located inland";
+                                }
+                            }
                             else
                             {
+                                if (global.MapIsOpen)
+                                {
+                                    global.MappingForm.MapFishingGround(gridName, FishingGrid.UTMZone, gridName);
+                                }
                                 if (_selectedItem != null)
                                     lvGrids.Items[_selectedItem.Name].With(o =>
                                     {
-                                        o.Text = GridName;
-                                        o.Name = GridName;
+                                        o.Text = gridName;
+                                        o.Name = gridName;
                                         _selectedItem = null;
                                     });
                                 else
                                 {
-                                    lvGrids.Items.Add(GridName).With(o => { o.Name = GridName; });
+                                    var lvi = lvGrids.Items.Add(gridName, gridName, null);
+                                    lvi.Tag = "new";
                                 }
                                 textBoxColumn.Text = "";
                                 textBoxRow.Text = "";
@@ -207,6 +254,10 @@ namespace FAD3
 
                 case "buttonRemove":
                     lvGrids.Items.Remove(_selectedItem);
+                    if (global.MapIsOpen)
+                    {
+                        global.MappingForm.MapLayersHandler.RemoveLayer(_selectedItem.Text);
+                    }
                     break;
 
                 case "buttonRemoveAll":
@@ -260,6 +311,16 @@ namespace FAD3
                     break;
 
                 case "buttonCancel":
+                    if (global.MapIsOpen)
+                    {
+                        foreach (ListViewItem item in lvGrids.Items)
+                        {
+                            if (item.Tag?.ToString() == "new")
+                            {
+                                global.MappingForm.MapLayersHandler.RemoveLayer(item.Text);
+                            }
+                        }
+                    }
                     Close();
                     break;
 

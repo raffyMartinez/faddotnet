@@ -1,8 +1,8 @@
-﻿using FAD3.Mapping.Classes;
+﻿using ClosedXML.Excel;
+using FAD3.Mapping.Classes;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.OleDb;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
@@ -10,6 +10,8 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace FAD3.Mapping.Forms
 {
@@ -27,11 +29,15 @@ namespace FAD3.Mapping.Forms
         private List<double> _dataValues = new List<double>();
         private List<double?> _columnValues = new List<double?>();
         private int _dataPoints;
+        private XLWorkbook _workBook;
+        private IXLWorksheet _workSheet;
         private int _selectionIndex = 0;
+        private int _columnCount;
+        private DataTable _dt;
 
         public static ChlorophyllForm GetInstance()
         {
-            if (_instance == null) return new ChlorophyllForm();
+            if (_instance == null) _instance = new ChlorophyllForm();
             return _instance;
         }
 
@@ -113,80 +119,122 @@ namespace FAD3.Mapping.Forms
             return sb.ToString();
         }
 
-        private void ReadExcelFile()
+        private async void GetExcelSheets()
         {
-            _connString = GetConnectionString(chkHasHeader.Checked);
-            OleDbConnection connection = new OleDbConnection(_connString);
-            connection.Open();
-            DataTable dtTables = new DataTable();
-            dtTables = connection.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, null);
-            if (dtTables != null)
+            bool result = await ReadExcelFIllAsync();
+        }
+
+        private Task<bool> ReadExcelFIllAsync()
+        {
+            return Task.Run(() => ReadExcelFile());
+        }
+
+        private bool ReadExcelFile()
+        {
+            _workBook = new XLWorkbook(_excelFileName, XLEventTracking.Disabled);
+
+            foreach (IXLWorksheet worksheet in _workBook.Worksheets)
             {
-                foreach (DataRow r in dtTables.Rows)
-                {
-                    listSheets.Items.Add(r["TABLE_NAME"].ToString());
-                }
+                //listSheets.Items.Add(worksheet.Name);
+                this.Invoke((MethodInvoker)(() => listSheets.Items.Add(worksheet.Name)));
             }
+            return listSheets.Items.Count > 0;
         }
 
         private void ReadSheet()
         {
-            OleDbConnection connection = new OleDbConnection(_connString);
-            connection.Open();
-            OleDbCommand cmd = new OleDbCommand();
-            cmd.Connection = connection;
-            cmd.CommandText = "Select * from [" + listSheets.Text + "]";
-            DataTable excelTable = new DataTable();
-            excelTable.TableName = listSheets.Text;
-
-            var adapter = new OleDbDataAdapter();
-            adapter.SelectCommand = cmd;
-
-            adapter.Fill(excelTable);
-
-            _excelData = new DataSet();
-            _excelData.Tables.Add(excelTable);
-
-            _dataPoints = _excelData.Tables[0].Rows.Count;
-            txtRows.Text = _dataPoints.ToString();
-            cboLatitude.Items.Clear();
-            cboLongitude.Items.Clear();
-            for (int n = 0; n < _excelData.Tables[0].Columns.Count; n++)
+            var sheetIndex = listSheets.SelectedIndex + 1;
+            _workSheet = _workBook.Worksheet(sheetIndex);
+            _dt = new DataTable();
+            bool firstRow = true;
+            _columnCount = 0;
+            var cells = 0;
+            foreach (IXLRow row in _workSheet.Rows())
             {
-                if (n == 0)
+                if (firstRow)
                 {
-                    cboLatitude.Items.Add(_excelData.Tables[0].Columns[n].ColumnName);
-                    cboLongitude.Items.Add(_excelData.Tables[0].Columns[n].ColumnName);
-                }
-                else if (n == 1)
-                {
-                    cboLatitude.Items.Add(_excelData.Tables[0].Columns[n].ColumnName);
-                    cboLongitude.Items.Add(_excelData.Tables[0].Columns[n].ColumnName);
+                    cboLatitude.Items.Clear();
+                    cboLongitude.Items.Clear();
+                    cboFirstData.Items.Clear();
+                    cboLastData.Items.Clear();
+                    foreach (IXLCell cell in row.Cells())
+                    {
+                        _dt.Columns.Add(cell.Value.ToString());
+                        if (_columnCount == 0)
+                        {
+                            cboLatitude.Items.Add(cell.Value.ToString());
+                            cboLongitude.Items.Add(cell.Value.ToString());
+                        }
+                        else if (_columnCount == 1)
+                        {
+                            cboLatitude.Items.Add(cell.Value.ToString());
+                            cboLongitude.Items.Add(cell.Value.ToString());
+                        }
+                        else
+                        {
+                            cboFirstData.Items.Add(cell.Value.ToString());
+                            cboLastData.Items.Add(cell.Value.ToString());
+                        }
+                        _columnCount++;
+                    }
+                    firstRow = false;
+                    cboLatitude.Enabled = true;
+                    cboLongitude.Enabled = true;
+                    cboFirstData.Enabled = true;
+                    cboLastData.Enabled = true;
                 }
                 else
                 {
-                    cboFirstData.Items.Add(_excelData.Tables[0].Columns[n].ColumnName);
-                    cboLastData.Items.Add(_excelData.Tables[0].Columns[n].ColumnName);
+                    _dt.Rows.Add();
+                    int i = 0;
+
+                    foreach (IXLCell cell in row.Cells(row.FirstCellUsed().Address.ColumnNumber, row.LastCellUsed().Address.ColumnNumber))
+                    {
+                        _dt.Rows[_dt.Rows.Count - 1][i] = cell.Value.ToString();
+                        i++;
+                        if (i > 1) cells++;
+                    }
+                    if (txtRows.Text.Length == 0)
+                    {
+                        txtRows.Text = i.ToString();
+                    }
+                    _dataPoints++;
                 }
             }
-
-            cboLatitude.Enabled = true;
-            cboLongitude.Enabled = true;
-            cboFirstData.Enabled = true;
-            cboLastData.Enabled = true;
+            txtRows.Text = _dataPoints.ToString();
         }
 
         private void listCoordinates()
         {
             _dictGridCentroidCoordinates.Clear();
-            var table = _excelData.Tables[0];
+            //var table = _excelData.Tables[0];
 
-            for (int row = 0; row < table.Rows.Count; row++)
+            for (int row = 0; row < _dt.Rows.Count; row++)
             {
-                var arr = table.Rows[row].ItemArray;
-                var latitude = (double)arr[_latitudeColIndex];
-                var longitude = (double)arr[_longitudeColIndex];
-                _dictGridCentroidCoordinates.Add(row, (latitude, longitude));
+                var arr = _dt.Rows[row].ItemArray;
+                var lat = 0d;
+                var lon = 0d;
+
+                IConvertible convert = arr[_latitudeColIndex] as IConvertible;
+                if (convert != null)
+                {
+                    lat = convert.ToDouble(null);
+                }
+                else
+                {
+                    lat = 0d;
+                }
+
+                convert = arr[_longitudeColIndex] as IConvertible;
+                if (convert != null)
+                {
+                    lon = convert.ToDouble(null);
+                }
+                else
+                {
+                    lon = 0d;
+                }
+                _dictGridCentroidCoordinates.Add(row, (lat, lon));
             }
         }
 
@@ -200,12 +248,15 @@ namespace FAD3.Mapping.Forms
                     break;
 
                 case "btnReadWorkbook":
-                    ReadExcelFile();
+                    //ReadExcelFile();
+                    GetExcelSheets();
                     break;
 
                 case "btnReadSheet":
                     if (listSheets.SelectedIndex >= 0)
                     {
+                        //ReadSheet();
+                        _dataPoints = 0;
                         ReadSheet();
                     }
                     break;
@@ -324,11 +375,11 @@ namespace FAD3.Mapping.Forms
         {
             lblMappedSheet.Text = $"{listSelectedSheets.Items[index]}";
             lblMappedSheet.Visible = true;
-            var table = _excelData.Tables[0];
+            //var table = _excelData.Tables[0];
             _columnValues.Clear();
-            for (int row = 0; row < table.Rows.Count; row++)
+            for (int row = 0; row < _dt.Rows.Count; row++)
             {
-                var arr = table.Rows[row].ItemArray;
+                var arr = _dt.Rows[row].ItemArray;
                 var col = index + _firstColIndex + 2;
                 double? v = null;
                 if (arr[col].GetType().Name == "String")
@@ -410,7 +461,7 @@ namespace FAD3.Mapping.Forms
             var includeColumn = false;
             if (cboLongitude.Text.Length > 0 && cboLatitude.Text.Length > 0 && cboFirstData.Text.Length > 0 && cboLastData.Text.Length > 0)
             {
-                for (int n = 0; n < _excelData.Tables[0].Columns.Count; n++)
+                for (int n = 0; n < _columnCount; n++)
                 {
                     if (!includeColumn && (n - 2) == _firstColIndex)
                     {
@@ -418,7 +469,7 @@ namespace FAD3.Mapping.Forms
                     }
                     if (includeColumn)
                     {
-                        listSelectedSheets.Items.Add(_excelData.Tables[0].Columns[n].ColumnName);
+                        listSelectedSheets.Items.Add(_dt.Columns[n].ColumnName);
                     }
                     if (includeColumn && (n - 2) == _lastColIndex)
                     {
@@ -431,17 +482,16 @@ namespace FAD3.Mapping.Forms
         private void getDataValues()
         {
             _dataValues.Clear();
-            var table = _excelData.Tables[0];
+            //var table = _excelData.Tables[0];
 
-            for (int row = 0; row < table.Rows.Count; row++)
+            for (int row = 0; row < _dt.Rows.Count; row++)
             {
-                var arr = table.Rows[row].ItemArray;
+                var arr = _dt.Rows[row].ItemArray;
                 for (int col = _firstColIndex + 2; col <= _lastColIndex + 2; col++)
                 {
-                    double? v = arr[col] as double?;
-                    if (v != null)
+                    if (double.TryParse(arr[col].ToString(), out double d))
                     {
-                        _dataValues.Add((double)v);
+                        _dataValues.Add(d);
                     }
                 }
             }
@@ -512,6 +562,7 @@ namespace FAD3.Mapping.Forms
                 var lower = listBreaks.Min();
                 var upper = 0D;
                 int row;
+
                 Color color;
 
                 MakeGridFromPoints.Categories.Clear();

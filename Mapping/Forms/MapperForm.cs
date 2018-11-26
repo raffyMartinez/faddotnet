@@ -20,6 +20,7 @@ namespace FAD3
         private tkCursorMode _cursorMode;
         private MapLayer _currentMapLayer;
         public event EventHandler MapperClosed;
+        public event EventHandler MapperOpen;
 
         public fadUTMZone UTMZone { get; private set; }
 
@@ -102,11 +103,11 @@ namespace FAD3
 
         public AxMap MapControl { get; internal set; }
 
-        public void MapFishingGround(string grid25Name, fadUTMZone utmZone)
+        public void MapFishingGround(string grid25Name, fadUTMZone utmZone, string pointName = "", bool testIfInland = false)
         {
             FishingGroundMappingHandler fgmh = new FishingGroundMappingHandler(axMap.GeoProjection);
             fgmh.MapLayersHandler = _mapLayersHandler;
-            fgmh.MapFishingGround(grid25Name, utmZone);
+            fgmh.MapFishingGround(grid25Name, utmZone, pointName, testIfInland);
         }
 
         public void DisplayGraticule()
@@ -145,7 +146,6 @@ namespace FAD3
             MapControl = axMap;
             toolstripToolBar.ClickThrough = true;
             Text = "Map";
-            global.MappingForm = this;
             global.LoadFormSettings(this);
             _mapLayersHandler = new MapLayersHandler(axMap);
             _mapLayersHandler.CurrentLayer += OnCurrentMapLayer;
@@ -164,6 +164,12 @@ namespace FAD3
             }
             ConfigureMapControl();
             SetCursor(tkCursorMode.cmSelection);
+            EventHandler handler = MapperOpen;
+            if (handler != null)
+            {
+                handler(this, EventArgs.Empty);
+            }
+            global.MappingForm = this;
         }
 
         private void OnCurrentMapLayer(MapLayersHandler s, LayerEventArg e)

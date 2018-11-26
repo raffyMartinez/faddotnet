@@ -51,17 +51,17 @@
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.tabConfigureText = new System.Windows.Forms.TabPage();
-            this.picPreview = new System.Windows.Forms.PictureBox();
             this.lnkNote = new System.Windows.Forms.LinkLabel();
             this.lnkTitle = new System.Windows.Forms.LinkLabel();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.chkTitle = new System.Windows.Forms.CheckBox();
             this.chkNote = new System.Windows.Forms.CheckBox();
+            this.picPreview = new System.Windows.Forms.PictureBox();
             this.tabsGraticule.SuspendLayout();
             this.tabConfigureGrid.SuspendLayout();
             this.tabConfigureText.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.picPreview)).BeginInit();
             this.groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.picPreview)).BeginInit();
             this.SuspendLayout();
             // 
             // btnOk
@@ -127,7 +127,7 @@
             this.tabConfigureGrid.Location = new System.Drawing.Point(4, 24);
             this.tabConfigureGrid.Name = "tabConfigureGrid";
             this.tabConfigureGrid.Padding = new System.Windows.Forms.Padding(3);
-            this.tabConfigureGrid.Size = new System.Drawing.Size(344, 391);
+            this.tabConfigureGrid.Size = new System.Drawing.Size(344, 441);
             this.tabConfigureGrid.TabIndex = 0;
             this.tabConfigureGrid.Text = "Graticule";
             this.tabConfigureGrid.UseVisualStyleBackColor = true;
@@ -296,16 +296,6 @@
             this.tabConfigureText.Text = "Labels";
             this.tabConfigureText.UseVisualStyleBackColor = true;
             // 
-            // picPreview
-            // 
-            this.picPreview.Image = global::FAD3.Properties.Resources.mapPreview;
-            this.picPreview.Location = new System.Drawing.Point(21, 45);
-            this.picPreview.Name = "picPreview";
-            this.picPreview.Size = new System.Drawing.Size(307, 310);
-            this.picPreview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.picPreview.TabIndex = 5;
-            this.picPreview.TabStop = false;
-            // 
             // lnkNote
             // 
             this.lnkNote.AutoSize = true;
@@ -369,6 +359,16 @@
             this.chkNote.UseVisualStyleBackColor = true;
             this.chkNote.CheckedChanged += new System.EventHandler(this.OnCheckChange);
             // 
+            // picPreview
+            // 
+            this.picPreview.Image = global::FAD3.Properties.Resources.mapPreview;
+            this.picPreview.Location = new System.Drawing.Point(21, 45);
+            this.picPreview.Name = "picPreview";
+            this.picPreview.Size = new System.Drawing.Size(307, 310);
+            this.picPreview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.picPreview.TabIndex = 5;
+            this.picPreview.TabStop = false;
+            // 
             // GraticuleForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -381,6 +381,7 @@
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "GraticuleForm";
+            this.ShowInTaskbar = false;
             this.Text = "Graticule";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.GraticuleForm_FormClosed);
             this.Load += new System.EventHandler(this.OnGraticuleForm_Load);
@@ -389,9 +390,9 @@
             this.tabConfigureGrid.PerformLayout();
             this.tabConfigureText.ResumeLayout(false);
             this.tabConfigureText.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.picPreview)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.picPreview)).EndInit();
             this.ResumeLayout(false);
 
         }

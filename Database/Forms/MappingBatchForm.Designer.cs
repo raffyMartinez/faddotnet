@@ -115,6 +115,7 @@
             this.Controls.Add(this.btnDirectory);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "MappingBatchForm";
+            this.ShowInTaskbar = false;
             this.Text = "MappingBatchForm";
             this.ResumeLayout(false);
             this.PerformLayout();

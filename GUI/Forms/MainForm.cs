@@ -70,6 +70,7 @@ namespace FAD3
         //for column sort
         private int _sortColumn = -1;
         private TreeNode _nodeParent;
+        public event EventHandler SamplingDetailClosed;
 
         public MainForm()
         {
@@ -904,6 +905,8 @@ namespace FAD3
                     o.Enabled = o.Name == "tsButtonExit";
                 });
             }
+            lvMain.Enabled = false;
+            treeMain.Enabled = false;
         }
 
         private void SetInventoryWindow(string inventoryGuid = "")
@@ -983,15 +986,6 @@ namespace FAD3
                     break;
 
                 case "menuGearInventory":
-                    //var gearInventoryForm = GearInventoryForm.GetInstance(_aoi);
-                    //if (gearInventoryForm.Visible)
-                    //{
-                    //    gearInventoryForm.BringToFront();
-                    //}
-                    //else
-                    //{
-                    //    gearInventoryForm.Show(this);
-                    //}
                     SetInventoryWindow();
                     break;
 
@@ -1204,6 +1198,7 @@ namespace FAD3
             switch (b.Name)
             {
                 case "buttonOK":
+                    SamplingDetailClosed?.Invoke(null, EventArgs.Empty);
                     SetupCatchListView(Show: false);
                     BackToSamplingMonth();
                     break;
@@ -1498,8 +1493,16 @@ namespace FAD3
             switch (tsi.Tag)
             {
                 case "about":
-                    AboutFadForm f = new AboutFadForm();
-                    f.ShowDialog();
+                    if (global.IsMapComponentRegistered)
+                    {
+                        AboutFadForm f = new AboutFadForm();
+                        f.ShowDialog(this);
+                    }
+                    else
+                    {
+                        AboutFADForm2 f = new AboutFADForm2();
+                        f.ShowDialog(this);
+                    }
                     break;
 
                 case "onlineManual":

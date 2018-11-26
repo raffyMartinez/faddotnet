@@ -51,7 +51,7 @@
             // dropDownMenu
             // 
             this.dropDownMenu.Name = "contextMenuStrip";
-            this.dropDownMenu.Size = new System.Drawing.Size(181, 26);
+            this.dropDownMenu.Size = new System.Drawing.Size(61, 4);
             this.dropDownMenu.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnContextMenuItemClick);
             // 
             // lblList
@@ -103,6 +103,7 @@
             this.Controls.Add(this.listBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "CatchLocalNameSelectedForm";
+            this.ShowInTaskbar = false;
             this.Text = "CatchLocalNameSelectedForm";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnFormClose);
             this.Load += new System.EventHandler(this.OnFormLoad);

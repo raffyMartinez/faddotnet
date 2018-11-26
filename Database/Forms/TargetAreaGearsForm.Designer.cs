@@ -148,6 +148,7 @@
             this.Controls.Add(this.btnOk);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "TargetAreaGearsForm";
+            this.ShowInTaskbar = false;
             this.Text = "TargetAreaGearsForm";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.TargetAreaGearsForm_FormClosed);
             this.Load += new System.EventHandler(this.TargetAreaGearsForm_Load);

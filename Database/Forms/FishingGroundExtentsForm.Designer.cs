@@ -81,6 +81,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "FishingGroundExtentsForm";
+            this.ShowInTaskbar = false;
             this.Text = "FishingGroundExtentsForm";
             this.Load += new System.EventHandler(this.FishingGroundExtentsForm_Load);
             this.ResumeLayout(false);

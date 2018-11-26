@@ -496,6 +496,10 @@ namespace FAD3
                         tsi = dropDownMenu.Items.Add("Delete gear local name");
                         tsi.Name = "itemDeleteLocalName";
                         tsi.Enabled = info.Item != null;
+
+                        tsi = dropDownMenu.Items.Add("Edit gear local name");
+                        tsi.Name = "itemEditLocalName";
+                        tsi.Enabled = info.Item != null;
                         break;
 
                     case "listViewCodes":
@@ -506,6 +510,7 @@ namespace FAD3
                         tsi = dropDownMenu.Items.Add("Delete gear code");
                         tsi.Name = "itemDeleteGearCode";
                         tsi.Enabled = info.Item != null;
+
                         break;
                 }
             }
@@ -589,6 +594,32 @@ namespace FAD3
                         if (Gear.DeleteLocalNameUsage(RowNumberForDeletion))
                         {
                             listViewLocalNames.Items.Remove(listViewLocalNames.SelectedItems[0]);
+                        }
+                    }
+                    break;
+
+                case "itemEditLocalName":
+                    using (GearEditorForm gef = new GearEditorForm(this))
+                    {
+                        gef.GearLocalName = listViewLocalNames.SelectedItems[0].Text;
+                        gef.Action = fad3GearEditAction.editLocalName;
+                        DialogResult dr = gef.ShowDialog(this);
+                        if (dr == DialogResult.OK)
+                        {
+                            listViewLocalNames.SelectedItems[0].Text = gef.GearLocalName;
+                        }
+                    }
+                    break;
+
+                case "itemEditGearVariation":
+                    using (GearEditorForm gef = new GearEditorForm(this))
+                    {
+                        gef.GearVariationName = listViewVariations.SelectedItems[0].Text;
+                        gef.Action = fad3GearEditAction.editGearVariation;
+                        DialogResult dr = gef.ShowDialog(this);
+                        if (dr == DialogResult.OK)
+                        {
+                            listViewVariations.SelectedItems[0].Text = gef.GearVariationName;
                         }
                     }
                     break;

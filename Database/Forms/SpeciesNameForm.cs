@@ -31,6 +31,43 @@ namespace FAD3
         private int _catchCompositionRecordCount;
         public bool ReadOnly { get; set; }
 
+        public bool DeleteSuccess { get; internal set; }
+
+        public string Genus
+        {
+            get { return _genus; }
+        }
+
+        public string Species
+        {
+            get { return _species; }
+        }
+
+        public Taxa Taxa
+        {
+            get { return _taxa; }
+        }
+
+        public string TaxaName
+        {
+            get { return _taxa.ToString(); }
+        }
+
+        public bool InFIshBase
+        {
+            get { return _inFishBase; }
+        }
+
+        public int? FishBaseSpeciesNumber
+        {
+            get { return _fishBaseSpeciesNumber; }
+        }
+
+        public string Notes
+        {
+            get { return _notes; }
+        }
+
         public SpeciesNameForm(Form Parent)
         {
             InitializeComponent();
@@ -80,6 +117,8 @@ namespace FAD3
             _dataStatus = fad3DataStatus.statusFromDB;
             _dialogTitle = $"Data for the species {genus} {species}";
             _parentForm = Parent;
+            chkInFishbase.Enabled = taxaName == "Fish";
+            _taxa = CatchName.TaxaFromTaxaName(taxaName);
         }
 
         private void SpeciesNameForm_Load(object sender, EventArgs e)
@@ -110,7 +149,15 @@ namespace FAD3
                 _speciesMPH2 = speciesData.speciesKey2 ?? default;
                 _catchCompositionRecordCount = Names.CatchCompositionRecordCount(_nameGuid);
                 labelRecordCount.Text = _catchCompositionRecordCount.ToString();
-
+                if (_taxa == Taxa.Cephalopods)
+                {
+                    _taxaName = "Cephalopods (squids etc)";
+                }
+                else
+                {
+                    _taxaName = _taxa.ToString();
+                }
+                cboTaxa.Text = _taxaName;
                 if (_catchCompositionRecordCount == 0)
                 {
                     buttonEdit.Text = "Delete";
@@ -126,7 +173,6 @@ namespace FAD3
                     var speciesFishBaseData = Names.NameInFishBaseEx(_genus, _species);
                     _inFishBase = chkInFishbase.Checked = speciesFishBaseData.inFishBase;
                     _fishBaseSpeciesNumber = speciesFishBaseData.fishBaseSpeciesNo;
-
                     if (chkInFishbase.Checked) cboTaxa.Text = "Fish";
 
                     var metaPhone = new DoubleMetaphoneShort();
@@ -180,6 +226,7 @@ namespace FAD3
                 buttonCancel.Visible = false;
                 buttonOK.Text = "Close";
             }
+            global.LoadFormSettings(this, true);
         }
 
         private void OnListViewDoubleClick(object sender, EventArgs e)
@@ -225,6 +272,19 @@ namespace FAD3
                                 {
                                     willClose = true;
                                 }
+                                else
+                                {
+                                    switch (_dataStatus)
+                                    {
+                                        case fad3DataStatus.statusNew:
+
+                                            MessageBox.Show("The changes you made cannot be saved. \r\nOne reason could be the species name already exists in the database",
+                                                             "Saving error",
+                                                             MessageBoxButtons.OK,
+                                                             MessageBoxIcon.Information);
+                                            break;
+                                    }
+                                }
                             }
 
                             if (_parentForm.GetType().Name != "AllSpeciesForm")
@@ -239,22 +299,40 @@ namespace FAD3
                                 }
                             }
 
-                            if (willClose) Close();
+                            if (willClose)
+                            {
+                                DialogResult = DialogResult.OK;
+                                Close();
+                            }
                         }
                         break;
 
                     case "buttonCancel":
                         if (_parentForm.GetType().Name != "AllSpeciesForm") ((CatchCompositionForm)_parentForm).NewName(Accepted: false);
+                        DialogResult = DialogResult.Cancel;
                         Close();
                         break;
 
                     case "buttonEdit":
                         if (btn.Text == "Edit")
                         {
+                            MessageBox.Show("To be implemented");
                         }
                         else if (btn.Text == "Delete")
                         {
+                            var result = Names.DeleteSpecies(_nameGuid, _genus, _species);
+                            if (result.success)
+                            {
+                                DeleteSuccess = true;
+                                DialogResult = DialogResult.OK;
+                                Close();
+                            }
+                            else
+                            {
+                                MessageBox.Show(result.message, "Delete species was not successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            }
                         }
+
                         break;
                 }
             }
@@ -279,17 +357,22 @@ namespace FAD3
                         var metaPhone = new DoubleMetaphoneShort();
                         if (o.Name == "txtGenus")
                         {
-                            _genus = o.Text;
+                            _genus = o.Text.Trim();
                             metaPhone.ComputeMetaphoneKeys(_genus, out short k1, out short k2);
                             _genusMPH1 = k1;
                             _genusMPH2 = k2;
+
+                            //ensure capitalization of first letter
+                            _genus = _genus[0].ToString().ToUpper() + _genus.Substring(1, _genus.Length - 1).ToLower();
+                            o.Text = _genus;
                         }
                         else
                         {
-                            _species = o.Text;
+                            _species = o.Text.Trim().ToLower();
                             metaPhone.ComputeMetaphoneKeys(_species, out short k1, out short k2);
                             _speciesMPH1 = k1;
                             _speciesMPH2 = k2;
+                            o.Text = _species;
                         }
                     }
                     break;
@@ -310,7 +393,7 @@ namespace FAD3
             o = null;
         }
 
-        private void OncboTaxa_Validating(object sender, CancelEventArgs e)
+        private void OnTaxaIndexChanged(object sender, EventArgs e)
         {
             var o = (ComboBox)sender;
             if (_dataStatus != fad3DataStatus.statusNew)
@@ -324,6 +407,7 @@ namespace FAD3
             {
                 var fbData = Names.NameInFishBaseEx(_genus, _species);
                 chkInFishbase.Checked = _inFishBase = fbData.inFishBase;
+                chkInFishbase.Enabled = false;
                 _fishBaseSpeciesNumber = fbData.fishBaseSpeciesNo;
             }
             else
@@ -331,9 +415,15 @@ namespace FAD3
                 _inFishBase = false;
                 _fishBaseSpeciesNumber = null;
                 chkInFishbase.Checked = false;
+                chkInFishbase.Enabled = false;
             }
 
             o = null;
+        }
+
+        private void OnFormClosed(object sender, FormClosedEventArgs e)
+        {
+            global.SaveFormSettings(this);
         }
     }
 }

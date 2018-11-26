@@ -75,6 +75,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_3945DE6F0ADF4EA4B3EC1A30D1838E9A"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_3B9CF9196F3B4DE3B6DAC28B6EF7A486"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -442,7 +448,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Owf.Controls.Office2007ColorPicker, Version=1.0.6897.27286, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Owf.Controls.Office2007ColorPicker, Version=1.0.6904.17237, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_059AB449DD051886E35C5F5AA11F0EDE"
@@ -660,6 +666,26 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3945DE6F0ADF4EA4B3EC1A30D1838E9A"
+            {
+            "SourcePath" = "8:..\\..\\..\\fad data\\visayan sea\\visayansea.mdb"
+            "TargetName" = "8:visayansea.mdb"
+            "Tag" = "8:"
+            "Folder" = "8:_E3620FA05AB247FC9D5379AE168D9957"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3B9CF9196F3B4DE3B6DAC28B6EF7A486"
@@ -1099,7 +1125,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_C6360E8B1DD89EB9258D31E8F6F6B226"
             {
-            "SourcePath" = "8:MapWinGIS.ocx"
+            "SourcePath" = "8:mapwingis.ocx"
             "TargetName" = "8:MapWinGIS.ocx"
             "Tag" = "8:"
             "Folder" = "8:_294D09F47B1E4BEC9A6B0F2F033191E9"
@@ -1339,6 +1365,17 @@
                                 {
                                 }
                             }
+                            "{9EF0B969-E518-4E46-987F-47570745A589}:_E3620FA05AB247FC9D5379AE168D9957"
+                            {
+                            "Name" = "8:Database"
+                            "AlwaysCreate" = "11:FALSE"
+                            "Condition" = "8:"
+                            "Transitive" = "11:FALSE"
+                            "Property" = "8:_3A7CCCFEE62B4CBCBEAF13FB6A7A55EC"
+                                "Folders"
+                                {
+                                }
+                            }
                         }
                     }
                 }
@@ -1393,7 +1430,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Fisheries Assessment Database"
         "ProductCode" = "8:{85D290DB-DFE6-4B6C-B04C-5B36FA09DB91}"
-        "PackageCode" = "8:{E0D62B0B-7D94-448F-9D13-AC25FCED307B}"
+        "PackageCode" = "8:{39624994-110B-42A4-BF1D-F87B08A2FD50}"
         "UpgradeCode" = "8:{60988C37-38EC-41CE-B9B2-C691852182A4}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"

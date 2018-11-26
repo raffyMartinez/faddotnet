@@ -328,6 +328,40 @@ namespace FAD3
             }
         }
 
+        public static (bool success, string message) DeleteSpecies(string speciesGuid, string genus, string species)
+        {
+            bool success = false;
+            string msg = "";
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                var sql = $"Delete * from tblAllSpecies where SpeciesGUID={{{speciesGuid}}}";
+                using (OleDbCommand delete = new OleDbCommand(sql, conn))
+                {
+                    try
+                    {
+                        success = delete.ExecuteNonQuery() > 0;
+                        if (success)
+                        {
+                            _speciesList.Remove(speciesGuid);
+                            _allSpeciesDictionary.Remove(speciesGuid);
+                            _allSpeciesDictionaryReverse.Remove(genus + " " + species);
+                            sql = $"Delete * from temp_AllNames where NameNo={{{speciesGuid}}}";
+                            using (OleDbCommand deleteFromTemp = new OleDbCommand(sql, conn))
+                            {
+                                deleteFromTemp.ExecuteNonQuery();
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        msg = ex.Message;
+                    }
+                }
+            }
+            return (success, msg);
+        }
+
         public static bool DeleteLocalNameSpeciesNamePair(string localName, string speciesName, string language)
         {
             string languageGUID = _languageDictReverse[language];
@@ -1263,18 +1297,36 @@ namespace FAD3
                 }
                 else if (dataStatus == fad3DataStatus.statusEdited)
                 {
-                    sql = $@"Update tblAllSpecies set
-                         Genus = '{genus}',
-                         species = '{species}',
+                    if (fishBaseSpeciesNo == null)
+                    {
+                        sql = $@"Update tblAllSpecies set
+                         Genus = ""{genus}"",
+                         species = ""{species}"",
+                         ListedFB = {inFishbase},
+                         FBSpNo = Null,
+                         Notes = ""{notes}"",
+                         TaxaNo = {(int)taxa},
+                         MPHG1 = {genusMPH1},
+                         MPHG2 = {genusMPH2},
+                         MPHS1 = {speciesMPH1},
+                         MPHS2 = {speciesMPH2}
+                         WHERE SpeciesGUID = {{{nameGuid}}}";
+                    }
+                    else
+                    {
+                        sql = $@"Update tblAllSpecies set
+                         Genus = ""{genus}"",
+                         species = ""{species}"",
                          ListedFB = {inFishbase},
                          FBSpNo = {fishBaseSpeciesNo},
-                         Notes = '{notes}',
+                         Notes = ""{notes}"",
                          TaxaNo = {(int)taxa},
-                         MPHG1 - {genusMPH1},
-                         MPHG2 - {genusMPH2},
-                         MPHS1 - {speciesMPH1},
-                         MPHS2 - {speciesMPH2}
+                         MPHG1 = {genusMPH1},
+                         MPHG2 = {genusMPH2},
+                         MPHS1 = {speciesMPH1},
+                         MPHS2 = {speciesMPH2}
                          WHERE SpeciesGUID = {{{nameGuid}}}";
+                    }
 
                     using (OleDbCommand update = new OleDbCommand(sql, conn))
                     {
@@ -1468,7 +1520,16 @@ namespace FAD3
                     inFishbase = (bool)dr["ListedFB"];
 
                     if (inFishbase)
-                        fishBaseNo = int.Parse(dr["FBSpNo"].ToString());
+                    {
+                        try
+                        {
+                            fishBaseNo = int.Parse(dr["FBSpNo"].ToString());
+                        }
+                        catch
+                        {
+                            fishBaseNo = null;
+                        }
+                    }
 
                     notes = dr["Notes"].ToString();
                     genusKey1 = (short)dr["MPHG1"];

@@ -62,6 +62,7 @@
             this.transpOutline = new FAD3.Mapping.UserControls.TransparencyControl();
             this.clpOutline = new Owf.Controls.Office2007ColorPicker(this.components);
             this.tabVertices = new System.Windows.Forms.TabPage();
+            this.label13 = new System.Windows.Forms.Label();
             this.clpVertexColor = new Owf.Controls.Office2007ColorPicker(this.components);
             this.udVerticesSize = new MWLite.Symbology.Controls.NumericUpDownExt(this.components);
             this.chkVerticesFillVisible = new System.Windows.Forms.CheckBox();
@@ -77,7 +78,6 @@
             this.chkFill = new System.Windows.Forms.CheckBox();
             this.chkOutline = new System.Windows.Forms.CheckBox();
             this.chkVertices = new System.Windows.Forms.CheckBox();
-            this.label13 = new System.Windows.Forms.Label();
             this.tabsProperties.SuspendLayout();
             this.tabFill.SuspendLayout();
             this.grpGradient.SuspendLayout();
@@ -484,6 +484,15 @@
             this.tabVertices.Text = "Vertices";
             this.tabVertices.UseVisualStyleBackColor = true;
             // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(55, 145);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(46, 13);
+            this.label13.TabIndex = 111;
+            this.label13.Text = "Show fill";
+            // 
             // clpVertexColor
             // 
             this.clpVertexColor.Color = System.Drawing.Color.Black;
@@ -631,15 +640,6 @@
             this.chkVertices.Text = "Show Vertices";
             this.chkVertices.UseVisualStyleBackColor = true;
             // 
-            // label13
-            // 
-            this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(55, 145);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(46, 13);
-            this.label13.TabIndex = 111;
-            this.label13.Text = "Show fill";
-            // 
             // PolygonLineLayerSymbologyForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -656,6 +656,7 @@
             this.Controls.Add(this.tabsProperties);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "PolygonLineLayerSymbologyForm";
+            this.ShowInTaskbar = false;
             this.Text = "PolygonLayerSymbologyForm";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnFormClosed);
             this.Load += new System.EventHandler(this.OnFormLoad);

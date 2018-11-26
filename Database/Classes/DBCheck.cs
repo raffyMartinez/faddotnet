@@ -89,6 +89,7 @@ namespace FAD3
                     //enumerate all indexes in the current data table and put in the list
                     foreach (Index i in dbData.TableDefs[tdTemplate.Name].Indexes)
                     {
+                        var name = tdTemplate.Name;
                         colList.Add(i.Name);
                     }
 
@@ -110,7 +111,14 @@ namespace FAD3
                                 dataIndex.IgnoreNulls = templateIndex.IgnoreNulls;
                                 dataIndex.Unique = templateIndex.Unique;
 
-                                o.Indexes.Append(dataIndex);
+                                try
+                                {
+                                    o.Indexes.Append(dataIndex);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Logger.Log(ex.Message, "DBCheck.cs", $"CheckDB: Add index {templateIndex.Name} to table { tdTemplate.Name}");
+                                }
                                 o.Indexes.Refresh();
                             });
                         }

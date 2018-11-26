@@ -47,6 +47,7 @@ namespace FAD3
         private static Color _MissingFieldBackColor = global.MissingFieldBackColor;
         private static List<string> _tempFiles = new List<string>();
         private static bool _isMapComponentRegistered;
+        public static event EventHandler MapperOpen;
 
         public static bool IsMapComponentRegistered
         {
@@ -111,6 +112,10 @@ namespace FAD3
             {
                 _mapForm = value;
                 _mapIsOpen = _mapForm != null;
+                if (_mapIsOpen)
+                {
+                    MapperOpen?.Invoke(null, EventArgs.Empty);
+                }
             }
         }
 

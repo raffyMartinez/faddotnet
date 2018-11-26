@@ -116,7 +116,7 @@
             this.groupBox1.Size = new System.Drawing.Size(165, 73);
             this.groupBox1.TabIndex = 6;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Chose coverage";
+            this.groupBox1.Text = "Choose coverage";
             // 
             // chkListYears
             // 
@@ -161,6 +161,7 @@
             this.Controls.Add(this.btnOk);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "OccurenceMappingForm";
+            this.ShowInTaskbar = false;
             this.Text = "Occurence mapping options";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnFormClosed);
             this.Load += new System.EventHandler(this.OnFormLoad);

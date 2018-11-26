@@ -286,6 +286,7 @@
             this.KeyPreview = true;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "CatchCompositionForm";
+            this.ShowInTaskbar = false;
             this.Text = "CatchCompositionForm";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnCatchCompositionForm_FormClosed);
             this.Load += new System.EventHandler(this.OnForm_Load);

@@ -127,6 +127,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "VesselDimensionForm";
+            this.ShowInTaskbar = false;
             this.Text = "Vessel dimension";
             this.ResumeLayout(false);
             this.PerformLayout();

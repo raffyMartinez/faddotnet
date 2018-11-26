@@ -74,6 +74,7 @@
             this.Controls.Add(this.btnOk);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "ExportImportDialogForm";
+            this.ShowInTaskbar = false;
             this.Text = "Export";
             this.Load += new System.EventHandler(this.OnFormLoad);
             this.ResumeLayout(false);

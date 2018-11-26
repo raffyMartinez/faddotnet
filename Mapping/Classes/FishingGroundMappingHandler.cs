@@ -53,10 +53,15 @@ namespace FAD3
         /// <param name="fishingGround"></param>
         /// <param name="utmZone"></param>
         /// <returns></returns>
-        public bool MapFishingGround(string fishingGround, fadUTMZone utmZone)
+        public bool MapFishingGround(string fishingGround, fadUTMZone utmZone, string layerName = "", bool testIfInland = false)
         {
             var sf = new Shapefile();
             bool success = false;
+            var fgLayerName = "Fishing ground";
+            if (layerName.Length > 0)
+            {
+                fgLayerName = layerName;
+            }
             if (sf.CreateNew("", ShpfileType.SHP_POINT))
             {
                 var shp = new Shape();
@@ -75,16 +80,34 @@ namespace FAD3
                     }
                     if (iShp >= 0 && sf.EditInsertShape(shp, 0))
                     {
-                        MapLayersHandler.RemoveLayer("Fishing ground");
+                        MapLayersHandler.RemoveLayer(fgLayerName);
                         sf.GeoProjection = _geoProjection;
-                        sf.DefaultDrawingOptions.PointShape = tkPointShapeType.ptShapeCircle;
-                        sf.DefaultDrawingOptions.FillColor = new Utils().ColorByName(tkMapColor.Red);
-                        sf.DefaultDrawingOptions.PointSize = 9;
-                        success = MapLayersHandler.AddLayer(sf, "Fishing ground", true, true) >= 0;
+                        var ifldLabel = sf.EditAddField("Label", FieldType.STRING_FIELD, 1, 15);
+                        sf.EditCellValue(ifldLabel, iShp, fgLayerName);
+                        sf.CollisionMode = tkCollisionMode.AllowCollisions;
+                        SymbolizeFishingGround(sf, fgLayerName, testIfInland);
+
+                        success = MapLayersHandler.AddLayer(sf, fgLayerName, true, true) >= 0;
                     }
                 }
             }
             return success;
+        }
+
+        private void SymbolizeFishingGround(Shapefile sf, string pointName, bool testForInland)
+        {
+            if (testForInland && pointName != "Fishing ground")
+            {
+                sf.DefaultDrawingOptions.SetDefaultPointSymbol(tkDefaultPointSymbol.dpsAsterisk);
+                sf.Labels.Generate("[Label]", tkLabelPositioning.lpCenter, true);
+            }
+            else
+            {
+                sf.DefaultDrawingOptions.PointShape = tkPointShapeType.ptShapeCircle;
+            }
+            sf.DefaultDrawingOptions.LineVisible = false;
+            sf.DefaultDrawingOptions.PointSize = 9;
+            sf.DefaultDrawingOptions.FillColor = new Utils().ColorByName(tkMapColor.Red);
         }
 
         /// <summary>

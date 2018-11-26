@@ -115,6 +115,7 @@
             this.Controls.Add(this.txtCPUE);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "CPUEHistoricalForm";
+            this.ShowInTaskbar = false;
             this.Text = "Historical CPUE";
             this.ResumeLayout(false);
             this.PerformLayout();

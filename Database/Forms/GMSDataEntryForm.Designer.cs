@@ -310,6 +310,7 @@
             this.KeyPreview = true;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "GMSDataEntryForm";
+            this.ShowInTaskbar = false;
             this.Text = "GMSDataEntryForm";
             this.Load += new System.EventHandler(this.OnGMSDataEntryForm_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnGMSDataEntryForm_KeyDown);

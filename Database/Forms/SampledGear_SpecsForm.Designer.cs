@@ -111,6 +111,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "SampledGear_SpecsForm";
+            this.ShowInTaskbar = false;
             this.Text = "SampledGear_SpecsForm";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnSpecsForm_FormClosed);
             this.Load += new System.EventHandler(this.OnSpecsForm_Load);

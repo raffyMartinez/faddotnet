@@ -85,6 +85,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "SaveMapForm";
+            this.ShowInTaskbar = false;
             this.Text = "Save fishing grid";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnGrid25SaveForm_FormClosed);
             this.Load += new System.EventHandler(this.OnGrid25SaveForm_Load);

@@ -102,6 +102,7 @@
             this.Controls.Add(this.btnKML);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "LandingSiteFromKMLForm";
+            this.ShowInTaskbar = false;
             this.Text = "LandingSiteFromKMLForm";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.LandingSiteFromKMLForm_FormClosed);
             this.Load += new System.EventHandler(this.OnFormLoad);

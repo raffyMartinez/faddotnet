@@ -196,11 +196,11 @@
             // 
             // tabText
             // 
-            this.tabText.Location = new System.Drawing.Point(4, 25);
+            this.tabText.Location = new System.Drawing.Point(4, 24);
             this.tabText.Margin = new System.Windows.Forms.Padding(4);
             this.tabText.Name = "tabText";
             this.tabText.Padding = new System.Windows.Forms.Padding(4);
-            this.tabText.Size = new System.Drawing.Size(341, 143);
+            this.tabText.Size = new System.Drawing.Size(341, 144);
             this.tabText.TabIndex = 1;
             this.tabText.Text = "Text";
             this.tabText.UseVisualStyleBackColor = true;
@@ -217,6 +217,7 @@
             // 
             // buttonCancel
             // 
+            this.buttonCancel.CausesValidation = false;
             this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.buttonCancel.Location = new System.Drawing.Point(253, 222);
             this.buttonCancel.Name = "buttonCancel";
@@ -228,6 +229,7 @@
             // 
             // buttonGrids
             // 
+            this.buttonGrids.CausesValidation = false;
             this.buttonGrids.Location = new System.Drawing.Point(195, 222);
             this.buttonGrids.Name = "buttonGrids";
             this.buttonGrids.Size = new System.Drawing.Size(52, 23);
@@ -250,6 +252,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "FishingGroundForm";
+            this.ShowInTaskbar = false;
             this.Text = "Fishing ground";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnFormClosed);
             this.Load += new System.EventHandler(this.OnFormLoad);

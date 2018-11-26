@@ -28,10 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.ListViewItem listViewItem9 = new System.Windows.Forms.ListViewItem("Fuel");
-            System.Windows.Forms.ListViewItem listViewItem10 = new System.Windows.Forms.ListViewItem("Food");
-            System.Windows.Forms.ListViewItem listViewItem11 = new System.Windows.Forms.ListViewItem("Ice");
-            System.Windows.Forms.ListViewItem listViewItem12 = new System.Windows.Forms.ListViewItem("");
+            System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem("Fuel");
+            System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem("Food");
+            System.Windows.Forms.ListViewItem listViewItem3 = new System.Windows.Forms.ListViewItem("Ice");
+            System.Windows.Forms.ListViewItem listViewItem4 = new System.Windows.Forms.ListViewItem("");
             this.btnOk = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.txtInventoryName = new System.Windows.Forms.TextBox();
@@ -524,10 +524,10 @@
             this.tabUsage.Controls.Add(this.label13);
             this.tabUsage.Controls.Add(this.label14);
             this.tabUsage.Controls.Add(this.label15);
-            this.tabUsage.Location = new System.Drawing.Point(4, 40);
+            this.tabUsage.Location = new System.Drawing.Point(4, 22);
             this.tabUsage.Name = "tabUsage";
             this.tabUsage.Padding = new System.Windows.Forms.Padding(3);
-            this.tabUsage.Size = new System.Drawing.Size(355, 310);
+            this.tabUsage.Size = new System.Drawing.Size(355, 328);
             this.tabUsage.TabIndex = 0;
             this.tabUsage.Text = "Usage count";
             // 
@@ -617,10 +617,10 @@
             this.tabSeasonality.Controls.Add(this.txtNumberOfDaysPerMonth);
             this.tabSeasonality.Controls.Add(this.chkListBoxMonthsSeason);
             this.tabSeasonality.Controls.Add(this.chkListBoxMonthsUsed);
-            this.tabSeasonality.Location = new System.Drawing.Point(4, 40);
+            this.tabSeasonality.Location = new System.Drawing.Point(4, 22);
             this.tabSeasonality.Name = "tabSeasonality";
             this.tabSeasonality.Padding = new System.Windows.Forms.Padding(3);
-            this.tabSeasonality.Size = new System.Drawing.Size(355, 310);
+            this.tabSeasonality.Size = new System.Drawing.Size(355, 328);
             this.tabSeasonality.TabIndex = 1;
             this.tabSeasonality.Text = "Seasonality";
             this.tabSeasonality.UseVisualStyleBackColor = true;
@@ -700,10 +700,10 @@
             this.tabCPUE.Controls.Add(this.listViewHistoryCpue);
             this.tabCPUE.Controls.Add(this.groupBox3);
             this.tabCPUE.Controls.Add(this.groupBox2);
-            this.tabCPUE.Location = new System.Drawing.Point(4, 40);
+            this.tabCPUE.Location = new System.Drawing.Point(4, 22);
             this.tabCPUE.Name = "tabCPUE";
             this.tabCPUE.Padding = new System.Windows.Forms.Padding(3);
-            this.tabCPUE.Size = new System.Drawing.Size(355, 310);
+            this.tabCPUE.Size = new System.Drawing.Size(355, 328);
             this.tabCPUE.TabIndex = 2;
             this.tabCPUE.Text = "CPUE";
             this.tabCPUE.UseVisualStyleBackColor = true;
@@ -1131,10 +1131,10 @@
             this.colSource,
             this.colNotes});
             this.listViewExpenses.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem9,
-            listViewItem10,
-            listViewItem11,
-            listViewItem12});
+            listViewItem1,
+            listViewItem2,
+            listViewItem3,
+            listViewItem4});
             this.listViewExpenses.Location = new System.Drawing.Point(9, 52);
             this.listViewExpenses.Name = "listViewExpenses";
             this.listViewExpenses.Size = new System.Drawing.Size(340, 202);
@@ -1233,6 +1233,7 @@
             this.Controls.Add(this.btnOk);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "GearInventoryEditForm";
+            this.ShowInTaskbar = false;
             this.Text = "GearInventoryEditForm";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnFormClosed);
             this.Load += new System.EventHandler(this.OnFormLoad);

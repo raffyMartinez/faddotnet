@@ -19,6 +19,113 @@ namespace FAD3.Database.Classes
         private Dictionary<string, (string InventoryName, DateTime DateConducted, string TargetArea)> _inventories = new Dictionary<string, (string InventoryName, DateTime DateConducted, string TargetArea)>();
         public event EventHandler<FisheriesInventoryImportEventArg> InventoryLevel;
 
+        public static List<string> Accessories { get; internal set; }
+        public static List<string> ExpenseItems { get; internal set; }
+        public static List<string> PaymentSources { get; internal set; }
+
+        public static void GetLists()
+        {
+            GetPaymentSources();
+            GetExpenses();
+            GetAccessories();
+        }
+
+        public static bool AddPaymentSource(string source)
+        {
+            PaymentSources.Add(source);
+            return true;
+        }
+
+        public static bool AddAccessory(string accessory)
+        {
+            Accessories.Add(accessory);
+            return true;
+        }
+
+        public static bool AddExpense(string expense)
+        {
+            ExpenseItems.Add(expense);
+            return true;
+        }
+
+        private static void GetPaymentSources()
+        {
+            PaymentSources = new List<string>();
+            var dt = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    string query = "SELECT DISTINCT Source from tblGearInventoryExpense Order By Source ";
+
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(dt);
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        DataRow dr = dt.Rows[i];
+                        PaymentSources.Add(dr["Source"].ToString());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex);
+                }
+            }
+        }
+
+        private static void GetExpenses()
+        {
+            ExpenseItems = new List<string>();
+            var dt = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    string query = "SELECT DISTINCT ExpenseItem from tblGearInventoryExpense Order By ExpenseItem ";
+
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(dt);
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        DataRow dr = dt.Rows[i];
+                        ExpenseItems.Add(dr["ExpenseItem"].ToString());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex);
+                }
+            }
+        }
+
+        private static void GetAccessories()
+        {
+            Accessories = new List<string>();
+            var dt = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    string query = "SELECT DISTINCT Accessory from tblGearInventoryAccesories Order By Accessory ";
+
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(dt);
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        DataRow dr = dt.Rows[i];
+                        Accessories.Add(dr["Accessory"].ToString());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex);
+                }
+            }
+        }
+
         public FishingGearInventory(TargetArea targetArea)
         {
             this.TargetArea = targetArea;

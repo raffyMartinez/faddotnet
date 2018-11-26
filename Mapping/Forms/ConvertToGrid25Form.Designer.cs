@@ -200,6 +200,7 @@
             this.Controls.Add(this.btnOk);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "ConvertToGrid25Form";
+            this.ShowInTaskbar = false;
             this.Text = "Convert point shapefile to grid25";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnConvertToGrid25Form_FormClosed);
             this.Load += new System.EventHandler(this.OnConvertToGrid25Form_Load);

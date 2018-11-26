@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using FAD3.GUI.Classes;
+using FAD3.Database.Classes;
 
 namespace FAD3
 {
@@ -18,6 +19,8 @@ namespace FAD3
         private List<string> _List = new List<string>();
         private List<string> comboList = new List<string>();
         private GearCodesUsageForm _parentForm;
+        public string GearLocalName { get; set; }
+        public string GearVariationName { get; set; }
 
         public GearCodesUsageForm parentForm
         {
@@ -109,6 +112,34 @@ namespace FAD3
                     listBox.Visible = false;
                     this.Height = buttonCancel.Location.Y + buttonCancel.Height + spacer * 2;
                     break;
+
+                case fad3GearEditAction.editLocalName:
+                case fad3GearEditAction.editGearVariation:
+                    comboBox.Visible = false;
+                    labelCode.Visible = false;
+                    x = buttonCancel.Location.X;
+                    y = comboBox.Location.Y + comboBox.Size.Height + spacer;
+                    buttonCancel.Location = new Point(x, y);
+                    x = buttonOk.Location.X;
+                    buttonOk.Location = new Point(x, y);
+                    listBox.Visible = false;
+                    this.Height = buttonCancel.Location.Y + buttonCancel.Height + spacer * 2;
+
+                    var name = "";
+                    switch (_action)
+                    {
+                        case fad3GearEditAction.editLocalName:
+                            name = GearLocalName;
+                            break;
+
+                        case fad3GearEditAction.editGearVariation:
+                            name = GearVariationName;
+                            break;
+                    }
+
+                    labelTitle.Text = $"Edit {name}";
+                    labelDescription.Text = $"Provide new spelling for {name}";
+                    break;
             }
 
             FillList();
@@ -140,14 +171,24 @@ namespace FAD3
 
                 case fad3GearEditAction.addAOI:
                 case fad3GearEditAction.addLocalName:
-                    TargetArea AOI = new TargetArea();
+                    TargetArea targetArea = new TargetArea();
 
                     ((ComboBox)comboBox).With(o =>
                     {
                         if (_action == fad3GearEditAction.addAOI)
-                            o.DataSource = new BindingSource(AOI.TargetAreas, null);
+                        {
+                            foreach (var item in targetArea.TargetAreas)
+                            {
+                                comboBox.Items.Add(item);
+                            }
+                        }
                         else
-                            o.DataSource = new BindingSource(Gear.GearLocalNames, null); ;
+                        {
+                            foreach (var item in Gear.GearLocalNames)
+                            {
+                                comboBox.Items.Add(item);
+                            }
+                        }
 
                         o.DisplayMember = "Value";
                         o.ValueMember = "Key";
@@ -167,7 +208,8 @@ namespace FAD3
             switch (((Button)sender).Name)
             {
                 case "buttonCancel":
-                    this.Close();
+                    DialogResult = DialogResult.Cancel;
+                    Close();
                     break;
 
                 case "buttonOk":
@@ -190,6 +232,29 @@ namespace FAD3
                         case fad3GearEditAction.addLocalName:
                             var localNameGuid = ((KeyValuePair<string, string>)comboBox.SelectedItem).Key;
                             _parentForm.UsageLocalName(localNameGuid, comboBox.Text);
+                            break;
+
+                        case fad3GearEditAction.editGearVariation:
+                            if (Gear.EditGearVariationName(textBox.Text, GearVariationName))
+                            {
+                                GearVariationName = textBox.Text;
+                                DialogResult = DialogResult.OK;
+                            }
+                            else
+                            {
+                                MessageBox.Show("Editing gear variation name was not successful",
+                                    "Editing not successful",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Information);
+                            }
+                            break;
+
+                        case fad3GearEditAction.editLocalName:
+                            if (Gear.EditGearLocalName(textBox.Text, GearLocalName))
+                            {
+                                GearLocalName = textBox.Text;
+                                DialogResult = DialogResult.OK;
+                            }
                             break;
                     }
                     Close();
@@ -245,6 +310,20 @@ namespace FAD3
                                    "zero and formatted to two digits";
                         }
                         break;
+
+                    case fad3GearEditAction.editGearVariation:
+                        if (Gear.AllGearVariationsList.Contains(textBox.Text.ToLower()))
+                        {
+                            msg = "Gear local name already used. Select another name";
+                        }
+                        break;
+
+                    case fad3GearEditAction.editLocalName:
+                        if (Gear.GearLocalNames.ContainsValue(textBox.Text))
+                        {
+                            msg = "Gear local name already used. Select another name";
+                        }
+                        break;
                 }
             }
 
@@ -282,7 +361,7 @@ namespace FAD3
 
                     if (dr == DialogResult.Yes)
                     {
-                        AddNewGearLocalName();
+                        AddNewGearLocalName(s);
                     }
                     else
                         e.Cancel = true;
@@ -302,9 +381,16 @@ namespace FAD3
             }
         }
 
-        private void AddNewGearLocalName()
+        private void AddNewGearLocalName(string newLocalName)
         {
-            ;
+            NewFisheryObjectName nfo = new NewFisheryObjectName(newLocalName, FisheryObjectNameType.GearLocalName);
+            var result = Gear.SaveNewLocalName(nfo);
+            if (result.success)
+            {
+                KeyValuePair<string, string> kv = new KeyValuePair<string, string>(result.newGuid, newLocalName);
+                comboBox.Items.Add(kv);
+                comboBox.SelectedItem = kv;
+            }
         }
     }
 }

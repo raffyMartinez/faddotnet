@@ -54,6 +54,7 @@ namespace FAD3.Mapping.Classes
             {
                 _colorBlend = value;
                 _scheme = ColorSchemes.ColorBlend2ColorScheme(_colorBlend);
+                _sheetMapSummary.Clear();
             }
         }
 
