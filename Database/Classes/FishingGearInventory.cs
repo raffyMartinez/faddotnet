@@ -15,13 +15,14 @@ namespace FAD3.Database.Classes
     /// </summary>
     public class FishingGearInventory
     {
-        private Dictionary<string, (string Province, string Municipality, string MunicipalityNumber, string barangay, string sitio)> _barangayInventories = new Dictionary<string, (string Province, string Municipality, string MunicipalityNumber, string barangay, string sitio)>();
+        private Dictionary<string, (string Province, string Municipality, string MunicipalityNumber, string barangay, string sitio, string enumerator, DateTime dateSurvey)> _barangayInventories = new Dictionary<string, (string Province, string Municipality, string MunicipalityNumber, string barangay, string sitio, string enumerator, DateTime dateSurvey)>();
         private Dictionary<string, (string InventoryName, DateTime DateConducted, string TargetArea)> _inventories = new Dictionary<string, (string InventoryName, DateTime DateConducted, string TargetArea)>();
         public event EventHandler<FisheriesInventoryImportEventArg> InventoryLevel;
 
         public static List<string> Accessories { get; internal set; }
         public static List<string> ExpenseItems { get; internal set; }
         public static List<string> PaymentSources { get; internal set; }
+        private static bool _costIsText;
 
         public static void GetLists()
         {
@@ -46,6 +47,432 @@ namespace FAD3.Database.Classes
         {
             ExpenseItems.Add(expense);
             return true;
+        }
+
+        public List<string> GetFishingAccessories(string dataGuid)
+        {
+            List<string> accessories = new List<string>();
+            var dt = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    string query = $@"SELECT Accessory
+                                        FROM tblGearInventoryAccesories
+                                        WHERE InventoryDataGuid={{{dataGuid}}}
+                                        ORDER BY Accessory";
+
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(dt);
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        DataRow dr = dt.Rows[i];
+                        accessories.Add(dr["Accessory"].ToString());
+                    }
+                }
+                catch
+                {
+                }
+            }
+            return accessories;
+        }
+
+        public List<(string localName, bool isDominant)> GetCatchComposition(string dataGuid)
+        {
+            List<(string localName, bool isDominant)> catchComposition = new List<(string localName, bool isDominant)>();
+            var sql = $@"SELECT tblBaseLocalNames.Name, tblGearInventoryCatchComposition.IsDominant
+                        FROM tblBaseLocalNames INNER JOIN
+                            tblGearInventoryCatchComposition ON
+                            tblBaseLocalNames.NameNo = tblGearInventoryCatchComposition.NameOfCatch
+                        WHERE tblGearInventoryCatchComposition.InventoryDataGuid ={{{dataGuid}}}";
+            var dt = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    var adapter = new OleDbDataAdapter(sql, conection);
+                    adapter.Fill(dt);
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        DataRow dr = dt.Rows[i];
+                        catchComposition.Add((dr["Name"].ToString(), (bool)dr["IsDominant"]));
+                    }
+                }
+                catch
+                {
+                }
+            }
+            return catchComposition;
+        }
+
+        public List<string> GetGearLocalNamesInventory(string dataGuid)
+        {
+            List<string> localNames = new List<string>();
+            var dt = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    string query = $@"SELECT tblGearLocalNames.LocalName
+                                    FROM tblGearInventoryBarangayData INNER JOIN
+                                        (tblGearLocalNames INNER JOIN
+                                        tblGearInventoryGearLocalNames ON
+                                        tblGearLocalNames.LocalNameGUID = tblGearInventoryGearLocalNames.LocalNameGuid) ON
+                                        tblGearInventoryBarangayData.DataGuid = tblGearInventoryGearLocalNames.InventoryDataGuid
+                                    WHERE tblGearInventoryGearLocalNames.InventoryDataGuid={{{dataGuid}}}";
+
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(dt);
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        DataRow dr = dt.Rows[i];
+                        localNames.Add(dr["LocalName"].ToString());
+                    }
+                }
+                catch
+                {
+                }
+            }
+            return localNames;
+        }
+
+        public Dictionary<string, (string projectName, string province, string lgu, string barangay, string sitio,
+            string enumerator, DateTime surveyDate, string gearClass, string gearVariation)> GetGearRowHeaders(string inventoryGuid)
+        {
+            Dictionary<string, (string projectName, string province, string lgu, string barangay, string sitio,
+                string enumerator, DateTime surveyDate, string gearClass, string gearVariation)> headers =
+                new Dictionary<string, (string projectName, string province, string lgu, string barangay,
+                string sitio, string enumerator, DateTime surveyDate, string gearClass, string gearVariation)>();
+
+            var sql = $@"SELECT tblGearInventoryBarangayData.DataGuid,
+                            tblGearInventories.InventoryName,
+                            Provinces.ProvinceName,
+                            Municipalities.Municipality,
+                            tblGearInventoryBarangay.Barangay,
+                            tblGearInventoryBarangay.Sitio,
+                            tblEnumerators.EnumeratorName,
+                            tblGearInventoryBarangay.InventoryDate,
+                            tblGearClass.GearClassName,
+                            tblGearVariations.Variation
+                         FROM (tblGearClass INNER JOIN
+                            tblGearVariations ON
+                            tblGearClass.GearClass = tblGearVariations.GearClass) INNER JOIN
+                            (tblEnumerators RIGHT JOIN
+                            ((Provinces INNER JOIN Municipalities ON
+                            Provinces.ProvNo = Municipalities.ProvNo) INNER JOIN
+                            ((tblGearInventories INNER JOIN
+                            tblGearInventoryBarangay ON
+                            tblGearInventories.InventoryGuid = tblGearInventoryBarangay.InventoryGuid) INNER JOIN
+                            tblGearInventoryBarangayData ON
+                            tblGearInventoryBarangay.BarangayInventoryGuid = tblGearInventoryBarangayData.BarangayInventoryGUID) ON
+                            Municipalities.MunNo = tblGearInventoryBarangay.Municipality) ON
+                            tblEnumerators.EnumeratorID = tblGearInventoryBarangay.Enumerator) ON
+                            tblGearVariations.GearVarGUID = tblGearInventoryBarangayData.GearVariation
+                         WHERE tblGearInventories.InventoryGuid={{{inventoryGuid}}}
+                         ORDER BY tblGearInventories.InventoryName,
+                            Provinces.ProvinceName,
+                            Municipalities.Municipality,
+                            tblGearInventoryBarangay.Barangay,
+                            tblGearInventoryBarangay.Sitio,
+                            tblGearInventoryBarangay.InventoryDate,
+                            tblGearClass.GearClassName,
+                            tblGearVariations.Variation";
+
+            var dt = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+
+                    var adapter = new OleDbDataAdapter(sql, conection);
+                    adapter.Fill(dt);
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        DataRow dr = dt.Rows[i];
+                        headers.Add(dr["DataGuid"].ToString(),
+                            (dr["InventoryName"].ToString(),
+                            dr["ProvinceName"].ToString(),
+                            dr["Municipality"].ToString(),
+                            dr["Barangay"].ToString(),
+                            dr["Sitio"].ToString(),
+                            dr["EnumeratorName"].ToString(),
+                            (DateTime)dr["InventoryDate"],
+                            dr["GearClassName"].ToString(),
+                            dr["Variation"].ToString()));
+                    }
+                }
+                catch
+                {
+                }
+            }
+
+            return headers;
+        }
+
+        public List<(int decade, int cpue, string unit)> GetCPUEHistorical(string dataGuid)
+        {
+            List<(int decade, int cpue, string unit)> cpueHistory = new List<(int decade, int cpue, string unit)>();
+            var sql = $@"SELECT Decade, CPUE, CPUEUnit
+                        FROM tblGearInventoryCPUEHistorical
+                        WHERE InventoryDataGuid={{{dataGuid}}}
+                        ORDER BY Decade DESC";
+            var dt = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    var adapter = new OleDbDataAdapter(sql, conection);
+                    adapter.Fill(dt);
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        DataRow dr = dt.Rows[i];
+                        cpueHistory.Add(((int)dr["Decade"],
+                                      (int)dr["CPUE"],
+                                      dr["CPUEUnit"].ToString()));
+                    }
+                }
+                catch
+                {
+                }
+            }
+            return cpueHistory;
+        }
+
+        public List<(string expenseItem, double cost, string source, string notes)> GetExpenses(string dataGuid)
+        {
+            List<(string expenseItem, double cost, string source, string notes)> expenses = new List<(string expenseItem, double cost, string source, string notes)>();
+            if (!_costIsText)
+            {
+                var sql = $@"SELECT tblGearInventoryExpense.ExpenseItem,
+                            tblGearInventoryExpense.Cost,
+                            tblGearInventoryExpense.Source,
+                            tblGearInventoryExpense.Notes
+                        FROM tblGearInventoryExpense
+                        WHERE tblGearInventoryExpense.InventoryDataGuid={{{dataGuid}}}";
+
+                var dt = new DataTable();
+                using (var conection = new OleDbConnection(global.ConnectionString))
+                {
+                    try
+                    {
+                        conection.Open();
+                        var adapter = new OleDbDataAdapter(sql, conection);
+                        adapter.Fill(dt);
+                        for (int i = 0; i < dt.Rows.Count; i++)
+                        {
+                            DataRow dr = dt.Rows[i];
+                            expenses.Add((dr["ExpenseItem"].ToString(),
+                                          (double)dr["Cost"],
+                                          dr["Source"].ToString(),
+                                          dr["Notes"].ToString()));
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        if (ex.Message == "Specified cast is not valid.")
+                        {
+                            expenses = GetFishingCostEx(dataGuid);
+                        }
+                        else
+                        {
+                            Logger.Log(ex.Message);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                expenses = GetFishingCostEx(dataGuid);
+            }
+            return expenses;
+        }
+
+        public Dictionary<string, (int countCommercial, int countMotorized, int countNonMotorized,
+            int countNoBoat, int maxCPUE, int minCPUE,
+            int upperMode, int lowerMode, int numberDaysUsed,
+            string cpueUnit, string Notes, int dominantPercent)> GetInventoryData(string inventoryGuid)
+        {
+            Dictionary<string, (int countCommercial, int countMotorized, int countNonMotorized,
+                        int countNoBoat, int maxCPUE, int minCPUE,
+                        int upperMode, int lowerMode, int numberDaysUsed,
+                        string cpueUnit, string Notes, int dominantPercent)> inventoryData = new
+                        Dictionary<string, (int countCommercial, int countMotorized, int countNonMotorized,
+                            int countNoBoat, int maxCPUE, int minCPUE,
+                            int upperMode, int lowerMode, int numberDaysUsed,
+                            string cpueUnit, string Notes, int dominantPercent)>();
+
+            var sql = $@"SELECT tblGearInventoryBarangayData.*
+                        FROM(tblGearInventories INNER JOIN
+                            tblGearInventoryBarangay ON
+                            tblGearInventories.InventoryGuid = tblGearInventoryBarangay.InventoryGuid) INNER JOIN
+                            tblGearInventoryBarangayData ON
+                            tblGearInventoryBarangay.BarangayInventoryGuid = tblGearInventoryBarangayData.BarangayInventoryGUID
+                        WHERE tblGearInventories.InventoryGuid={{{inventoryGuid}}}";
+
+            var dt = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    var adapter = new OleDbDataAdapter(sql, conection);
+                    adapter.Fill(dt);
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        DataRow dr = dt.Rows[i];
+                        inventoryData.Add(dr["DataGuid"].ToString(),
+                            ((int)dr["CountCommercial"],
+                             (int)dr["CountMunicipalMotorized"],
+                             (int)dr["CountMunicipalNonMotorized"],
+                             (int)dr["CountNoBoat"],
+                             (int)dr["MaxCPUE"],
+                             (int)dr["MinCPUE"],
+                             (int)dr["ModeUpper"],
+                             (int)dr["ModeLower"],
+                             (int)dr["NumberDaysPerMonth"],
+                             dr["CPUEUnit"].ToString(),
+                             dr["Notes"].ToString(),
+                             (int)dr["DominantCatchPercent"]));
+                    }
+                }
+                catch
+                {
+                }
+            }
+
+            return inventoryData;
+        }
+
+        public List<int> GetMonthsFishing(string dataGuid, bool getPeakMonths = false)
+        {
+            List<int> months = new List<int>();
+            var sql = "";
+            if (getPeakMonths)
+            {
+                sql = $@"SELECT PeakSeasonMonthNumber
+                        FROM tblGearInventoryPeakMonths
+                        WHERE InventoryDataGuid = {{{dataGuid}}}
+                        ORDER BY PeakSeasonMonthNumber";
+            }
+            else
+            {
+                sql = $@"SELECT MonthNumber
+                        FROM tblGearInventoryMonthsUsed
+                        WHERE InventoryDataGuid={{{dataGuid}}}
+                        ORDER BY MonthNumber";
+            }
+
+            var dt = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    var adapter = new OleDbDataAdapter(sql, conection);
+                    adapter.Fill(dt);
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        DataRow dr = dt.Rows[i];
+                        if (getPeakMonths)
+                        {
+                            months.Add((int)dr["PeakSeasonMonthNumber"]);
+                        }
+                        else
+                        {
+                            months.Add((int)dr["MonthNumber"]);
+                        }
+                    }
+                }
+                catch
+                {
+                }
+            }
+            return months;
+        }
+
+        public List<(string project, string province, string lgu, string barangay,
+            string sitio, int fisherCount, int commercialCount, int motorizedCount,
+            int nonMotorizedCount, string enumerator, DateTime dateSurveyed)> GetFisherVesselInventory(string inventoryGuid)
+        {
+            List<(string project, string province, string lgu, string barangay,
+            string sitio, int fisherCount, int commercialCount, int motorizedCount,
+            int nonMotorizedCount, string enumerator, DateTime dateSurveyed)> fisherVessel = new List
+              <(string project, string province, string lgu, string barangay,
+              string sitio, int fisherCount, int commercialCount, int motorizedCount,
+              int nonMotorizedCount, string enumerator, DateTime dateSurveyed)>();
+
+            string project = "";
+            string province = "";
+            string lgu = "";
+            string barangay = "";
+            string sitio = "";
+            int fisherCount = 0;
+            int commercialCount = 0;
+            int motorizedCount = 0;
+            int nonMotorizedCount = 0;
+            string enumerator = "";
+            DateTime dateSurveyed = DateTime.Now;
+
+            var dt = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    string query = $@"SELECT tblGearInventories.InventoryName,
+                                        Provinces.ProvinceName,
+                                        Municipalities.Municipality,
+                                        tblGearInventoryBarangay.Barangay,
+                                        tblGearInventoryBarangay.Sitio,
+                                        tblGearInventoryBarangay.CountFishers,
+                                        tblGearInventoryBarangay.CountCommercial,
+                                        tblGearInventoryBarangay.CountMunicipalMotorized,
+                                        tblGearInventoryBarangay.CountMunicipalNonMotorized,
+                                        tblEnumerators.EnumeratorName,
+                                        tblGearInventoryBarangay.InventoryDate
+                                       FROM tblEnumerators RIGHT JOIN
+                                        (tblGearInventories INNER JOIN
+                                        ((Provinces INNER JOIN
+                                        Municipalities ON
+                                        Provinces.ProvNo = Municipalities.ProvNo) INNER JOIN
+                                        tblGearInventoryBarangay ON
+                                        Municipalities.MunNo = tblGearInventoryBarangay.Municipality) ON
+                                        tblGearInventories.InventoryGuid = tblGearInventoryBarangay.InventoryGuid) ON
+                                        tblEnumerators.EnumeratorID = tblGearInventoryBarangay.Enumerator
+                                       WHERE tblGearInventories.InventoryGuid={{{inventoryGuid}}}";
+
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(dt);
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        DataRow dr = dt.Rows[i];
+                        project = dr["InventoryName"].ToString();
+                        province = dr["ProvinceName"].ToString();
+                        lgu = dr["Municipality"].ToString();
+                        barangay = dr["Barangay"].ToString();
+                        sitio = dr["Sitio"].ToString();
+                        fisherCount = (int)dr["CountFishers"];
+                        commercialCount = (int)dr["CountCommercial"];
+                        motorizedCount = (int)dr["CountMunicipalMotorized"];
+                        nonMotorizedCount = (int)dr["CountMunicipalNonMotorized"];
+                        enumerator = dr["EnumeratorName"].ToString();
+                        dateSurveyed = (DateTime)dr["InventoryDate"];
+
+                        fisherVessel.Add((project, province, lgu, barangay, sitio, fisherCount, commercialCount, motorizedCount, nonMotorizedCount, enumerator, dateSurveyed));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex);
+                }
+            }
+
+            return fisherVessel;
         }
 
         private static void GetPaymentSources()
@@ -167,7 +594,7 @@ namespace FAD3.Database.Classes
             return list;
         }
 
-        public Dictionary<string, (string Province, string Municipality, string MunicipalityNumber, string barangay, string sitio)> BarangayInventories
+        public Dictionary<string, (string Province, string Municipality, string MunicipalityNumber, string barangay, string sitio, string Enumerator, DateTime dateSurvey)> BarangayInventories
         {
             get { return _barangayInventories; }
         }
@@ -778,7 +1205,8 @@ namespace FAD3.Database.Classes
             int cpueRangeMax, int cpueRangeMin, int cpueModeUpper, int cpueModeLower, string cpueUnit,
             List<(int decade, int cpue, string unit)> historicalCPUE,
             List<string> dominantCatch, List<string> nonDominantCatch, int percentageOfDominance,
-            string notes, List<string> accessories, List<(string expense, double cost, string source, string notes)> expenses) GetGearVariationInventoryData(string inventoryGuid)
+            string notes, List<string> accessories, List<(string expense, double cost, string source, string notes)> expenses,
+            DateTime barangaySurveyDate, string enumerator) GetGearVariationInventoryData(string inventoryGuid)
         {
             List<string> gearLocalNames = new List<string>();
             List<int> monthsInUse = new List<int>();
@@ -809,6 +1237,8 @@ namespace FAD3.Database.Classes
             int cpueModeLower = 0;
             string cpueUnit = "";
             int percentageOfDominance = 0;
+            DateTime surveyDate = DateTime.Now;
+            string enumerator = ""; ;
 
             //first, we get the main inventory data of the fishing gear
             string sql = $@"SELECT tblGearInventories.InventoryName, tblGearInventories.DateConducted, tblAOI.AOIName, Provinces.ProvinceName,
@@ -1036,14 +1466,59 @@ namespace FAD3.Database.Classes
                 }
             }
 
-            //get list of expenses
-            sql = $@"SELECT ExpenseItem,
+            if (!FishingGearInventory._costIsText)
+            {
+                //get list of expenses
+                sql = $@"SELECT ExpenseItem,
                         Cost,
                         Source,
                         Notes
                     FROM tblGearInventoryExpense
                     WHERE InventoryDataGuid={{{inventoryGuid}}}
                     ORDER BY ExpenseItem";
+                dt = new DataTable();
+                using (var conection = new OleDbConnection(global.ConnectionString))
+                {
+                    try
+                    {
+                        conection.Open();
+                        var adapter = new OleDbDataAdapter(sql, conection);
+                        adapter.Fill(dt);
+                        for (int n = 0; n < dt.Rows.Count; n++)
+                        {
+                            DataRow dr = dt.Rows[n];
+                            expenses.Add((dr["ExpenseItem"].ToString(), (double)dr["Cost"], dr["Source"].ToString(), dr["Notes"].ToString()));
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        if (ex.Message == "Specified cast is not valid.")
+                        {
+                            _costIsText = true;
+                            expenses = GetFishingCostEx(inventoryGuid);
+                        }
+                        else
+                        {
+                            Logger.Log(ex);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                expenses = GetFishingCostEx(inventoryGuid);
+            }
+
+            //get surveydate and enumerator
+            sql = $@"SELECT tblGearInventoryBarangay.InventoryDate,
+                        tblEnumerators.EnumeratorName
+                    FROM tblEnumerators INNER JOIN
+                        (tblGearInventoryBarangay INNER JOIN
+                        tblGearInventoryBarangayData ON
+                        tblGearInventoryBarangay.BarangayInventoryGuid = tblGearInventoryBarangayData.BarangayInventoryGUID) ON
+                        tblEnumerators.EnumeratorID = tblGearInventoryBarangay.Enumerator
+                    WHERE tblGearInventoryBarangayData.DataGuid={{{inventoryGuid}}}";
+
             dt = new DataTable();
             using (var conection = new OleDbConnection(global.ConnectionString))
             {
@@ -1052,11 +1527,9 @@ namespace FAD3.Database.Classes
                     conection.Open();
                     var adapter = new OleDbDataAdapter(sql, conection);
                     adapter.Fill(dt);
-                    for (int n = 0; n < dt.Rows.Count; n++)
-                    {
-                        DataRow dr = dt.Rows[n];
-                        expenses.Add((dr["ExpenseItem"].ToString(), (double)dr["Cost"], dr["Source"].ToString(), dr["Notes"].ToString()));
-                    }
+                    DataRow dr = dt.Rows[0];
+                    surveyDate = (DateTime)dr["InventoryDate"];
+                    enumerator = dr["EnumeratorName"].ToString();
                 }
                 catch (Exception ex)
                 {
@@ -1069,7 +1542,41 @@ namespace FAD3.Database.Classes
                     gearClass, gearVariation, gearLocalNames, commercialCount, motorizedCount, nonMotorizedCount,
                     noBoatCount, monthsInUse, peakMonths, numberDaysGearUsedPerMonth,
                     cpueRangeMax, cpueRangeMin, cpueModeUpper, cpueModeLower, cpueUnit, historicalCPUE,
-                    dominantCatch, nonDominantCatch, percentageOfDominance, notes, accessories, expenses);
+                    dominantCatch, nonDominantCatch, percentageOfDominance, notes, accessories, expenses, surveyDate, enumerator);
+        }
+
+        private List<(string expense, double cost, string source, string notes)> GetFishingCostEx(string inventoryGuid)
+        {
+            List<(string expense, double cost, string source, string notes)> expenses = new List<(string expense, double cost, string source, string notes)>();
+            var dt = new DataTable();
+            string sql = "";
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    sql = $@"SELECT ExpenseItem,
+                                Cost,
+                                Source,
+                                Notes
+                            FROM tblGearInventoryExpense
+                            WHERE InventoryDataGuid={{{inventoryGuid}}}
+                            ORDER BY ExpenseItem";
+
+                    var adapter = new OleDbDataAdapter(sql, conection);
+                    adapter.Fill(dt);
+                    for (int n = 0; n < dt.Rows.Count; n++)
+                    {
+                        DataRow dr = dt.Rows[n];
+                        expenses.Add((dr["ExpenseItem"].ToString(), double.Parse(dr["Cost"].ToString()), dr["Source"].ToString(), dr["Notes"].ToString()));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex);
+                }
+                return expenses;
+            }
         }
 
         /// <summary>
@@ -1090,11 +1597,9 @@ namespace FAD3.Database.Classes
 
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
-                    for (int i = 0; i < dt.Rows.Count; i++)
-                    {
-                        DataRow dr = dt.Rows[i];
-                        return (dr["InventoryName"].ToString(), (DateTime)dr["DateConducted"]);
-                    }
+
+                    DataRow dr = dt.Rows[0];
+                    return (dr["InventoryName"].ToString(), (DateTime)dr["DateConducted"]);
                 }
                 catch (Exception ex)
                 {
@@ -1340,9 +1845,10 @@ namespace FAD3.Database.Classes
         /// <param name="barangay"></param>
         /// <param name="sitio"></param>
         /// <returns></returns>
-        public (int fisherCount, int commercialCount, int motorizedCount, int nonMotorizedCount) GetSitioNumbers(string inventoryGuid, string province, string municipality, string barangay, string sitio = "")
+        public (int fisherCount, int commercialCount, int motorizedCount, int nonMotorizedCount, DateTime? dateSurvey, string enumerator)
+                GetSitioNumbers(string inventoryGuid, string province, string municipality, string barangay, string sitio = "")
         {
-            (int fisherCount, int commercialCount, int motorizedCount, int nonMotorizedCount) numbers = (0, 0, 0, 0);
+            (int fisherCount, int commercialCount, int motorizedCount, int nonMotorizedCount, DateTime? dateSurvey, string enumerator) numbers = (0, 0, 0, 0, null, "");
             var dt = new DataTable();
             using (var conection = new OleDbConnection(global.ConnectionString))
             {
@@ -1353,14 +1859,24 @@ namespace FAD3.Database.Classes
                     {
                         sitio = string.Empty;
                     }
-                    string query = $@"SELECT CountFishers, CountMunicipalMotorized, CountMunicipalNonMotorized, CountCommercial
-                                    FROM Provinces INNER JOIN (Municipalities INNER JOIN tblGearInventoryBarangay ON
-                                      Municipalities.MunNo = tblGearInventoryBarangay.Municipality) ON
-                                      Provinces.ProvNo = Municipalities.ProvNo
-                                    WHERE tblGearInventoryBarangay.InventoryGuid={{{inventoryGuid}}} AND
-                                      Provinces.ProvinceName = '{province}' AND Municipalities.Municipality='{municipality}' AND
-                                      tblGearInventoryBarangay.Barangay='{barangay}' AND
-                                      tblGearInventoryBarangay.Sitio='{sitio}'";
+                    string query = $@"SELECT tblGearInventoryBarangay.CountFishers,
+                                        tblGearInventoryBarangay.CountMunicipalMotorized,
+                                        tblGearInventoryBarangay.CountMunicipalNonMotorized,
+                                        tblGearInventoryBarangay.CountCommercial,
+                                        tblGearInventoryBarangay.InventoryDate,
+                                        tblEnumerators.EnumeratorName
+                                      FROM ((Provinces INNER JOIN
+                                        Municipalities ON
+                                        Provinces.ProvNo = Municipalities.ProvNo) INNER JOIN
+                                        tblGearInventoryBarangay ON
+                                        Municipalities.MunNo = tblGearInventoryBarangay.Municipality) LEFT JOIN
+                                        tblEnumerators ON
+                                        tblGearInventoryBarangay.Enumerator = tblEnumerators.EnumeratorID
+                                      WHERE tblGearInventoryBarangay.InventoryGuid={{{inventoryGuid}}} AND
+                                        Provinces.ProvinceName='{province}' AND
+                                        Municipalities.Municipality='{municipality}' AND
+                                        tblGearInventoryBarangay.Barangay='{barangay}' AND
+                                        tblGearInventoryBarangay.Sitio='{sitio}'";
 
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
@@ -1370,6 +1886,8 @@ namespace FAD3.Database.Classes
                     numbers.commercialCount = (int)dr["CountCommercial"];
                     numbers.motorizedCount = (int)dr["CountMunicipalMotorized"];
                     numbers.nonMotorizedCount = (int)dr["CountMunicipalNonMotorized"];
+                    numbers.dateSurvey = dr["InventoryDate"] == null ? default : (DateTime)dr["InventoryDate"];
+                    numbers.enumerator = dr["EnumeratorName"].ToString();
                 }
                 catch (Exception ex)
                 {
@@ -1599,12 +2117,16 @@ namespace FAD3.Database.Classes
                                         Municipalities.MunNo,
                                         tblGearInventoryBarangay.Barangay,
                                         tblGearInventoryBarangay.Sitio,
-                                        tblGearInventoryBarangay.BarangayInventoryGuid
-                                    FROM (Provinces INNER JOIN
+                                        tblGearInventoryBarangay.BarangayInventoryGuid,
+                                        tblEnumerators.EnumeratorName,
+                                        tblGearInventoryBarangay.InventoryDate
+                                    FROM ((Provinces INNER JOIN
                                         Municipalities ON
                                         Provinces.ProvNo = Municipalities.ProvNo) INNER JOIN
                                         tblGearInventoryBarangay ON
-                                        Municipalities.MunNo = tblGearInventoryBarangay.Municipality
+                                        Municipalities.MunNo = tblGearInventoryBarangay.Municipality) LEFT JOIN
+                                        tblEnumerators ON
+                                        tblGearInventoryBarangay.Enumerator = tblEnumerators.EnumeratorID
                                     WHERE tblGearInventoryBarangay.InventoryGuid={{{inventoryGuid}}}
                                     ORDER BY Provinces.ProvinceName, Municipalities.Municipality,
                                       tblGearInventoryBarangay.Barangay, tblGearInventoryBarangay.Sitio";
@@ -1614,7 +2136,14 @@ namespace FAD3.Database.Classes
                     for (int i = 0; i < dt.Rows.Count; i++)
                     {
                         DataRow dr = dt.Rows[i];
-                        _barangayInventories.Add(dr["BarangayInventoryGuid"].ToString(), (dr["ProvinceName"].ToString(), dr["Municipality"].ToString(), dr["MunNo"].ToString(), dr["Barangay"].ToString(), dr["Sitio"].ToString()));
+                        _barangayInventories.Add(dr["BarangayInventoryGuid"].ToString(),
+                            (dr["ProvinceName"].ToString(),
+                            dr["Municipality"].ToString(),
+                            dr["MunNo"].ToString(),
+                            dr["Barangay"].ToString(),
+                            dr["Sitio"].ToString(),
+                            dr["EnumeratorName"].ToString(),
+                            DateTime.Parse(dr["InventoryDate"].ToString())));
                     }
                 }
                 catch (Exception ex)
@@ -1678,8 +2207,10 @@ namespace FAD3.Database.Classes
         /// <param name="BarangayInventoryGuid"></param>
         /// <param name="sitio"></param>
         /// <returns></returns>
-        public bool SaveBarangayInventory(fad3DataStatus dataStatus, string inventoryGuid, long municipalityNumber, string barangay, int countFishers,
-                                           int countCommercial, int countMunicipalMotorized, int countMunicipalNonMotorized, string BarangayInventoryGuid, string sitio = "")
+        public bool SaveBarangayInventory(fad3DataStatus dataStatus, string inventoryGuid, long municipalityNumber,
+                                           string barangay, int countFishers, int countCommercial, int countMunicipalMotorized,
+                                           int countMunicipalNonMotorized, string BarangayInventoryGuid, DateTime surveyDate,
+                                           string enumeratorGuid, string sitio = "")
         {
             bool Success = false;
             string updateQuery = "";
@@ -1689,22 +2220,47 @@ namespace FAD3.Database.Classes
                 {
                     if (dataStatus == fad3DataStatus.statusNew)
                     {
-                        updateQuery = $@"Insert into tblGearInventoryBarangay (InventoryGuid, Municipality, Barangay, Sitio, CountFishers,
-                                        CountMunicipalMotorized, CountMunicipalNonMotorized, CountCommercial, BarangayInventoryGuid) values (
-                                      {{{inventoryGuid}}}, {municipalityNumber}, '{barangay}', '{sitio}', {countFishers},
-                                       {countMunicipalMotorized}, {countMunicipalNonMotorized}, {countCommercial}, {{{BarangayInventoryGuid}}})";
+                        updateQuery = $@"Insert into tblGearInventoryBarangay (
+                                            InventoryGuid,
+                                            Municipality,
+                                            Barangay,
+                                            Sitio,
+                                            CountFishers,
+                                            CountMunicipalMotorized,
+                                            CountMunicipalNonMotorized,
+                                            CountCommercial,
+                                            BarangayInventoryGuid,
+                                            InventoryDate,
+                                            Enumerator
+                                          )
+                                          VALUES (
+                                            {{{inventoryGuid}}},
+                                            {municipalityNumber},
+                                            '{barangay}',
+                                            '{sitio}',
+                                            {countFishers},
+                                            {countMunicipalMotorized},
+                                            {countMunicipalNonMotorized},
+                                            {countCommercial},
+                                            {{{BarangayInventoryGuid}}},
+                                            '{surveyDate}',
+                                            {{{enumeratorGuid}}}
+                                         )";
                     }
                     else
                     {
-                        updateQuery = $@"Update tblGearInventoryBarangay set
-                                        Municipality = '{municipalityNumber}',
-                                        Barangay = '{barangay}',
-                                        Sitio = '{sitio}',
-                                        CountFishers = {countFishers},
-                                        CountMunicipalMotorized = {countMunicipalMotorized},
-                                        CountMunicipalNonMotorized = {countMunicipalNonMotorized},
-                                        CountCommercial = {countCommercial}
-                                        Where BarangayInventoryGuid = {{{BarangayInventoryGuid}}}";
+                        updateQuery = $@"Update tblGearInventoryBarangay
+                                         SET
+                                             Municipality = '{municipalityNumber}',
+                                             Barangay = '{barangay}',
+                                             Sitio = '{sitio}',
+                                             CountFishers = {countFishers},
+                                             CountMunicipalMotorized = {countMunicipalMotorized},
+                                             CountMunicipalNonMotorized = {countMunicipalNonMotorized},
+                                             CountCommercial = {countCommercial},
+                                             InventoryDate= '{surveyDate}',
+                                             Enumerator = {{{enumeratorGuid}}}
+                                         WHERE BarangayInventoryGuid = {{{BarangayInventoryGuid}}}";
                     }
                     conn.Open();
                     using (OleDbCommand update = new OleDbCommand(updateQuery, conn))

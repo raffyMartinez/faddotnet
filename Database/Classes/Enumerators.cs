@@ -6,12 +6,15 @@ using System.Data;
 using System.Data.OleDb;
 using System.Windows.Forms;
 using FAD3.GUI.Classes;
+using FAD3.Database.Classes;
+using System.IO;
+using System.Xml;
 
 namespace FAD3
 {
     public static class Enumerators
     {
-        private static string _AOIGuid;
+        private static string _targetAreaGuid;
         private static string _EnumeratorGuid;
 
         static Enumerators()
@@ -29,10 +32,10 @@ namespace FAD3
 
         public static string AOIGuid
         {
-            get { return _AOIGuid; }
+            get { return _targetAreaGuid; }
             set
             {
-                _AOIGuid = value;
+                _targetAreaGuid = value;
             }
         }
 
@@ -47,6 +50,146 @@ namespace FAD3
                     return (int)count.ExecuteScalar();
                 }
             }
+        }
+
+        public static bool ImportEnumerators(string fileName, string targetAreaGuid)
+        {
+            var success = false;
+            var elementCounter = 0;
+            var proceed = false;
+            switch (Path.GetExtension(fileName))
+            {
+                case ".txt":
+                    break;
+
+                case ".xml":
+                case ".XML":
+                    Dictionary<string, (string enumeratorName, DateTime dateHired, bool isActive, fad3DataStatus DataStatus)> enumDict = new Dictionary<string, (string enumeratorName, DateTime dateHired, bool isActive, fad3DataStatus DataStatus)>();
+                    XmlTextReader xmlReader = new XmlTextReader(fileName);
+                    var enumeratorName = "";
+                    var enumeratorGuid = "";
+                    DateTime dateHired = DateTime.Now;
+                    while ((elementCounter == 0 || (elementCounter > 0 && proceed)) && xmlReader.Read())
+                    {
+                        switch (xmlReader.NodeType)
+                        {
+                            case XmlNodeType.Element:
+                                if (elementCounter == 0 && xmlReader.Name == "Enumerators")
+                                {
+                                    proceed = true;
+                                }
+                                if (xmlReader.Name == "Enumerator")
+                                {
+                                    enumeratorGuid = xmlReader.GetAttribute("guid");
+                                    dateHired = DateTime.Parse(xmlReader.GetAttribute("DateHired"));
+                                    elementCounter++;
+                                }
+
+                                break;
+
+                            case XmlNodeType.Text:
+                                enumeratorName = xmlReader.Value;
+                                break;
+                        }
+
+                        if (enumeratorName?.Length > 0 && enumeratorGuid?.Length > 0)
+                        {
+                            enumDict.Add(enumeratorGuid, (enumeratorName, dateHired, true, fad3DataStatus.statusNew));
+                            enumeratorName = "";
+                            enumeratorGuid = "";
+                        }
+                    }
+                    success = SaveTargetAreaEnumerators(enumDict, targetAreaGuid);
+                    break;
+            }
+            return success;
+        }
+
+        public static int ExportEnumerators(string targetAreaGuid)
+        {
+            FileDialogHelper.Title = "Provide filename for exporting enumerators";
+            FileDialogHelper.DialogType = FileDialogType.FileSave;
+            FileDialogHelper.DataFileType = DataFileType.Text | DataFileType.XML | DataFileType.CSV;
+            FileDialogHelper.ShowDialog();
+            var fileName = FileDialogHelper.FileName;
+            var exportCount = 0;
+            if (fileName.Length > 0)
+            {
+                switch (Path.GetExtension(fileName))
+                {
+                    case ".txt":
+
+                        break;
+
+                    case ".XML":
+                    case ".xml":
+                        var enumerators = Enumerators.GetTargetAreaEnumerators(targetAreaGuid);
+                        var count = enumerators.Count;
+                        if (count > 0)
+                        {
+                            var n = 0;
+                            XmlWriter writer = XmlWriter.Create(fileName);
+                            writer.WriteStartDocument();
+                            writer.WriteStartElement("Enumerators");
+                            foreach (var item in enumerators)
+                            {
+                                writer.WriteStartElement("Enumerator");
+                                writer.WriteAttributeString("guid", item.Key);
+                                writer.WriteAttributeString("DateHired", string.Format("{0:MMM-dd-yyyy}", item.Value.DateHired));
+                                writer.WriteString(item.Value.EnumeratorName);
+                                if (count == 1)
+                                {
+                                    writer.WriteEndDocument();
+                                }
+                                else
+                                {
+                                    if (n < (count - 1))
+                                    {
+                                        writer.WriteEndElement();
+                                    }
+                                    else
+                                    {
+                                        writer.WriteEndDocument();
+                                    }
+                                }
+                                n++;
+                            }
+                            writer.Close();
+                            exportCount = n;
+                        }
+                        break;
+
+                    case ".xlsx":
+                        break;
+                }
+            }
+            return exportCount;
+        }
+
+        public static (bool success, string newGuid) SaveNewTargetAreaEnumerator(string targetAreaGuid, string name, DateTime hireDate, bool isActive)
+        {
+            var success = false;
+            string sql = "";
+            string newEnumeratorGuid = Guid.NewGuid().ToString();
+
+            sql = $@"Insert into tblEnumerators (EnumeratorID, EnumeratorName, HireDate, Active, TargetArea) values (
+                       {{{newEnumeratorGuid}}}, '{name}', '{hireDate}', {isActive}, {{{targetAreaGuid}}})";
+
+            using (var conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                using (OleDbCommand update = new OleDbCommand(sql, conn))
+                {
+                    success = update.ExecuteNonQuery() > 0;
+                }
+            }
+            return (success, newEnumeratorGuid);
+        }
+
+        public static bool SaveTargetAreaEnumerators(Dictionary<string, (string enumeratorName, DateTime dateHired, bool isActive, fad3DataStatus dataStatus)> enumeratorsData, string targetAreaGuid)
+        {
+            _targetAreaGuid = targetAreaGuid;
+            return SaveTargetAreaEnumerators(enumeratorsData);
         }
 
         public static bool SaveTargetAreaEnumerators(Dictionary<string, (string enumeratorName, DateTime dateHired, bool isActive, fad3DataStatus DataStatus)> enumeratorsData)
@@ -71,7 +214,7 @@ namespace FAD3
                         else if (kv.Value.DataStatus == fad3DataStatus.statusNew)
                         {
                             sql = $@"Insert into tblEnumerators (EnumeratorID, EnumeratorName, HireDate, Active, TargetArea) values (
-                             {{{kv.Key}}}, '{kv.Value.enumeratorName}', '{kv.Value.dateHired}', {kv.Value.isActive}, {{{_AOIGuid}}})";
+                             {{{kv.Key}}}, '{kv.Value.enumeratorName}', '{kv.Value.dateHired}', {kv.Value.isActive}, {{{_targetAreaGuid}}})";
                         }
                         else if (kv.Value.DataStatus == fad3DataStatus.statusForDeletion)
                         {
@@ -89,12 +232,18 @@ namespace FAD3
             return n > 0;
         }
 
+        public static Dictionary<string, (string EnumeratorName, DateTime DateHired, bool IsActive, fad3DataStatus DataStatus)> GetTargetAreaEnumerators(string targetAreaGuid)
+        {
+            _targetAreaGuid = targetAreaGuid;
+            return GetTargetAreaEnumerators();
+        }
+
         public static Dictionary<string, (string EnumeratorName, DateTime DateHired, bool IsActive, fad3DataStatus DataStatus)> GetTargetAreaEnumerators()
         {
             var myRows = new Dictionary<string, (string EnumeratorName, DateTime DateHired, bool IsActive, fad3DataStatus DataStatus)>();
 
             var sql = $@"SELECT EnumeratorID, EnumeratorName, HireDate, Active FROM tblEnumerators WHERE
-                         tblEnumerators.TargetArea={{{_AOIGuid}}}";
+                         tblEnumerators.TargetArea={{{_targetAreaGuid}}}";
 
             using (var conection = new OleDbConnection(global.ConnectionString))
             {

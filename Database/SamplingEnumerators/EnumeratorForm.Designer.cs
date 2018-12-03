@@ -47,7 +47,13 @@ namespace FAD3
             this.labelEnumeratorName = new System.Windows.Forms.Label();
             this.txtHireDate = new System.Windows.Forms.TextBox();
             this.txtName = new System.Windows.Forms.TextBox();
+            this.toolBar = new System.Windows.Forms.ToolStrip();
+            this.tbAdd = new System.Windows.Forms.ToolStripButton();
+            this.tbRemove = new System.Windows.Forms.ToolStripButton();
+            this.tbExport = new System.Windows.Forms.ToolStripButton();
+            this.tbImport = new System.Windows.Forms.ToolStripButton();
             this.panelTop.SuspendLayout();
+            this.toolBar.SuspendLayout();
             this.SuspendLayout();
             // 
             // buttonOK
@@ -124,7 +130,7 @@ namespace FAD3
             // 
             // chkActive
             // 
-            this.chkActive.Location = new System.Drawing.Point(486, 23);
+            this.chkActive.Location = new System.Drawing.Point(486, 32);
             this.chkActive.Margin = new System.Windows.Forms.Padding(4);
             this.chkActive.Name = "chkActive";
             this.chkActive.Size = new System.Drawing.Size(92, 22);
@@ -134,7 +140,7 @@ namespace FAD3
             // 
             // labelHireDate
             // 
-            this.labelHireDate.Location = new System.Drawing.Point(271, 23);
+            this.labelHireDate.Location = new System.Drawing.Point(271, 32);
             this.labelHireDate.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelHireDate.Name = "labelHireDate";
             this.labelHireDate.Size = new System.Drawing.Size(74, 23);
@@ -143,7 +149,7 @@ namespace FAD3
             // 
             // labelEnumeratorName
             // 
-            this.labelEnumeratorName.Location = new System.Drawing.Point(6, 21);
+            this.labelEnumeratorName.Location = new System.Drawing.Point(6, 30);
             this.labelEnumeratorName.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelEnumeratorName.Name = "labelEnumeratorName";
             this.labelEnumeratorName.Size = new System.Drawing.Size(46, 23);
@@ -152,7 +158,7 @@ namespace FAD3
             // 
             // txtHireDate
             // 
-            this.txtHireDate.Location = new System.Drawing.Point(341, 22);
+            this.txtHireDate.Location = new System.Drawing.Point(341, 31);
             this.txtHireDate.Margin = new System.Windows.Forms.Padding(4);
             this.txtHireDate.Name = "txtHireDate";
             this.txtHireDate.Size = new System.Drawing.Size(122, 21);
@@ -160,17 +166,73 @@ namespace FAD3
             // 
             // txtName
             // 
-            this.txtName.Location = new System.Drawing.Point(55, 21);
+            this.txtName.Location = new System.Drawing.Point(55, 30);
             this.txtName.Margin = new System.Windows.Forms.Padding(4);
             this.txtName.Name = "txtName";
             this.txtName.Size = new System.Drawing.Size(196, 21);
             this.txtName.TabIndex = 8;
+            // 
+            // toolBar
+            // 
+            this.toolBar.Dock = System.Windows.Forms.DockStyle.None;
+            this.toolBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tbAdd,
+            this.tbRemove,
+            this.tbExport,
+            this.tbImport});
+            this.toolBar.Location = new System.Drawing.Point(55, 275);
+            this.toolBar.Name = "toolBar";
+            this.toolBar.Size = new System.Drawing.Size(135, 25);
+            this.toolBar.TabIndex = 13;
+            this.toolBar.Text = "toolStrip1";
+            this.toolBar.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnToolbarItemClick);
+            // 
+            // tbAdd
+            // 
+            this.tbAdd.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tbAdd.Image = global::FAD3.Properties.Resources.Add_16xSM;
+            this.tbAdd.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tbAdd.Name = "tbAdd";
+            this.tbAdd.Size = new System.Drawing.Size(23, 22);
+            this.tbAdd.Text = "toolStripButton1";
+            this.tbAdd.ToolTipText = "Add enumerator";
+            // 
+            // tbRemove
+            // 
+            this.tbRemove.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tbRemove.Image = global::FAD3.Properties.Resources.Remove_16xSM;
+            this.tbRemove.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tbRemove.Name = "tbRemove";
+            this.tbRemove.Size = new System.Drawing.Size(23, 22);
+            this.tbRemove.Text = "toolStripButton2";
+            this.tbRemove.ToolTipText = "Remove enumerator";
+            // 
+            // tbExport
+            // 
+            this.tbExport.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tbExport.Image = global::FAD3.Properties.Resources.ExportFile_16x;
+            this.tbExport.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tbExport.Name = "tbExport";
+            this.tbExport.Size = new System.Drawing.Size(23, 22);
+            this.tbExport.Text = "toolStripButton3";
+            this.tbExport.ToolTipText = "Export";
+            // 
+            // tbImport
+            // 
+            this.tbImport.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tbImport.Image = global::FAD3.Properties.Resources.ImportFile_16x;
+            this.tbImport.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tbImport.Name = "tbImport";
+            this.tbImport.Size = new System.Drawing.Size(23, 22);
+            this.tbImport.Text = "toolStripButton4";
+            this.tbImport.ToolTipText = "Import";
             // 
             // EnumeratorForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(766, 316);
+            this.Controls.Add(this.toolBar);
             this.Controls.Add(this.panelTop);
             this.Controls.Add(this.tree);
             this.Controls.Add(this.lvEnumerators);
@@ -186,7 +248,10 @@ namespace FAD3
             this.Load += new System.EventHandler(this.OnFormLoad);
             this.panelTop.ResumeLayout(false);
             this.panelTop.PerformLayout();
+            this.toolBar.ResumeLayout(false);
+            this.toolBar.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
 		}
 		private System.Windows.Forms.Label labelSamplings;
@@ -200,5 +265,10 @@ namespace FAD3
         private System.Windows.Forms.Label labelEnumeratorName;
         private System.Windows.Forms.TextBox txtHireDate;
         private System.Windows.Forms.TextBox txtName;
+        private System.Windows.Forms.ToolStrip toolBar;
+        private System.Windows.Forms.ToolStripButton tbAdd;
+        private System.Windows.Forms.ToolStripButton tbRemove;
+        private System.Windows.Forms.ToolStripButton tbExport;
+        private System.Windows.Forms.ToolStripButton tbImport;
     }
 }

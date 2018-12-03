@@ -64,7 +64,7 @@
             this.lvNames.TabIndex = 0;
             this.lvNames.UseCompatibleStateImageBehavior = false;
             this.lvNames.DoubleClick += new System.EventHandler(this.OnlvNames_DoubleClick);
-            this.lvNames.MouseClick += new System.Windows.Forms.MouseEventHandler(this.OnListViewMouseClick);
+            this.lvNames.MouseClick += new System.Windows.Forms.MouseEventHandler(this.OnlvNamesMouseClick);
             this.lvNames.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnlvNames_MouseDown);
             // 
             // dropDownMenu

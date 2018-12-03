@@ -1,0 +1,2 @@
+nov 30,2018 - fixed query for adding new fisher inventory at the barangay level
+dec 03,2018 - fixed query that read cost of fishing when an earllier version of the database stored cost as text and not as a double. The database was updated to make costs double.

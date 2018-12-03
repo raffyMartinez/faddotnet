@@ -1,0 +1,1 @@
+fixed query for adding new fisher inventory at the barangay level

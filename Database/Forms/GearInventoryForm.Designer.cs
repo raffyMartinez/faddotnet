@@ -33,14 +33,17 @@
             this.split = new System.Windows.Forms.SplitContainer();
             this.treeInventory = new System.Windows.Forms.TreeView();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.lvInventory = new System.Windows.Forms.ListView();
             this.lblGuide = new System.Windows.Forms.Label();
+            this.lvInventory = new System.Windows.Forms.ListView();
             this.toolStrip = new System.Windows.Forms.ToolStrip();
             this.tsButtonAddInventory = new System.Windows.Forms.ToolStripButton();
             this.tsButtonAddSitioLevelInventory = new System.Windows.Forms.ToolStripButton();
             this.tsButtonAddGear = new System.Windows.Forms.ToolStripButton();
             this.tsButtonExport = new System.Windows.Forms.ToolStripButton();
             this.tsButtonImport = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsButtonTable = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.tsButtonExit = new System.Windows.Forms.ToolStripButton();
             ((System.ComponentModel.ISupportInitialize)(this.split)).BeginInit();
             this.split.Panel1.SuspendLayout();
@@ -71,8 +74,8 @@
             // split.Panel2
             // 
             this.split.Panel2.Controls.Add(this.tableLayoutPanel1);
-            this.split.Size = new System.Drawing.Size(896, 521);
-            this.split.SplitterDistance = 298;
+            this.split.Size = new System.Drawing.Size(926, 186);
+            this.split.SplitterDistance = 307;
             this.split.TabIndex = 2;
             // 
             // treeInventory
@@ -82,37 +85,28 @@
             this.treeInventory.HideSelection = false;
             this.treeInventory.Location = new System.Drawing.Point(0, 0);
             this.treeInventory.Name = "treeInventory";
-            this.treeInventory.Size = new System.Drawing.Size(298, 521);
+            this.treeInventory.Size = new System.Drawing.Size(307, 186);
             this.treeInventory.TabIndex = 1;
             this.treeInventory.AfterExpand += new System.Windows.Forms.TreeViewEventHandler(this.OnTreeAfterExpand);
             this.treeInventory.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.OnNodeClicked);
             // 
             // tableLayoutPanel1
             // 
+            this.tableLayoutPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.tableLayoutPanel1.ColumnCount = 1;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Controls.Add(this.lvInventory, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.lblGuide, 0, 0);
-            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel1.Controls.Add(this.lvInventory, 0, 1);
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 2;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(594, 521);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(612, 186);
             this.tableLayoutPanel1.TabIndex = 4;
-            // 
-            // lvInventory
-            // 
-            this.lvInventory.ContextMenuStrip = this.contextMenu;
-            this.lvInventory.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lvInventory.Location = new System.Drawing.Point(3, 23);
-            this.lvInventory.Name = "lvInventory";
-            this.lvInventory.Size = new System.Drawing.Size(588, 495);
-            this.lvInventory.TabIndex = 4;
-            this.lvInventory.UseCompatibleStateImageBehavior = false;
-            this.lvInventory.DoubleClick += new System.EventHandler(this.OnListViewDoubleClick);
-            this.lvInventory.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnMouseDown);
+            this.tableLayoutPanel1.ClientSizeChanged += new System.EventHandler(this.OnPanelSizeChanged);
             // 
             // lblGuide
             // 
@@ -121,9 +115,21 @@
             this.lblGuide.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblGuide.Location = new System.Drawing.Point(3, 0);
             this.lblGuide.Name = "lblGuide";
-            this.lblGuide.Size = new System.Drawing.Size(588, 20);
+            this.lblGuide.Size = new System.Drawing.Size(606, 20);
             this.lblGuide.TabIndex = 3;
             this.lblGuide.Text = "label1";
+            // 
+            // lvInventory
+            // 
+            this.lvInventory.ContextMenuStrip = this.contextMenu;
+            this.lvInventory.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lvInventory.Location = new System.Drawing.Point(3, 23);
+            this.lvInventory.Name = "lvInventory";
+            this.lvInventory.Size = new System.Drawing.Size(606, 161);
+            this.lvInventory.TabIndex = 4;
+            this.lvInventory.UseCompatibleStateImageBehavior = false;
+            this.lvInventory.DoubleClick += new System.EventHandler(this.OnListViewDoubleClick);
+            this.lvInventory.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnMouseDown);
             // 
             // toolStrip
             // 
@@ -133,10 +139,13 @@
             this.tsButtonAddGear,
             this.tsButtonExport,
             this.tsButtonImport,
+            this.toolStripSeparator1,
+            this.tsButtonTable,
+            this.toolStripSeparator2,
             this.tsButtonExit});
             this.toolStrip.Location = new System.Drawing.Point(0, 0);
             this.toolStrip.Name = "toolStrip";
-            this.toolStrip.Size = new System.Drawing.Size(898, 25);
+            this.toolStrip.Size = new System.Drawing.Size(928, 25);
             this.toolStrip.TabIndex = 3;
             this.toolStrip.Text = "toolStrip1";
             this.toolStrip.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnToolStripItemClicked);
@@ -179,7 +188,7 @@
             this.tsButtonExport.Name = "tsButtonExport";
             this.tsButtonExport.Size = new System.Drawing.Size(23, 22);
             this.tsButtonExport.Text = "toolStripButton1";
-            this.tsButtonExport.ToolTipText = "Export inventory";
+            this.tsButtonExport.ToolTipText = "Export";
             // 
             // tsButtonImport
             // 
@@ -189,7 +198,27 @@
             this.tsButtonImport.Name = "tsButtonImport";
             this.tsButtonImport.Size = new System.Drawing.Size(23, 22);
             this.tsButtonImport.Text = "toolStripButton2";
-            this.tsButtonImport.ToolTipText = "Import inventory";
+            this.tsButtonImport.ToolTipText = "Import";
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
+            // 
+            // tsButtonTable
+            // 
+            this.tsButtonTable.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsButtonTable.Image = global::FAD3.Properties.Resources.Table_16x;
+            this.tsButtonTable.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsButtonTable.Name = "tsButtonTable";
+            this.tsButtonTable.Size = new System.Drawing.Size(23, 22);
+            this.tsButtonTable.Text = "toolStripButton1";
+            this.tsButtonTable.ToolTipText = "Tables";
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
             // 
             // tsButtonExit
             // 
@@ -205,7 +234,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(898, 557);
+            this.ClientSize = new System.Drawing.Size(928, 222);
             this.Controls.Add(this.toolStrip);
             this.Controls.Add(this.split);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
@@ -241,5 +270,8 @@
         private System.Windows.Forms.ToolStripButton tsButtonAddGear;
         private System.Windows.Forms.ToolStripButton tsButtonExport;
         private System.Windows.Forms.ToolStripButton tsButtonImport;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripButton tsButtonTable;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
     }
 }

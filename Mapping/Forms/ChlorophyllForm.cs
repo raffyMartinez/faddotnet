@@ -34,6 +34,7 @@ namespace FAD3.Mapping.Forms
         private int _selectionIndex = 0;
         private int _columnCount;
         private DataTable _dt;
+        private bool _hasMesh;
 
         public static ChlorophyllForm GetInstance()
         {
@@ -67,6 +68,7 @@ namespace FAD3.Mapping.Forms
                 icbColorScheme.SelectedIndex = 0;
             }
             txtCategoryCount.Text = "5";
+            listSelectedSheets.Enabled = false;
         }
 
         private void OpenFile()
@@ -100,11 +102,6 @@ namespace FAD3.Mapping.Forms
                 props["Extended Properties"] = @"""Excel 12.0 XML;HDR=NO;IMEX=1;"";";
             }
             props["Data Source"] = _excelFileName;
-
-            // XLS - Excel 2003 and Older
-            //props["Provider"] = "Microsoft.Jet.OLEDB.4.0";
-            //props["Extended Properties"] = "Excel 8.0";
-            //props["Data Source"] = "C:\\MyExcel.xls";
 
             StringBuilder sb = new StringBuilder();
 
@@ -286,8 +283,9 @@ namespace FAD3.Mapping.Forms
                 case "btnShowGridPolygons":
                     if (MakeGridFromPoints.MakeGridShapefile())
                     {
-                        global.MappingForm.MapLayersHandler.AddLayer(MakeGridFromPoints.GridShapefile, "Mesh");
+                        _hasMesh = global.MappingForm.MapLayersHandler.AddLayer(MakeGridFromPoints.GridShapefile, "Mesh") > 0;
                     }
+                    listSelectedSheets.Enabled = _hasMesh;
                     break;
 
                 case "btnUp":
@@ -373,45 +371,52 @@ namespace FAD3.Mapping.Forms
 
         private void MapSheet(int index)
         {
-            lblMappedSheet.Text = $"{listSelectedSheets.Items[index]}";
-            lblMappedSheet.Visible = true;
-            //var table = _excelData.Tables[0];
-            _columnValues.Clear();
-            for (int row = 0; row < _dt.Rows.Count; row++)
+            if (_hasMesh)
             {
-                var arr = _dt.Rows[row].ItemArray;
-                var col = index + _firstColIndex + 2;
-                double? v = null;
-                if (arr[col].GetType().Name == "String")
+                lblMappedSheet.Text = $"{listSelectedSheets.Items[index]}";
+                lblMappedSheet.Visible = true;
+                //var table = _excelData.Tables[0];
+                _columnValues.Clear();
+                for (int row = 0; row < _dt.Rows.Count; row++)
                 {
-                    if (double.TryParse((string)arr[col], out double d))
+                    var arr = _dt.Rows[row].ItemArray;
+                    var col = index + _firstColIndex + 2;
+                    double? v = null;
+                    if (arr[col].GetType().Name == "String")
                     {
-                        v = d;
+                        if (double.TryParse((string)arr[col], out double d))
+                        {
+                            v = d;
+                        }
                     }
+                    else
+                    {
+                        v = arr[col] as double?;
+                    }
+                    _columnValues.Add(v);
                 }
-                else
+                MakeGridFromPoints.MapColumn(_columnValues, lblMappedSheet.Text.ToString());
+                global.MappingForm.MapControl.Redraw();
+
+                graphSheet.Series.Clear();
+                graphSheet.ChartAreas[0].AxisY.Minimum = 0;
+                graphSheet.ChartAreas[0].AxisY.Maximum = 100;
+                graphSheet.ChartAreas[0].AxisY.MajorGrid.Enabled = false;
+                graphSheet.ChartAreas[0].AxisX.MajorGrid.Enabled = false;
+                graphSheet.ChartAreas[0].AxisX.LabelStyle.Enabled = false;
+                var series = new Series
                 {
-                    v = arr[col] as double?;
-                }
-                _columnValues.Add(v);
+                    ChartType = SeriesChartType.Column,
+                    Name = "summary",
+                };
+                graphSheet.Series.Add(series);
+
+                UpdateSheetSummary(MakeGridFromPoints.SheetMapSummary);
             }
-            MakeGridFromPoints.MapColumn(_columnValues, lblMappedSheet.Text.ToString());
-            global.MappingForm.MapControl.Redraw();
-
-            graphSheet.Series.Clear();
-            graphSheet.ChartAreas[0].AxisY.Minimum = 0;
-            graphSheet.ChartAreas[0].AxisY.Maximum = 100;
-            graphSheet.ChartAreas[0].AxisY.MajorGrid.Enabled = false;
-            graphSheet.ChartAreas[0].AxisX.MajorGrid.Enabled = false;
-            graphSheet.ChartAreas[0].AxisX.LabelStyle.Enabled = false;
-            var series = new Series
+            else
             {
-                ChartType = SeriesChartType.Column,
-                Name = "summary",
-            };
-            graphSheet.Series.Add(series);
-
-            UpdateSheetSummary(MakeGridFromPoints.SheetMapSummary);
+                MessageBox.Show("Mesh layer not found", "Layer not found", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
 
         private void UpdateSheetSummary(Dictionary<string, int> summary)

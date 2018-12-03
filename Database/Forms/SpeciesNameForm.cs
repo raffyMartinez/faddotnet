@@ -33,6 +33,33 @@ namespace FAD3
 
         public bool DeleteSuccess { get; internal set; }
 
+        public string SpeciesGuid
+        {
+            get { return _nameGuid; }
+            set
+            {
+                _nameGuid = value;
+                var speciesName = Names.AllSpeciesDictionary[_nameGuid];
+                var arr = speciesName.Split(' ');
+                for (int n = 0; n < arr.Length; n++)
+                {
+                    if (n == 0)
+                    {
+                        _genus = arr[n];
+                    }
+                    else
+                    {
+                        _species = arr[n] + " ";
+                    }
+                }
+                _species = _species.Trim(' ');
+                _taxa = CatchName.TaxaFromCatchName(_genus, _species);
+                _dialogTitle = "Edit species";
+                chkInFishbase.Enabled = _taxa == Taxa.Fish;
+                _dataStatus = fad3DataStatus.statusFromDB;
+            }
+        }
+
         public string Genus
         {
             get { return _genus; }
@@ -53,7 +80,7 @@ namespace FAD3
             get { return _taxa.ToString(); }
         }
 
-        public bool InFIshBase
+        public bool InFishBase
         {
             get { return _inFishBase; }
         }

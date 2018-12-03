@@ -38,24 +38,28 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.buttonRemove = new System.Windows.Forms.Button();
             this.buttonAdd = new System.Windows.Forms.Button();
+            this.lblTotalFreq = new System.Windows.Forms.Label();
+            this.lblLen = new System.Windows.Forms.Label();
+            this.lblFreq = new System.Windows.Forms.Label();
+            this.lblCatchCompCount = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // panelUI
             // 
             this.panelUI.AutoScroll = true;
-            this.panelUI.Location = new System.Drawing.Point(3, 136);
+            this.panelUI.Location = new System.Drawing.Point(0, 150);
             this.panelUI.Margin = new System.Windows.Forms.Padding(4);
             this.panelUI.Name = "panelUI";
-            this.panelUI.Size = new System.Drawing.Size(242, 263);
+            this.panelUI.Size = new System.Drawing.Size(242, 278);
             this.panelUI.TabIndex = 0;
             // 
             // buttonOK
             // 
-            this.buttonOK.Location = new System.Drawing.Point(241, 407);
+            this.buttonOK.Location = new System.Drawing.Point(241, 447);
             this.buttonOK.Margin = new System.Windows.Forms.Padding(4);
             this.buttonOK.Name = "buttonOK";
-            this.buttonOK.Size = new System.Drawing.Size(52, 28);
+            this.buttonOK.Size = new System.Drawing.Size(52, 25);
             this.buttonOK.TabIndex = 1;
             this.buttonOK.Text = "OK";
             this.buttonOK.UseVisualStyleBackColor = true;
@@ -65,10 +69,10 @@
             // 
             this.buttonCancel.CausesValidation = false;
             this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.buttonCancel.Location = new System.Drawing.Point(177, 407);
+            this.buttonCancel.Location = new System.Drawing.Point(182, 447);
             this.buttonCancel.Margin = new System.Windows.Forms.Padding(4);
             this.buttonCancel.Name = "buttonCancel";
-            this.buttonCancel.Size = new System.Drawing.Size(57, 28);
+            this.buttonCancel.Size = new System.Drawing.Size(53, 25);
             this.buttonCancel.TabIndex = 2;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = true;
@@ -110,6 +114,7 @@
             this.checkUniqueIntervals.TabIndex = 8;
             this.checkUniqueIntervals.Text = "Unique length classes";
             this.checkUniqueIntervals.UseVisualStyleBackColor = true;
+            this.checkUniqueIntervals.CheckedChanged += new System.EventHandler(this.OnCheckChanged);
             // 
             // groupBox1
             // 
@@ -147,12 +152,54 @@
             this.buttonAdd.UseVisualStyleBackColor = true;
             this.buttonAdd.Click += new System.EventHandler(this.OnButtonClick);
             // 
+            // lblTotalFreq
+            // 
+            this.lblTotalFreq.AutoSize = true;
+            this.lblTotalFreq.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblTotalFreq.Location = new System.Drawing.Point(2, 454);
+            this.lblTotalFreq.Name = "lblTotalFreq";
+            this.lblTotalFreq.Size = new System.Drawing.Size(125, 15);
+            this.lblTotalFreq.TabIndex = 12;
+            this.lblTotalFreq.Text = "Total of frequency:";
+            // 
+            // lblLen
+            // 
+            this.lblLen.AutoSize = true;
+            this.lblLen.Location = new System.Drawing.Point(54, 131);
+            this.lblLen.Name = "lblLen";
+            this.lblLen.Size = new System.Drawing.Size(45, 15);
+            this.lblLen.TabIndex = 13;
+            this.lblLen.Text = "Length";
+            // 
+            // lblFreq
+            // 
+            this.lblFreq.AutoSize = true;
+            this.lblFreq.Location = new System.Drawing.Point(139, 131);
+            this.lblFreq.Name = "lblFreq";
+            this.lblFreq.Size = new System.Drawing.Size(64, 15);
+            this.lblFreq.TabIndex = 14;
+            this.lblFreq.Text = "Frequency";
+            // 
+            // lblCatchCompCount
+            // 
+            this.lblCatchCompCount.AutoSize = true;
+            this.lblCatchCompCount.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblCatchCompCount.Location = new System.Drawing.Point(2, 432);
+            this.lblCatchCompCount.Name = "lblCatchCompCount";
+            this.lblCatchCompCount.Size = new System.Drawing.Size(129, 15);
+            this.lblCatchCompCount.TabIndex = 15;
+            this.lblCatchCompCount.Text = "Catch comp. count:";
+            // 
             // LengthFreqForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCancel;
-            this.ClientSize = new System.Drawing.Size(300, 443);
+            this.ClientSize = new System.Drawing.Size(300, 476);
+            this.Controls.Add(this.lblCatchCompCount);
+            this.Controls.Add(this.lblFreq);
+            this.Controls.Add(this.lblLen);
+            this.Controls.Add(this.lblTotalFreq);
             this.Controls.Add(this.buttonRemove);
             this.Controls.Add(this.buttonAdd);
             this.Controls.Add(this.groupBox1);
@@ -169,6 +216,7 @@
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -184,5 +232,9 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Button buttonRemove;
         private System.Windows.Forms.Button buttonAdd;
+        private System.Windows.Forms.Label lblTotalFreq;
+        private System.Windows.Forms.Label lblLen;
+        private System.Windows.Forms.Label lblFreq;
+        private System.Windows.Forms.Label lblCatchCompCount;
     }
 }

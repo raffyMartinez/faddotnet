@@ -1238,6 +1238,7 @@ namespace FAD3
 
         private static void GetGearLocalNames()
         {
+            _gearLocalNameListDict.Clear();
             DataTable dt = new DataTable();
             using (var conection = new OleDbConnection(global.ConnectionString))
             {

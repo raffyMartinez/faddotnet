@@ -15,6 +15,7 @@ using System.Data.OleDb;
 using System.Drawing;
 using System.Windows.Forms;
 using FAD3.GUI.Classes;
+using FAD3.Database.Classes;
 
 namespace FAD3
 {
@@ -23,7 +24,7 @@ namespace FAD3
     /// </summary>
     public partial class EnumeratorForm : Form
     {
-        private TargetArea _AOI = new TargetArea();
+        private TargetArea _targetArea = new TargetArea();
         private string _enumeratorGuid = "";
         private string _enumeratorName = "";
         private bool _IsNew = false;
@@ -73,6 +74,7 @@ namespace FAD3
 
         private void OnFormLoad(object sender, EventArgs e)
         {
+            toolBar.Visible = false;
             if (_enumeratorGuid.Length > 0)
             {
                 global.LoadFormSettings(this);
@@ -83,11 +85,14 @@ namespace FAD3
             }
             else
             {
+                toolBar.Visible = true;
+                toolBar.Dock = DockStyle.Top;
                 panelTop.Hide();
                 tree.Hide();
                 ConfigureListEnumerators();
                 Text = "Landing site enumerators";
             }
+            toolBar.Visible = _enumeratorGuid.Length == 0;
         }
 
         public void EditedEnumerator(string enumeratorGuid, string enumeratorName, DateTime dateHired, bool isActive, fad3DataStatus dataStatus)
@@ -125,16 +130,16 @@ namespace FAD3
             }
         }
 
-        public TargetArea AOI
+        public TargetArea TargetArea
         {
-            get { return _AOI; }
-            set { _AOI = value; }
+            get { return _targetArea; }
+            set { _targetArea = value; }
         }
 
         public void AddNew()
         {
             _IsNew = true;
-            this.Text = "Add a new enumerator for " + _AOI.TargetAreaName;
+            this.Text = "Add a new enumerator for " + _targetArea.TargetAreaName;
         }
 
         protected bool CheckDate(String date)
@@ -169,6 +174,7 @@ namespace FAD3
 
         private void ConfigureListEnumerators()
         {
+            lvEnumerators.Clear();
             labelSamplings.Visible = false;
             labelHireDate.Visible = false;
             labelEnumeratorName.Visible = false;
@@ -182,7 +188,7 @@ namespace FAD3
             lvEnumerators.With(o =>
             {
                 o.Width = Width - 60;
-                o.Location = new Point(0, 10);
+                o.Location = new Point(0, toolBar.Height);
                 o.View = View.Details;
                 o.FullRowSelect = true;
                 o.Columns.Add("Enumerator name");
@@ -590,6 +596,43 @@ namespace FAD3
                 {
                     Logger.Log(ex);
                 }
+            }
+        }
+
+        private void OnToolbarItemClick(object sender, ToolStripItemClickedEventArgs e)
+        {
+            switch (e.ClickedItem.Name)
+            {
+                case "tbAdd":
+                    break;
+
+                case "tbRemove":
+                    break;
+
+                case "tbExport":
+                    var exportCount = Enumerators.ExportEnumerators(_targetArea.TargetAreaGuid);
+                    if (exportCount > 0)
+                    {
+                        MessageBox.Show($"Successfully exported {exportCount} enumerators");
+                    }
+                    break;
+
+                case "tbImport":
+                    FileDialogHelper.Title = "Import enumerators";
+                    FileDialogHelper.DialogType = FileDialogType.FileOpen;
+                    FileDialogHelper.DataFileType = DataFileType.Text | DataFileType.XML | DataFileType.HTML;
+                    FileDialogHelper.ShowDialog();
+                    var fileName = FileDialogHelper.FileName;
+                    if (fileName.Length > 0)
+                    {
+                        if (Enumerators.ImportEnumerators(fileName, _targetArea.TargetAreaGuid))
+                        {
+                            ConfigureListEnumerators();
+                            global.mainForm.SetUPLV("aoi");
+                            MessageBox.Show("Successfully imported enumerators to the database");
+                        }
+                    }
+                    break;
             }
         }
     }

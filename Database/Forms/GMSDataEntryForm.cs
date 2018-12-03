@@ -10,7 +10,7 @@ namespace FAD3
 {
     public partial class GMSDataEntryForm : Form
     {
-        private Dictionary<string, GMSLineClass> _GMSData = new Dictionary<string, GMSLineClass>();
+        private Dictionary<string, GMSLineClass> _gmsData = new Dictionary<string, GMSLineClass>();
 
         //represents the last row of fields
         private TextBox _lastGMS;
@@ -26,18 +26,18 @@ namespace FAD3
         private ComboBox _cboGMS = new ComboBox();
         private ComboBox _cboSex = new ComboBox();
 
-        private string _CatchName = "";
-        private string _CatchRowGuid = "";
-        private bool _ComboBoxesSet = false;
+        private string _catchName = "";
+        private string _catchRowGuid = "";
+        private bool _comboBoxesSet = false;
         private int _ctlHeight;
         private int _ctlWidth;
-        private TextBox _CurrentTextBox;
-        private bool _IsNew = false;
+        private TextBox _currentTextBox;
+        private bool _isNew = false;
         private int _row = 1;
         private Sampling _sampling;
         private int _spacer = 3;
         private Taxa _taxa = Taxa.To_be_determined;
-        private bool _UpdateSequence = false;
+        private bool _updateSequence = false;
         private int _y = 5;
         private MainForm _parent_form;
 
@@ -45,15 +45,15 @@ namespace FAD3
         private string _currentTextContents = "";
         private bool _errorValidating = false;
 
-        public GMSDataEntryForm(bool IsNew, Sampling sampling, string CatchRowGuid, string CatchName, Taxa taxa, MainForm Parent)
+        public GMSDataEntryForm(bool isNew, Sampling sampling, string catchRowGuid, string catchName, Taxa taxa, MainForm parent)
         {
             InitializeComponent();
-            _CatchRowGuid = CatchRowGuid;
-            _CatchName = CatchName;
+            _catchRowGuid = catchRowGuid;
+            _catchName = catchName;
             _sampling = sampling;
-            _IsNew = IsNew;
+            _isNew = isNew;
             _taxa = taxa;
-            _parent_form = Parent;
+            _parent_form = parent;
         }
 
         private void SetTextBoxEvents(TextBox t)
@@ -63,6 +63,11 @@ namespace FAD3
             t.GotFocus += OnTextFocus;
             t.Validating += OnTextValidating;
             t.DoubleClick += OnTextBoxDoubleClick;
+            //t.KeyDown += OnTextKeyDown;
+        }
+
+        private void OnTextKeyDown(object sender, KeyEventArgs e)
+        {
         }
 
         private void AddRow(bool IsNew, string key = "", GMSLineClass gmsLine = null)
@@ -78,9 +83,9 @@ namespace FAD3
             TextBox textSex = new TextBox();
 
             //we only add the comboboxes once
-            if (_row == 1 && _ComboBoxesSet == false)
+            if (_row == 1 && _comboBoxesSet == false)
             {
-                _ComboBoxesSet = true;
+                _comboBoxesSet = true;
 
                 _cboSex.With(o =>
                     {
@@ -139,11 +144,11 @@ namespace FAD3
             if (IsNew)
             {
                 key = Guid.NewGuid().ToString();
-                _GMSData.Add(key, new GMSLineClass(_CatchRowGuid));
-                _GMSData[key].RowGuid = Guid.NewGuid().ToString();
-                _GMSData[key].Sequence = _row;
-                _GMSData[key].DataStatus = fad3DataStatus.statusNew;
-                _GMSData[key].Taxa = _taxa;
+                _gmsData.Add(key, new GMSLineClass(_catchRowGuid));
+                _gmsData[key].RowGuid = Guid.NewGuid().ToString();
+                _gmsData[key].Sequence = _row;
+                _gmsData[key].DataStatus = fad3DataStatus.statusNew;
+                _gmsData[key].Taxa = _taxa;
             }
 
             labelRow.With(o =>
@@ -164,7 +169,7 @@ namespace FAD3
                 _ctlWidth = o.Width;
                 if (!IsNew)
                 {
-                    if (_GMSData[key].Length != null) o.Text = _GMSData[key].Length.ToString();
+                    if (_gmsData[key].Length != null) o.Text = _gmsData[key].Length.ToString();
                 }
                 o.Tag = key;
                 SetTextBoxEvents(o);
@@ -177,7 +182,7 @@ namespace FAD3
                 o.Location = new Point(textLength.Left + textLength.Width + _spacer, yPos);
                 if (!IsNew)
                 {
-                    if (_GMSData[key].Weight != null) o.Text = _GMSData[key].Weight.ToString();
+                    if (_gmsData[key].Weight != null) o.Text = _gmsData[key].Weight.ToString();
                 }
                 o.Tag = key;
                 SetTextBoxEvents(o);
@@ -191,7 +196,7 @@ namespace FAD3
                 o.Width += (int)(_ctlWidth * 0.5);
                 if (!IsNew)
                 {
-                    o.Text = _GMSData[key].Sex.ToString();
+                    o.Text = _gmsData[key].Sex.ToString();
                 }
                 o.Tag = key;
                 SetTextBoxEvents(o);
@@ -205,7 +210,7 @@ namespace FAD3
                 o.Width += _ctlWidth;
                 if (!IsNew)
                 {
-                    o.Text = GMSManager.GMSStageToString(_GMSData[key].Taxa, _GMSData[key].GMS);
+                    o.Text = GMSManager.GMSStageToString(_gmsData[key].Taxa, _gmsData[key].GMS);
                 }
                 o.Tag = key;
                 SetTextBoxEvents(o);
@@ -218,11 +223,17 @@ namespace FAD3
                 o.Location = new Point(textGMS.Left + textGMS.Width + _spacer, yPos);
                 if (!IsNew)
                 {
-                    if (_GMSData[key].GonadWeight != null) o.Text = _GMSData[key].GonadWeight.ToString();
+                    if (_gmsData[key].GonadWeight != null) o.Text = _gmsData[key].GonadWeight.ToString();
                 }
                 o.Tag = key;
                 SetTextBoxEvents(o);
             });
+
+            textLength.Enabled = chkLenght.Checked;
+            textWeight.Enabled = chkWeight.Checked;
+            textSex.Enabled = chkSex.Checked;
+            textGMS.Enabled = chkGMS.Checked;
+            textGonadWeight.Enabled = chkGonadWt.Checked;
 
             if (_row == 1)
             {
@@ -236,7 +247,7 @@ namespace FAD3
 
             _y += labelRow.Height + _spacer;
 
-            if (_IsNew || _row >= GMSManager.GMSMeasurementRows)
+            if (IsNew || _row >= GMSManager.GMSMeasurementRows)
             {
                 _lastGMS = textGMS;
                 _lastGonadWt = textGonadWeight;
@@ -249,7 +260,7 @@ namespace FAD3
 
         private void ControlToFocus(TextBox txt, char key = ' ')
         {
-            _CurrentTextBox = txt;
+            _currentTextBox = txt;
             _cboEditor.Hide();
             bool Proceed = true;
             var s = txt.Text;
@@ -305,7 +316,7 @@ namespace FAD3
             }
         }
 
-        private TextBox GetTextBox(ComboBox fromComboBox = null, TextBox fromTextBox = null, bool GetNext = false)
+        private TextBox GetTextBox(ComboBox fromComboBox = null, TextBox fromTextBox = null, bool getNext = false)
         {
             var myTextBox = new TextBox();
             var myTextBoxName = "";
@@ -318,13 +329,13 @@ namespace FAD3
                 {
                     case "cboSex":
                         myTextBoxName = "textSex";
-                        if (GetNext) myTextBoxName = "textGMS";
+                        if (getNext) myTextBoxName = "textGMS";
                         break;
 
                     case "cboGMS":
 
                         myTextBoxName = "textGMS";
-                        if (GetNext) myTextBoxName = "textGonadWeight";
+                        if (getNext) myTextBoxName = "textGonadWeight";
                         break;
                 }
             }
@@ -337,28 +348,28 @@ namespace FAD3
                 switch (myTextBoxName)
                 {
                     case "textLen":
-                        if (GetNext)
+                        if (getNext)
                         {
                             myTextBoxName = "textWgt";
                         }
                         break;
 
                     case "textWgt":
-                        if (GetNext)
+                        if (getNext)
                         {
                             myTextBoxName = "textSex";
                         }
                         break;
 
                     case "textSex":
-                        if (GetNext)
+                        if (getNext)
                         {
                             myTextBoxName = "textGMS";
                         }
                         break;
 
                     case "textGMS":
-                        if (GetNext)
+                        if (getNext)
                         {
                             myTextBoxName = "textGonadWeight";
                         }
@@ -428,7 +439,48 @@ namespace FAD3
                     break;
 
                 case "buttonRemove":
+                    GMSLineClass gls = _gmsData[_currentRow];
+                    gls.DataStatus = fad3DataStatus.statusForDeletion;
+                    _gmsData[_currentRow] = gls;
+                    panelUI.Controls.Clear();
+                    if (_gmsData.Count == 1 || FieldRowCount() == 0)
+                    {
+                        PopulateFieldControls(isNew: true);
+                    }
+                    else
+                    {
+                        PopulateFieldControls(isNew: false, repopulate: true);
+                    }
                     break;
+            }
+        }
+
+        private void SetupUIFromOptions()
+        {
+            foreach (Control c in panelUI.Controls)
+            {
+                switch (c.Name)
+                {
+                    case "textLen":
+                        c.Enabled = chkLenght.Checked;
+                        break;
+
+                    case "textWgt":
+                        c.Enabled = chkWeight.Checked;
+                        break;
+
+                    case "textSex":
+                        c.Enabled = chkSex.Checked;
+                        break;
+
+                    case "textGMS":
+                        c.Enabled = chkGMS.Checked;
+                        break;
+
+                    case "textGonadWeight":
+                        c.Enabled = chkGonadWt.Checked;
+                        break;
+                }
             }
         }
 
@@ -457,7 +509,7 @@ namespace FAD3
                     {
                         ShowOptions(false);
                     }
-
+                    SetupUIFromOptions();
                     break;
 
                 case "buttonOptionsCancel":
@@ -470,7 +522,7 @@ namespace FAD3
         {
             if (e.KeyCode == Keys.Return)
             {
-                GetTextBox(_cboEditor, GetNext: true).Focus();
+                GetTextBox(_cboEditor, getNext: true).Focus();
             }
             else if (e.KeyCode == Keys.Escape)
             {
@@ -483,18 +535,18 @@ namespace FAD3
             switch (_cboEditor.Name)
             {
                 case "cboSex":
-                    _GMSData[_cboEditor.Tag.ToString()].Sex = (Sex)Enum.Parse(typeof(Sex), _cboEditor.Text);
+                    _gmsData[_cboEditor.Tag.ToString()].Sex = (Sex)Enum.Parse(typeof(Sex), _cboEditor.Text);
                     break;
 
                 case "cboGMS":
-                    _GMSData[_cboEditor.Tag.ToString()].GMS = GMSManager.GMSStageFromString(_cboEditor.Text, _GMSData[_cboEditor.Tag.ToString()].Taxa);
+                    _gmsData[_cboEditor.Tag.ToString()].GMS = GMSManager.GMSStageFromString(_cboEditor.Text, _gmsData[_cboEditor.Tag.ToString()].Taxa);
                     break;
             }
 
-            if (_CurrentTextBox.Text != _cboEditor.Text)
+            if (_currentTextBox.Text != _cboEditor.Text)
             {
-                _CurrentTextBox.Text = _cboEditor.Text;
-                SetRowStatusToEdited(_CurrentTextBox);
+                _currentTextBox.Text = _cboEditor.Text;
+                SetRowStatusToEdited(_currentTextBox);
             }
         }
 
@@ -515,7 +567,7 @@ namespace FAD3
                     }
                     else
                     {
-                        GetTextBox(fromTextBox: (TextBox)this.ActiveControl, GetNext: true).Focus();
+                        GetTextBox(fromTextBox: (TextBox)this.ActiveControl, getNext: true).Focus();
                     }
                 }
             }
@@ -523,12 +575,12 @@ namespace FAD3
 
         private void OnGMSDataEntryForm_Load(object sender, EventArgs e)
         {
-            labelTitle.Text = $"GMS data table for {_CatchName}";
-            if (_IsNew)
+            labelTitle.Text = $"GMS data table for {_catchName}";
+            if (_isNew)
             {
-                labelTitle.Text = $"New GMS data table for {_CatchName}";
+                labelTitle.Text = $"New GMS data table for {_catchName}";
             }
-            PopulateFieldControls();
+            PopulateFieldControls(_isNew);
 
             RegistryKey rk = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\FAD3");
             var CheckedOptions = rk.GetValue("GMSData", "NULL").ToString().Split(',');
@@ -587,12 +639,12 @@ namespace FAD3
                     case "textLen":
                         if (o.Text.Length == 0)
                         {
-                            _GMSData[o.Tag.ToString()].Length = null;
+                            _gmsData[o.Tag.ToString()].Length = null;
                         }
                         else
                         {
                             if (IsValidDoubleValue(o.Text))
-                                _GMSData[o.Tag.ToString()].Length = double.Parse(o.Text);
+                                _gmsData[o.Tag.ToString()].Length = double.Parse(o.Text);
                             else
                                 e.Cancel = true;
                         }
@@ -601,12 +653,12 @@ namespace FAD3
                     case "textWgt":
                         if (o.Text.Length == 0)
                         {
-                            _GMSData[o.Tag.ToString()].Weight = null;
+                            _gmsData[o.Tag.ToString()].Weight = null;
                         }
                         else
                         {
                             if (IsValidDoubleValue(o.Text))
-                                _GMSData[o.Tag.ToString()].Weight = double.Parse(o.Text);
+                                _gmsData[o.Tag.ToString()].Weight = double.Parse(o.Text);
                             else
                                 e.Cancel = true;
                         }
@@ -615,12 +667,12 @@ namespace FAD3
                     case "textGonadWeight":
                         if (o.Text.Length == 0)
                         {
-                            _GMSData[o.Tag.ToString()].GonadWeight = null;
+                            _gmsData[o.Tag.ToString()].GonadWeight = null;
                         }
                         else
                         {
                             if (IsValidDoubleValue(o.Text))
-                                _GMSData[o.Tag.ToString()].GonadWeight = double.Parse(o.Text);
+                                _gmsData[o.Tag.ToString()].GonadWeight = double.Parse(o.Text);
                             else
                                 e.Cancel = true;
                         }
@@ -644,42 +696,70 @@ namespace FAD3
             }
         }
 
+        private int FieldRowCount()
+        {
+            var n = 0;
+            foreach (var item in _gmsData)
+            {
+                if (item.Value.DataStatus != fad3DataStatus.statusForDeletion)
+                {
+                    n++;
+                }
+            }
+            return n;
+        }
+
         /// <summary>
         /// Populates fields if GMS data exists or adds a new row
         /// </summary>
         /// <param name="IsNew"></param>
-        private void PopulateFieldControls()
+        private void PopulateFieldControls(bool isNew, bool repopulate = false)
         {
-            if (_IsNew)
+            _y = 5;
+            _row = 1;
+            if (repopulate)
             {
-                //adds a new row of empty fields
-                AddRow(IsNew: true);
+                foreach (var item in _gmsData)
+                {
+                    if (item.Value.DataStatus != fad3DataStatus.statusForDeletion)
+                    {
+                        AddRow(IsNew: false, item.Key, item.Value);
+                    }
+                }
             }
             else
             {
-                _GMSData = GMSManager.RetrieveGMSData(_CatchRowGuid);
-                foreach (var item in _GMSData)
+                if (isNew)
                 {
-                    AddRow(IsNew: false, item.Key, item.Value);
+                    //adds a new row of empty fields
+                    AddRow(IsNew: true);
                 }
-            }
-
-            foreach (Control c in panelUI.Controls)
-            {
-                if (c.GetType().Name == "TextBox")
+                else
                 {
-                    ((TextBox)c).With(o =>
+                    _gmsData = GMSManager.RetrieveGMSData(_catchRowGuid);
+                    foreach (var item in _gmsData)
                     {
-                        o.Font = Font;
-                        o.Height = _ctlHeight;
-                    });
+                        AddRow(IsNew: false, item.Key, item.Value);
+                    }
+                }
+
+                foreach (Control c in panelUI.Controls)
+                {
+                    if (c.GetType().Name == "TextBox")
+                    {
+                        ((TextBox)c).With(o =>
+                        {
+                            o.Font = Font;
+                            o.Height = _ctlHeight;
+                        });
+                    }
                 }
             }
         }
 
         private bool SaveGMS()
         {
-            return GMSManager.UpdateGMSData(_GMSData);
+            return GMSManager.UpdateGMSData(_gmsData);
         }
 
         /// <summary>
@@ -724,18 +804,24 @@ namespace FAD3
 
         private void SetRowStatusToEdited(Control source)
         {
-            if (_GMSData[source.Tag.ToString()].DataStatus != fad3DataStatus.statusNew)
+            if (_gmsData[source.Tag.ToString()].DataStatus != fad3DataStatus.statusNew)
             {
-                _GMSData[source.Tag.ToString()].DataStatus = fad3DataStatus.statusEdited;
+                _gmsData[source.Tag.ToString()].DataStatus = fad3DataStatus.statusEdited;
             }
         }
 
-        private void ShowOptions(bool Visible)
+        private void ShowOptions(bool visible)
         {
-            if (Visible)
+            if (visible)
+            {
                 panelOptions.Show();
+            }
             else
+            {
                 panelOptions.Hide();
+            }
+            buttonOK.Enabled = !visible;
+            buttonCancel.Enabled = !visible;
         }
 
         private bool ValidateData()

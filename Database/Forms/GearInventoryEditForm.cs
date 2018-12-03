@@ -15,7 +15,7 @@ namespace FAD3.Database.Forms
     public partial class GearInventoryEditForm : Form
     {
         private string _treeLevel;
-        private TargetArea _aoi;
+        private TargetArea _targetArea;
         private string _inventoryGuid;
         private string _barangayInventoryGuid;
         private string _gearInventoryGuid;
@@ -32,6 +32,7 @@ namespace FAD3.Database.Forms
         private GearInventoryForm _parentForm;
         private List<string> _sitios = new List<string>();
         private ListViewItem _hitItem;
+        private DateTime _dateProjectImplemented;
 
         public void SelectedSimilarName(string similarName, FisheryObjectNameType localNameType)
         {
@@ -68,7 +69,7 @@ namespace FAD3.Database.Forms
         {
             InitializeComponent();
             _treeLevel = treeLevel;
-            _aoi = aoi;
+            _targetArea = aoi;
             _inventory = inventory;
             _parentForm = parent;
         }
@@ -130,7 +131,26 @@ namespace FAD3.Database.Forms
             _inventoryGuid = inventoryGuid;
             pnlBarangay.Visible = true;
             SetupProvinceComboBox();
+            SetupEnumeratorsComboBox();
+            _dateProjectImplemented = _inventory.Inventories[_inventoryGuid].DateConducted;
             Text = "Add barangay fisher and fishing boat inventory data";
+        }
+
+        private void SetupEnumeratorsComboBox()
+        {
+            var surveyEnumerators = Enumerators.AOIEnumeratorsList(_targetArea.TargetAreaGuid);
+            cboBarangaySurveyEnumerator.AutoCompleteSource = AutoCompleteSource.ListItems;
+            cboBarangaySurveyEnumerator.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            cboBarangaySurveyEnumerator.ValueMember = "Key";
+            cboBarangaySurveyEnumerator.DisplayMember = "Value";
+            foreach (var item in surveyEnumerators)
+            {
+                cboBarangaySurveyEnumerator.Items.Add(item);
+            }
+            if (cboBarangaySurveyEnumerator.Items.Count > 0)
+            {
+                cboBarangaySurveyEnumerator.SelectedIndex = 0;
+            }
         }
 
         private void FillUpMonths()
@@ -317,6 +337,13 @@ namespace FAD3.Database.Forms
             //    proceed = MessageBox.Show("List of accessories or expenses is not filled up\r\nDo you still want to proceed?",
             //        "Confirmation needed", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes;
             //}
+            if (!proceed)
+            {
+                MessageBox.Show("Cannot save because there are required information that are missing",
+                                "Failed to save",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+            }
 
             return proceed;
         }
@@ -380,7 +407,9 @@ namespace FAD3.Database.Forms
                         && txtCountNonMotorized.Text.Length > 0
                         && comboBarangays.Text.Length > 0
                         && comboMunicipality.Text.Length > 0
-                        && comboProvince.Text.Length > 0;
+                        && comboProvince.Text.Length > 0
+                        && txtBarangaySurveyDate.Text.Length > 0
+                        && cboBarangaySurveyEnumerator.Text.Length > 0;
 
                 case "sitio":
                     return ValidateGearInventory();
@@ -510,9 +539,11 @@ namespace FAD3.Database.Forms
         }
 
         public void EditInventoryLevel(string barangayInventoryGuid, int municipalityNumber, string barangay, string sitio,
-                                    int fisherCount, int motorizedCount, int nonMotorizedCount, int commercialCount)
+                                    int fisherCount, int motorizedCount, int nonMotorizedCount, int commercialCount,
+                                    DateTime? surveyDate, string enumeratorName)
         {
             SetupProvinceComboBox();
+            SetupEnumeratorsComboBox();
             _municipalityNumber = municipalityNumber;
             _treeLevel = "barangay";
             _barangayInventoryGuid = barangayInventoryGuid;
@@ -522,6 +553,8 @@ namespace FAD3.Database.Forms
             txtCountMotorized.Text = motorizedCount.ToString();
             txtCountNonMotorized.Text = nonMotorizedCount.ToString();
             txtCountCommercial.Text = commercialCount.ToString();
+            txtBarangaySurveyDate.Text = surveyDate == null ? "" : string.Format("{0:MMM-dd-yyyy}", surveyDate);
+            cboBarangaySurveyEnumerator.Text = enumeratorName;
 
             var location = global.ProvinceMunicipalityNamesFromMunicipalityNumber(municipalityNumber);
             comboProvince.Text = location.province;
@@ -577,10 +610,12 @@ namespace FAD3.Database.Forms
                                 {
                                     guid = _barangayInventoryGuid;
                                 }
+                                var enumeratorGuid = ((KeyValuePair<string, string>)cboBarangaySurveyEnumerator.SelectedItem).Key;
                                 success = _inventory.SaveBarangayInventory(_dataStatus, _inventoryGuid, _municipalityNumber, comboBarangays.Text,
                                                                            int.Parse(txtCountFishers.Text), int.Parse(txtCountCommercial.Text),
                                                                            int.Parse(txtCountMotorized.Text), int.Parse(txtCountNonMotorized.Text),
-                                                                           guid, txtSitio.Text);
+                                                                           guid, DateTime.Parse(txtBarangaySurveyDate.Text), enumeratorGuid,
+                                                                           txtSitio.Text);
 
                                 if (success) _parentForm.RefreshSitioLevelInventory(comboProvince.Text, comboMunicipality.Text, comboBarangays.Text, txtSitio.Text);
                                 break;
@@ -670,17 +705,36 @@ namespace FAD3.Database.Forms
 
                                     && _inventory.SaveSitioGearInventoryCatchComposition(guid, listDominantCatchNameGuid, listNonDominantCatchNameGuid);
 
-                                _inventory.SaveSitioGearInventoryAccessories(guid, listAccessories);
-                                _inventory.SaveSitioGearInventoryExpenses(guid, listExpenses);
-                                _inventory.SaveSitioGearInventoryHistoricalCPUE(guid, listHistoryCPUE);
+                                if (success)
+                                {
+                                    _inventory.SaveSitioGearInventoryAccessories(guid, listAccessories);
+                                    _inventory.SaveSitioGearInventoryExpenses(guid, listExpenses);
+                                    _inventory.SaveSitioGearInventoryHistoricalCPUE(guid, listHistoryCPUE);
 
-                                if (success) _parentForm.RefreshSitioGearInventory(guid, _dataStatus == fad3DataStatus.statusNew);
+                                    _parentForm.RefreshSitioGearInventory(guid, _dataStatus == fad3DataStatus.statusNew);
+                                }
                                 break;
                         }
 
                         if (success)
                         {
                             Close();
+                        }
+                    }
+                    else
+                    {
+                        switch (_treeLevel)
+                        {
+                            case "root":
+                            case "targetAreaInventory":
+                            case "province":
+                            case "municipality":
+                            case "barangay":
+                                MessageBox.Show("Cannot save because there are required data that are missing",
+                                                 "Failed to save",
+                                                 MessageBoxButtons.OK,
+                                                 MessageBoxIcon.Information);
+                                break;
                         }
                     }
                     break;
@@ -864,6 +918,24 @@ namespace FAD3.Database.Forms
                         msg = "Name must be at least 10 characters";
                         break;
 
+                    case "txtBarangaySurveyDate":
+
+                        if (DateTime.TryParse(s, out DateTime sDate))
+                        {
+                            if (sDate < _dateProjectImplemented || sDate > DateTime.Now)
+                            {
+                                e.Cancel = true;
+                                msg = "Survey date must be between date of implementation of project and the current date";
+                            }
+                        }
+                        else
+                        {
+                            msg = "Not a valid date";
+                            e.Cancel = true;
+                        }
+
+                        break;
+
                     case "txtDateImplemented":
                         DateTime date;
                         if (!DateTime.TryParse(s, out date))
@@ -904,6 +976,10 @@ namespace FAD3.Database.Forms
                     case "txtModeUpper":
                     case "txtModeLower":
                     case "txtDominantPercentage":
+                    case "txtCountFishers":
+                    case "txtCountCommercial":
+                    case "txtCountMotorized":
+                    case "txtCountNonMotorized":
                         msg = "Only whole numbers are accepted";
                         if (!int.TryParse(s, out int v))
                         {
@@ -914,7 +990,10 @@ namespace FAD3.Database.Forms
                             if (ctlName == "txtCommercialUsage"
                                 || ctlName == "txtMunicipalMotorizedUsage"
                                 || ctlName == "txtMunicipalNonMotorizedUsage"
-                                || ctlName == "txtNoBoatGears")
+                                || ctlName == "txtNoBoatGears"
+                                || ctlName == "txtCountCommercial"
+                                || ctlName == "txtCountMotorized"
+                                || ctlName == "txtCountNonMotorized")
                             {
                                 e.Cancel = v < 0;
                                 msg = "Cannot accept values less than zero";
@@ -1164,6 +1243,35 @@ namespace FAD3.Database.Forms
                                     comboBarangays.Items.Add(s);
                                     _sitios.Clear();
                                     _sitios = _inventory.GetBarangaySitios(comboProvince.Text, comboMunicipality.Text, s);
+                                }
+                                else
+                                {
+                                    e.Cancel = true;
+                                }
+                            }
+                            break;
+
+                        case "cboBarangaySurveyEnumerator":
+                            bool enumeratorFound = false;
+                            foreach (KeyValuePair<string, string> kv in cboBarangaySurveyEnumerator.Items)
+                            {
+                                enumeratorFound = kv.Value == s;
+                                if (enumeratorFound) break;
+                            }
+                            if (!enumeratorFound)
+                            {
+                                msg = $"'{s}' is not in list of enumerators\r\nDo you want to add a new enumerator?";
+                                var result = MessageBox.Show(msg, "Create new enumerator", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                                if (result == DialogResult.Yes)
+                                {
+                                    EnumeratorEntryForm enf = new EnumeratorEntryForm(s, _targetArea.TargetAreaGuid);
+                                    enf.ShowDialog(this);
+                                    if (enf.DialogResult == DialogResult.OK)
+                                    {
+                                        KeyValuePair<string, string> newEnumerator = new KeyValuePair<string, string>(enf.EnumeratorGuid, enf.EnumeratorName);
+                                        cboBarangaySurveyEnumerator.Items.Add(newEnumerator);
+                                        cboBarangaySurveyEnumerator.Text = newEnumerator.Value;
+                                    }
                                 }
                                 else
                                 {

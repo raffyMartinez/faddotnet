@@ -140,10 +140,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Database\Classes\CatchNameURLGenerator.cs" />
+    <Compile Include="Database\Classes\EffortEventArg.cs" />
     <Compile Include="Database\Classes\FileDialogHelper.cs" />
     <Compile Include="Database\Classes\FishingGearInventory.cs" />
     <Compile Include="Database\Classes\FisheriesInventoryImportEventArg.cs" />
     <Compile Include="Database\Classes\ImportRowsFromFileEventArgs.cs" />
+    <Compile Include="Database\Classes\LengthFreq.cs" />
+    <Compile Include="Database\Classes\LGUs.cs" />
     <Compile Include="Database\Classes\SimMetrics\AbstractStringMetric.cs" />
     <Compile Include="Database\Classes\SimMetrics\AbstractSubstitutionCost.cs" />
     <Compile Include="Database\Classes\SimMetrics\IStringMetric.cs" />
@@ -216,11 +219,29 @@
     <Compile Include="Database\Forms\GearInventoryForm.Designer.cs">
       <DependentUpon>GearInventoryForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Database\Forms\GearInventoryTabularForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Database\Forms\GearInventoryTabularForm.Designer.cs">
+      <DependentUpon>GearInventoryTabularForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Database\Forms\HTMLTableSelectColumnsForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Database\Forms\HTMLTableSelectColumnsForm.Designer.cs">
       <DependentUpon>HTMLTableSelectColumnsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Database\Forms\LGUItemForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Database\Forms\LGUItemForm.Designer.cs">
+      <DependentUpon>LGUItemForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Database\Forms\LGUSForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Database\Forms\LGUSForm.Designer.cs">
+      <DependentUpon>LGUSForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Database\Forms\LocalNameSciNameEditForm.cs">
       <SubType>Form</SubType>
@@ -459,7 +480,7 @@
     <Compile Include="GUI\Forms\AboutFadForm.Designer.cs">
       <DependentUpon>AboutFadForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Database\SamplingEnumerators\Enumerators.cs" />
+    <Compile Include="Database\Classes\Enumerators.cs" />
     <Compile Include="Mapping\Classes\SaveMapImage.cs" />
     <Compile Include="Mapping\Forms\ShapefileAttributesForm.cs">
       <SubType>Form</SubType>
@@ -653,8 +674,17 @@
     <EmbeddedResource Include="Database\Forms\GearInventoryForm.resx">
       <DependentUpon>GearInventoryForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Database\Forms\GearInventoryTabularForm.resx">
+      <DependentUpon>GearInventoryTabularForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Database\Forms\HTMLTableSelectColumnsForm.resx">
       <DependentUpon>HTMLTableSelectColumnsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Database\Forms\LGUItemForm.resx">
+      <DependentUpon>LGUItemForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Database\Forms\LGUSForm.resx">
+      <DependentUpon>LGUSForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Database\Forms\LocalNameSciNameEditForm.resx">
       <DependentUpon>LocalNameSciNameEditForm.cs</DependentUpon>
@@ -890,6 +920,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="FAD3.ico" />
+    <None Include="Resources\Table_16x.png" />
     <None Include="Resources\report document.bmp" />
     <None Include="Resources\label_add.bmp" />
     <None Include="Resources\layerRemove.bmp" />

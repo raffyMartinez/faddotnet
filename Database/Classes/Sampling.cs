@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
 using System.Xml;
+using FAD3.Database.Classes;
 
 namespace FAD3
 {
@@ -23,11 +24,23 @@ namespace FAD3
     {
         private static Dictionary<string, UserInterfaceStructure> _uis = new Dictionary<string, UserInterfaceStructure>();
         private long _CatchAndEffortPropertyCount = 0;
-        private int _LFRowsCount;
         private string _RererenceNo = "";
         private string _SamplingGUID = "";
         private static List<string> _engines = new List<string>();
         private static bool _engineReadDone = false;
+
+        private static Dictionary<string, (string RefNo, DateTime SamplingDate, string FishingGround,
+                               string EnumeratorName, string Notes, double? WtCatch, bool IsGrid25FG,
+                               string HasSpecs, int CatchRows)> _effortMonth = new Dictionary<string, (string RefNo, DateTime SamplingDate, string FishingGround,
+                               string EnumeratorName, string Notes, double? WtCatch, bool IsGrid25FG,
+                               string HasSpecs, int CatchRows)>();
+
+        public static Dictionary<string, (string RefNo, DateTime SamplingDate, string FishingGround,
+                               string EnumeratorName, string Notes, double? WtCatch, bool IsGrid25FG,
+                               string HasSpecs, int CatchRows)> EffortMonth
+        {
+            get { return _effortMonth; }
+        }
 
         public static List<string> Engines
         {
@@ -54,8 +67,10 @@ namespace FAD3
         }
 
         public delegate void ReadUIElement(Sampling s, UIRowFromXML e);
-
         public event ReadUIElement OnUIRowRead;
+
+        public delegate void EffortUpdateHandler(Sampling s, EffortEventArg e);
+        public event EffortUpdateHandler OnEffortUpdated;
 
         static public Dictionary<string, UserInterfaceStructure> uis
         {
@@ -65,11 +80,6 @@ namespace FAD3
         public long CatchAndEffortPropertyCount
         {
             get { return _CatchAndEffortPropertyCount; }
-        }
-
-        public long LFRowsCount
-        {
-            get { return _LFRowsCount; }
         }
 
         public string ReferenceNo
@@ -83,6 +93,26 @@ namespace FAD3
             set { _SamplingGUID = value; }
         }
 
+        private static bool HasEnumerators(string landingSiteGuid)
+        {
+            int samplingCount = 0;
+            using (var conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                var sql = $@"SELECT Count(tblEnumerators.EnumeratorID) AS n
+                        FROM tblEnumerators
+                            INNER JOIN tblLandingSites ON
+                            tblEnumerators.TargetArea = tblLandingSites.AOIGuid
+                        WHERE tblLandingSites.LSGUID ={{{landingSiteGuid}}}";
+
+                using (OleDbCommand getCount = new OleDbCommand(sql, conn))
+                {
+                    samplingCount = (int)getCount.ExecuteScalar();
+                }
+            }
+            return samplingCount > 0;
+        }
+
         /// <summary>
         /// returns a dictionary of 9 element tuples that will fill a list view with a sampling summary
         /// </summary>
@@ -94,9 +124,7 @@ namespace FAD3
                                 string EnumeratorName, string Notes, double? WtCatch, bool IsGrid25FG,
                                 string HasSpecs, int CatchRows)> SamplingSummaryForMonth(string LSGUID, string GearGUID, string SamplingMonth)
         {
-            var Samplings = new Dictionary<string, (string RefNo, DateTime SamplingDate, string FishingGround,
-                                string EnumeratorName, string Notes, double? WtCatch, bool IsGrid25FG,
-                                string HasSpecs, int CatchRows)>();
+            _effortMonth.Clear();
             var CompleteGrid25 = FishingGrid.IsCompleteGrid25;
             string[] arr = SamplingMonth.Split('-');
             string MonthNumber = "1";
@@ -170,17 +198,62 @@ namespace FAD3
                     using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.MDBPath))
                     {
                         conection.Open();
-
-                        string query = $@"SELECT tblSampling.RefNo, tblSampling.SamplingDate, tblSampling.FishingGround, tblEnumerators.EnumeratorName,
-                                          tblSampling.Notes, tblSampling.WtCatch, tblSampling.SamplingGUID, tblSampling.IsGrid25FG, (SELECT TOP 1 'x' AS
-                                          HasSpec FROM tblGearSpecs INNER JOIN tblSampledGearSpec ON tblGearSpecs.RowID = tblSampledGearSpec.SpecID
-                                          WHERE tblGearSpecs.Version='2' AND tblSampledGearSpec.SamplingGUID=[tblSampling.SamplingGUID]) AS Specs,
-                                          (SELECT Count(SamplingGUID) AS n FROM tblCatchComp GROUP BY tblCatchComp.SamplingGUID HAVING
-                                          tblCatchComp.SamplingGUID=[tblSampling.SamplingGUID]) AS [rows]
-                                          FROM tblEnumerators RIGHT JOIN tblSampling ON tblEnumerators.EnumeratorID = tblSampling.Enumerator
-                                          WHERE tblSampling.SamplingDate >=#{StartDate}# And tblSampling.SamplingDate <#{EndDate}# AND
-                                          tblSampling.LSGUID={{{LSGUID}}} AND tblSampling.GearVarGUID={{{GearGUID}}}
-                                          ORDER BY tblSampling.DateEncoded";
+                        string query = "";
+                        if (HasEnumerators(LSGUID))
+                        {
+                            query = $@"SELECT tblSampling.RefNo,
+                                        tblSampling.SamplingDate,
+                                        tblSampling.FishingGround,
+                                        tblEnumerators.EnumeratorName,
+                                        tblSampling.Notes,
+                                        tblSampling.WtCatch,
+                                        tblSampling.SamplingGUID,
+                                        tblSampling.IsGrid25FG,
+                                        (SELECT TOP 1 'x' AS HasSpec
+                                          FROM tblGearSpecs
+                                          INNER JOIN tblSampledGearSpec ON
+                                            tblGearSpecs.RowID = tblSampledGearSpec.SpecID
+                                          WHERE tblGearSpecs.Version='2' AND
+                                            tblSampledGearSpec.SamplingGUID=[tblSampling.SamplingGUID]) AS Specs,
+                                        (SELECT Count(SamplingGUID) AS n
+                                          FROM tblCatchComp
+                                          GROUP BY tblCatchComp.SamplingGUID
+                                          HAVING tblCatchComp.SamplingGUID=[tblSampling.SamplingGUID]) AS [rows]
+                                        FROM tblEnumerators RIGHT JOIN
+                                          tblSampling ON
+                                          tblEnumerators.EnumeratorID = tblSampling.Enumerator
+                                        WHERE tblSampling.SamplingDate >=#{StartDate}# AND
+                                          tblSampling.SamplingDate <#{EndDate}# AND
+                                          tblSampling.LSGUID={{{LSGUID}}} AND
+                                          tblSampling.GearVarGUID={{{GearGUID}}}
+                                        ORDER BY tblSampling.DateEncoded";
+                        }
+                        else
+                        {
+                            query = $@"SELECT tblSampling.RefNo,
+                                        tblSampling.SamplingDate,
+                                        tblSampling.FishingGround,
+                                        """" AS EnumeratorName,
+                                        tblSampling.Notes,
+                                        tblSampling.WtCatch,
+                                        tblSampling.SamplingGUID,
+                                        tblSampling.IsGrid25FG,
+                                        (SELECT TOP 1 'x' AS  HasSpec
+                                            FROM tblGearSpecs INNER JOIN
+                                              tblSampledGearSpec ON
+                                              tblGearSpecs.RowID = tblSampledGearSpec.SpecID
+                                            WHERE tblGearSpecs.Version='2' AND
+                                              tblSampledGearSpec.SamplingGUID=[tblSampling.SamplingGUID]) AS Specs,
+                                        (SELECT Count(SamplingGUID) AS n
+                                            FROM tblCatchComp
+                                            GROUP BY tblCatchComp.SamplingGUID
+                                            HAVING tblCatchComp.SamplingGUID=[tblSampling.SamplingGUID]) AS [rows]
+                                        FROM tblSampling WHERE tblSampling.SamplingDate >= #{StartDate}# AND
+                                          tblSampling.SamplingDate < #{EndDate}# AND
+                                          tblSampling.LSGUID={{{LSGUID}}} AND
+                                          tblSampling.GearVarGUID={{{GearGUID}}}
+                                        ORDER BY tblSampling.DateEncoded";
+                        }
 
                         using (var adapter = new OleDbDataAdapter(query, conection))
                         {
@@ -188,9 +261,13 @@ namespace FAD3
                             foreach (DataRow dr in myDT.Rows)
                             {
                                 double? wt = null;
-                                if (dr["WtCatch"].ToString().Length > 0)
+                                //if (dr["WtCatch"].ToString().Length > 0)
+                                //{
+                                //    wt = double.Parse(dr["WtCatch"].ToString());
+                                //}
+                                if (double.TryParse(dr["wtCatch"].ToString(), out double w))
                                 {
-                                    wt = double.Parse(dr["WtCatch"].ToString());
+                                    wt = w;
                                 }
                                 string specs = "x";
                                 if (dr["Specs"].ToString().Length == 0)
@@ -202,18 +279,19 @@ namespace FAD3
                                 {
                                     rows = int.Parse(dr["rows"].ToString());
                                 }
-                                Samplings.Add(dr["SamplingGUID"].ToString(), (dr["RefNo"].ToString(), DateTime.Parse(dr["SamplingDate"].ToString()),
+                                _effortMonth.Add(dr["SamplingGUID"].ToString(), (dr["RefNo"].ToString(), DateTime.Parse(dr["SamplingDate"].ToString()),
                                 dr["FishingGround"].ToString(), dr["EnumeratorName"].ToString(), dr["Notes"].ToString(), wt,
                                 bool.Parse(dr["IsGrid25FG"].ToString()), specs, rows));
                             }
                         }
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
+                    Logger.Log(ex.Message, "Sampling.cs", "Sampling.SamplingSummaryForMonth");
                 }
             }
-            return Samplings;
+            return _effortMonth;
         }
 
         public static List<int> GetSamplingYears(string targetAreaGuid = "")
@@ -682,51 +760,6 @@ namespace FAD3
             }
         }
 
-        /// <summary>
-        /// Reads LF data from the database and returns it as as Dictionary
-        /// with the catch row as key and LF structure as value
-        /// </summary>
-        /// <param name="CatchCompRowNo"></param>
-        /// <returns></returns>
-        public Dictionary<string, LFLine> LFData(string CatchCompRowNo)
-        {
-            _LFRowsCount = 0;
-            Dictionary<string, LFLine> mydata = new Dictionary<string, LFLine>();
-            var dt = new DataTable();
-            using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.MDBPath))
-            {
-                try
-                {
-                    conection.Open();
-                    string query = $"SELECT RowGUID, Sequence, LenClass, Freq FROM tblLF WHERE tblLF.CatchCompRow={{{CatchCompRowNo}}} ORDER BY Sequence, LenClass";
-                    var adapter = new OleDbDataAdapter(query, conection);
-                    adapter.Fill(dt);
-                    for (int i = 0; i < dt.Rows.Count; i++)
-                    {
-                        DataRow dr = dt.Rows[i];
-
-                        var myLF = new LFLine
-                        {
-                            Length = double.Parse(dr["lenClass"].ToString()),
-                            Freq = int.Parse(dr["Freq"].ToString()),
-                            DataStatus = fad3DataStatus.statusFromDB,
-                            LFRowGuid = dr["RowGUID"].ToString(),
-                            CatchRowGuid = CatchCompRowNo,
-                            Sequence = dr["Sequence"] == DBNull.Value ? -1 : int.Parse(dr["Sequence"].ToString())
-                        };
-                        mydata.Add(dr["RowGUID"].ToString(), myLF);
-                    }
-                    _LFRowsCount++;
-                }
-                catch (Exception ex)
-                {
-                    Logger.Log(ex);
-                }
-            }
-
-            return mydata;
-        }
-
         public List<string> MonthsFromLSandGear(string landingsiteguid, string gearguid)
         {
             List<string> myList = new List<string>();
@@ -785,6 +818,7 @@ namespace FAD3
 
         public void ReadUIFromXML()
         {
+            var innerText = "";
             string xmlFile = global.AppPath + "\\UITable.xml";
             if (System.IO.File.Exists(xmlFile))
             {
@@ -818,6 +852,7 @@ namespace FAD3
 
                             case "Key":
                                 row.Key = c.InnerText;
+                                innerText = row.Key;
                                 break;
 
                             case "Label":
@@ -862,22 +897,10 @@ namespace FAD3
                                 break;
                         }
                     }
+
                     OnUIRowRead(this, row);
                 }
             }
-        }
-
-        public bool SaveEditedLF(Dictionary<string, LFLine> LFData)
-        {
-            var SaveCount = 0;
-            foreach (KeyValuePair<string, LFLine> kv in LFData)
-            {
-                if (UpdateLF(kv.Value.Length, kv.Value.Freq, kv.Value.Sequence,
-                          kv.Value.CatchRowGuid, kv.Value.LFRowGuid, kv.Value.DataStatus))
-                    SaveCount++;
-            }
-
-            return SaveCount == LFData.Count;
         }
 
         public bool UpdateEffort(bool isNew, Dictionary<string, string> EffortData, List<string> FishingGrounds)
@@ -974,9 +997,20 @@ namespace FAD3
                         Success = (update.ExecuteNonQuery() > 0);
                         conn.Close();
                     }
+                    if (Success)
+                    {
+                        //EffortUpdated?.Invoke(this, new EffortEventArg(DateTime.Parse(EffortData["SamplingDate"]), EffortData["FishingGear"], EffortData["LandingSite"]));
+                        if (OnEffortUpdated != null)
+                        {
+                            EffortEventArg e = new EffortEventArg(DateTime.Parse(EffortData["SamplingDate"]), EffortData["FishingGear"], EffortData["LandingSite"]);
+                            OnEffortUpdated(this, e);
+                        }
+                    }
 
                     if (Success && FishingGrounds.Count > 1)
+                    {
                         SaveAdditionalFishingGrounds(FishingGrounds, SamplingGuid);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -1021,62 +1055,6 @@ namespace FAD3
             }
         }
 
-        private bool UpdateLF(double LenClass, long ClassCount, int Sequence,
-                                              string CatchCompRow, string RowGUID, fad3DataStatus DataStatus)
-        {
-            bool Success = false;
-            string query = "";
-            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
-            {
-                try
-                {
-                    if (DataStatus == fad3DataStatus.statusNew)
-                    {
-                        query = $@"Insert into tblLF (LenClass, Freq, CatchCompRow, RowGUID, Sequence) values
-                                    ({LenClass}, {ClassCount}, {{{CatchCompRow}}}, {{{RowGUID}}}, {Sequence})";
-                    }
-                    else if (DataStatus == fad3DataStatus.statusEdited)
-                    {
-                        query = $@"Update tblLF set
-                                   LenClass = {LenClass},
-                                   Freq= {ClassCount},
-                                   Sequence= {Sequence}
-                                   Where RowGUID ={{{RowGUID}}}";
-                    }
-                    else if (DataStatus == fad3DataStatus.statusForDeletion)
-                    {
-                        query = $"Delete * from tblLF where RowGUID = {{{RowGUID}}}";
-                    }
-                    if (query.Length > 0)
-                    {
-                        OleDbCommand update = new OleDbCommand(query, conn);
-                        conn.Open();
-                        Success = (update.ExecuteNonQuery() > 0);
-                        conn.Close();
-                    }
-                    else
-                    {
-                        Success = true;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Logger.Log(ex);
-                }
-            }
-            return Success;
-        }
-
-        public struct LFLine
-        {
-            public string CatchRowGuid { get; set; }
-            public fad3DataStatus DataStatus { get; set; }
-            public int Freq { get; set; }
-            public double Length { get; set; }
-            public string LFRowGuid { get; set; }
-            public int Sequence { get; set; }
-        }
-
         /// <summary>
         /// represents the data structure of effort data and will be
         /// used to generate the user interface of the
@@ -1117,16 +1095,6 @@ namespace FAD3
                 _ToolTip = ToolTip;
                 _Required = Required;
             }
-
-            //public enum UIControlType
-            //{
-            //    TextBox,
-            //    ComboBox,
-            //    Spacer,
-            //    DateMask,
-            //    TimeMask,
-            //    Check
-            //}
 
             public string ButtonText
             {

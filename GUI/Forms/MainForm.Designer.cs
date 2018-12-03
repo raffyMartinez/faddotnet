@@ -61,6 +61,7 @@ namespace FAD3
             this.menuItemZone50 = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemZone51 = new System.Windows.Forms.ToolStripMenuItem();
             this.cholorophyllGridMappingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemBrowseLGUs = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.onlineManualToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -226,7 +227,8 @@ namespace FAD3
             this.toolStripSeparator2,
             this.generateInlandDbToolStripMenuItem,
             this.generateGridMapToolStripMenuItem,
-            this.cholorophyllGridMappingToolStripMenuItem});
+            this.cholorophyllGridMappingToolStripMenuItem,
+            this.menuItemBrowseLGUs});
             this.menuTools.Name = "menuTools";
             this.menuTools.Size = new System.Drawing.Size(48, 20);
             this.menuTools.Text = "Tools";
@@ -311,6 +313,13 @@ namespace FAD3
             this.cholorophyllGridMappingToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
             this.cholorophyllGridMappingToolStripMenuItem.Tag = "chlorophyll";
             this.cholorophyllGridMappingToolStripMenuItem.Text = "Cholorophyll grid mapping";
+            // 
+            // menuItemBrowseLGUs
+            // 
+            this.menuItemBrowseLGUs.Name = "menuItemBrowseLGUs";
+            this.menuItemBrowseLGUs.Size = new System.Drawing.Size(218, 22);
+            this.menuItemBrowseLGUs.Tag = "browseLGUs";
+            this.menuItemBrowseLGUs.Text = "LGUs";
             // 
             // menuHelp
             // 
@@ -539,6 +548,7 @@ namespace FAD3
             this.lvMain.View = System.Windows.Forms.View.Details;
             this.lvMain.DoubleClick += new System.EventHandler(this.OnListView_DoubleClick);
             this.lvMain.Leave += new System.EventHandler(this.OnListViewLeave);
+            this.lvMain.MouseClick += new System.Windows.Forms.MouseEventHandler(this.OnListView_MouseClick);
             this.lvMain.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnListView_MouseDown);
             // 
             // toolbar
@@ -713,5 +723,6 @@ namespace FAD3
         private System.Windows.Forms.Label lblErrorFormOpen;
         private System.Windows.Forms.Label lblTitle;
         private System.Windows.Forms.ToolStripButton tsButtonLN2SN;
+        private System.Windows.Forms.ToolStripMenuItem menuItemBrowseLGUs;
     }
 }

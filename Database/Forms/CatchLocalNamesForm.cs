@@ -26,9 +26,27 @@ namespace FAD3.Database.Forms
         private int _rowsImported;
         private bool _hiddenTree;
         private string _speciesGuid;
+        private string _localNameGuid;
         private Form _parentForm;
 
         public string SpeciesName { get; set; }
+        public string LocalName { get; set; }
+
+        public string LocalNameGuid
+        {
+            get { return _localNameGuid; }
+            set
+            {
+                if (value != _localNameGuid)
+                {
+                    _localNameGuid = value;
+                    _speciesGuid = "";
+                    _idType = Identification.LocalName;
+                    //FillListSpeciesNames();
+                    FillListsNames();
+                }
+            }
+        }
 
         public string SpeciesGuid
         {
@@ -38,7 +56,10 @@ namespace FAD3.Database.Forms
                 if (value != _speciesGuid)
                 {
                     _speciesGuid = value;
-                    FillListLocalNames();
+                    _localNameGuid = "";
+                    _idType = Identification.Scientific;
+                    //FillListLocalNames();
+                    FillListsNames();
                 }
             }
         }
@@ -153,10 +174,35 @@ namespace FAD3.Database.Forms
             _parentForm = parentForm;
         }
 
+        public static CatchLocalNamesForm GetInstance(string nameGuid, Identification idType, Form parentForm)
+        {
+            if (_instance == null) _instance = new CatchLocalNamesForm(nameGuid, idType, parentForm);
+            return _instance;
+        }
+
         public static CatchLocalNamesForm GetInstance(string speciesGuid, Form parentForm)
         {
-            if (_instance == null) return new CatchLocalNamesForm(speciesGuid, parentForm);
+            if (_instance == null) _instance = new CatchLocalNamesForm(speciesGuid, parentForm);
             return _instance;
+        }
+
+        public CatchLocalNamesForm(string nameGuid, Identification idType, Form parentForm)
+        {
+            InitializeComponent();
+            _idType = idType;
+            _hiddenTree = true;
+            _parentForm = parentForm;
+            switch (_idType)
+            {
+                case Identification.LocalName:
+                    LocalNameGuid = nameGuid;
+                    break;
+
+                case Identification.Scientific:
+                    SpeciesGuid = nameGuid;
+                    break;
+            }
+            Names.RowsImported += OnNamesImportRows;
         }
 
         public CatchLocalNamesForm(Identification identification)
@@ -297,7 +343,10 @@ namespace FAD3.Database.Forms
                 lblList.Location = lblTree.Location;
                 tbCombo.Visible = false;
                 tbComboLabel.Visible = false;
-                FillListLocalNames();
+                FillListsNames();
+                //listView.Height += (Height - listView.Height-toolBar.Height-lblList.Height-50);
+                listView.Height += ClientSize.Height - listView.Height - toolBar.Height - lblList.Height - 15;
+                listView.Width += ClientSize.Width - listView.Width - 5;
             }
         }
 
@@ -311,9 +360,15 @@ namespace FAD3.Database.Forms
             }
             else
             {
-                if (_parentForm?.GetType().Name == "AllSpeciesForm")
+                switch (_parentForm.GetType().Name)
                 {
-                    ((AllSpeciesForm)_parentForm).LocalNameClosed();
+                    case "AllSpeciesForm":
+                        ((AllSpeciesForm)_parentForm).CatchhLocalNamesFormClosed();
+                        break;
+
+                    case "MainForm":
+                        ((MainForm)_parentForm).CatchhLocalNamesFormClosed();
+                        break;
                 }
             }
         }
@@ -352,6 +407,88 @@ namespace FAD3.Database.Forms
                     contextMenu.Items.Add(menuItem);
                 }
             }
+        }
+
+        private void FillListsNames()
+        {
+            listView.Visible = false;
+            listView.Items.Clear();
+            treeView.Visible = false;
+            var items = 0;
+            var nameItems = "";
+            foreach (var item in Names.Languages)
+            {
+                StringBuilder sb = new StringBuilder();
+                var lvi = listView.Items.Add(item.Key, item.Value, null);
+                switch (_idType)
+                {
+                    case Identification.LocalName:
+                        foreach (var names in Names.GetSpeciesNameFromLocalNameLanguage(_localNameGuid, lvi.Name))
+                        {
+                            sb.Append(names.genus + " " + names.species);
+                            sb.Append(", ");
+                            _listedNameCount++;
+                            items++;
+                        }
+                        break;
+
+                    case Identification.Scientific:
+                        foreach (var names in Names.GetLocalNameFromSpeciesNameLanguage(_speciesGuid, lvi.Name))
+                        {
+                            sb.Append(names);
+                            sb.Append(", ");
+                            _listedNameCount++;
+                            items++;
+                        }
+                        break;
+                }
+
+                nameItems = sb.ToString().Trim(new char[] { ',', ' ' });
+                lvi.SubItems.Add(nameItems);
+                lvi.Tag = items;
+            }
+            SizeColumns(listView, false);
+            listView.Visible = true;
+            switch (_idType)
+            {
+                case Identification.LocalName:
+                    Text = $"Species names of {LocalName}";
+                    lblList.Text = $"List of species names: {items}";
+                    break;
+
+                case Identification.Scientific:
+                    Text = $"Local names of {SpeciesName}";
+                    lblList.Text = $"List of local names: {items}";
+                    break;
+            }
+        }
+
+        private void FillListSpeciesNames()
+        {
+            listView.Visible = false;
+            listView.Items.Clear();
+            treeView.Visible = false;
+            var items = 0;
+            var nameItems = "";
+            foreach (var item in Names.Languages)
+            {
+                StringBuilder sb = new StringBuilder();
+                var lvi = listView.Items.Add(item.Key, item.Value, null);
+                foreach (var names in Names.GetSpeciesNameFromLocalNameLanguage(_localNameGuid, lvi.Name))
+                {
+                    sb.Append(names.genus + " " + names.species);
+                    sb.Append(", ");
+                    _listedNameCount++;
+                    items++;
+                }
+                nameItems = sb.ToString().Trim(new char[] { ',', ' ' });
+                lvi.SubItems.Add(nameItems);
+                lvi.Tag = items;
+            }
+            SizeColumns(listView, false);
+            listView.Visible = true;
+            Text = $"Species names of {LocalName}";
+            lblList.Text = $"List of local names: {items}";
         }
 
         private void FillListLocalNames()
@@ -472,10 +609,19 @@ namespace FAD3.Database.Forms
         {
             if (_hiddenTree)
             {
-                CatchLocalNameSelectedForm clnsf = CatchLocalNameSelectedForm.GetInstance(_idType, listView.SelectedItems[0].Text, SpeciesName, this);
+                var name = "";
+                if (_idType == Identification.Scientific)
+                {
+                    name = SpeciesName;
+                }
+                else
+                {
+                    name = LocalName;
+                }
+                CatchLocalNameSelectedForm clnsf = CatchLocalNameSelectedForm.GetInstance(_idType, listView.SelectedItems[0].Text, name, this);
                 if (clnsf.Visible)
                 {
-                    clnsf.NewSelection(_idType, listView.SelectedItems[0].Text, SpeciesName);
+                    clnsf.NewSelection(_idType, listView.SelectedItems[0].Text, name);
                     clnsf.BringToFront();
                 }
                 else

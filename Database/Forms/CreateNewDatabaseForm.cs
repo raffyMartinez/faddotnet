@@ -36,13 +36,24 @@ namespace FAD3
                 case "buttonOk":
                     if (_newMDBFile.Length > 0)
                     {
-                        File.Copy(global.TemplateMDBFile, _newMDBFile);
-                        if (UpdateNewMDB())
+                        if (File.Exists(_newMDBFile))
                         {
-                            _parentForm.MRUList.AddFile(_newMDBFile);
-                            _parentForm.NewDBFile(_newMDBFile);
-                            MessageBox.Show("New database is ready");
-                            this.Close();
+                            MessageBox.Show($"{_newMDBFile} is an existing file. Delete this file first befor being able to use this filename",
+                                              "Cannot use this file",
+                                              MessageBoxButtons.OK,
+                                              MessageBoxIcon.Information);
+                            Close();
+                        }
+                        else
+                        {
+                            File.Copy(global.TemplateMDBFile, _newMDBFile);
+                            if (UpdateNewMDB())
+                            {
+                                _parentForm.MRUList.AddFile(_newMDBFile);
+                                _parentForm.NewDBFile(_newMDBFile);
+                                MessageBox.Show("New database is ready");
+                                this.Close();
+                            }
                         }
                     }
                     break;
@@ -198,8 +209,12 @@ namespace FAD3
                 qd.Execute();
             }
 
-            if(checkLocalNameToSpeciesName.Checked && checkFishLocalNames.Checked && checkSciNames.Checked)
+            if (checkLocalNameToSpeciesName.Checked && checkFishLocalNames.Checked && checkSciNames.Checked)
             {
+                sql = $"Insert Into tblLanguages In '{_newMDBFile}' Select {TableFieldList("tblLanguages")}  from tblLanguages";
+                qd = dbData.CreateQueryDef("", sql);
+                qd.Execute();
+
                 sql = $"Insert Into tblLocalNamesScientific In '{_newMDBFile}' Select {TableFieldList("tblLocalNamesScientific")}  from tblLocalNamesScientific";
                 qd = dbData.CreateQueryDef("", sql);
                 qd.Execute();

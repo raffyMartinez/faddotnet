@@ -14,7 +14,8 @@
 
     public enum FisheriesInventoryLevel
     {
-        Project,
+        Root,
+        Project = 0,
         TargetArea,
         Province,
         Municipality,
@@ -51,7 +52,10 @@
         CatchLocalNames = 32,
         CatchLocalNameSpeciesNamePair = 64,
         CatchNametDataSelect = 128,
-        GearNameDataSelect = 256
+        GearNameDataSelect = 256,
+        GearInventory = 512,
+        Enumerators = 1024,
+        GearInventoryDataSelect = 2048
     }
 
     public enum EditActionType

@@ -218,10 +218,13 @@ namespace FAD3
             global.SaveFormSettings(this);
             ManageGearSpecsClass.SampledGearSpecs.Clear();
             if (IsNew) _parentForm.NewSamplingDataEntryCancelled();
+            _sampling.OnUIRowRead -= new Sampling.ReadUIElement(OnUIRowRead);
+            _sampling = null;
         }
 
         private void OnUIRowRead(object sender, UIRowFromXML e)
         {
+            //Logger.Log(e.Key + " " + e.Control.ToString());
             int ht = 16;
             int x = 0;
 
@@ -614,9 +617,9 @@ namespace FAD3
         {
             this.Size = new Size(Width, _lv.Height);
             global.LoadFormSettings(this, true);
-            _sampling = new Sampling();
+            //_sampling = new Sampling();
+            _sampling = _parentForm.Sampling;
             _sampling.OnUIRowRead += new Sampling.ReadUIElement(OnUIRowRead);
-
             panelUI.SuspendLayout();
             _sampling.ReadUIFromXML();
             AdustControlsPosition();
@@ -939,6 +942,7 @@ namespace FAD3
                     {
                         if (SaveEdits())
                         {
+                            _sampling.OnUIRowRead -= new Sampling.ReadUIElement(OnUIRowRead);
                             if (IsNew) ReferenceNumberManager.UpdateRefCodeCounter();
                             _parentForm.RefreshCatchDetail(_samplingGUID, _isNew, _samplingDate, _gearVarGuid, _landingSiteGuid);
                             Close();
@@ -1292,9 +1296,9 @@ namespace FAD3
             //we want to get the UserInterfaceStructure element specified in the tag of the control to validate
             Sampling.UserInterfaceStructure ui = Sampling.uis[((Control)sender).Tag.ToString()];
 
-            string comboText = ((Control)sender).Text;
+            string controlText = ((Control)sender).Text;
             string msg = "";
-            if (!ui.ReadOnly && comboText.Length > 0)
+            if (!ui.ReadOnly && controlText.Length > 0)
             {
                 switch (ui.DataType)
                 {
@@ -1302,12 +1306,12 @@ namespace FAD3
                         if (ui.Key == "Engine")
                         {
                             var cbEngine = (ComboBox)panelUI.Controls["combo" + ui.Key];
-                            if (!cbEngine.Items.Contains(comboText))
+                            if (!cbEngine.Items.Contains(controlText))
                             {
-                                if (MessageBox.Show($"{comboText} is not found in the list of engines.\r\nDo you want to add an engine?", "Add a new engine",
+                                if (MessageBox.Show($"{controlText} is not found in the list of engines.\r\nDo you want to add an engine?", "Add a new engine",
                                                     MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
                                 {
-                                    cbEngine.Items.Add(comboText);
+                                    cbEngine.Items.Add(controlText);
                                 }
                                 else
                                 {
@@ -1320,7 +1324,7 @@ namespace FAD3
                     case "int":
                         try
                         {
-                            int x = int.Parse(comboText);
+                            int x = int.Parse(controlText);
                             if (x < 0)
                             {
                                 msg = "Expected value is a whole number greater than zero";
@@ -1336,7 +1340,7 @@ namespace FAD3
                         DateTime myDateTime;
                         try
                         {
-                            myDateTime = DateTime.Parse(comboText);
+                            myDateTime = DateTime.Parse(controlText);
                             if (ui.Control.ToString() == "DateMask")
                             {
                                 if (myDateTime > DateTime.Now)
@@ -1346,7 +1350,7 @@ namespace FAD3
                             }
                             else
                             {
-                                if (comboText.Length != 5)
+                                if (controlText.Length != 5)
                                 {
                                     msg = "Expected time value should be in a 24 hour format";
                                 }
@@ -1354,7 +1358,7 @@ namespace FAD3
                         }
                         catch
                         {
-                            if (comboText != _datePrompt && comboText != _timePrompt)
+                            if (controlText != _datePrompt && controlText != _timePrompt)
                             {
                                 if (ui.Control.ToString() == "DateMask")
                                 {
@@ -1371,36 +1375,52 @@ namespace FAD3
 
                     case "lookup":
                         var key = "";
+                        var isInList = false;
                         var cbo = (ComboBox)panelUI.Controls["combo" + ui.Key];
-                        switch (ui.Key)
+                        foreach (KeyValuePair<string, string> item in cbo.Items)
                         {
-                            case "TargetArea":
-                                key = ((KeyValuePair<string, string>)cbo.SelectedItem).Key;
-                                e.Cancel = !Enumerators.AOIHaveEnumerators(key);
-                                if (e.Cancel)
-                                    msg = "Cannot use the selected target area because it does not have enumerators";
-                                else
-                                {
-                                    _aoiName = cbo.Text;
-                                    _AOIGuid = key;
-                                }
-
+                            if (item.Value == controlText)
+                            {
+                                isInList = true;
                                 break;
+                            }
+                        }
+                        if (isInList)
+                        {
+                            switch (ui.Key)
+                            {
+                                case "TargetArea":
+                                    key = ((KeyValuePair<string, string>)cbo.SelectedItem).Key;
+                                    e.Cancel = !Enumerators.AOIHaveEnumerators(key);
+                                    if (e.Cancel)
+                                        msg = "Cannot use the selected target area because it does not have enumerators";
+                                    else
+                                    {
+                                        _aoiName = cbo.Text;
+                                        _AOIGuid = key;
+                                    }
 
-                            case "GearClass":
-                                break;
+                                    break;
 
-                            case "FishingGear":
-                                _gearVarName = cbo.Text;
-                                _gearVarGuid = ((KeyValuePair<string, string>)cbo.SelectedItem).Key;
-                                break;
+                                case "GearClass":
+                                    break;
+
+                                case "FishingGear":
+                                    _gearVarName = cbo.Text;
+                                    _gearVarGuid = ((KeyValuePair<string, string>)cbo.SelectedItem).Key;
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            msg = $"{controlText} is not found in the dropdown list.";
                         }
                         break;
 
                     case "double":
                         try
                         {
-                            double x = double.Parse(comboText);
+                            double x = double.Parse(controlText);
                             if (x <= 0)
                             {
                                 if (ui.Key == "WeightOfCatch")

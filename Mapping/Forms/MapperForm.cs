@@ -103,6 +103,14 @@ namespace FAD3
 
         public AxMap MapControl { get; internal set; }
 
+        public void MapFishingGround(string samplingGuid, fadUTMZone utmZone)
+        {
+            FishingGroundMappingHandler fgmh = new FishingGroundMappingHandler(axMap.GeoProjection);
+            fgmh.MapLayersHandler = _mapLayersHandler;
+            fgmh.MapSamplingFishingGround(samplingGuid, utmZone, "Fishing ground");
+            MapControl.Redraw();
+        }
+
         public void MapFishingGround(string grid25Name, fadUTMZone utmZone, string pointName = "", bool testIfInland = false)
         {
             FishingGroundMappingHandler fgmh = new FishingGroundMappingHandler(axMap.GeoProjection);

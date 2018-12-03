@@ -20,7 +20,7 @@ namespace FAD3.Database.Classes
 
         public static void ShowDialog()
         {
-            FileName = "";
+            //FileName = "";
 
             if (DialogType == FileDialogType.FileOpen)
             {
@@ -53,7 +53,7 @@ namespace FAD3.Database.Classes
                 }
                 if ((DataFileType & DataFileType.Excel) == DataFileType.Excel)
                 {
-                    Filter = Filter.Length > 0 ? Filter += "|Excel file|*.xls;*.xlsx" : "Excel file|*.xls;*.xlsx";
+                    Filter = Filter.Length > 0 ? Filter += "|Excel file|*.xlsx" : "Excel file|*.xlsx";
                 }
                 if ((DataFileType & DataFileType.CSV) == DataFileType.CSV)
                 {
@@ -70,7 +70,8 @@ namespace FAD3.Database.Classes
             {
                 _dlg.Title = Title;
             }
-
+            _dlg.FileName = FileName;
+            FilterIndex = _dlg.FilterIndex;
             _dlg.ShowDialog();
             FileName = _dlg.FileName;
         }

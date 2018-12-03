@@ -40,6 +40,10 @@
             this.txtDateImplemented = new System.Windows.Forms.TextBox();
             this.pnlInventory = new System.Windows.Forms.Panel();
             this.pnlBarangay = new System.Windows.Forms.Panel();
+            this.cboBarangaySurveyEnumerator = new System.Windows.Forms.ComboBox();
+            this.label37 = new System.Windows.Forms.Label();
+            this.txtBarangaySurveyDate = new System.Windows.Forms.TextBox();
+            this.label36 = new System.Windows.Forms.Label();
             this.comboBarangays = new System.Windows.Forms.ComboBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.label10 = new System.Windows.Forms.Label();
@@ -225,6 +229,10 @@
             // 
             // pnlBarangay
             // 
+            this.pnlBarangay.Controls.Add(this.cboBarangaySurveyEnumerator);
+            this.pnlBarangay.Controls.Add(this.label37);
+            this.pnlBarangay.Controls.Add(this.txtBarangaySurveyDate);
+            this.pnlBarangay.Controls.Add(this.label36);
             this.pnlBarangay.Controls.Add(this.comboBarangays);
             this.pnlBarangay.Controls.Add(this.groupBox1);
             this.pnlBarangay.Controls.Add(this.label7);
@@ -236,18 +244,57 @@
             this.pnlBarangay.Controls.Add(this.comboMunicipality);
             this.pnlBarangay.Controls.Add(this.label3);
             this.pnlBarangay.Controls.Add(this.comboProvince);
-            this.pnlBarangay.Location = new System.Drawing.Point(2, 154);
+            this.pnlBarangay.Location = new System.Drawing.Point(2, 135);
             this.pnlBarangay.Name = "pnlBarangay";
-            this.pnlBarangay.Size = new System.Drawing.Size(373, 294);
+            this.pnlBarangay.Size = new System.Drawing.Size(373, 357);
             this.pnlBarangay.TabIndex = 5;
             this.pnlBarangay.Visible = false;
+            // 
+            // cboBarangaySurveyEnumerator
+            // 
+            this.cboBarangaySurveyEnumerator.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.cboBarangaySurveyEnumerator.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.cboBarangaySurveyEnumerator.DisplayMember = "Value";
+            this.cboBarangaySurveyEnumerator.FormattingEnabled = true;
+            this.cboBarangaySurveyEnumerator.Location = new System.Drawing.Point(99, 326);
+            this.cboBarangaySurveyEnumerator.Name = "cboBarangaySurveyEnumerator";
+            this.cboBarangaySurveyEnumerator.Size = new System.Drawing.Size(161, 21);
+            this.cboBarangaySurveyEnumerator.TabIndex = 16;
+            this.cboBarangaySurveyEnumerator.ValueMember = "Key";
+            this.cboBarangaySurveyEnumerator.Validating += new System.ComponentModel.CancelEventHandler(this.OnComboValidating);
+            // 
+            // label37
+            // 
+            this.label37.AutoSize = true;
+            this.label37.Location = new System.Drawing.Point(15, 330);
+            this.label37.Name = "label37";
+            this.label37.Size = new System.Drawing.Size(61, 13);
+            this.label37.TabIndex = 17;
+            this.label37.Text = "Enumerator";
+            // 
+            // txtBarangaySurveyDate
+            // 
+            this.txtBarangaySurveyDate.Location = new System.Drawing.Point(99, 300);
+            this.txtBarangaySurveyDate.Name = "txtBarangaySurveyDate";
+            this.txtBarangaySurveyDate.Size = new System.Drawing.Size(105, 20);
+            this.txtBarangaySurveyDate.TabIndex = 14;
+            this.txtBarangaySurveyDate.Validating += new System.ComponentModel.CancelEventHandler(this.OnTextBoxValidating);
+            // 
+            // label36
+            // 
+            this.label36.AutoSize = true;
+            this.label36.Location = new System.Drawing.Point(14, 303);
+            this.label36.Name = "label36";
+            this.label36.Size = new System.Drawing.Size(76, 13);
+            this.label36.TabIndex = 15;
+            this.label36.Text = "Date surveyed";
             // 
             // comboBarangays
             // 
             this.comboBarangays.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
             this.comboBarangays.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.comboBarangays.FormattingEnabled = true;
-            this.comboBarangays.Location = new System.Drawing.Point(83, 70);
+            this.comboBarangays.Location = new System.Drawing.Point(99, 68);
             this.comboBarangays.Name = "comboBarangays";
             this.comboBarangays.Size = new System.Drawing.Size(161, 21);
             this.comboBarangays.TabIndex = 2;
@@ -297,10 +344,11 @@
             // 
             // txtCountCommercial
             // 
-            this.txtCountCommercial.Location = new System.Drawing.Point(75, 30);
+            this.txtCountCommercial.Location = new System.Drawing.Point(82, 30);
             this.txtCountCommercial.Name = "txtCountCommercial";
             this.txtCountCommercial.Size = new System.Drawing.Size(68, 20);
             this.txtCountCommercial.TabIndex = 5;
+            this.txtCountCommercial.Validating += new System.ComponentModel.CancelEventHandler(this.OnTextBoxValidating);
             // 
             // txtCountNonMotorized
             // 
@@ -308,13 +356,15 @@
             this.txtCountNonMotorized.Name = "txtCountNonMotorized";
             this.txtCountNonMotorized.Size = new System.Drawing.Size(68, 20);
             this.txtCountNonMotorized.TabIndex = 7;
+            this.txtCountNonMotorized.Validating += new System.ComponentModel.CancelEventHandler(this.OnTextBoxValidating);
             // 
             // txtCountMotorized
             // 
-            this.txtCountMotorized.Location = new System.Drawing.Point(75, 66);
+            this.txtCountMotorized.Location = new System.Drawing.Point(82, 66);
             this.txtCountMotorized.Name = "txtCountMotorized";
             this.txtCountMotorized.Size = new System.Drawing.Size(68, 20);
             this.txtCountMotorized.TabIndex = 6;
+            this.txtCountMotorized.Validating += new System.ComponentModel.CancelEventHandler(this.OnTextBoxValidating);
             // 
             // label7
             // 
@@ -326,14 +376,15 @@
             // 
             // txtCountFishers
             // 
-            this.txtCountFishers.Location = new System.Drawing.Point(83, 133);
+            this.txtCountFishers.Location = new System.Drawing.Point(99, 131);
             this.txtCountFishers.Name = "txtCountFishers";
             this.txtCountFishers.Size = new System.Drawing.Size(68, 20);
             this.txtCountFishers.TabIndex = 4;
+            this.txtCountFishers.Validating += new System.ComponentModel.CancelEventHandler(this.OnTextBoxValidating);
             // 
             // txtSitio
             // 
-            this.txtSitio.Location = new System.Drawing.Point(83, 97);
+            this.txtSitio.Location = new System.Drawing.Point(99, 95);
             this.txtSitio.Name = "txtSitio";
             this.txtSitio.Size = new System.Drawing.Size(161, 20);
             this.txtSitio.TabIndex = 3;
@@ -371,7 +422,7 @@
             this.comboMunicipality.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
             this.comboMunicipality.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.comboMunicipality.FormattingEnabled = true;
-            this.comboMunicipality.Location = new System.Drawing.Point(83, 44);
+            this.comboMunicipality.Location = new System.Drawing.Point(99, 42);
             this.comboMunicipality.Name = "comboMunicipality";
             this.comboMunicipality.Size = new System.Drawing.Size(161, 21);
             this.comboMunicipality.TabIndex = 1;
@@ -391,7 +442,7 @@
             this.comboProvince.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
             this.comboProvince.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.comboProvince.FormattingEnabled = true;
-            this.comboProvince.Location = new System.Drawing.Point(83, 17);
+            this.comboProvince.Location = new System.Drawing.Point(99, 15);
             this.comboProvince.Name = "comboProvince";
             this.comboProvince.Size = new System.Drawing.Size(161, 21);
             this.comboProvince.TabIndex = 0;
@@ -524,10 +575,10 @@
             this.tabUsage.Controls.Add(this.label13);
             this.tabUsage.Controls.Add(this.label14);
             this.tabUsage.Controls.Add(this.label15);
-            this.tabUsage.Location = new System.Drawing.Point(4, 22);
+            this.tabUsage.Location = new System.Drawing.Point(4, 40);
             this.tabUsage.Name = "tabUsage";
             this.tabUsage.Padding = new System.Windows.Forms.Padding(3);
-            this.tabUsage.Size = new System.Drawing.Size(355, 328);
+            this.tabUsage.Size = new System.Drawing.Size(355, 310);
             this.tabUsage.TabIndex = 0;
             this.tabUsage.Text = "Usage count";
             // 
@@ -617,10 +668,10 @@
             this.tabSeasonality.Controls.Add(this.txtNumberOfDaysPerMonth);
             this.tabSeasonality.Controls.Add(this.chkListBoxMonthsSeason);
             this.tabSeasonality.Controls.Add(this.chkListBoxMonthsUsed);
-            this.tabSeasonality.Location = new System.Drawing.Point(4, 22);
+            this.tabSeasonality.Location = new System.Drawing.Point(4, 40);
             this.tabSeasonality.Name = "tabSeasonality";
             this.tabSeasonality.Padding = new System.Windows.Forms.Padding(3);
-            this.tabSeasonality.Size = new System.Drawing.Size(355, 328);
+            this.tabSeasonality.Size = new System.Drawing.Size(355, 310);
             this.tabSeasonality.TabIndex = 1;
             this.tabSeasonality.Text = "Seasonality";
             this.tabSeasonality.UseVisualStyleBackColor = true;
@@ -700,10 +751,10 @@
             this.tabCPUE.Controls.Add(this.listViewHistoryCpue);
             this.tabCPUE.Controls.Add(this.groupBox3);
             this.tabCPUE.Controls.Add(this.groupBox2);
-            this.tabCPUE.Location = new System.Drawing.Point(4, 22);
+            this.tabCPUE.Location = new System.Drawing.Point(4, 40);
             this.tabCPUE.Name = "tabCPUE";
             this.tabCPUE.Padding = new System.Windows.Forms.Padding(3);
-            this.tabCPUE.Size = new System.Drawing.Size(355, 328);
+            this.tabCPUE.Size = new System.Drawing.Size(355, 310);
             this.tabCPUE.TabIndex = 2;
             this.tabCPUE.Text = "CPUE";
             this.tabCPUE.UseVisualStyleBackColor = true;
@@ -744,6 +795,7 @@
             this.columnHeader2,
             this.columnHeader3});
             this.listViewHistoryCpue.FullRowSelect = true;
+            this.listViewHistoryCpue.HideSelection = false;
             this.listViewHistoryCpue.Location = new System.Drawing.Point(15, 181);
             this.listViewHistoryCpue.Name = "listViewHistoryCpue";
             this.listViewHistoryCpue.Size = new System.Drawing.Size(330, 109);
@@ -1130,6 +1182,7 @@
             this.Cost,
             this.colSource,
             this.colNotes});
+            this.listViewExpenses.HideSelection = false;
             this.listViewExpenses.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
             listViewItem1,
             listViewItem2,
@@ -1377,5 +1430,9 @@
         private System.Windows.Forms.ColumnHeader Cost;
         private System.Windows.Forms.ColumnHeader colSource;
         private System.Windows.Forms.ColumnHeader colNotes;
+        private System.Windows.Forms.ComboBox cboBarangaySurveyEnumerator;
+        private System.Windows.Forms.Label label37;
+        private System.Windows.Forms.TextBox txtBarangaySurveyDate;
+        private System.Windows.Forms.Label label36;
     }
 }

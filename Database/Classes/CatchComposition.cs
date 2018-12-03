@@ -111,14 +111,6 @@ namespace FAD3
                 {
                     conection.Open();
 
-                    //string query = $@"SELECT tblSampling.SamplingGUID, Identification, tblCatchComp.RowGUID, tblCatchComp.NameGUID, temp_AllNames.Name1,
-                    //                temp_AllNames.Name2, tblSampling.WtCatch, tblSampling.WtSample, tblCatchDetail.Live, tblCatchDetail.wt, tblCatchComp.Sequence,
-                    //                tblCatchDetail.ct, tblCatchDetail.swt, tblCatchDetail.sct, tblCatchDetail.FromTotal, tblAllSpecies.TaxaNo, tblCatchDetail.RowGUID As CatchDetailRow
-                    //                FROM ((tblSampling INNER JOIN (tblCatchComp INNER JOIN temp_AllNames ON tblCatchComp.NameGUID = temp_AllNames.NameNo)
-                    //                ON tblSampling.SamplingGUID = tblCatchComp.SamplingGUID) INNER JOIN tblCatchDetail ON
-                    //                tblCatchComp.RowGUID = tblCatchDetail.CatchCompRow) LEFT JOIN tblAllSpecies ON temp_AllNames.NameNo = tblAllSpecies.SpeciesGUID
-                    //                WHERE tblSampling.SamplingGUID={{{SamplingGUID}}} ORDER BY tblCatchComp.Sequence";
-
                     var query = $@"SELECT tblCatchComp.SamplingGUID, tblCatchComp.RowGUID, tblCatchComp.NameGUID, temp_AllNames.Name1, temp_AllNames.Name2, tblAllSpecies.TaxaNo,
                                 temp_AllNames.Identification, tblCatchComp.Sequence, tblCatchComp.LFInterval, tblCatchDetail.RowGUID AS CatchDetailRow, tblCatchDetail.wt, tblCatchDetail.ct,
                                 tblCatchDetail.swt, tblCatchDetail.sct, tblCatchDetail.FromTotal, tblCatchDetail.Live, tblCatchDetail.Notes FROM tblAllSpecies RIGHT JOIN

@@ -74,7 +74,7 @@
             this.panelOptions.Controls.Add(this.label1);
             this.panelOptions.Controls.Add(this.buttonOptionsCancel);
             this.panelOptions.Controls.Add(this.buttonOptionsOK);
-            this.panelOptions.Location = new System.Drawing.Point(0, 3);
+            this.panelOptions.Location = new System.Drawing.Point(4, 0);
             this.panelOptions.Name = "panelOptions";
             this.panelOptions.Size = new System.Drawing.Size(450, 338);
             this.panelOptions.TabIndex = 12;

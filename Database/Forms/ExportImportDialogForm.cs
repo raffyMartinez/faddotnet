@@ -70,6 +70,28 @@ namespace FAD3.Database.Forms
 
                     break;
 
+                case ExportImportDataType.GearInventoryDataSelect:
+                    var enumeratorCaption = "Export enumerators";
+                    var inventoryCaption = "Export fishery inventory";
+                    if (_action == ExportImportAction.ActionImport)
+                    {
+                        enumeratorCaption = "Import enumerators";
+                        inventoryCaption = "Import fishery inventory";
+                    }
+
+                    rdButton.Top = 20;
+                    rdButton.Text = enumeratorCaption;
+                    rdButton.Tag = ExportImportDataType.Enumerators;
+                    rdButton.Visible = true;
+
+                    rdButton1.Text = inventoryCaption;
+                    rdButton1.Left = rdButton.Left;
+                    rdButton1.Top = rdButton.Top + rdButton.Height + spacing;
+                    rdButton1.Tag = ExportImportDataType.GearInventory;
+                    rdButton1.AutoSize = true;
+                    Controls.Add(rdButton1);
+                    break;
+
                 case ExportImportDataType.GearNameDataSelect:
                     var gearVarCaption = "Export gear variations";
                     var gearLocalNameCaption = "Export gear local names";
@@ -137,6 +159,14 @@ namespace FAD3.Database.Forms
             }
             rdButton.CheckedChanged += OnCheckChanged;
             chkBox.CheckedChanged += OnCheckChanged;
+            if (_action == ExportImportAction.ActionImport)
+            {
+                Text = "Import";
+            }
+            else
+            {
+                Text = "Export";
+            }
         }
 
         private void OnCheckChanged(object sender, EventArgs e)

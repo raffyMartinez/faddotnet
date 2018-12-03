@@ -25,7 +25,7 @@ namespace FAD3
         private Dictionary<string, string> _filters = new Dictionary<string, string>();
         private int _rowsImported;
         private static AllSpeciesForm _instance;
-        private CatchLocalNamesForm _localNamesForm;
+        private CatchLocalNamesForm _catchLocalNamesForm;
         private string _speciesName;
 
         public static AllSpeciesForm GetInstance(MainForm parent)
@@ -167,9 +167,9 @@ namespace FAD3
             }
         }
 
-        public void LocalNameClosed()
+        public void CatchhLocalNamesFormClosed()
         {
-            _localNamesForm = null;
+            _catchLocalNamesForm = null;
         }
 
         private void ShowLocalNames(string speciesGuid)
@@ -183,7 +183,7 @@ namespace FAD3
             {
                 clnf.SpeciesName = _speciesName;
                 clnf.Show(this);
-                _localNamesForm = clnf;
+                _catchLocalNamesForm = clnf;
             }
         }
 
@@ -346,7 +346,7 @@ namespace FAD3
                                 lvi.SubItems[1].Text = snf.Genus;
                                 lvi.SubItems[2].Text = snf.Species;
                                 lvi.SubItems[3].Text = snf.TaxaName;
-                                if (snf.InFIshBase)
+                                if (snf.InFishBase)
                                 {
                                     lvi.SubItems[4].Text = "x";
                                 }
@@ -585,13 +585,13 @@ namespace FAD3
             MessageBox.Show($"{_rowsImported} species names were saved to the database", "Import successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        private void OnListViewMouseClick(object sender, MouseEventArgs e)
+        private void OnlvNamesMouseClick(object sender, MouseEventArgs e)
         {
             _speciesName = $"{lvNames.SelectedItems[0].SubItems[1].Text} {lvNames.SelectedItems[0].SubItems[2].Text}";
-            if (_localNamesForm != null)
+            if (_catchLocalNamesForm != null)
             {
-                _localNamesForm.SpeciesName = _speciesName;
-                _localNamesForm.SpeciesGuid = lvNames.SelectedItems[0].Name;
+                _catchLocalNamesForm.SpeciesName = _speciesName;
+                _catchLocalNamesForm.SpeciesGuid = lvNames.SelectedItems[0].Name;
             }
         }
     }

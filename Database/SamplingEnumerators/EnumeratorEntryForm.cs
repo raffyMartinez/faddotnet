@@ -7,35 +7,48 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using FAD3.GUI.Classes;
+using FAD3.Database.Classes;
 
 namespace FAD3
 {
     public partial class EnumeratorEntryForm : Form
     {
-        private string _EnumeratorName;
-        private DateTime _DateHired;
-        private bool _IsActive;
-        private EnumeratorForm _ParentForm;
-        private fad3DataStatus _DataStatus;
-        private string _EnumeratorGuid;
+        private string _enumeratorName;
+        private DateTime _dateHired;
+        private bool _isActive;
+        private EnumeratorForm _parentForm;
+        private fad3DataStatus _dataStatus;
+        private string _enumeratorGuid;
+        private string _targetAreaGuid;
+        public string EnumeratorName { get; internal set; }
+        public DateTime DateHired { get; internal set; }
+        public string EnumeratorGuid { get; internal set; }
 
         public EnumeratorEntryForm(EnumeratorForm Parent)
         {
             InitializeComponent();
-            _ParentForm = Parent;
-            _DataStatus = fad3DataStatus.statusNew;
+            _parentForm = Parent;
+            _dataStatus = fad3DataStatus.statusNew;
+        }
+
+        public EnumeratorEntryForm(string enumeratorName, string targetAreaGuid)
+        {
+            InitializeComponent();
+            _dataStatus = fad3DataStatus.statusNew;
+            txtName.Text = enumeratorName;
+            _targetAreaGuid = targetAreaGuid;
         }
 
         public EnumeratorEntryForm(string EnumeratorGuid, string EnumeratorName, DateTime DateHired, bool IsActive, EnumeratorForm Parent)
         {
             InitializeComponent();
-            _EnumeratorName = EnumeratorName;
-            _DateHired = DateHired;
-            _IsActive = IsActive;
-            _ParentForm = Parent;
+            _enumeratorName = EnumeratorName;
+            _dateHired = DateHired;
+            _isActive = IsActive;
+            _parentForm = Parent;
 
-            _EnumeratorGuid = EnumeratorGuid;
-            txtName.Text = _EnumeratorName;
+            _enumeratorGuid = EnumeratorGuid;
+            txtName.Text = _enumeratorName;
             txtHireDate.Text = DateHired.ToString("MMM-dd-yyyy");
             chkActive.Checked = IsActive;
         }
@@ -47,15 +60,37 @@ namespace FAD3
                 case "buttonOK":
                     if (txtName.Text.Length > 0 && txtHireDate.Text.Length > 0)
                     {
-                        _EnumeratorName = txtName.Text;
-                        _DateHired = DateTime.Parse(txtHireDate.Text);
-                        _IsActive = chkActive.Checked;
-                        if (_DataStatus == fad3DataStatus.statusNew) _EnumeratorGuid = Guid.NewGuid().ToString();
+                        _enumeratorName = txtName.Text;
+                        _dateHired = DateTime.Parse(txtHireDate.Text);
+                        _isActive = chkActive.Checked;
 
-                        if (_DataStatus == fad3DataStatus.statusNew || _DataStatus == fad3DataStatus.statusEdited)
-                            _ParentForm.EditedEnumerator(_EnumeratorGuid, _EnumeratorName, _DateHired, _IsActive, _DataStatus);
+                        if (_dataStatus == fad3DataStatus.statusNew)
+                        {
+                            _enumeratorGuid = Guid.NewGuid().ToString();
+                        }
 
-                        Close();
+                        if (_dataStatus == fad3DataStatus.statusNew || _dataStatus == fad3DataStatus.statusEdited)
+                        {
+                            if (_parentForm != null)
+                            {
+                                _parentForm.EditedEnumerator(_enumeratorGuid, _enumeratorName, _dateHired, _isActive, _dataStatus);
+                            }
+                            else
+                            {
+                                _enumeratorGuid = "";
+                                var result = Enumerators.SaveNewTargetAreaEnumerator(_targetAreaGuid, _enumeratorName, _dateHired, _isActive);
+                                if (result.success)
+                                {
+                                    _enumeratorGuid = result.newGuid;
+                                    EnumeratorName = _enumeratorName;
+                                    DateHired = _dateHired;
+                                    EnumeratorGuid = _enumeratorGuid;
+                                    DialogResult = DialogResult.OK;
+                                }
+                            }
+
+                            Close();
+                        }
                     }
                     else
                     {
@@ -65,6 +100,7 @@ namespace FAD3
                     break;
 
                 case "buttonCancel":
+                    DialogResult = DialogResult.Cancel;
                     Close();
                     break;
             }
@@ -114,12 +150,12 @@ namespace FAD3
 
         private void OnTextChanged(object sender, EventArgs e)
         {
-            if (_DataStatus != fad3DataStatus.statusNew) _DataStatus = fad3DataStatus.statusEdited;
+            if (_dataStatus != fad3DataStatus.statusNew) _dataStatus = fad3DataStatus.statusEdited;
         }
 
         private void chkActive_CheckedChanged(object sender, EventArgs e)
         {
-            if (_DataStatus != fad3DataStatus.statusNew) _DataStatus = fad3DataStatus.statusEdited;
+            if (_dataStatus != fad3DataStatus.statusNew) _dataStatus = fad3DataStatus.statusEdited;
         }
 
         private void OnTextBox_KeyDown(object sender, KeyEventArgs e)

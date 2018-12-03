@@ -4,6 +4,7 @@ using MapWinGIS;
 using System;
 using System.Data;
 using System.Data.OleDb;
+using System.Collections.Generic;
 
 namespace FAD3
 {
@@ -108,6 +109,70 @@ namespace FAD3
             sf.DefaultDrawingOptions.LineVisible = false;
             sf.DefaultDrawingOptions.PointSize = 9;
             sf.DefaultDrawingOptions.FillColor = new Utils().ColorByName(tkMapColor.Red);
+        }
+
+        public bool MapSamplingFishingGround(string samplingGuid, fadUTMZone utmZone, string layerName)
+        {
+            var success = false;
+            List<string> fg = new List<string>();
+            var sql = $@"SELECT FishingGround FROM tblSampling WHERE SamplingGUID={{{samplingGuid}}}
+                        UNION ALL
+                        SELECT GridName from tblGrid WHERE SamplingGUID={{{samplingGuid}}}";
+
+            DataTable dt = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    var adapter = new OleDbDataAdapter(sql, conection);
+                    adapter.Fill(dt);
+
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        DataRow dr = dt.Rows[i];
+                        fg.Add(dr["FishingGround"].ToString());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex);
+                }
+            }
+
+            if (fg.Count > 0)
+            {
+                var sf = new Shapefile();
+                if (sf.CreateNew("", ShpfileType.SHP_POINT))
+                {
+                    foreach (var item in fg)
+                    {
+                        var shp = new Shape();
+                        if (shp.Create(ShpfileType.SHP_POINT))
+                        {
+                            var iShp = 0;
+
+                            var result = FishingGrid.Grid25ToLatLong(item, utmZone);
+                            iShp = shp.AddPoint(result.longitude, result.latitude);
+
+                            if (iShp >= 0 && sf.EditInsertShape(shp, 0))
+                            {
+                                MapLayersHandler.RemoveLayer(layerName);
+                                sf.GeoProjection = _geoProjection;
+                                var ifldLabel = sf.EditAddField("Label", FieldType.STRING_FIELD, 1, 15);
+                                sf.EditCellValue(ifldLabel, iShp, item);
+                                sf.CollisionMode = tkCollisionMode.AllowCollisions;
+                            }
+                        }
+                    }
+                    sf.DefaultDrawingOptions.SetDefaultPointSymbol(tkDefaultPointSymbol.dpsCircle);
+                    sf.DefaultDrawingOptions.FillColor = new Utils().ColorByName(tkMapColor.Red);
+                    sf.DefaultDrawingOptions.PointSize = 7;
+                    sf.DefaultDrawingOptions.LineVisible = false;
+                    success = MapLayersHandler.AddLayer(sf, layerName, true, true) >= 0;
+                }
+            }
+            return success;
         }
 
         /// <summary>
