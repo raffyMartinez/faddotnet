@@ -34,6 +34,10 @@ Our [wiki](https://github.com/raffyMartinez/faddotnet/wiki) has an online manual
 
 [Opening FAD for the first time](https://github.com/raffyMartinez/faddotnet/wiki/Opening-FAD-for-the-first-time)
 
+[Target areas](https://github.com/raffyMartinez/faddotnet/wiki/Target-areas)
+
+[Grid25 fishing ground maps](https://github.com/raffyMartinez/faddotnet/wiki/Grid25-fishing-ground-maps)
+
 [Enumerators](https://github.com/raffyMartinez/faddotnet/wiki/Enumerators)
 
 [Inventory of fishers, fishing vessels, and fishing gears](https://github.com/raffyMartinez/faddotnet/wiki/Inventory-of-fishers,-fishing-vessels,-and-fishing-gears)
