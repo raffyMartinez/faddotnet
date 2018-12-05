@@ -21,8 +21,13 @@ What are some of the features of  FAD?
 8. Map properties such as chlorophyll distribution
 
 Our wiki has an online manual.
+
 [Installing FAD](https://github.com/raffyMartinez/faddotnet/wiki/Installing-FAD)
+
 [Installing MapWinGIS mapping component](https://github.com/raffyMartinez/faddotnet/wiki/Installing-the-mapping-component)
+
 [The installation folder](https://github.com/raffyMartinez/faddotnet/wiki/The-installation-folder)
+
 [Opening FAD for the first time](https://github.com/raffyMartinez/faddotnet/wiki/Opening-FAD-for-the-first-time)
+
 [Enumerators](https://github.com/raffyMartinez/faddotnet/wiki/Enumerators)
