@@ -40,6 +40,8 @@ Our [wiki](https://github.com/raffyMartinez/faddotnet/wiki) has an online manual
 
 [Defining extent of target area fishing ground](https://github.com/raffyMartinez/faddotnet/wiki/Defining-extent-of-target-area-fishing-ground)
 
+[Use multiple and smaller grid maps in a target area](https://github.com/raffyMartinez/faddotnet/wiki/Use-multiple-and-smaller-grid-maps-in-a-target-area)
+
 [Enumerators](https://github.com/raffyMartinez/faddotnet/wiki/Enumerators)
 
 [Inventory of fishers, fishing vessels, and fishing gears](https://github.com/raffyMartinez/faddotnet/wiki/Inventory-of-fishers,-fishing-vessels,-and-fishing-gears)
