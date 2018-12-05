@@ -31,3 +31,5 @@ Our wiki has an online manual.
 [Opening FAD for the first time](https://github.com/raffyMartinez/faddotnet/wiki/Opening-FAD-for-the-first-time)
 
 [Enumerators](https://github.com/raffyMartinez/faddotnet/wiki/Enumerators)
+
+[Inventory of fishers, fishing vessels, and fishing gears](https://github.com/raffyMartinez/faddotnet/wiki/Inventory-of-fishers,-fishing-vessels,-and-fishing-gears)
