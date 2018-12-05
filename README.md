@@ -38,6 +38,8 @@ Our [wiki](https://github.com/raffyMartinez/faddotnet/wiki) has an online manual
 
 [Grid25 fishing ground maps](https://github.com/raffyMartinez/faddotnet/wiki/Grid25-fishing-ground-maps)
 
+[Defining extent of target area fishing ground](https://github.com/raffyMartinez/faddotnet/wiki/Defining-extent-of-target-area-fishing-ground)
+
 [Enumerators](https://github.com/raffyMartinez/faddotnet/wiki/Enumerators)
 
 [Inventory of fishers, fishing vessels, and fishing gears](https://github.com/raffyMartinez/faddotnet/wiki/Inventory-of-fishers,-fishing-vessels,-and-fishing-gears)
