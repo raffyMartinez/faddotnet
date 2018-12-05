@@ -20,7 +20,7 @@ What are some of the features of  FAD?
 7. Import and export datasets using excel, text, and xml formats.
 8. Map properties such as chlorophyll distribution
 
-Our wiki has an online manual.
+Our [wiki](https://github.com/raffyMartinez/faddotnet/wiki) has an online manual.
 
 [Installing FAD](https://github.com/raffyMartinez/faddotnet/wiki/Installing-FAD)
 
