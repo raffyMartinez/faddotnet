@@ -23,6 +23,11 @@ What are some of the features of  FAD?
 |-------|----|----|
 |3.1    |Dec 05,2018|[zipped file](https://github.com/raffyMartinez/faddotnet/releases/download/3.1/FAD3.1.setup.zip)|
 
+### Updaters
+|Date | Link  |
+|-----|-------|
+|Dec 6.2018|[FADUpdater.zip](https://github.com/raffyMartinez/faddotnet/releases/download/3.1/FADUpdater.zip)|
+
 ### Wiki
 Our [wiki](https://github.com/raffyMartinez/faddotnet/wiki) has an online manual.
 
