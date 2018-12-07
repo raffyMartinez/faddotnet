@@ -502,14 +502,35 @@ namespace FAD3.Database.Forms
 
             //CPUE and historical averages
             var unit = " " + item.cpueUnit;
-            lvi = lvInventory.Items.Add("Maximum reported CPUE");
-            lvi.SubItems.Add(item.cpueRangeMax.ToString() + unit + (item.cpueRangeMax == 1 ? "" : "s"));
-            lvi = lvInventory.Items.Add("Minimum reported CPUE");
-            lvi.SubItems.Add(item.cpueRangeMin.ToString() + unit + (item.cpueRangeMin == 1 ? "" : "s"));
-            lvi = lvInventory.Items.Add("Upper mode of CPUE");
-            lvi.SubItems.Add(item.cpueModeUpper.ToString() + unit + (item.cpueModeUpper == 1 ? "" : "s"));
-            lvi = lvInventory.Items.Add("Lower mode of CPUE");
-            lvi.SubItems.Add(item.cpueModeLower.ToString() + unit + (item.cpueModeLower == 1 ? "" : "s"));
+            if (item.cpueAverage != null)
+            {
+                lvi = lvInventory.Items.Add("Average CPUE");
+                lvi.SubItems.Add(item.cpueAverage.ToString() + unit);
+            }
+            else
+            {
+                lvi = lvInventory.Items.Add("Maximum reported CPUE");
+                lvi.SubItems.Add(item.cpueRangeMax.ToString() + unit + (item.cpueRangeMax == 1 ? "" : "s"));
+                lvi = lvInventory.Items.Add("Minimum reported CPUE");
+                lvi.SubItems.Add(item.cpueRangeMin.ToString() + unit + (item.cpueRangeMin == 1 ? "" : "s"));
+            }
+            if (item.cpueMode != null)
+            {
+                lvi = lvInventory.Items.Add("CPUE mode");
+                lvi.SubItems.Add(item.cpueMode.ToString() + unit);
+            }
+            else
+            {
+                lvi = lvInventory.Items.Add("Upper mode of CPUE");
+                lvi.SubItems.Add(item.cpueModeUpper.ToString() + unit + (item.cpueModeUpper == 1 ? "" : "s"));
+                lvi = lvInventory.Items.Add("Lower mode of CPUE");
+                lvi.SubItems.Add(item.cpueModeLower.ToString() + unit + (item.cpueModeLower == 1 ? "" : "s"));
+            }
+            if (unit != " kilo")
+            {
+                lvi = lvInventory.Items.Add($"Kilos per {unit}");
+                lvi.SubItems.Add(item.equivalentKg.ToString());
+            }
 
             n = 0;
             foreach (var hist in item.historicalCPUE)
@@ -751,13 +772,35 @@ namespace FAD3.Database.Forms
                     lvi = lvInventory.Items.Add("Enumerator");
                     lvi.SubItems.Add(numbers.enumerator);
 
-                    lvi = lvInventory.Items.Add("");
-                    lvi = lvInventory.Items.Add("");
+                    int row = 0;
                     foreach (var item in gearLevelDict)
                     {
+                        if (row == 0)
+                        {
+                            lvi = lvInventory.Items.Add("");
+                            lvi = lvInventory.Items.Add("");
+                        }
                         lvi = lvInventory.Items.Add(item.Value.gearClass + "-" + item.Key);
                         lvi.SubItems.Add(item.Value.total.ToString());
                         lvi.ImageKey = Gear.GearClassImageKeyFromGearClasName(item.Value.gearClass);
+                        row++;
+                    }
+
+                    row = 0;
+                    foreach (var item in _inventory.GetSitioRespondents(numbers.brgySurveyGuid))
+                    {
+                        if (row == 0)
+                        {
+                            lvi = lvInventory.Items.Add("");
+                            lvi = lvInventory.Items.Add("");
+                            lvi = lvInventory.Items.Add("Respondents");
+                        }
+                        else
+                        {
+                            lvi = lvInventory.Items.Add("");
+                        }
+                        lvi.SubItems.Add(item);
+                        row++;
                     }
 
                     _sitioNode = node;
@@ -1068,7 +1111,7 @@ namespace FAD3.Database.Forms
                             if (nd.FirstNode.Name == "entireBarangay")
                             {
                                 MessageBox.Show("Cannot add a new sitio because sitios are already included in 'Entire barangay'",
-                                                "Cannot a new sitio", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                                "Cannot add new sitio", MessageBoxButtons.OK, MessageBoxIcon.Information);
                                 return;
                             }
                             else

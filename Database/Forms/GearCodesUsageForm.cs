@@ -267,25 +267,34 @@ namespace FAD3
         private void FillVariationsList()
         {
             listViewVariations.Items.Clear();
-            var key = ((KeyValuePair<string, string>)comboClass.SelectedItem).Key;
-            var list = Gear.GearVariationsWithSpecs(key);
-            foreach (var item in list)
+            if (comboClass.Items.Count > 0)
             {
-                var lvi = new ListViewItem
+                var key = ((KeyValuePair<string, string>)comboClass.SelectedItem).Key;
+                var list = Gear.GearVariationsWithSpecs(key);
+                foreach (var item in list)
                 {
-                    Name = item.Item1,
-                    Text = item.Item2
-                };
-                lvi.SubItems.Add(item.Item3 ? "x" : "");
-                listViewVariations.Items.Add(lvi);
+                    var lvi = new ListViewItem
+                    {
+                        Name = item.Item1,
+                        Text = item.Item2
+                    };
+                    lvi.SubItems.Add(item.Item3 ? "x" : "");
+                    listViewVariations.Items.Add(lvi);
+                }
             }
         }
 
         private void ReadGearClass()
         {
+            comboClass.Items.Clear();
+            Gear.RefreshGearClasses();
+            foreach (var item in Gear.GearClass)
+            {
+                comboClass.Items.Add(item);
+            }
             comboClass.With(o =>
             {
-                o.DataSource = new BindingSource(Gear.GearClass, null);
+                //o.DataSource = new BindingSource(Gear.GearClass, null);
                 o.DisplayMember = "Value";
                 o.ValueMember = "Key";
                 o.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
@@ -466,6 +475,7 @@ namespace FAD3
 
                         tsi = dropDownMenu.Items.Add("Add a gear variation");
                         tsi.Name = "itemAddGearVariation";
+                        tsi.Enabled = comboClass.SelectedItem != null;
 
                         tsi = dropDownMenu.Items.Add("Edit gear variation");
                         tsi.Name = "itemEditGearVariation";
@@ -677,15 +687,18 @@ namespace FAD3
                 case "itemAddGearVariation":
                 case "itemAddLocalName":
                 case "itemAddGearCode":
-                    _gearClassGuid = ((KeyValuePair<string, string>)comboClass.SelectedItem).Key;
-                    GearEditorForm f = new GearEditorForm(this)
+                    if (comboClass.SelectedItem != null)
                     {
-                        GearClassGuid = _gearClassGuid,
-                        GearVariationGuid = _gearVarGuid,
-                        Action = _action,
-                        InList = myList
-                    };
-                    f.ShowDialog(this);
+                        _gearClassGuid = ((KeyValuePair<string, string>)comboClass.SelectedItem).Key;
+                        GearEditorForm f = new GearEditorForm(this)
+                        {
+                            GearClassGuid = _gearClassGuid,
+                            GearVariationGuid = _gearVarGuid,
+                            Action = _action,
+                            InList = myList
+                        };
+                        f.ShowDialog(this);
+                    }
                     break;
 
                 case "itemManageGearSpecs":
@@ -848,20 +861,23 @@ namespace FAD3
                     case ".XML":
                         switch (whatToExport)
                         {
-                            case ExportImportDataType.GearsVariation:
-                                var count = Names.Languages.Count;
+                            case ExportImportDataType.GearsRefCode:
+                                var codes = Gear.GetGearRefCodes();
+                                var count = codes.Count;
 
                                 if (count > 0)
                                 {
                                     var n = 0;
                                     XmlWriter writer = XmlWriter.Create(fileName);
                                     writer.WriteStartDocument();
-                                    writer.WriteStartElement("Languages");
-                                    foreach (var language in Names.Languages)
+                                    writer.WriteStartElement("GearReferenceCodes");
+                                    foreach (var code in codes)
                                     {
-                                        writer.WriteStartElement("Language");
-                                        writer.WriteAttributeString("guid", language.Key);
-                                        writer.WriteString(language.Value);
+                                        writer.WriteStartElement("GearReferenceCode");
+                                        writer.WriteAttributeString("code", code.Key);
+                                        writer.WriteAttributeString("gearVariationGuid", code.Value.variationGuid);
+                                        writer.WriteAttributeString("gearVariationName", code.Value.variationName);
+                                        writer.WriteAttributeString("isSubVariation", code.Value.isSubVariation.ToString());
                                         if (count == 1)
                                         {
                                             writer.WriteEndDocument();
@@ -882,7 +898,92 @@ namespace FAD3
                                     writer.Close();
                                     if (n > 0 && count > 0)
                                     {
-                                        MessageBox.Show($"Succesfully exported {count} languages", "Export successful");
+                                        MessageBox.Show($"Succesfully exported {count} gear reference codes", "Export successful");
+                                    }
+                                }
+                                break;
+
+                            case ExportImportDataType.GearsVariation:
+                                var gearsDict = Gear.GetAllVariations();
+                                count = gearsDict.Count;
+
+                                if (count > 0)
+                                {
+                                    var n = 0;
+                                    XmlWriter writer = XmlWriter.Create(fileName);
+                                    writer.WriteStartDocument();
+                                    writer.WriteStartElement("GearVariations");
+                                    foreach (var gear in gearsDict)
+                                    {
+                                        writer.WriteStartElement("GearVariation");
+                                        writer.WriteAttributeString("guid", gear.Key);
+                                        writer.WriteAttributeString("name", gear.Value.gearVarName);
+                                        writer.WriteAttributeString("gear_class", gear.Value.gearCLassGuid);
+                                        writer.WriteAttributeString("mph1", gear.Value.metaPhoneKey1.ToString());
+                                        writer.WriteAttributeString("mph2", gear.Value.metaPhoneKey2.ToString());
+                                        writer.WriteAttributeString("name2", gear.Value.Name2);
+                                        if (count == 1)
+                                        {
+                                            writer.WriteEndDocument();
+                                        }
+                                        else
+                                        {
+                                            if (n < (count - 1))
+                                            {
+                                                writer.WriteEndElement();
+                                            }
+                                            else
+                                            {
+                                                writer.WriteEndDocument();
+                                            }
+                                        }
+                                        n++;
+                                    }
+                                    writer.Close();
+                                    if (n > 0 && count > 0)
+                                    {
+                                        MessageBox.Show($"Succesfully exported {count} gear variations", "Export successful");
+                                    }
+                                }
+                                break;
+
+                            case ExportImportDataType.GearsClass:
+                                var gearClassDict = Gear.GetGearClassEx();
+                                count = gearClassDict.Count;
+
+                                if (count > 0)
+                                {
+                                    var n = 0;
+                                    XmlWriter writer = XmlWriter.Create(fileName);
+                                    writer.WriteStartDocument();
+                                    writer.WriteStartElement("GearClasses");
+                                    foreach (var gearClass in gearClassDict)
+                                    {
+                                        writer.WriteStartElement("GearClass");
+                                        writer.WriteAttributeString("guid", gearClass.Key);
+                                        writer.WriteAttributeString("name", gearClass.Value.gearClassName);
+                                        writer.WriteAttributeString("code", gearClass.Value.gearCode);
+                                        if (count == 1)
+                                        {
+                                            writer.WriteEndDocument();
+                                        }
+                                        else
+                                        {
+                                            if (n < (count - 1))
+                                            {
+                                                writer.WriteEndElement();
+                                            }
+                                            else
+                                            {
+                                                writer.WriteEndDocument();
+                                            }
+                                        }
+                                        n++;
+                                    }
+                                    writer.Close();
+                                    if (n > 0 && count > 0)
+                                    {
+                                        MessageBox.Show($"Succesfully exported {count} gear classes", "Export successful");
                                     }
                                 }
                                 break;
@@ -902,6 +1003,10 @@ namespace FAD3
             FileDialogHelper.DataFileType = DataFileType.Text | DataFileType.XML | DataFileType.CSV;
             FileDialogHelper.ShowDialog();
             var fileName = FileDialogHelper.FileName;
+            var saveCounter = 0;
+            var elementCounter = 0;
+            var proceed = false;
+            var msg = "";
             if (fileName.Length > 0)
             {
                 switch (Path.GetExtension(fileName))
@@ -916,7 +1021,166 @@ namespace FAD3
                     case ".XML":
                         switch (whatToImport)
                         {
+                            case ExportImportDataType.GearsClass:
+                                XmlTextReader xmlReader = new XmlTextReader(fileName);
+                                string gearClassGuid = "";
+                                string gearClass = "";
+                                string gearClassCode = "";
+                                while ((elementCounter == 0 || (elementCounter > 0 && proceed)) && xmlReader.Read())
+                                {
+                                    switch (xmlReader.NodeType)
+                                    {
+                                        case XmlNodeType.Element:
+                                            if (elementCounter == 0 && xmlReader.Name == "GearClasses")
+                                            {
+                                                proceed = true;
+                                            }
+                                            if (xmlReader.Name == "GearClass")
+                                            {
+                                                gearClassGuid = xmlReader.GetAttribute("guid");
+                                                gearClass = xmlReader.GetAttribute("name");
+                                                gearClassCode = xmlReader.GetAttribute("code");
+                                                elementCounter++;
+                                            }
+
+                                            break;
+                                    }
+
+                                    if (gearClassGuid?.Length > 0 && gearClass?.Length > 0 && gearClassCode.Length > 0)
+                                    {
+                                        var success = Gear.SaveNewGearClass(gearClassGuid, gearClass, gearClassCode);
+                                        if (success)
+                                        {
+                                            saveCounter++;
+                                        }
+                                        gearClassGuid = "";
+                                        gearClass = "";
+                                        gearClassCode = "";
+                                    }
+                                }
+                                if (saveCounter == 0)
+                                {
+                                    msg = "No gear classes was imported into the database";
+                                }
+                                else
+                                {
+                                    msg = $"{saveCounter.ToString()} gear classes saved to the database";
+                                    ReadGearClass();
+                                }
+                                MessageBox.Show(msg, "Import gear classes", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                break;
+
                             case ExportImportDataType.GearsVariation:
+                                xmlReader = new XmlTextReader(fileName);
+                                string gearVariation = "";
+                                string gearVariationGuid = "";
+                                gearClassGuid = "";
+                                int mph1 = 0;
+                                int mph2 = 0;
+                                string name2 = "";
+                                while ((elementCounter == 0 || (elementCounter > 0 && proceed)) && xmlReader.Read())
+                                {
+                                    switch (xmlReader.NodeType)
+                                    {
+                                        case XmlNodeType.Element:
+                                            if (elementCounter == 0 && xmlReader.Name == "GearVariations")
+                                            {
+                                                proceed = true;
+                                            }
+                                            if (xmlReader.Name == "GearVariation")
+                                            {
+                                                gearVariationGuid = xmlReader.GetAttribute("guid");
+                                                gearVariation = xmlReader.GetAttribute("name");
+                                                gearClassGuid = xmlReader.GetAttribute("gear_class");
+                                                mph1 = int.Parse(xmlReader.GetAttribute("mph1"));
+                                                mph2 = int.Parse(xmlReader.GetAttribute("mph2"));
+                                                name2 = xmlReader.GetAttribute("name2");
+                                                elementCounter++;
+                                            }
+
+                                            break;
+                                    }
+
+                                    if (gearVariation?.Length > 0 && gearVariationGuid?.Length > 0 && gearClassGuid.Length > 0)
+                                    {
+                                        NewFisheryObjectName nfon = new NewFisheryObjectName(gearVariation, FisheryObjectNameType.GearVariationName);
+                                        var result = Gear.SaveNewVariationName(nfon, gearClassGuid, gearVariationGuid);
+                                        if (result.success)
+                                        {
+                                            saveCounter++;
+                                        }
+                                        gearVariation = "";
+                                        gearVariationGuid = "";
+                                        gearClassGuid = "";
+                                        mph1 = 0;
+                                        mph2 = 0;
+                                        name2 = "";
+                                    }
+                                }
+                                if (saveCounter == 0)
+                                {
+                                    msg = "No gear variations was imported into the database";
+                                }
+                                else
+                                {
+                                    msg = $"{saveCounter.ToString()} gear variation saved to the database";
+                                    FillVariationsList();
+                                    SizeColumns(listViewVariations, false);
+                                }
+                                MessageBox.Show(msg, "Import gear variation", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                break;
+
+                            case ExportImportDataType.GearsRefCode:
+                                xmlReader = new XmlTextReader(fileName);
+                                string gearCode = "";
+                                gearVariationGuid = "";
+                                gearVariation = "";
+                                bool isSubVariation = false;
+                                while ((elementCounter == 0 || (elementCounter > 0 && proceed)) && xmlReader.Read())
+                                {
+                                    switch (xmlReader.NodeType)
+                                    {
+                                        case XmlNodeType.Element:
+                                            if (elementCounter == 0 && xmlReader.Name == "GearReferenceCodes")
+                                            {
+                                                proceed = true;
+                                            }
+                                            if (xmlReader.Name == "GearReferenceCode")
+                                            {
+                                                gearCode = xmlReader.GetAttribute("code");
+                                                gearVariation = xmlReader.GetAttribute("gearVariationName");
+                                                gearVariationGuid = xmlReader.GetAttribute("gearVariationGuid");
+                                                isSubVariation = bool.Parse(xmlReader.GetAttribute("isSubVariation"));
+                                                elementCounter++;
+                                            }
+
+                                            break;
+                                    }
+
+                                    if (gearVariation?.Length > 0 && gearVariationGuid?.Length > 0 && gearCode.Length > 0)
+                                    {
+                                        var success = Gear.SaveNewGearReferenceCode(gearCode, gearVariationGuid, isSubVariation);
+                                        if (success)
+                                        {
+                                            saveCounter++;
+                                        }
+                                        gearCode = "";
+                                        gearVariationGuid = "";
+                                        gearVariation = "";
+                                        isSubVariation = false;
+                                    }
+                                }
+                                if (saveCounter == 0)
+                                {
+                                    msg = "No gear reference codes was imported into the database";
+                                }
+                                else
+                                {
+                                    msg = $"{saveCounter.ToString()} gear reference codes saved to the database";
+                                    FillRefCodeList();
+                                    SizeColumns(listViewCodes, false);
+                                }
+                                MessageBox.Show(msg, "Import gear variation", MessageBoxButtons.OK, MessageBoxIcon.Information);
                                 break;
 
                             case ExportImportDataType.GearsLocalName:
@@ -931,6 +1195,10 @@ namespace FAD3
         {
             switch (e.ClickedItem.Name)
             {
+                case "tbClose":
+                    Close();
+                    break;
+
                 case "tbAdd":
                     break;
 
@@ -946,7 +1214,22 @@ namespace FAD3
                         eidf.ShowDialog(this);
                         if (eidf.DialogResult == DialogResult.OK)
                         {
-                            var result = eidf.Selection;
+                            //var result = eidf.Selection;
+                            if ((eidf.Selection & ExportImportDataType.GearsVariation) == ExportImportDataType.GearsVariation)
+                            {
+                                Export(ExportImportDataType.GearsVariation);
+                            }
+                            else if ((eidf.Selection & ExportImportDataType.GearsLocalName) == ExportImportDataType.GearsLocalName)
+                            {
+                            }
+                            else if ((eidf.Selection & ExportImportDataType.GearsClass) == ExportImportDataType.GearsClass)
+                            {
+                                Export(ExportImportDataType.GearsClass);
+                            }
+                            else if ((eidf.Selection & ExportImportDataType.GearsRefCode) == ExportImportDataType.GearsRefCode)
+                            {
+                                Export(ExportImportDataType.GearsRefCode);
+                            }
                         }
                     }
                     break;
@@ -957,10 +1240,47 @@ namespace FAD3
                         eidf.ShowDialog(this);
                         if (eidf.DialogResult == DialogResult.OK)
                         {
-                            var result = eidf.Selection;
+                            //var result = eidf.Selection;
+                            if ((eidf.Selection & ExportImportDataType.GearsVariation) == ExportImportDataType.GearsVariation)
+                            {
+                                Import(ExportImportDataType.GearsVariation);
+                            }
+                            else if ((eidf.Selection & ExportImportDataType.GearsLocalName) == ExportImportDataType.GearsLocalName)
+                            {
+                            }
+                            else if ((eidf.Selection & ExportImportDataType.GearsClass) == ExportImportDataType.GearsClass)
+                            {
+                                Import(ExportImportDataType.GearsClass);
+                            }
+                            else if ((eidf.Selection & ExportImportDataType.GearsRefCode) == ExportImportDataType.GearsRefCode)
+                            {
+                                Import(ExportImportDataType.GearsRefCode);
+                            }
                         }
                     }
                     break;
+            }
+        }
+
+        private void ExportGearVariations()
+        {
+            FileDialogHelper.Title = "Export gear variations";
+            FileDialogHelper.DialogType = FileDialogType.FileSave;
+            FileDialogHelper.DataFileType = DataFileType.Text | DataFileType.XML | DataFileType.CSV;
+            FileDialogHelper.ShowDialog();
+            var fileName = FileDialogHelper.FileName;
+            if (fileName.Length > 0)
+            {
+                switch (Path.GetExtension(fileName))
+                {
+                    case ".txt":
+
+                        break;
+
+                    case ".XML":
+                    case ".xml":
+                        break;
+                }
             }
         }
 

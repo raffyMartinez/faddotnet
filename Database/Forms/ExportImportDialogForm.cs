@@ -79,7 +79,7 @@ namespace FAD3.Database.Forms
                         inventoryCaption = "Import fishery inventory";
                     }
 
-                    rdButton.Top = 20;
+                    //rdButton.Top = 20;
                     rdButton.Text = enumeratorCaption;
                     rdButton.Tag = ExportImportDataType.Enumerators;
                     rdButton.Visible = true;
@@ -96,13 +96,15 @@ namespace FAD3.Database.Forms
                     var gearVarCaption = "Export gear variations";
                     var gearLocalNameCaption = "Export gear local names";
                     var gearClassCaption = "Export gear classes";
+                    var gearRefCodeCaption = "Export gear codes";
                     if (_action == ExportImportAction.ActionImport)
                     {
                         gearVarCaption = "Import gear variations";
                         gearLocalNameCaption = "Import gear local names";
                         gearClassCaption = "Import gear classes";
+                        gearRefCodeCaption = "Import gear codes";
                     }
-                    rdButton.Top = 20;
+                    //rdButton.Top = 20;
                     rdButton.Text = gearVarCaption;
                     rdButton.Tag = ExportImportDataType.GearsVariation;
                     rdButton.Visible = true;
@@ -122,6 +124,14 @@ namespace FAD3.Database.Forms
                     rdButton2.AutoSize = true;
                     Controls.Add(rdButton2);
 
+                    RadioButton rdButton3 = new RadioButton();
+                    rdButton3.Text = gearRefCodeCaption;
+                    rdButton3.Left = rdButton.Left;
+                    rdButton3.Top = rdButton2.Top + rdButton2.Height + spacing;
+                    rdButton3.Tag = ExportImportDataType.GearsRefCode;
+                    rdButton3.AutoSize = true;
+                    Controls.Add(rdButton3);
+
                     break;
 
                 case ExportImportDataType.CatchNametDataSelect:
@@ -134,7 +144,7 @@ namespace FAD3.Database.Forms
                         localNamesCaption = "Import local names";
                         namePairCaption = "Import local name - scientific name pairs";
                     }
-                    rdButton.Top = 20;
+                    //rdButton.Top = 20;
                     rdButton.Left = 10;
                     rdButton.Text = languageCaption;
                     rdButton.Tag = ExportImportDataType.LocalNameLanguages;
@@ -167,6 +177,20 @@ namespace FAD3.Database.Forms
             {
                 Text = "Export";
             }
+
+            //adjust form and button depending on position of last radio button
+            int lastRowButton = 0;
+            foreach (Control c in Controls)
+            {
+                if (c.GetType().Name == "RadioButton" && c.Location.Y > lastRowButton)
+                {
+                    lastRowButton = c.Location.Y;
+                }
+            }
+
+            btnCancel.Top = lastRowButton + 40;
+            btnOk.Top = lastRowButton + 40;
+            Height = btnOk.Top + btnOk.Height + 40;
         }
 
         private void OnCheckChanged(object sender, EventArgs e)

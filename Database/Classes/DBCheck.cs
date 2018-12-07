@@ -67,7 +67,10 @@ namespace FAD3
                         fldData = dbData.TableDefs[tdTemplate.Name].Fields[fldTemplate.Name];
                         fldData.AllowZeroLength = fldTemplate.AllowZeroLength;
                         fldData.Required = fldTemplate.Required;
-
+                        if (fldData.Type != fldTemplate.Type)
+                        {
+                            FixField(dbData.TableDefs[tdName], fldData, fldTemplate, mdbPath);
+                        }
                         foreach (Property pTemplate in fldTemplate.Properties)
                         {
                             if (pTemplate.Name == "Description")
@@ -182,6 +185,37 @@ namespace FAD3
             dbTemplate = null;
 
             return true;
+        }
+
+        private static void FixField(TableDef td, Field fData, Field fTemplate, string mdbPath)
+        {
+            var newType = "";
+            switch (fTemplate.Type)
+            {
+                case (short)DataTypeEnum.dbInteger:
+                    newType = "SMALLINT";
+                    break;
+
+                case (short)DataTypeEnum.dbLong:
+                    newType = "INTEGER";
+                    break;
+
+                case (short)DataTypeEnum.dbText:
+                    newType = "TEXT";
+                    break;
+
+                case (short)DataTypeEnum.dbDouble:
+                    newType = "DOUBLE";
+                    break;
+            }
+            var dbe = new DBEngine();
+            var dbData = dbe.OpenDatabase(mdbPath);
+            var sql = $"ALTER TABLE {td.Name} ALTER COLUMN {fData.Name} {newType}";
+
+            dbData.Execute(sql);
+
+            dbData.Close();
+            dbData = null;
         }
     }
 }

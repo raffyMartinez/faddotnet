@@ -6,6 +6,8 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using FAD3.Database.Classes;
+using FAD3.Database.Forms;
 
 namespace FAD3
 {
@@ -16,11 +18,11 @@ namespace FAD3
         private string _samplingGUID = "";
         private ListView _lv;
         private Control _topControl;
-        private string _AOIGuid = "";
+        private string _targetAreaGuid = "";
         private int _widestLabel = 0;
         private int _controlWidth = 175;
         private int _yPos;
-        private string _aoiName = "";
+        private string _targetAreaName = "";
         private string _landingSiteName = "";
         private string _landingSiteGuid = "";
         private string _gearClassName = "";
@@ -30,7 +32,7 @@ namespace FAD3
         private string _gearRefCode = "";
         private MainForm _parentForm;
         private bool _isNew;
-        private TargetArea _aoi;
+        private TargetArea _targetArea;
         private TextBox _txtVesselDimension = new TextBox();
 
         private string _vesLength = "";
@@ -50,6 +52,8 @@ namespace FAD3
         private bool _sampledGearSpecIsEdited;
 
         private List<string> _fishingGrounds;
+
+        private Dictionary<string, ComboBox> _comboBoxes = new Dictionary<string, ComboBox>();
 
         public bool SampledGearSpecIsEdited
         {
@@ -122,16 +126,16 @@ namespace FAD3
             }
         }
 
-        public string AOIName
+        public string TargetAreaName
         {
-            get { return _aoiName; }
-            set { _aoiName = value; }
+            get { return _targetAreaName; }
+            set { _targetAreaName = value; }
         }
 
-        public string AOIGuid
+        public string TargetAreaGuid
         {
-            get { return _AOIGuid; }
-            set { _AOIGuid = value; }
+            get { return _targetAreaGuid; }
+            set { _targetAreaGuid = value; }
         }
 
         public string LandingSiteName
@@ -170,10 +174,10 @@ namespace FAD3
             set { _gearVarGuid = value; }
         }
 
-        public TargetArea AOI
+        public TargetArea TargetArea
         {
-            get { return _aoi; }
-            set { _aoi = value; }
+            get { return _targetArea; }
+            set { _targetArea = value; }
         }
 
         public MainForm Parent_Form
@@ -297,7 +301,7 @@ namespace FAD3
                     switch (e.Key)
                     {
                         case "Enumerator":
-                            Enumerators.AOIEnumeratorsList(_AOIGuid, (ComboBox)ctl);
+                            Enumerators.AOIEnumeratorsList(_targetAreaGuid, (ComboBox)ctl);
                             break;
 
                         case "TargetArea":
@@ -305,7 +309,7 @@ namespace FAD3
                             break;
 
                         case "LandingSite":
-                            TargetArea.LandingSitesFromTargetArea(_AOIGuid, (ComboBox)ctl);
+                            TargetArea.LandingSitesFromTargetArea(_targetAreaGuid, (ComboBox)ctl);
                             break;
 
                         case "GearClass":
@@ -337,7 +341,7 @@ namespace FAD3
                                 }
                             }
 
-                            Gear.GearVariationsUsage(_gearClassGuid, _AOIGuid, (ComboBox)ctl);
+                            Gear.GearVariationsUsage(_gearClassGuid, _targetAreaGuid, (ComboBox)ctl);
                             break;
 
                         case "TypeOfVesselUsed":
@@ -456,8 +460,8 @@ namespace FAD3
                                 break;
 
                             case "TargetArea":
-                                _aoiName = ctl.Text;
-                                _AOIGuid = ((KeyValuePair<string, string>)((ComboBox)ctl).SelectedItem).Key;
+                                _targetAreaName = ctl.Text;
+                                _targetAreaGuid = ((KeyValuePair<string, string>)((ComboBox)ctl).SelectedItem).Key;
                                 break;
 
                             case "AdditionalFishingGround":
@@ -483,7 +487,7 @@ namespace FAD3
                             break;
 
                         case "TargetArea":
-                            ctl.Text = _aoiName;
+                            ctl.Text = _targetAreaName;
                             break;
 
                         case "LandingSite":
@@ -776,12 +780,12 @@ namespace FAD3
 
                 case "btnGearClass":
 
-                    GearCodesUsageForm form = GearCodesUsageForm.GetInstance(_gearVarGuid, _AOIGuid, _gearClassName);
+                    GearCodesUsageForm form = GearCodesUsageForm.GetInstance(_gearVarGuid, _targetAreaGuid, _gearClassName);
                     form.With(o =>
                     {
                         o.GearRefCode = _gearRefCode;
                         o.Parent_Form = this;
-                        o.TargetArea(_aoiName, _AOIGuid);
+                        o.TargetArea(_targetAreaName, _targetAreaGuid);
                         o.GearVariation(_gearVarName, _gearVarGuid);
                     });
                     if (!form.Visible)
@@ -825,7 +829,7 @@ namespace FAD3
                     if (CheckRequiredForRefNumber())
                     {
                         var txt = (MaskedTextBox)panelUI.Controls["dtxtSamplingDate"];
-                        ReferenceNumberManager.SetAOI_GearVariation(_AOIGuid, _gearVarGuid, DateTime.Parse(txt.Text));
+                        ReferenceNumberManager.SetAOI_GearVariation(_targetAreaGuid, _gearVarGuid, DateTime.Parse(txt.Text));
                         ReferenceNumberForm grf = new ReferenceNumberForm();
                         grf.Parent_Form = this;
                         grf.ShowDialog(this);
@@ -841,7 +845,7 @@ namespace FAD3
                     if (FishingGrid.IsCompleteGrid25)
                     {
                         PopulateFGList();
-                        FishingGroundForm fg = new FishingGroundForm(_AOIGuid, this);
+                        FishingGroundForm fg = new FishingGroundForm(_targetAreaGuid, this);
                         fg.FishingGrounds = _fishingGrounds;
                         fg.Show(this);
                     }
@@ -1391,13 +1395,13 @@ namespace FAD3
                             {
                                 case "TargetArea":
                                     key = ((KeyValuePair<string, string>)cbo.SelectedItem).Key;
-                                    e.Cancel = !Enumerators.AOIHaveEnumerators(key);
+                                    e.Cancel = !Enumerators.TargetAreaHasEnumerators(key);
                                     if (e.Cancel)
                                         msg = "Cannot use the selected target area because it does not have enumerators";
                                     else
                                     {
-                                        _aoiName = cbo.Text;
-                                        _AOIGuid = key;
+                                        _targetAreaName = cbo.Text;
+                                        _targetAreaGuid = key;
                                     }
 
                                     break;
@@ -1413,7 +1417,30 @@ namespace FAD3
                         }
                         else
                         {
-                            msg = $"{controlText} is not found in the dropdown list.";
+                            if (ui.Key == "Enumerator")
+                            {
+                                DialogResult dr = MessageBox.Show($"{controlText} is not in the list of enumerators.\r\n" +
+                                                        "Would you like to add a new enumerator?",
+                                                        "Add a new enumerator",
+                                                        MessageBoxButtons.YesNo,
+                                                        MessageBoxIcon.Information);
+                                if (dr == DialogResult.Yes)
+                                {
+                                    EnumeratorEntryForm enf = new EnumeratorEntryForm(controlText, _targetAreaGuid);
+                                    enf.ShowDialog(this);
+                                    if (enf.DialogResult == DialogResult.OK)
+                                    {
+                                        KeyValuePair<string, string> newEnumerator = new KeyValuePair<string, string>(enf.EnumeratorGuid, enf.EnumeratorName);
+                                        cbo.Items.Add(newEnumerator);
+                                        cbo.Text = newEnumerator.Value;
+                                        global.mainForm.RefreshTargetAreaEnumerators(_targetArea.TargetAreaGuid);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                msg = $"{controlText} is not found in the dropdown list.";
+                            }
                         }
                         break;
 

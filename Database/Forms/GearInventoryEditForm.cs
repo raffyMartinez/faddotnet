@@ -12,6 +12,9 @@ using FAD3.GUI.Classes;
 
 namespace FAD3.Database.Forms
 {
+    /// <summary>
+    ///Displays fisher, vessel and fishing gear inventory data
+    /// </summary>
     public partial class GearInventoryEditForm : Form
     {
         private string _treeLevel;
@@ -65,11 +68,11 @@ namespace FAD3.Database.Forms
             }
         }
 
-        public GearInventoryEditForm(string treeLevel, TargetArea aoi, FishingGearInventory inventory, GearInventoryForm parent)
+        public GearInventoryEditForm(string treeLevel, TargetArea targetArea, FishingGearInventory inventory, GearInventoryForm parent)
         {
             InitializeComponent();
             _treeLevel = treeLevel;
-            _targetArea = aoi;
+            _targetArea = targetArea;
             _inventory = inventory;
             _parentForm = parent;
         }
@@ -110,6 +113,7 @@ namespace FAD3.Database.Forms
             comboBarangays.Text = barangay;
             _sitios.Clear();
             _sitios = _inventory.GetBarangaySitios(province, municipality, barangay);
+            lblCurrentSitio.Text = $"New fisher and vessel inventory: {barangay}, {municipality}, {province}";
         }
 
         public void AddNewBarangyInventory(string inventoryGuid, string province, string municipality)
@@ -117,12 +121,14 @@ namespace FAD3.Database.Forms
             AddNewBarangyInventory(inventoryGuid);
             comboProvince.Text = province;
             comboMunicipality.Text = municipality;
+            lblCurrentSitio.Text = $"New fisher and vessel inventory: {municipality}, {province}";
         }
 
         public void AddNewBarangyInventory(string inventoryGuid, string province)
         {
             AddNewBarangyInventory(inventoryGuid);
             comboProvince.Text = province;
+            lblCurrentSitio.Text = $"New fisher and vessel inventory: {province}";
         }
 
         public void AddNewBarangyInventory(string inventoryGuid)
@@ -134,6 +140,7 @@ namespace FAD3.Database.Forms
             SetupEnumeratorsComboBox();
             _dateProjectImplemented = _inventory.Inventories[_inventoryGuid].DateConducted;
             Text = "Add barangay fisher and fishing boat inventory data";
+            lblCurrentSitio.Text = "New fisher and vessel inventory";
         }
 
         private void SetupEnumeratorsComboBox()
@@ -291,6 +298,7 @@ namespace FAD3.Database.Forms
 
         private bool ValidateGearInventory()
         {
+            var msg = "";
             var proceed = cboGearClass.Text.Length > 0
                 && cboGearVariation.Text.Length > 0
                 && listBoxGearLocalNames.Items.Count > 0
@@ -301,16 +309,23 @@ namespace FAD3.Database.Forms
                 && txtNumberOfDaysPerMonth.Text.Length > 0
                 && chkListBoxMonthsSeason.CheckedItems.Count > 0
                 && chkListBoxMonthsUsed.CheckedItems.Count > 0
-                && (txtRangeMax.Text.Length > 0 || txtRangeMin.Text.Length > 0)
-                && (txtModeLower.Text.Length > 0 || txtModeUpper.Text.Length > 0)
                 && listBoxDominantCatch.Items.Count > 0
-                && txtDominantPercentage.Text.Length > 0
-                && IsCatchValuesOK();
+                && txtDominantPercentage.Text.Length > 0;
+
+            if (proceed)
+            {
+                var result = IsCatchValuesOK();
+                proceed = result.success;
+                if (!proceed && result.msg.Length > 0)
+                {
+                    MessageBox.Show(result.msg, "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return false;
+                }
+            }
 
             if (proceed && (listBoxAccessories.Items.Count == 0 || listViewExpenses.Items.Count == 0 || listViewHistoryCpue.Items.Count == 0))
             {
                 var n = 0;
-                var msg = "";
                 if (listBoxAccessories.Items.Count == 0)
                 {
                     msg += "Fishing accessories\r\n";
@@ -332,11 +347,6 @@ namespace FAD3.Database.Forms
                     "Confirmation needed", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes;
             }
 
-            //if (proceed)
-            //{
-            //    proceed = MessageBox.Show("List of accessories or expenses is not filled up\r\nDo you still want to proceed?",
-            //        "Confirmation needed", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes;
-            //}
             if (!proceed)
             {
                 MessageBox.Show("Cannot save because there are required information that are missing",
@@ -348,28 +358,93 @@ namespace FAD3.Database.Forms
             return proceed;
         }
 
-        private bool IsCatchValuesOK(bool FormValidation = true)
+        private (bool success, string msg) IsCatchValuesOK(bool FormValidation = true)
         {
             bool isOk = false;
+            string msg = "";
             bool cpueDataComplete = false;
-            if (txtRangeMax.Text.Length > 0 && txtRangeMin.Text.Length > 0
-                && txtModeLower.Text.Length > 0 && txtModeUpper.Text.Length > 0)
+
+            isOk = !chkCPUERange.Checked && txtAverageCPUE.Text.Length > 0;
+            if (!isOk)
             {
-                cpueDataComplete = true;
-                var maxCPUE = int.Parse(txtRangeMax.Text);
-                var minCPUE = int.Parse(txtRangeMin.Text);
-                var upperMode = int.Parse(txtModeUpper.Text);
-                var lowerMode = int.Parse(txtModeLower.Text);
+                isOk = chkCPUERange.Checked;
+            }
 
-                isOk = (maxCPUE > minCPUE
-                    && upperMode > lowerMode
-                    && upperMode <= maxCPUE
-                    && lowerMode >= minCPUE);
-
+            if (isOk)
+            {
+                isOk = !chkCPUEModeRange.Checked && txtMode.Text.Length > 0;
                 if (!isOk)
                 {
-                    var msg = "Please review catch rate range and catch rate mode.\r\nThey must not conflict with each other.";
-                    MessageBox.Show(msg, "Review CPUE range and mode", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    isOk = chkCPUEModeRange.Checked;
+                }
+            }
+
+            if (isOk)
+            {
+                int maxCPUE = 0;
+                int minCPUE = 0;
+                int upperMode = 0;
+                int lowerMode = 0;
+
+                if (txtRangeMax.Text.Length > 0
+                    && txtRangeMin.Text.Length > 0
+                    && txtModeLower.Text.Length > 0
+                    && txtModeUpper.Text.Length > 0
+                    && chkCPUEModeRange.Checked
+                    && chkCPUERange.Checked)
+                {
+                    cpueDataComplete = true;
+                    maxCPUE = int.Parse(txtRangeMax.Text);
+                    minCPUE = int.Parse(txtRangeMin.Text);
+                    upperMode = int.Parse(txtModeUpper.Text);
+                    lowerMode = int.Parse(txtModeLower.Text);
+
+                    isOk = (maxCPUE > minCPUE
+                        && upperMode > lowerMode
+                        && upperMode <= maxCPUE
+                        && lowerMode >= minCPUE);
+                    if (!isOk)
+                    {
+                        msg = "Please review catch rate range and catch rate mode.\r\nThey must not conflict with each other.";
+                    }
+                }
+                else if (chkCPUERange.Checked)
+                {
+                    isOk = txtRangeMax.Text.Length > 0 && txtRangeMin.Text.Length > 0;
+                    if (isOk)
+                    {
+                        maxCPUE = int.Parse(txtRangeMax.Text);
+                        minCPUE = int.Parse(txtRangeMin.Text);
+                        isOk = maxCPUE > minCPUE;
+                        if (!isOk)
+                        {
+                            msg = "Maximum CPUE rate must be greater than minimum rate";
+                        }
+                    }
+
+                    if (isOk && txtMode.Text.Length > 0)
+                    {
+                        int mode = int.Parse(txtMode.Text);
+                        isOk = mode < maxCPUE && mode > minCPUE;
+                        if (!isOk)
+                        {
+                            msg = "Mode must be between upper and lower CPUE values";
+                        }
+                    }
+                }
+                if (isOk && chkCPUEModeRange.Checked)
+                {
+                    isOk = txtModeUpper.Text.Length > 0 && txtModeLower.Text.Length > 0;
+                    if (isOk)
+                    {
+                        upperMode = int.Parse(txtModeUpper.Text);
+                        lowerMode = int.Parse(txtModeLower.Text);
+                        isOk = upperMode > lowerMode;
+                        if (!isOk)
+                        {
+                            msg = "Upper CPUE mode must be greater than lower mode";
+                        }
+                    }
                 }
             }
 
@@ -377,16 +452,16 @@ namespace FAD3.Database.Forms
             {
                 if (cpueDataComplete)
                 {
-                    return isOk;
+                    return (isOk, msg);
                 }
                 else
                 {
-                    return true;
+                    return (true, msg);
                 }
             }
             else
             {
-                return isOk;
+                return (isOk, msg);
             }
         }
 
@@ -479,6 +554,14 @@ namespace FAD3.Database.Forms
             txtRangeMin.Text = gearData.cpueRangeMin.ToString();
             txtModeUpper.Text = gearData.cpueModeUpper.ToString();
             txtModeLower.Text = gearData.cpueModeLower.ToString();
+            txtAverageCPUE.Text = gearData.cpueAverage.ToString();
+            txtMode.Text = gearData.cpueMode.ToString();
+            txtEquivalentKg.Text = gearData.equivalentKg.ToString();
+
+            chkCPUERange.Checked = txtAverageCPUE.Text.Length == 0;
+            OnCheckCPUEChange(chkCPUERange, null);
+            chkCPUEModeRange.Checked = txtMode.Text.Length == 0;
+            OnCheckCPUEChange(chkCPUEModeRange, null);
 
             foreach (var item in gearData.historicalCPUE)
             {
@@ -566,6 +649,33 @@ namespace FAD3.Database.Forms
             }
 
             Text = "Edit barangay fisher and fishing boat inventory data";
+            var displayNameSitio = "";
+            if (sitio.Length == 0)
+            {
+                displayNameSitio = "Entire barangay";
+            }
+            else
+            {
+                displayNameSitio = sitio;
+            }
+
+            StringBuilder sb = new StringBuilder();
+            int n = 0;
+            var respondents = _inventory.GetSitioRespondents(_barangayInventoryGuid);
+            foreach (var item in respondents)
+            {
+                if (n == respondents.Count)
+                {
+                    sb.Append(item);
+                }
+                else
+                {
+                    sb.Append(item + "\r\n");
+                }
+                n++;
+            }
+            txtRespondents.Text = sb.ToString();
+            lblCurrentSitio.Text = $"Fisher and vessel inventory: {displayNameSitio}, {barangay}, {location.municipality}, {location.province}";
         }
 
         private void OnButtonClick(object sender, EventArgs e)
@@ -616,6 +726,15 @@ namespace FAD3.Database.Forms
                                                                            int.Parse(txtCountMotorized.Text), int.Parse(txtCountNonMotorized.Text),
                                                                            guid, DateTime.Parse(txtBarangaySurveyDate.Text), enumeratorGuid,
                                                                            txtSitio.Text);
+
+                                if (success && txtRespondents.Text.Length > 0)
+                                {
+                                    var arr = txtRespondents.Text.Split(new char[] { '\n' });
+                                    if (arr.Length > 0)
+                                    {
+                                        _inventory.SaveSitioRespondents(arr, guid);
+                                    }
+                                }
 
                                 if (success) _parentForm.RefreshSitioLevelInventory(comboProvince.Text, comboMunicipality.Text, comboBarangays.Text, txtSitio.Text);
                                 break;
@@ -682,22 +801,31 @@ namespace FAD3.Database.Forms
                                 }
 
                                 int? rangeCPUEMax = null;
-                                if (int.TryParse(txtRangeMax.Text, out int v)) rangeCPUEMax = v;
+                                if (chkCPUERange.Checked && int.TryParse(txtRangeMax.Text, out int v)) rangeCPUEMax = v;
 
                                 int? rangeCPUEMin = null;
-                                if (int.TryParse(txtRangeMin.Text, out v)) rangeCPUEMin = v;
+                                if (chkCPUERange.Checked && int.TryParse(txtRangeMin.Text, out v)) rangeCPUEMin = v;
 
                                 int? modeCPUEUpper = null;
-                                if (int.TryParse(txtModeUpper.Text, out v)) modeCPUEUpper = v;
+                                if (chkCPUEModeRange.Checked && int.TryParse(txtModeUpper.Text, out v)) modeCPUEUpper = v;
 
                                 int? modeCPUELower = null;
-                                if (int.TryParse(txtModeLower.Text, out v)) modeCPUELower = v;
+                                if (chkCPUEModeRange.Checked && int.TryParse(txtModeLower.Text, out v)) modeCPUELower = v;
+
+                                int? cpueAverage = null;
+                                if (!chkCPUERange.Checked && int.TryParse(txtAverageCPUE.Text, out v)) cpueAverage = v;
+
+                                int? modeCPUE = null;
+                                if (!chkCPUEModeRange.Checked && int.TryParse(txtMode.Text, out v)) modeCPUE = v;
+
+                                double? equivalentKilo = null;
+                                if (cboCatchUnit.Text != "kilo" && double.TryParse(txtEquivalentKg.Text, out double vv)) equivalentKilo = vv;
 
                                 success = _inventory.SaveSitioGearInventoryMain(_barangayInventoryGuid, _gearVariationKey,
                                     int.Parse(txtCommercialUsage.Text), int.Parse(txtMunicipalMotorizedUsage.Text),
                                     int.Parse(txtMunicipalNonMotorizedUsage.Text), int.Parse(txtNoBoatGears.Text),
                                     int.Parse(txtNumberOfDaysPerMonth.Text), cboCatchUnit.Text, int.Parse(txtDominantPercentage.Text),
-                                    guid, _dataStatus, rangeCPUEMax, rangeCPUEMin, modeCPUEUpper, modeCPUELower, txtNotes.Text)
+                                    guid, _dataStatus, rangeCPUEMax, rangeCPUEMin, modeCPUEUpper, modeCPUELower, txtNotes.Text, cpueAverage, modeCPUE, equivalentKilo)
 
                                     && _inventory.SaveSitioGearInventoryGearLocalNames(guid, listGearLocalNameGuids)
 
@@ -975,6 +1103,9 @@ namespace FAD3.Database.Forms
                     case "txtRangeMin":
                     case "txtModeUpper":
                     case "txtModeLower":
+                    case "txtAverageCPUE":
+                    case "txtMode":
+                    case "txtEquivalentKg":
                     case "txtDominantPercentage":
                     case "txtCountFishers":
                     case "txtCountCommercial":
@@ -987,34 +1118,26 @@ namespace FAD3.Database.Forms
                         }
                         else
                         {
+                            //|| ctlName == "txtRangeMax"
+                            //|| ctlName == "txtRangeMin"
+                            //|| ctlName == "txtModeUpper"
+                            //|| ctlName == "txtModeLower"
+                            //|| ctlName == "txtAverageCPUE"
+                            //|| ctlName == "txtMode"
+                            //|| ctlName == "txtEquivalentKg"
+
                             if (ctlName == "txtCommercialUsage"
                                 || ctlName == "txtMunicipalMotorizedUsage"
                                 || ctlName == "txtMunicipalNonMotorizedUsage"
                                 || ctlName == "txtNoBoatGears"
                                 || ctlName == "txtCountCommercial"
                                 || ctlName == "txtCountMotorized"
-                                || ctlName == "txtCountNonMotorized")
+                                || ctlName == "txtCountNonMotorized"
+                                || ctlName == "txtRangeMin"
+                                )
                             {
                                 e.Cancel = v < 0;
                                 msg = "Cannot accept values less than zero";
-
-                                //if (ctlName == "txtCommercialUsage")
-                                //{
-                                //    e.Cancel = v > _countCommercial;
-                                //    msg = $"Gear distribution in commercial vessels ({v}) must not be more than total number of commercial vessels ({_countCommercial})";
-                                //}
-
-                                //if (ctlName == "txtMunicipalMotorizedUsage")
-                                //{
-                                //    e.Cancel = v > _countMunicipalMotorized;
-                                //    msg = $"Gear distribution in municipal motorized vessels ({v}) must not be more than total number of municipal motorized vessels ({_countMunicipalMotorized})";
-                                //}
-
-                                //if (ctlName == "txtMunicipalNonMotorizedUsage")
-                                //{
-                                //    e.Cancel = v > _countMunicipalNonMotorized;
-                                //    msg = $"Gear distribution in municipal non-motorized vessels ({v}) must not be more than total number of municipal non-motorized vessels ({_countMunicipalNonMotorized})";
-                                //}
                             }
                             else if (ctlName == "txtNumberOfDaysPerMonth")
                             {
@@ -1034,10 +1157,12 @@ namespace FAD3.Database.Forms
 
                             if (!e.Cancel)
                             {
-                                e.Cancel = !IsCatchValuesOK(FormValidation: false);
+                                var result = IsCatchValuesOK(FormValidation: false);
+                                e.Cancel = !result.success;
                                 if (e.Cancel)
                                 {
-                                    showError = false;
+                                    msg = result.msg;
+                                    showError = true;
                                 }
                             }
                         }
@@ -1271,6 +1396,7 @@ namespace FAD3.Database.Forms
                                         KeyValuePair<string, string> newEnumerator = new KeyValuePair<string, string>(enf.EnumeratorGuid, enf.EnumeratorName);
                                         cboBarangaySurveyEnumerator.Items.Add(newEnumerator);
                                         cboBarangaySurveyEnumerator.Text = newEnumerator.Value;
+                                        global.mainForm.RefreshTargetAreaEnumerators(_targetArea.TargetAreaGuid);
                                     }
                                 }
                                 else
@@ -1288,12 +1414,28 @@ namespace FAD3.Database.Forms
         {
             pnlGear.Location = pnlInventory.Location;
             pnlBarangay.Location = pnlInventory.Location;
+            pnlBarangay.Size = pnlGear.Size;
+            //tabsBarangayData.Location = tabsGear.Location;
+            tabsBarangayData.Top = cboGearClass.Top;
+            lblCurrentSitio.Location = lblLocation.Location;
 
             Width = (pnlInventory.Left * 8) + pnlInventory.Width;
             global.LoadFormSettings(this, true);
             if (pnlGear.Visible)
             {
                 cboGearVariation.Focus();
+            }
+            txtAverageCPUE.Location = txtRangeMax.Location;
+            txtMode.Location = txtModeUpper.Location;
+            if (_dataStatus == fad3DataStatus.statusNew)
+            {
+                txtAverageCPUE.Visible = false;
+                lblCPUE.Text = "Maximum";
+                lblMode.Text = "Upper";
+                chkCPUERange.Checked = true;
+                chkCPUEModeRange.Checked = true;
+                txtMode.Visible = false;
+                txtEquivalentKg.Enabled = cboCatchUnit.Text != "kilo";
             }
         }
 
@@ -1475,6 +1617,52 @@ namespace FAD3.Database.Forms
                         AddExpense(_hitItem);
                         break;
                 }
+            }
+        }
+
+        private void OnCheckCPUEChange(object sender, EventArgs e)
+        {
+            CheckBox chk = (CheckBox)sender;
+            switch (chk.Name)
+            {
+                case "chkCPUERange":
+                    txtRangeMax.Visible = chkCPUERange.Checked;
+                    txtRangeMin.Visible = chkCPUERange.Checked;
+                    txtAverageCPUE.Visible = !chkCPUERange.Checked;
+                    label22.Visible = chkCPUERange.Checked;
+                    if (chkCPUERange.Checked)
+                    {
+                        lblCPUE.Text = "Maximum";
+                    }
+                    else
+                    {
+                        lblCPUE.Text = "Average";
+                    }
+                    break;
+
+                case "chkCPUEModeRange":
+                    txtModeUpper.Visible = chkCPUEModeRange.Checked;
+                    txtModeLower.Visible = chkCPUEModeRange.Checked;
+                    txtMode.Visible = !chkCPUEModeRange.Checked;
+                    label23.Visible = chkCPUEModeRange.Checked;
+                    if (chkCPUEModeRange.Checked)
+                    {
+                        lblMode.Text = "Upper";
+                    }
+                    else
+                    {
+                        lblMode.Text = "Mode";
+                    }
+                    break;
+            }
+        }
+
+        private void OnCPUEUnitChange(object sender, EventArgs e)
+        {
+            txtEquivalentKg.Enabled = cboCatchUnit.Text != "kilo";
+            if (!txtEquivalentKg.Enabled)
+            {
+                txtEquivalentKg.Text = "";
             }
         }
     }

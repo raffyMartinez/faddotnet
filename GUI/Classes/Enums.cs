@@ -55,7 +55,8 @@
         GearNameDataSelect = 256,
         GearInventory = 512,
         Enumerators = 1024,
-        GearInventoryDataSelect = 2048
+        GearInventoryDataSelect = 2048,
+        GearsRefCode = 4096
     }
 
     public enum EditActionType

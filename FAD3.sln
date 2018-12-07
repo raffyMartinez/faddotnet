@@ -9,6 +9,10 @@ Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup", "setup\Setup\Setup.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Owf.Controls.Office2007ColorPicker", "Owf.Controls.Office2007ColorPicker\Owf.Controls.Office2007ColorPicker.csproj", "{F017C4CB-751D-4F5D-8A72-96A279135473}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "FADUpdater", "FADUpdater\FADUpdater\FADUpdater.vdproj", "{131A7BE7-3F07-4DF7-A76F-754415F67B36}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "FADEXEUpdater", "FADEXEUpdater\FADEXEUpdater.vdproj", "{A792CD71-F8C2-43EB-BA34-3AA44647F9F5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,7 +35,7 @@ Global
 		{244B71F0-A919-46E9-B27F-3352D54DCD78}.Release|x64.Build.0 = Release|Any CPU
 		{244B71F0-A919-46E9-B27F-3352D54DCD78}.Release|x86.ActiveCfg = Release|Any CPU
 		{244B71F0-A919-46E9-B27F-3352D54DCD78}.Release|x86.Build.0 = Release|Any CPU
-		{98F3E998-E133-47A8-86C7-4EA964DFD2D8}.Debug|Any CPU.ActiveCfg = Debug
+		{98F3E998-E133-47A8-86C7-4EA964DFD2D8}.Debug|Any CPU.ActiveCfg = Release
 		{98F3E998-E133-47A8-86C7-4EA964DFD2D8}.Debug|x64.ActiveCfg = Debug
 		{98F3E998-E133-47A8-86C7-4EA964DFD2D8}.Debug|x64.Build.0 = Debug
 		{98F3E998-E133-47A8-86C7-4EA964DFD2D8}.Debug|x86.ActiveCfg = Debug
@@ -54,6 +58,18 @@ Global
 		{F017C4CB-751D-4F5D-8A72-96A279135473}.Release|x64.Build.0 = Release|Any CPU
 		{F017C4CB-751D-4F5D-8A72-96A279135473}.Release|x86.ActiveCfg = Release|Any CPU
 		{F017C4CB-751D-4F5D-8A72-96A279135473}.Release|x86.Build.0 = Release|Any CPU
+		{131A7BE7-3F07-4DF7-A76F-754415F67B36}.Debug|Any CPU.ActiveCfg = Debug
+		{131A7BE7-3F07-4DF7-A76F-754415F67B36}.Debug|x64.ActiveCfg = Debug
+		{131A7BE7-3F07-4DF7-A76F-754415F67B36}.Debug|x86.ActiveCfg = Debug
+		{131A7BE7-3F07-4DF7-A76F-754415F67B36}.Release|Any CPU.ActiveCfg = Release
+		{131A7BE7-3F07-4DF7-A76F-754415F67B36}.Release|x64.ActiveCfg = Release
+		{131A7BE7-3F07-4DF7-A76F-754415F67B36}.Release|x86.ActiveCfg = Release
+		{A792CD71-F8C2-43EB-BA34-3AA44647F9F5}.Debug|Any CPU.ActiveCfg = Debug
+		{A792CD71-F8C2-43EB-BA34-3AA44647F9F5}.Debug|x64.ActiveCfg = Debug
+		{A792CD71-F8C2-43EB-BA34-3AA44647F9F5}.Debug|x86.ActiveCfg = Debug
+		{A792CD71-F8C2-43EB-BA34-3AA44647F9F5}.Release|Any CPU.ActiveCfg = Release
+		{A792CD71-F8C2-43EB-BA34-3AA44647F9F5}.Release|x64.ActiveCfg = Release
+		{A792CD71-F8C2-43EB-BA34-3AA44647F9F5}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

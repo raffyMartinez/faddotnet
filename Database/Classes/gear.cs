@@ -33,6 +33,11 @@ namespace FAD3
             GetAccessories();
         }
 
+        public static void RefreshGearClasses()
+        {
+            GetGearClass();
+        }
+
         public static bool AddPaymentSource(string source)
         {
             PaymentSources.Add(source);
@@ -264,13 +269,21 @@ namespace FAD3
             return (success, guid);
         }
 
-        public static (bool success, string newGuid) SaveNewVariationName(NewFisheryObjectName newName, string gearClassGuid)
+        public static (bool success, string newGuid) SaveNewVariationName(NewFisheryObjectName newName, string gearClassGuid, string gearVariationGuid = "")
         {
             bool success = false;
             var newVariationName = newName.NewName;
             var key1 = newName.Key1;
             var key2 = newName.Key2;
-            var guid = newName.ObjectGUID;
+            var guid = "";
+            if (gearVariationGuid.Length > 0)
+            {
+                guid = gearVariationGuid;
+            }
+            else
+            {
+                guid = newName.ObjectGUID;
+            }
             using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
             {
                 conn.Open();
@@ -278,7 +291,14 @@ namespace FAD3
                         ('{newVariationName}', '{newName.NewName.Replace(" ", "")}', {{{guid}}}, {key1}, {key2}, {{{gearClassGuid}}})";
                 using (OleDbCommand update = new OleDbCommand(sql, conn))
                 {
-                    success = update.ExecuteNonQuery() > 0;
+                    try
+                    {
+                        success = update.ExecuteNonQuery() > 0;
+                    }
+                    catch
+                    {
+                        //duplicate key error: ignore
+                    }
                 }
             }
             return (success, guid);
@@ -630,6 +650,35 @@ namespace FAD3
             return myList;
         }
 
+        public static Dictionary<string, (string variationGuid, string variationName, bool isSubVariation)> GetGearRefCodes()
+        {
+            Dictionary<string, (string variationGuid, string variationName, bool isSubVariation)> dict = new Dictionary<string, (string variationGuid, string variationName, bool isSubVariation)>();
+            var myDT = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    const string query = @"SELECT tblRefGearCodes.RefGearCode,
+                                            tblGearVariations.GearVarGUID,
+                                            tblGearVariations.Variation,
+                                            tblRefGearCodes.SubVariation
+                                           FROM tblGearVariations INNER JOIN
+                                            tblRefGearCodes ON
+                                            tblGearVariations.GearVarGUID = tblRefGearCodes.GearVar";
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(myDT);
+                    for (int i = 0; i < myDT.Rows.Count; i++)
+                    {
+                        DataRow dr = myDT.Rows[i];
+                        dict.Add(dr["RefGearCode"].ToString(), (dr["GearVarGUID"].ToString(), dr["Variation"].ToString(), (bool)dr["SubVariation"]));
+                    }
+                }
+                catch (Exception ex) { Logger.Log(ex); }
+            }
+            return dict;
+        }
+
         public static List<string> GearCodesByClass(string GearClassGuid)
         {
             var myDT = new DataTable();
@@ -838,6 +887,80 @@ namespace FAD3
                     Logger.Log(ex);
                 }
             }
+        }
+
+        public static bool SaveNewGearReferenceCode(string code, string gearVariationGuid, bool isVariation)
+        {
+            bool success = false;
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                var sql = $@"Insert into tblRefGearCodes (RefGearCode, GearVar, SubVariation) values
+                        ('{code}', {{{gearVariationGuid}}}, {isVariation})";
+                using (OleDbCommand update = new OleDbCommand(sql, conn))
+                {
+                    try
+                    {
+                        success = update.ExecuteNonQuery() > 0;
+                    }
+                    catch
+                    {
+                        //ignore duplicate key error
+                    }
+                }
+            }
+            return success;
+        }
+
+        public static bool SaveNewGearClass(string gearClassGuid, string gearClassName, string gearClassCode)
+        {
+            bool success = false;
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                var sql = $@"Insert into tblGearClass (RefGearCode, GearClassName, GearLetter) values
+                        ({{{gearClassGuid}}}, ""{gearClassName}"", ""{gearClassCode}"")";
+                using (OleDbCommand update = new OleDbCommand(sql, conn))
+                {
+                    try
+                    {
+                        success = update.ExecuteNonQuery() > 0;
+                    }
+                    catch
+                    {
+                        //ignore duplicate key error
+                    }
+                }
+            }
+            return success;
+        }
+
+        public static Dictionary<string, (string gearClassName, string gearCode)> GetGearClassEx()
+        {
+            Dictionary<string, (string gearClassName, string gearCode)> dict = new Dictionary<string, (string gearClassName, string gearCode)>();
+            var myDT = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    const string query = "Select GearClass, GearLetter, GearClassName from tblGearClass order by GearClassName";
+                    using (var adapter = new OleDbDataAdapter(query, conection))
+                    {
+                        adapter.Fill(myDT);
+                        for (int i = 0; i < myDT.Rows.Count; i++)
+                        {
+                            DataRow dr = myDT.Rows[i];
+                            dict.Add(dr["GearClass"].ToString(), (dr["GearClassName"].ToString(), dr["GearLetter"].ToString()));
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex);
+                }
+            }
+            return dict;
         }
 
         public static bool GetGearCodeCounter(string GearCode, ref long counter)
@@ -1260,6 +1383,35 @@ namespace FAD3
                     Logger.Log(ex);
                 }
             }
+        }
+
+        public static Dictionary<string, (string gearVarName, string gearCLassGuid, int metaPhoneKey1, int metaPhoneKey2, string Name2)> GetAllVariations()
+        {
+            Dictionary<string, (string gearVarName, string gearCLassGuid, int metaPhoneKey1, int metaPhoneKey2, string Name2)> dict =
+                new Dictionary<string, (string gearVarName, string gearCLassGuid, int metaPhoneKey1, int metaPhoneKey2, string Name2)>();
+
+            var dt = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    const string query = "SELECT * from tblGearVariations order by Variation";
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(dt);
+                    dict.Clear();
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        DataRow dr = dt.Rows[i];
+                        dict.Add(dr["GearVarGUID"].ToString(), (dr["Variation"].ToString(), dr["GearClass"].ToString(), (int)dr["MPH1"], (int)dr["MPH2"], dr["Name2"].ToString()));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex);
+                }
+            }
+            return dict;
         }
 
         private static void GetGearVariations()

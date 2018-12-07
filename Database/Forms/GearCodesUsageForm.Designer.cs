@@ -47,6 +47,8 @@
             this.tbEdit = new System.Windows.Forms.ToolStripButton();
             this.tbExport = new System.Windows.Forms.ToolStripButton();
             this.tbImport = new System.Windows.Forms.ToolStripButton();
+            this.tbClose = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.toolBar.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -173,7 +175,9 @@
             this.tbRemove,
             this.tbEdit,
             this.tbExport,
-            this.tbImport});
+            this.tbImport,
+            this.toolStripSeparator1,
+            this.tbClose});
             this.toolBar.Location = new System.Drawing.Point(0, 0);
             this.toolBar.Name = "toolBar";
             this.toolBar.Size = new System.Drawing.Size(803, 25);
@@ -231,6 +235,21 @@
             this.tbImport.Text = "toolStripButton4";
             this.tbImport.ToolTipText = "Import";
             // 
+            // tbClose
+            // 
+            this.tbClose.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tbClose.Image = global::FAD3.Properties.Resources.im_exit;
+            this.tbClose.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tbClose.Name = "tbClose";
+            this.tbClose.Size = new System.Drawing.Size(23, 22);
+            this.tbClose.Text = "toolStripButton1";
+            this.tbClose.ToolTipText = "Close form";
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
+            // 
             // GearCodesUsageForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -284,5 +303,7 @@
         private System.Windows.Forms.ToolStripButton tbEdit;
         private System.Windows.Forms.ToolStripButton tbImport;
         private System.Windows.Forms.ToolStripButton tbExport;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripButton tbClose;
     }
 }

@@ -51,8 +51,10 @@
             treeNode9,
             treeNode10,
             treeNode11});
-            System.Windows.Forms.TreeNode treeNode13 = new System.Windows.Forms.TreeNode("Inventory Project", new System.Windows.Forms.TreeNode[] {
-            treeNode12});
+            System.Windows.Forms.TreeNode treeNode13 = new System.Windows.Forms.TreeNode("Respondents");
+            System.Windows.Forms.TreeNode treeNode14 = new System.Windows.Forms.TreeNode("Inventory Project", new System.Windows.Forms.TreeNode[] {
+            treeNode12,
+            treeNode13});
             this.treeInventory = new System.Windows.Forms.TreeView();
             this.toolBar = new System.Windows.Forms.ToolStrip();
             this.tsbExport = new System.Windows.Forms.ToolStripButton();
@@ -91,10 +93,12 @@
             treeNode11.Text = "Notes";
             treeNode12.Name = "nodeFisherVessel";
             treeNode12.Text = "Fisher and vessel inventory";
-            treeNode13.Name = "nodeProject";
-            treeNode13.Text = "Inventory Project";
+            treeNode13.Name = "nodeRespondents";
+            treeNode13.Text = "Respondents";
+            treeNode14.Name = "nodeProject";
+            treeNode14.Text = "Inventory Project";
             this.treeInventory.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode13});
+            treeNode14});
             this.treeInventory.Size = new System.Drawing.Size(222, 425);
             this.treeInventory.TabIndex = 0;
             this.treeInventory.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.OnNodeAfterSelect);

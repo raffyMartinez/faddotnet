@@ -23,12 +23,15 @@ namespace FAD3.Database.Forms
         private Dictionary<string, (string month, string type)> _monthsFishing = new Dictionary<string, (string month, string type)>();
 
         private Dictionary<string, (int countCommercial, int countMotorized, int countNonMotorized,
-            int countNoBoat, int maxCPUE, int minCPUE,
-            int upperMode, int lowerMode, int numberDaysUsed,
-            string cpueUnit, string Notes, int dominantPercent)> _inventoryData = new
+            int countNoBoat, int? maxCPUE, int? minCPUE,
+            int? upperMode, int? lowerMode, int numberDaysUsed,
+            string cpueUnit, string Notes, int dominantPercent,
+            int? averageCPUE, int? cpueMode, double? equivalentKg)> _inventoryData = new
             Dictionary<string, (int countCommercial, int countMotorized, int countNonMotorized,
-                int countNoBoat, int maxCPUE, int minCPUE, int upperMode,
-                int lowerMode, int numberDaysUsed, string cpueUnit, string Notes, int dominantPercent)>();
+            int countNoBoat, int? maxCPUE, int? minCPUE,
+            int? upperMode, int? lowerMode, int numberDaysUsed,
+            string cpueUnit, string Notes, int dominantPercent,
+            int? averageCPUE, int? cpueMode, double? equivalentKg)>();
 
         private Dictionary<string, (string projectName, string province, string lgu, string barangay, string sitio,
             string enumerator, DateTime surveyDate, string gearClass, string gearVariation)> _headers = new
@@ -106,6 +109,10 @@ namespace FAD3.Database.Forms
 
                 case "nodeNotes":
                     ShowNotes();
+                    break;
+
+                case "nodeRespondents":
+                    ShowRespondents();
                     break;
             }
         }
@@ -189,19 +196,28 @@ namespace FAD3.Database.Forms
             AddColumnDataType(col, "int");
             col = listResults.Columns.Add("Minimum CPUE");
             AddColumnDataType(col, "int");
+            col = listResults.Columns.Add("Average CPUE");
+            AddColumnDataType(col, "int");
             col = listResults.Columns.Add("Upper CPUE mode");
             AddColumnDataType(col, "int");
             col = listResults.Columns.Add("Lower CPUE mode");
             AddColumnDataType(col, "int");
+            col = listResults.Columns.Add("CPUE mode");
+            AddColumnDataType(col, "int");
             listResults.Columns.Add("Unit");
+            col = listResults.Columns.Add("Equivalent kg");
+            AddColumnDataType(col, "double");
             SizeColumns(listResults);
             foreach (ListViewItem lvi in listResults.Items)
             {
                 lvi.SubItems.Add(_inventoryData[lvi.Name].maxCPUE.ToString());
                 lvi.SubItems.Add(_inventoryData[lvi.Name].minCPUE.ToString());
+                lvi.SubItems.Add(_inventoryData[lvi.Name].averageCPUE.ToString());
                 lvi.SubItems.Add(_inventoryData[lvi.Name].upperMode.ToString());
                 lvi.SubItems.Add(_inventoryData[lvi.Name].lowerMode.ToString());
+                lvi.SubItems.Add(_inventoryData[lvi.Name].cpueMode.ToString());
                 lvi.SubItems.Add(_inventoryData[lvi.Name].cpueUnit);
+                lvi.SubItems.Add(_inventoryData[lvi.Name].equivalentKg.ToString());
             }
             SizeColumns(listResults, false);
         }
@@ -576,6 +592,68 @@ namespace FAD3.Database.Forms
             foreach (ListViewItem lvi in listResults.Items)
             {
                 lvi.SubItems.Add(_inventoryData[lvi.Name].numberDaysUsed.ToString());
+            }
+            SizeColumns(listResults, false);
+        }
+
+        private void ShowRespondents()
+        {
+            var col = new ColumnHeader();
+            var rowCount = 0;
+            listResults.Clear();
+            listResults.Columns.Add("Project");
+            listResults.Columns.Add("Province");
+            listResults.Columns.Add("LGU");
+            listResults.Columns.Add("Barangay");
+            listResults.Columns.Add("Sitio");
+            listResults.Columns.Add("Enumerator");
+            col = listResults.Columns.Add("Date surveyed");
+            AddColumnDataType(col, "date");
+            col = listResults.Columns.Add("Respondents");
+            AddColumnDataType(col, "string");
+            SizeColumns(listResults);
+            foreach (var item in _inventory.GetFisherVesselInventory(_inventoryGuid))
+            {
+                var lvi = listResults.Items.Add(item.brgyInventoryGuid, item.project, null);
+                lvi.SubItems.Add(item.province);
+                lvi.SubItems.Add(item.lgu);
+                lvi.SubItems.Add(item.barangay);
+                var sitio = item.sitio;
+                if (sitio.Length > 0)
+                {
+                    lvi.SubItems.Add(sitio);
+                }
+                else
+                {
+                    lvi.SubItems.Add("Entire barangay");
+                }
+                lvi.SubItems.Add(item.enumerator);
+                lvi.SubItems.Add(string.Format("{0:MMM-dd-yyyy}", item.dateSurveyed));
+
+                rowCount = 0;
+                foreach (var responder in (_inventory.GetSitioRespondents(lvi.Name)))
+                {
+                    if (rowCount == 0)
+                    {
+                        lvi.SubItems.Add(responder);
+                    }
+                    else
+                    {
+                        for (int n = 0; n < 7; n++)
+                        {
+                            if (n == 0)
+                            {
+                                lvi = listResults.Items.Add("");
+                            }
+                            else
+                            {
+                                lvi.SubItems.Add("");
+                            }
+                        }
+                        lvi.SubItems.Add(responder);
+                    }
+                    rowCount++;
+                }
             }
             SizeColumns(listResults, false);
         }

@@ -74,7 +74,7 @@
             // split.Panel2
             // 
             this.split.Panel2.Controls.Add(this.tableLayoutPanel1);
-            this.split.Size = new System.Drawing.Size(926, 186);
+            this.split.Size = new System.Drawing.Size(926, 326);
             this.split.SplitterDistance = 307;
             this.split.TabIndex = 2;
             // 
@@ -85,7 +85,7 @@
             this.treeInventory.HideSelection = false;
             this.treeInventory.Location = new System.Drawing.Point(0, 0);
             this.treeInventory.Name = "treeInventory";
-            this.treeInventory.Size = new System.Drawing.Size(307, 186);
+            this.treeInventory.Size = new System.Drawing.Size(307, 326);
             this.treeInventory.TabIndex = 1;
             this.treeInventory.AfterExpand += new System.Windows.Forms.TreeViewEventHandler(this.OnTreeAfterExpand);
             this.treeInventory.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.OnNodeClicked);
@@ -104,7 +104,7 @@
             this.tableLayoutPanel1.RowCount = 2;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(612, 186);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(612, 326);
             this.tableLayoutPanel1.TabIndex = 4;
             this.tableLayoutPanel1.ClientSizeChanged += new System.EventHandler(this.OnPanelSizeChanged);
             // 
@@ -125,7 +125,7 @@
             this.lvInventory.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lvInventory.Location = new System.Drawing.Point(3, 23);
             this.lvInventory.Name = "lvInventory";
-            this.lvInventory.Size = new System.Drawing.Size(606, 161);
+            this.lvInventory.Size = new System.Drawing.Size(606, 300);
             this.lvInventory.TabIndex = 4;
             this.lvInventory.UseCompatibleStateImageBehavior = false;
             this.lvInventory.DoubleClick += new System.EventHandler(this.OnListViewDoubleClick);
@@ -234,7 +234,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(928, 222);
+            this.ClientSize = new System.Drawing.Size(928, 362);
             this.Controls.Add(this.toolStrip);
             this.Controls.Add(this.split);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;

@@ -310,7 +310,7 @@ namespace FAD3
             return myRows;
         }
 
-        static public bool AOIHaveEnumerators(string AOIGuid)
+        static public bool TargetAreaHasEnumerators(string AOIGuid)
         {
             var HasEnumerator = false;
             using (var conection = new OleDbConnection(global.ConnectionString))

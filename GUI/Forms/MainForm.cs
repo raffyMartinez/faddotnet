@@ -1090,7 +1090,7 @@ namespace FAD3
                     break;
 
                 case "menuGearInventory":
-                    if (Enumerators.AOIHaveEnumerators(_targetAreaGuid))
+                    if (Enumerators.TargetAreaHasEnumerators(_targetAreaGuid))
                     {
                         SetInventoryWindow();
                     }
@@ -1135,7 +1135,7 @@ namespace FAD3
                 case "menuNewSampling":
                     if (FishingGrid.IsCompleteGrid25)
                     {
-                        if (Enumerators.AOIHaveEnumerators(_targetAreaGuid))
+                        if (Enumerators.TargetAreaHasEnumerators(_targetAreaGuid))
                             NewSamplingForm();
                         else
                         {
@@ -1309,11 +1309,11 @@ namespace FAD3
                 GearClassGuid = _gearClassGUID,
                 GearVarGuid = _gearVarGUID,
                 GearVarName = _gearVarName,
-                AOIGuid = TargetAreaGuid,
-                AOIName = TargetAreaName,
+                TargetAreaGuid = TargetAreaGuid,
+                TargetAreaName = TargetAreaName,
                 LandingSiteName = _landingSiteName,
                 LandingSiteGuid = _landingSiteGuid,
-                AOI = _targetArea
+                TargetArea = _targetArea
             };
             f3.ListViewSamplingDetail(lvMain);
             f3.Parent_Form = this;
@@ -2344,6 +2344,14 @@ namespace FAD3
             return Proceed;
         }
 
+        public void RefreshTargetAreaEnumerators(string targetAreaGUID)
+        {
+            if (_targetAreaGuid == targetAreaGUID && _treeLevel == "aoi")
+            {
+                SetUPLV(_treeLevel);
+            }
+        }
+
         /// <summary>
         /// this will show a list of summaries depending on the level of the node selected
         /// level could be root, AOI, Landing site, gear used, and sampling month
@@ -2405,16 +2413,11 @@ namespace FAD3
                     break;
             }
 
-            //apply column widths saved in registry
-            //if (!ApplyListViewColumnWidth(TreeLevel))
-            //{
-            //savedColWidthExist = false;
             lvMain.Tag = TreeLevel;
             SizeColumns(lvMain);
             //}
 
             //add rows to the listview
-            // switch (_treeLevel)
             switch (TreeLevel)
             {
                 case "sampling":
@@ -2665,11 +2668,7 @@ namespace FAD3
                     break;
             }
 
-            //if (!colWidthAdjusted && !savedColWidthExist)
-            //{
             SizeColumns(lvMain, false);
-            // SaveColumnWidthToRegistry();
-            //}
             lvMain.ResumeLayout();
             lvMain.Visible = true;
         }
@@ -3012,8 +3011,8 @@ namespace FAD3
             SamplingForm fs = new SamplingForm();
             fs.SamplingGUID = _samplingGUID;
             fs.ListViewSamplingDetail(lvMain);
-            fs.AOI = _targetArea;
-            fs.AOIGuid = _targetAreaGuid;
+            fs.TargetArea = _targetArea;
+            fs.TargetAreaGuid = _targetAreaGuid;
             fs.Parent_Form = this;
             fs.VesselDimension(_vesLength, _vesWidth, _vesHeight);
             fs.Show(this);
