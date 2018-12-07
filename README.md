@@ -50,4 +50,6 @@ Our [wiki](https://github.com/raffyMartinez/faddotnet/wiki) has an online manual
 
 [Enumerators](https://github.com/raffyMartinez/faddotnet/wiki/Enumerators)
 
+[Fishing gears](https://github.com/raffyMartinez/faddotnet/wiki/Fishing-gears)
+
 [Inventory of fishers, fishing vessels, and fishing gears](https://github.com/raffyMartinez/faddotnet/wiki/Inventory-of-fishers,-fishing-vessels,-and-fishing-gears)
