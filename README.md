@@ -54,4 +54,6 @@ Our [wiki](https://github.com/raffyMartinez/faddotnet/wiki) has an online manual
 
 [Species names](https://github.com/raffyMartinez/faddotnet/wiki/Species-names)
 
+[Database of local/common names and species names](https://github.com/raffyMartinez/faddotnet/wiki/Database-of-local-names-and-species-names)
+
 [Inventory of fishers, fishing vessels, and fishing gears](https://github.com/raffyMartinez/faddotnet/wiki/Inventory-of-fishers,-fishing-vessels,-and-fishing-gears)
