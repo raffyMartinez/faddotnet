@@ -26,7 +26,7 @@ What are some of the features of  FAD?
 ### Updaters
 |Date | Link  |
 |-----|-------|
-|Dec 10, 2018|https://github.com/raffyMartinez/faddotnet/releases/download/3.1/FADUpdater12102018.zip|
+|Dec 10, 2018|[FADUpdate12102018.zip(]https://github.com/raffyMartinez/faddotnet/releases/download/3.1/FADUpdater12102018.zip)|
 |Dec 7, 2018|[FADExeUpdater.zip](https://github.com/raffyMartinez/faddotnet/releases/download/3.1/FADExeUpdater12072018.zip)
 |Dec 6, 2018|[FADUpdater.zip](https://github.com/raffyMartinez/faddotnet/releases/download/3.1/FADUpdater.zip)|
 
