@@ -26,8 +26,10 @@ What are some of the features of  FAD?
 ### Updaters
 |Date | Link  |
 |-----|-------|
-|Dec 6, 2018|[FADUpdater.zip](https://github.com/raffyMartinez/faddotnet/releases/download/3.1/FADUpdater.zip)|
+|Dec 10, 2018|[FADUpdate12102018.zip](https://github.com/raffyMartinez/faddotnet/releases/download/3.1/FADUpdater12102018.zip)|
 |Dec 7, 2018|[FADExeUpdater.zip](https://github.com/raffyMartinez/faddotnet/releases/download/3.1/FADExeUpdater12072018.zip)
+|Dec 6, 2018|[FADUpdater.zip](https://github.com/raffyMartinez/faddotnet/releases/download/3.1/FADUpdater.zip)|
+
 
 ### Wiki
 Our [wiki](https://github.com/raffyMartinez/faddotnet/wiki) has an online manual.
@@ -51,5 +53,9 @@ Our [wiki](https://github.com/raffyMartinez/faddotnet/wiki) has an online manual
 [Enumerators](https://github.com/raffyMartinez/faddotnet/wiki/Enumerators)
 
 [Fishing gears](https://github.com/raffyMartinez/faddotnet/wiki/Fishing-gears)
+
+[Species names](https://github.com/raffyMartinez/faddotnet/wiki/Species-names)
+
+[Database of local/common names and species names](https://github.com/raffyMartinez/faddotnet/wiki/Database-of-local-names-and-species-names)
 
 [Inventory of fishers, fishing vessels, and fishing gears](https://github.com/raffyMartinez/faddotnet/wiki/Inventory-of-fishers,-fishing-vessels,-and-fishing-gears)
