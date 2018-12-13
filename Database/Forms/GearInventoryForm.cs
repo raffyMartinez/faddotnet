@@ -532,7 +532,9 @@ namespace FAD3.Database.Forms
                 lvi.SubItems.Add(item.equivalentKg.ToString());
             }
 
+            //historical cpue
             n = 0;
+            int year = DateTime.Now.Year;
             foreach (var hist in item.historicalCPUE)
             {
                 if (n == 0)

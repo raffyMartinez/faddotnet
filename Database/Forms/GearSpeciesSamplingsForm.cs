@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using FAD3.GUI.Classes;
 
 namespace FAD3
 {
@@ -10,22 +11,24 @@ namespace FAD3
         private string _itemName;
         private Form _parentForm;
         private static GearSpeciesSamplingsForm _instance;
+        private OccurenceDataType _mappingType;
 
         private Dictionary<string, (string targetAreaName, string refNo, string landingSite, string gearClassName, string gear,
                         DateTime samplingDate, string fishingGround, string vesselType, double wtCatch, string GUIDs, string EnumeratorName)> _samplings;
 
-        public static GearSpeciesSamplingsForm GetInstance(string itemNameGuid, string itemName, Form parent)
+        public static GearSpeciesSamplingsForm GetInstance(string itemNameGuid, string itemName, Form parent, OccurenceDataType mappingType)
         {
-            if (_instance == null) _instance = new GearSpeciesSamplingsForm(itemNameGuid, itemName, parent);
+            if (_instance == null) _instance = new GearSpeciesSamplingsForm(itemNameGuid, itemName, parent, mappingType);
             return _instance;
         }
 
-        public GearSpeciesSamplingsForm(string itemNameGuid, string itemName, Form parent)
+        public GearSpeciesSamplingsForm(string itemNameGuid, string itemName, Form parent, OccurenceDataType mappingType)
         {
             InitializeComponent();
             _itemNameGuid = itemNameGuid;
             _itemName = itemName;
             _parentForm = parent;
+            _mappingType = mappingType;
         }
 
         public void setItemGuid_Name_Parent(string itemNameGuid, string itemName, Form parent)
@@ -151,6 +154,16 @@ namespace FAD3
         {
             SetupListView();
             setUpUI();
+            switch (_mappingType)
+            {
+                case OccurenceDataType.Gear:
+                    Text = $"List of samplings of gear: {_itemName}";
+                    break;
+
+                case OccurenceDataType.Species:
+                    Text = $"List of samplings of species: {_itemName}";
+                    break;
+            }
         }
 
         private void SetupListView()

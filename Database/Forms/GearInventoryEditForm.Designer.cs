@@ -28,10 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem("Fuel");
-            System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem("Food");
-            System.Windows.Forms.ListViewItem listViewItem3 = new System.Windows.Forms.ListViewItem("Ice");
-            System.Windows.Forms.ListViewItem listViewItem4 = new System.Windows.Forms.ListViewItem("");
+            System.Windows.Forms.ListViewItem listViewItem9 = new System.Windows.Forms.ListViewItem("Fuel");
+            System.Windows.Forms.ListViewItem listViewItem10 = new System.Windows.Forms.ListViewItem("Food");
+            System.Windows.Forms.ListViewItem listViewItem11 = new System.Windows.Forms.ListViewItem("Ice");
+            System.Windows.Forms.ListViewItem listViewItem12 = new System.Windows.Forms.ListViewItem("");
             this.btnOk = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.txtInventoryName = new System.Windows.Forms.TextBox();
@@ -197,7 +197,7 @@
             // 
             // txtInventoryName
             // 
-            this.txtInventoryName.Location = new System.Drawing.Point(83, 16);
+            this.txtInventoryName.Location = new System.Drawing.Point(97, 16);
             this.txtInventoryName.Name = "txtInventoryName";
             this.txtInventoryName.Size = new System.Drawing.Size(262, 20);
             this.txtInventoryName.TabIndex = 0;
@@ -206,7 +206,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(14, 19);
+            this.label1.Location = new System.Drawing.Point(11, 19);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(35, 13);
             this.label1.TabIndex = 1;
@@ -215,7 +215,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(14, 58);
+            this.label2.Location = new System.Drawing.Point(11, 58);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(53, 13);
             this.label2.TabIndex = 2;
@@ -223,7 +223,7 @@
             // 
             // txtDateImplemented
             // 
-            this.txtDateImplemented.Location = new System.Drawing.Point(83, 55);
+            this.txtDateImplemented.Location = new System.Drawing.Point(97, 55);
             this.txtDateImplemented.Name = "txtDateImplemented";
             this.txtDateImplemented.Size = new System.Drawing.Size(105, 20);
             this.txtDateImplemented.TabIndex = 1;
@@ -238,7 +238,7 @@
             this.pnlInventory.Controls.Add(this.label2);
             this.pnlInventory.Location = new System.Drawing.Point(2, 17);
             this.pnlInventory.Name = "pnlInventory";
-            this.pnlInventory.Size = new System.Drawing.Size(373, 97);
+            this.pnlInventory.Size = new System.Drawing.Size(373, 279);
             this.pnlInventory.TabIndex = 4;
             this.pnlInventory.Visible = false;
             // 
@@ -246,7 +246,7 @@
             // 
             this.pnlBarangay.Controls.Add(this.lblCurrentSitio);
             this.pnlBarangay.Controls.Add(this.tabsBarangayData);
-            this.pnlBarangay.Location = new System.Drawing.Point(2, 120);
+            this.pnlBarangay.Location = new System.Drawing.Point(776, 18);
             this.pnlBarangay.Name = "pnlBarangay";
             this.pnlBarangay.Size = new System.Drawing.Size(373, 407);
             this.pnlBarangay.TabIndex = 5;
@@ -265,7 +265,7 @@
             // 
             this.tabsBarangayData.Controls.Add(this.tabData);
             this.tabsBarangayData.Controls.Add(this.tabRespondents);
-            this.tabsBarangayData.Location = new System.Drawing.Point(3, 0);
+            this.tabsBarangayData.Location = new System.Drawing.Point(3, 3);
             this.tabsBarangayData.Name = "tabsBarangayData";
             this.tabsBarangayData.SelectedIndex = 0;
             this.tabsBarangayData.Size = new System.Drawing.Size(367, 388);
@@ -1325,10 +1325,10 @@
             this.colNotes});
             this.listViewExpenses.HideSelection = false;
             this.listViewExpenses.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem1,
-            listViewItem2,
-            listViewItem3,
-            listViewItem4});
+            listViewItem9,
+            listViewItem10,
+            listViewItem11,
+            listViewItem12});
             this.listViewExpenses.Location = new System.Drawing.Point(9, 52);
             this.listViewExpenses.Name = "listViewExpenses";
             this.listViewExpenses.Size = new System.Drawing.Size(340, 202);
@@ -1420,7 +1420,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(764, 567);
+            this.ClientSize = new System.Drawing.Size(1150, 567);
             this.Controls.Add(this.pnlGear);
             this.Controls.Add(this.pnlBarangay);
             this.Controls.Add(this.pnlInventory);

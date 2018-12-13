@@ -92,7 +92,7 @@ namespace FAD3
         {
             global.LoadFormSettings(this, false);
             dropDownMenu.ItemClicked += OnDropDownMenuItemClicked;
-            Text = "List of all species in catch composition of sampled landings";
+            Text = "Database of species names of catch in the Philippines";
             //lvTaxa.Columns.Add("");
             lvTaxa.View = View.List;
             //SizeColumns(lvTaxa);
@@ -128,15 +128,15 @@ namespace FAD3
             {
                 case "menuViewSamplings":
                     var catchName = $"{lvNames.SelectedItems[0].SubItems[1].Text} {lvNames.SelectedItems[0].SubItems[2].Text}";
-                    var ef = GearSpeciesSamplingsForm.GetInstance(lvNames.SelectedItems[0].Name, catchName, this);
-                    if (!ef.Visible)
+                    var gssf = GearSpeciesSamplingsForm.GetInstance(lvNames.SelectedItems[0].Name, catchName, this, OccurenceDataType.Species);
+                    if (!gssf.Visible)
                     {
-                        ef.Show(this);
+                        gssf.Show(this);
                     }
                     else
                     {
-                        ef.BringToFront();
-                        ef.setItemGuid_Name_Parent(lvNames.SelectedItems[0].Name, catchName, this);
+                        gssf.BringToFront();
+                        gssf.setItemGuid_Name_Parent(lvNames.SelectedItems[0].Name, catchName, this);
                     }
 
                     break;

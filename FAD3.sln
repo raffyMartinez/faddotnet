@@ -9,9 +9,7 @@ Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup", "setup\Setup\Setup.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Owf.Controls.Office2007ColorPicker", "Owf.Controls.Office2007ColorPicker\Owf.Controls.Office2007ColorPicker.csproj", "{F017C4CB-751D-4F5D-8A72-96A279135473}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "FADUpdater", "FADUpdater\FADUpdater\FADUpdater.vdproj", "{131A7BE7-3F07-4DF7-A76F-754415F67B36}"
-EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "FADEXEUpdater", "FADEXEUpdater\FADEXEUpdater.vdproj", "{A792CD71-F8C2-43EB-BA34-3AA44647F9F5}"
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "FADUpdate12102018", "FADUpdate12102018\FADUpdate12102018.vdproj", "{4A71546E-EB27-47FC-9E7A-78F8F712BB26}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -58,18 +56,12 @@ Global
 		{F017C4CB-751D-4F5D-8A72-96A279135473}.Release|x64.Build.0 = Release|Any CPU
 		{F017C4CB-751D-4F5D-8A72-96A279135473}.Release|x86.ActiveCfg = Release|Any CPU
 		{F017C4CB-751D-4F5D-8A72-96A279135473}.Release|x86.Build.0 = Release|Any CPU
-		{131A7BE7-3F07-4DF7-A76F-754415F67B36}.Debug|Any CPU.ActiveCfg = Debug
-		{131A7BE7-3F07-4DF7-A76F-754415F67B36}.Debug|x64.ActiveCfg = Debug
-		{131A7BE7-3F07-4DF7-A76F-754415F67B36}.Debug|x86.ActiveCfg = Debug
-		{131A7BE7-3F07-4DF7-A76F-754415F67B36}.Release|Any CPU.ActiveCfg = Release
-		{131A7BE7-3F07-4DF7-A76F-754415F67B36}.Release|x64.ActiveCfg = Release
-		{131A7BE7-3F07-4DF7-A76F-754415F67B36}.Release|x86.ActiveCfg = Release
-		{A792CD71-F8C2-43EB-BA34-3AA44647F9F5}.Debug|Any CPU.ActiveCfg = Debug
-		{A792CD71-F8C2-43EB-BA34-3AA44647F9F5}.Debug|x64.ActiveCfg = Debug
-		{A792CD71-F8C2-43EB-BA34-3AA44647F9F5}.Debug|x86.ActiveCfg = Debug
-		{A792CD71-F8C2-43EB-BA34-3AA44647F9F5}.Release|Any CPU.ActiveCfg = Release
-		{A792CD71-F8C2-43EB-BA34-3AA44647F9F5}.Release|x64.ActiveCfg = Release
-		{A792CD71-F8C2-43EB-BA34-3AA44647F9F5}.Release|x86.ActiveCfg = Release
+		{4A71546E-EB27-47FC-9E7A-78F8F712BB26}.Debug|Any CPU.ActiveCfg = Debug
+		{4A71546E-EB27-47FC-9E7A-78F8F712BB26}.Debug|x64.ActiveCfg = Debug
+		{4A71546E-EB27-47FC-9E7A-78F8F712BB26}.Debug|x86.ActiveCfg = Debug
+		{4A71546E-EB27-47FC-9E7A-78F8F712BB26}.Release|Any CPU.ActiveCfg = Release
+		{4A71546E-EB27-47FC-9E7A-78F8F712BB26}.Release|x64.ActiveCfg = Release
+		{4A71546E-EB27-47FC-9E7A-78F8F712BB26}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -423,6 +423,15 @@ namespace FAD3
             //}
         }
 
+        private void OncboEditoe_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+            if (e.KeyData == Keys.Tab)
+            {
+                e.IsInputKey = true;
+                GetTextBox(_cboEditor, GetNext: true).Focus();
+            }
+        }
+
         private void OncboEditor_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Return)
@@ -1043,7 +1052,7 @@ namespace FAD3
                 var ev = new EventArgs();
                 OnButtonClick(buttonAdd, ev);
             }
-            else if (e.KeyCode == Keys.Return)
+            else if (e.KeyCode == Keys.Return || e.KeyCode == Keys.Tab)
             {
                 if (this.ActiveControl.GetType().Name == "TextBox"
                     || this.ActiveControl.GetType().Name == "CheckBox")
@@ -1498,6 +1507,7 @@ namespace FAD3
         {
             _cboEditor.KeyDown += OncboEditor_KeyDown;
             _cboEditor.Validating += OncboEditor_Validating;
+            _cboEditor.PreviewKeyDown += OncboEditoe_PreviewKeyDown;
         }
 
         private void SetIDType(TextBox source)

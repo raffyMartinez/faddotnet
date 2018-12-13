@@ -1787,7 +1787,22 @@ namespace FAD3
                     break;
 
                 case "tsButtonReport":
-
+                    if (_treeLevel == "aoi" && _targetAreaName.Length > 0 && _targetAreaGuid.Length > 0)
+                    {
+                        DatabaseReportForm drf = DatabaseReportForm.GetInstance(_treeLevel, _targetArea);
+                        if (drf.Visible)
+                        {
+                            drf.BringToFront();
+                        }
+                        else
+                        {
+                            drf.Show(this);
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Please select a target area", "Select a target area", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
                     break;
 
                 case "tsButtonMap":
@@ -1952,6 +1967,12 @@ namespace FAD3
                         _landingSiteGuid = "";
                         _gearVarName = "";
                         _gearVarGUID = "";
+                        DatabaseReportForm drf = DatabaseReportForm.GetInstance();
+                        if (drf != null)
+                        {
+                            drf.TargetArea = _targetArea;
+                            drf.BringToFront();
+                        }
                         break;
 
                     case "root":
@@ -2814,9 +2835,44 @@ namespace FAD3
             {
                 lvCatch.Items.Clear();
                 int n = 1;
-                //foreach (KeyValuePair<string, sampling.CatchLine> kv in _Sampling.CatchComp())
+                double computedWeight = 0;
+                double totalCatchWt = 0;
+                int totalCatchCount = 0;
+                double totalComputedWeight = 0;
+                int totalComputedCount = 0;
+                int computedCount = 0;
                 foreach (KeyValuePair<string, CatchLine> kv in CatchComposition.RetrieveCatchComposition(_samplingGUID))
                 {
+                    if (kv.Value.FromTotalCatch)
+                    {
+                        computedWeight = kv.Value.CatchWeight;
+                        if (kv.Value.CatchCount == null)
+                        {
+                            computedCount = (int)((kv.Value.CatchWeight / kv.Value.CatchSubsampleWt) * kv.Value.CatchSubsampleCount);
+                        }
+                        else
+                        {
+                            computedCount = (int)kv.Value.CatchCount;
+                        }
+                    }
+                    else
+                    {
+                        if (_weightOfSample != null)
+                        {
+                            computedWeight = (_weightOfCatch / (double)_weightOfSample) * kv.Value.CatchWeight;
+                            if (kv.Value.CatchCount == null)
+                            {
+                                computedCount = (int)((kv.Value.CatchWeight / kv.Value.CatchSubsampleWt) * kv.Value.CatchSubsampleCount);
+                            }
+                            else
+                            {
+                                computedCount = (int)((_weightOfCatch / (double)_weightOfSample) * kv.Value.CatchCount);
+                            }
+                        }
+                        else
+                        {
+                        }
+                    }
                     var lvi = new ListViewItem(new string[]
                     {
                         n.ToString(),
@@ -2826,14 +2882,31 @@ namespace FAD3
                         kv.Value.CatchSubsampleWt.ToString(),
                         kv.Value.CatchSubsampleCount.ToString(),
                         kv.Value.FromTotalCatch.ToString(),
-                        kv.Value.TaxaNumber.ToString()
+                        //kv.Value.TaxaNumber.ToString()
+                        computedWeight.ToString("N2"),
+                        computedCount.ToString()
                     });
                     lvi.Name = kv.Key;
                     lvi.SubItems[1].Name = kv.Value.CatchNameGUID;
                     lvi.Tag = kv.Value.NameType.ToString();
                     lvCatch.Items.Add(lvi);
+                    totalCatchWt += kv.Value.CatchWeight;
+                    totalCatchCount += kv.Value.CatchCount == null ? 0 : (int)kv.Value.CatchCount;
+                    totalComputedWeight += computedWeight;
+                    totalComputedCount += computedCount;
                     n++;
                 }
+
+                lvCatch.Items.Add("");
+                var lviTotal = lvCatch.Items.Add("");
+                lviTotal.SubItems.Add("Totals");
+                lviTotal.SubItems.Add(totalCatchWt.ToString());
+                lviTotal.SubItems.Add(totalCatchCount.ToString());
+                lviTotal.SubItems.Add("");
+                lviTotal.SubItems.Add("");
+                lviTotal.SubItems.Add("");
+                lviTotal.SubItems.Add(totalComputedWeight.ToString("N2"));
+                lviTotal.SubItems.Add(totalComputedCount.ToString());
 
                 if (lvCatch.Items.Count > 0)
                     lvCatch.Items[0].Selected = true;

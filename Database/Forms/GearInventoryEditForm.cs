@@ -202,12 +202,49 @@ namespace FAD3.Database.Forms
 
             //setup listview of history of cpue
             SizeColumns(listViewHistoryCpue);
-            int decadeNow = ((int)(DateTime.Now.Year / 10)) * 10;
-            for (int y = 0; y < 5; y++)
+            //int fiveyearCount = 0;
+            int year = DateTime.Now.Year;
+            year = 2021;
+            int decadeNow = (year / 10) * 10;
+            //for (int y = 0; y < 10; y++)
+            while (decadeNow > 1930)
             {
                 decadeNow -= 10;
                 listViewHistoryCpue.Items.Add(decadeNow.ToString(), decadeNow.ToString() + "s", null);
             }
+            //int halfDecadeNow = (year / 5) * 5;
+            //var lustrumText = halfDecadeNow.ToString();
+            //bool adjusted = false;
+            //for (int y = 0; y < 16; y++)
+            //while (halfDecadeNow > 1920)
+            //{
+            //    if (fiveyearCount >= 4)
+            //    {
+            //        if (((double)halfDecadeNow / 10) == halfDecadeNow / 10)
+            //        {
+            //            if (!adjusted)
+            //            {
+            //                halfDecadeNow -= 10;
+            //                lustrumText = halfDecadeNow.ToString();
+            //                adjusted = true;
+            //            }
+            //            listViewHistoryCpue.Items.Add(lustrumText, lustrumText + "s", null);
+            //        }
+
+            //        if (((double)halfDecadeNow / 10) != halfDecadeNow / 10 && fiveyearCount < 5)
+            //        {
+            //            listViewHistoryCpue.Items.Add(lustrumText, $"{lustrumText} - {(halfDecadeNow - 5).ToString()}", null);
+            //        }
+            //    }
+            //    else
+            //    {
+            //        listViewHistoryCpue.Items.Add(lustrumText, $"{lustrumText} - {(halfDecadeNow - 5).ToString()}", null);
+            //    }
+            //    halfDecadeNow -= 5;
+            //    lustrumText = halfDecadeNow.ToString();
+            //    fiveyearCount++;
+            //}
+
             SizeColumns(listViewHistoryCpue, false);
 
             //setup combobox of catch local names
@@ -567,7 +604,14 @@ namespace FAD3.Database.Forms
             {
                 foreach (ListViewItem lvi in listViewHistoryCpue.Items)
                 {
-                    if (lvi.Text == item.decade.ToString() + "s")
+                    //if (lvi.Text == item.decade.ToString() + "s")
+                    //{
+                    //    lvi.SubItems.Add(item.cpue.ToString());
+                    //    lvi.SubItems.Add(item.unit);
+                    //    break;
+                    //}
+
+                    if (lvi.Name == item.decade.ToString())
                     {
                         lvi.SubItems.Add(item.cpue.ToString());
                         lvi.SubItems.Add(item.unit);
@@ -769,7 +813,8 @@ namespace FAD3.Database.Forms
                                 {
                                     if (item.SubItems.Count > 1)
                                     {
-                                        listHistoryCPUE.Add((int.Parse(item.Text.Trim('s')), int.Parse(item.SubItems[1].Text), item.SubItems[2].Text));
+                                        //listHistoryCPUE.Add((int.Parse(item.Text.Trim('s')), int.Parse(item.SubItems[1].Text), item.SubItems[2].Text));
+                                        listHistoryCPUE.Add((int.Parse(item.Name), int.Parse(item.SubItems[1].Text), item.SubItems[2].Text));
                                     }
                                 }
 

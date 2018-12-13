@@ -535,7 +535,7 @@ namespace FAD3
             {
                 case "itemGearSamplings":
 
-                    var ef = GearSpeciesSamplingsForm.GetInstance(_gearVarGuid, _gearVarName, this);
+                    var ef = GearSpeciesSamplingsForm.GetInstance(_gearVarGuid, _gearVarName, this, OccurenceDataType.Gear);
                     if (!ef.Visible)
                     {
                         ef.Show(this);

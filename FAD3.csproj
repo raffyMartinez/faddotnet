@@ -147,6 +147,7 @@
     <Compile Include="Database\Classes\ImportRowsFromFileEventArgs.cs" />
     <Compile Include="Database\Classes\LengthFreq.cs" />
     <Compile Include="Database\Classes\LGUs.cs" />
+    <Compile Include="Database\Classes\ReportGeneratorClass.cs" />
     <Compile Include="Database\Classes\SimMetrics\AbstractStringMetric.cs" />
     <Compile Include="Database\Classes\SimMetrics\AbstractSubstitutionCost.cs" />
     <Compile Include="Database\Classes\SimMetrics\IStringMetric.cs" />
@@ -188,6 +189,12 @@
     </Compile>
     <Compile Include="Database\Forms\CPUEHistoricalForm.Designer.cs">
       <DependentUpon>CPUEHistoricalForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Database\Forms\DatabaseReportForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Database\Forms\DatabaseReportForm.Designer.cs">
+      <DependentUpon>DatabaseReportForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Database\Forms\EditSelectedLocalNameForm.cs">
       <SubType>Form</SubType>
@@ -261,7 +268,13 @@
     <Compile Include="Database\Forms\NewNameForm.Designer.cs">
       <DependentUpon>NewNameForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\Classes\Enums.cs" />
+    <Compile Include="Database\Classes\Enums.cs" />
+    <Compile Include="Database\Forms\ReportTableForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Database\Forms\ReportTableForm.Designer.cs">
+      <DependentUpon>ReportTableForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="GUI\Forms\AboutFADForm2.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -659,6 +672,9 @@
     <EmbeddedResource Include="Database\Forms\CPUEHistoricalForm.resx">
       <DependentUpon>CPUEHistoricalForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Database\Forms\DatabaseReportForm.resx">
+      <DependentUpon>DatabaseReportForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Database\Forms\EditSelectedLocalNameForm.resx">
       <DependentUpon>EditSelectedLocalNameForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -694,6 +710,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Database\Forms\NewNameForm.resx">
       <DependentUpon>NewNameForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Database\Forms\ReportTableForm.resx">
+      <DependentUpon>ReportTableForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Forms\AboutFADForm2.resx">
       <DependentUpon>AboutFADForm2.cs</DependentUpon>
@@ -1007,6 +1026,7 @@
     <None Include="Resources\Edit_16xMD.png" />
     <None Include="Resources\ImportFile_16x.png" />
     <None Include="Resources\fish list.bmp" />
+    <None Include="Resources\ExportToExcel_16x.png" />
     <Content Include="Resources\internet-web-browser.png" />
     <None Include="Resources\system-file-manager.png" />
     <None Include="Resources\layerAdd.bmp" />
