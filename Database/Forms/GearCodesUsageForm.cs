@@ -129,8 +129,11 @@ namespace FAD3
                 lv.Items[_gearVarGuid].Selected = true;
             else
             {
-                lv.Items[0].Selected = true;
-                _gearVarGuid = lv.Items[0].Name;
+                if (lv.Items.Count > 0)
+                {
+                    lv.Items[0].Selected = true;
+                    _gearVarGuid = lv.Items[0].Name;
+                }
             }
             FillGearVarSpecsColumn(lv);
             SizeColumns(lv, false);
@@ -146,16 +149,19 @@ namespace FAD3
                 lv.Items[_gearRefCode].Selected = true;
             else
             {
-                lv.Items[0].Selected = true;
-                _gearRefCode = lv.Items[0].Name;
+                if (lv.Items.Count > 0)
+                {
+                    lv.Items[0].Selected = true;
+                    _gearRefCode = lv.Items[0].Name;
+                }
             }
 
             //fill this list view with target areas where the variation is used
+            lv = listViewWhereUsed;
+            lv.Columns.Add("Target area of use");
+            SizeColumns(lv);
             if (_gearRefCode.Length > 0)
             {
-                lv = listViewWhereUsed;
-                lv.Columns.Add("Target area of use");
-                SizeColumns(lv);
                 FillRefCodeUsage();
                 SizeColumns(lv, false);
                 if (_targetAreaGuid.Length > 0)

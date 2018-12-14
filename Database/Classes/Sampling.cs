@@ -574,6 +574,11 @@ namespace FAD3
             }
         }
 
+        //public override string ToString()
+        //{
+        //    return $"Target area {}";
+        //}
+
         /// <summary>
         /// reads the catch and effort data of a sampled fish landing and returs a
         /// Dictionary object of keys and values
