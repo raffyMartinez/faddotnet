@@ -6,7 +6,7 @@ using System.Data.OleDb;
 using System.Data;
 using MapWinGIS;
 using Oware;
-using FAD3.GUI.Classes;
+using FAD3.Database.Classes;
 
 namespace FAD3
 {

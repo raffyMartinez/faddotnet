@@ -8,7 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using MapWinGIS;
 using System.IO;
-using FAD3.GUI.Classes;
+using FAD3.Database.Classes;
 
 namespace FAD3
 {

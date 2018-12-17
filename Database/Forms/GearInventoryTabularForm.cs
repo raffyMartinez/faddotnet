@@ -8,7 +8,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using FAD3.Database.Classes;
-using FAD3.GUI.Classes;
+
+using FAD3.Database.Classes;
+
 using ClosedXML.Excel;
 using System.IO;
 
@@ -268,9 +270,11 @@ namespace FAD3.Database.Forms
             if (showCPUETrend)
             {
                 listResults.Columns.Add("Decade");
+                listResults.Columns.Add("Year");
                 col = listResults.Columns.Add("CPUE");
                 AddColumnDataType(col, "int");
                 listResults.Columns.Add("Unit");
+                listResults.Columns.Add("Notes");
                 SizeColumns(listResults);
             }
 
@@ -348,9 +352,16 @@ namespace FAD3.Database.Forms
                                 }
                             }
                         }
-                        lvi.SubItems.Add(cpue.decade.ToString() + "s");
+                        var sDecade = cpue.decade.ToString();
+                        if (sDecade.Length > 0)
+                        {
+                            sDecade += "s";
+                        }
+                        lvi.SubItems.Add(sDecade);
+                        lvi.SubItems.Add(cpue.historyYear.ToString());
                         lvi.SubItems.Add(cpue.cpue.ToString());
                         lvi.SubItems.Add(cpue.unit);
+                        lvi.SubItems.Add(cpue.notes);
                         cpueLine++;
                     }
                 }

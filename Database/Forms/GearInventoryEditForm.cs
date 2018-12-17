@@ -8,7 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using FAD3.Database.Classes;
-using FAD3.GUI.Classes;
+
+using FAD3.Database.Classes;
 
 namespace FAD3.Database.Forms
 {
@@ -173,6 +174,72 @@ namespace FAD3.Database.Forms
             }
         }
 
+        private void SetupCPUEHistoryList()
+        {
+            listViewHistoryCpue.Columns.Clear();
+            listViewHistoryCpue.Columns.Add("Decade");
+            listViewHistoryCpue.Columns.Add("CPUE");
+            listViewHistoryCpue.Columns.Add("Unit");
+            listViewHistoryCpue.Columns.Add("Notes");
+            SizeColumns(listViewHistoryCpue);
+            listViewHistoryCpue.Items.Clear();
+            if (chkByDecade.Checked)
+            {
+                //setup listview of history of cpue
+
+                //int fiveyearCount = 0;
+                int year = DateTime.Now.Year;
+                year = 2021;
+                int decadeNow = (year / 10) * 10;
+                //for (int y = 0; y < 10; y++)
+                ListViewItem lvi;
+                while (decadeNow > 1930)
+                {
+                    decadeNow -= 10;
+                    lvi = listViewHistoryCpue.Items.Add(decadeNow.ToString(), decadeNow.ToString() + "s", null);
+                    lvi.Tag = decadeNow;
+                }
+                //int halfDecadeNow = (year / 5) * 5;
+                //var lustrumText = halfDecadeNow.ToString();
+                //bool adjusted = false;
+                //for (int y = 0; y < 16; y++)
+                //while (halfDecadeNow > 1920)
+                //{
+                //    if (fiveyearCount >= 4)
+                //    {
+                //        if (((double)halfDecadeNow / 10) == halfDecadeNow / 10)
+                //        {
+                //            if (!adjusted)
+                //            {
+                //                halfDecadeNow -= 10;
+                //                lustrumText = halfDecadeNow.ToString();
+                //                adjusted = true;
+                //            }
+                //            listViewHistoryCpue.Items.Add(lustrumText, lustrumText + "s", null);
+                //        }
+
+                //        if (((double)halfDecadeNow / 10) != halfDecadeNow / 10 && fiveyearCount < 5)
+                //        {
+                //            listViewHistoryCpue.Items.Add(lustrumText, $"{lustrumText} - {(halfDecadeNow - 5).ToString()}", null);
+                //        }
+                //    }
+                //    else
+                //    {
+                //        listViewHistoryCpue.Items.Add(lustrumText, $"{lustrumText} - {(halfDecadeNow - 5).ToString()}", null);
+                //    }
+                //    halfDecadeNow -= 5;
+                //    lustrumText = halfDecadeNow.ToString();
+                //    fiveyearCount++;
+                //}
+            }
+            else
+            {
+                listViewHistoryCpue.Columns[0].Text = "Year";
+            }
+
+            SizeColumns(listViewHistoryCpue, false);
+        }
+
         private void SetupGearInventoryUI()
         {
             //setup the gearclass combo box
@@ -200,52 +267,7 @@ namespace FAD3.Database.Forms
 
             FillUpMonths();
 
-            //setup listview of history of cpue
-            SizeColumns(listViewHistoryCpue);
-            //int fiveyearCount = 0;
-            int year = DateTime.Now.Year;
-            year = 2021;
-            int decadeNow = (year / 10) * 10;
-            //for (int y = 0; y < 10; y++)
-            while (decadeNow > 1930)
-            {
-                decadeNow -= 10;
-                listViewHistoryCpue.Items.Add(decadeNow.ToString(), decadeNow.ToString() + "s", null);
-            }
-            //int halfDecadeNow = (year / 5) * 5;
-            //var lustrumText = halfDecadeNow.ToString();
-            //bool adjusted = false;
-            //for (int y = 0; y < 16; y++)
-            //while (halfDecadeNow > 1920)
-            //{
-            //    if (fiveyearCount >= 4)
-            //    {
-            //        if (((double)halfDecadeNow / 10) == halfDecadeNow / 10)
-            //        {
-            //            if (!adjusted)
-            //            {
-            //                halfDecadeNow -= 10;
-            //                lustrumText = halfDecadeNow.ToString();
-            //                adjusted = true;
-            //            }
-            //            listViewHistoryCpue.Items.Add(lustrumText, lustrumText + "s", null);
-            //        }
-
-            //        if (((double)halfDecadeNow / 10) != halfDecadeNow / 10 && fiveyearCount < 5)
-            //        {
-            //            listViewHistoryCpue.Items.Add(lustrumText, $"{lustrumText} - {(halfDecadeNow - 5).ToString()}", null);
-            //        }
-            //    }
-            //    else
-            //    {
-            //        listViewHistoryCpue.Items.Add(lustrumText, $"{lustrumText} - {(halfDecadeNow - 5).ToString()}", null);
-            //    }
-            //    halfDecadeNow -= 5;
-            //    lustrumText = halfDecadeNow.ToString();
-            //    fiveyearCount++;
-            //}
-
-            SizeColumns(listViewHistoryCpue, false);
+            SetupCPUEHistoryList();
 
             //setup combobox of catch local names
             cboCatchLocalName.Items.Clear();
@@ -292,6 +314,7 @@ namespace FAD3.Database.Forms
 
         public void AddNewGearInventory(string barangayInventoryGuid, int countCommercial, int countMunicipalMotorized, int countMunicipalNonMotorized, int countFishers)
         {
+            chkByDecade.Checked = true;
             var item = _inventory.GetMunicipalityBrangaySitioFromBarangayInventory(barangayInventoryGuid);
             _dataStatus = fad3DataStatus.statusNew;
             _barangayInventoryGuid = barangayInventoryGuid;
@@ -600,24 +623,49 @@ namespace FAD3.Database.Forms
             chkCPUEModeRange.Checked = txtMode.Text.Length == 0;
             OnCheckCPUEChange(chkCPUEModeRange, null);
 
-            foreach (var item in gearData.historicalCPUE)
+            var historicalCPUE = gearData.historicalCPUE;
+            chkByDecade.Enabled = true;
+            if (historicalCPUE.Count == 0)
             {
-                foreach (ListViewItem lvi in listViewHistoryCpue.Items)
-                {
-                    //if (lvi.Text == item.decade.ToString() + "s")
-                    //{
-                    //    lvi.SubItems.Add(item.cpue.ToString());
-                    //    lvi.SubItems.Add(item.unit);
-                    //    break;
-                    //}
+                chkByDecade.Checked = true;
+            }
+            else if (historicalCPUE.Count > 0)
+            {
+                int? decade = historicalCPUE[0].decade;
+                chkByDecade.Checked = decade != null;
+                chkByDecade.Enabled = false;
 
-                    if (lvi.Name == item.decade.ToString())
+                foreach (var item in historicalCPUE)
+                {
+                    if (chkByDecade.Checked)
                     {
+                        foreach (ListViewItem lvi in listViewHistoryCpue.Items)
+                        {
+                            //if (lvi.Text == item.decade.ToString() + "s")
+                            //{
+                            //    lvi.SubItems.Add(item.cpue.ToString());
+                            //    lvi.SubItems.Add(item.unit);
+                            //    break;
+                            //}
+
+                            if (lvi.Name == item.decade.ToString())
+                            {
+                                lvi.SubItems.Add(item.cpue.ToString());
+                                lvi.SubItems.Add(item.unit);
+                                lvi.SubItems.Add(item.notes);
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        ListViewItem lvi = listViewHistoryCpue.Items.Add(item.historyYear.ToString(), item.historyYear.ToString(), null);
                         lvi.SubItems.Add(item.cpue.ToString());
                         lvi.SubItems.Add(item.unit);
-                        break;
+                        lvi.SubItems.Add(item.notes);
                     }
                 }
+                SizeColumns(listViewHistoryCpue, false);
             }
 
             foreach (var item in gearData.dominantCatch)
@@ -726,6 +774,59 @@ namespace FAD3.Database.Forms
         {
             switch (((Button)sender).Name)
             {
+                case "btnAddHistory":
+                    EditCPUEHistory();
+                    break;
+
+                case "btnRemoveHistory":
+                    if (chkByDecade.Checked)
+                    {
+                        try
+                        {
+                            listViewHistoryCpue.SelectedItems[0].SubItems[1].Text = "";
+                            listViewHistoryCpue.SelectedItems[0].SubItems[2].Text = "";
+                            listViewHistoryCpue.SelectedItems[0].SubItems[3].Text = "";
+                        }
+                        catch
+                        {
+                            //ignore
+                        }
+
+                        try
+                        {
+                            btnAddHistory.Enabled = listViewHistoryCpue.SelectedItems[0].SubItems[1].Text == "";
+                        }
+                        catch
+                        {
+                            btnAddHistory.Enabled = true;
+                        }
+
+                        int rows = 0;
+
+                        foreach (ListViewItem lvi in listViewHistoryCpue.Items)
+                        {
+                            if (lvi.SubItems.Count == 1)
+                            {
+                                rows++;
+                            }
+                            else if (lvi.SubItems[1].Text == "")
+                            {
+                                rows++;
+                            }
+                        }
+                        chkByDecade.Enabled = rows == listViewHistoryCpue.Items.Count;
+                    }
+                    else
+                    {
+                        if (listViewHistoryCpue.SelectedItems.Count > 0)
+                        {
+                            listViewHistoryCpue.Items.Remove(listViewHistoryCpue.SelectedItems[0]);
+                        }
+
+                        chkByDecade.Enabled = listViewHistoryCpue.Items.Count == 0;
+                    }
+                    break;
+
                 case "btnOk":
                     if (ValidateForm())
                     {
@@ -808,13 +909,20 @@ namespace FAD3.Database.Forms
                                     listMonthGearSeason.Add(item);
                                 }
 
-                                List<(int decade, int catchRate, string unit)> listHistoryCPUE = new List<(int decade, int catchRate, string unit)>();
+                                List<(int? decade, int? historyYear, int catchRate, string unit, string notes)> listHistoryCPUE = new List<(int? decade, int? historyYear, int catchRate, string unit, string notes)>();
                                 foreach (ListViewItem item in listViewHistoryCpue.Items)
                                 {
                                     if (item.SubItems.Count > 1)
+
                                     {
-                                        //listHistoryCPUE.Add((int.Parse(item.Text.Trim('s')), int.Parse(item.SubItems[1].Text), item.SubItems[2].Text));
-                                        listHistoryCPUE.Add((int.Parse(item.Name), int.Parse(item.SubItems[1].Text), item.SubItems[2].Text));
+                                        if (chkByDecade.Checked)
+                                        {
+                                            listHistoryCPUE.Add((int.Parse(item.Name), null, int.Parse(item.SubItems[1].Text), item.SubItems[2].Text, item.SubItems[3].Text));
+                                        }
+                                        else
+                                        {
+                                            listHistoryCPUE.Add((null, int.Parse(item.Name), int.Parse(item.SubItems[1].Text), item.SubItems[2].Text, item.SubItems[3].Text));
+                                        }
                                     }
                                 }
 
@@ -1179,6 +1287,7 @@ namespace FAD3.Database.Forms
                                 || ctlName == "txtCountMotorized"
                                 || ctlName == "txtCountNonMotorized"
                                 || ctlName == "txtRangeMin"
+                                || ctlName == "txtDominantPercentage"
                                 )
                             {
                                 e.Cancel = v < 0;
@@ -1189,11 +1298,11 @@ namespace FAD3.Database.Forms
                                 e.Cancel = v < 1 || v > 31;
                                 msg = "Number of days must be from 1 to 31";
                             }
-                            else if (ctlName == "txtDominantPercentage")
-                            {
-                                e.Cancel = v < 51 || v > 100;
-                                msg = "Dominant percent value must be more than 50 but not exceed 100";
-                            }
+                            //else if (ctlName == "txtDominantPercentage")
+                            //{
+                            //    e.Cancel = v < 51 || v > 100;
+                            //    msg = "Dominant percent value must be more than 50 but not exceed 100";
+                            //}
                             else
                             {
                                 e.Cancel = v <= 0;
@@ -1484,21 +1593,142 @@ namespace FAD3.Database.Forms
             }
         }
 
+        public ListView HistoryList
+        {
+            get { return listViewHistoryCpue; }
+        }
+
+        private void EditCPUEHistory()
+        {
+            CPUEHistoricalForm chf = new CPUEHistoricalForm(this);
+            chf.ByDecade = chkByDecade.Checked;
+            if (chf.ByDecade)
+            {
+                if (listViewHistoryCpue.SelectedItems.Count > 0)
+                {
+                    chf.DecadeYear = int.Parse(listViewHistoryCpue.SelectedItems[0].Name);
+                    try
+                    {
+                        if (listViewHistoryCpue.SelectedItems[0].SubItems[1].Text.Length > 0
+                            && listViewHistoryCpue.SelectedItems[0].SubItems[2].Text.Length > 0)
+                        {
+                            chf.CPUE = int.Parse(listViewHistoryCpue.SelectedItems[0].SubItems[1].Text);
+                            chf.CPUEUnit = listViewHistoryCpue.SelectedItems[0].SubItems[2].Text;
+                            try
+                            {
+                                chf.Notes = listViewHistoryCpue.SelectedItems[0].SubItems[3].Text;
+                            }
+                            catch
+                            {
+                                //ignore error
+                            }
+                            chf.DataStatus = fad3DataStatus.statusFromDB;
+                        }
+                        else
+                        {
+                            chf.DataStatus = fad3DataStatus.statusNew;
+                        }
+                    }
+                    catch
+                    {
+                        chf.DataStatus = fad3DataStatus.statusNew;
+                    }
+                }
+                else
+                {
+                    return;
+                }
+            }
+            else
+            {
+                if (listViewHistoryCpue.SelectedItems.Count > 0)
+                {
+                    chf.DecadeYear = int.Parse(listViewHistoryCpue.SelectedItems[0].Name);
+                    if (listViewHistoryCpue.SelectedItems[0].SubItems[1].Text.Length > 0
+                        && listViewHistoryCpue.SelectedItems[0].SubItems[2].Text.Length > 0)
+                    {
+                        chf.CPUE = int.Parse(listViewHistoryCpue.SelectedItems[0].SubItems[1].Text);
+                        chf.CPUEUnit = listViewHistoryCpue.SelectedItems[0].SubItems[2].Text;
+                        try
+                        {
+                            chf.Notes = listViewHistoryCpue.SelectedItems[0].SubItems[3].Text;
+                        }
+                        catch
+                        {
+                            //ignore
+                        }
+                        chf.DataStatus = fad3DataStatus.statusFromDB;
+                    }
+                }
+                else
+                {
+                    chf.DataStatus = fad3DataStatus.statusNew;
+                }
+            }
+            DialogResult dr = chf.ShowDialog(this);
+            if (dr == DialogResult.OK)
+            {
+                if (chkByDecade.Checked)
+                {
+                    if (listViewHistoryCpue.SelectedItems[0].SubItems.Count == 1)
+                    {
+                        listViewHistoryCpue.SelectedItems[0].SubItems.Add(chf.CPUE.ToString());
+                        listViewHistoryCpue.SelectedItems[0].SubItems.Add(chf.CPUEUnit);
+                        listViewHistoryCpue.SelectedItems[0].SubItems.Add(chf.Notes);
+                    }
+                    else
+                    {
+                        listViewHistoryCpue.SelectedItems[0].SubItems[1].Text = chf.CPUE.ToString();
+                        listViewHistoryCpue.SelectedItems[0].SubItems[2].Text = chf.CPUEUnit;
+                        try
+                        {
+                            listViewHistoryCpue.SelectedItems[0].SubItems[3].Text = chf.Notes;
+                        }
+                        catch
+                        {
+                            listViewHistoryCpue.SelectedItems[0].SubItems.Add(chf.Notes);
+                        }
+                    }
+                }
+                else
+                {
+                    if (listViewHistoryCpue.Items.Count == 0)
+                    {
+                        var lvi = listViewHistoryCpue.Items.Add(chf.DecadeYear.ToString(), chf.DecadeYear.ToString(), null);
+                        lvi.SubItems.Add(chf.CPUE.ToString());
+                        lvi.SubItems.Add(chf.CPUEUnit);
+                        lvi.SubItems.Add(chf.Notes);
+                    }
+                    else
+                    {
+                        if (listViewHistoryCpue.SelectedItems.Count == 0)
+                        {
+                            var lvi = listViewHistoryCpue.Items.Add(chf.DecadeYear.ToString(), chf.DecadeYear.ToString(), null);
+                            lvi.SubItems.Add(chf.CPUE.ToString());
+                            lvi.SubItems.Add(chf.CPUEUnit);
+                            lvi.SubItems.Add(chf.Notes);
+                        }
+                        else
+                        {
+                            listViewHistoryCpue.SelectedItems[0].Text = chf.DecadeYear.ToString();
+                            listViewHistoryCpue.SelectedItems[0].Name = chf.DecadeYear.ToString();
+                            listViewHistoryCpue.SelectedItems[0].SubItems[1].Text = chf.CPUE.ToString();
+                            listViewHistoryCpue.SelectedItems[0].SubItems[2].Text = chf.CPUEUnit;
+                            listViewHistoryCpue.SelectedItems[0].SubItems[3].Text = chf.Notes;
+                        }
+                    }
+                }
+            }
+            SizeColumns(listViewHistoryCpue, false);
+        }
+
         private void OnListViewDblClick(object sender, EventArgs e)
         {
             switch (((ListView)sender).Name)
             {
                 case "listViewHistoryCpue":
+                    EditCPUEHistory();
 
-                    var historicalCPUEForm = new CPUEHistoricalForm(this, listViewHistoryCpue.SelectedItems[0].Text);
-                    if (listViewHistoryCpue.SelectedItems[0].SubItems.Count > 1
-                        && listViewHistoryCpue.SelectedItems[0].SubItems[1].Text.Length > 0
-                        && listViewHistoryCpue.SelectedItems[0].SubItems[2].Text.Length > 0)
-                    {
-                        historicalCPUEForm.CatchValue(int.Parse(listViewHistoryCpue.SelectedItems[0].SubItems[1].Text),
-                                                      listViewHistoryCpue.SelectedItems[0].SubItems[2].Text);
-                    }
-                    historicalCPUEForm.ShowDialog(this);
                     break;
 
                 case "listViewExpenses":
@@ -1509,18 +1739,8 @@ namespace FAD3.Database.Forms
             }
         }
 
-        public void HistoricalCPUE(int catchWeight, string unit)
+        public void HistoricalCPUE(int catchWeight, string unit, string notes)
         {
-            if (listViewHistoryCpue.SelectedItems[0].SubItems.Count == 1)
-            {
-                listViewHistoryCpue.SelectedItems[0].SubItems.Add(catchWeight.ToString());
-                listViewHistoryCpue.SelectedItems[0].SubItems.Add(unit);
-            }
-            else
-            {
-                listViewHistoryCpue.SelectedItems[0].SubItems[1].Text = catchWeight.ToString();
-                listViewHistoryCpue.SelectedItems[0].SubItems[2].Text = unit;
-            }
         }
 
         private void OnCheckBoxCheckChanged(object sender, EventArgs e)
@@ -1652,6 +1872,31 @@ namespace FAD3.Database.Forms
                     case "listViewExpenses":
 
                         break;
+
+                    case "listViewHistoryCpue":
+                        if (_hitItem != null)
+                        {
+                            if (chkByDecade.Checked)
+                            {
+                                if (_hitItem.SubItems.Count == 1)
+                                {
+                                    btnAddHistory.Enabled = true;
+                                }
+                                else
+                                {
+                                    btnAddHistory.Enabled = _hitItem.SubItems[1].Text.Length == 0;
+                                }
+                            }
+                            else
+                            {
+                                btnAddHistory.Enabled = false;
+                            }
+                        }
+                        else
+                        {
+                            btnAddHistory.Enabled = true;
+                        }
+                        break;
                 }
             }
             else if (e.Clicks == 2)
@@ -1660,6 +1905,13 @@ namespace FAD3.Database.Forms
                 {
                     case "listViewExpenses":
                         AddExpense(_hitItem);
+                        break;
+
+                    case "listViewHistoryCpue":
+                        if (!chkByDecade.Checked)
+                        {
+                            EditCPUEHistory();
+                        }
                         break;
                 }
             }
@@ -1709,6 +1961,12 @@ namespace FAD3.Database.Forms
             {
                 txtEquivalentKg.Text = "";
             }
+        }
+
+        private void OnCheckByDecadeChange(object sender, EventArgs e)
+        {
+            CheckBox chk = (CheckBox)sender;
+            SetupCPUEHistoryList();
         }
     }
 }

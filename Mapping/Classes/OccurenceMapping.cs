@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using AxMapWinGIS;
 using MapWinGIS;
 using FAD3.Mapping.Classes;
-using FAD3.GUI.Classes;
+using FAD3.Database.Classes;
 using System.Data;
 using System.Data.OleDb;
 

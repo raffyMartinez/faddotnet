@@ -19,7 +19,9 @@ using System.IO;
 using System.Windows.Forms;
 using FAD3.Database.Forms;
 using FAD3.Database.Classes;
-using FAD3.GUI.Classes;
+
+using FAD3.Database.Classes;
+
 using FAD3.GUI.Forms;
 
 //using dao;
@@ -1665,6 +1667,12 @@ namespace FAD3
                     {
                         Help.ShowHelp(this, helpFile);
                     }
+                    break;
+
+                case "diagnostics":
+                    //DBCheck.ListDBTables(global.MDBPath, Application.ProductVersion);
+                    FADDiagnostics.ListDBTables(global.MDBPath, Application.ProductVersion);
+                    MessageBox.Show("Finished writing diagnostics to log!", "Diagnostics finished", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     break;
             }
         }

@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Owf.Controls.Office2007Colo
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "FADUpdate12102018", "FADUpdate12102018\FADUpdate12102018.vdproj", "{4A71546E-EB27-47FC-9E7A-78F8F712BB26}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "FADUpdate12152018", "FADUpdate12152018\FADUpdate12152018.vdproj", "{0597C5FD-0D0A-4D26-A8CB-6A22DFF5188A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,7 +41,6 @@ Global
 		{98F3E998-E133-47A8-86C7-4EA964DFD2D8}.Debug|x86.ActiveCfg = Debug
 		{98F3E998-E133-47A8-86C7-4EA964DFD2D8}.Debug|x86.Build.0 = Debug
 		{98F3E998-E133-47A8-86C7-4EA964DFD2D8}.Release|Any CPU.ActiveCfg = Release
-		{98F3E998-E133-47A8-86C7-4EA964DFD2D8}.Release|Any CPU.Build.0 = Release
 		{98F3E998-E133-47A8-86C7-4EA964DFD2D8}.Release|x64.ActiveCfg = Release
 		{98F3E998-E133-47A8-86C7-4EA964DFD2D8}.Release|x64.Build.0 = Release
 		{98F3E998-E133-47A8-86C7-4EA964DFD2D8}.Release|x86.ActiveCfg = Release
@@ -62,6 +63,13 @@ Global
 		{4A71546E-EB27-47FC-9E7A-78F8F712BB26}.Release|Any CPU.ActiveCfg = Release
 		{4A71546E-EB27-47FC-9E7A-78F8F712BB26}.Release|x64.ActiveCfg = Release
 		{4A71546E-EB27-47FC-9E7A-78F8F712BB26}.Release|x86.ActiveCfg = Release
+		{0597C5FD-0D0A-4D26-A8CB-6A22DFF5188A}.Debug|Any CPU.ActiveCfg = Debug
+		{0597C5FD-0D0A-4D26-A8CB-6A22DFF5188A}.Debug|x64.ActiveCfg = Debug
+		{0597C5FD-0D0A-4D26-A8CB-6A22DFF5188A}.Debug|x86.ActiveCfg = Debug
+		{0597C5FD-0D0A-4D26-A8CB-6A22DFF5188A}.Release|Any CPU.ActiveCfg = Release
+		{0597C5FD-0D0A-4D26-A8CB-6A22DFF5188A}.Release|Any CPU.Build.0 = Release
+		{0597C5FD-0D0A-4D26-A8CB-6A22DFF5188A}.Release|x64.ActiveCfg = Release
+		{0597C5FD-0D0A-4D26-A8CB-6A22DFF5188A}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

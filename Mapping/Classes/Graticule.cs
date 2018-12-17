@@ -5,7 +5,7 @@ using System.Text;
 using MapWinGIS;
 using AxMapWinGIS;
 using FAD3.Mapping.Classes;
-using FAD3.GUI.Classes;
+using FAD3.Database.Classes;
 
 namespace FAD3
 {

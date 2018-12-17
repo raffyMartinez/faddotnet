@@ -16,7 +16,7 @@ using System.Diagnostics;
 using System.Windows.Forms;
 using Microsoft.Win32;
 using System.Drawing;
-using FAD3.GUI.Classes;
+using FAD3.Database.Classes;
 
 namespace FAD3
 {
@@ -77,7 +77,7 @@ namespace FAD3
         {
             try
             {
-                var key = Registry.ClassesRoot.OpenSubKey("MapWinGIS.Shapefile");
+                var key = Registry.ClassesRoot.OpenSubKey("MapWinGIS.Shapefile1");
                 _isMapComponentRegistered = key.Name.Length > 0;
             }
             catch
@@ -387,6 +387,16 @@ namespace FAD3
             _TemplateFileExists = File.Exists(_templateMDBFile);
             _InlandGridDBFileExists = File.Exists(ApplicationPath + "\\grid25inland.mdb");
             _AllRequiredFilesExists = _UITemplateFileExists && _TemplateFileExists && _InlandGridDBFileExists;
+            if (_AllRequiredFilesExists)
+            {
+                RegistryKey reg_key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\FAD3", true);
+                reg_key.SetValue("ApplicationPath", ApplicationPath);
+            }
+            else
+            {
+                RegistryKey reg_key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\FAD3", true);
+                reg_key.SetValue("ApplicationPath", "");
+            }
         }
 
         /// <summary>

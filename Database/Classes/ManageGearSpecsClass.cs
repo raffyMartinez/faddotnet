@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
 using System.Text;
-using FAD3.GUI.Classes;
+using FAD3.Database.Classes;
 
 namespace FAD3
 {

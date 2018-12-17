@@ -80,5 +80,14 @@ namespace FAD3
                 writer.WriteLine($"Error: {errorDescription} at Class:{className} at  Method{methodName} at Date : { DateTime.Now.ToString()}");
             }
         }
+
+        public static void LogSimple(string s)
+        {
+            string filepath = Application.StartupPath + "\\fad.log";
+            using (StreamWriter writer = new StreamWriter(filepath, true))
+            {
+                writer.WriteLine(s);
+            }
+        }
     }
 }

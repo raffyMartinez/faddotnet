@@ -1,5 +1,5 @@
 ﻿using AxMapWinGIS;
-using FAD3.GUI.Classes;
+using FAD3.Database.Classes;
 using MapWinGIS;
 using System;
 using System.Data;

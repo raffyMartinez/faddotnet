@@ -1,7 +1,9 @@
 ﻿//using ADOX;
 using dao;
 using FAD3.Database.Classes;
-using FAD3.GUI.Classes;
+
+using FAD3.Database.Classes;
+
 using System;
 using System.Collections.Generic;
 using System.Data;

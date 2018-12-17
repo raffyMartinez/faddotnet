@@ -1,4 +1,4 @@
-﻿using FAD3.GUI.Classes;
+﻿using FAD3.Database.Classes;
 using FAD3.Mapping.Classes;
 using Microsoft.VisualBasic.PowerPacks;
 using System;

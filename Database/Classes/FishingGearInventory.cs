@@ -1,4 +1,4 @@
-﻿using FAD3.GUI.Classes;
+﻿using FAD3.Database.Classes;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -213,10 +213,10 @@ namespace FAD3.Database.Classes
             return headers;
         }
 
-        public List<(int decade, int cpue, string unit)> GetCPUEHistorical(string dataGuid)
+        public List<(int? decade, int? historyYear, int cpue, string unit, string notes)> GetCPUEHistorical(string dataGuid)
         {
-            List<(int decade, int cpue, string unit)> cpueHistory = new List<(int decade, int cpue, string unit)>();
-            var sql = $@"SELECT Decade, CPUE, CPUEUnit
+            List<(int? decade, int? historyYear, int cpue, string unit, string notes)> cpueHistory = new List<(int? decade, int? historyYear, int cpue, string unit, string notes)>();
+            var sql = $@"SELECT Decade, HistoryYear, CPUE, CPUEUnit, Notes
                         FROM tblGearInventoryCPUEHistorical
                         WHERE InventoryDataGuid={{{dataGuid}}}
                         ORDER BY Decade DESC";
@@ -231,9 +231,21 @@ namespace FAD3.Database.Classes
                     for (int i = 0; i < dt.Rows.Count; i++)
                     {
                         DataRow dr = dt.Rows[i];
-                        cpueHistory.Add(((int)dr["Decade"],
-                                      (int)dr["CPUE"],
-                                      dr["CPUEUnit"].ToString()));
+                        int? decade = null;
+                        int? historyYear = null;
+                        if (int.TryParse(dr["Decade"].ToString(), out int v))
+                        {
+                            decade = v;
+                        }
+                        if (int.TryParse(dr["HistoryYear"].ToString(), out v))
+                        {
+                            historyYear = v;
+                        }
+                        cpueHistory.Add((decade,
+                                         historyYear,
+                                         (int)dr["CPUE"],
+                                         dr["CPUEUnit"].ToString(),
+                                         dr["Notes"].ToString()));
                     }
                 }
                 catch
@@ -1305,7 +1317,7 @@ namespace FAD3.Database.Classes
             int commercialCount, int motorizedCount, int nonMotorizedCount, int noBoatCount,
             List<int> monthsInUse, List<int> peakMonths, int numberDaysGearUsedPerMonth,
             int? cpueRangeMax, int? cpueRangeMin, int? cpueModeUpper, int? cpueModeLower, string cpueUnit,
-            List<(int decade, int cpue, string unit)> historicalCPUE,
+            List<(int? decade, int? historyYear, int cpue, string unit, string notes)> historicalCPUE,
             List<string> dominantCatch, List<string> nonDominantCatch, int percentageOfDominance,
             string notes, List<string> accessories, List<(string expense, double cost, string source, string notes)> expenses,
             DateTime barangaySurveyDate, string enumerator, int? cpueAverage, int? cpueMode, double? equivalentKg) GetGearVariationInventoryData(string inventoryGuid)
@@ -1313,7 +1325,7 @@ namespace FAD3.Database.Classes
             List<string> gearLocalNames = new List<string>();
             List<int> monthsInUse = new List<int>();
             List<int> peakMonths = new List<int>();
-            List<(int decade, int cpue, string unit)> historicalCPUE = new List<(int decade, int cpue, string unit)>();
+            List<(int? decade, int? historyYear, int cpue, string unit, string notes)> historicalCPUE = new List<(int? decade, int? historyYear, int cpue, string unit, string notes)>();
             List<string> dominantCatch = new List<string>();
             List<string> nonDominantCatch = new List<string>();
             List<string> accessories = new List<string>();
@@ -1501,7 +1513,11 @@ namespace FAD3.Database.Classes
             }
 
             //next, we get the historical cpue
-            sql = $@"SELECT tblGearInventoryCPUEHistorical.Decade, tblGearInventoryCPUEHistorical.CPUE, tblGearInventoryCPUEHistorical.CPUEUnit
+            sql = $@"SELECT tblGearInventoryCPUEHistorical.Decade,
+                        tblGearInventoryCPUEHistorical.HistoryYear,
+                        tblGearInventoryCPUEHistorical.CPUE,
+                        tblGearInventoryCPUEHistorical.CPUEUnit,
+                        tblGearInventoryCPUEHistorical.Notes
                     FROM tblGearInventoryCPUEHistorical
                     WHERE tblGearInventoryCPUEHistorical.InventoryDataGuid={{{inventoryGuid}}}
                     ORDER BY tblGearInventoryCPUEHistorical.Decade DESC;";
@@ -1516,7 +1532,17 @@ namespace FAD3.Database.Classes
                     for (int n = 0; n < dt.Rows.Count; n++)
                     {
                         DataRow dr = dt.Rows[n];
-                        historicalCPUE.Add(((int)dr["Decade"], (int)dr["CPUE"], (string)dr["CPUEUnit"]));
+                        int? decade = null;
+                        int? historyYear = null;
+                        if (int.TryParse(dr["Decade"].ToString(), out int r))
+                        {
+                            decade = r;
+                        }
+                        if (int.TryParse(dr["HistoryYear"].ToString(), out r))
+                        {
+                            historyYear = r;
+                        }
+                        historicalCPUE.Add((decade, historyYear, (int)dr["CPUE"], dr["CPUEUnit"].ToString(), dr["Notes"].ToString()));
                     }
                 }
                 catch (Exception ex)
@@ -2639,7 +2665,7 @@ namespace FAD3.Database.Classes
         /// <param name="sitioGearInventoryGuid"></param>
         /// <param name="cpueHistorical"></param>
         /// <returns></returns>
-        public bool SaveSitioGearInventoryHistoricalCPUE(string sitioGearInventoryGuid, List<(int decade, int cpue, string unit)> cpueHistorical)
+        public bool SaveSitioGearInventoryHistoricalCPUE(string sitioGearInventoryGuid, List<(int? decade, int? historyYear, int cpue, string unit, string notes)> cpueHistorical)
         {
             int n = 0;
             using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
@@ -2656,8 +2682,20 @@ namespace FAD3.Database.Classes
 
                     foreach (var item in cpueHistorical)
                     {
-                        sql = $@"Insert into tblGearInventoryCPUEHistorical (InventoryDataGuid, Decade, CPUE, CPUEUnit, RowGuid) values
-                              ({{{sitioGearInventoryGuid}}}, {item.decade},{item.cpue}, '{item.unit}', {{{Guid.NewGuid().ToString()}}})";
+                        string decade = "null";
+                        string historyYear = "null";
+                        if (item.decade != null)
+                        {
+                            decade = item.decade.ToString();
+                        }
+
+                        if (item.historyYear != null)
+                        {
+                            historyYear = item.historyYear.ToString();
+                        }
+
+                        sql = $@"Insert into tblGearInventoryCPUEHistorical (InventoryDataGuid, Decade, HistoryYear, CPUE, CPUEUnit, RowGuid, Notes) values
+                              ({{{sitioGearInventoryGuid}}}, {decade}, {historyYear}, {item.cpue}, '{item.unit}', {{{Guid.NewGuid().ToString()}}}, '{item.notes}')";
                         using (OleDbCommand update = new OleDbCommand(sql, conn))
                         {
                             if (update.ExecuteNonQuery() > 0) n++;

@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using FAD3.Database.Classes;
-using FAD3.GUI.Classes;
+using FAD3.GUI.Forms;
 
 namespace FAD3.Database.Forms
 {
@@ -194,7 +194,7 @@ namespace FAD3.Database.Forms
                                                                 MessageBoxIcon.Information);
                             if (dr == DialogResult.Yes)
                             {
-                                NewFisheryObjectName nfo = new NewFisheryObjectName(s, GUI.Classes.FisheryObjectNameType.CatchLocalName);
+                                NewFisheryObjectName nfo = new NewFisheryObjectName(s, FisheryObjectNameType.CatchLocalName);
                                 var result = Names.SaveNewLocalName(nfo);
                                 if (result.success)
                                 {

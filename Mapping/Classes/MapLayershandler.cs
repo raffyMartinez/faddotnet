@@ -9,7 +9,7 @@ using System.IO;
 using System.Reflection;
 using System.Xml;
 using FAD3.Mapping;
-using FAD3.GUI.Classes;
+using FAD3.Database.Classes;
 
 namespace FAD3
 

@@ -8,7 +8,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using FAD3.Database.Classes;
-using FAD3.GUI.Classes;
+
+using FAD3.Database.Classes;
+
 using System.Xml;
 using System.IO;
 
@@ -534,21 +536,39 @@ namespace FAD3.Database.Forms
 
             //historical cpue
             n = 0;
-            int year = DateTime.Now.Year;
-            foreach (var hist in item.historicalCPUE)
+            if (item.historicalCPUE.Count > 0)
             {
-                if (n == 0)
+                bool byDecade = item.historicalCPUE[0].decade != null;
+                foreach (var hist in item.historicalCPUE)
                 {
-                    lvi = lvInventory.Items.Add("Historical CPUE averages");
+                    if (n == 0)
+                    {
+                        lvi = lvInventory.Items.Add("Historical CPUE averages");
+                    }
+                    else
+                    {
+                        lvi = lvInventory.Items.Add("");
+                    }
+
+                    string rowItem = "";
+                    if (byDecade)
+                    {
+                        rowItem = $"{hist.decade.ToString()}s: {hist.cpue.ToString()} {hist.unit}";
+                    }
+                    else
+                    {
+                        rowItem = $"{hist.historyYear.ToString()}: {hist.cpue.ToString()} {hist.unit}";
+                    }
+
+                    if (hist.notes.Length > 0)
+                    {
+                        rowItem += $", {hist.notes}";
+                    }
+                    lvi.SubItems.Add(rowItem);
+                    n++;
                 }
-                else
-                {
-                    lvi = lvInventory.Items.Add("");
-                }
-                lvi.SubItems.Add(hist.decade.ToString() + "s: " + hist.cpue.ToString() + " " + hist.unit);
-                n++;
+                lvi = lvInventory.Items.Add("");
             }
-            lvi = lvInventory.Items.Add("");
 
             //catch composition
             n = 0;

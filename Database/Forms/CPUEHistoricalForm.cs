@@ -8,32 +8,56 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using FAD3.Database.Forms;
+using FAD3.Database.Classes;
 
 namespace FAD3.Database.Forms
 {
     public partial class CPUEHistoricalForm : Form
     {
-        private GearInventoryEditForm _parentForm;
         private int _catchWt;
+        private bool _byDecade;
+        private int? _decadeYear;
+        private GearInventoryEditForm _parentForm;
+        public int DecadeYear { get; set; }
+        public int CPUE { get; set; }
+        public bool ByDecade { get; set; }
+        public string CPUEUnit { get; set; }
+        public string Notes { get; set; }
+        public fad3DataStatus DataStatus { get; set; }
+        private bool _duplicatedYear;
 
-        public CPUEHistoricalForm(GearInventoryEditForm parentForm, string decade)
+        public CPUEHistoricalForm(GearInventoryEditForm parent)
         {
             InitializeComponent();
-            lblTitle.Text += $" {decade}";
-            _parentForm = parentForm;
-
-            cboUnit.Items.Add("kilos");
-            cboUnit.Items.Add("banyera");
-            cboUnit.Items.Add("ice box");
-            cboUnit.SelectedIndex = 0;
+            _parentForm = parent;
         }
 
-        public void CatchValue(int? catchWt, string unit)
+        private bool FormValidated()
         {
-            if (catchWt != null && unit.Length > 0)
+            if (ByDecade)
             {
-                txtCPUE.Text = catchWt.ToString();
-                cboUnit.Text = unit;
+                return txtCPUE.Text.Length > 0 && cboUnit.Text.Length > 0;
+            }
+            else
+            {
+                _duplicatedYear = false;
+                if (txtHistoryYear.Text.Length > 0)
+                {
+                    if (DataStatus == fad3DataStatus.statusNew && _parentForm.HistoryList.Items.ContainsKey(txtHistoryYear.Text))
+                    {
+                        MessageBox.Show("Year already in the list", "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        _duplicatedYear = true;
+                        return false;
+                    }
+                    else
+                    {
+                        return txtCPUE.Text.Length > 0 && cboUnit.Text.Length > 0;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
             }
         }
 
@@ -42,19 +66,30 @@ namespace FAD3.Database.Forms
             switch (((Button)sender).Name)
             {
                 case "btnOk":
-                    if (txtCPUE.Text.Length > 0 && cboUnit.Text.Length > 0)
+                    if (FormValidated())
                     {
-                        _parentForm.HistoricalCPUE(_catchWt, cboUnit.Text);
-                        Close();
+                        //_parentForm.HistoricalCPUE(_catchWt, cboUnit.Text, txtNotes.Text);
+                        if (!ByDecade)
+                        {
+                            DecadeYear = int.Parse(txtHistoryYear.Text);
+                        }
+                        CPUE = int.Parse(txtCPUE.Text);
+                        CPUEUnit = cboUnit.Text;
+                        Notes = txtNotes.Text;
+                        DialogResult = DialogResult.OK;
+                        //Close();
                     }
                     else
                     {
-                        MessageBox.Show("Please provide catch weight and unit");
+                        if (!_duplicatedYear)
+                        {
+                            MessageBox.Show("Please provide catch weight and unit");
+                        }
                     }
                     break;
 
                 case "btnCancel":
-                    Close();
+                    DialogResult = DialogResult.Cancel;
                     break;
             }
         }
@@ -75,6 +110,54 @@ namespace FAD3.Database.Forms
             {
                 MessageBox.Show("Only whole numbers greater than zero are accepted", "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
+        }
+
+        private void OnFormLoad(object sender, EventArgs e)
+        {
+            if (ByDecade)
+            {
+                lblTitle.Text += $" {DecadeYear.ToString()}s";
+            }
+            else
+            {
+                lblTitle.Visible = false;
+                txtHistoryYear.Size = txtCPUE.Size;
+                txtHistoryYear.Location = txtCPUE.Location;
+                txtHistoryYear.Top = txtCPUE.Top - txtCPUE.Height - 6;
+                txtHistoryYear.Visible = true;
+                lblHistoryYear.Visible = true;
+                lblHistoryYear.Top = txtHistoryYear.Top + 3;
+                lblHistoryYear.Left = lblValue.Left;
+                lblHistoryYear.Text = "Year";
+            }
+            cboUnit.Items.Add("kilos");
+            cboUnit.Items.Add("banyera");
+            cboUnit.Items.Add("ice box");
+            cboUnit.SelectedIndex = 0;
+            global.LoadFormSettings(this, true);
+            if (DataStatus != fad3DataStatus.statusNew)
+            {
+                txtCPUE.Text = CPUE.ToString();
+                txtNotes.Text = Notes;
+                cboUnit.Text = CPUEUnit;
+                if (!ByDecade)
+                {
+                    txtHistoryYear.Text = DecadeYear.ToString();
+                    txtHistoryYear.Focus();
+                }
+            }
+            else
+            {
+                if (!ByDecade)
+                {
+                    txtHistoryYear.Focus();
+                }
+            }
+        }
+
+        private void CPUEHistoricalForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            global.SaveFormSettings(this);
         }
     }
 }

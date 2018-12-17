@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using MetaphoneCOM;
-using FAD3.GUI.Classes;
+using FAD3.Database.Classes;
 using FAD3.Database.Classes;
 using FAD3.Database.Forms;
 using System.IO;

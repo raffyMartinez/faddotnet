@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
-using FAD3.GUI.Classes;
+using FAD3.Database.Classes;
 
 namespace FAD3.Mapping.Classes
 {

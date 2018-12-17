@@ -12,7 +12,7 @@ using System.Data;
 using System.Data.OleDb;
 using System.Collections.Generic;
 using ISO_Classes;
-using FAD3.GUI.Classes;
+using FAD3.Database.Classes;
 
 //using System.Diagnostics;
 

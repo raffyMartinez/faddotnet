@@ -2,7 +2,7 @@
 using MapWinGIS;
 using System;
 using System.IO;
-using FAD3.GUI.Classes;
+using FAD3.Database.Classes;
 
 namespace FAD3
 {

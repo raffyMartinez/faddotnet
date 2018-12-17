@@ -4,7 +4,7 @@ using System.Data;
 using System.Data.OleDb;
 using System.Linq;
 using System.Text;
-using FAD3.GUI.Classes;
+using FAD3.Database.Classes;
 using System.Xml;
 using System.IO;
 

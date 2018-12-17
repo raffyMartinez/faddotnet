@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Windows.Forms;
 using ISO_Classes;
-using FAD3.GUI.Classes;
+using FAD3.Database.Classes;
 
 namespace FAD3
 {

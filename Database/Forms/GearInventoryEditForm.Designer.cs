@@ -28,10 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.ListViewItem listViewItem9 = new System.Windows.Forms.ListViewItem("Fuel");
-            System.Windows.Forms.ListViewItem listViewItem10 = new System.Windows.Forms.ListViewItem("Food");
-            System.Windows.Forms.ListViewItem listViewItem11 = new System.Windows.Forms.ListViewItem("Ice");
-            System.Windows.Forms.ListViewItem listViewItem12 = new System.Windows.Forms.ListViewItem("");
+            System.Windows.Forms.ListViewItem listViewItem5 = new System.Windows.Forms.ListViewItem("Fuel");
+            System.Windows.Forms.ListViewItem listViewItem6 = new System.Windows.Forms.ListViewItem("Food");
+            System.Windows.Forms.ListViewItem listViewItem7 = new System.Windows.Forms.ListViewItem("Ice");
+            System.Windows.Forms.ListViewItem listViewItem8 = new System.Windows.Forms.ListViewItem("");
             this.btnOk = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.txtInventoryName = new System.Windows.Forms.TextBox();
@@ -96,15 +96,17 @@
             this.chkListBoxMonthsSeason = new System.Windows.Forms.CheckedListBox();
             this.chkListBoxMonthsUsed = new System.Windows.Forms.CheckedListBox();
             this.tabCPUE = new System.Windows.Forms.TabPage();
+            this.listViewHistoryCpue = new System.Windows.Forms.ListView();
+            this.chDecade = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.chCPUE = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.chUnit = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.chNotes = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.chkByDecade = new System.Windows.Forms.CheckBox();
             this.label21 = new System.Windows.Forms.Label();
             this.txtEquivalentKg = new System.Windows.Forms.TextBox();
             this.label30 = new System.Windows.Forms.Label();
             this.cboCatchUnit = new System.Windows.Forms.ComboBox();
             this.label25 = new System.Windows.Forms.Label();
-            this.listViewHistoryCpue = new System.Windows.Forms.ListView();
-            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.txtMode = new System.Windows.Forms.TextBox();
             this.chkCPUEModeRange = new System.Windows.Forms.CheckBox();
@@ -154,6 +156,8 @@
             this.cboGearVariation = new System.Windows.Forms.ComboBox();
             this.label11 = new System.Windows.Forms.Label();
             this.cboGearClass = new System.Windows.Forms.ComboBox();
+            this.btnAddHistory = new System.Windows.Forms.Button();
+            this.btnRemoveHistory = new System.Windows.Forms.Button();
             this.pnlInventory.SuspendLayout();
             this.pnlBarangay.SuspendLayout();
             this.tabsBarangayData.SuspendLayout();
@@ -820,12 +824,15 @@
             // 
             // tabCPUE
             // 
+            this.tabCPUE.Controls.Add(this.btnRemoveHistory);
+            this.tabCPUE.Controls.Add(this.btnAddHistory);
+            this.tabCPUE.Controls.Add(this.listViewHistoryCpue);
+            this.tabCPUE.Controls.Add(this.chkByDecade);
             this.tabCPUE.Controls.Add(this.label21);
             this.tabCPUE.Controls.Add(this.txtEquivalentKg);
             this.tabCPUE.Controls.Add(this.label30);
             this.tabCPUE.Controls.Add(this.cboCatchUnit);
             this.tabCPUE.Controls.Add(this.label25);
-            this.tabCPUE.Controls.Add(this.listViewHistoryCpue);
             this.tabCPUE.Controls.Add(this.groupBox3);
             this.tabCPUE.Controls.Add(this.groupBox2);
             this.tabCPUE.Location = new System.Drawing.Point(4, 40);
@@ -835,6 +842,51 @@
             this.tabCPUE.TabIndex = 2;
             this.tabCPUE.Text = "CPUE";
             this.tabCPUE.UseVisualStyleBackColor = true;
+            // 
+            // listViewHistoryCpue
+            // 
+            this.listViewHistoryCpue.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.chDecade,
+            this.chCPUE,
+            this.chUnit,
+            this.chNotes});
+            this.listViewHistoryCpue.FullRowSelect = true;
+            this.listViewHistoryCpue.HideSelection = false;
+            this.listViewHistoryCpue.Location = new System.Drawing.Point(7, 201);
+            this.listViewHistoryCpue.Name = "listViewHistoryCpue";
+            this.listViewHistoryCpue.Size = new System.Drawing.Size(315, 134);
+            this.listViewHistoryCpue.TabIndex = 2;
+            this.listViewHistoryCpue.UseCompatibleStateImageBehavior = false;
+            this.listViewHistoryCpue.View = System.Windows.Forms.View.Details;
+            this.listViewHistoryCpue.DoubleClick += new System.EventHandler(this.OnListViewDblClick);
+            this.listViewHistoryCpue.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnListViewMouseDown);
+            // 
+            // chDecade
+            // 
+            this.chDecade.Text = "Decade";
+            // 
+            // chCPUE
+            // 
+            this.chCPUE.Text = "Catch rate";
+            // 
+            // chUnit
+            // 
+            this.chUnit.Text = "Unit of catch";
+            // 
+            // chNotes
+            // 
+            this.chNotes.Text = "Notes";
+            // 
+            // chkByDecade
+            // 
+            this.chkByDecade.AutoSize = true;
+            this.chkByDecade.Location = new System.Drawing.Point(225, 184);
+            this.chkByDecade.Name = "chkByDecade";
+            this.chkByDecade.Size = new System.Drawing.Size(77, 17);
+            this.chkByDecade.TabIndex = 26;
+            this.chkByDecade.Text = "By decade";
+            this.chkByDecade.UseVisualStyleBackColor = true;
+            this.chkByDecade.CheckedChanged += new System.EventHandler(this.OnCheckByDecadeChange);
             // 
             // label21
             // 
@@ -877,39 +929,11 @@
             // label25
             // 
             this.label25.AutoSize = true;
-            this.label25.Location = new System.Drawing.Point(12, 185);
+            this.label25.Location = new System.Drawing.Point(6, 185);
             this.label25.Name = "label25";
             this.label25.Size = new System.Drawing.Size(97, 13);
             this.label25.TabIndex = 17;
             this.label25.Text = "Historical averages";
-            // 
-            // listViewHistoryCpue
-            // 
-            this.listViewHistoryCpue.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader1,
-            this.columnHeader2,
-            this.columnHeader3});
-            this.listViewHistoryCpue.FullRowSelect = true;
-            this.listViewHistoryCpue.HideSelection = false;
-            this.listViewHistoryCpue.Location = new System.Drawing.Point(15, 201);
-            this.listViewHistoryCpue.Name = "listViewHistoryCpue";
-            this.listViewHistoryCpue.Size = new System.Drawing.Size(330, 134);
-            this.listViewHistoryCpue.TabIndex = 2;
-            this.listViewHistoryCpue.UseCompatibleStateImageBehavior = false;
-            this.listViewHistoryCpue.View = System.Windows.Forms.View.Details;
-            this.listViewHistoryCpue.DoubleClick += new System.EventHandler(this.OnListViewDblClick);
-            // 
-            // columnHeader1
-            // 
-            this.columnHeader1.Text = "Decade";
-            // 
-            // columnHeader2
-            // 
-            this.columnHeader2.Text = "Catch rate";
-            // 
-            // columnHeader3
-            // 
-            this.columnHeader3.Text = "Unit of catch";
             // 
             // groupBox3
             // 
@@ -1325,10 +1349,10 @@
             this.colNotes});
             this.listViewExpenses.HideSelection = false;
             this.listViewExpenses.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem9,
-            listViewItem10,
-            listViewItem11,
-            listViewItem12});
+            listViewItem5,
+            listViewItem6,
+            listViewItem7,
+            listViewItem8});
             this.listViewExpenses.Location = new System.Drawing.Point(9, 52);
             this.listViewExpenses.Name = "listViewExpenses";
             this.listViewExpenses.Size = new System.Drawing.Size(340, 202);
@@ -1415,6 +1439,28 @@
             this.cboGearClass.Size = new System.Drawing.Size(165, 21);
             this.cboGearClass.TabIndex = 0;
             this.cboGearClass.SelectedIndexChanged += new System.EventHandler(this.OnComboSelectedIndexChanged);
+            // 
+            // btnAddHistory
+            // 
+            this.btnAddHistory.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnAddHistory.Location = new System.Drawing.Point(325, 226);
+            this.btnAddHistory.Name = "btnAddHistory";
+            this.btnAddHistory.Size = new System.Drawing.Size(24, 24);
+            this.btnAddHistory.TabIndex = 27;
+            this.btnAddHistory.Text = "+";
+            this.btnAddHistory.UseVisualStyleBackColor = true;
+            this.btnAddHistory.Click += new System.EventHandler(this.OnButtonClick);
+            // 
+            // btnRemoveHistory
+            // 
+            this.btnRemoveHistory.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnRemoveHistory.Location = new System.Drawing.Point(325, 252);
+            this.btnRemoveHistory.Name = "btnRemoveHistory";
+            this.btnRemoveHistory.Size = new System.Drawing.Size(24, 24);
+            this.btnRemoveHistory.TabIndex = 28;
+            this.btnRemoveHistory.Text = "-";
+            this.btnRemoveHistory.UseVisualStyleBackColor = true;
+            this.btnRemoveHistory.Click += new System.EventHandler(this.OnButtonClick);
             // 
             // GearInventoryEditForm
             // 
@@ -1528,9 +1574,9 @@
         private System.Windows.Forms.TabPage tabCPUE;
         private System.Windows.Forms.Label label25;
         private System.Windows.Forms.ListView listViewHistoryCpue;
-        private System.Windows.Forms.ColumnHeader columnHeader1;
-        private System.Windows.Forms.ColumnHeader columnHeader2;
-        private System.Windows.Forms.ColumnHeader columnHeader3;
+        private System.Windows.Forms.ColumnHeader chDecade;
+        private System.Windows.Forms.ColumnHeader chCPUE;
+        private System.Windows.Forms.ColumnHeader chUnit;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.Label label23;
         private System.Windows.Forms.TextBox txtModeLower;
@@ -1592,5 +1638,9 @@
         private System.Windows.Forms.Label label24;
         private System.Windows.Forms.TextBox txtRespondents;
         private System.Windows.Forms.Label lblCurrentSitio;
+        private System.Windows.Forms.ColumnHeader chNotes;
+        private System.Windows.Forms.CheckBox chkByDecade;
+        private System.Windows.Forms.Button btnRemoveHistory;
+        private System.Windows.Forms.Button btnAddHistory;
     }
 }

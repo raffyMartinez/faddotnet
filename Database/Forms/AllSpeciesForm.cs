@@ -6,7 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using FAD3.GUI.Classes;
+using FAD3.Database.Classes;
 using FAD3.Database.Classes;
 using System.Diagnostics;
 using FAD3.Database.Forms;

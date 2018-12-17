@@ -1,4 +1,4 @@
-﻿namespace FAD3.GUI.Classes
+﻿namespace FAD3.Database.Classes
 {
     public enum ExportImportAction
     {

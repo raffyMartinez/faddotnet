@@ -89,6 +89,7 @@ namespace FAD3
             this.tsButtonReport = new System.Windows.Forms.ToolStripButton();
             this.tsButtonMap = new System.Windows.Forms.ToolStripButton();
             this.tsButtonExit = new System.Windows.Forms.ToolStripButton();
+            this.diagnosticMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMenuBar.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.tblLayout.SuspendLayout();
@@ -325,7 +326,8 @@ namespace FAD3
             // 
             this.menuHelp.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.aboutToolStripMenuItem,
-            this.onlineManualToolStripMenuItem});
+            this.onlineManualToolStripMenuItem,
+            this.diagnosticMenuItem});
             this.menuHelp.Name = "menuHelp";
             this.menuHelp.Size = new System.Drawing.Size(44, 20);
             this.menuHelp.Text = "Help";
@@ -334,14 +336,14 @@ namespace FAD3
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
             this.aboutToolStripMenuItem.Tag = "about";
             this.aboutToolStripMenuItem.Text = "About...";
             // 
             // onlineManualToolStripMenuItem
             // 
             this.onlineManualToolStripMenuItem.Name = "onlineManualToolStripMenuItem";
-            this.onlineManualToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.onlineManualToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
             this.onlineManualToolStripMenuItem.Tag = "onlineManual";
             this.onlineManualToolStripMenuItem.Text = "Online manual";
             // 
@@ -642,6 +644,13 @@ namespace FAD3
             this.tsButtonExit.Text = "toolStripButton6";
             this.tsButtonExit.ToolTipText = "Exit";
             // 
+            // diagnosticMenuItem
+            // 
+            this.diagnosticMenuItem.Name = "diagnosticMenuItem";
+            this.diagnosticMenuItem.Size = new System.Drawing.Size(207, 22);
+            this.diagnosticMenuItem.Tag = "diagnostics";
+            this.diagnosticMenuItem.Text = "Log database diagnostics";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -724,5 +733,6 @@ namespace FAD3
         private System.Windows.Forms.Label lblTitle;
         private System.Windows.Forms.ToolStripButton tsButtonLN2SN;
         private System.Windows.Forms.ToolStripMenuItem menuItemBrowseLGUs;
+        private System.Windows.Forms.ToolStripMenuItem diagnosticMenuItem;
     }
 }
