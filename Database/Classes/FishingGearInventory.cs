@@ -142,12 +142,12 @@ namespace FAD3.Database.Classes
         }
 
         public Dictionary<string, (string projectName, string province, string lgu, string barangay, string sitio,
-            string enumerator, DateTime surveyDate, string gearClass, string gearVariation)> GetGearRowHeaders(string inventoryGuid)
+            string enumerator, DateTime surveyDate, string gearClass, string gearVariation, string localNames)> GetGearRowHeaders(string inventoryGuid)
         {
             Dictionary<string, (string projectName, string province, string lgu, string barangay, string sitio,
-                string enumerator, DateTime surveyDate, string gearClass, string gearVariation)> headers =
+                string enumerator, DateTime surveyDate, string gearClass, string gearVariation, string localNames)> headers =
                 new Dictionary<string, (string projectName, string province, string lgu, string barangay,
-                string sitio, string enumerator, DateTime surveyDate, string gearClass, string gearVariation)>();
+                string sitio, string enumerator, DateTime surveyDate, string gearClass, string gearVariation, string localNames)>();
 
             var sql = $@"SELECT tblGearInventoryBarangayData.DataGuid,
                             tblGearInventories.InventoryName,
@@ -195,6 +195,11 @@ namespace FAD3.Database.Classes
                     for (int i = 0; i < dt.Rows.Count; i++)
                     {
                         DataRow dr = dt.Rows[i];
+                        var names = "";
+                        foreach (string name in InventoryGearLocalName(dr["DataGuid"].ToString()))
+                        {
+                            names += name + ", ";
+                        }
                         headers.Add(dr["DataGuid"].ToString(),
                             (dr["InventoryName"].ToString(),
                             dr["ProvinceName"].ToString(),
@@ -204,7 +209,8 @@ namespace FAD3.Database.Classes
                             dr["EnumeratorName"].ToString(),
                             (DateTime)dr["InventoryDate"],
                             dr["GearClassName"].ToString(),
-                            dr["Variation"].ToString()));
+                            dr["Variation"].ToString(),
+                            names.Trim(new char[] { ' ', ',' })));
                     }
                 }
                 catch
@@ -213,6 +219,37 @@ namespace FAD3.Database.Classes
             }
 
             return headers;
+        }
+
+        public List<string> InventoryGearLocalName(string brgyGearInventoryGuid)
+        {
+            List<string> localNames = new List<string>();
+            string query = $@"SELECT tblGearLocalNames.LocalName
+                            FROM tblGearLocalNames INNER JOIN
+                                tblGearInventoryGearLocalNames ON
+                                tblGearLocalNames.LocalNameGUID = tblGearInventoryGearLocalNames.LocalNameGuid
+                            WHERE tblGearInventoryGearLocalNames.InventoryDataGuid ={{{brgyGearInventoryGuid}}}";
+            var dt = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(dt);
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        DataRow dr = dt.Rows[i];
+                        localNames.Add(dr["LocalName"].ToString());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
+                }
+            }
+            return localNames;
         }
 
         public List<(int? decade, int? historyYear, int cpue, string unit, string notes)> GetCPUEHistorical(string dataGuid)
@@ -773,14 +810,14 @@ namespace FAD3.Database.Classes
         /// <param name="provinceName"></param>
         /// <param name="municipalityName"></param>
         /// <returns></returns>
-        public List<(string barangay, string sitio, string gearClass, string gearVariation, string dataGuid, string barangayInventoryGUID, int total)>
+        public List<(string barangay, string sitio, string gearClass, string gearVariation, string dataGuid, string barangayInventoryGUID, int total, string localNames)>
                 GetBarangaysGearInventory(string inventoryGuid, string provinceName, string municipalityName)
         {
             var rowsReturned = 0;
             List<string> listedItems = new List<string>();
 
-            List<(string barangay, string sitio, string gearClass, string gearVariation, string dataGuid, string barangayInventoryGUID, int total)> list =
-                new List<(string barangay, string sitio, string gearClass, string gearVariation, string dataGuid, string barangayInventoryGUID, int total)>();
+            List<(string barangay, string sitio, string gearClass, string gearVariation, string dataGuid, string barangayInventoryGUID, int total, string localNames)> list =
+                new List<(string barangay, string sitio, string gearClass, string gearVariation, string dataGuid, string barangayInventoryGUID, int total, string localNames)>();
 
             var sql = $@"SELECT tblGearInventoryBarangay.Barangay, tblGearInventoryBarangay.Sitio, tblGearClass.GearClassName,
                            tblGearVariations.Variation, tblGearInventoryBarangay.BarangayInventoryGuid, t2.DataGuid,
@@ -808,9 +845,15 @@ namespace FAD3.Database.Classes
                     for (int n = 0; n < dt.Rows.Count; n++)
                     {
                         DataRow dr = dt.Rows[n];
+                        var localNames = "";
+                        foreach (string name in GetGearLocalNamesInventory(dr["DataGuid"].ToString()))
+                        {
+                            localNames += name + ", ";
+                        }
                         listedItems.Add(dr["Barangay"].ToString() + dr["Sitio"].ToString());
                         list.Add((dr["Barangay"].ToString(), dr["Sitio"].ToString(), dr["GearClassName"].ToString(),
-                                  dr["Variation"].ToString(), dr["DataGuid"].ToString(), dr["BarangayInventoryGuid"].ToString(), int.Parse(dr["Total"].ToString())));
+                                  dr["Variation"].ToString(), dr["DataGuid"].ToString(), dr["BarangayInventoryGuid"].ToString(),
+                                  int.Parse(dr["Total"].ToString()), localNames.Trim(new char[] { ' ', ',' })));
                     }
                 }
                 catch (Exception ex)
@@ -841,7 +884,7 @@ namespace FAD3.Database.Classes
                         DataRow dr = dt.Rows[n];
                         if (!listedItems.Contains(dr["Barangay"].ToString() + dr["Sitio"].ToString()))
                         {
-                            list.Add((dr["Barangay"].ToString(), dr["Sitio"].ToString(), "", "", "", dr["BarangayInventoryGuid"].ToString(), 0));
+                            list.Add((dr["Barangay"].ToString(), dr["Sitio"].ToString(), "", "", "", dr["BarangayInventoryGuid"].ToString(), 0, ""));
                         }
                     }
                 }
@@ -852,6 +895,40 @@ namespace FAD3.Database.Classes
             }
 
             return list;
+        }
+
+        public List<string> GearLocalNamesBarangayGear(string barangayInventoryGuid, string gearVariationGuid)
+        {
+            List<string> localNames = new List<string>();
+            var query = $@"SELECT tblGearInventoryGearLocalNames.LocalNameGuid
+                        FROM tblGearInventoryBarangayData INNER JOIN
+                            tblGearInventoryGearLocalNames ON
+                            tblGearInventoryBarangayData.DataGuid = tblGearInventoryGearLocalNames.InventoryDataGuid
+                        WHERE tblGearInventoryBarangayData.BarangayInventoryGUID ={{{barangayInventoryGuid}}} AND
+                            tblGearInventoryBarangayData.GearVariation ={{{gearVariationGuid}}}";
+            var dt = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(dt);
+
+                    for (int n = 0; n < dt.Rows.Count; n++)
+                    {
+                        DataRow dr = dt.Rows[n];
+
+                        localNames.Add(dr["LocalNameGuid"].ToString());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
+                }
+            }
+            return localNames;
         }
 
         public bool IsGearInInventory(string barangayInventoryGuid, string gearVariationGuid)
@@ -1814,9 +1891,9 @@ namespace FAD3.Database.Classes
         /// <param name="barangayName"></param>
         /// <param name="sitioName"></param>
         /// <returns></returns>
-        public Dictionary<string, (string gearClass, int total, int sumCommercial, int sumMotorized, int sumNonMotorized, int sumNoBoat)> GetLevelGearsInventory(string inventoryGuid, string provinceName = "", string municipalityName = "", string barangayName = "", string sitioName = "")
+        public Dictionary<string, (string gearClass, string gearVariation, string localNames, int total, int sumCommercial, int sumMotorized, int sumNonMotorized, int sumNoBoat)> GetLevelGearsInventory(string inventoryGuid, string provinceName = "", string municipalityName = "", string barangayName = "", string sitioName = "")
         {
-            Dictionary<string, (string gearClass, int total, int sumCommercial, int sumMotorized, int sumNonMotorized, int sumNoBoat)> dict = new Dictionary<string, (string gearClass, int total, int sumCommercial, int sumMotorized, int sumNonMotorized, int sumNoBoat)>();
+            Dictionary<string, (string gearClass, string gearVariation, string localNames, int total, int sumCommercial, int sumMotorized, int sumNonMotorized, int sumNoBoat)> dict = new Dictionary<string, (string gearClass, string gearVariation, string localNames, int total, int sumCommercial, int sumMotorized, int sumNonMotorized, int sumNoBoat)>();
 
             var dt = new DataTable();
             string query = "";
@@ -1825,13 +1902,14 @@ namespace FAD3.Database.Classes
                 try
                 {
                     conection.Open();
+                    var sitio = "";
                     if (sitioName.Length > 0)
                     {
-                        if (sitioName == "entireBarangay")
+                        if (sitioName != "entireBarangay")
                         {
-                            sitioName = "";
+                            sitio = sitioName;
                         }
-                        query = $@"SELECT tblGearClass.GearClassName, tblGearVariations.Variation,
+                        query = $@"SELECT t2.DataGuid, tblGearClass.GearClassName, tblGearVariations.Variation,
                                 Sum([t2].[CountCommercial]+[t2].[CountMunicipalMotorized]+[t2].[CountMunicipalNonMotorized]+[t2].[CountNoBoat]) AS Total,
                                 Sum(t2.CountCommercial) AS TotalCommercial,
                                 Sum(t2.CountMunicipalMotorized) AS TotalMotorized,
@@ -1845,13 +1923,13 @@ namespace FAD3.Database.Classes
                                     tblGearClass.GearClass = tblGearVariations.GearClass
                                 WHERE tblGearInventoryBarangay.InventoryGuid={{{inventoryGuid}}} AND Provinces.ProvinceName='{provinceName}'
                                     AND Municipalities.Municipality= '{municipalityName}' AND tblGearInventoryBarangay.Barangay='{barangayName}'
-                                    AND tblGearInventoryBarangay.Sitio='{sitioName}'
-                                GROUP BY tblGearClass.GearClassName, tblGearVariations.Variation
+                                    AND tblGearInventoryBarangay.Sitio='{sitio}'
+                                GROUP BY  t2.DataGuid, tblGearClass.GearClassName, tblGearVariations.Variation
                                 ORDER BY tblGearClass.GearClassName, tblGearVariations.Variation;";
                     }
                     else if (barangayName.Length > 0)
                     {
-                        query = $@"SELECT tblGearClass.GearClassName, tblGearVariations.Variation,
+                        query = $@"SELECT t2.DataGuid, tblGearClass.GearClassName, tblGearVariations.Variation,
                                 Sum([t2].[CountCommercial]+[t2].[CountMunicipalMotorized]+[t2].[CountMunicipalNonMotorized]+[t2].[CountNoBoat]) AS Total,
                                 Sum(t2.CountCommercial) AS TotalCommercial,
                                 Sum(t2.CountMunicipalMotorized) AS TotalMotorized,
@@ -1865,12 +1943,12 @@ namespace FAD3.Database.Classes
                                     tblGearClass.GearClass = tblGearVariations.GearClass
                                 WHERE tblGearInventoryBarangay.InventoryGuid={{{inventoryGuid}}} AND Provinces.ProvinceName='{provinceName}'
                                     AND Municipalities.Municipality= '{municipalityName}' AND tblGearInventoryBarangay.Barangay='{barangayName}'
-                                GROUP BY tblGearClass.GearClassName, tblGearVariations.Variation
+                                GROUP BY t2.DataGuid, tblGearClass.GearClassName, tblGearVariations.Variation
                                 ORDER BY tblGearClass.GearClassName, tblGearVariations.Variation;";
                     }
                     else if (municipalityName.Length > 0)
                     {
-                        query = $@"SELECT tblGearClass.GearClassName, tblGearVariations.Variation,
+                        query = $@" tblGearClass.GearClassName, tblGearVariations.Variation,
                                 Sum([t2].[CountCommercial]+[t2].[CountMunicipalMotorized]+[t2].[CountMunicipalNonMotorized]+[t2].[CountNoBoat]) AS Total,
                                 Sum(t2.CountCommercial) AS TotalCommercial,
                                 Sum(t2.CountMunicipalMotorized) AS TotalMotorized,
@@ -1888,7 +1966,7 @@ namespace FAD3.Database.Classes
                     }
                     else if (provinceName.Length > 0)
                     {
-                        query = $@"SELECT tblGearClass.GearClassName, tblGearVariations.Variation,
+                        query = $@"SELECT  tblGearClass.GearClassName, tblGearVariations.Variation,
                                 Sum([t2].[CountCommercial]+[t2].[CountMunicipalMotorized]+[t2].[CountMunicipalNonMotorized]+[t2].[CountNoBoat]) AS Total,
                                 Sum(t2.CountCommercial) AS TotalCommercial,
                                 Sum(t2.CountMunicipalMotorized) AS TotalMotorized,
@@ -1928,7 +2006,21 @@ namespace FAD3.Database.Classes
                     for (int n = 0; n < dt.Rows.Count; n++)
                     {
                         DataRow dr = dt.Rows[n];
-                        dict.Add(dr["Variation"].ToString(), (dr["GearClassName"].ToString(), int.Parse(dr["Total"].ToString()), int.Parse(dr["TotalCommercial"].ToString()), int.Parse(dr["TotalMotorized"].ToString()), int.Parse(dr["TotalNonMotorized"].ToString()), int.Parse(dr["TotalNoBoat"].ToString())));
+                        var localNames = "";
+
+                        if (sitioName.Length > 0 || barangayName.Length > 0)
+                        {
+                            foreach (string name in GetGearLocalNamesInventory(dr["DataGuid"].ToString()))
+                            {
+                                localNames += name + ", ";
+                            }
+
+                            dict.Add(dr["DataGuid"].ToString(), (dr["GearClassName"].ToString(), dr["Variation"].ToString(), localNames.Trim(',', ' '), int.Parse(dr["Total"].ToString()), int.Parse(dr["TotalCommercial"].ToString()), int.Parse(dr["TotalMotorized"].ToString()), int.Parse(dr["TotalNonMotorized"].ToString()), int.Parse(dr["TotalNoBoat"].ToString())));
+                        }
+                        else
+                        {
+                            dict.Add(dr["Variation"].ToString(), (dr["GearClassName"].ToString(), dr["Variation"].ToString(), localNames, int.Parse(dr["Total"].ToString()), int.Parse(dr["TotalCommercial"].ToString()), int.Parse(dr["TotalMotorized"].ToString()), int.Parse(dr["TotalNonMotorized"].ToString()), int.Parse(dr["TotalNoBoat"].ToString())));
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -2364,9 +2456,9 @@ namespace FAD3.Database.Classes
         /// </summary>
         /// <param name="barangayInventoryGuid"></param>
         /// <returns></returns>
-        public List<(string gearClass, string gearVariation, string variationInventoryGuid)> ReadSitioGearInventory(string barangayInventoryGuid)
+        public List<(string gearClass, string gearVariation, string variationInventoryGuid, string localNames)> ReadSitioGearInventory(string barangayInventoryGuid)
         {
-            List<(string gearClass, string gearVariation, string variationInventoryGuid)> myList = new List<(string gearClass, string gearVariation, string variationInventoryGuid)>();
+            List<(string gearClass, string gearVariation, string variationInventoryGuid, string localNames)> myList = new List<(string gearClass, string gearVariation, string variationInventoryGuid, string localNames)>();
             string sql = $@"SELECT tblGearClass.GearClassName, tblGearVariations.Variation, tblGearInventoryBarangayData.DataGuid
                             FROM tblGearClass INNER JOIN (tblGearVariations INNER JOIN tblGearInventoryBarangayData ON
                               tblGearVariations.GearVarGUID = tblGearInventoryBarangayData.GearVariation) ON
@@ -2383,7 +2475,12 @@ namespace FAD3.Database.Classes
                     for (int i = 0; i < dt.Rows.Count; i++)
                     {
                         DataRow dr = dt.Rows[i];
-                        myList.Add((dr["GearClassName"].ToString(), dr["Variation"].ToString(), dr["DataGuid"].ToString()));
+                        string localNames = "";
+                        foreach (string name in GetGearLocalNamesInventory(dr["DataGuid"].ToString()))
+                        {
+                            localNames += name + ", ";
+                        }
+                        myList.Add((dr["GearClassName"].ToString(), dr["Variation"].ToString(), dr["DataGuid"].ToString(), localNames.Trim(new char[] { ',', ' ' })));
                     }
                 }
                 catch (Exception ex)

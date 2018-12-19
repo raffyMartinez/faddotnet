@@ -83,6 +83,7 @@
             this.treeInventory.ContextMenuStrip = this.contextMenu;
             this.treeInventory.Dock = System.Windows.Forms.DockStyle.Fill;
             this.treeInventory.HideSelection = false;
+            this.treeInventory.Indent = 10;
             this.treeInventory.Location = new System.Drawing.Point(0, 0);
             this.treeInventory.Name = "treeInventory";
             this.treeInventory.Size = new System.Drawing.Size(307, 326);

@@ -37,9 +37,9 @@ namespace FAD3.Database.Forms
             int? averageCPUE, int? cpueMode, double? equivalentKg)>();
 
         private Dictionary<string, (string projectName, string province, string lgu, string barangay, string sitio,
-            string enumerator, DateTime surveyDate, string gearClass, string gearVariation)> _headers = new
+            string enumerator, DateTime surveyDate, string gearClass, string gearVariation, string localNames)> _headers = new
             Dictionary<string, (string projectName, string province, string lgu, string barangay, string sitio,
-            string enumerator, DateTime surveyDate, string gearClass, string gearVariation)>();
+            string enumerator, DateTime surveyDate, string gearClass, string gearVariation, string localNames)>();
 
         public bool ShowProjectColumn { get; set; }
         public string InventoryProjectName { get; set; }
@@ -267,6 +267,7 @@ namespace FAD3.Database.Forms
             AddColumnDataType(col, "date");
             listResults.Columns.Add("Gear class");
             listResults.Columns.Add("Gear variation");
+            listResults.Columns.Add("Local names");
 
             if (showExpenses)
             {
@@ -316,6 +317,7 @@ namespace FAD3.Database.Forms
                 lvi.SubItems.Add(string.Format("{0:MMM-dd-yyyy}", item.Value.surveyDate));
                 lvi.SubItems.Add(item.Value.gearClass);
                 lvi.SubItems.Add(item.Value.gearVariation);
+                lvi.SubItems.Add(item.Value.localNames);
 
                 if (showExpenses)
                 {
@@ -324,7 +326,7 @@ namespace FAD3.Database.Forms
                     {
                         if (costLine > 0)
                         {
-                            for (int n = 1; n < 10; n++)
+                            for (int n = 1; n < 11; n++)
                             {
                                 if (n == 1)
                                 {
@@ -351,7 +353,7 @@ namespace FAD3.Database.Forms
                     {
                         if (cpueLine > 0)
                         {
-                            for (int n = 1; n < 10; n++)
+                            for (int n = 1; n < 11; n++)
                             {
                                 if (n == 1)
                                 {
@@ -398,6 +400,12 @@ namespace FAD3.Database.Forms
         {
             _instance = null;
             global.SaveFormSettings(this);
+            foreach (TraceListener listener in Debug.Listeners)
+            {
+                listener.Flush();
+                listener.Close();
+            }
+            _listener = null;
         }
 
         /// <summary>
@@ -462,7 +470,7 @@ namespace FAD3.Database.Forms
 
                 foreach (var month in _inventory.GetMonthsFishing(lvi.Name, true))
                 {
-                    lvi.SubItems[month + 8].Text = "x";
+                    lvi.SubItems[month + 9].Text = "x";
                 }
             }
             SizeColumns(listResults, false);
@@ -494,7 +502,7 @@ namespace FAD3.Database.Forms
 
                 foreach (var month in _inventory.GetMonthsFishing(lvi.Name))
                 {
-                    lvi.SubItems[month + 8].Text = "x";
+                    lvi.SubItems[month + 9].Text = "x";
                 }
             }
             SizeColumns(listResults, false);
@@ -534,17 +542,17 @@ namespace FAD3.Database.Forms
         {
             Debug.WriteLine($"{GetType().Name} {MethodBase.GetCurrentMethod().Name} {DateTime.Now.ToString()}");
             FillHeaderRows();
-            listResults.Columns.Add("Local names");
+            //listResults.Columns.Add("Local names");
             SizeColumns(listResults);
-            foreach (ListViewItem lvi in listResults.Items)
-            {
-                var localNames = "";
-                foreach (var name in _inventory.GetGearLocalNamesInventory(lvi.Name))
-                {
-                    localNames += name + ", ";
-                }
-                lvi.SubItems.Add(localNames.Trim(new char[] { ',', ' ' }));
-            }
+            //foreach (ListViewItem lvi in listResults.Items)
+            //{
+            //    var localNames = "";
+            //    foreach (var name in _inventory.GetGearLocalNamesInventory(lvi.Name))
+            //    {
+            //        localNames += name + ", ";
+            //    }
+            //    lvi.SubItems.Add(localNames.Trim(new char[] { ',', ' ' }));
+            //}
             SizeColumns(listResults, false);
         }
 

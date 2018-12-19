@@ -9,9 +9,9 @@ Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup", "setup\Setup\Setup.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Owf.Controls.Office2007ColorPicker", "Owf.Controls.Office2007ColorPicker\Owf.Controls.Office2007ColorPicker.csproj", "{F017C4CB-751D-4F5D-8A72-96A279135473}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "FADUpdate12102018", "FADUpdate12102018\FADUpdate12102018.vdproj", "{4A71546E-EB27-47FC-9E7A-78F8F712BB26}"
-EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "FADUpdate12152018", "FADUpdate12152018\FADUpdate12152018.vdproj", "{0597C5FD-0D0A-4D26-A8CB-6A22DFF5188A}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "FADUpdate12192018", "FADUpdate12192018\FADUpdate12192018.vdproj", "{0DB8E270-17FE-4565-8ED7-BE5C2F6F75DF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,12 +57,6 @@ Global
 		{F017C4CB-751D-4F5D-8A72-96A279135473}.Release|x64.Build.0 = Release|Any CPU
 		{F017C4CB-751D-4F5D-8A72-96A279135473}.Release|x86.ActiveCfg = Release|Any CPU
 		{F017C4CB-751D-4F5D-8A72-96A279135473}.Release|x86.Build.0 = Release|Any CPU
-		{4A71546E-EB27-47FC-9E7A-78F8F712BB26}.Debug|Any CPU.ActiveCfg = Debug
-		{4A71546E-EB27-47FC-9E7A-78F8F712BB26}.Debug|x64.ActiveCfg = Debug
-		{4A71546E-EB27-47FC-9E7A-78F8F712BB26}.Debug|x86.ActiveCfg = Debug
-		{4A71546E-EB27-47FC-9E7A-78F8F712BB26}.Release|Any CPU.ActiveCfg = Release
-		{4A71546E-EB27-47FC-9E7A-78F8F712BB26}.Release|x64.ActiveCfg = Release
-		{4A71546E-EB27-47FC-9E7A-78F8F712BB26}.Release|x86.ActiveCfg = Release
 		{0597C5FD-0D0A-4D26-A8CB-6A22DFF5188A}.Debug|Any CPU.ActiveCfg = Debug
 		{0597C5FD-0D0A-4D26-A8CB-6A22DFF5188A}.Debug|x64.ActiveCfg = Debug
 		{0597C5FD-0D0A-4D26-A8CB-6A22DFF5188A}.Debug|x86.ActiveCfg = Debug
@@ -70,6 +64,12 @@ Global
 		{0597C5FD-0D0A-4D26-A8CB-6A22DFF5188A}.Release|Any CPU.Build.0 = Release
 		{0597C5FD-0D0A-4D26-A8CB-6A22DFF5188A}.Release|x64.ActiveCfg = Release
 		{0597C5FD-0D0A-4D26-A8CB-6A22DFF5188A}.Release|x86.ActiveCfg = Release
+		{0DB8E270-17FE-4565-8ED7-BE5C2F6F75DF}.Debug|Any CPU.ActiveCfg = Debug
+		{0DB8E270-17FE-4565-8ED7-BE5C2F6F75DF}.Debug|x64.ActiveCfg = Debug
+		{0DB8E270-17FE-4565-8ED7-BE5C2F6F75DF}.Debug|x86.ActiveCfg = Debug
+		{0DB8E270-17FE-4565-8ED7-BE5C2F6F75DF}.Release|Any CPU.ActiveCfg = Release
+		{0DB8E270-17FE-4565-8ED7-BE5C2F6F75DF}.Release|x64.ActiveCfg = Release
+		{0DB8E270-17FE-4565-8ED7-BE5C2F6F75DF}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

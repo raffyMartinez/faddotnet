@@ -802,7 +802,7 @@ namespace FAD3.Database.Forms
                             lvi = lvInventory.Items.Add("");
                             lvi = lvInventory.Items.Add("");
                         }
-                        lvi = lvInventory.Items.Add(item.Value.gearClass + "-" + item.Key);
+                        lvi = lvInventory.Items.Add($"{item.Value.gearClass} - {item.Value.gearVariation} ({item.Value.localNames})");
                         lvi.SubItems.Add(item.Value.total.ToString());
                         lvi.ImageKey = Gear.GearClassImageKeyFromGearClasName(item.Value.gearClass);
                         row++;
@@ -924,7 +924,7 @@ namespace FAD3.Database.Forms
                     {
                         node.Nodes.Clear();
                     }
-                    var nd = node.Nodes.Add(item.variationInventoryGuid, item.gearVariation);
+                    var nd = node.Nodes.Add(item.variationInventoryGuid, $"{item.gearVariation} ({item.localNames})");
                     nd.Tag = "gearVariation";
                     nd.ImageKey = Gear.GearClassImageKeyFromGearClasName(item.gearClass);
                 }
@@ -941,7 +941,7 @@ namespace FAD3.Database.Forms
         /// <param name="gearInventoryDict"></param>
         /// <param name="node"></param>
         private void SetupListSummaryView(int fisherCount, int commercialCount, int motorizedCount, int nonMotorizedCount,
-            Dictionary<string, (string gearClass, int total, int sumCommercial, int sumMotorized, int sumNonMotorized, int sumNoBoat)> gearInventoryDict, TreeNode node = null)
+            Dictionary<string, (string gearClass, string variation, string localNames, int total, int sumCommercial, int sumMotorized, int sumNonMotorized, int sumNoBoat)> gearInventoryDict, TreeNode node = null)
         {
             ListViewItem lvi;
 
@@ -1052,7 +1052,7 @@ namespace FAD3.Database.Forms
                         }
                         if (item.gearClass != "" && item.gearVariation != "")
                         {
-                            lvi = lvInventory.Items.Add("       " + item.gearClass + "-" + item.gearVariation);
+                            lvi = lvInventory.Items.Add("       " + item.gearClass + "-" + item.gearVariation + " (" + item.localNames + ")");
                             lvi.Name = (item.dataGuid);
                             lvi.SubItems.Add(item.total.ToString());
                             lvi.ImageKey = Gear.GearClassImageKeyFromGearClasName(item.gearClass);
@@ -1079,7 +1079,14 @@ namespace FAD3.Database.Forms
                 lvi = lvInventory.Items.Add("");
                 foreach (var item in gearInventoryDict)
                 {
-                    lvi = lvInventory.Items.Add(item.Value.gearClass + "-" + item.Key);
+                    if (item.Value.localNames.Length > 0)
+                    {
+                        lvi = lvInventory.Items.Add($"{item.Value.gearClass} - {item.Value.variation} ({item.Value.localNames})");
+                    }
+                    else
+                    {
+                        lvi = lvInventory.Items.Add($"{item.Value.gearClass} - {item.Value.variation}");
+                    }
                     lvi.SubItems.Add(item.Value.total.ToString());
                     lvi.ImageKey = Gear.GearClassImageKeyFromGearClasName(item.Value.gearClass);
                 }

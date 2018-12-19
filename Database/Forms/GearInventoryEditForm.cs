@@ -1426,12 +1426,13 @@ namespace FAD3.Database.Forms
                         case "cboSelectAccessory":
                             if (ComboItemsContains(cbo, s))
                             {
-                                if (ctlName == "cboGearVariation")
+                                if (ctlName == "cboSelectGearLocalName")
                                 {
-                                    //we check database if gear variation is already in the inventory then cancel if true
-                                    if (_dataStatus == fad3DataStatus.statusNew && _inventory.IsGearInInventory(_barangayInventoryGuid, _gearVariationKey))
+                                    var localNameKey = ((KeyValuePair<string, string>)(cboSelectGearLocalName.SelectedItem)).Key;
+                                    var localNameGUIDs = _inventory.GearLocalNamesBarangayGear(_barangayInventoryGuid, _gearVariationKey);
+                                    if (localNameGUIDs.Contains(localNameKey))
                                     {
-                                        msg = "Cannot accept selected gear\r\nbecause it has been inventoried";
+                                        msg = $"Cannot accept {cboSelectGearLocalName.Text} as local name for {cboGearVariation.Text}\r\nbecause it has been inventoried";
                                         MessageBox.Show(msg, "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Information);
                                         e.Cancel = true;
                                     }

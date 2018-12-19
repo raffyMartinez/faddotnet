@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Reflection;
 
 namespace FAD3
 {
@@ -94,6 +95,11 @@ namespace FAD3
                     {
                         var name = tdTemplate.Name;
                         colList.Add(i.Name);
+
+                        if (tdTemplate.Name == "tblGearInventoryBarangayData" && i.Name == "AltKey")
+                        {
+                            RemoveGearInventoryBarangayDataAltKey(mdbPath);
+                        }
                     }
 
                     //enumerate all indexes in the current template table
@@ -185,6 +191,26 @@ namespace FAD3
             dbTemplate = null;
 
             return true;
+        }
+
+        private static void RemoveGearInventoryBarangayDataAltKey(string mdbPath)
+        {
+            var dbe = new DBEngine();
+            var dbData = dbe.OpenDatabase(mdbPath);
+            //var sql = "ALTER TABLE tblGearInventoryBarangayData DROP INDEX AltKey";
+            var sql = "DROP INDEX AltKey ON tblGearInventoryBarangayData";
+
+            try
+            {
+                dbData.Execute(sql);
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
+            }
+
+            dbData.Close();
+            dbData = null;
         }
 
         private static void FixField(TableDef td, Field fData, Field fTemplate, string mdbPath)
