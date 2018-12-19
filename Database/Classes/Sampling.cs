@@ -13,7 +13,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
 using System.Xml;
-using FAD3.Database.Classes;
+using System.Reflection;
 
 namespace FAD3
 {
@@ -355,7 +355,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
         }
@@ -397,7 +397,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
             return Success;
@@ -418,7 +418,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
             return Success;
@@ -605,131 +605,134 @@ namespace FAD3
 
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(myDT);
-                    DataRow dr = myDT.Rows[0];
-
-                    PropertyValue.Add("ReferenceNumber", dr["RefNo"].ToString());
-                    try { PropertyValue.Add("Enumerator", dr["EnumeratorName"].ToString() + "|" + dr["Enumerator"].ToString()); }
-                    catch { PropertyValue.Add("Enumerator", ""); }
-                    PropertyValue.Add("TargetArea", dr["AOIName"].ToString());
-                    PropertyValue.Add("LandingSite", dr["LSName"].ToString() + "|" + dr["LSGuid"].ToString());
-                    PropertyValue.Add("GearClass", dr["GearClassName"].ToString() + "|" + dr["GearClass"].ToString());
-                    PropertyValue.Add("FishingGear", dr["Variation"].ToString() + "|" + dr["GearVarGUID"].ToString());
-                    try { PropertyValue.Add("FishingGround", dr["FishingGround"].ToString()); }
-                    catch { PropertyValue.Add("FishingGround", ""); }
-
-                    DateTime dt = new DateTime();
-
-                    myVal = dr["SamplingDate"].ToString();
-                    if (myVal != "")
+                    if (myDT.Rows.Count > 0)
                     {
-                        dt = Convert.ToDateTime(myVal);
-                        PropertyValue.Add("SamplingDate", string.Format("{0:MMM-dd-yyyy}", dt));
-                    }
-                    else
-                    {
-                        PropertyValue.Add("SamplingDate", "");
-                    }
+                        DataRow dr = myDT.Rows[0];
 
-                    myVal = dr["SamplingTime"].ToString();
-                    if (myVal != "")
-                    {
-                        dt = Convert.ToDateTime(myVal);
-                        PropertyValue.Add("SamplingTime", string.Format("{0:HH:mm}", dt));
-                    }
-                    else
-                    {
-                        PropertyValue.Add("SamplingTime", "");
-                    }
+                        PropertyValue.Add("ReferenceNumber", dr["RefNo"].ToString());
+                        try { PropertyValue.Add("Enumerator", dr["EnumeratorName"].ToString() + "|" + dr["Enumerator"].ToString()); }
+                        catch { PropertyValue.Add("Enumerator", ""); }
+                        PropertyValue.Add("TargetArea", dr["AOIName"].ToString());
+                        PropertyValue.Add("LandingSite", dr["LSName"].ToString() + "|" + dr["LSGuid"].ToString());
+                        PropertyValue.Add("GearClass", dr["GearClassName"].ToString() + "|" + dr["GearClass"].ToString());
+                        PropertyValue.Add("FishingGear", dr["Variation"].ToString() + "|" + dr["GearVarGUID"].ToString());
+                        try { PropertyValue.Add("FishingGround", dr["FishingGround"].ToString()); }
+                        catch { PropertyValue.Add("FishingGround", ""); }
 
-                    myVal = dr["DateSet"].ToString();
-                    if (myVal != "")
-                    {
-                        dt = Convert.ToDateTime(myVal);
-                        PropertyValue.Add("DateSet", string.Format("{0:MMM-dd-yyyy}", dt));
-                    }
-                    else
-                    {
-                        PropertyValue.Add("DateSet", "");
-                    }
+                        DateTime dt = new DateTime();
 
-                    myVal = dr["TimeSet"].ToString();
-                    if (myVal != "")
-                    {
-                        dt = Convert.ToDateTime(myVal);
-                        PropertyValue.Add("TimeSet", string.Format("{0:HH:mm}", dt));
-                    }
-                    else
-                    {
-                        PropertyValue.Add("TimeSet", "");
-                    }
+                        myVal = dr["SamplingDate"].ToString();
+                        if (myVal != "")
+                        {
+                            dt = Convert.ToDateTime(myVal);
+                            PropertyValue.Add("SamplingDate", string.Format("{0:MMM-dd-yyyy}", dt));
+                        }
+                        else
+                        {
+                            PropertyValue.Add("SamplingDate", "");
+                        }
 
-                    myVal = dr["DateHauled"].ToString();
-                    if (myVal != "")
-                    {
-                        dt = Convert.ToDateTime(myVal);
-                        PropertyValue.Add("DateHauled", string.Format("{0:MMM-dd-yyyy}", dt));
-                    }
-                    else
-                    {
-                        PropertyValue.Add("DateHauled", "");
-                    }
+                        myVal = dr["SamplingTime"].ToString();
+                        if (myVal != "")
+                        {
+                            dt = Convert.ToDateTime(myVal);
+                            PropertyValue.Add("SamplingTime", string.Format("{0:HH:mm}", dt));
+                        }
+                        else
+                        {
+                            PropertyValue.Add("SamplingTime", "");
+                        }
 
-                    myVal = dr["TimeHauled"].ToString();
-                    if (myVal != "")
-                    {
-                        dt = Convert.ToDateTime(myVal);
-                        PropertyValue.Add("TimeHauled", string.Format("{0:HH:mm}", dt));
-                    }
-                    else
-                    {
-                        PropertyValue.Add("TimeHauled", "");
-                    }
+                        myVal = dr["DateSet"].ToString();
+                        if (myVal != "")
+                        {
+                            dt = Convert.ToDateTime(myVal);
+                            PropertyValue.Add("DateSet", string.Format("{0:MMM-dd-yyyy}", dt));
+                        }
+                        else
+                        {
+                            PropertyValue.Add("DateSet", "");
+                        }
 
-                    PropertyValue.Add("NumberOfHauls", dr["NoHauls"].ToString());
-                    PropertyValue.Add("NumberOfFishers", dr["NoFishers"].ToString());
-                    PropertyValue.Add("WeightOfCatch", dr["WtCatch"].ToString());
-                    PropertyValue.Add("WeightOfSample", dr["WtSample"].ToString());
+                        myVal = dr["TimeSet"].ToString();
+                        if (myVal != "")
+                        {
+                            dt = Convert.ToDateTime(myVal);
+                            PropertyValue.Add("TimeSet", string.Format("{0:HH:mm}", dt));
+                        }
+                        else
+                        {
+                            PropertyValue.Add("TimeSet", "");
+                        }
 
-                    string HasLiveFish = "False";
-                    if (Convert.ToBoolean(dr["HasLiveFish"]))
-                    {
-                        HasLiveFish = "True";
-                    }
-                    PropertyValue.Add("HasLiveFish", HasLiveFish);
+                        myVal = dr["DateHauled"].ToString();
+                        if (myVal != "")
+                        {
+                            dt = Convert.ToDateTime(myVal);
+                            PropertyValue.Add("DateHauled", string.Format("{0:MMM-dd-yyyy}", dt));
+                        }
+                        else
+                        {
+                            PropertyValue.Add("DateHauled", "");
+                        }
 
-                    VesType = FishingVessel.VesselTypeFromVesselTypeNumber((int)dr["VesType"]);
-                    PropertyValue.Add("TypeOfVesselUsed", VesType);
+                        myVal = dr["TimeHauled"].ToString();
+                        if (myVal != "")
+                        {
+                            dt = Convert.ToDateTime(myVal);
+                            PropertyValue.Add("TimeHauled", string.Format("{0:HH:mm}", dt));
+                        }
+                        else
+                        {
+                            PropertyValue.Add("TimeHauled", "");
+                        }
 
-                    PropertyValue.Add("Engine", dr["Engine"].ToString());
-                    PropertyValue.Add("EngineHorsepower", dr["hp"].ToString());
+                        PropertyValue.Add("NumberOfHauls", dr["NoHauls"].ToString());
+                        PropertyValue.Add("NumberOfFishers", dr["NoFishers"].ToString());
+                        PropertyValue.Add("WeightOfCatch", dr["WtCatch"].ToString());
+                        PropertyValue.Add("WeightOfSample", dr["WtSample"].ToString());
 
-                    PropertyValue.Add("VesLength", dr["len"].ToString());
-                    PropertyValue.Add("VesWidth", dr["wdt"].ToString());
-                    PropertyValue.Add("VesHeight", dr["hgt"].ToString());
+                        string HasLiveFish = "False";
+                        if (Convert.ToBoolean(dr["HasLiveFish"]))
+                        {
+                            HasLiveFish = "True";
+                        }
+                        PropertyValue.Add("HasLiveFish", HasLiveFish);
 
-                    string VesDimension = "(LxWxH): " + dr["len"].ToString() + " x " + dr["wdt"].ToString() + " x " + dr["hgt"].ToString();
-                    PropertyValue.Add("VesselDimension", VesDimension);
+                        VesType = FishingVessel.VesselTypeFromVesselTypeNumber((int)dr["VesType"]);
+                        PropertyValue.Add("TypeOfVesselUsed", VesType);
 
-                    PropertyValue.Add("Notes", dr["Notes"].ToString());
+                        PropertyValue.Add("Engine", dr["Engine"].ToString());
+                        PropertyValue.Add("EngineHorsepower", dr["hp"].ToString());
 
-                    //the following are class properties that can be accessed by property get
-                    _RererenceNo = dr["RefNo"].ToString();
+                        PropertyValue.Add("VesLength", dr["len"].ToString());
+                        PropertyValue.Add("VesWidth", dr["wdt"].ToString());
+                        PropertyValue.Add("VesHeight", dr["hgt"].ToString());
 
-                    myVal = dr["DateEncoded"].ToString();
-                    if (myVal != "")
-                    {
-                        dt = Convert.ToDateTime(myVal);
-                        PropertyValue.Add("DateEncoded", string.Format("{0:MMM-dd-yyyy HH:mm}", dt));
-                    }
-                    else
-                    {
-                        PropertyValue.Add("DateEncoded", "");
+                        string VesDimension = "(LxWxH): " + dr["len"].ToString() + " x " + dr["wdt"].ToString() + " x " + dr["hgt"].ToString();
+                        PropertyValue.Add("VesselDimension", VesDimension);
+
+                        PropertyValue.Add("Notes", dr["Notes"].ToString());
+
+                        //the following are class properties that can be accessed by property get
+                        _RererenceNo = dr["RefNo"].ToString();
+
+                        myVal = dr["DateEncoded"].ToString();
+                        if (myVal != "")
+                        {
+                            dt = Convert.ToDateTime(myVal);
+                            PropertyValue.Add("DateEncoded", string.Format("{0:MMM-dd-yyyy HH:mm}", dt));
+                        }
+                        else
+                        {
+                            PropertyValue.Add("DateEncoded", "");
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
-                Logger.Log(ex);
+                Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
             }
 
             _CatchAndEffortPropertyCount = PropertyValue.Count;
@@ -759,7 +762,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
                 return myList;
             }
@@ -789,7 +792,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
             return myList;
@@ -815,7 +818,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
             return myList;
@@ -1019,7 +1022,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
             if (Success)

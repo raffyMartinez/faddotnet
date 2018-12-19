@@ -5,6 +5,7 @@ using System.Data.OleDb;
 using System.Text;
 using Oware;
 using FAD3.Database.Classes;
+using System.Reflection;
 
 namespace FAD3
 {
@@ -820,7 +821,7 @@ namespace FAD3
                     }
                     catch (Exception ex)
                     {
-                        Logger.Log(ex);
+                        Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                     }
                 }
             }
@@ -866,13 +867,16 @@ namespace FAD3
                         using (var adapter = new OleDbDataAdapter(query, conection))
                         {
                             adapter.Fill(dt);
-                            DataRow dr = dt.Rows[0];
-                            _SubGridStyle = (fadSubgridSyle)int.Parse(dr["SubgridStyle"].ToString());
+                            if (dt.Rows.Count > 0)
+                            {
+                                DataRow dr = dt.Rows[0];
+                                _SubGridStyle = (fadSubgridSyle)int.Parse(dr["SubgridStyle"].ToString());
+                            }
                         }
                     }
                     catch (Exception ex)
                     {
-                        Logger.Log(ex);
+                        Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                     }
                 }
             }

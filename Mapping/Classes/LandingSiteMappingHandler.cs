@@ -7,6 +7,7 @@ using System.Data;
 using MapWinGIS;
 using Oware;
 using FAD3.Database.Classes;
+using System.Reflection;
 
 namespace FAD3
 {
@@ -76,7 +77,7 @@ namespace FAD3
                         }
                     }
                 }
-                catch (Exception ex) { Logger.Log(ex); }
+                catch (Exception ex) { Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name); }
             }
 
             return iShp >= 0;

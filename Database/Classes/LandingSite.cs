@@ -13,6 +13,7 @@ using System.Data.OleDb;
 using System.Collections.Generic;
 using ISO_Classes;
 using FAD3.Database.Classes;
+using System.Reflection;
 
 //using System.Diagnostics;
 
@@ -124,7 +125,7 @@ namespace FAD3
                     var command = new OleDbCommand(query, conection);
                     myCount = (int)command.ExecuteScalar();
                 }
-                catch (Exception ex) { Logger.Log(ex); }
+                catch (Exception ex) { Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name); }
             }
             return myCount;
         }
@@ -215,7 +216,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
                 return myList;
             }
@@ -269,7 +270,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
                 return myList;
             }
@@ -299,7 +300,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
                 return myList;
             }
@@ -384,7 +385,7 @@ namespace FAD3
                         dict.Add((int)dr["MunNo"], (dr["LSName"].ToString(), dr["Municipality"].ToString(), dr["ProvinceName"].ToString(), (int)dr["MunNo"]));
                     }
                 }
-                catch (Exception ex) { Logger.Log(ex); }
+                catch (Exception ex) { Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name); }
             }
             return dict;
         }
@@ -423,7 +424,7 @@ namespace FAD3
                         myList.Add(dr[0].ToString() + ": " + dr[1].ToString());
                     }
                 }
-                catch (Exception ex) { Logger.Log(ex); }
+                catch (Exception ex) { Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name); }
             }
             return myList;
         }
@@ -455,7 +456,7 @@ namespace FAD3
                         _GearUsedCount++;
                     }
                 }
-                catch (Exception ex) { Logger.Log(ex); }
+                catch (Exception ex) { Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name); }
             }
             return myGears;
         }
@@ -517,7 +518,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
 
@@ -531,7 +532,7 @@ namespace FAD3
         public string LandingSiteData()
         {
             string rv = "";
-            var myDT = new DataTable();
+            var dt = new DataTable();
             using (var conection = new OleDbConnection(global.ConnectionString))
             {
                 try
@@ -545,32 +546,35 @@ namespace FAD3
 
                     double num = 0;
                     var adapter = new OleDbDataAdapter(query, conection);
-                    adapter.Fill(myDT);
-                    DataRow dr = myDT.Rows[0];
-                    _LandingSiteName = dr["LSName"].ToString();
+                    adapter.Fill(dt);
+                    if (dt.Rows.Count > 0)
+                    {
+                        DataRow dr = dt.Rows[0];
+                        _LandingSiteName = dr["LSName"].ToString();
 
-                    if (double.TryParse((dr["cx"].ToString()), out num))
-                    {
-                        _xCoord = num;
-                    }
-                    if (double.TryParse((dr["cy"].ToString()), out num))
-                    {
-                        _yCoord = num;
-                    }
-
-                    for (int i = 0; i < myDT.Columns.Count; i++)
-                    {
-                        if (i == 0)
+                        if (double.TryParse((dr["cx"].ToString()), out num))
                         {
-                            rv = dr[i].ToString();
+                            _xCoord = num;
                         }
-                        else
+                        if (double.TryParse((dr["cy"].ToString()), out num))
                         {
-                            rv += "," + dr[i].ToString();
+                            _yCoord = num;
+                        }
+
+                        for (int i = 0; i < dt.Columns.Count; i++)
+                        {
+                            if (i == 0)
+                            {
+                                rv = dr[i].ToString();
+                            }
+                            else
+                            {
+                                rv += "," + dr[i].ToString();
+                            }
                         }
                     }
                 }
-                catch (Exception ex) { Logger.Log(ex); }
+                catch (Exception ex) { Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name); }
             }
             return rv;
         }

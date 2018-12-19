@@ -8,8 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using FAD3.Database.Classes;
-
-using FAD3.Database.Classes;
+using System.Diagnostics;
+using System.Reflection;
 
 using ClosedXML.Excel;
 using System.IO;
@@ -18,6 +18,7 @@ namespace FAD3.Database.Forms
 {
     public partial class GearInventoryTabularForm : Form
     {
+        private TraceListener _listener;
         private Dictionary<string, string> _columnDataType = new Dictionary<string, string>();
         private static GearInventoryTabularForm _instance;
         private string _inventoryGuid;
@@ -51,10 +52,14 @@ namespace FAD3.Database.Forms
 
         public GearInventoryTabularForm(FishingGearInventory inventory, string inventoryGuid)
         {
+            Logger.Log($"Constructing {this.ToString()}");
             InitializeComponent();
             _inventory = inventory;
             _inventoryGuid = inventoryGuid;
             ShowProjectColumn = true;
+            _listener = new DelimitedListTraceListener($@"{Application.StartupPath}\fad.log");
+            Debug.Listeners.Add(_listener);
+            Debug.AutoFlush = true;
         }
 
         private void OnNodeAfterSelect(object sender, TreeViewEventArgs e)
@@ -121,11 +126,13 @@ namespace FAD3.Database.Forms
 
         private void ShowCPUEHistory()
         {
+            Debug.WriteLine($"{GetType().Name} {MethodBase.GetCurrentMethod().Name} {DateTime.Now.ToString()}");
             FillHeaderRows(showCPUETrend: true);
         }
 
         private void ShowNotes()
         {
+            Debug.WriteLine($"{GetType().Name} {MethodBase.GetCurrentMethod().Name} {DateTime.Now.ToString()}");
             FillHeaderRows();
             listResults.Columns.Add("Notes");
             SizeColumns(listResults);
@@ -138,6 +145,7 @@ namespace FAD3.Database.Forms
 
         private void ShowFishingAccessories()
         {
+            Debug.WriteLine($"{GetType().Name} {MethodBase.GetCurrentMethod().Name} {DateTime.Now.ToString()}");
             FillHeaderRows();
             listResults.Columns.Add("Accessories used in fishing");
             SizeColumns(listResults);
@@ -155,6 +163,7 @@ namespace FAD3.Database.Forms
 
         private void ShowCatchComposition()
         {
+            Debug.WriteLine($"{GetType().Name} {MethodBase.GetCurrentMethod().Name} {DateTime.Now.ToString()}");
             ColumnHeader col = new ColumnHeader();
             FillHeaderRows();
             listResults.Columns.Add("Composition of dominant catch");
@@ -192,6 +201,7 @@ namespace FAD3.Database.Forms
 
         private void ShowCPUE()
         {
+            Debug.WriteLine($"{GetType().Name} {MethodBase.GetCurrentMethod().Name} {DateTime.Now.ToString()}");
             var col = new ColumnHeader();
             FillHeaderRows();
             col = listResults.Columns.Add("Maximum CPUE");
@@ -226,6 +236,7 @@ namespace FAD3.Database.Forms
 
         private void ShowExpenses()
         {
+            Debug.WriteLine($"{GetType().Name} {MethodBase.GetCurrentMethod().Name} {DateTime.Now.ToString()}");
             FillHeaderRows(showExpenses: true);
         }
 
@@ -412,6 +423,7 @@ namespace FAD3.Database.Forms
 
         private void ShowProject()
         {
+            Debug.WriteLine($"{GetType().Name} {MethodBase.GetCurrentMethod().Name} {DateTime.Now.ToString()}");
             var col = new ColumnHeader();
             listResults.Clear();
             listResults.Columns.Add("Project name");
@@ -426,6 +438,7 @@ namespace FAD3.Database.Forms
 
         private void ShowMonthsPeak()
         {
+            Debug.WriteLine($"{GetType().Name} {MethodBase.GetCurrentMethod().Name} {DateTime.Now.ToString()}");
             FillHeaderRows();
             listResults.Columns.Add("Jan");
             listResults.Columns.Add("Feb");
@@ -457,6 +470,7 @@ namespace FAD3.Database.Forms
 
         private void ShowMonthsFishing()
         {
+            Debug.WriteLine($"{GetType().Name} {MethodBase.GetCurrentMethod().Name} {DateTime.Now.ToString()}");
             FillHeaderRows();
             listResults.Columns.Add("Jan");
             listResults.Columns.Add("Feb");
@@ -488,6 +502,7 @@ namespace FAD3.Database.Forms
 
         private void ShowGearCounts()
         {
+            Debug.WriteLine($"{GetType().Name} {MethodBase.GetCurrentMethod().Name} {DateTime.Now.ToString()}");
             var col = new ColumnHeader();
             FillHeaderRows();
             col = listResults.Columns.Add("Count in commercial vessels");
@@ -517,6 +532,7 @@ namespace FAD3.Database.Forms
 
         private void ShowGearLocalNames()
         {
+            Debug.WriteLine($"{GetType().Name} {MethodBase.GetCurrentMethod().Name} {DateTime.Now.ToString()}");
             FillHeaderRows();
             listResults.Columns.Add("Local names");
             SizeColumns(listResults);
@@ -595,6 +611,7 @@ namespace FAD3.Database.Forms
 
         private void ShowGearDaysInUse()
         {
+            Debug.WriteLine($"{GetType().Name} {MethodBase.GetCurrentMethod().Name} {DateTime.Now.ToString()}");
             var col = new ColumnHeader();
             FillHeaderRows();
             col = listResults.Columns.Add("Number of days in use per month");
@@ -609,6 +626,7 @@ namespace FAD3.Database.Forms
 
         private void ShowRespondents()
         {
+            Debug.WriteLine($"{GetType().Name} {MethodBase.GetCurrentMethod().Name} {DateTime.Now.ToString()}");
             var col = new ColumnHeader();
             var rowCount = 0;
             listResults.Clear();
@@ -671,6 +689,7 @@ namespace FAD3.Database.Forms
 
         private void ShowFisherVessel()
         {
+            Debug.WriteLine($"{GetType().Name} {MethodBase.GetCurrentMethod().Name} {DateTime.Now.ToString()}");
             var col = new ColumnHeader();
             listResults.Clear();
             listResults.Columns.Add("Project");
@@ -719,6 +738,7 @@ namespace FAD3.Database.Forms
 
         private DataTable ListViewToDataTable(ListView lv, string tableName)
         {
+            Debug.WriteLine($"{GetType().Name} {MethodBase.GetCurrentMethod().Name} {DateTime.Now.ToString()}");
             DataTable dt = new DataTable();
             dt.TableName = tableName;
             foreach (ColumnHeader ch in lv.Columns)
@@ -770,8 +790,15 @@ namespace FAD3.Database.Forms
         {
             TreeViewEventArgs e = new TreeViewEventArgs(nd);
             OnNodeAfterSelect(null, e);
-            var wks = wb.Worksheets.Add(ListViewToDataTable(listResults, nd.Text));
-            wks.Name = nd.Text;
+            try
+            {
+                var wks = wb.Worksheets.Add(ListViewToDataTable(listResults, nd.Text));
+                wks.Name = nd.Text;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message, "GearInventoryTabularForm", "PrintNodesRecursive");
+            }
             foreach (TreeNode subNode in nd.Nodes)
             {
                 PrintNodesRecursive(subNode, wb);
@@ -780,16 +807,23 @@ namespace FAD3.Database.Forms
 
         private void ExportInventoryXL(string fileName)
         {
-            var wb = new XLWorkbook();
-
-            foreach (TreeNode nd in treeInventory.Nodes)
+            try
             {
-                PrintNodesRecursive(nd, wb);
+                var wb = new XLWorkbook();
+
+                foreach (TreeNode nd in treeInventory.Nodes)
+                {
+                    PrintNodesRecursive(nd, wb);
+                }
+                wb.SaveAs(fileName);
+                treeInventory.SelectedNode = treeInventory.Nodes["nodeProject"];
+                ShowProject();
+                MessageBox.Show($"Inventory data successfully save to {fileName}");
             }
-            wb.SaveAs(fileName);
-            treeInventory.SelectedNode = treeInventory.Nodes["nodeProject"];
-            ShowProject();
-            MessageBox.Show($"Inventory data successfully save to {fileName}");
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message, "GearInventoryTabularForm", "ExportInventoryXL");
+            }
         }
 
         private void ExportInventoryXML(string fileName)
@@ -812,6 +846,8 @@ namespace FAD3.Database.Forms
 
                     if (fileName.Length > 0)
                     {
+                        //Logger.Log($"Gear inventory tabular form Exporting inventory to file: {fileName}");
+                        Debug.WriteLine($"Gear inventory tabular form Exporting inventory to file: {fileName}");
                         switch (Path.GetExtension(fileName))
                         {
                             case ".txt":

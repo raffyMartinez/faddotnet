@@ -16,9 +16,11 @@ namespace FAD3.Database.Classes
             var dbTemplate = dbe.OpenDatabase(global.ApplicationPath + "\\template.mdb");
             var dbData = dbe.OpenDatabase(mdbPath);
             var count = 0;
+            var os = Environment.OSVersion;
 
             Logger.LogSimple("");
             Logger.Log("start FADDiagnostics");
+            Logger.LogSimple($"OS: {Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ProductName", "")} {os.Version.Major}.{os.Version.Minor} {os.ServicePack}");
             Logger.LogSimple($"FAD version: {productVersion}");
             Logger.LogSimple($"Application path: {GetAppPath()}");
             Logger.LogSimple("-------------------------------------------------");

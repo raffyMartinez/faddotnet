@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
 using System.Windows.Forms;
+using System.Reflection;
 
 namespace FAD3
 {
@@ -77,7 +78,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
         }
@@ -103,7 +104,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
         }
@@ -129,7 +130,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
         }
@@ -374,7 +375,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
 
@@ -467,7 +468,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
 
@@ -510,7 +511,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
             return dict;
@@ -530,13 +531,17 @@ namespace FAD3
                                    tblGearVariations.GearClass WHERE tblGearVariations.GearVarGUID={{{varGUID}}}";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
-                    _gearVar.Clear();
-                    DataRow dr = dt.Rows[0];
-                    myClass = new KeyValuePair<string, string>(dr["GearClass"].ToString(), dr["GearClassName"].ToString());
+
+                    if (dt.Rows.Count > 0)
+                    {
+                        _gearVar.Clear();
+                        DataRow dr = dt.Rows[0];
+                        myClass = new KeyValuePair<string, string>(dr["GearClass"].ToString(), dr["GearClassName"].ToString());
+                    }
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
 
@@ -556,12 +561,15 @@ namespace FAD3
                                    tblGearClass.GearClass = tblGearVariations.GearClass WHERE GearVarGUID={{{GearVarGUID}}}";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
-                    DataRow dr = dt.Rows[0];
-                    gearClass = dr["GearClassName"].ToString();
+                    if (dt.Rows.Count > 0)
+                    {
+                        DataRow dr = dt.Rows[0];
+                        gearClass = dr["GearClassName"].ToString();
+                    }
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
                 return gearClass;
             }
@@ -580,12 +588,15 @@ namespace FAD3
                                    tblGearClass.GearClass = tblGearVariations.GearClass WHERE GearVarGUID={{{GearVarGUID}}}";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
-                    DataRow dr = dt.Rows[0];
-                    rv = new KeyValuePair<string, string>(dr["GearClass"].ToString(), dr["GearClassName"].ToString());
+                    if (dt.Rows.Count > 0)
+                    {
+                        DataRow dr = dt.Rows[0];
+                        rv = new KeyValuePair<string, string>(dr["GearClass"].ToString(), dr["GearClassName"].ToString());
+                    }
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
                 return rv;
             }
@@ -645,7 +656,7 @@ namespace FAD3
                         myList.Add(dr["RefGearCode"].ToString());
                     }
                 }
-                catch (Exception ex) { Logger.Log(ex); }
+                catch (Exception ex) { Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name); }
             }
             return myList;
         }
@@ -674,7 +685,7 @@ namespace FAD3
                         dict.Add(dr["RefGearCode"].ToString(), (dr["GearVarGUID"].ToString(), dr["Variation"].ToString(), (bool)dr["SubVariation"]));
                     }
                 }
-                catch (Exception ex) { Logger.Log(ex); }
+                catch (Exception ex) { Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name); }
             }
             return dict;
         }
@@ -700,7 +711,7 @@ namespace FAD3
                         myList.Add(dr["RefGearCode"].ToString());
                     }
                 }
-                catch (Exception ex) { Logger.Log(ex); }
+                catch (Exception ex) { Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name); }
             }
             return myList;
         }
@@ -717,10 +728,13 @@ namespace FAD3
                     string query = $"Select GearLetter from tblGearClass where GearClass ={{{GearClassGuid}}}";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(myDT);
-                    DataRow dr = myDT.Rows[0];
-                    myLetter = dr["GearLetter"].ToString();
+                    if (myDT.Rows.Count > 0)
+                    {
+                        DataRow dr = myDT.Rows[0];
+                        myLetter = dr["GearLetter"].ToString();
+                    }
                 }
-                catch (Exception ex) { Logger.Log(ex); }
+                catch (Exception ex) { Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name); }
             }
             return myLetter;
         }
@@ -751,7 +765,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
 
@@ -782,7 +796,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
 
@@ -850,8 +864,11 @@ namespace FAD3
                 using (var adapter = new OleDbDataAdapter(query, conection))
                 {
                     adapter.Fill(dt);
-                    DataRow dr = dt.Rows[0];
-                    gearName = dr["Variation"].ToString();
+                    if (dt.Rows.Count > 0)
+                    {
+                        DataRow dr = dt.Rows[0];
+                        gearName = dr["Variation"].ToString();
+                    }
                 }
             }
             return gearName;
@@ -884,7 +901,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
         }
@@ -957,7 +974,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
             return dict;
@@ -996,7 +1013,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
             return Success;
@@ -1034,7 +1051,7 @@ namespace FAD3
                         myMonths.Add($"{lsGUID}|{gearGUID}|{month}", dr["sMonth"].ToString() + ": " + dr["n"].ToString());
                     }
                 }
-                catch (Exception ex) { Logger.Log(ex); }
+                catch (Exception ex) { Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name); }
             }
             return myMonths;
         }
@@ -1137,7 +1154,7 @@ namespace FAD3
                         GearNameMatches.Add((dr["Variation"].ToString(), matchQuality));
                     }
                 }
-                catch (Exception ex) { Logger.Log(ex); }
+                catch (Exception ex) { Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name); }
             }
             return GearNameMatches;
         }
@@ -1325,7 +1342,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
 
@@ -1354,7 +1371,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
         }
@@ -1380,7 +1397,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
         }
@@ -1408,7 +1425,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
             return dict;
@@ -1435,7 +1452,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
         }
@@ -1492,7 +1509,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
         }
@@ -1512,7 +1529,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
             return Success;

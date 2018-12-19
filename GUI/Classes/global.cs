@@ -17,6 +17,7 @@ using System.Windows.Forms;
 using Microsoft.Win32;
 using System.Drawing;
 using FAD3.Database.Classes;
+using System.Reflection;
 
 namespace FAD3
 {
@@ -236,7 +237,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
                 return list;
             }
@@ -280,7 +281,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
             return list;
@@ -548,7 +549,7 @@ namespace FAD3
             }
             catch (Exception ex)
             {
-                Logger.Log(ex.Message);
+                Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
             }
             finally
             {
@@ -585,7 +586,10 @@ namespace FAD3
                         _listBarangays.Add(dr["Barangay"].ToString());
                     }
                 }
-                catch (Exception ex) { Logger.Log(ex); }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
+                }
             }
         }
 
@@ -611,7 +615,10 @@ namespace FAD3
                         _munDict.Add(Convert.ToInt32(dr["MunNo"]), dr["Municipality"].ToString());
                     }
                 }
-                catch (Exception ex) { Logger.Log(ex); }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
+                }
             }
         }
 
@@ -661,7 +668,7 @@ namespace FAD3
             string province = "";
             string municipality = "";
 
-            var myDT = new DataTable();
+            var dt = new DataTable();
             using (var conection = new OleDbConnection(_ConnectionString))
             {
                 try
@@ -672,14 +679,20 @@ namespace FAD3
                                     WHERE Municipalities.MunNo = {munNumber}";
 
                     var adapter = new OleDbDataAdapter(query, conection);
-                    adapter.Fill(myDT);
-                    _munDict.Clear();
+                    adapter.Fill(dt);
+                    if (dt.Rows.Count > 0)
+                    {
+                        _munDict.Clear();
+                        DataRow dr = dt.Rows[0];
 
-                    DataRow dr = myDT.Rows[0];
-                    province = dr["ProvinceName"].ToString();
-                    municipality = dr["Municipality"].ToString();
+                        province = dr["ProvinceName"].ToString();
+                        municipality = dr["Municipality"].ToString();
+                    }
                 }
-                catch (Exception ex) { Logger.Log(ex); }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
+                }
             }
 
             return (province, municipality);
@@ -728,7 +741,10 @@ namespace FAD3
                         }
                     }
                 }
-                catch (Exception ex) { Logger.Log(ex); }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
+                }
             }
         }
 
@@ -761,7 +777,10 @@ namespace FAD3
                         _provinceDict.Add(Convert.ToInt32(dr[0]), dr[1].ToString());
                     }
                 }
-                catch (Exception ex) { Logger.Log(ex); }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
+                }
             }
         }
 
@@ -817,7 +836,7 @@ namespace FAD3
             }
             catch (Exception ex)
             {
-                Logger.Log(ex);
+                Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
             }
         }
     }

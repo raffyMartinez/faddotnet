@@ -15,7 +15,7 @@ using System.Data.OleDb;
 using System.Drawing;
 using System.Windows.Forms;
 using FAD3.Database.Classes;
-using FAD3.Database.Classes;
+using System.Reflection;
 
 namespace FAD3
 {
@@ -594,7 +594,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
         }

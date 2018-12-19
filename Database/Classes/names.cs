@@ -15,6 +15,7 @@ using HtmlAgilityPack;
 using System.Xml;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Reflection;
 
 namespace FAD3
 {
@@ -1349,6 +1350,7 @@ namespace FAD3
 
         public static Dictionary<string, CatchName> RetrieveScientificNames(Dictionary<string, string> filters = null, bool selectOnlyWithRecords = false)
         {
+            System.Windows.Forms.MessageBox.Show(MethodBase.GetCurrentMethod().DeclaringType.Name + MethodBase.GetCurrentMethod().Name);
             var catchNames = new Dictionary<string, CatchName>();
             var filter = "";
             if (filters != null)
@@ -1409,7 +1411,8 @@ namespace FAD3
                     }
                     catch (Exception ex)
                     {
-                        Logger.Log(ex.Message);
+                        //Logger.Log(ex.Message);
+                        Logger.Log(ex.Message, "Names.cs", "RetrieveScienticiNames");
                     }
                 }
             }
@@ -1573,7 +1576,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
         }
@@ -1599,7 +1602,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
         }
@@ -1616,12 +1619,15 @@ namespace FAD3
                     string query = $"Select ListedFB from tblAllSpecies where SpeciesGUID = {{{NameGUID}}}";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
-                    DataRow dr = dt.Rows[0];
-                    isListed = bool.Parse(dr["ListedFB"].ToString());
+                    if (dt.Rows.Count > 0)
+                    {
+                        DataRow dr = dt.Rows[0];
+                        isListed = bool.Parse(dr["ListedFB"].ToString());
+                    }
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
             return isListed;
@@ -1703,7 +1709,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
         }
@@ -1780,7 +1786,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
         }

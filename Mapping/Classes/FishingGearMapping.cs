@@ -7,6 +7,7 @@ using MapWinGIS;
 using System.Data;
 using System.Data.OleDb;
 using FAD3.Database.Classes;
+using System.Reflection;
 
 namespace FAD3.Mapping.Classes
 {
@@ -130,7 +131,7 @@ namespace FAD3.Mapping.Classes
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
             if (sf.NumShapes >= 0)

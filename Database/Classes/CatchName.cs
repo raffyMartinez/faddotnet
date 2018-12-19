@@ -7,6 +7,7 @@ using System.Text;
 using FAD3.Database.Classes;
 using System.Xml;
 using System.IO;
+using System.Reflection;
 
 namespace FAD3
 {
@@ -57,12 +58,15 @@ namespace FAD3
                     string query = $"Select TaxaNo from tblAllSpecies where SpeciesGUID = {{{CatchNameGUID}}}";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
-                    DataRow dr = dt.Rows[0];
-                    taxa = (Taxa)int.Parse(dr["TaxaNo"].ToString());
+                    if (dt.Rows.Count > 0)
+                    {
+                        DataRow dr = dt.Rows[0];
+                        taxa = (Taxa)int.Parse(dr["TaxaNo"].ToString());
+                    }
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
                 return taxa;
             }
@@ -80,12 +84,15 @@ namespace FAD3
                     string query = $"Select TaxaNo from tblAllSpecies where Genus = '{genus}' and species = '{species}'";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
-                    DataRow dr = dt.Rows[0];
-                    taxa = (Taxa)int.Parse(dr["TaxaNo"].ToString());
+                    if (dt.Rows.Count > 0)
+                    {
+                        DataRow dr = dt.Rows[0];
+                        taxa = (Taxa)int.Parse(dr["TaxaNo"].ToString());
+                    }
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
                 return taxa;
             }

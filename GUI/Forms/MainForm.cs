@@ -19,9 +19,7 @@ using System.IO;
 using System.Windows.Forms;
 using FAD3.Database.Forms;
 using FAD3.Database.Classes;
-
-using FAD3.Database.Classes;
-
+using System.Reflection;
 using FAD3.GUI.Forms;
 
 //using dao;
@@ -469,7 +467,7 @@ namespace FAD3
             }
             catch (Exception ex)
             {
-                Logger.Log(ex);
+                Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
             }
             return false;
         }

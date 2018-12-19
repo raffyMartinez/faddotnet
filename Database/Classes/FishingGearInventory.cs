@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
 using System.Xml;
+using System.Reflection;
 
 namespace FAD3.Database.Classes
 {
@@ -132,8 +133,9 @@ namespace FAD3.Database.Classes
                         localNames.Add(dr["LocalName"].ToString());
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
             return localNames;
@@ -285,7 +287,7 @@ namespace FAD3.Database.Classes
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex.Message);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
 
@@ -353,7 +355,7 @@ namespace FAD3.Database.Classes
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex.Message);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
 
@@ -582,7 +584,7 @@ namespace FAD3.Database.Classes
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
 
@@ -610,7 +612,7 @@ namespace FAD3.Database.Classes
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
         }
@@ -636,7 +638,7 @@ namespace FAD3.Database.Classes
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
         }
@@ -662,7 +664,7 @@ namespace FAD3.Database.Classes
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
         }
@@ -702,7 +704,7 @@ namespace FAD3.Database.Classes
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
             return list;
@@ -813,7 +815,7 @@ namespace FAD3.Database.Classes
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
 
@@ -845,7 +847,7 @@ namespace FAD3.Database.Classes
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
 
@@ -878,7 +880,7 @@ namespace FAD3.Database.Classes
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
             return false;
@@ -903,16 +905,18 @@ namespace FAD3.Database.Classes
 
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
-
-                    DataRow dr = dt.Rows[0];
-                    return (dr["ProvinceName"].ToString(),
-                            dr["MunicipalityName"].ToString(),
-                            dr["Barangay"].ToString(),
-                            dr["Sitio"].ToString());
+                    if (dt.Rows.Count > 0)
+                    {
+                        DataRow dr = dt.Rows[0];
+                        return (dr["ProvinceName"].ToString(),
+                                dr["MunicipalityName"].ToString(),
+                                dr["Barangay"].ToString(),
+                                dr["Sitio"].ToString());
+                    }
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
             return ("", "", "", "");
@@ -940,17 +944,19 @@ namespace FAD3.Database.Classes
 
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
-
-                    DataRow dr = dt.Rows[0];
-                    return (dr["ProvinceName"].ToString(),
-                            dr["MunicipalityName"].ToString(),
-                            dr["MunicipalityNumber"].ToString(),
-                            dr["Barangay"].ToString(),
-                            dr["Sitio"].ToString());
+                    if (dt.Rows.Count > 0)
+                    {
+                        DataRow dr = dt.Rows[0];
+                        return (dr["ProvinceName"].ToString(),
+                                dr["MunicipalityName"].ToString(),
+                                dr["MunicipalityNumber"].ToString(),
+                                dr["Barangay"].ToString(),
+                                dr["Sitio"].ToString());
+                    }
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
             return ("", "", "", "", "");
@@ -1023,16 +1029,17 @@ namespace FAD3.Database.Classes
         public (string gearClass, string gearVariation, Dictionary<string, string> gearLocalNames,
             int commercialCount, int motorizedCount, int nonMotorizedCount, int noBoatCount,
             List<int> monthsInUse, List<int> peakMonths, int numberDaysGearUsedPerMonth,
-            int cpueRangeMax, int cpueRangeMin, int cpueModeUpper, int cpueModeLower, string cpueUnit,
-            List<(int decade, int cpue, string unit)> historicalCPUE,
+            int? cpueRangeMax, int? cpueRangeMin, int? cpueModeUpper, int? cpueModeLower, string cpueUnit,
+            List<(int? decade, int? historyYear, int cpue, string unit, string notes)> historicalCPUE,
             Dictionary<string, string> dominantCatch, Dictionary<string, string> nonDominantCatch, int percentageOfDominance,
-            string notes, List<string> accessories, List<(string expense, double cost, string source, string notes)> expenses)
+            string notes, List<string> accessories, List<(string expense, double cost, string source, string notes)> expenses,
+            int? cpueAverage, int? cpueMode, double? equivalentKg)
           GetGearVariationInventoryDataEx(string gearInventoryGuid)
         {
             Dictionary<string, string> gearLocalNames = new Dictionary<string, string>();
             List<int> monthsInUse = new List<int>();
             List<int> peakMonths = new List<int>();
-            List<(int decade, int cpue, string unit)> historicalCPUE = new List<(int decade, int cpue, string unit)>();
+            List<(int? decade, int? historyYear, int cpue, string unit, string notes)> historicalCPUE = new List<(int? decade, int? historyYear, int cpue, string unit, string notes)>();
             Dictionary<string, string> dominantCatch = new Dictionary<string, string>();
             Dictionary<string, string> nonDominantCatch = new Dictionary<string, string>();
             List<string> accessories = new List<string>();
@@ -1045,10 +1052,13 @@ namespace FAD3.Database.Classes
             int nonMotorizedCount = 0;
             int noBoatCount = 0;
             int numberDaysGearUsedPerMonth = 0;
-            int cpueRangeMax = 0;
-            int cpueRangeMin = 0;
-            int cpueModeUpper = 0;
-            int cpueModeLower = 0;
+            int? cpueRangeMax = null;
+            int? cpueRangeMin = null;
+            int? cpueModeUpper = null;
+            int? cpueModeLower = null;
+            int? cpueAverage = null;
+            int? cpueMode = null;
+            double? equivalentKg = null;
             string cpueUnit = "";
             int percentageOfDominance = 0;
 
@@ -1079,17 +1089,42 @@ namespace FAD3.Database.Classes
                     nonMotorizedCount = (int)dr["CountMunicipalNonMotorized"];
                     noBoatCount = (int)dr["CountNoBoat"];
                     numberDaysGearUsedPerMonth = (int)dr["NumberDaysPerMonth"];
-                    cpueRangeMax = (int)dr["MaxCPUE"];
-                    cpueRangeMin = (int)dr["MinCPUE"];
-                    cpueModeUpper = (int)dr["ModeUpper"];
-                    cpueModeLower = (int)dr["ModeLower"];
+
+                    if (int.TryParse(dr["MaxCPUE"].ToString(), out int v))
+                    {
+                        cpueRangeMax = v;
+                    }
+                    if (int.TryParse(dr["MinCPUE"].ToString(), out v))
+                    {
+                        cpueRangeMin = v;
+                    }
+                    if (int.TryParse(dr["ModeUpper"].ToString(), out v))
+                    {
+                        cpueModeUpper = v;
+                    }
+                    if (int.TryParse(dr["ModeLower"].ToString(), out v))
+                    {
+                        cpueModeLower = v;
+                    }
+                    if (int.TryParse(dr["AverageCPUE"].ToString(), out v))
+                    {
+                        cpueAverage = v;
+                    }
+                    if (int.TryParse(dr["Mode"].ToString(), out v))
+                    {
+                        cpueMode = v;
+                    }
+                    if (double.TryParse(dr["EquivalentKg"].ToString(), out double vd))
+                    {
+                        equivalentKg = v;
+                    }
                     cpueUnit = dr["CPUEUnit"].ToString();
                     percentageOfDominance = (int)dr["DominantCatchPercent"];
                     notes = dr["Notes"].ToString();
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, "FishingGearInventoyr.cs", "GetGearVariationInventoryDataEx", "get the main inventory data of the fishing gear");
                 }
             }
 
@@ -1116,7 +1151,7 @@ namespace FAD3.Database.Classes
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, "FishingGearInventoyr.cs", "GetGearVariationInventoryDataEx", "get the local names of the fishing gear");
                 }
             }
 
@@ -1141,7 +1176,7 @@ namespace FAD3.Database.Classes
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, "FishingGearInventoyr.cs", "GetGearVariationInventoryDataEx", "get the months of use");
                 }
             }
 
@@ -1166,12 +1201,16 @@ namespace FAD3.Database.Classes
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, "FishingGearInventoyr.cs", "GetGearVariationInventoryDataEx", "get peak months");
                 }
             }
 
             //next, we get the historical cpue
-            sql = $@"SELECT tblGearInventoryCPUEHistorical.Decade, tblGearInventoryCPUEHistorical.CPUE, tblGearInventoryCPUEHistorical.CPUEUnit
+            sql = $@"SELECT tblGearInventoryCPUEHistorical.Decade,
+                        tblGearInventoryCPUEHistorical.HistoryYear,
+                        tblGearInventoryCPUEHistorical.CPUE,
+                        tblGearInventoryCPUEHistorical.CPUEUnit,
+                        tblGearInventoryCPUEHistorical.Notes
                     FROM tblGearInventoryCPUEHistorical
                     WHERE tblGearInventoryCPUEHistorical.InventoryDataGuid={{{gearInventoryGuid}}}
                     ORDER BY tblGearInventoryCPUEHistorical.Decade DESC;";
@@ -1186,16 +1225,26 @@ namespace FAD3.Database.Classes
                     for (int n = 0; n < dt.Rows.Count; n++)
                     {
                         DataRow dr = dt.Rows[n];
-                        historicalCPUE.Add(((int)dr["Decade"], (int)dr["CPUE"], (string)dr["CPUEUnit"]));
+                        int? decade = null;
+                        int? historyYear = null;
+                        if (int.TryParse(dr["Decade"].ToString(), out int v))
+                        {
+                            decade = v;
+                        }
+                        if (int.TryParse(dr["HistoryYear"].ToString(), out v))
+                        {
+                            historyYear = v;
+                        }
+                        historicalCPUE.Add((decade, historyYear, (int)dr["CPUE"], dr["CPUEUnit"].ToString(), dr["Notes"].ToString()));
                     }
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, "FishingGearInventoyr.cs", "GetGearVariationInventoryDataEx", "get historical CPUE");
                 }
             }
 
-            //finally, we get the catch composition, we put dominant catch in one list
+            // we get the catch composition, we put dominant catch in one list
             sql = $@"SELECT tblBaseLocalNames.Name,tblBaseLocalNames.NameNo
                     FROM tblBaseLocalNames INNER JOIN tblGearInventoryCatchComposition ON
                       tblBaseLocalNames.NameNo = tblGearInventoryCatchComposition.NameOfCatch
@@ -1217,7 +1266,7 @@ namespace FAD3.Database.Classes
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, "FishingGearInventoyr.cs", "GetGearVariationInventoryDataEx", "get dominant catch");
                 }
             }
 
@@ -1243,7 +1292,7 @@ namespace FAD3.Database.Classes
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, "FishingGearInventoyr.cs", "GetGearVariationInventoryDataEx", "get non-dominant catch");
                 }
             }
 
@@ -1268,7 +1317,7 @@ namespace FAD3.Database.Classes
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, "FishingGearInventoyr.cs", "GetGearVariationInventoryDataEx", "get accessories");
                 }
             }
 
@@ -1296,7 +1345,7 @@ namespace FAD3.Database.Classes
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, "FishingGearInventoyr.cs", "GetGearVariationInventoryDataEx", "get expenses");
                 }
             }
 
@@ -1304,7 +1353,7 @@ namespace FAD3.Database.Classes
             return (gearClass, gearVariation, gearLocalNames, commercialCount, motorizedCount, nonMotorizedCount,
                     noBoatCount, monthsInUse, peakMonths, numberDaysGearUsedPerMonth,
                     cpueRangeMax, cpueRangeMin, cpueModeUpper, cpueModeLower, cpueUnit, historicalCPUE,
-                    dominantCatch, nonDominantCatch, percentageOfDominance, notes, accessories, expenses);
+                    dominantCatch, nonDominantCatch, percentageOfDominance, notes, accessories, expenses, cpueAverage, cpueMode, equivalentKg);
         }
 
         /// <summary>
@@ -1434,7 +1483,7 @@ namespace FAD3.Database.Classes
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, "FishingGearInventory.cs", "GetGearVariationInventoryData", "get the main inventory data");
                 }
             }
 
@@ -1459,11 +1508,11 @@ namespace FAD3.Database.Classes
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, "FishingGearInventory.cs", "GetGearVariationInventoryData", "get the local names of the fishing");
                 }
             }
 
-            //next, we get the months of use and peak months
+            //next, we get the months of use
             sql = $@"SELECT tblGearInventoryMonthsUsed.MonthNumber
                     FROM tblGearInventoryMonthsUsed
                     WHERE tblGearInventoryMonthsUsed.InventoryDataGuid={{{inventoryGuid}}}
@@ -1484,7 +1533,7 @@ namespace FAD3.Database.Classes
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, "FishingGearInventory.cs", "GetGearVariationInventoryData", "get the months of use");
                 }
             }
             //peak months
@@ -1508,7 +1557,7 @@ namespace FAD3.Database.Classes
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, "FishingGearInventory.cs", "GetGearVariationInventoryData", "get peak months");
                 }
             }
 
@@ -1547,7 +1596,7 @@ namespace FAD3.Database.Classes
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, "FishingGearInventory.cs", "GetGearVariationInventoryData", "get historical cpue");
                 }
             }
 
@@ -1573,7 +1622,7 @@ namespace FAD3.Database.Classes
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, "FishingGearInventory.cs", "GetGearVariationInventoryData", "get dominant catch");
                 }
             }
             //and we put non-dominant catch in another list
@@ -1598,7 +1647,7 @@ namespace FAD3.Database.Classes
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, "FishingGearInventory.cs", "GetGearVariationInventoryData", "get non-dominant catch");
                 }
             }
 
@@ -1623,7 +1672,7 @@ namespace FAD3.Database.Classes
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, "FishingGearInventory.cs", "GetGearVariationInventoryData", "get accessories");
                 }
             }
 
@@ -1651,7 +1700,7 @@ namespace FAD3.Database.Classes
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, "FishingGearInventory.cs", "GetGearVariationInventoryData", "get expenses");
                 }
             }
 
@@ -1679,7 +1728,7 @@ namespace FAD3.Database.Classes
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, "FishingGearInventory.cs", "GetGearVariationInventoryData", "get survey date and enumerator");
                 }
             }
 
@@ -1720,7 +1769,7 @@ namespace FAD3.Database.Classes
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
                 return expenses;
             }
@@ -1750,7 +1799,7 @@ namespace FAD3.Database.Classes
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
             return ("", null);
@@ -1884,7 +1933,7 @@ namespace FAD3.Database.Classes
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
 
@@ -1971,13 +2020,15 @@ namespace FAD3.Database.Classes
 
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
-
-                    DataRow dr = dt.Rows[0];
-                    summary = (int.Parse(dr["TotalFishers"].ToString()), int.Parse(dr["TotalMotorized"].ToString()), int.Parse(dr["TotalNonMotorized"].ToString()), int.Parse(dr["TotalCommercial"].ToString()));
+                    if (dt.Rows.Count > 0)
+                    {
+                        DataRow dr = dt.Rows[0];
+                        summary = (int.Parse(dr["TotalFishers"].ToString()), int.Parse(dr["TotalMotorized"].ToString()), int.Parse(dr["TotalNonMotorized"].ToString()), int.Parse(dr["TotalCommercial"].ToString()));
+                    }
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, "FishingGearInventory.cs", "GetLevelSummary");
                 }
                 return summary;
             }
@@ -2029,18 +2080,21 @@ namespace FAD3.Database.Classes
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
 
-                    DataRow dr = dt.Rows[0];
-                    numbers.fisherCount = (int)dr["CountFishers"];
-                    numbers.commercialCount = (int)dr["CountCommercial"];
-                    numbers.motorizedCount = (int)dr["CountMunicipalMotorized"];
-                    numbers.nonMotorizedCount = (int)dr["CountMunicipalNonMotorized"];
-                    numbers.dateSurvey = dr["InventoryDate"] == null ? default : (DateTime)dr["InventoryDate"];
-                    numbers.enumerator = dr["EnumeratorName"].ToString();
-                    numbers.brgySurveyGuid = dr["BarangayInventoryGuid"].ToString();
+                    if (dt.Rows.Count > 0)
+                    {
+                        DataRow dr = dt.Rows[0];
+                        numbers.fisherCount = (int)dr["CountFishers"];
+                        numbers.commercialCount = (int)dr["CountCommercial"];
+                        numbers.motorizedCount = (int)dr["CountMunicipalMotorized"];
+                        numbers.nonMotorizedCount = (int)dr["CountMunicipalNonMotorized"];
+                        numbers.dateSurvey = dr["InventoryDate"] == null ? default : (DateTime)dr["InventoryDate"];
+                        numbers.enumerator = dr["EnumeratorName"].ToString();
+                        numbers.brgySurveyGuid = dr["BarangayInventoryGuid"].ToString();
+                    }
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
 
@@ -2066,15 +2120,18 @@ namespace FAD3.Database.Classes
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
 
-                    DataRow dr = dt.Rows[0];
-                    numbers.fisherCount = (int)dr["CountFishers"];
-                    numbers.commercialCount = (int)dr["CountCommercial"];
-                    numbers.motorizedCount = (int)dr["CountMunicipalMotorized"];
-                    numbers.nonMotorizedCount = (int)dr["CountMunicipalNonMotorized"];
+                    if (dt.Rows.Count > 0)
+                    {
+                        DataRow dr = dt.Rows[0];
+                        numbers.fisherCount = (int)dr["CountFishers"];
+                        numbers.commercialCount = (int)dr["CountCommercial"];
+                        numbers.motorizedCount = (int)dr["CountMunicipalMotorized"];
+                        numbers.nonMotorizedCount = (int)dr["CountMunicipalNonMotorized"];
+                    }
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
 
@@ -2155,7 +2212,7 @@ namespace FAD3.Database.Classes
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
             return (municipalityCount, barangayCount);
@@ -2200,7 +2257,7 @@ namespace FAD3.Database.Classes
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
             return (municipalityCount, barangayCount);
@@ -2297,7 +2354,7 @@ namespace FAD3.Database.Classes
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
         }
@@ -2331,7 +2388,7 @@ namespace FAD3.Database.Classes
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
             return myList;
@@ -2885,7 +2942,7 @@ namespace FAD3.Database.Classes
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
             return sitios;
@@ -2918,7 +2975,7 @@ namespace FAD3.Database.Classes
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
         }

@@ -1420,19 +1420,30 @@ namespace FAD3.Database.Forms
                             writer.WriteStartElement("CPUE");
                             writer.WriteAttributeString("CatchRangeMaximum", gearDetail.cpueRangeMax.ToString());
                             writer.WriteAttributeString("CatchRangeMinimum", gearDetail.cpueRangeMin.ToString());
+                            writer.WriteAttributeString("CatchAverageCPUE", gearDetail.cpueAverage.ToString());
                             writer.WriteAttributeString("CatchModeUpper", gearDetail.cpueModeUpper.ToString());
                             writer.WriteAttributeString("CatchModeLower", gearDetail.cpueModeLower.ToString());
+                            writer.WriteAttributeString("CatchMode", gearDetail.cpueMode.ToString());
                             writer.WriteAttributeString("Unit", gearDetail.cpueUnit);
+                            writer.WriteAttributeString("KiloEquivalent", gearDetail.equivalentKg.ToString());
 
                             //historical cpue
                             {
                                 writer.WriteStartElement("CPUEHistoricalTrend");
                                 foreach (var trend in gearDetail.historicalCPUE)
                                 {
-                                    writer.WriteStartElement("Decade");
-                                    writer.WriteAttributeString("DecadeStart", trend.decade.ToString() + "s");
+                                    writer.WriteStartElement("CPUEHistory");
+                                    if (trend.decade != null)
+                                    {
+                                        writer.WriteAttributeString("DecadeStart", trend.decade.ToString() + "s");
+                                    }
+                                    else
+                                    {
+                                        writer.WriteAttributeString("SpecificYear", trend.historyYear.ToString());
+                                    }
                                     writer.WriteAttributeString("AverageCPUE", trend.cpue.ToString());
                                     writer.WriteAttributeString("Unit", trend.unit);
+                                    writer.WriteAttributeString("Notes", trend.notes);
                                     writer.WriteEndElement();
                                 }
                                 writer.WriteEndElement();

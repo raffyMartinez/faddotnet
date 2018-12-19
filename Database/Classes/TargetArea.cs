@@ -13,8 +13,7 @@ using System.Data;
 using System.Data.OleDb;
 using System.Windows.Forms;
 using FAD3.Database.Classes;
-using FAD3.Database.Classes;
-using FAD3.Mapping.Classes;
+using System.Reflection;
 
 namespace FAD3
 {
@@ -146,7 +145,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
                 return myList;
             }
@@ -172,7 +171,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
                 return myList;
             }
@@ -198,7 +197,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
                 return myName;
             }
@@ -228,7 +227,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
 
                 return myList;
@@ -255,7 +254,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
         }
@@ -286,7 +285,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                     landingSite = null;
                 }
             }
@@ -318,7 +317,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
 
@@ -350,7 +349,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
             return myCount;
@@ -377,7 +376,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
 
@@ -406,7 +405,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
 
@@ -433,7 +432,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
         }
@@ -469,7 +468,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
             return myList;
@@ -511,7 +510,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
             return Success;
@@ -538,7 +537,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
             return myData;
@@ -547,7 +546,7 @@ namespace FAD3
         public string TargetAreaData()
         {
             string rv = "";
-            var myDT = new DataTable();
+            var dt = new DataTable();
             using (var conection = new OleDbConnection(global.ConnectionString))
             {
                 try
@@ -556,23 +555,26 @@ namespace FAD3
 
                     string query = $"Select AOIName, Letter, MajorGridList from tblAOI where AOIGuid = {{{_targetAreaGuid}}}";
                     var adapter = new OleDbDataAdapter(query, conection);
-                    adapter.Fill(myDT);
-                    DataRow dr = myDT.Rows[0];
-                    for (int i = 0; i < myDT.Columns.Count; i++)
+                    adapter.Fill(dt);
+                    if (dt.Rows.Count > 0)
                     {
-                        if (i == 0)
+                        DataRow dr = dt.Rows[0];
+                        for (int i = 0; i < dt.Columns.Count; i++)
                         {
-                            rv = dr[i].ToString();
-                        }
-                        else
-                        {
-                            rv += "|" + dr[i].ToString();
+                            if (i == 0)
+                            {
+                                rv = dr[i].ToString();
+                            }
+                            else
+                            {
+                                rv += "|" + dr[i].ToString();
+                            }
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
             return rv;
@@ -599,7 +601,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
                 }
             }
             return myYears;
