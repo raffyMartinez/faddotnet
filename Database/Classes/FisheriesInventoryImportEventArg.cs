@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FAD3.Database.Classes;
 
 namespace FAD3.Database.Classes
 {
@@ -13,6 +8,7 @@ namespace FAD3.Database.Classes
         public string ProjectGuid { get; internal set; }
         public string TargetAreaName { get; internal set; }
         public string TargetAreaGuid { get; internal set; }
+        public ImportInventoryAction ImportInventoryAction { get; set; }
         public FisheriesInventoryLevel InventoryLevel { get; internal set; }
         public bool Cancel { get; set; }
         public string CancelReason { get; set; }

@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
 
 namespace Oware
 {
     //Port from javascript to c#
-    //Javascript source: 
+    //Javascript source:
     //https://github.com/shahid28/utm-latlng/blob/master/UTMLatLng.js
     public class LatLngUTMConverter
     {
@@ -25,6 +21,7 @@ namespace Oware
             public double UTMNorthing { get; set; }
             public int ZoneNumber { get; set; }
             public String ZoneLetter { get; set; }
+
             public String Zona
             {
                 get
@@ -128,7 +125,7 @@ namespace Oware
             }
             else
             {
-                ZoneNumber = (int) ((LongTemp + 180) / 6) + 1;
+                ZoneNumber = (int)((LongTemp + 180) / 6) + 1;
 
                 if (latitude >= 72.0 && latitude < 84.0)
                 {
@@ -178,7 +175,7 @@ namespace Oware
             if (latitude < 0)
                 UTMNorthing += 10000000.0;
 
-            return new UTMResult { Easting= UTMEasting, Northing= UTMNorthing, ZoneNumber= ZoneNumber, ZoneLetter= UTMZone};
+            return new UTMResult { Easting = UTMEasting, Northing = UTMNorthing, ZoneNumber = ZoneNumber, ZoneLetter = UTMZone };
         }
 
         private void setEllipsoid(String name)
@@ -189,100 +186,123 @@ namespace Oware
                     a = 6377563;
                     eccSquared = 0.00667054;
                     break;
+
                 case "Australian National":
                     a = 6378160;
                     eccSquared = 0.006694542;
                     break;
+
                 case "Bessel 1841":
                     a = 6377397;
                     eccSquared = 0.006674372;
                     break;
+
                 case "Bessel 1841 Nambia":
                     a = 6377484;
                     eccSquared = 0.006674372;
                     break;
+
                 case "Clarke 1866":
                     a = 6378206;
                     eccSquared = 0.006768658;
                     break;
+
                 case "Clarke 1880":
                     a = 6378249;
                     eccSquared = 0.006803511;
                     break;
+
                 case "Everest":
                     a = 6377276;
                     eccSquared = 0.006637847;
                     break;
+
                 case "Fischer 1960 Mercury":
                     a = 6378166;
                     eccSquared = 0.006693422;
                     break;
+
                 case "Fischer 1968":
                     a = 6378150;
                     eccSquared = 0.006693422;
                     break;
+
                 case "GRS 1967":
                     a = 6378160;
                     eccSquared = 0.006694605;
                     break;
+
                 case "GRS 1980":
                     a = 6378137;
                     eccSquared = 0.00669438;
                     break;
+
                 case "Helmert 1906":
                     a = 6378200;
                     eccSquared = 0.006693422;
                     break;
+
                 case "Hough":
                     a = 6378270;
                     eccSquared = 0.00672267;
                     break;
+
                 case "International":
                     a = 6378388;
                     eccSquared = 0.00672267;
                     break;
+
                 case "Krassovsky":
                     a = 6378245;
                     eccSquared = 0.006693422;
                     break;
+
                 case "Modified Airy":
                     a = 6377340;
                     eccSquared = 0.00667054;
                     break;
+
                 case "Modified Everest":
                     a = 6377304;
                     eccSquared = 0.006637847;
                     break;
+
                 case "Modified Fischer 1960":
                     a = 6378155;
                     eccSquared = 0.006693422;
                     break;
+
                 case "South American 1969":
                     a = 6378160;
                     eccSquared = 0.006694542;
                     break;
+
                 case "WGS 60":
                     a = 6378165;
                     eccSquared = 0.006693422;
                     break;
+
                 case "WGS 66":
                     a = 6378145;
                     eccSquared = 0.006694542;
                     break;
+
                 case "WGS 72":
                     a = 6378135;
                     eccSquared = 0.006694318;
                     break;
+
                 case "ED50":
                     a = 6378388;
                     eccSquared = 0.00672267;
                     break; // International Ellipsoid
                 case "WGS 84":
                 case "EUREF89": // Max deviation from WGS 84 is 40 cm/km see http://ocq.dk/euref89 (in danish)
-                case "ETRS89": // Same as EUREF89 
+                case "ETRS89": // Same as EUREF89
                     a = 6378137;
                     eccSquared = 0.00669438;
                     break;
+
                 default:
                     status = true;
                     break;
@@ -336,8 +356,9 @@ namespace Oware
             return new LatLng { Lat = Lat, Lng = Long };
         }
 
-        private double toDegrees (double rad) {
-            return rad / Math.PI* 180;
+        private double toDegrees(double rad)
+        {
+            return rad / Math.PI * 180;
         }
     }
 }

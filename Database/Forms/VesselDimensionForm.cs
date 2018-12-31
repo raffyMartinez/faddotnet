@@ -1,17 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace FAD3
 {
     public partial class VesselDimensionForm : Form
     {
-        SamplingForm _Parent = new SamplingForm();
+        private SamplingForm _Parent = new SamplingForm();
 
         public VesselDimensionForm()
         {
@@ -38,7 +33,7 @@ namespace FAD3
             var msg = "";
             var val = 0D;
 
-            if(s.Length>0)
+            if (s.Length > 0)
             {
                 try
                 {
@@ -53,7 +48,7 @@ namespace FAD3
                 {
                     e.Cancel = val <= 0;
                     if (e.Cancel)
-                        msg = "Value should be a number greater than zero";       
+                        msg = "Value should be a number greater than zero";
                 }
             }
 
@@ -66,7 +61,7 @@ namespace FAD3
             var btn = (Button)sender;
             if (btn.Name == "buttonOk")
             {
-                if (textLength.Text.Length>0 && textHeight.Text.Length>0 && textWidth.Text.Length>0)
+                if (textLength.Text.Length > 0 && textHeight.Text.Length > 0 && textWidth.Text.Length > 0)
                 {
                     _Parent.VesselDimension(textLength.Text, textWidth.Text, textHeight.Text);
                     this.Close();
@@ -76,7 +71,7 @@ namespace FAD3
                     MessageBox.Show("Please provide all values", "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
-            else if(btn.Name=="buttonCancel")
+            else if (btn.Name == "buttonCancel")
             {
                 this.Close();
             }

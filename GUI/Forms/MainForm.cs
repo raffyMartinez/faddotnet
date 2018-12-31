@@ -7,20 +7,18 @@
  * To change this template use Tools | Options | Coding | Edit Standard Headers.
  */
 
+using FAD3.Database.Classes;
+using FAD3.Database.Forms;
+using FAD3.GUI.Forms;
 using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
 using System.Collections;
-using System.Data;
-using System.Data.OleDb;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Windows.Forms;
-using FAD3.Database.Forms;
-using FAD3.Database.Classes;
 using System.Reflection;
-using FAD3.GUI.Forms;
+using System.Windows.Forms;
 
 //using dao;
 
@@ -141,7 +139,7 @@ namespace FAD3
                     if (value.Length > 0)
                     {
                         _targetArea.TargetAreaGuid = _targetAreaGuid;
-                        FishingGrid.AOIGuid = _targetAreaGuid;
+                        FishingGrid.TargetAreaGuid = _targetAreaGuid;
                         Enumerators.AOIGuid = _targetAreaGuid;
                     }
                 }
@@ -796,8 +794,8 @@ namespace FAD3
             {
                 toolStripRecentlyOpened.DropDownItems.Clear();
 
-                //setup an MRU that contains 5 items
-                _mrulist = new mru("FAD3", toolStripRecentlyOpened, 5);
+                //setup an MRU that contains 10 items
+                _mrulist = new mru("FAD3", toolStripRecentlyOpened, 10);
 
                 //setup the event handlers for the mru
                 _mrulist.FileSelected += OnMRUlist_FileSelected;
@@ -813,6 +811,7 @@ namespace FAD3
                         global.MDBPath = SavedMDBPath;
                         Names.GetGenus_LocalNames();
                         Names.GetLocalNames();
+                        Gear.GetGearLocalNames();
                         statusPanelDBPath.Text = SavedMDBPath;
                         lblErrorFormOpen.Visible = false;
                         PopulateTree();
@@ -1302,6 +1301,8 @@ namespace FAD3
         private void NewSamplingForm()
         {
             ListViewNewSampling();
+            //lvMain.Items.Clear();
+            //_enableUIEvent = true;
             var f3 = new SamplingForm
             {
                 IsNew = true,
@@ -1496,6 +1497,7 @@ namespace FAD3
                                     }
                                     else
                                     {
+                                        _enableUIEvent = false;
                                         ShowSamplingDetailForm();
                                     }
                                     break;
@@ -1669,7 +1671,7 @@ namespace FAD3
 
                 case "diagnostics":
                     //DBCheck.ListDBTables(global.MDBPath, Application.ProductVersion);
-                    FADDiagnostics.ListDBTables(global.MDBPath, Application.ProductVersion);
+                    FADDiagnostics.Diagnose(global.MDBPath, Application.ProductVersion);
                     MessageBox.Show("Finished writing diagnostics to log!", "Diagnostics finished", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     break;
             }
@@ -2731,7 +2733,9 @@ namespace FAD3
                 lblErrorFormOpen.Visible = false;
                 Names.GetGenus_LocalNames();
                 Names.GetLocalNames();
+                Gear.GetGearLocalNames();
                 PopulateTree();
+                treeMain.SelectedNode = treeMain.Nodes["root"];
                 statusPanelDBPath.Text = MDBFile;
                 if (_appIsLocked)
                 {
@@ -3036,7 +3040,12 @@ namespace FAD3
                             break;
 
                         case "WeightOfCatch":
-                            _weightOfCatch = double.Parse(effortData[lvi.Name]);
+                            //double? wtCatch = null;
+                            if (double.TryParse(effortData[lvi.Name], out double v))
+                            {
+                                _weightOfCatch = v;
+                            }
+                            //_weightOfCatch = double.Parse(effortData[lvi.Name]);
                             lvi.SubItems[1].Text = _weightOfCatch.ToString();
                             break;
 

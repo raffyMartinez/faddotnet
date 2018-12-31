@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FAD3.Database.Classes;
-using MetaphoneCOM;
+﻿using MetaphoneCOM;
+using System;
 
 namespace FAD3.Database.Classes
 {

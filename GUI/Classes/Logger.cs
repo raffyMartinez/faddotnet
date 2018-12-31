@@ -8,8 +8,8 @@
  */
 
 using System;
-using System.IO;
 using System.Diagnostics;
+using System.IO;
 using System.Windows.Forms;
 
 namespace FAD3
@@ -69,7 +69,7 @@ namespace FAD3
             string filepath = Application.StartupPath + "\\fad.log";
             using (StreamWriter writer = new StreamWriter(filepath, true))
             {
-                writer.WriteLine("Message: " + s + "<br/>" + "Date :" + DateTime.Now.ToString());
+                writer.WriteLine("Message: " + s + " " + "Date :" + DateTime.Now.ToString());
             }
         }
 
@@ -97,6 +97,15 @@ namespace FAD3
             using (StreamWriter writer = new StreamWriter(filepath, true))
             {
                 writer.WriteLine(s);
+            }
+        }
+
+        public static void LogSimpleEx(string s)
+        {
+            string filepath = Application.StartupPath + "\\fad.log";
+            using (StreamWriter writer = new StreamWriter(filepath, true))
+            {
+                writer.Write(s);
             }
         }
     }

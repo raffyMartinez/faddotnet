@@ -236,7 +236,7 @@ namespace FAD3.Properties {
         ///    &lt;ColorScheme&gt;
         ///      &lt;Break Color=&quot;-5383962&quot; Value=&quot;0&quot; /&gt;
         ///      &lt;Break Color=&quot;-23296&quot; Value=&quot;1&quot; /&gt;
-        ///    &lt;/ColorScheme&gt;  
+        ///    &lt;/ColorScheme&gt;
         ///    &lt;ColorScheme&gt;
         ///      &lt;Break Color=&quot;-256&quot; Value=&quot;0&quot; /&gt;
         ///      &lt;Break Color=&quot;-23296&quot; Value=&quot;1&quot; /&gt;
@@ -247,7 +247,7 @@ namespace FAD3.Properties {
         ///      &lt;Break Color=&quot;-926587&quot; Value=&quot;1&quot; /&gt;
         ///    &lt;/ColorScheme&gt;
         ///    &lt;ColorScheme&gt;
-        ///      &lt;Break Color=&quot;-13399600&quot; [rest of string was truncated]&quot;;.
+        ///      &lt;Break Color=&quot;-13399600&quot; V [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string colorschemes {
             get {
@@ -1021,6 +1021,16 @@ namespace FAD3.Properties {
         internal static System.Drawing.Bitmap ProcedureMissing_16x {
             get {
                 object obj = ResourceManager.GetObject("ProcedureMissing_16x", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ProjectFolderOpen_16x {
+            get {
+                object obj = ResourceManager.GetObject("ProjectFolderOpen_16x", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

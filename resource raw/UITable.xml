@@ -5,7 +5,7 @@
 		<Label>Target area</Label>
 		<Height>1</Height>
 		<control>ComboBox</control>
-		<ButtonText/>
+		<ButtonText />
 		<DataType>lookup</DataType>
 		<ReadOnly>false</ReadOnly>
 		<ToolTip>Name of the target area</ToolTip>
@@ -16,7 +16,7 @@
 		<Label>Landing site</Label>
 		<Height>1</Height>
 		<control>ComboBox</control>
-		<ButtonText/>
+		<ButtonText />
 		<DataType>lookup</DataType>
 		<ReadOnly>false</ReadOnly>
 		<ToolTip>Name of the landing site</ToolTip>
@@ -27,7 +27,7 @@
 		<Label>Sampling date</Label>
 		<Height>1</Height>
 		<control>MaskDate</control>
-		<ButtonText/>
+		<ButtonText />
 		<DataType>datetime</DataType>
 		<ReadOnly>false</ReadOnly>
 		<ToolTip>Date of sampling</ToolTip>
@@ -38,7 +38,7 @@
 		<Label>Sampling time</Label>
 		<Height>1</Height>
 		<control>MaskTime</control>
-		<ButtonText/>
+		<ButtonText />
 		<DataType>datetime</DataType>
 		<ReadOnly>false</ReadOnly>
 		<ToolTip>Time of sampling</ToolTip>
@@ -57,13 +57,13 @@
 	</UIRow>
 	<UIRow>
 		<Key>spacer</Key>
-		<Label/>
+		<Label />
 		<Height>1</Height>
-		<control/>
-		<ButtonText/>
+		<control />
+		<ButtonText />
 		<DataType>null</DataType>
 		<ReadOnly>false</ReadOnly>
-		<ToolTip/>
+		<ToolTip />
 		<Required>false</Required>
 	</UIRow>
 	<UIRow>
@@ -82,7 +82,7 @@
 		<Label>Fishing gear</Label>
 		<Height>1</Height>
 		<control>ComboBox</control>
-		<ButtonText/>
+		<ButtonText />
 		<DataType>lookup</DataType>
 		<ReadOnly>false</ReadOnly>
 		<ToolTip>Specific kind of fishing gear used</ToolTip>
@@ -115,7 +115,7 @@
 		<Label>Weight of catch</Label>
 		<Height>1</Height>
 		<control>TextBox</control>
-		<ButtonText/>
+		<ButtonText />
 		<DataType>double</DataType>
 		<ReadOnly>false</ReadOnly>
 		<ToolTip>Weight of the catch</ToolTip>
@@ -126,7 +126,7 @@
 		<Label>Weight of sample</Label>
 		<Height>1</Height>
 		<control>TextBox</control>
-		<ButtonText/>
+		<ButtonText />
 		<DataType>double</DataType>
 		<ReadOnly>false</ReadOnly>
 		<ToolTip>Weight of the sample</ToolTip>
@@ -137,7 +137,7 @@
 		<Label>Has live fish</Label>
 		<Height>1</Height>
 		<control>CheckBox</control>
-		<ButtonText/>
+		<ButtonText />
 		<DataType>bool</DataType>
 		<ReadOnly>false</ReadOnly>
 		<ToolTip>Whether live food fish are landed</ToolTip>
@@ -145,13 +145,13 @@
 	</UIRow>
 	<UIRow>
 		<Key>spacer</Key>
-		<Label/>
+		<Label />
 		<Height>1</Height>
-		<control/>
-		<ButtonText/>
+		<control />
+		<ButtonText />
 		<DataType>null</DataType>
 		<ReadOnly>false</ReadOnly>
-		<ToolTip/>
+		<ToolTip />
 		<Required>false</Required>
 	</UIRow>
 	<UIRow>
@@ -170,7 +170,7 @@
 		<Label>Additional fishing ground</Label>
 		<Height>1</Height>
 		<control>TextBox</control>
-		<ButtonText/>
+		<ButtonText />
 		<DataType>string</DataType>
 		<ReadOnly>true</ReadOnly>
 		<ToolTip>Additional grid locations of the effort</ToolTip>
@@ -181,7 +181,7 @@
 		<Label>Date set</Label>
 		<Height>1</Height>
 		<control>MaskDate</control>
-		<ButtonText/>
+		<ButtonText />
 		<DataType>datetime</DataType>
 		<ReadOnly>false</ReadOnly>
 		<ToolTip>Date fishing gear was set</ToolTip>
@@ -192,7 +192,7 @@
 		<Label>Time set</Label>
 		<Height>1</Height>
 		<control>MaskTime</control>
-		<ButtonText/>
+		<ButtonText />
 		<DataType>datetime</DataType>
 		<ReadOnly>false</ReadOnly>
 		<ToolTip>Time fishing gear was set</ToolTip>
@@ -203,7 +203,7 @@
 		<Label>Date hauled</Label>
 		<Height>1</Height>
 		<control>MaskDate</control>
-		<ButtonText/>
+		<ButtonText />
 		<DataType>datetime</DataType>
 		<ReadOnly>false</ReadOnly>
 		<ToolTip>Date fishing gear was hauled</ToolTip>
@@ -214,7 +214,7 @@
 		<Label>Time hauled</Label>
 		<Height>1</Height>
 		<control>MaskTime</control>
-		<ButtonText/>
+		<ButtonText />
 		<DataType>datetime</DataType>
 		<ReadOnly>false</ReadOnly>
 		<ToolTip>Time fishing gear was hauled</ToolTip>
@@ -225,7 +225,7 @@
 		<Label>Number of hauls</Label>
 		<Height>1</Height>
 		<control>TextBox</control>
-		<ButtonText/>
+		<ButtonText />
 		<DataType>int</DataType>
 		<ReadOnly>false</ReadOnly>
 		<ToolTip>Number times gear was hauled</ToolTip>
@@ -236,7 +236,7 @@
 		<Label>Number of fishers</Label>
 		<Height>1</Height>
 		<control>TextBox</control>
-		<ButtonText/>
+		<ButtonText />
 		<DataType>int</DataType>
 		<ReadOnly>false</ReadOnly>
 		<ToolTip>Number of fishers in the fishing vessel</ToolTip>
@@ -244,13 +244,13 @@
 	</UIRow>
 	<UIRow>
 		<Key>spacer</Key>
-		<Label/>
+		<Label />
 		<Height>1</Height>
-		<control/>
-		<ButtonText/>
+		<control />
+		<ButtonText />
 		<DataType>null</DataType>
 		<ReadOnly>false</ReadOnly>
-		<ToolTip/>
+		<ToolTip />
 		<Required>false</Required>
 	</UIRow>
 	<UIRow>
@@ -258,7 +258,7 @@
 		<Label>Type of vessel used</Label>
 		<Height>1</Height>
 		<control>ComboBox</control>
-		<ButtonText/>
+		<ButtonText />
 		<DataType>lookup</DataType>
 		<ReadOnly>false</ReadOnly>
 		<ToolTip>Type of fishing vessel</ToolTip>
@@ -269,7 +269,7 @@
 		<Label>Engine</Label>
 		<Height>1</Height>
 		<control>TextBox</control>
-		<ButtonText/>
+		<ButtonText />
 		<DataType>string</DataType>
 		<ReadOnly>false</ReadOnly>
 		<ToolTip>Engine of the vessel</ToolTip>
@@ -280,7 +280,7 @@
 		<Label>Engine horsepower</Label>
 		<Height>1</Height>
 		<control>TextBox</control>
-		<ButtonText/>
+		<ButtonText />
 		<DataType>double</DataType>
 		<ReadOnly>false</ReadOnly>
 		<ToolTip>Engine horsepower</ToolTip>
@@ -299,13 +299,13 @@
 	</UIRow>
 	<UIRow>
 		<Key>spacer</Key>
-		<Label/>
+		<Label />
 		<Height>1</Height>
-		<control/>
-		<ButtonText/>
+		<control />
+		<ButtonText />
 		<DataType>null</DataType>
 		<ReadOnly>false</ReadOnly>
-		<ToolTip/>
+		<ToolTip />
 		<Required>false</Required>
 	</UIRow>
 	<UIRow>
@@ -313,7 +313,7 @@
 		<Label>Notes</Label>
 		<Height>5</Height>
 		<control>TextBox</control>
-		<ButtonText/>
+		<ButtonText />
 		<DataType>string</DataType>
 		<ReadOnly>false</ReadOnly>
 		<ToolTip>Notes</ToolTip>

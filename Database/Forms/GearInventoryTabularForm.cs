@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+﻿using ClosedXML.Excel;
 using FAD3.Database.Classes;
+using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
-using System.Reflection;
-
-using ClosedXML.Excel;
 using System.IO;
+using System.Reflection;
+using System.Windows.Forms;
 
 namespace FAD3.Database.Forms
 {
@@ -28,12 +22,12 @@ namespace FAD3.Database.Forms
         private Dictionary<string, (int countCommercial, int countMotorized, int countNonMotorized,
             int countNoBoat, int? maxCPUE, int? minCPUE,
             int? upperMode, int? lowerMode, int numberDaysUsed,
-            string cpueUnit, string Notes, int dominantPercent,
+            string cpueUnit, string Notes, int? dominantPercent,
             int? averageCPUE, int? cpueMode, double? equivalentKg)> _inventoryData = new
             Dictionary<string, (int countCommercial, int countMotorized, int countNonMotorized,
             int countNoBoat, int? maxCPUE, int? minCPUE,
             int? upperMode, int? lowerMode, int numberDaysUsed,
-            string cpueUnit, string Notes, int dominantPercent,
+            string cpueUnit, string Notes, int? dominantPercent,
             int? averageCPUE, int? cpueMode, double? equivalentKg)>();
 
         private Dictionary<string, (string projectName, string province, string lgu, string barangay, string sitio,

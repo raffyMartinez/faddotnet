@@ -26,7 +26,7 @@ namespace FAD3
         {
             if (TargetArea != null && File.Exists(KMLFile))
             {
-                FishingGrid.AOIGuid = TargetArea.TargetAreaGuid;
+                FishingGrid.TargetAreaGuid = TargetArea.TargetAreaGuid;
                 var grid25 = FishingGrid.Grid25;
                 var doc = new XmlDocument();
                 var inLandingSiteFolder = false;

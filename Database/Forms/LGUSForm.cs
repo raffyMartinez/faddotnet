@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
+﻿using FAD3.Database.Classes;
+using System;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using FAD3.Database.Classes;
-using FAD3.Database.Classes;
 
 namespace FAD3.Database.Forms
 {

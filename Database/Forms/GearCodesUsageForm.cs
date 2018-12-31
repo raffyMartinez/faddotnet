@@ -1,19 +1,16 @@
-﻿using System;
+﻿using FAD3.Database.Classes;
+using FAD3.Database.Forms;
+using FAD3.Mapping.Classes;
+using FAD3.Mapping.Forms;
+using MetaphoneCOM;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using MetaphoneCOM;
-using FAD3.Database.Classes;
-using FAD3.Database.Classes;
-using FAD3.Database.Forms;
-using System.IO;
 using System.Xml;
-using FAD3.Mapping.Forms;
-using FAD3.Mapping.Classes;
 
 namespace FAD3
 {

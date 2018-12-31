@@ -7,17 +7,16 @@
  * To change this template use Tools | Options | Coding | Edit Standard Headers.
  */
 
+using FAD3.Database.Classes;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.IO;
 using System.Data.OleDb;
-using System.Diagnostics;
-using System.Windows.Forms;
-using Microsoft.Win32;
 using System.Drawing;
-using FAD3.Database.Classes;
+using System.IO;
 using System.Reflection;
+using System.Windows.Forms;
 
 namespace FAD3
 {
@@ -78,7 +77,7 @@ namespace FAD3
         {
             try
             {
-                var key = Registry.ClassesRoot.OpenSubKey("MapWinGIS.Shapefile1");
+                var key = Registry.ClassesRoot.OpenSubKey("MapWinGIS.Shapefile");
                 _isMapComponentRegistered = key.Name.Length > 0;
             }
             catch

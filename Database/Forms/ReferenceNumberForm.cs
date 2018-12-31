@@ -1,19 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace FAD3
 {
     public partial class ReferenceNumberForm : Form
     {
-
-        SamplingForm _Parent_Form;
-        string _NextRefCode = "";
+        private SamplingForm _Parent_Form;
+        private string _NextRefCode = "";
 
         public SamplingForm Parent_Form
         {
@@ -37,6 +32,7 @@ namespace FAD3
                         Close();
                     }
                     break;
+
                 case "buttonCancel":
                     Close();
                     break;
@@ -49,7 +45,6 @@ namespace FAD3
 
             if (ReferenceNumberManager.Count == 1)
             {
-
                 lvCodes.Visible = false;
                 labelTitle.Text = "A reference number was generated for the sampling.";
                 labelRefNo.With(o =>
@@ -88,6 +83,7 @@ namespace FAD3
                     case "Sub-variation":
                         c.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
                         break;
+
                     case "Local names":
                         c.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
                         break;

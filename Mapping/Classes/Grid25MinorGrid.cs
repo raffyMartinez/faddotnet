@@ -1,9 +1,7 @@
-﻿using System;
-using AxMapWinGIS;
+﻿using AxMapWinGIS;
 using MapWinGIS;
-using System.Collections.Generic;
+using System;
 using System.Linq;
-using System.Text;
 
 namespace FAD3
 {

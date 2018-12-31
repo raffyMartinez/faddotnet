@@ -5,8 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
-using System.Windows.Forms;
 using System.Reflection;
+using System.Windows.Forms;
 
 namespace FAD3
 {
@@ -16,6 +16,7 @@ namespace FAD3
         private static Dictionary<string, string> _gearClassLetterCodes = new Dictionary<string, string>();
         private static string _gearClassUsed = "";
         private static Dictionary<string, string> _gearLocalNameListDict = new Dictionary<string, string>();
+        private static Dictionary<string, string> _gearLocalNameListReverseDict = new Dictionary<string, string>();
         private static Dictionary<string, string> _gearVar = new Dictionary<string, string>();
         private static string _GearVarGUID = "";
         private static Dictionary<string, string> _gearVariationsUsage = new Dictionary<string, string>();
@@ -217,7 +218,7 @@ namespace FAD3
         {
             get
             {
-                GetGearLocalNames();
+                //GetGearLocalNames();
                 return _gearLocalNameListDict;
             }
         }
@@ -250,13 +251,16 @@ namespace FAD3
             set { _GearVarGUID = value; }
         }
 
-        public static (bool success, string newGuid) SaveNewLocalName(NewFisheryObjectName newName)
+        public static (bool success, string newGuid) SaveNewLocalName(NewFisheryObjectName newName, string guid = "")
         {
             bool success = false;
             var newLocalName = newName.NewName;
             var key1 = newName.Key1;
             var key2 = newName.Key2;
-            var guid = newName.ObjectGUID;
+            if (guid.Length == 0)
+            {
+                guid = newName.ObjectGUID;
+            }
             using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
             {
                 conn.Open();
@@ -264,7 +268,26 @@ namespace FAD3
                         ('{newLocalName}', {{{guid}}},{key1},{key2})";
                 using (OleDbCommand update = new OleDbCommand(sql, conn))
                 {
-                    success = update.ExecuteNonQuery() > 0;
+                    try
+                    {
+                        success = update.ExecuteNonQuery() > 0;
+                        if (success)
+                        {
+                            _gearLocalNameListDict.Add(guid, newLocalName);
+                            _gearLocalNameListReverseDict.Add(newLocalName, guid);
+                        }
+                    }
+                    catch (OleDbException dbex)
+                    {
+                        if (dbex.ErrorCode == -2147467259)
+                        {
+                            guid = _gearLocalNameListReverseDict[newLocalName];
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log(ex.Message, "Gear", "SaveNewLocalName");
+                    }
                 }
             }
             return (success, guid);
@@ -1376,9 +1399,10 @@ namespace FAD3
             }
         }
 
-        private static void GetGearLocalNames()
+        public static void GetGearLocalNames()
         {
             _gearLocalNameListDict.Clear();
+            _gearLocalNameListReverseDict.Clear();
             DataTable dt = new DataTable();
             using (var conection = new OleDbConnection(global.ConnectionString))
             {
@@ -1393,6 +1417,7 @@ namespace FAD3
                     {
                         DataRow dr = dt.Rows[i];
                         _gearLocalNameListDict.Add(dr["LocalNameGUID"].ToString(), dr["LocalName"].ToString());
+                        _gearLocalNameListReverseDict.Add(dr["LocalName"].ToString(), dr["LocalNameGUID"].ToString());
                     }
                 }
                 catch (Exception ex)

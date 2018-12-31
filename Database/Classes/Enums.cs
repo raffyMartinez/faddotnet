@@ -6,6 +6,13 @@
         ActionImport
     }
 
+    public enum ImportInventoryAction
+    {
+        ImportDoNothing,
+        ImportIntoExisting,
+        ImportIntoNew
+    }
+
     public enum OccurenceDataType
     {
         Species,

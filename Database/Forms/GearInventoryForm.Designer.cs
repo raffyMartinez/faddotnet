@@ -56,7 +56,7 @@
             // contextMenu
             // 
             this.contextMenu.Name = "contextMenu";
-            this.contextMenu.Size = new System.Drawing.Size(61, 4);
+            this.contextMenu.Size = new System.Drawing.Size(181, 26);
             this.contextMenu.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnContextMenu_ItemClicked);
             // 
             // split

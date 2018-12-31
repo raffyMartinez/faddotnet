@@ -1,14 +1,12 @@
-﻿using System;
+﻿using FAD3.Database.Classes;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Data;
 using System.Data.OleDb;
-using System.Windows.Forms;
-using FAD3.Database.Classes;
 using System.IO;
-using System.Xml;
 using System.Reflection;
+using System.Windows.Forms;
+using System.Xml;
 
 namespace FAD3
 {
@@ -184,6 +182,36 @@ namespace FAD3
                 }
             }
             return (success, newEnumeratorGuid);
+        }
+
+        public static bool SaveNewTargetAreaEnumerator(string targetAreaGuid, string name, DateTime hireDate, bool isActive, string enumeratorGuid)
+        {
+            var success = false;
+            string sql = "";
+
+            sql = $@"Insert into tblEnumerators (EnumeratorID, EnumeratorName, HireDate, Active, TargetArea) values (
+                       {{{enumeratorGuid}}}, '{name}', '{hireDate}', {isActive}, {{{targetAreaGuid}}})";
+
+            using (var conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                using (OleDbCommand update = new OleDbCommand(sql, conn))
+                {
+                    try
+                    {
+                        success = update.ExecuteNonQuery() > 0;
+                    }
+                    catch (OleDbException oledbEx)
+                    {
+                        //ignore: dulplicate primary key error
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log(ex.Message, "Enumerators", "SaveNewTargetAreaEnumerator");
+                    }
+                }
+            }
+            return success;
         }
 
         public static bool SaveTargetAreaEnumerators(Dictionary<string, (string enumeratorName, DateTime dateHired, bool isActive, fad3DataStatus dataStatus)> enumeratorsData, string targetAreaGuid)

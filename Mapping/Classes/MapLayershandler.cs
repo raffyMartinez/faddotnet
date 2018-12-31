@@ -1,15 +1,14 @@
 ﻿using AxMapWinGIS;
+using FAD3.Database.Classes;
+using FAD3.Mapping;
 using MapWinGIS;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.IO;
 using System.Reflection;
 using System.Xml;
-using FAD3.Mapping;
-using FAD3.Database.Classes;
 
 namespace FAD3
 

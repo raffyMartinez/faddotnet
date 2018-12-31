@@ -56,8 +56,8 @@
 
 namespace SimMetricsUtilities
 {
-    using System;
     using SimMetricsApi;
+    using System;
 
     /// <summary>
     /// implements a substitution cost function where d(i,j) = 1 if idoes not equal j, 0 if i equals j.

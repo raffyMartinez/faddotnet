@@ -1,16 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using dao;
+﻿using dao;
 using Microsoft.Win32;
+using System;
+using Microsoft.VisualBasic.Devices;
 
 namespace FAD3.Database.Classes
 {
     public static class FADDiagnostics
     {
-        public static bool ListDBTables(string mdbPath, string productVersion)
+        private static string GetProcessor()
+        {
+            string cpu = "";
+            RegistryKey processor_name = Registry.LocalMachine.OpenSubKey(@"Hardware\Description\System\CentralProcessor\0", false);
+            if (processor_name != null && processor_name.GetValue("ProcessorNameString") != null)
+            {
+                cpu = processor_name.GetValue("ProcessorNameString").ToString();
+            }
+            return cpu;
+        }
+
+        public static bool Diagnose(string mdbPath, string productVersion)
         {
             var dbe = new DBEngine();
             var dbTemplate = dbe.OpenDatabase(global.ApplicationPath + "\\template.mdb");
@@ -23,33 +31,34 @@ namespace FAD3.Database.Classes
             Logger.LogSimple($"OS: {Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ProductName", "")} {os.Version.Major}.{os.Version.Minor} {os.ServicePack}");
             Logger.LogSimple($"FAD version: {productVersion}");
             Logger.LogSimple($"Application path: {GetAppPath()}");
-            Logger.LogSimple("-------------------------------------------------");
-            Logger.LogSimple("Logging tables in data database");
-            Logger.LogSimple("-------------------------------------------------");
-            foreach (TableDef td in dbData.TableDefs)
-            {
-                if (td.Name.Substring(0, 4) != "MSys" && td.Name.Substring(0, 5) != "temp_")
-                {
-                    count++;
-                    Logger.LogSimple($"{count}. {td.Name}");
-                }
-            }
-            Logger.LogSimple("-------------------------------------------------");
+            Logger.LogSimple($"Logged in user: {Environment.UserName}");
+            Logger.LogSimple($"Machine name: {Environment.MachineName}");
+            Logger.LogSimple($"RAM: {((int)(new ComputerInfo().TotalPhysicalMemory / (Math.Pow(1024, 3)) + 0.5)).ToString()} GB");
+            Logger.LogSimple($"CPU: {GetProcessor()}");
+
             Logger.LogSimple("");
-            Logger.LogSimple("");
-            Logger.LogSimple("-------------------------------------------------");
-            Logger.LogSimple("Logging tables in template database");
-            Logger.LogSimple("-------------------------------------------------");
+            Logger.LogSimple("------------------------------------------------------------");
+            Logger.LogSimple("Database tables");
+            Logger.LogSimple($"Row\t{string.Format("{0,-40}", "Template table")}\tData table");
+            Logger.LogSimple("------------------------------------------------------------");
             count = 0;
             foreach (TableDef tdTemplate in dbTemplate.TableDefs)
             {
                 if (tdTemplate.Name.Substring(0, 4) != "MSys" && tdTemplate.Name.Substring(0, 5) != "temp_")
                 {
                     count++;
-                    Logger.LogSimple($"{count}. {tdTemplate.Name}");
+                    Logger.LogSimpleEx($"{count}\t{string.Format("{0,-40}", tdTemplate.Name)}");
+                    foreach (TableDef tdData in dbData.TableDefs)
+                    {
+                        if (tdData.Name == tdTemplate.Name)
+                        {
+                            Logger.LogSimpleEx("\tx\r\n");
+                            break;
+                        }
+                    }
                 }
             }
-            Logger.LogSimple("-------------------------------------------------");
+            Logger.LogSimple("------------------------------------------------------------");
             Logger.LogSimple("");
             Logger.Log("end FADDiagnostics");
 

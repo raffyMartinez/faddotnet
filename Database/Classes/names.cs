@@ -1,21 +1,17 @@
 ﻿//using ADOX;
 using dao;
 using FAD3.Database.Classes;
-
-using FAD3.Database.Classes;
-
+using HtmlAgilityPack;
+using MetaphoneCOM;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
 using System.IO;
-using System.Text;
-using MetaphoneCOM;
-using HtmlAgilityPack;
-using System.Xml;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
+using System.Xml;
 
 namespace FAD3
 {

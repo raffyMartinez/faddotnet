@@ -1,10 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.IO;
 using System.Windows.Forms;
 
@@ -90,6 +85,16 @@ namespace FAD3
                 dropDownMenu.Items["menuRemove"].Enabled = Enabled;
                 dropDownMenu.Items["menuOpen"].Enabled = Enabled;
             }
+        }
+
+        private void OnFormLoad(object sender, EventArgs e)
+        {
+            global.LoadFormSettings(this);
+        }
+
+        private void OnFormClosing(object sender, FormClosingEventArgs e)
+        {
+            global.SaveFormSettings(this);
         }
     }
 }

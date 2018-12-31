@@ -6,8 +6,6 @@
 /////////////////////////////////////////////
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Windows.Forms;
 
 namespace ToolStripExtensions
@@ -25,7 +23,7 @@ namespace ToolStripExtensions
     // Rick Brewster shows how to implement ClickThrough on his blog at:
     //   http://blogs.msdn.com/rickbrew/
     //
-    // JasonD suggests the method to suppress the highlighting on at forum at: 
+    // JasonD suggests the method to suppress the highlighting on at forum at:
     //   http://forums.microsoft.com/MSDN/ShowPost.aspx?PostID=118385&SiteID=1
     //
 
@@ -44,10 +42,10 @@ namespace ToolStripExtensions
 
     /// <summary>
     /// This class adds to the functionality provided in System.Windows.Forms.MenuStrip.
-    /// 
-    /// It allows you to "ClickThrough" to the MenuStrip so that you don't have to click once to 
+    ///
+    /// It allows you to "ClickThrough" to the MenuStrip so that you don't have to click once to
     /// bring the form into focus and once more to take the desired action
-    /// 
+    ///
     /// It also implements a SuppressHighlighting property to turn off the highlighting
     /// that occures on mouseover when the form is not active
     /// </summary>
@@ -83,11 +81,11 @@ namespace ToolStripExtensions
 
         /// <summary>
         /// This method overrides the procedure that responds to Windows messages.
-        /// 
+        ///
         /// It intercepts the WM_MOUSEMOVE message
         /// and ignores it if SuppressHighlighting is on and the TopLevelControl does not contain the focus.
         /// Otherwise, it calls the base class procedure to handle the message.
-        /// 
+        ///
         /// It also intercepts the WM_MOUSEACTIVATE message and replaces an "Activate and Eat" result with
         /// an "Activate" result if ClickThrough is enabled.
         /// </summary>
@@ -96,23 +94,23 @@ namespace ToolStripExtensions
         {
             // If we don't want highlighting, throw away mousemove commands
             // when the parent form or one of its children does not have the focus
-            if(m.Msg == WinConst.WM_MOUSEMOVE && this.suppressHighlighting && !this.TopLevelControl.ContainsFocus)
+            if (m.Msg == WinConst.WM_MOUSEMOVE && this.suppressHighlighting && !this.TopLevelControl.ContainsFocus)
                 return;
             else
                 base.WndProc(ref m);
 
             // If we want ClickThrough, replace "Activate and Eat" with "Activate" on WM_MOUSEACTIVATE messages
-            if(m.Msg == WinConst.WM_MOUSEACTIVATE && this.clickThrough && m.Result == (IntPtr)WinConst.MA_ACTIVATEANDEAT)
+            if (m.Msg == WinConst.WM_MOUSEACTIVATE && this.clickThrough && m.Result == (IntPtr)WinConst.MA_ACTIVATEANDEAT)
                 m.Result = (IntPtr)WinConst.MA_ACTIVATE;
         }
     }
 
     /// <summary>
     /// This class adds to the functionality provided in System.Windows.Forms.ToolStrip.
-    /// 
-    /// It allows you to "ClickThrough" to the MenuStrip so that you don't have to click once to 
+    ///
+    /// It allows you to "ClickThrough" to the MenuStrip so that you don't have to click once to
     /// bring the form into focus and once more to take the desired action
-    /// 
+    ///
     /// It also implements a SuppressHighlighting property to turn off the highlighting
     /// that occures on mouseover when the form is not active
     /// </summary>
@@ -148,11 +146,11 @@ namespace ToolStripExtensions
 
         /// <summary>
         /// This method overrides the procedure that responds to Windows messages.
-        /// 
+        ///
         /// It intercepts the WM_MOUSEMOVE message
         /// and ignores it if SuppressHighlighting is on and the TopLevelControl does not contain the focus.
         /// Otherwise, it calls the base class procedure to handle the message.
-        /// 
+        ///
         /// It also intercepts the WM_MOUSEACTIVATE message and replaces an "Activate and Eat" result with
         /// an "Activate" result if ClickThrough is enabled.
         /// </summary>
@@ -161,13 +159,13 @@ namespace ToolStripExtensions
         {
             // If we don't want highlighting, throw away mousemove commands
             // when the parent form or one of its children does not have the focus
-            if(m.Msg == WinConst.WM_MOUSEMOVE && this.suppressHighlighting && !this.TopLevelControl.ContainsFocus)
+            if (m.Msg == WinConst.WM_MOUSEMOVE && this.suppressHighlighting && !this.TopLevelControl.ContainsFocus)
                 return;
             else
                 base.WndProc(ref m);
 
             // If we want ClickThrough, replace "Activate and Eat" with "Activate" on WM_MOUSEACTIVATE messages
-            if(m.Msg == WinConst.WM_MOUSEACTIVATE && this.clickThrough && m.Result == (IntPtr)WinConst.MA_ACTIVATEANDEAT)
+            if (m.Msg == WinConst.WM_MOUSEACTIVATE && this.clickThrough && m.Result == (IntPtr)WinConst.MA_ACTIVATEANDEAT)
                 m.Result = (IntPtr)WinConst.MA_ACTIVATE;
         }
     }

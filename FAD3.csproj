@@ -241,6 +241,18 @@
     <Compile Include="Database\Forms\HTMLTableSelectColumnsForm.Designer.cs">
       <DependentUpon>HTMLTableSelectColumnsForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Database\Forms\ImportInventoryForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Database\Forms\ImportInventoryForm.Designer.cs">
+      <DependentUpon>ImportInventoryForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Database\Forms\ImportInventoryXMLForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Database\Forms\ImportInventoryXMLForm.Designer.cs">
+      <DependentUpon>ImportInventoryXMLForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Database\Forms\LGUItemForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -699,6 +711,12 @@
     <EmbeddedResource Include="Database\Forms\HTMLTableSelectColumnsForm.resx">
       <DependentUpon>HTMLTableSelectColumnsForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Database\Forms\ImportInventoryForm.resx">
+      <DependentUpon>ImportInventoryForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Database\Forms\ImportInventoryXMLForm.resx">
+      <DependentUpon>ImportInventoryXMLForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Database\Forms\LGUItemForm.resx">
       <DependentUpon>LGUItemForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -942,6 +960,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="FAD3.ico" />
+    <None Include="Resources\ProjectFolderOpen_16x.png" />
     <None Include="Resources\Table_16x.png" />
     <None Include="Resources\report document.bmp" />
     <None Include="Resources\label_add.bmp" />

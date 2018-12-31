@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FAD3.Mapping.Classes;
+using System;
 using System.Windows.Forms;
-using FAD3.Mapping.Classes;
 
 namespace FAD3.Mapping.Forms
 {

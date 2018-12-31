@@ -18,8 +18,6 @@ namespace Cyotek.Windows.Forms
 
         #endregion Private Member Declarations
 
-
-
         #region Public Constructors
 
         public FontComboBox()
@@ -36,15 +34,11 @@ namespace Cyotek.Windows.Forms
 
         #endregion Public Constructors
 
-
-
         #region Events
 
         public event EventHandler PreviewFontSizeChanged;
 
         #endregion Events
-
-
 
         #region Protected Overridden Methods
 
@@ -128,8 +122,6 @@ namespace Cyotek.Windows.Forms
 
         #endregion Protected Overridden Methods
 
-
-
         #region Public Methods
 
         public virtual void LoadFontFamilies()
@@ -146,8 +138,6 @@ namespace Cyotek.Windows.Forms
         }
 
         #endregion Public Methods
-
-
 
         #region Public Properties
 
@@ -179,8 +169,6 @@ namespace Cyotek.Windows.Forms
 
         #endregion Public Properties
 
-
-
         #region Private Methods
 
         private void CalculateLayout()
@@ -211,8 +199,6 @@ namespace Cyotek.Windows.Forms
         }
 
         #endregion Private Methods
-
-
 
         #region Protected Methods
 
@@ -291,6 +277,5 @@ namespace Cyotek.Windows.Forms
         }
 
         #endregion Protected Methods
-
     }
 }

@@ -3,11 +3,11 @@
 // Location: http://github.com/jaime-olivares/coordinate
 
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
-using System.Collections.Generic;
-using System.Globalization;
 
 namespace ISO_Classes
 {

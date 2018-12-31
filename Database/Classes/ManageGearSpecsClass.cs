@@ -1,9 +1,8 @@
-﻿using System;
+﻿using FAD3.Database.Classes;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
-using System.Text;
-using FAD3.Database.Classes;
 
 namespace FAD3
 {

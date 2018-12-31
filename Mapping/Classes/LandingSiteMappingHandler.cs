@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Data.OleDb;
-using System.Data;
+﻿using FAD3.Database.Classes;
 using MapWinGIS;
 using Oware;
-using FAD3.Database.Classes;
+using System;
+using System.Data;
+using System.Data.OleDb;
 using System.Reflection;
 
 namespace FAD3

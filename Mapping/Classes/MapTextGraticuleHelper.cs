@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MapWinGIS;
+﻿using MapWinGIS;
 
 namespace FAD3.Mapping.Classes
 {

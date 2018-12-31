@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using System.Windows.Forms;
 using System.IO;
+using System.Windows.Forms;
 
 namespace FAD3
 {
@@ -24,7 +21,6 @@ namespace FAD3
         //private ToolStripSeparator Separator;
         private ToolStripMenuItem[] MenuItems;
 
-
         // Raised when the user selects a file from the MRU list.
         public delegate void FileSelectedEventHandler(string file_name);
         public event FileSelectedEventHandler FileSelected;
@@ -32,7 +28,6 @@ namespace FAD3
         //Raise when the user wants to manage the MRU
         public delegate void ManageMRUEventHandler(object sender, EventArgs e);
         public event ManageMRUEventHandler ManageMRU;
-
 
         // Constructor.
         public mru()

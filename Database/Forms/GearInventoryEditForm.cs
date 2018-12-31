@@ -1,15 +1,11 @@
-﻿using System;
+﻿using FAD3.Database.Classes;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using FAD3.Database.Classes;
-
-using FAD3.Database.Classes;
 
 namespace FAD3.Database.Forms
 {
@@ -369,8 +365,8 @@ namespace FAD3.Database.Forms
                 && txtNumberOfDaysPerMonth.Text.Length > 0
                 && chkListBoxMonthsSeason.CheckedItems.Count > 0
                 && chkListBoxMonthsUsed.CheckedItems.Count > 0
-                && listBoxDominantCatch.Items.Count > 0
-                && txtDominantPercentage.Text.Length > 0;
+                && listBoxDominantCatch.Items.Count > 0;
+            //&& txtDominantPercentage.Text.Length > 0;
 
             if (proceed)
             {
@@ -843,7 +839,7 @@ namespace FAD3.Database.Forms
                                 {
                                     guid = _inventoryGuid;
                                 }
-                                success = _inventory.SaveFishingGearInventory(_dataStatus, txtInventoryName.Text, DateTime.Parse(txtDateImplemented.Text), guid);
+                                success = _inventory.SaveFisheryInventoryProject(_dataStatus, txtInventoryName.Text, DateTime.Parse(txtDateImplemented.Text), guid);
                                 if (success)
                                 {
                                     if (_dataStatus == fad3DataStatus.statusNew)
@@ -974,10 +970,13 @@ namespace FAD3.Database.Forms
                                 double? equivalentKilo = null;
                                 if (cboCatchUnit.Text != "kilo" && double.TryParse(txtEquivalentKg.Text, out double vv)) equivalentKilo = vv;
 
+                                int? dominantPercentage = null;
+                                if (txtDominantPercentage.TextLength > 0) dominantPercentage = int.Parse(txtDominantPercentage.Text);
+
                                 success = _inventory.SaveSitioGearInventoryMain(_barangayInventoryGuid, _gearVariationKey,
                                     int.Parse(txtCommercialUsage.Text), int.Parse(txtMunicipalMotorizedUsage.Text),
                                     int.Parse(txtMunicipalNonMotorizedUsage.Text), int.Parse(txtNoBoatGears.Text),
-                                    int.Parse(txtNumberOfDaysPerMonth.Text), cboCatchUnit.Text, int.Parse(txtDominantPercentage.Text),
+                                    int.Parse(txtNumberOfDaysPerMonth.Text), cboCatchUnit.Text, dominantPercentage,
                                     guid, _dataStatus, rangeCPUEMax, rangeCPUEMin, modeCPUEUpper, modeCPUELower, txtNotes.Text, cpueAverage, modeCPUE, equivalentKilo)
 
                                     && _inventory.SaveSitioGearInventoryGearLocalNames(guid, listGearLocalNameGuids)
@@ -1287,7 +1286,6 @@ namespace FAD3.Database.Forms
                                 || ctlName == "txtCountMotorized"
                                 || ctlName == "txtCountNonMotorized"
                                 || ctlName == "txtRangeMin"
-                                || ctlName == "txtDominantPercentage"
                                 )
                             {
                                 e.Cancel = v < 0;
@@ -1298,11 +1296,11 @@ namespace FAD3.Database.Forms
                                 e.Cancel = v < 1 || v > 31;
                                 msg = "Number of days must be from 1 to 31";
                             }
-                            //else if (ctlName == "txtDominantPercentage")
-                            //{
-                            //    e.Cancel = v < 51 || v > 100;
-                            //    msg = "Dominant percent value must be more than 50 but not exceed 100";
-                            //}
+                            else if (ctlName == "txtDominantPercentage")
+                            {
+                                e.Cancel = v < 1 || v > 100;
+                                msg = "Dominant percent must be from one to 100";
+                            }
                             else
                             {
                                 e.Cancel = v <= 0;

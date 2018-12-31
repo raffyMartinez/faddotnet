@@ -1,18 +1,9 @@
-﻿using System;
+﻿using FAD3.Database.Classes;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using FAD3.Database.Classes;
-
-using FAD3.Database.Classes;
-
-using System.Xml;
 using System.IO;
+using System.Windows.Forms;
+using System.Xml;
 
 namespace FAD3.Database.Forms
 {
@@ -37,6 +28,7 @@ namespace FAD3.Database.Forms
 
         private bool _clickFromTree;
         private MainForm _parentForm;
+        private Dictionary<string, string> _deleteInventoryArgs = new Dictionary<string, string>();
 
         //function to ensure that only one instance of the form is open
         public static GearInventoryForm GetInstance(TargetArea aoi, MainForm parentForm, string inventoryGuid = "")
@@ -83,11 +75,32 @@ namespace FAD3.Database.Forms
                         }
                         if (!projectFound)
                         {
-                            e.Cancel = true;
+                            if (e.ImportInventoryAction == ImportInventoryAction.ImportIntoNew)
+                            {
+                                DialogResult dr = MessageBox.Show("Do you want to create a new inventory project entitled\r\n" +
+                                    e.ProjectName + "?", "Create new inventory project", MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
+                                e.Cancel = dr == DialogResult.Cancel;
+                            }
+                            else
+                            {
+                                e.Cancel = true;
+                            }
                         }
                         break;
 
                     case FisheriesInventoryLevel.TargetArea:
+                        switch (e.ImportInventoryAction)
+                        {
+                            case ImportInventoryAction.ImportDoNothing:
+                                break;
+
+                            case ImportInventoryAction.ImportIntoExisting:
+                                break;
+
+                            case ImportInventoryAction.ImportIntoNew:
+                                e.Cancel = false;
+                                break;
+                        }
                         break;
 
                     case FisheriesInventoryLevel.Province:
@@ -316,6 +329,76 @@ namespace FAD3.Database.Forms
             menuItem = contextMenu.Items.Add("Add fishing gear inventory");
             menuItem.Name = "itemAddFishingGear";
             menuItem.Enabled = _treeLevel == "sitio";
+
+            if (_clickFromTree)
+            {
+                string itemCaption = "";
+                bool proceed = true;
+                TreeNode nd = treeInventory.SelectedNode;
+                _deleteInventoryArgs.Clear();
+                switch (_treeLevel)
+                {
+                    case "gearVariation":
+                        itemCaption = "Delete gear inventory";
+                        _deleteInventoryArgs.Add("gearInventoryGuid", nd.Name);
+                        break;
+
+                    case "sitio":
+                        itemCaption = "Delete sitio and gear inventory";
+                        _deleteInventoryArgs.Add("sitio", nd.Text);
+                        _deleteInventoryArgs.Add("barangay", nd.Parent.Text);
+                        _deleteInventoryArgs.Add("municipality", nd.Parent.Parent.Text);
+                        _deleteInventoryArgs.Add("province", nd.Parent.Parent.Parent.Text);
+                        _deleteInventoryArgs.Add("projectGuid", nd.Parent.Parent.Parent.Parent.Name);
+                        break;
+
+                    case "barangay":
+                        itemCaption = "Delete all inventories in barangay";
+                        _deleteInventoryArgs.Add("sitio", "");
+                        _deleteInventoryArgs.Add("barangay", nd.Text);
+                        _deleteInventoryArgs.Add("municipality", nd.Parent.Text);
+                        _deleteInventoryArgs.Add("province", nd.Parent.Parent.Text);
+                        _deleteInventoryArgs.Add("projectGuid", nd.Parent.Parent.Parent.Name);
+                        break;
+
+                    case "municipality":
+                        itemCaption = "Delete all inventories in municipality";
+                        _deleteInventoryArgs.Add("sitio", "");
+                        _deleteInventoryArgs.Add("barangay", "");
+                        _deleteInventoryArgs.Add("municipality", nd.Text);
+                        _deleteInventoryArgs.Add("province", nd.Parent.Text);
+                        _deleteInventoryArgs.Add("projectGuid", nd.Parent.Parent.Name);
+                        break;
+
+                    case "province":
+                        itemCaption = "Delete all inventories in province";
+                        _deleteInventoryArgs.Add("sitio", "");
+                        _deleteInventoryArgs.Add("barangay", "");
+                        _deleteInventoryArgs.Add("municipality", "");
+                        _deleteInventoryArgs.Add("province", nd.Text);
+                        _deleteInventoryArgs.Add("projectGuid", nd.Parent.Name);
+                        break;
+
+                    case "targetAreaInventory":
+                        itemCaption = "Delete all inventories";
+                        _deleteInventoryArgs.Add("sitio", "");
+                        _deleteInventoryArgs.Add("barangay", "");
+                        _deleteInventoryArgs.Add("municipality", "");
+                        _deleteInventoryArgs.Add("province", "");
+                        _deleteInventoryArgs.Add("projectGuid", nd.Name);
+                        break;
+
+                    default:
+                        proceed = false;
+                        break;
+                }
+                if (proceed)
+                {
+                    contextMenu.Items.Add("-");
+                    menuItem = contextMenu.Items.Add(itemCaption);
+                    menuItem.Name = "itemDeleteInventory";
+                }
+            }
         }
 
         /// <summary>
@@ -372,20 +455,27 @@ namespace FAD3.Database.Forms
 
         private void OnNodeClicked(object sender, TreeNodeMouseClickEventArgs e)
         {
-            _clickFromTree = true;
-            _barangayInventoryGuid = string.Empty;
             _treeLevel = e.Node.Tag.ToString();
-            ConfigureContextMenu();
-            ConfigToolbar();
-            if (_treeLevel == "gearVariation")
+            _clickFromTree = true;
+            if (e.Button == MouseButtons.Left)
             {
-                ConfigListViewGear(e.Node.Name);
+                _barangayInventoryGuid = string.Empty;
+
+                ConfigToolbar();
+                if (_treeLevel == "gearVariation")
+                {
+                    ConfigListViewGear(e.Node.Name);
+                }
+                else
+                {
+                    ConfigListView(e.Node);
+                }
+                e.Node.SelectedImageKey = e.Node.ImageKey;
             }
-            else
+            else if (e.Button == MouseButtons.Right)
             {
-                ConfigListView(e.Node);
+                ConfigureContextMenu();
             }
-            e.Node.SelectedImageKey = e.Node.ImageKey;
         }
 
         /// <summary>
@@ -602,7 +692,10 @@ namespace FAD3.Database.Forms
             }
 
             lvi = lvInventory.Items.Add("Percentage of dominant catch");
-            lvi.SubItems.Add(item.percentageOfDominance.ToString() + "%");
+            if (item.percentageOfDominance != null)
+            {
+                lvi.SubItems.Add(item.percentageOfDominance.ToString() + "%");
+            }
             lvInventory.Items.Add("");
 
             //accessories
@@ -891,8 +984,19 @@ namespace FAD3.Database.Forms
                     default:
                         var item = _inventory.GetMunicipalityBrangaySitioFromGearInventory(sitioGearInventoryGuid);
                         treeInventory.SelectedNode.Expand();
-                        treeInventory.SelectedNode.Nodes[item.barangay].Expand();
-                        _sitioNode = treeInventory.SelectedNode.Nodes[item.barangay].Nodes[item.sitio];
+                        try
+                        {
+                            treeInventory.SelectedNode.Nodes[item.barangay].Expand();
+                            _sitioNode = treeInventory.SelectedNode.Nodes[item.barangay].Nodes[item.sitio];
+                        }
+                        catch (NullReferenceException nre)
+                        {
+                            //ignore
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Log(ex.Message, "GearInventoryForm", "RefreshSitioGearInventory");
+                        }
                         break;
                 }
             }
@@ -1118,6 +1222,28 @@ namespace FAD3.Database.Forms
                     AddInventory();
                     break;
 
+                case "itemDeleteInventory":
+                    TreeNode parent = treeInventory.SelectedNode.Parent;
+                    switch (_treeLevel)
+                    {
+                        case "gearVariation":
+                            if (_inventory.DeleteGearVariationInventory(_deleteInventoryArgs["gearInventoryGuid"]))
+                            {
+                                parent.Nodes.Remove(treeInventory.SelectedNode);
+                            }
+                            break;
+
+                        default:
+                            if (_inventory.DeleteInventory(_deleteInventoryArgs))
+                            {
+                                parent.Nodes.Remove(treeInventory.SelectedNode);
+                            }
+                            break;
+                    }
+                    TreeNodeMouseClickEventArgs ee = new TreeNodeMouseClickEventArgs(parent, MouseButtons.Left, 1, 0, 0);
+                    OnNodeClicked(null, ee);
+                    return;
+
                 case "itemAddBarangay":
                     TreeNode nd = treeInventory.SelectedNode;
                     switch (_treeLevel)
@@ -1149,7 +1275,6 @@ namespace FAD3.Database.Forms
                             }
                             break;
                     }
-                    //inventoryEditForm.AddNewBarangyInventory(_inventoryGuid);
                     break;
 
                 case "itemAddFishingGear":
@@ -1305,7 +1430,7 @@ namespace FAD3.Database.Forms
                                         break;
                                 }
                             }
-                            if ((eidf.Selection & ExportImportDataType.GearInventory) == ExportImportDataType.GearInventory)
+                            else if ((eidf.Selection & ExportImportDataType.GearInventory) == ExportImportDataType.GearInventory)
                             {
                                 switch (actionType)
                                 {
@@ -1314,7 +1439,7 @@ namespace FAD3.Database.Forms
                                         break;
 
                                     case ExportImportAction.ActionImport:
-                                        ImportInventory();
+                                        ImportGearInventory();
                                         break;
                                 }
                             }
@@ -1343,6 +1468,21 @@ namespace FAD3.Database.Forms
             writer.WriteAttributeString("ProjectName", _inventory.Inventories[_inventoryGuid].InventoryName);
             //writer.WriteEndElement();
 
+            //list inventory enumerators
+            {
+                writer.WriteStartElement("Enumerators");
+                foreach (var enumerator in _inventory.GetInventoryEnumerators(_inventoryGuid))
+                {
+                    writer.WriteStartElement("Enumerator");
+                    writer.WriteAttributeString("Name", enumerator.enumeratorName);
+                    writer.WriteAttributeString("EnumeratorGuid", enumerator.enumeratorGUID);
+                    writer.WriteAttributeString("DateHired", enumerator.hired.ToShortDateString());
+                    writer.WriteAttributeString("Active", enumerator.Active.ToString());
+                    writer.WriteEndElement();
+                }
+                writer.WriteEndElement();
+            }
+
             foreach (var item in _inventory.BarangayInventories)
             {
                 //barangay fisher-vessel inventory
@@ -1352,7 +1492,7 @@ namespace FAD3.Database.Forms
                 writer.WriteAttributeString("MunicipalityNumber", item.Value.MunicipalityNumber);
                 writer.WriteAttributeString("Barangay", item.Value.barangay);
                 writer.WriteAttributeString("Sitio", item.Value.sitio);
-                writer.WriteAttributeString("Enumerator", item.Value.Enumerator);
+                writer.WriteAttributeString("EnumeratorGUID", item.Value.EnumeratorGuid);
                 writer.WriteAttributeString("SurveyDate", string.Format("{0:MMM-dd-yyyy}", item.Value.dateSurvey.ToShortDateString()));
                 writer.WriteAttributeString("BarangayInventoryGuid", item.Key);
                 var numbers = _inventory.GetSitioNumbers(item.Key);
@@ -1361,6 +1501,16 @@ namespace FAD3.Database.Forms
                 writer.WriteAttributeString("CountMunicipalNonMotorized", numbers.nonMotorizedCount.ToString());
                 writer.WriteAttributeString("CountFishers", numbers.fisherCount.ToString());
 
+                //respondents
+                writer.WriteStartElement("Respondents");
+                foreach (string respondent in _inventory.GetSitioRespondents(item.Key))
+                {
+                    writer.WriteStartElement("Respondent");
+                    writer.WriteAttributeString("Name", respondent);
+                    writer.WriteEndElement();
+                }
+                writer.WriteEndElement();
+
                 //gear inventory in sitio
                 foreach (var sitioGear in _inventory.ReadSitioGearInventory(item.Key))
                 {
@@ -1368,6 +1518,7 @@ namespace FAD3.Database.Forms
                     writer.WriteStartElement("GearInventory");
                     writer.WriteAttributeString("GearClass", sitioGear.gearClass);
                     writer.WriteAttributeString("GearVariation", sitioGear.gearVariation);
+                    writer.WriteAttributeString("GearVariationGuid", sitioGear.gearVariationGuid);
                     writer.WriteAttributeString("GearInventoryGuid", sitioGear.variationInventoryGuid);
 
                     {
@@ -1378,7 +1529,7 @@ namespace FAD3.Database.Forms
                             writer.WriteStartElement("GearLocalNames");
                             foreach (var localName in gearDetail.gearLocalNames)
                             {
-                                writer.WriteStartElement("LocalName");
+                                writer.WriteStartElement("GearLocalName");
                                 writer.WriteAttributeString("Value", localName.Value);
                                 writer.WriteAttributeString("key", localName.Key);
                                 writer.WriteEndElement();
@@ -1389,7 +1540,7 @@ namespace FAD3.Database.Forms
                         //distribution of gear within vessel types
                         {
                             writer.WriteStartElement("UsageCount");
-                            writer.WriteAttributeString("CountCommercialUSe", gearDetail.commercialCount.ToString());
+                            writer.WriteAttributeString("CountCommercialUse", gearDetail.commercialCount.ToString());
                             writer.WriteAttributeString("CountMotorizedUse", gearDetail.motorizedCount.ToString());
                             writer.WriteAttributeString("CountNonCommercialUse", gearDetail.nonMotorizedCount.ToString());
                             writer.WriteAttributeString("CountNoBoatUse", gearDetail.noBoatCount.ToString());
@@ -1562,34 +1713,23 @@ namespace FAD3.Database.Forms
             }
         }
 
-        private async void ImportGearInventory(string fileName)
+        private async void ImportGearInventory()
         {
-            int result = await _inventory.ImportInventoryAsync(fileName);
-
-            //lblList.Text = "List of species names";
-            //MessageBox.Show($"{_rowsImported} local name - species name pairs were saved to the database", "Import successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
-
-        private void ImportInventory()
-        {
-            FileDialogHelper.Title = "Get filename for importing fisher, vessel and fishing gear inventory";
-            FileDialogHelper.DialogType = FileDialogType.FileOpen;
-            FileDialogHelper.DataFileType = DataFileType.Text | DataFileType.XML | DataFileType.CSV;
-            FileDialogHelper.ShowDialog();
-            var fileName = FileDialogHelper.FileName;
-            if (fileName.Length > 0)
+            ImportInventoryXMLForm iifx = new ImportInventoryXMLForm(_inventory);
+            iifx.ShowDialog(this);
+            if (iifx.DialogResult == DialogResult.OK)
             {
-                switch (Path.GetExtension(fileName))
+                int result = await _inventory.ImportInventoryAsync(iifx.ImportedInventoryFileName, iifx.ImportInventoryAction);
+                string msg = "";
+                if (result > 0)
                 {
-                    case ".txt":
-
-                        break;
-
-                    case ".XML":
-                    case ".xml":
-                        ImportGearInventory(fileName);
-                        break;
+                    msg = $"Finished importing {result} gear variation inventories into the database";
                 }
+                else
+                {
+                    msg = "Finished importing inventory to the database but zero gear variation inventories was imported";
+                }
+                MessageBox.Show(msg, "Import inventory", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 

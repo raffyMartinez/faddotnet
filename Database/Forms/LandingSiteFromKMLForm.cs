@@ -1,13 +1,7 @@
-﻿using System;
+﻿using ISO_Classes;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using System.IO;
-using ISO_Classes;
 
 namespace FAD3
 {

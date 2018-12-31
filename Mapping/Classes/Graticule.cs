@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using MapWinGIS;
-using AxMapWinGIS;
-using FAD3.Mapping.Classes;
+﻿using AxMapWinGIS;
 using FAD3.Database.Classes;
+using FAD3.Mapping.Classes;
+using MapWinGIS;
+using System;
 
 namespace FAD3
 {

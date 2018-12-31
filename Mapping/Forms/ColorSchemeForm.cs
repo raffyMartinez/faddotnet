@@ -16,11 +16,11 @@
 // Date            Changed By      Notes
 // ********************************************************************************************************
 
+using Owf.Controls;
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
-using Owf.Controls;
 
 namespace FAD3.Mapping.Forms
 {

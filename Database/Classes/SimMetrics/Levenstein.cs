@@ -56,9 +56,9 @@
 
 namespace SimMetricsMetricUtilities
 {
-    using System;
     using SimMetricsApi;
     using SimMetricsUtilities;
+    using System;
 
     /// <summary>
     /// levenstein implements the levenstein distance function.

@@ -41,13 +41,17 @@
             // 
             // listBoxFiles
             // 
+            this.listBoxFiles.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.listBoxFiles.ContextMenuStrip = this.dropDownMenu;
             this.listBoxFiles.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.listBoxFiles.FormattingEnabled = true;
+            this.listBoxFiles.IntegralHeight = false;
             this.listBoxFiles.ItemHeight = 15;
             this.listBoxFiles.Location = new System.Drawing.Point(1, 45);
             this.listBoxFiles.Name = "listBoxFiles";
-            this.listBoxFiles.Size = new System.Drawing.Size(392, 229);
+            this.listBoxFiles.Size = new System.Drawing.Size(479, 251);
             this.listBoxFiles.TabIndex = 0;
             this.listBoxFiles.MouseDown += new System.Windows.Forms.MouseEventHandler(this.listBoxFiles_MouseDown);
             // 
@@ -74,7 +78,8 @@
             // 
             // buttonOK
             // 
-            this.buttonOK.Location = new System.Drawing.Point(330, 296);
+            this.buttonOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonOK.Location = new System.Drawing.Point(421, 302);
             this.buttonOK.Name = "buttonOK";
             this.buttonOK.Size = new System.Drawing.Size(53, 26);
             this.buttonOK.TabIndex = 1;
@@ -84,7 +89,8 @@
             // 
             // buttonCancel
             // 
-            this.buttonCancel.Location = new System.Drawing.Point(271, 296);
+            this.buttonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonCancel.Location = new System.Drawing.Point(362, 302);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(53, 26);
             this.buttonCancel.TabIndex = 2;
@@ -105,17 +111,19 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(394, 334);
+            this.ClientSize = new System.Drawing.Size(481, 333);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.buttonOK);
             this.Controls.Add(this.listBoxFiles);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "ManageMRUForm";
             this.ShowInTaskbar = false;
             this.Text = "Manage recently opened files";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.OnFormClosing);
+            this.Load += new System.EventHandler(this.OnFormLoad);
             this.dropDownMenu.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();

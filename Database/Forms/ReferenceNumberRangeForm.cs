@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace FAD3
@@ -18,7 +13,6 @@ namespace FAD3
         {
             InitializeComponent();
         }
-
 
         private void ButtonClick(object sender, EventArgs e)
         {
@@ -46,7 +40,6 @@ namespace FAD3
                         MessageBox.Show("Maximum value must be greater than the minimum", "Validation error");
                     }
                 }
-
             }
         }
 
@@ -61,14 +54,12 @@ namespace FAD3
                     _MinVal = rv;
                 else
                     _MaxVal = rv;
-
             }
             else
             {
                 e.Cancel = val.Length > 0;
-                if(e.Cancel)
-                  MessageBox.Show("Only numbers greater than zero are accepted", "Validation error");
-                
+                if (e.Cancel)
+                    MessageBox.Show("Only numbers greater than zero are accepted", "Validation error");
             }
         }
 
@@ -77,7 +68,7 @@ namespace FAD3
             long min, max = 0;
             ReferenceNumberManager.ReadRefNoRange();
             ReferenceNumberManager.GetRefNoRange(out min, out max);
-            if (min>=0 && max>0)
+            if (min >= 0 && max > 0)
             {
                 _MinVal = min;
                 _MaxVal = max;

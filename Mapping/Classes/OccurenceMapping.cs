@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AxMapWinGIS;
-using MapWinGIS;
-using FAD3.Mapping.Classes;
+﻿using AxMapWinGIS;
 using FAD3.Database.Classes;
+using MapWinGIS;
+using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
 

@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using FAD3.Database.Classes;
-using FAD3.Database.Forms;
 
 namespace FAD3
 {
@@ -1105,17 +1100,17 @@ namespace FAD3
                 }
             }
 
-            //Step 4. There should be catch weight if datetime of gear set and haul is given
-            if (isValidated && !GearDateTimeIsEmpty)
-            {
-                isValidated = (panelUI.Controls["textWeightOfCatch"].Text.Length > 0);
-                if (!isValidated)
-                {
-                    msg = "Weight of catch could not be blank";
-                }
-            }
+            ////Step 4. There should be catch weight if datetime of gear set and haul is given
+            //if (isValidated && !GearDateTimeIsEmpty)
+            //{
+            //    isValidated = (panelUI.Controls["textWeightOfCatch"].Text.Length > 0);
+            //    if (!isValidated)
+            //    {
+            //        msg = "Weight of catch could not be blank";
+            //    }
+            //}
 
-            //Step 5. Weight of sample cannot be more than weight of catch
+            //Step 4. Weight of sample cannot be more than weight of catch
             if (isValidated && panelUI.Controls["textWeightOfCatch"].Text.Length > 0 &&
                 panelUI.Controls["textWeightOfSample"].Text.Length > 0)
             {
@@ -1131,16 +1126,16 @@ namespace FAD3
             TextBox catchWt = (TextBox)panelUI.Controls["textWeightOfCatch"];
             TextBox fishingGround = (TextBox)panelUI.Controls["textFishingGround"];
 
-            //Step 6. if catch weight is blank then confirm it
-            if (isValidated && GearDateTimeIsEmpty && catchWt.Text.Length == 0)
-            {
-                DialogResult dr = MessageBox.Show("Confirm that weight of catch is blank", "Please validate",
-                                                   MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
-                isValidated = (dr == DialogResult.Yes);
-                if (!isValidated) catchWt.Focus();
-            }
+            ////Step 6. if catch weight is blank then confirm it
+            //if (isValidated && GearDateTimeIsEmpty && catchWt.Text.Length == 0)
+            //{
+            //    DialogResult dr = MessageBox.Show("Confirm that weight of catch is blank", "Please validate",
+            //                                       MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
+            //    isValidated = (dr == DialogResult.Yes);
+            //    if (!isValidated) catchWt.Focus();
+            //}
 
-            //Step 7. If catch is not blank then confirm if fishing ground is blank
+            //Step 5. If catch is not blank then confirm if fishing ground is blank
             if (isValidated && catchWt.Text.Length > 0)
             {
                 isValidated = fishingGround.Text.Length > 0;

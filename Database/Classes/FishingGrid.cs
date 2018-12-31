@@ -1,10 +1,9 @@
-﻿using System;
+﻿using FAD3.Database.Classes;
+using Oware;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
-using System.Text;
-using Oware;
-using FAD3.Database.Classes;
 using System.Reflection;
 
 namespace FAD3
@@ -14,7 +13,7 @@ namespace FAD3
     /// </summary>
     public static class FishingGrid
     {
-        private static string _AOIGuid;
+        private static string _targetAreaGuid;
         public static Grid25Struct _grid25 = new Grid25Struct();
         private static fadUTMZone _utmZone = fadUTMZone.utmZone_Undefined;
         private static int ZoneNumber = 50;
@@ -333,20 +332,20 @@ namespace FAD3
         /// </summary>
         public static void Refresh()
         {
-            _gt = SetupFishingGrid(_AOIGuid);
+            _gt = SetupFishingGrid(_targetAreaGuid);
             GetSubgridType();
         }
 
         /// <summary>
         /// sets and gets the AOI guid of the fishing grid
         /// </summary>
-        public static string AOIGuid
+        public static string TargetAreaGuid
         {
-            get { return _AOIGuid; }
+            get { return _targetAreaGuid; }
             set
             {
-                _AOIGuid = value;
-                _gt = SetupFishingGrid(_AOIGuid);
+                _targetAreaGuid = value;
+                _gt = SetupFishingGrid(_targetAreaGuid);
                 GetSubgridType();
             }
         }
@@ -473,7 +472,7 @@ namespace FAD3
         {
             using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
             {
-                var sql = $"Update tblAOI set GridDescription = '{description}', UpperLeftGrid= '{upperCorner}', LowerRightGrid = '{lowerCorner}' where AOIGuid = {{{_AOIGuid}}}";
+                var sql = $"Update tblAOI set GridDescription = '{description}', UpperLeftGrid= '{upperCorner}', LowerRightGrid = '{lowerCorner}' where AOIGuid = {{{_targetAreaGuid}}}";
                 OleDbCommand update = new OleDbCommand(sql, conn);
                 conn.Open();
                 return update.ExecuteNonQuery() > 0;
@@ -840,7 +839,7 @@ namespace FAD3
             {
                 try
                 {
-                    var sql = $"Update tblAOI set SubgridStyle = {(int)_SubGridStyle} where AOIGuid ={{{AOIGuid}}}";
+                    var sql = $"Update tblAOI set SubgridStyle = {(int)_SubGridStyle} where AOIGuid ={{{TargetAreaGuid}}}";
                     OleDbCommand update = new OleDbCommand(sql, conn);
                     conn.Open();
                     Success = (update.ExecuteNonQuery() > 0);
@@ -863,7 +862,7 @@ namespace FAD3
                     try
                     {
                         conection.Open();
-                        string query = $"SELECT SubgridStyle FROM tblAOI WHERE AOIGuid= {{{_AOIGuid}}}";
+                        string query = $"SELECT SubgridStyle FROM tblAOI WHERE AOIGuid= {{{_targetAreaGuid}}}";
                         using (var adapter = new OleDbDataAdapter(query, conection))
                         {
                             adapter.Fill(dt);
