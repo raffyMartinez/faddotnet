@@ -81,10 +81,18 @@ namespace FAD3.Database.Forms
                                     e.ProjectName + "?", "Create new inventory project", MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
                                 e.Cancel = dr == DialogResult.Cancel;
                             }
+                            else if (e.ImportInventoryAction == ImportInventoryAction.ImportIntoExisting)
+                            {
+                                e.Cancel = false;
+                            }
                             else
                             {
                                 e.Cancel = true;
                             }
+                        }
+                        else
+                        {
+                            //project with similar name as imported project exists
                         }
                         break;
 
@@ -170,6 +178,7 @@ namespace FAD3.Database.Forms
                 OnNodeClicked(subNode, ee);
             }
             global.LoadFormSettings(this);
+            ConfigureContextMenu();
         }
 
         public void RefreshSitioLevelInventory(string province, string municipality, string barangay, string sitio)
@@ -1200,9 +1209,17 @@ namespace FAD3.Database.Forms
         /// <summary>
         /// called by context or toolbar to add an inventory project
         /// </summary>
-        private void AddInventory()
+        private void AddInventory(GearInventoryEditForm gearInventoryEditForm = null)
         {
-            var inventoryEditForm = new GearInventoryEditForm(_treeLevel, _targetArea, _inventory, this);
+            GearInventoryEditForm inventoryEditForm;
+            if (gearInventoryEditForm == null)
+            {
+                inventoryEditForm = new GearInventoryEditForm(_treeLevel, _targetArea, _inventory, this);
+            }
+            else
+            {
+                inventoryEditForm = gearInventoryEditForm;
+            }
             inventoryEditForm.AddNewInventory();
             inventoryEditForm.ShowDialog(this);
         }
@@ -1215,12 +1232,13 @@ namespace FAD3.Database.Forms
         private void OnContextMenu_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
             e.ClickedItem.Owner.Visible = false;
+
             var inventoryEditForm = new GearInventoryEditForm(_treeLevel, _targetArea, _inventory, this);
             switch (e.ClickedItem.Name)
             {
                 case "itemAddInventory":
-                    AddInventory();
-                    break;
+                    AddInventory(inventoryEditForm);
+                    return;
 
                 case "itemDeleteInventory":
                     TreeNode parent = treeInventory.SelectedNode.Parent;
@@ -1715,21 +1733,27 @@ namespace FAD3.Database.Forms
 
         private async void ImportGearInventory()
         {
-            ImportInventoryXMLForm iifx = new ImportInventoryXMLForm(_inventory);
-            iifx.ShowDialog(this);
-            if (iifx.DialogResult == DialogResult.OK)
+            using (ImportInventoryXMLForm iifx = new ImportInventoryXMLForm(_inventory))
             {
-                int result = await _inventory.ImportInventoryAsync(iifx.ImportedInventoryFileName, iifx.ImportInventoryAction);
-                string msg = "";
-                if (result > 0)
+                iifx.ShowDialog(this);
+                if (iifx.DialogResult == DialogResult.OK)
                 {
-                    msg = $"Finished importing {result} gear variation inventories into the database";
+                    int result = await _inventory.ImportInventoryAsync(iifx.ImportedInventoryFileName, iifx.ImportInventoryAction, iifx.ImportIntoExistingProjectGuid);
+                    string msg = "";
+                    if (result > 0)
+                    {
+                        msg = $"Finished importing {result} gear variation inventories into the database";
+                    }
+                    else if (result == -1)
+                    {
+                        msg = "Import was cancelled";
+                    }
+                    else
+                    {
+                        msg = "Finished importing inventory to the database but zero gear variation inventories was imported";
+                    }
+                    MessageBox.Show(msg, "Import inventory", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
-                else
-                {
-                    msg = "Finished importing inventory to the database but zero gear variation inventories was imported";
-                }
-                MessageBox.Show(msg, "Import inventory", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 

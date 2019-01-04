@@ -641,7 +641,11 @@ namespace FAD3.Database.Classes
                                         Municipalities.MunNo = tblGearInventoryBarangay.Municipality) ON
                                         tblGearInventories.InventoryGuid = tblGearInventoryBarangay.InventoryGuid) ON
                                         tblEnumerators.EnumeratorID = tblGearInventoryBarangay.Enumerator
-                                       WHERE tblGearInventories.InventoryGuid={{{inventoryGuid}}}";
+                                       WHERE tblGearInventories.InventoryGuid={{{inventoryGuid}}}
+                                       ORDER BY Provinces.ProvinceName, 
+                                        Municipalities.Municipality,
+                                        tblGearInventoryBarangay.Barangay,
+                                        tblGearInventoryBarangay.Sitio";
 
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
@@ -1100,313 +1104,355 @@ namespace FAD3.Database.Classes
             return ("", "", "", "", "");
         }
 
-        public Task<int> ImportInventoryAsync(string fileName, ImportInventoryAction importAction)
+        public Task<int> ImportInventoryAsync(string fileName, ImportInventoryAction importAction, string existingInventoryGuid = "")
         {
-            return Task.Run(() => ImportInventory(fileName, importAction));
+            return Task.Run(() => ImportInventory(fileName, importAction, existingInventoryGuid));
         }
 
-        private int ImportInventory(string fileName, ImportInventoryAction importAction)
+        private int ImportInventory(string fileName, ImportInventoryAction importAction, string existingInventoryGuid = "")
         {
-            var elementCounter = 0;
             bool proceed = false;
-            bool cancel = false;
-            int importedGearInventoryCount = 0;
-            switch (Path.GetExtension(fileName))
+            int elementCounter = 0;
+            XmlTextReader xmlReader = new XmlTextReader(fileName);
+            string projectGuid = "";
+            string projectName = "";
+            DateTime projectDate = DateTime.Now;
+            string projectTargetArea = "";
+            string projectTargetAreaGuid = "";
+            int municipalityNumber = -1;
+            string barangay = "";
+            string sitio = "";
+            string enumeratorGuid = "";
+            string enumeratorName = "";
+            string barangaySurveyGuid = "";
+            string gearInventoryGuid = "";
+            string gearVariationGuid = "";
+            List<string> respondents = new List<string>();
+            Dictionary<string, string> localNames = new Dictionary<string, string>();
+            int usageCommercial = 0;
+            int usageMunicipalMotorized = 0;
+            int usageMunicipalNonMotorized = 0;
+            int usageNoBoat = 0;
+            int numberDaysFishingPerMonth = 0;
+            bool inMonthFishing = true;
+            List<int> fishingMonths = new List<int>();
+            List<int> peakMonths = new List<int>();
+            bool validGearVariation = false;
+            int? cpueMax = null;
+            int? cpueMin = null;
+            int? cpueAvg = null;
+            int? cpueModalUpper = null;
+            int? cpueModalLower = null;
+            double? kiloPerUnit = null;
+            int? cpueMode = null;
+            int? percentDominance = null;
+            bool inDominantCatch = false;
+            string notes = "";
+            string unit = "";
+            int importedGearCount = 0;
+            List<string> accessories = new List<string>();
+            Dictionary<string, string> dominantCatchDict = new Dictionary<string, string>();
+            Dictionary<string, string> nonDominantCatchDict = new Dictionary<string, string>();
+            List<(int? decade, int? specificYear, int cpue, string unit, string notes)> cpueHistories = new List<(int? decade, int? specificYear, int cpue, string unit, string notes)>();
+            List<(string expenseItem, double cost, string source, string notes)> expenseItems = new List<(string expenseItem, double cost, string source, string notes)>();
+            while ((elementCounter == 0 || (elementCounter > 0 && proceed)) && xmlReader.Read())
             {
-                case ".xml":
-                case ".XML":
-
-                    bool inGearInventoryData = false;
-                    var projectName = "";
-                    DateTime projectDate = DateTime.Now;
-                    var projectTargetArea = "";
-                    var projectTargetAreaGuid = "";
-                    var projectGuid = "";
-                    int municipalityNumber = 0;
-                    string barangaySurveyGuid = "";
-                    string gearInventoryGuid = "";
-                    string gearVariationGuid = "";
-                    string barangay = "";
-                    string sitio = "";
-                    bool subVariationExists = false;
-                    List<string> respondents = new List<string>();
-                    Dictionary<string, string> localNames = new Dictionary<string, string>();
-                    int usageCommercial = 0;
-                    int usageMunicipalMotorized = 0;
-                    int usageMunicipalNonMotorized = 0;
-                    int usageNoBoat = 0;
-                    int? cpueMax = null;
-                    int? cpueMin = null;
-                    int? cpueAvg = null;
-                    int? cpueModalUpper = null;
-                    int? cpueModalLower = null;
-                    double? kiloPerUnit = null;
-                    int numberDaysFishingPerMonth = 0;
-                    int? cpueMode = null;
-                    int? percentDominance = null;
-                    string notes = "";
-                    string unit = "";
-                    bool inMonthFishing = false;
-                    bool inDominantCatch = false;
-                    XmlTextReader xmlReader = new XmlTextReader(fileName);
-                    List<int> fishingMonths = new List<int>();
-                    List<int> peakMonths = new List<int>();
-                    List<string> accessories = new List<string>();
-                    Dictionary<string, string> dominantCatchDict = new Dictionary<string, string>();
-                    Dictionary<string, string> nonDominantCatchDict = new Dictionary<string, string>();
-                    Dictionary<int, (bool isDecadal, int cpue, string unit)> cpueHistory = new Dictionary<int, (bool isDecadal, int cpue, string unit)>();
-                    while ((elementCounter == 0 || (elementCounter > 0 && proceed)) && xmlReader.Read())
+                if (xmlReader.NodeType == XmlNodeType.Element)
+                {
+                    switch (xmlReader.Name)
                     {
-                        switch (xmlReader.NodeType)
-                        {
-                            case XmlNodeType.Element:
-                                if (elementCounter == 0 && xmlReader.Name == "FisherVesselGearInventoryProject")
-                                {
-                                    projectGuid = xmlReader.GetAttribute("ProjectGuid");
-                                    projectName = xmlReader.GetAttribute("ProjectName");
-                                    FisheriesInventoryImportEventArg e = new FisheriesInventoryImportEventArg(projectName, projectGuid, FisheriesInventoryLevel.Project);
-                                    e.ImportInventoryAction = importAction;
-                                    InventoryLevel?.Invoke(this, e);
-                                    cancel = e.Cancel;
-                                    if (!cancel)
-                                    {
-                                        projectDate = DateTime.Parse(xmlReader.GetAttribute("DateStart"));
-                                        projectTargetArea = xmlReader.GetAttribute("TargetArea");
-                                        projectTargetAreaGuid = xmlReader.GetAttribute("TargetAreaGuid");
-                                        e = new FisheriesInventoryImportEventArg(projectTargetArea, projectTargetAreaGuid, FisheriesInventoryLevel.TargetArea);
-                                        e.ImportInventoryAction = importAction;
-                                        InventoryLevel?.Invoke(this, e);
+                        case "FisherVesselGearInventoryProject":
+                            projectGuid = xmlReader.GetAttribute("ProjectGuid");
+                            projectName = xmlReader.GetAttribute("ProjectName");
+                            FisheriesInventoryImportEventArg e = new FisheriesInventoryImportEventArg(projectName, projectGuid, FisheriesInventoryLevel.Project);
+                            e.ImportInventoryAction = importAction;
+                            InventoryLevel?.Invoke(this, e);
+                            if (e.Cancel)
+                            {
+                                return -1;
+                            }
+                            else
+                            {
+                                projectDate = DateTime.Parse(xmlReader.GetAttribute("DateStart"));
+                                projectTargetArea = xmlReader.GetAttribute("TargetArea");
+                                projectTargetAreaGuid = xmlReader.GetAttribute("TargetAreaGuid");
 
-                                        if (!e.Cancel)
-                                        {
-                                            switch (importAction)
+                                e = new FisheriesInventoryImportEventArg(projectTargetArea, projectTargetAreaGuid, FisheriesInventoryLevel.TargetArea);
+                                e.ImportInventoryAction = importAction;
+                                InventoryLevel?.Invoke(this, e);
+
+                                if (e.Cancel)
+                                {
+                                    return -1;
+                                }
+                                else
+                                {
+                                    switch (importAction)
+                                    {
+                                        case ImportInventoryAction.ImportDoNothing:
+                                            break;
+
+                                        case ImportInventoryAction.ImportIntoExisting:
+                                            projectGuid = existingInventoryGuid;
+                                            break;
+
+                                        case ImportInventoryAction.ImportIntoNew:
+                                            if (!SaveFisheryInventoryProject(fad3DataStatus.statusNew, projectName, projectDate, projectGuid))
                                             {
-                                                case ImportInventoryAction.ImportDoNothing:
-                                                    break;
-
-                                                case ImportInventoryAction.ImportIntoExisting:
-                                                    break;
-
-                                                case ImportInventoryAction.ImportIntoNew:
-                                                    SaveFisheryInventoryProject(fad3DataStatus.statusNew, projectName, projectDate, projectGuid);
-                                                    break;
+                                                return -1;
                                             }
-                                        }
-                                        proceed = true;
-                                        elementCounter++;
-                                    }
-                                    else
-                                    {
-                                        e.CancelReason = $@"Target area does not have inventory project with a name of ""{projectName}"" ";
-                                        InventoryLevel?.Invoke(this, e);
+                                            break;
                                     }
                                 }
-                                if (!cancel && xmlReader.Name == "Enumerator")
+                            }
+                            break;
+
+                        case "Enumerators":
+
+                            break;
+
+                        case "Enumerator":
+                            enumeratorName = xmlReader.GetAttribute("Name");
+                            enumeratorGuid = xmlReader.GetAttribute("EnumeratorGuid");
+                            DateTime dateHired = DateTime.Parse(xmlReader.GetAttribute("DateHired"));
+                            bool isActive = bool.Parse(xmlReader.GetAttribute("Active"));
+                            Enumerators.SaveNewTargetAreaEnumerator(FishingGrid.TargetAreaGuid, enumeratorName, dateHired, isActive, enumeratorGuid);
+                            break;
+
+                        case "FisherVesselInventory":
+                            municipalityNumber = int.Parse(xmlReader.GetAttribute("MunicipalityNumber"));
+                            barangay = xmlReader.GetAttribute("Barangay");
+                            sitio = xmlReader.GetAttribute("Sitio");
+                            enumeratorGuid = xmlReader.GetAttribute("EnumeratorGUID");
+                            int countFishers = int.Parse(xmlReader.GetAttribute("CountFishers"));
+                            int countMunicipalMotorized = int.Parse(xmlReader.GetAttribute("CountMunicipalMotorized"));
+                            int countMunicipalNonMotorized = int.Parse(xmlReader.GetAttribute("CountMunicipalNonMotorized"));
+                            int countCommercial = int.Parse(xmlReader.GetAttribute("CountCommercial"));
+                            DateTime surveyDate = DateTime.Parse(xmlReader.GetAttribute("SurveyDate"));
+                            barangaySurveyGuid = xmlReader.GetAttribute("BarangayInventoryGuid");
+
+                            SaveBarangayInventory(fad3DataStatus.statusNew, projectGuid, municipalityNumber,
+                                barangay, countFishers, countCommercial, countMunicipalMotorized, countMunicipalNonMotorized,
+                                barangaySurveyGuid, surveyDate, enumeratorGuid, sitio);
+
+                            break;
+
+                        case "Respondents":
+                            respondents.Clear();
+                            break;
+
+                        case "Respondent":
+                            respondents.Add(xmlReader.GetAttribute("Name"));
+                            break;
+
+                        case "GearInventory":
+                            if (respondents.Count > 0)
+                            {
+                                SaveSitioRespondents(respondents, barangaySurveyGuid);
+                                respondents.Clear();
+                            }
+                            gearInventoryGuid = xmlReader.GetAttribute("GearInventoryGuid");
+                            gearVariationGuid = xmlReader.GetAttribute("GearVariationGuid");
+                            break;
+
+                        case "GearLocalNames":
+                            localNames.Clear();
+                            break;
+
+                        case "GearLocalName":
+                            localNames.Add(xmlReader.GetAttribute("key"), xmlReader.GetAttribute("Value"));
+                            break;
+                    }
+                    if (validGearVariation || (gearVariationGuid.Length > 0
+                        && localNames.Count > 0
+                        && !GearInventoryExists(gearVariationGuid, municipalityNumber, barangay, sitio, localNames)))
+                    {
+                        validGearVariation = true;
+
+                        switch (xmlReader.Name)
+                        {
+                            case "UsageCount":
+                                usageCommercial = int.Parse(xmlReader.GetAttribute("CountCommercialUse"));
+                                usageMunicipalMotorized = int.Parse(xmlReader.GetAttribute("CountMotorizedUse"));
+                                usageMunicipalNonMotorized = int.Parse(xmlReader.GetAttribute("CountNonCommercialUse"));
+                                usageNoBoat = int.Parse(xmlReader.GetAttribute("CountNoBoatUse"));
+                                break;
+
+                            case "Seaonality":
+                                numberDaysFishingPerMonth = int.Parse(xmlReader.GetAttribute("NumberDaysPerMonth"));
+                                fishingMonths.Clear();
+                                peakMonths.Clear();
+                                break;
+
+                            case "MonthsInUse":
+                                inMonthFishing = true;
+                                break;
+
+                            case "MonthsPeak":
+
+                                inMonthFishing = false;
+                                break;
+
+                            case "Month":
+                                if (inMonthFishing)
                                 {
-                                    string enumeratorName = xmlReader.GetAttribute("Name");
-                                    string enumeratorGuid = xmlReader.GetAttribute("EnumeratorGuid");
-                                    DateTime dateHired = DateTime.Parse(xmlReader.GetAttribute("DateHired"));
-                                    bool isActive = bool.Parse(xmlReader.GetAttribute("Active"));
-                                    Enumerators.SaveNewTargetAreaEnumerator(FishingGrid.TargetAreaGuid, enumeratorName, dateHired, isActive, enumeratorGuid);
+                                    fishingMonths.Add(_monthToInt[xmlReader.ReadString()]);
                                 }
-                                if (!cancel && xmlReader.Name == "FisherVesselInventory")
+                                else
                                 {
-                                    municipalityNumber = int.Parse(xmlReader.GetAttribute("MunicipalityNumber"));
-                                    barangay = xmlReader.GetAttribute("Barangay");
-                                    sitio = xmlReader.GetAttribute("Sitio");
-                                    var enumeratorGuid = xmlReader.GetAttribute("EnumeratorGUID");
-                                    int countFishers = int.Parse(xmlReader.GetAttribute("CountFishers"));
-                                    int countMunicipalMotorized = int.Parse(xmlReader.GetAttribute("CountMunicipalMotorized"));
-                                    int countMunicipalNonMotorized = int.Parse(xmlReader.GetAttribute("CountMunicipalNonMotorized"));
-                                    int countCommercial = int.Parse(xmlReader.GetAttribute("CountCommercial"));
-                                    DateTime surveyDate = DateTime.Parse(xmlReader.GetAttribute("SurveyDate"));
-                                    barangaySurveyGuid = xmlReader.GetAttribute("BarangayInventoryGuid");
-                                    SaveBarangayInventory(fad3DataStatus.statusNew, projectGuid, municipalityNumber, barangay, countFishers, countCommercial, countMunicipalMotorized, countMunicipalNonMotorized, barangaySurveyGuid, surveyDate, enumeratorGuid, sitio);
-                                    elementCounter++;
+                                    peakMonths.Add(_monthToInt[xmlReader.ReadString()]);
+                                }
+                                break;
+
+                            case "CPUE":
+                                cpueMax = null;
+                                cpueMin = null;
+                                cpueAvg = null;
+                                cpueModalLower = null;
+                                cpueModalUpper = null;
+                                cpueMode = null;
+                                kiloPerUnit = null;
+                                unit = "";
+                                if (int.TryParse(xmlReader.GetAttribute("CatchRangeMaximum"), out int v))
+                                {
+                                    cpueMax = v;
+                                }
+                                if (int.TryParse(xmlReader.GetAttribute("CatchRangeMinimum"), out v))
+                                {
+                                    cpueMin = v;
+                                }
+                                if (int.TryParse(xmlReader.GetAttribute("CatchAverageCPUE"), out v))
+                                {
+                                    cpueAvg = v;
+                                }
+                                if (int.TryParse(xmlReader.GetAttribute("CatchModeUpper"), out v))
+                                {
+                                    cpueModalUpper = v;
+                                }
+                                if (int.TryParse(xmlReader.GetAttribute("CatchModeLower"), out v))
+                                {
+                                    cpueModalLower = v;
+                                }
+                                if (int.TryParse(xmlReader.GetAttribute("CatchMode"), out v))
+                                {
+                                    cpueMode = v;
                                 }
 
-                                if (!cancel && xmlReader.Name == "Respondent")
+                                if (double.TryParse(xmlReader.GetAttribute("KiloEquivalent"), out double d))
                                 {
-                                    respondents.Add(xmlReader.GetAttribute("Name"));
+                                    kiloPerUnit = d;
                                 }
+                                unit = xmlReader.GetAttribute("Unit");
+                                break;
 
-                                if (!cancel && xmlReader.Name == "GearInventory")
+                            case "CPUEHistoricalTrend":
+                                cpueHistories.Clear();
+                                break;
+
+                            case "CPUEHistory":
+                                string decade = "";
+                                int? decadeStart = null;
+                                int? specificYear = null;
+                                try
                                 {
-                                    if (respondents.Count > 0)
-                                    {
-                                        SaveSitioRespondents(respondents, barangaySurveyGuid);
-                                        respondents.Clear();
-                                    }
-
-                                    string gearVariation = xmlReader.GetAttribute("GearVariation");
-                                    string gearClass = xmlReader.GetAttribute("GearClass");
-                                    gearInventoryGuid = xmlReader.GetAttribute("GearInventoryGuid");
-                                    gearVariationGuid = xmlReader.GetAttribute("GearVariationGuid");
+                                    decade = xmlReader.GetAttribute("DecadeStart");
+                                    specificYear = int.Parse(xmlReader.GetAttribute("SpecificYear"));
                                 }
-
-                                if (!cancel && xmlReader.Name == "GearLocalNames")
+                                catch (ArgumentNullException nullEx)
                                 {
-                                    localNames.Clear();
+                                    //ignore
                                 }
-                                if (!cancel && xmlReader.Name == "GearLocalName")
+                                finally
                                 {
-                                    localNames.Add(xmlReader.GetAttribute("key"), xmlReader.GetAttribute("Value"));
+                                    if (decade != null)
+                                    {
+                                        decadeStart = int.Parse(decade.Trim('s'));
+                                    }
                                 }
+                                cpueHistories.Add((decadeStart, specificYear,
+                                    int.Parse(xmlReader.GetAttribute("AverageCPUE")),
+                                    xmlReader.GetAttribute("Unit"),
+                                    xmlReader.GetAttribute("Notes")));
+                                break;
 
-                                if (!cancel && xmlReader.Name == "UsageCount")
+                            case "CatchComposition":
+                                dominantCatchDict.Clear();
+                                nonDominantCatchDict.Clear();
+                                if (int.TryParse(xmlReader.GetAttribute("PercentageOfDominance"), out v))
                                 {
-                                    subVariationExists = GearInventoryExists(gearVariationGuid, municipalityNumber, barangay, sitio, localNames);
+                                    percentDominance = v;
                                 }
-                                if (!cancel && !subVariationExists)
+                                break;
+
+                            case "DominantCatch":
+                                inDominantCatch = true;
+                                break;
+
+                            case "NonDominantCatch":
+                                inDominantCatch = false;
+                                break;
+
+                            case "Name":
+                                if (inDominantCatch)
                                 {
-                                    //proceed with rest of gear inventory
-                                    if (xmlReader.Name == "UsageCount")
-                                    {
-                                        inGearInventoryData = true;
-                                        usageCommercial = int.Parse(xmlReader.GetAttribute("CountCommercialUse"));
-                                        usageMunicipalMotorized = int.Parse(xmlReader.GetAttribute("CountMotorizedUse"));
-                                        usageMunicipalNonMotorized = int.Parse(xmlReader.GetAttribute("CountNonCommercialUse"));
-                                        usageNoBoat = int.Parse(xmlReader.GetAttribute("CountNoBoatUse"));
-                                    }
-                                    else if (xmlReader.Name == "Seaonality")
-                                    {
-                                        numberDaysFishingPerMonth = int.Parse(xmlReader.GetAttribute("NumberDaysPerMonth"));
-                                        inMonthFishing = false;
-                                        fishingMonths.Clear();
-                                        peakMonths.Clear();
-                                    }
-                                    else if (xmlReader.Name == "MonthsInUse")
-                                    {
-                                        inMonthFishing = true;
-                                    }
-                                    else if (xmlReader.Name == "MonthsPeak")
-                                    {
-                                        inMonthFishing = false;
-                                    }
-                                    else if (xmlReader.Name == "Month")
-                                    {
-                                        if (inMonthFishing)
-                                        {
-                                            fishingMonths.Add(_monthToInt[xmlReader.ReadString()]);
-                                        }
-                                        else
-                                        {
-                                            peakMonths.Add(_monthToInt[xmlReader.ReadString()]);
-                                        }
-                                    }
-                                    else if (xmlReader.Name == "CPUE")
-                                    {
-                                        cpueMax = null;
-                                        cpueMin = null;
-                                        cpueAvg = null;
-                                        cpueModalLower = null;
-                                        cpueModalUpper = null;
-                                        cpueMode = null;
-                                        kiloPerUnit = null;
-                                        unit = "";
-                                        if (int.TryParse(xmlReader.GetAttribute("CatchRangeMaximum"), out int v))
-                                        {
-                                            cpueMax = v;
-                                        }
-                                        if (int.TryParse(xmlReader.GetAttribute("CatchRangeMinimum"), out v))
-                                        {
-                                            cpueMin = v;
-                                        }
-                                        if (int.TryParse(xmlReader.GetAttribute("CatchAverageCPUE"), out v))
-                                        {
-                                            cpueAvg = v;
-                                        }
-                                        if (int.TryParse(xmlReader.GetAttribute("CatchModeUpper"), out v))
-                                        {
-                                            cpueModalUpper = v;
-                                        }
-                                        if (int.TryParse(xmlReader.GetAttribute("CatchModeLower"), out v))
-                                        {
-                                            cpueModalLower = v;
-                                        }
-                                        if (int.TryParse(xmlReader.GetAttribute("CatchMode"), out v))
-                                        {
-                                            cpueMode = v;
-                                        }
-
-                                        if (double.TryParse(xmlReader.GetAttribute("KiloEquivalent"), out double d))
-                                        {
-                                            kiloPerUnit = d;
-                                        }
-                                        unit = xmlReader.GetAttribute("Unit");
-                                    }
-                                    else if (xmlReader.Name == "CPUEHistoricalTrend")
-                                    {
-                                        if (xmlReader.GetAttribute("DecadeStart") != null)
-                                        {
-                                        }
-                                        else
-                                        {
-                                        }
-                                    }
-                                    else if (xmlReader.Name == "CatchComposition")
-                                    {
-                                        dominantCatchDict.Clear();
-                                        nonDominantCatchDict.Clear();
-                                        if (int.TryParse(xmlReader.GetAttribute("PercentageOfDominance"), out int v))
-                                        {
-                                            percentDominance = v;
-                                        }
-                                    }
-                                    else if (xmlReader.Name == "DominantCatch")
-                                    {
-                                        inDominantCatch = true;
-                                    }
-                                    else if (xmlReader.Name == "NonDominantCatch")
-                                    {
-                                        inDominantCatch = false;
-                                    }
-                                    else if (xmlReader.Name == "Name")
-                                    {
-                                        if (inDominantCatch)
-                                        {
-                                            dominantCatchDict.Add(xmlReader.GetAttribute("guid"), xmlReader.GetAttribute("Value"));
-                                        }
-                                        else
-                                        {
-                                            nonDominantCatchDict.Add(xmlReader.GetAttribute("guid"), xmlReader.GetAttribute("Value"));
-                                        }
-                                    }
-                                    else if (xmlReader.Name == "Accessories")
-                                    {
-                                        accessories.Clear();
-                                    }
-                                    else if (xmlReader.Name == "Accessory")
-                                    {
-                                        accessories.Add(xmlReader.GetAttribute("Name"));
-                                    }
-                                    else if (xmlReader.Name == "Expenses")
-                                    {
-                                    }
-                                    else if (xmlReader.Name == "Notes")
-                                    {
-                                        notes = xmlReader.GetAttribute("Notes");
-                                        if (SaveSitioGearInventoryMain(barangaySurveyGuid, gearVariationGuid, usageCommercial, usageMunicipalMotorized, usageMunicipalNonMotorized, usageNoBoat,
-                                                numberDaysFishingPerMonth, unit, percentDominance, gearInventoryGuid, fad3DataStatus.statusNew, cpueMax, cpueMin, cpueModalUpper, cpueModalLower,
-                                                notes, cpueAvg, cpueMode, kiloPerUnit))
-                                        {
-                                            SaveSitioGearInventoryFishingMonths(gearInventoryGuid, fishingMonths, peakMonths);
-                                            SaveSitioGearInventoryCatchComposition(gearInventoryGuid, dominantCatchDict, nonDominantCatchDict);
-                                            SaveSitioGearInventoryGearLocalNames(gearInventoryGuid, localNames);
-                                            SaveSitioGearInventoryAccessories(gearInventoryGuid, accessories);
-                                            importedGearInventoryCount++;
-                                        }
-                                    }
-
-                                    //localNames.Clear();
+                                    dominantCatchDict.Add(xmlReader.GetAttribute("guid"), xmlReader.GetAttribute("Value"));
                                 }
+                                else
+                                {
+                                    nonDominantCatchDict.Add(xmlReader.GetAttribute("guid"), xmlReader.GetAttribute("Value"));
+                                }
+                                break;
 
+                            case "Accessories":
+                                accessories.Clear();
+                                break;
+
+                            case "Accessory":
+                                accessories.Add(xmlReader.GetAttribute("Name"));
+                                break;
+
+                            case "Expenses":
+                                expenseItems.Clear();
+                                break;
+
+                            case "Expense":
+                                expenseItems.Add((xmlReader.GetAttribute("Name"),
+                                    double.Parse(xmlReader.GetAttribute("Cost")),
+                                    xmlReader.GetAttribute("SourceOfFunds"),
+                                    xmlReader.GetAttribute("NOtes")));
+                                break;
+
+                            case "Notes":
+                                notes = xmlReader.GetAttribute("Notes");
+                                if (SaveSitioGearInventoryMain(barangaySurveyGuid, gearVariationGuid, usageCommercial, usageMunicipalMotorized, usageMunicipalNonMotorized, usageNoBoat,
+                                      numberDaysFishingPerMonth, unit, percentDominance, gearInventoryGuid, fad3DataStatus.statusNew, cpueMax, cpueMin, cpueModalUpper, cpueModalLower,
+                                      notes, cpueAvg, cpueMode, kiloPerUnit))
+                                {
+                                    SaveSitioGearInventoryFishingMonths(gearInventoryGuid, fishingMonths, peakMonths);
+                                    SaveSitioGearInventoryCatchComposition(gearInventoryGuid, dominantCatchDict, nonDominantCatchDict);
+                                    SaveSitioGearInventoryGearLocalNames(gearInventoryGuid, localNames);
+                                    SaveSitioGearInventoryAccessories(gearInventoryGuid, accessories);
+                                    SaveSitioGearInventoryHistoricalCPUE(gearInventoryGuid, cpueHistories);
+                                    SaveSitioGearInventoryExpenses(gearInventoryGuid, expenseItems);
+                                    importedGearCount++;
+                                }
+                                notes = "";
+                                validGearVariation = false;
+                                gearVariationGuid = "";
+                                localNames.Clear();
                                 break;
                         }
                     }
-                    break;
+                    else if (localNames.Count > 0 && xmlReader.Name == "UsageCount")
+                    {
+                        gearVariationGuid = "";
+                        localNames.Clear();
+                        xmlReader.ReadToFollowing("Notes");
+                    }
+                }
             }
-            return importedGearInventoryCount;
+
+            return importedGearCount;
         }
 
         public bool DeleteInventory(Dictionary<string, string> deleteInventoryArgs)
@@ -1653,7 +1699,7 @@ namespace FAD3.Database.Classes
             string gearLocalNames = "";
             foreach (var item in localNames)
             {
-                gearLocalNames = $@"""{item.Value}"",";
+                gearLocalNames += $@"""{item.Value}"",";
             }
             //string gearLocalNames = $@"""{localNames.Values[0]}"",";
             //for (int n = 1; n < localNames.Count; n++)
@@ -2610,7 +2656,7 @@ namespace FAD3.Database.Classes
                     }
                     else if (municipalityName.Length > 0)
                     {
-                        query = $@" tblGearClass.GearClassName, tblGearVariations.Variation,
+                        query = $@"SELECT tblGearClass.GearClassName, tblGearVariations.Variation,
                                 Sum([t2].[CountCommercial]+[t2].[CountMunicipalMotorized]+[t2].[CountMunicipalNonMotorized]+[t2].[CountNoBoat]) AS Total,
                                 Sum(t2.CountCommercial) AS TotalCommercial,
                                 Sum(t2.CountMunicipalMotorized) AS TotalMotorized,
@@ -3235,6 +3281,10 @@ namespace FAD3.Database.Classes
                         Success = (update.ExecuteNonQuery() > 0);
                     }
                     conn.Close();
+                }
+                catch (OleDbException exOleDb)
+                {
+                    //ignore duplicate unique index error
                 }
                 catch (Exception ex)
                 {

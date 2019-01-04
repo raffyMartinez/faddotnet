@@ -25,6 +25,7 @@ namespace FAD3.Database.Forms
         public string ImportedInventoryProjectGuid { get; internal set; }
         public DateTime ImportedInventoryProjectDate { get; internal set; }
         public string ImportedInventoryFileName { get; internal set; }
+        public string ImportIntoExistingProjectGuid { get; internal set; }
         private string _fileName;
         private bool _isInventoryXML;
 
@@ -83,8 +84,13 @@ namespace FAD3.Database.Forms
                     if (!_importedProjectFound)
                     {
                         txtImportedProject.Text = _importedProjectName;
-                        rdbImportExisting.Enabled = false;
-                        cboInventories.Enabled = false;
+                        rdbImportExisting.Enabled = cboInventories.Items.Count > 0;
+                        cboInventories.Enabled = cboInventories.Items.Count > 0;
+                        if (cboInventories.Items.Count > 0)
+                        {
+                            cboInventories.SelectedIndex = 0;
+                            //ImportIntoExistingProjectGuid = ((KeyValuePair<string, string>)cboInventories.SelectedItem).Key;
+                        }
                     }
                     else
                     {
@@ -112,11 +118,13 @@ namespace FAD3.Database.Forms
                         {
                             ImportInventoryAction = ImportInventoryAction.ImportIntoExisting;
                             ImportedInventoryProjectName = cboInventories.Text;
+                            ImportIntoExistingProjectGuid = ((KeyValuePair<string, string>)cboInventories.SelectedItem).Key;
                         }
                         else if (rdbImportNew.Checked)
                         {
                             ImportInventoryAction = ImportInventoryAction.ImportIntoNew;
                             ImportedInventoryProjectName = txtImportedProject.Text;
+                            ImportIntoExistingProjectGuid = "";
                         }
                         ImportedInventoryProjectGuid = _importedProjectGUID;
                         ImportedInventoryProjectDate = _importedProjectDateImplemented;
