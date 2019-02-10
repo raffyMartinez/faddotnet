@@ -22,7 +22,7 @@ namespace FAD3.Mapping.Classes
             {
                 for (int n = 0; n < MapControl.NumLayers; n++)
                 {
-                    if (MapControl.get_LayerFilename(n) == shapefileFileName)
+                    if (MapControl.get_LayerFilename(n) == $"{shapefileFileName}.shp")
                     {
                         MapControl.RemoveLayer(n);
                     }

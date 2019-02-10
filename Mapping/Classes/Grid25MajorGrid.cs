@@ -209,8 +209,12 @@ namespace FAD3
                         _listSelectedShapeGridNumbers.Clear();
                         for (int n = 0; n < _shapefileMajorGridIntersect.NumShapes; n++)
                         {
-                            var shpIndex = (string)_shapefileMajorGridIntersect.CellValue[_shapefileMajorGridIntersect.FieldIndexByName["hGrid"], n];
+                            string shpIndex = (string)_shapefileMajorGridIntersect.CellValue[_shapefileMajorGridIntersect.FieldIndexByName["hGrid"], n];
+                            if (shpIndex.Length > 0)
+                            { 
                             _listSelectedShapeGridNumbers.Add(int.Parse(shpIndex));
+                            //_listSelectedShapeGridNumbers.Add(shpIndex);
+                        }
                         }
 
                         //get the intersection of the minorGridExtent and the selected major grids
@@ -1068,9 +1072,12 @@ namespace FAD3
                             for (int n = 0; n < shapes.Length; n++)
                             {
                                 var iShp = _shapefileMajorGridIntersect.EditAddShape(shapes[n]);
-                                _shapefileMajorGridIntersect.EditCellValue(ifldMGNo, iShp, gridNo);
-                                _shapefileMajorGridIntersect.EditCellValue(ifldGridHandle, iShp, item);
-                                _listIntersectedMajorGrids.Add((gridNo, (int)shapes[n].Centroid.x, shapes[n].Centroid.y));
+                                if (iShp > 0)
+                                {
+                                    _shapefileMajorGridIntersect.EditCellValue(ifldMGNo, iShp, gridNo);
+                                    _shapefileMajorGridIntersect.EditCellValue(ifldGridHandle, iShp, item);
+                                    _listIntersectedMajorGrids.Add((gridNo, (int)shapes[n].Centroid.x, shapes[n].Centroid.y));
+                                }
                             }
                         }
                         success = true;

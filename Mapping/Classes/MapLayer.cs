@@ -33,6 +33,8 @@ namespace FAD3
         public string SymbolSettinsXML { get; internal set; }
         public Labels Labels { get; internal set; }
         public fad3MappingMode MappingMode { get; set; }
+        public bool IsFishingGridLayoutTemplate { get; set; }
+        public string FishingGridFishingGroundName { get; set; }
 
         public void RestoreSettingsFromXML()
         {

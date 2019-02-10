@@ -25,6 +25,13 @@ namespace FAD3.Mapping.Classes
         public delegate void LayoutCreatededEvent(Grid25LayoutHelper s, Grid25LayoutHelperEventArgs e);
         public event LayoutCreatededEvent LayerCreated;
 
+        public int LayerHandle
+        {
+            get { return _hsfLayout; }
+        }
+
+        public string FishingGround { get; set; }
+
         public Extents SelectedMajorGridExtents
         {
             get { return _selectedMajorGridShapesExtent; }
@@ -54,10 +61,19 @@ namespace FAD3.Mapping.Classes
                 {
                     _majorGrid = null;
                 }
-                _sfLayout.Close();
-                _sfLayout = null;
-                _layoutExtents = null;
-                _selectedMajorGridShapesExtent = null;
+                if (_sfLayout != null)
+                {
+                    _sfLayout.Close();
+                    _sfLayout = null;
+                }
+                if (_layoutExtents != null)
+                {
+                    _layoutExtents = null;
+                }
+                if (_selectedMajorGridShapesExtent != null)
+                {
+                    _selectedMajorGridShapesExtent = null;
+                }
 
                 _axMap.SelectBoxFinal -= OnMapSelectBoxFinal;
                 _axMap = null;
@@ -122,6 +138,26 @@ namespace FAD3.Mapping.Classes
                     SetupLayout(lhe.Rows, lhe.Columns, lhe.Overlap);
                 }
             }
+        }
+
+        public bool OpenLayoutFile(string fileName)
+        {
+            bool success = false;
+            _sfLayout = new Shapefile();
+            if (_sfLayout.Open(fileName.Replace("lay", "shp")))
+            {
+                _hsfLayout = _majorGrid.MapLayers.AddLayer(_sfLayout, "Layout frame", true, true);
+                if (_hsfLayout > 0)
+                {
+                    _sfLayout.DefaultDrawingOptions.FillVisible = false;
+                    _sfLayout.DefaultDrawingOptions.LineWidth = 2;
+                    _sfLayout.DefaultDrawingOptions.LineColor = new Utils().ColorByName(tkMapColor.DarkBlue);
+                    _majorGrid.MapLayers[_hsfLayout].IsFishingGridLayoutTemplate = true;
+                    _axMap.Redraw();
+                    success = true;
+                }
+            }
+            return success;
         }
 
         private Extents IntersectSelectionBoxWithMajorGridSelection()
@@ -275,6 +311,7 @@ namespace FAD3.Mapping.Classes
                     }
                 }
                 _hsfLayout = _majorGrid.MapLayers.AddLayer(_sfLayout, "Layout frame", true, true);
+                _majorGrid.MapLayers[_hsfLayout].IsFishingGridLayoutTemplate = true;
                 _majorGrid.MapLayers.ClearAllSelections();
                 _axMap.Redraw();
                 return _sfLayout.NumShapes > 0;

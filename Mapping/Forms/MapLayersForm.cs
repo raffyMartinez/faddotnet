@@ -3,6 +3,8 @@ using MapWinGIS;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
+using System.IO;
+using FAD3.Mapping.Classes;
 
 namespace FAD3
 {
@@ -313,15 +315,46 @@ namespace FAD3
                     switch (_mapLayersHandler.CurrentMapLayer.LayerType)
                     {
                         case "ShapefileClass":
-                            var sf = (Shapefile)_mapLayersHandler.CurrentMapLayer.LayerObject;
-                            var saveAs = new SaveFileDialog();
-                            saveAs.Filter = "Shapefile *.shp|*.shp|All files *.*|*.*";
-                            saveAs.FilterIndex = 1;
-                            saveAs.ShowDialog();
-                            if (saveAs.FileName.Length > 0 && sf.SaveAs(saveAs.FileName))
+
+                            if (!_mapLayersHandler.CurrentMapLayer.IsFishingGridLayoutTemplate
+                                || ValidLayoutTemplateShapefile())
                             {
-                                var prjFile = sf.Filename.Replace(".shp", ".prj");
-                                sf.GeoProjection.WriteToFile(prjFile);
+                                var sf = (Shapefile)_mapLayersHandler.CurrentMapLayer.LayerObject;
+                                var saveAs = new SaveFileDialog();
+                                saveAs.Filter = "Shapefile *.shp|*.shp|All files *.*|*.*";
+                                saveAs.FilterIndex = 1;
+                                saveAs.ShowDialog();
+                                if (File.Exists(saveAs.FileName))
+                                {
+                                    ShapefileDiskStorageHelper.Delete(saveAs.FileName.Replace(".shp", ""));
+                                }
+                                if (saveAs.FileName.Length > 0 && sf.SaveAs(saveAs.FileName))
+                                {
+                                    var prjFile = sf.Filename.Replace(".shp", ".prj");
+                                    sf.GeoProjection.WriteToFile(prjFile);
+
+                                    if (_mapLayersHandler.CurrentMapLayer.IsFishingGridLayoutTemplate)
+                                    {
+                                        var layoutFile = sf.Filename.Replace(".shp", ".lay");
+                                        if (File.Exists(layoutFile))
+                                        {
+                                            try
+                                            {
+                                                File.Delete(layoutFile);
+                                            }
+                                            catch (IOException ioex)
+                                            {
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                            }
+                                        }
+                                        using (StreamWriter writer = new StreamWriter(layoutFile, true))
+                                        {
+                                            writer.WriteLine(_mapLayersHandler.CurrentMapLayer.FishingGridFishingGroundName);
+                                        }
+                                    }
+                                }
                             }
                             break;
 
@@ -329,6 +362,28 @@ namespace FAD3
                             break;
                     }
                     break;
+            }
+        }
+
+        private bool ValidLayoutTemplateShapefile()
+        {
+            bool isValid = true;
+            {
+                if (_mapLayersHandler.CurrentMapLayer.IsFishingGridLayoutTemplate)
+                {
+                    var sf = (Shapefile)_mapLayersHandler.CurrentMapLayer.LayerObject;
+                    int fldTitle = sf.FieldIndexByName["Title"];
+                    for (int n = 0; n < sf.NumShapes; n++)
+                    {
+                        if (sf.CellValue[fldTitle, n].ToString().Length == 0)
+                        {
+                            isValid = false;
+                            MessageBox.Show("All panels must have titles", "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            break;
+                        }
+                    }
+                }
+                return isValid;
             }
         }
 

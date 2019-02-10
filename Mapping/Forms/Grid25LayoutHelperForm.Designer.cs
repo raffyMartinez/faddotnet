@@ -54,6 +54,7 @@
             this.textFishingGround = new System.Windows.Forms.TextBox();
             this.tabResults = new System.Windows.Forms.TabPage();
             this.lvResults = new System.Windows.Forms.ListView();
+            this.btnOpenLayout = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabLayout.SuspendLayout();
             this.tabSave.SuspendLayout();
@@ -137,6 +138,8 @@
             this.imageList1.Images.SetKeyName(1, "cancel");
             this.imageList1.Images.SetKeyName(2, "save");
             this.imageList1.Images.SetKeyName(3, "addToFolder");
+            this.imageList1.Images.SetKeyName(4, "addLayout");
+            this.imageList1.Images.SetKeyName(5, "openLayoutGrid");
             // 
             // btnCancel
             // 
@@ -212,6 +215,7 @@
             // 
             // tabLayout
             // 
+            this.tabLayout.Controls.Add(this.btnOpenLayout);
             this.tabLayout.Controls.Add(this.txtPageWidth);
             this.tabLayout.Controls.Add(this.label2);
             this.tabLayout.Controls.Add(this.txtPageHeight);
@@ -310,6 +314,17 @@
             this.lvResults.TabIndex = 0;
             this.lvResults.UseCompatibleStateImageBehavior = false;
             // 
+            // btnOpenLayout
+            // 
+            this.btnOpenLayout.ImageKey = "openLayoutGrid";
+            this.btnOpenLayout.ImageList = this.imageList1;
+            this.btnOpenLayout.Location = new System.Drawing.Point(293, 17);
+            this.btnOpenLayout.Name = "btnOpenLayout";
+            this.btnOpenLayout.Size = new System.Drawing.Size(28, 28);
+            this.btnOpenLayout.TabIndex = 13;
+            this.btnOpenLayout.UseVisualStyleBackColor = true;
+            this.btnOpenLayout.Click += new System.EventHandler(this.OnButtonClick);
+            // 
             // Grid25LayoutHelperForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -362,5 +377,6 @@
         private System.Windows.Forms.ImageList imageList1;
         private System.Windows.Forms.TabPage tabResults;
         private System.Windows.Forms.ListView lvResults;
+        private System.Windows.Forms.Button btnOpenLayout;
     }
 }

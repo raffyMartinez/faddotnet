@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using MapWinGIS;
 using FAD3.Mapping.Classes;
 using Microsoft.Win32;
+using System.IO;
 
 namespace FAD3.Mapping.Forms
 {
@@ -101,6 +102,27 @@ namespace FAD3.Mapping.Forms
         {
             switch (((Button)(sender)).Name)
             {
+                case "btnOpenLayout":
+                    OpenFileDialog ofd = new OpenFileDialog();
+                    ofd.Title = "Open a layout grid template file";
+                    ofd.Filter = "Layout file|*.lay|All files|*.*";
+                    ofd.FilterIndex = 0;
+                    ofd.ShowDialog();
+                    if (ofd.FileName.Length > 0)
+                    {
+                        if (LayoutHelper.OpenLayoutFile(ofd.FileName))
+                        {
+                            string layoutData = File.ReadAllText(ofd.FileName);
+                            textFishingGround.Text = layoutData;
+                            textFolderToSave.Text = Path.GetDirectoryName(ofd.FileName);
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Selected file is not valid", "Invalid file", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    break;
+
                 case "btnSelectFolderSave":
                     FolderBrowserDialog fbd = new FolderBrowserDialog();
                     fbd.Description = "Select folder to save fishing ground grid map";
@@ -127,7 +149,12 @@ namespace FAD3.Mapping.Forms
                         {
                             if (_majorGrid.GenerateMinorGridFromLayout(textFishingGround.Text, _parentFolder))
                             {
-                                FillResultList();
+                                if (_majorGrid.LayoutHelper.LayerHandle > 0)
+                                {
+                                    _majorGrid.LayoutHelper.FishingGround = textFishingGround.Text;
+                                    _majorGrid.MapLayers[_majorGrid.LayoutHelper.LayerHandle].FishingGridFishingGroundName = textFishingGround.Text;
+                                    FillResultList();
+                                }
                             }
                         }
                         else
