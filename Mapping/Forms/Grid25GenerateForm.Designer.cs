@@ -76,6 +76,7 @@
             this.tsButtonRetrieve = new System.Windows.Forms.ToolStripButton();
             this.tsButtonExit = new System.Windows.Forms.ToolStripButton();
             this.lblGridStatus = new System.Windows.Forms.Label();
+            this.buttonLocateGrid = new System.Windows.Forms.Button();
             this.groupLabels.SuspendLayout();
             this.toolbar.SuspendLayout();
             this.SuspendLayout();
@@ -150,6 +151,8 @@
             this.imList.Images.SetKeyName(1, "clearSelection");
             this.imList.Images.SetKeyName(2, "label");
             this.imList.Images.SetKeyName(3, "label_add");
+            this.imList.Images.SetKeyName(4, "Ruler_16x.png");
+            this.imList.Images.SetKeyName(5, "gridLayout");
             // 
             // buttonLabel
             // 
@@ -534,11 +537,23 @@
             this.lblGridStatus.TabIndex = 8;
             this.lblGridStatus.Text = "Grid status:";
             // 
+            // buttonLocateGrid
+            // 
+            this.buttonLocateGrid.ImageIndex = 5;
+            this.buttonLocateGrid.ImageList = this.imList;
+            this.buttonLocateGrid.Location = new System.Drawing.Point(257, 159);
+            this.buttonLocateGrid.Name = "buttonLocateGrid";
+            this.buttonLocateGrid.Size = new System.Drawing.Size(23, 23);
+            this.buttonLocateGrid.TabIndex = 9;
+            this.buttonLocateGrid.UseVisualStyleBackColor = true;
+            this.buttonLocateGrid.Click += new System.EventHandler(this.OnButtons_Click);
+            // 
             // Grid25GenerateForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(285, 532);
+            this.Controls.Add(this.buttonLocateGrid);
             this.Controls.Add(this.lblGridStatus);
             this.Controls.Add(this.toolbar);
             this.Controls.Add(this.buttonClose);
@@ -612,5 +627,6 @@
         private System.Windows.Forms.ToolStripButton tsButtonExit;
         private System.Windows.Forms.Button btnLabelsFromKML;
         private System.Windows.Forms.Label lblGridStatus;
+        private System.Windows.Forms.Button buttonLocateGrid;
     }
 }

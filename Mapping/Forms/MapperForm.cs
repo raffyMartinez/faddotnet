@@ -5,6 +5,7 @@ using MapWinGIS;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
+using FAD3.Mapping.Forms;
 
 namespace FAD3
 {
@@ -301,7 +302,14 @@ namespace FAD3
             _saveMapImage.PreviewImage = Preview;
             _saveMapImage.MapLayersHandler = _mapLayersHandler;
             success = _saveMapImage.Save(_grid25MajorGrid != null);
-            _saveMapImage.Dispose();
+            try
+            {
+                _saveMapImage.Dispose();
+            }
+            catch
+            {
+                //ignore
+            }
             return success;
         }
 
@@ -335,16 +343,25 @@ namespace FAD3
                     break;
 
                 case "tsButtonAttributes":
-                    var sfa = ShapefileAttributesForm.GetInstance(this, _mapInterActionHandler);
-                    if (!sfa.Visible)
+                    //var sfa = ShapefileAttributesForm.GetInstance(this, _mapInterActionHandler);
+                    //if (!sfa.Visible)
+                    //{
+                    //    sfa.Show(this);
+                    //}
+                    //else
+                    //{
+                    //    sfa.BringToFront();
+                    //}
+
+                    EditShapeAttributeForm esaf = EditShapeAttributeForm.GetInstance(this, _mapInterActionHandler);
+                    if (esaf.Visible)
                     {
-                        sfa.Show(this);
+                        esaf.BringToFront();
                     }
                     else
                     {
-                        sfa.BringToFront();
+                        esaf.Show(this);
                     }
-
                     break;
 
                 case "tsButtonZoomIn":

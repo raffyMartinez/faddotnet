@@ -299,6 +299,8 @@
     <Compile Include="Mapping\Classes\Colors.cs" />
     <Compile Include="Mapping\Classes\ColorSchemes.cs" />
     <Compile Include="Mapping\Classes\ExtentDraggedBoxEventArgs.cs" />
+    <Compile Include="Mapping\Classes\Grid25LayoutHelper.cs" />
+    <Compile Include="Mapping\Classes\Grid25LayoutHelperEventArgs.cs" />
     <Compile Include="Mapping\Classes\OccurenceMapping.cs" />
     <Compile Include="Mapping\Classes\MapTextGraticuleHelper.cs" />
     <Compile Include="Mapping\Classes\Discretizer.cs" />
@@ -306,11 +308,18 @@
     <Compile Include="Mapping\Classes\JenksFisher.cs" />
     <Compile Include="Mapping\Classes\MakeGridFromPoints.cs" />
     <Compile Include="Mapping\Classes\OccurenceMapEventArgs.cs" />
+    <Compile Include="Mapping\Classes\ShapefileDiskStorageHelper.cs" />
     <Compile Include="Mapping\Forms\ChlorophyllForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Mapping\Forms\ChlorophyllForm.Designer.cs">
       <DependentUpon>ChlorophyllForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Mapping\Forms\EditShapeAttributeForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Mapping\Forms\EditShapeAttributeForm.Designer.cs">
+      <DependentUpon>EditShapeAttributeForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Mapping\Forms\GraticuleTextHelperForm.cs">
       <SubType>Form</SubType>
@@ -617,6 +626,12 @@
     </Compile>
     <Compile Include="GUI\Classes\mru.cs" />
     <Compile Include="Database\Classes\Names.cs" />
+    <Compile Include="Mapping\Forms\Grid25LayoutHelperForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Mapping\Forms\Grid25LayoutHelperForm.Designer.cs">
+      <DependentUpon>Grid25LayoutHelperForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Mapping\UserControls\CharacterControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -740,6 +755,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Mapping\Forms\ChlorophyllForm.resx">
       <DependentUpon>ChlorophyllForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Mapping\Forms\EditShapeAttributeForm.resx">
+      <DependentUpon>EditShapeAttributeForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Mapping\Forms\GraticuleTextHelperForm.resx">
       <DependentUpon>GraticuleTextHelperForm.cs</DependentUpon>
@@ -873,6 +891,9 @@
     <EmbeddedResource Include="GUI\Forms\ManageMRUForm.resx">
       <DependentUpon>ManageMRUForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Mapping\Forms\Grid25LayoutHelperForm.resx">
+      <DependentUpon>Grid25LayoutHelperForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Mapping\UserControls\ListControl.resx">
       <DependentUpon>ListControl.cs</DependentUpon>
     </EmbeddedResource>
@@ -960,6 +981,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="FAD3.ico" />
+    <None Include="Resources\Save_16x.bmp" />
+    <None Include="Resources\set layout.bmp" />
+    <None Include="Resources\Ruler_16x.png" />
     <None Include="Resources\ProjectFolderOpen_16x.png" />
     <None Include="Resources\Table_16x.png" />
     <None Include="Resources\report document.bmp" />
@@ -1018,7 +1042,10 @@
     <None Include="Resources\Actor_16x.png" />
     <None Include="Resources\Actor_16xSM.png" />
     <None Include="Resources\BigProp.png" />
+    <None Include="Resources\2Rows2Columns_16x.png" />
+    <None Include="Resources\apply grid.bmp" />
     <Content Include="Resources\BigProp.bmp" />
+    <None Include="Resources\Cancel_16x.bmp" />
     <Content Include="Resources\clear_selection.bmp" />
     <None Include="Resources\document-save.bmp" />
     <None Include="Resources\fit.bmp" />

@@ -11,7 +11,7 @@ namespace FAD3
         public bool LayerRemoved { get; }
         public string LayerType { get; }
         public bool LayerSaved { get; }
-        public string FileName { get; }
+        public string FileName { get; set; }
         public int SelectedIndex { get; set; }
         public string Action { get; set; }
         public string MapTitle { get; set; }
@@ -63,6 +63,11 @@ namespace FAD3
         public LayerEventArg(int layerHandle)
         {
             LayerHandle = layerHandle;
+        }
+
+        public LayerEventArg(string layerName)
+        {
+            LayerName = layerName;
         }
     }
 }

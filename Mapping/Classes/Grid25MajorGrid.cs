@@ -29,6 +29,7 @@ namespace FAD3
         private Grid25MinorGrid _grid25MinorGrid;                               //helper class for managing minor grids
         private Dictionary<string, uint> _gridAndLabelProperties;               //holds the various properties of grid labels and lines
         private bool _inDefineMinorGrid;                                        //if we are in the part of creating the minor grid
+
         private bool _selectionFromSelectBox = false;                           //if selection was made by dragging a select box or by clicking
         private List<int> _listGridLayers = new List<int>();                    //list of layer handles of shapefiles that make up a fishing grid
         private List<int> _listSelectedShapeGridNumbers = new List<int>();      //list major grid numbers
@@ -36,6 +37,7 @@ namespace FAD3
         private List<(int GridNo, double x, double y)>
             _listIntersectedMajorGrids = new List<(int, double, double)>();     //list major grids that become part of the grid map
 
+        private Grid25LayoutHelper _layoutHelper;
         private MapLayersHandler _mapLayers;                                    //reference to the map layers class
         private MapInterActionHandler _mapInterActionHandler;                   //reference to the MapInterActionHandler class
         private int[] _selectedShapeIndexes;                                    //holds the indexes of selected shapes
@@ -46,10 +48,15 @@ namespace FAD3
         private Shapefile _shapefileMajorGridIntersect;                         //shapefile of major grid intersected with extent of minor grids
         private Shapefile _shapeFileSelectedMajorGridBuffer;                    //a shapefile that holds a convex hull of the selected major grids
         private int _hCursorDefineGrid;                                         //the handle of the cursor used when defining selection extent of major grid
+
+        private int _hCursorDefineLayout;
         private string _mapTitle;                                               //title of the fishing ground grid map
         private MapLayer _currentMapLayer;
         private bool _enableMapInteraction;                                     //allows the class to interact with the axMap map control
         private bool _completeFishingGrid;
+        private bool _loadGridInPanel;
+        private string _folderToSave;
+        private bool _inDefineGridFromLayout;
 
         public delegate void FishingGridLayerSavedHandler(Grid25MajorGrid s, LayerEventArg e);              //event raised when a layer is selected from the list found in the layers form
         public event FishingGridLayerSavedHandler LayerSaved;
@@ -60,7 +67,38 @@ namespace FAD3
         public delegate void MapExtentCreated(Grid25MajorGrid s, ExtentDraggedBoxEventArgs e);                          //event raised when an extent is created
         public event MapExtentCreated ExtentCreatedInLayer;
 
+        public delegate void GridLayoutOriginDefined(Grid25MajorGrid s, ExtentDraggedBoxEventArgs e);
+        public event GridLayoutOriginDefined LayoutDefined;
+
+        public delegate void GridInPanelCreated(Grid25MajorGrid s, LayerEventArg e);
+        public event GridInPanelCreated OnGridInPanelCreated;
+
         private static List<string> _filesToDeleteOnClose = new List<string>();
+
+        public bool InDefindeGridFromLayout
+        {
+            get { return _inDefineGridFromLayout; }
+        }
+
+        public string FolderToSave
+        {
+            get { return _folderToSave; }
+        }
+
+        public Grid25LayoutHelper LayoutHelper
+        {
+            get { return _layoutHelper; }
+        }
+
+        public AxMap MapControl
+        {
+            get { return _axMap; }
+        }
+
+        public Extents SelectedMajorGridShapesExtent
+        {
+            get { return _selectedMajorGridShapesExtent; }
+        }
 
         public MapInterActionHandler MapInterActionHandler
         {
@@ -121,6 +159,15 @@ namespace FAD3
             }
         }
 
+        public void LoadPanelGrid(LayerEventArg e)
+        {
+            _loadGridInPanel = true;
+            OnFishingGridSelected(null, e);
+
+            if (e.Action == "LoadGridMap")
+                FitGridToMap();
+        }
+
         /// <summary>
         /// Load the fishing map whose booundary was selected in the map control
         /// </summary>
@@ -128,84 +175,96 @@ namespace FAD3
         /// <param name="e"></param>
         private void OnFishingGridSelected(MapInterActionHandler s, LayerEventArg e)
         {
-            //in this context, CurrentMapLayer contains the grid boundaries of fishing ground maps
-            var sf = ((Shapefile)_mapLayers.CurrentMapLayer.LayerObject);
+            string fgFileName = "";
+            Shapefile sf = new Shapefile();
+            if (_loadGridInPanel)
+            {
+                fgFileName = $@"{_folderToSave}\{e.FileName}";
+                _mapTitle = e.LayerName;
+            }
+            else
+            {
+                //in this context, CurrentMapLayer contains the grid boundaries of fishing ground maps
+                sf = ((Shapefile)_mapLayers.CurrentMapLayer.LayerObject);
 
-            //let us get the base filename of the selected fishing ground boundary
-            var fgFileName = sf.CellValue[sf.FieldIndexByName["BaseName"], e.SelectedIndex];
+                //let us get the base filename of the selected fishing ground boundary
+                fgFileName = sf.CellValue[sf.FieldIndexByName["BaseName"], e.SelectedIndex].ToString();
 
-            //let us get the map title of the selected fishing ground
-            _mapTitle = (string)sf.CellValue[sf.FieldIndexByName["MapName"], e.SelectedIndex];
+                //let us get the map title of the selected fishing ground
+                _mapTitle = (string)sf.CellValue[sf.FieldIndexByName["MapName"], e.SelectedIndex];
+            }
 
             if (e.Action == "LoadGridMap")
             {
                 int h = 0;
 
                 //load the minor grid shapefile
-                _grid25MinorGrid.LoadMinorGridShapefile($"{fgFileName}_gridlines.shp");
-
-                //load the major grids of the fishing ground
-                _shapefileMajorGridIntersect = new Shapefile();
-                _shapefileMajorGridIntersect.Open($"{fgFileName}_majorgrid.shp");
-
-                //populate the list with the shape indexes of the major grids
-                _listSelectedShapeGridNumbers.Clear();
-                for (int n = 0; n < _shapefileMajorGridIntersect.NumShapes; n++)
+                if (_grid25MinorGrid.LoadMinorGridShapefile($"{fgFileName}_gridlines.shp"))
                 {
-                    var shpIndex = (string)_shapefileMajorGridIntersect.CellValue[_shapefileMajorGridIntersect.FieldIndexByName["hGrid"], n];
-                    _listSelectedShapeGridNumbers.Add(int.Parse(shpIndex));
-                }
-
-                //get the intersection of the minorGridExtent and the selected major grids
-                if (MajorGridsIntersectMinorGridExtent(_grid25MinorGrid.MinorGridLinesShapeFile.Extents))
-                {
-                    _shapeFileSelectedMajorGridBuffer = _shapefileMajorGridIntersect.BufferByDistance(0, 1, false, true);
-                    _shapeFileSelectedMajorGridBuffer.GeoProjection = _axMap.GeoProjection;
-                }
-
-                //using Grid25LabelManager, create labels that follow the path defined by  _shapeFileSelectedMajorGridBuffer
-                _grid25LabelManager = new Grid25LabelManager(_axMap.GeoProjection);
-                if (_grid25LabelManager.LabelGrid(_shapeFileSelectedMajorGridBuffer, _gridAndLabelProperties, _mapTitle))
-                {
-                    //add label shapefile to the map
-                    _grid25LabelManager.AddMajorGridLabels(_listIntersectedMajorGrids);
-                    _grid25LabelManager.Grid25Labels.Labels.ApplyCategories();
-                    h = _mapLayers.AddLayer(_grid25LabelManager.Grid25Labels, "Labels", true, true);
-                    _mapLayers.LayerDictionary[h].IsFishingGrid = true;
-                    AssignLayerWeight(_mapLayers.LayerDictionary[h]);
-                    _listGridLayers.Add(h);
-
-                    //add minor grid shapefile to the map
-                    h = _mapLayers.AddLayer(_grid25MinorGrid.MinorGridLinesShapeFile, "Minor grid", true, true);
-                    _mapLayers.LayerDictionary[h].IsGraticule = true;
-                    _mapLayers.LayerDictionary[h].IsFishingGrid = true;
-                    AssignLayerWeight(_mapLayers.LayerDictionary[h]);
-                    _listGridLayers.Add(h);
-
-                    //add major grids
-                    h = _mapLayers.AddLayer(_shapefileMajorGridIntersect, "Major grid", true, true);
-                    _mapLayers.LayerDictionary[h].IsGraticule = true;
-                    _mapLayers.LayerDictionary[h].IsFishingGrid = true;
-                    AssignLayerWeight(_mapLayers.LayerDictionary[h]);
-                    _listGridLayers.Add(h);
-
-                    //add boundary
-                    _shapefileBoundingRectangle = new Shapefile();
-                    _shapefileBoundingRectangle.Open($"{fgFileName}_gridboundary.shp");
-                    h = _mapLayers.AddLayer(_shapefileBoundingRectangle, "MBR", true, true);
-                    _mapLayers.LayerDictionary[h].IsGraticule = true;
-                    _mapLayers.LayerDictionary[h].IsFishingGrid = true;
-                    AssignLayerWeight(_mapLayers.LayerDictionary[h]);
-                    _listGridLayers.Add(h);
-
-                    ApplyGridSymbology();
-
-                    //raise event declaring that a fishing grid was retrieved from file
-                    if (GridRetrieved != null)
+                    //load the major grids of the fishing ground
+                    _shapefileMajorGridIntersect = new Shapefile();
+                    if (_shapefileMajorGridIntersect.Open($"{fgFileName}_majorgrid.shp"))
                     {
-                        var mapName = _shapefileBoundingRectangle.CellValue[_shapefileBoundingRectangle.FieldIndexByName["MapTitle"], 0];
-                        LayerEventArg lp = new LayerEventArg(h, (string)mapName);
-                        GridRetrieved(this, lp);
+                        //populate the list with the shape indexes of the major grids
+                        _listSelectedShapeGridNumbers.Clear();
+                        for (int n = 0; n < _shapefileMajorGridIntersect.NumShapes; n++)
+                        {
+                            var shpIndex = (string)_shapefileMajorGridIntersect.CellValue[_shapefileMajorGridIntersect.FieldIndexByName["hGrid"], n];
+                            _listSelectedShapeGridNumbers.Add(int.Parse(shpIndex));
+                        }
+
+                        //get the intersection of the minorGridExtent and the selected major grids
+                        if (MajorGridsIntersectMinorGridExtent(_grid25MinorGrid.MinorGridLinesShapeFile.Extents))
+                        {
+                            _shapeFileSelectedMajorGridBuffer = _shapefileMajorGridIntersect.BufferByDistance(0, 1, false, true);
+                            _shapeFileSelectedMajorGridBuffer.GeoProjection = _axMap.GeoProjection;
+                        }
+
+                        //using Grid25LabelManager, create labels that follow the path defined by  _shapeFileSelectedMajorGridBuffer
+                        _grid25LabelManager = new Grid25LabelManager(_axMap.GeoProjection);
+                        if (_grid25LabelManager.LabelGrid(_shapeFileSelectedMajorGridBuffer, _gridAndLabelProperties, _mapTitle))
+                        {
+                            //add label shapefile to the map
+                            _grid25LabelManager.AddMajorGridLabels(_listIntersectedMajorGrids);
+                            _grid25LabelManager.Grid25Labels.Labels.ApplyCategories();
+                            h = _mapLayers.AddLayer(_grid25LabelManager.Grid25Labels, "Labels", true, true);
+                            _mapLayers.LayerDictionary[h].IsFishingGrid = true;
+                            AssignLayerWeight(_mapLayers.LayerDictionary[h]);
+                            _listGridLayers.Add(h);
+
+                            //add minor grid shapefile to the map
+                            h = _mapLayers.AddLayer(_grid25MinorGrid.MinorGridLinesShapeFile, "Minor grid", true, true);
+                            _mapLayers.LayerDictionary[h].IsGraticule = true;
+                            _mapLayers.LayerDictionary[h].IsFishingGrid = true;
+                            AssignLayerWeight(_mapLayers.LayerDictionary[h]);
+                            _listGridLayers.Add(h);
+
+                            //add major grids
+                            h = _mapLayers.AddLayer(_shapefileMajorGridIntersect, "Major grid", true, true);
+                            _mapLayers.LayerDictionary[h].IsGraticule = true;
+                            _mapLayers.LayerDictionary[h].IsFishingGrid = true;
+                            AssignLayerWeight(_mapLayers.LayerDictionary[h]);
+                            _listGridLayers.Add(h);
+
+                            //add boundary
+                            _shapefileBoundingRectangle = new Shapefile();
+                            _shapefileBoundingRectangle.Open($"{fgFileName}_gridboundary.shp");
+                            h = _mapLayers.AddLayer(_shapefileBoundingRectangle, "MBR", true, true);
+                            _mapLayers.LayerDictionary[h].IsGraticule = true;
+                            _mapLayers.LayerDictionary[h].IsFishingGrid = true;
+                            AssignLayerWeight(_mapLayers.LayerDictionary[h]);
+                            _listGridLayers.Add(h);
+
+                            ApplyGridSymbology();
+
+                            //raise event declaring that a fishing grid was retrieved from file
+                            if (GridRetrieved != null)
+                            {
+                                var mapName = _shapefileBoundingRectangle.CellValue[_shapefileBoundingRectangle.FieldIndexByName["MapTitle"], 0];
+                                LayerEventArg lp = new LayerEventArg(h, (string)mapName);
+                                GridRetrieved(this, lp);
+                            }
+                        }
                     }
                 }
             }
@@ -224,6 +283,13 @@ namespace FAD3
                 _axMap.Redraw();
 
                 _filesToDeleteOnClose.Add($"{fgFileName}_gridboundary");
+            }
+            else if (e.Action == "UnloadGridMap")
+            {
+                _mapLayers.RemoveLayer("Labels");
+                _mapLayers.RemoveLayer("MBR");
+                _mapLayers.RemoveLayer("Major grid");
+                _mapLayers.RemoveLayer("Minor grid");
             }
         }
 
@@ -250,7 +316,8 @@ namespace FAD3
             _axMap.CursorMode = tkCursorMode.cmSelection;
             _utmZone = fadUTMZone.utmZone51N;
 
-            _grid25MinorGrid = new Grid25MinorGrid(_axMap);
+            _grid25MinorGrid = new Grid25MinorGrid(_axMap, this);
+            ShapefileDiskStorageHelper.MapControl = _axMap;
         }
 
         private void OnSelectBoxDrag(object sender, _DMapEvents_SelectBoxDragEvent e)
@@ -319,13 +386,16 @@ namespace FAD3
                             break;
                     }
 
-                    var result = ml.Save(fileName);
-                    if (result) saveCount++;
-
-                    if (LayerSaved != null)
+                    if (ShapefileDiskStorageHelper.Delete(fileName))
                     {
-                        LayerEventArg lp = new LayerEventArg(ml.Handle, result, fileName);
-                        LayerSaved(this, lp);
+                        var result = ml.Save(fileName);
+                        if (result) saveCount++;
+
+                        if (LayerSaved != null)
+                        {
+                            LayerEventArg lp = new LayerEventArg(ml.Handle, result, fileName);
+                            LayerSaved(this, lp);
+                        }
                     }
                 }
             }
@@ -556,7 +626,7 @@ namespace FAD3
             }
         }
 
-        private bool EnableMapInteraction
+        public bool EnableMapInteraction
 
         {
             get { return _enableMapInteraction; }
@@ -663,6 +733,28 @@ namespace FAD3
             _axMap.Redraw();
         }
 
+        public void ReleaseLayoutHelper()
+        {
+            _layoutHelper.Dispose();
+            _layoutHelper = null;
+            _enableMapInteraction = true;
+            _axMap.Redraw();
+        }
+
+        public void DefineGridLayout(int iconHandle)
+        {
+            if (_layoutHelper == null)
+            {
+                _inDefineMinorGrid = false;
+                _hCursorDefineLayout = iconHandle;
+                _enableMapInteraction = false;
+                _layoutHelper = new Grid25LayoutHelper(this, iconHandle);
+            }
+            _axMap.CursorMode = tkCursorMode.cmSelection;
+            _axMap.MapCursor = tkCursor.crsrUserDefined;
+            _axMap.UDCursorHandle = _hCursorDefineLayout;
+        }
+
         /// <summary>
         /// Returns true if there is a major grid selection.
         /// This will calculate extent of the selected major grids
@@ -673,6 +765,7 @@ namespace FAD3
         {
             _hCursorDefineGrid = iconHandle;
             _inDefineMinorGrid = _listSelectedShapeGridNumbers.Count > 0;
+            _inDefineGridFromLayout = false;
             if (_inDefineMinorGrid)
             {
                 _shapefileMajorGrid.SelectNone();
@@ -897,7 +990,7 @@ namespace FAD3
                         {
                             for (int n = 0; n < 5; n++)
                             {
-                                pt = new MapWinGIS.Point();
+                                pt = new Point();
                                 switch (n)
                                 {
                                     case 0:
@@ -1097,6 +1190,83 @@ namespace FAD3
             }
         }
 
+        private bool GenerateMinorGridInsideExtent(Extents definitionExtent, string mapTitle = "")
+        {
+            bool minorGridCreated = false;
+            if (mapTitle.Length > 0)
+            {
+                _mapTitle = mapTitle;
+            }
+
+            //pass the extents of the selected major grids and the extent defined by the select box
+            //if minor grid is defined successfully, we proceed with the next steps
+            if (_grid25MinorGrid.DefineMinorGrids(_selectedMajorGridShapesExtent, definitionExtent))
+            {
+                var minorGridExtent = _grid25MinorGrid.MinorGridLinesShapeFile.Extents;
+
+                //get the intersection of the minorGridExtent and the selected major grids
+                if (MajorGridsIntersectMinorGridExtent(minorGridExtent))
+                {
+                    _shapeFileSelectedMajorGridBuffer = _shapefileMajorGridIntersect.BufferByDistance(0, 1, false, true);
+                    _shapeFileSelectedMajorGridBuffer.GeoProjection = _axMap.GeoProjection;
+
+                    if (_shapefileMajorGridIntersect.NumShapes > 0
+                        && _grid25MinorGrid.ClipMinorGrid(_shapeFileSelectedMajorGridBuffer)
+                        && DefineBoundingRectangle(minorGridExtent))
+                    {
+                        _grid25LabelManager = new Grid25LabelManager(_axMap.GeoProjection);
+
+                        if (_grid25LabelManager.LabelGrid(_shapeFileSelectedMajorGridBuffer, _gridAndLabelProperties, _mapTitle))
+                        {
+                            _grid25LabelManager.AddMajorGridLabels(_listIntersectedMajorGrids);
+                            _grid25LabelManager.Grid25Labels.Labels.ApplyCategories();
+
+                            //we add the layers using the maplayer class, then we add the layer handles to listGridLayers
+                            var h = _mapLayers.AddLayer(_grid25MinorGrid.MinorGridLinesShapeFile, "Minor grid", true, true);
+                            _mapLayers.LayerDictionary[h].IsGraticule = true;
+                            _mapLayers.LayerDictionary[h].IsFishingGrid = true;
+                            //_mapLayers.LayerDictionary[h].LayerWeight = 2;
+                            AssignLayerWeight(_mapLayers.LayerDictionary[h]);
+                            _listGridLayers.Add(h);
+
+                            h = _mapLayers.AddLayer(_grid25LabelManager.Grid25Labels, "Labels", true, true);
+                            _mapLayers.LayerDictionary[h].IsFishingGrid = true;
+                            //_mapLayers.LayerDictionary[h].LayerWeight = 1;
+                            AssignLayerWeight(_mapLayers.LayerDictionary[h]);
+                            _listGridLayers.Add(h);
+
+                            h = _mapLayers.AddLayer(_shapefileMajorGridIntersect, "Major grid", true, true);
+                            _mapLayers.LayerDictionary[h].IsGraticule = true;
+                            _mapLayers.LayerDictionary[h].IsFishingGrid = true;
+                            //_mapLayers.LayerDictionary[h].LayerWeight = 4;
+                            AssignLayerWeight(_mapLayers.LayerDictionary[h]);
+                            _listGridLayers.Add(h);
+
+                            h = _mapLayers.AddLayer(_shapefileBoundingRectangle, "MBR", true, true);
+                            _mapLayers.LayerDictionary[h].IsGraticule = true;
+                            _mapLayers.LayerDictionary[h].IsFishingGrid = true;
+                            //_mapLayers.LayerDictionary[h].LayerWeight = 3;
+                            AssignLayerWeight(_mapLayers.LayerDictionary[h]);
+                            _listGridLayers.Add(h);
+
+                            _completeFishingGrid = true;
+                            ApplyGridSymbology();
+
+                            if (ExtentCreatedInLayer != null)
+                            {
+                                ExtentDraggedBoxEventArgs arg = new ExtentDraggedBoxEventArgs(_shapefileBoundingRectangle.Extents.yMax, _shapefileBoundingRectangle.Extents.yMin, _shapefileBoundingRectangle.Extents.xMin, _shapefileBoundingRectangle.Extents.xMax, false);
+                                ExtentCreatedInLayer(this, arg);
+                            }
+                            minorGridCreated = true;
+                        }
+                        _axMap.MapCursor = tkCursor.crsrMapDefault;
+                    }
+                }
+            }
+
+            return minorGridCreated;
+        }
+
         /// <summary>
         /// Creates an extent defined by the selection box.
         /// The extent will be used to select major grids or,
@@ -1123,78 +1293,51 @@ namespace FAD3
                 if (_inDefineMinorGrid && _axMap.UDCursorHandle == _hCursorDefineGrid)
                 {
                     //This is where the actual work of constructing the grid map takes place
-
-                    //pass the extents of the selected major grids and the extent defined by the select box
-                    //if minor grid is defined successfully, we proceed with the next steps
-                    if (_grid25MinorGrid.DefineMinorGrids(_selectedMajorGridShapesExtent, selectionBoxExtent))
+                    if (!GenerateMinorGridInsideExtent(selectionBoxExtent))
                     {
-                        var minorGridExtent = _grid25MinorGrid.MinorGridLinesShapeFile.Extents;
-
-                        //get the intersection of the minorGridExtent and the selected major grids
-                        if (MajorGridsIntersectMinorGridExtent(minorGridExtent))
-                        {
-                            _shapeFileSelectedMajorGridBuffer = _shapefileMajorGridIntersect.BufferByDistance(0, 1, false, true);
-                            _shapeFileSelectedMajorGridBuffer.GeoProjection = _axMap.GeoProjection;
-
-                            if (_shapefileMajorGridIntersect.NumShapes > 0
-                                && _grid25MinorGrid.ClipMinorGrid(_shapeFileSelectedMajorGridBuffer)
-                                && DefineBoundingRectangle(minorGridExtent))
-                            {
-                                _grid25LabelManager = new Grid25LabelManager(_axMap.GeoProjection);
-
-                                if (_grid25LabelManager.LabelGrid(_shapeFileSelectedMajorGridBuffer, _gridAndLabelProperties, _mapTitle))
-                                {
-                                    _grid25LabelManager.AddMajorGridLabels(_listIntersectedMajorGrids);
-                                    _grid25LabelManager.Grid25Labels.Labels.ApplyCategories();
-
-                                    //we add the layers using the maplayer class, then we add the layer handles to listGridLayers
-                                    var h = _mapLayers.AddLayer(_grid25MinorGrid.MinorGridLinesShapeFile, "Minor grid", true, true);
-                                    _mapLayers.LayerDictionary[h].IsGraticule = true;
-                                    _mapLayers.LayerDictionary[h].IsFishingGrid = true;
-                                    //_mapLayers.LayerDictionary[h].LayerWeight = 2;
-                                    AssignLayerWeight(_mapLayers.LayerDictionary[h]);
-                                    _listGridLayers.Add(h);
-
-                                    h = _mapLayers.AddLayer(_grid25LabelManager.Grid25Labels, "Labels", true, true);
-                                    _mapLayers.LayerDictionary[h].IsFishingGrid = true;
-                                    //_mapLayers.LayerDictionary[h].LayerWeight = 1;
-                                    AssignLayerWeight(_mapLayers.LayerDictionary[h]);
-                                    _listGridLayers.Add(h);
-
-                                    h = _mapLayers.AddLayer(_shapefileMajorGridIntersect, "Major grid", true, true);
-                                    _mapLayers.LayerDictionary[h].IsGraticule = true;
-                                    _mapLayers.LayerDictionary[h].IsFishingGrid = true;
-                                    //_mapLayers.LayerDictionary[h].LayerWeight = 4;
-                                    AssignLayerWeight(_mapLayers.LayerDictionary[h]);
-                                    _listGridLayers.Add(h);
-
-                                    h = _mapLayers.AddLayer(_shapefileBoundingRectangle, "MBR", true, true);
-                                    _mapLayers.LayerDictionary[h].IsGraticule = true;
-                                    _mapLayers.LayerDictionary[h].IsFishingGrid = true;
-                                    //_mapLayers.LayerDictionary[h].LayerWeight = 3;
-                                    AssignLayerWeight(_mapLayers.LayerDictionary[h]);
-                                    _listGridLayers.Add(h);
-
-                                    _completeFishingGrid = true;
-                                    ApplyGridSymbology();
-
-                                    if (ExtentCreatedInLayer != null)
-                                    {
-                                        ExtentDraggedBoxEventArgs arg = new ExtentDraggedBoxEventArgs(_shapefileBoundingRectangle.Extents.yMax, _shapefileBoundingRectangle.Extents.yMin, _shapefileBoundingRectangle.Extents.xMin, _shapefileBoundingRectangle.Extents.xMax, false);
-                                        ExtentCreatedInLayer(this, arg);
-                                    }
-                                }
-                                _axMap.MapCursor = tkCursor.crsrMapDefault;
-                            }
-                        }
                     }
                 }
                 else
                 {
                     //pass the extent to SelectGrids function
                     //FromSelectionBox is true because we dragged a selection box
-                    SelectGrids(selectionBoxExtent, SelectionFromSelectBox: true);
+                    SelectGrids(selectionBoxExtent, SelectionFromSelectBox: true, CreateSelectionInMajorGrid: false);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Perform gridding using the layout
+        /// </summary>
+        /// <returns></returns>
+        public bool GenerateMinorGridFromLayout(string fishingGround, string folder)
+        {
+            if (_layoutHelper != null
+                && _layoutHelper.LayoutShapeFile.NumShapes > 0
+                && _layoutHelper.HasCompletePanelTitles())
+            {
+                _inDefineGridFromLayout = true;
+                _folderToSave = folder;
+                _selectedMajorGridShapesExtent = _layoutHelper.SelectedMajorGridExtents;
+                for (int n = 0; n < _layoutHelper.LayoutShapeFile.NumShapes; n++)
+                {
+                    int fldTitle = _layoutHelper.LayoutShapeFile.FieldIndexByName["Title"];
+                    string mapTitle = _layoutHelper.LayoutShapeFile.CellValue[fldTitle, n].ToString();
+                    if (GenerateMinorGridInsideExtent(_layoutHelper.LayoutShapeFile.Shape[n].Extents, mapTitle))
+                    {
+                        Save($@"{_folderToSave}\{fishingGround}-{mapTitle}");
+                        if (OnGridInPanelCreated != null)
+                        {
+                            LayerEventArg e = new LayerEventArg(mapTitle);
+                            OnGridInPanelCreated(this, e);
+                        }
+                    }
+                }
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
@@ -1206,7 +1349,7 @@ namespace FAD3
         /// </summary>
         /// <param name="ext"></param>
         /// <param name="SelectionFromSelectBox"></param>
-        private void SelectGrids(Extents ext, bool SelectionFromSelectBox = false)
+        private void SelectGrids(Extents ext, bool SelectionFromSelectBox = false, bool CreateSelectionInMajorGrid = false)
         {
             var ifldToGrid = _shapefileMajorGrid.FieldIndexByName["toGrid"];
             _selectionFromSelectBox = SelectionFromSelectBox;
@@ -1225,7 +1368,9 @@ namespace FAD3
                         if (_listSelectedShapeGridNumbers.Count > 0)
                         {
                             foreach (var item in _listSelectedShapeGridNumbers)
+                            {
                                 _shapefileMajorGrid.EditCellValue(ifldToGrid, item, "");
+                            }
                         }
                         _listSelectedShapeGridNumbers.Clear();
 
@@ -1234,6 +1379,10 @@ namespace FAD3
                         {
                             _shapefileMajorGrid.EditCellValue(ifldToGrid, _selectedShapeIndexes[n], "T");
                             _listSelectedShapeGridNumbers.Add(_selectedShapeIndexes[n]);
+                            if (CreateSelectionInMajorGrid)
+                            {
+                                _shapefileMajorGrid.ShapeSelected[_selectedShapeIndexes[n]] = true;
+                            }
                         }
 
                         //categorizes grid and makes those with "T" in toGrid column  have a light red fill color

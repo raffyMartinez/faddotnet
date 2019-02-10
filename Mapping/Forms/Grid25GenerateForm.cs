@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
+using FAD3.Mapping.Forms;
+using MapWinGIS;
 
 namespace FAD3
 {
@@ -46,7 +48,29 @@ namespace FAD3
             _grid25MajorGrid.LayerSaved += OnGrid25LayerSaved;
             _grid25MajorGrid.GridRetrieved += OnGrid25GridRetrieved;
             _grid25MajorGrid.ExtentCreatedInLayer += OnExtentCreated;
+            _grid25MajorGrid.OnGridInPanelCreated += OnGridInPanelCreated;
+            //_grid25MajorGrid.LayoutDefined += OnGridLayoutDefined;
         }
+
+        private void OnGridInPanelCreated(Grid25MajorGrid s, LayerEventArg e)
+        {
+            txtMapTitle.Text = e.LayerName;
+        }
+
+        //private void OnGridLayoutDefined(Grid25MajorGrid s, ExtentDraggedBoxEventArgs e)
+        //{
+        //    using (Grid25LayoutHelperForm mglf = new Grid25LayoutHelperForm())
+        //    {
+        //        var ext = new MapWinGIS.Extents();
+        //        ext.SetBounds(e.Left, e.Bottom, 0, e.Right, e.Top, 0);
+        //        mglf.SelectionBoxExtent = ext;
+        //        mglf.MajorGridSelectionExtent = _grid25MajorGrid.SelectedMajorGridShapesExtent;
+        //        mglf.ShowDialog(this);
+        //        if (mglf.DialogResult == DialogResult.OK)
+        //        {
+        //        }
+        //    }
+        //}
 
         private void OnExtentCreated(Grid25MajorGrid s, ExtentDraggedBoxEventArgs e)
         {
@@ -84,7 +108,7 @@ namespace FAD3
         /// <summary>
         /// fills a dictionary with label and grid line properties
         /// </summary>
-        private void SetupDictionary()
+        public void SetupDictionary()
         {
             _labelAndGridProperties.Clear();
             _labelAndGridProperties.Add("minorGridLabelDistance", uint.Parse(txtMinorGridLabelDistance.Text));
@@ -188,6 +212,39 @@ namespace FAD3
 
                 case "buttonClose":
                     Close();
+                    break;
+
+                case "buttonLocateGrid":
+
+                    if (_grid25MajorGrid.SelectedShapeGridNumbers.Count > 0)
+                    {
+                        if (txtMinorGridLabelDistance.Text.Length > 0 && txtMinorGridLabelSize.Text.Length > 0)
+                        {
+                            SetupDictionary();
+                            _grid25MajorGrid.LabelAndGridProperties = _labelAndGridProperties;
+                            _grid25MajorGrid.DefineGridLayout((int)((Bitmap)imList.Images["gridLayout"]).GetHicon());
+                            Grid25LayoutHelperForm g25lhf = Grid25LayoutHelperForm.GetInstance(_grid25MajorGrid);
+
+                            if (g25lhf.Visible)
+                            {
+                                g25lhf.BringToFront();
+                            }
+                            else
+                            {
+                                // _grid25MajorGrid.DefineGridLayout((int)((Bitmap)imList.Images["gridLayout"]).GetHicon());
+                                g25lhf.Show(this);
+                            }
+                        }
+                        else
+                        {
+                            MessageBox.Show("Provide minor grid label distance and minor grid label size", "Validation error",
+                                MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("No selection in major grid", "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
                     break;
             }
         }

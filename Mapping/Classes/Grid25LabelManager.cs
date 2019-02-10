@@ -16,6 +16,7 @@ namespace FAD3
         public string MapTitle { get; set; }                                        //refers to the map title
         public bool _disposed;
         private int _labelDistance;
+        public string PanelTitle { get; set; }
 
         /// <summary>
         /// returns the shapefile containing point labels

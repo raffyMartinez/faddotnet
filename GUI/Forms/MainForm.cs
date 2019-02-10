@@ -2385,8 +2385,8 @@ namespace FAD3
         /// this will show a list of summaries depending on the level of the node selected
         /// level could be root, AOI, Landing site, gear used, and sampling month
         /// </summary>
-        /// <param name="TreeLevel"></param>
-        public void SetUPLV(string TreeLevel)
+        /// <param name="treeLevel"></param>
+        public void SetUPLV(string treeLevel)
         {
             lvMain.Visible = false;
             //var savedColWidthExist = true;
@@ -2405,7 +2405,7 @@ namespace FAD3
             //setup columns in the listview
             lvMain.Columns.Add("Property");
             lvMain.Columns.Add("Value");
-            switch (TreeLevel)
+            switch (treeLevel)
             {
                 case "root":
                     lblTitle.Text = "Database summary";
@@ -2442,12 +2442,12 @@ namespace FAD3
                     break;
             }
 
-            lvMain.Tag = TreeLevel;
+            lvMain.Tag = treeLevel;
             SizeColumns(lvMain);
             //}
 
             //add rows to the listview
-            switch (TreeLevel)
+            switch (treeLevel)
             {
                 case "sampling":
                     FillLVSamplingSummary(_landingSiteGuid, _gearVarGUID, _samplingMonth);
@@ -2612,7 +2612,8 @@ namespace FAD3
                     n = 0;
                     var inventory = new FishingGearInventory(_targetArea);
                     lvMain.Items.Add("");
-                    lvi = lvMain.Items.Add("Fishery inventories");
+                    lvi = lvMain.Items.Add("fisheryInventories", "Fishery inventories", null);
+                    lvi.Tag = "inventory";
                     if (inventory.Inventories.Count > 0)
                     {
                         foreach (var item in inventory.Inventories)
@@ -2622,8 +2623,8 @@ namespace FAD3
                                 lvi = lvMain.Items.Add("");
                             }
                             lvi.Name = item.Key;
-                            lvi.SubItems.Add(item.Value.InventoryName);
                             lvi.Tag = "inventory";
+                            lvi.SubItems.Add(item.Value.InventoryName);
                             n++;
                         }
                     }
@@ -2714,6 +2715,52 @@ namespace FAD3
                 this.panelSamplingButtons.Location = new Point(lvMain.Width - panelSamplingButtons.Width - 30, lvMain.Top + 50);
             }
             CancelButton = buttonOK.Visible ? buttonOK : null;
+        }
+
+        /// <summary>
+        /// updates the list of fishery inventories in a target area
+        /// </summary>
+        /// <param name="inventory"></param>
+        public void UpdateInventoryList(FishingGearInventory inventory)
+        {
+            int n = 0;
+            if (_treeLevel == "aoi")
+            {
+                foreach (ListViewItem item in lvMain.Items)
+                {
+                    if (item.Tag?.ToString() == "inventory")
+                    {
+                        if (n == 0)
+                        {
+                            item.SubItems[1].Text = "0";
+                            item.Name = "fisheryInventories";
+                        }
+                        else
+                        {
+                            lvMain.Items.Remove(item);
+                        }
+                        n++;
+                    }
+                }
+
+                n = 0;
+                ListViewItem lvi = new ListViewItem();
+                foreach (var item in inventory.Inventories)
+                {
+                    if (n == 0)
+                    {
+                        lvi = lvMain.Items["fisheryInventories"];
+                    }
+                    else
+                    {
+                        lvi = lvMain.Items.Add("");
+                    }
+                    lvi.Name = item.Key;
+                    lvi.Tag = "inventory";
+                    lvi.SubItems[1].Text = item.Value.InventoryName;
+                    n++;
+                }
+            }
         }
 
         /// <summary>

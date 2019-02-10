@@ -2,6 +2,7 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
+using FAD3.Mapping.Forms;
 
 namespace FAD3
 {
@@ -235,7 +236,16 @@ namespace FAD3
 
         private void OnListViewDoubleClick(object sender, EventArgs e)
         {
-            MessageBox.Show("To be implemented!");
+            //MessageBox.Show("To be implemented!");
+            //EditShapeAttributeForm eaf = EditShapeAttributeForm.
+
+            using (EditShapeAttributeForm esaf = new EditShapeAttributeForm(global.MappingForm, MapInterActionHandler))
+            {
+                esaf.ShowDialog(this);
+                if (esaf.DialogResult == DialogResult.OK)
+                {
+                }
+            }
         }
 
         /// <summary>

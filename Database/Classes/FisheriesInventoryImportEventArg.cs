@@ -12,6 +12,7 @@ namespace FAD3.Database.Classes
         public FisheriesInventoryLevel InventoryLevel { get; internal set; }
         public bool Cancel { get; set; }
         public string CancelReason { get; set; }
+        public bool ImportCompleted { get; internal set; }
 
         public FisheriesInventoryImportEventArg(string levelName, string levelGuid, FisheriesInventoryLevel inventoryLevel)
         {
@@ -28,6 +29,13 @@ namespace FAD3.Database.Classes
                     TargetAreaName = levelName;
                     break;
             }
+        }
+
+        public FisheriesInventoryImportEventArg(bool importCompleted, string projectName, string projectGuid)
+        {
+            ImportCompleted = importCompleted;
+            ProjectName = projectName;
+            ProjectGuid = projectGuid;
         }
     }
 }

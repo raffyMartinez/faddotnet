@@ -25,13 +25,16 @@ namespace FAD3
         private int _minorGridColumns;                                      //number of minor grid columns
         private const int CELLSIDE = 2000;                                  //length of one side of a minor grid
 
+        private Grid25MajorGrid _grid25MajorGrid;
+
         /// <summary>
         /// Passes a map control reference.
         /// </summary>
         /// <param name="mapControl"></param>
-        public Grid25MinorGrid(AxMap mapControl)
+        public Grid25MinorGrid(AxMap mapControl, Grid25MajorGrid majorGrid)
         {
             _axMap = mapControl;
+            _grid25MajorGrid = majorGrid;
         }
 
         /// <summary>
@@ -46,27 +49,27 @@ namespace FAD3
         /// Public entry point to start creating minor grids. It also sets the extents of the minor grid.
         /// </summary>
         /// <param name="selectedMajorGridShapesExtent"></param>
-        /// <param name="selectionBoxExtent"></param>
+        /// <param name="definitionExtent"></param>
         /// <returns></returns>
-        public bool DefineMinorGrids(Extents selectedMajorGridShapesExtent, Extents selectionBoxExtent)
+        public bool DefineMinorGrids(Extents selectedMajorGridShapesExtent, Extents definitionExtent)
         {
             var success = false;
             var mbrExtentIsMaxExtent = false;
-            if (selectionBoxExtent.ToShape().Contains(selectedMajorGridShapesExtent.ToShape()))
+            if (definitionExtent.ToShape().Contains(selectedMajorGridShapesExtent.ToShape()))
             {
                 //minor grid extent is the extent of the selected major grid shapes
                 _minorGridExtents = selectedMajorGridShapesExtent;
                 mbrExtentIsMaxExtent = true;
             }
-            else if (selectedMajorGridShapesExtent.ToShape().Contains(selectionBoxExtent.ToShape()))
+            else if (selectedMajorGridShapesExtent.ToShape().Contains(definitionExtent.ToShape()))
             {
                 //minor grid extent is the extent of the selection box
-                _minorGridExtents = selectionBoxExtent;
+                _minorGridExtents = definitionExtent;
             }
-            else if (selectionBoxExtent.ToShape().Intersects(selectedMajorGridShapesExtent.ToShape()))
+            else if (definitionExtent.ToShape().Intersects(selectedMajorGridShapesExtent.ToShape()))
             {
                 var results = new object();
-                if (selectionBoxExtent.ToShape().GetIntersection(selectedMajorGridShapesExtent.ToShape(), ref results))
+                if (definitionExtent.ToShape().GetIntersection(selectedMajorGridShapesExtent.ToShape(), ref results))
                 {
                     //convets results object to an array of shapes that is a product of the intersection
                     object[] shapeArray = results as object[];
@@ -96,10 +99,10 @@ namespace FAD3
             return success;
         }
 
-        public void LoadMinorGridShapefile(string fileName)
+        public bool LoadMinorGridShapefile(string fileName)
         {
             _shapefileMinorGridLines = new Shapefile();
-            _shapefileMinorGridLines.Open(fileName, null);
+            return _shapefileMinorGridLines.Open(fileName, null);
         }
 
         /// <summary>
@@ -146,8 +149,16 @@ namespace FAD3
                     }
                     else
                     {
-                        _minorGridMBRHeight = ((ht / CELLSIDE) * CELLSIDE) + CELLSIDE;
-                        _minorGridMBRWidth = ((wdt / CELLSIDE) * CELLSIDE) + CELLSIDE;
+                        if (_grid25MajorGrid.InDefindeGridFromLayout)
+                        {
+                            _minorGridMBRHeight = ((ht / CELLSIDE) * CELLSIDE);
+                            _minorGridMBRWidth = ((wdt / CELLSIDE) * CELLSIDE);
+                        }
+                        else
+                        {
+                            _minorGridMBRHeight = ((ht / CELLSIDE) * CELLSIDE) + CELLSIDE;
+                            _minorGridMBRWidth = ((wdt / CELLSIDE) * CELLSIDE) + CELLSIDE;
+                        }
                         if (_isIntersect)
                         {
                             if (_minorGridMBRWidth - wdt == CELLSIDE)

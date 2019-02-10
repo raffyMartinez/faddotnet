@@ -44,13 +44,27 @@ namespace FAD3
             }
         }
 
+        public bool EditShapeFileField(string fieldName, int shapeIndex, object newValue)
+        {
+            bool successEdit = false;
+            if (LayerType == "ShapefileClass")
+            {
+                var sf = LayerObject as Shapefile;
+                successEdit = sf.EditCellValue(sf.FieldIndexByName[fieldName], shapeIndex, newValue);
+            }
+            return successEdit;
+        }
+
         public void SaveXMLSettings()
         {
-            var sf = LayerObject as Shapefile;
-            if (sf != null)
+            if (LayerType == "ShapefileClass")
             {
-                LabelSettingsXML = sf.Labels.Serialize();
-                SymbolSettinsXML = sf.DefaultDrawingOptions.Serialize();
+                var sf = LayerObject as Shapefile;
+                if (sf != null)
+                {
+                    LabelSettingsXML = sf.Labels.Serialize();
+                    SymbolSettinsXML = sf.DefaultDrawingOptions.Serialize();
+                }
             }
         }
 

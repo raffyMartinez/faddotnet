@@ -642,7 +642,7 @@ namespace FAD3.Database.Classes
                                         tblGearInventories.InventoryGuid = tblGearInventoryBarangay.InventoryGuid) ON
                                         tblEnumerators.EnumeratorID = tblGearInventoryBarangay.Enumerator
                                        WHERE tblGearInventories.InventoryGuid={{{inventoryGuid}}}
-                                       ORDER BY Provinces.ProvinceName, 
+                                       ORDER BY Provinces.ProvinceName,
                                         Municipalities.Municipality,
                                         tblGearInventoryBarangay.Barangay,
                                         tblGearInventoryBarangay.Sitio";
@@ -1104,11 +1104,27 @@ namespace FAD3.Database.Classes
             return ("", "", "", "", "");
         }
 
+        /// <summary>
+        /// helper function that handles asynch importing  fisheries inventory in XML
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="importAction"></param>
+        /// <param name="existingInventoryGuid"></param>
+        /// <returns>
+        /// number of inventoried gears successfuly imported
+        /// </returns>
         public Task<int> ImportInventoryAsync(string fileName, ImportInventoryAction importAction, string existingInventoryGuid = "")
         {
             return Task.Run(() => ImportInventory(fileName, importAction, existingInventoryGuid));
         }
 
+        /// <summary>
+        /// main function for importing fisheries inventory in XML
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="importAction"></param>
+        /// <param name="existingInventoryGuid"></param>
+        /// <returns></returns>
         private int ImportInventory(string fileName, ImportInventoryAction importAction, string existingInventoryGuid = "")
         {
             bool proceed = false;
@@ -1263,7 +1279,7 @@ namespace FAD3.Database.Classes
                             localNames.Add(xmlReader.GetAttribute("key"), xmlReader.GetAttribute("Value"));
                             break;
                     }
-                    if (validGearVariation || (gearVariationGuid.Length > 0
+                    if (validGearVariation || (gearVariationGuid?.Length > 0
                         && localNames.Count > 0
                         && !GearInventoryExists(gearVariationGuid, municipalityNumber, barangay, sitio, localNames)))
                     {
@@ -1452,6 +1468,11 @@ namespace FAD3.Database.Classes
                 }
             }
 
+            //if (importedGearCount > 0)
+            //{
+            //    FisheriesInventoryImportEventArg e = new FisheriesInventoryImportEventArg(true, projectName, projectGuid);
+            //    InventoryLevel?.Invoke(this, e);
+            //}
             return importedGearCount;
         }
 
@@ -3847,11 +3868,16 @@ namespace FAD3.Database.Classes
             return sitios;
         }
 
+        public void RefreshInventories(string targetAreaGuid)
+        {
+            ReadInventoriesInTargetArea(targetAreaGuid);
+        }
+
         /// <summary>
         /// gets inventory projects found in a target area
         /// </summary>
-        /// <param name="AOIGuid"></param>
-        private void ReadInventoriesInTargetArea(string AOIGuid)
+        /// <param name="targetAreaGuid"></param>
+        private void ReadInventoriesInTargetArea(string targetAreaGuid)
         {
             _inventories.Clear();
             var dt = new DataTable();
@@ -3862,7 +3888,7 @@ namespace FAD3.Database.Classes
                     conection.Open();
                     string query = $@"SELECT tblGearInventories.InventoryGuid, tblAOI.AOIName, tblGearInventories.InventoryName, tblGearInventories.DateConducted
                                       FROM tblAOI INNER JOIN tblGearInventories ON tblAOI.AOIGuid = tblGearInventories.TargetArea
-                                      WHERE tblGearInventories.[TargetArea] ={{{AOIGuid}}}";
+                                      WHERE tblGearInventories.[TargetArea] ={{{targetAreaGuid}}}";
 
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
