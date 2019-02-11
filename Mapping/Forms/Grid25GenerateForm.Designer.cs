@@ -77,6 +77,7 @@
             this.tsButtonExit = new System.Windows.Forms.ToolStripButton();
             this.lblGridStatus = new System.Windows.Forms.Label();
             this.buttonLocateGrid = new System.Windows.Forms.Button();
+            this.btnOpenLayoutGrid = new System.Windows.Forms.Button();
             this.groupLabels.SuspendLayout();
             this.toolbar.SuspendLayout();
             this.SuspendLayout();
@@ -128,7 +129,7 @@
             this.groupLabels.Controls.Add(this.shapeContainer1);
             this.groupLabels.Location = new System.Drawing.Point(4, 89);
             this.groupLabels.Name = "groupLabels";
-            this.groupLabels.Size = new System.Drawing.Size(245, 352);
+            this.groupLabels.Size = new System.Drawing.Size(245, 363);
             this.groupLabels.TabIndex = 4;
             this.groupLabels.TabStop = false;
             this.groupLabels.Text = "Labels";
@@ -137,9 +138,9 @@
             // 
             this.btnLabelsFromKML.ImageKey = "label_add";
             this.btnLabelsFromKML.ImageList = this.imList;
-            this.btnLabelsFromKML.Location = new System.Drawing.Point(172, 323);
+            this.btnLabelsFromKML.Location = new System.Drawing.Point(169, 323);
             this.btnLabelsFromKML.Name = "btnLabelsFromKML";
-            this.btnLabelsFromKML.Size = new System.Drawing.Size(23, 23);
+            this.btnLabelsFromKML.Size = new System.Drawing.Size(28, 28);
             this.btnLabelsFromKML.TabIndex = 27;
             this.btnLabelsFromKML.UseVisualStyleBackColor = true;
             // 
@@ -153,6 +154,7 @@
             this.imList.Images.SetKeyName(3, "label_add");
             this.imList.Images.SetKeyName(4, "Ruler_16x.png");
             this.imList.Images.SetKeyName(5, "gridLayout");
+            this.imList.Images.SetKeyName(6, "openLayoutGrid");
             // 
             // buttonLabel
             // 
@@ -160,7 +162,7 @@
             this.buttonLabel.ImageList = this.imList;
             this.buttonLabel.Location = new System.Drawing.Point(201, 323);
             this.buttonLabel.Name = "buttonLabel";
-            this.buttonLabel.Size = new System.Drawing.Size(23, 23);
+            this.buttonLabel.Size = new System.Drawing.Size(28, 28);
             this.buttonLabel.TabIndex = 26;
             this.buttonLabel.UseVisualStyleBackColor = true;
             this.buttonLabel.Click += new System.EventHandler(this.OnButtons_Click);
@@ -372,7 +374,7 @@
             this.shapeBorderColor,
             this.shapeMajorGridLabelColor,
             this.shapeMinorGridLabelColor});
-            this.shapeContainer1.Size = new System.Drawing.Size(239, 332);
+            this.shapeContainer1.Size = new System.Drawing.Size(239, 343);
             this.shapeContainer1.TabIndex = 25;
             this.shapeContainer1.TabStop = false;
             // 
@@ -433,9 +435,9 @@
             // 
             this.buttonClear.ImageIndex = 1;
             this.buttonClear.ImageList = this.imList;
-            this.buttonClear.Location = new System.Drawing.Point(257, 130);
+            this.buttonClear.Location = new System.Drawing.Point(255, 132);
             this.buttonClear.Name = "buttonClear";
-            this.buttonClear.Size = new System.Drawing.Size(23, 23);
+            this.buttonClear.Size = new System.Drawing.Size(28, 28);
             this.buttonClear.TabIndex = 3;
             this.buttonClear.UseVisualStyleBackColor = true;
             this.buttonClear.Click += new System.EventHandler(this.OnButtons_Click);
@@ -444,9 +446,9 @@
             // 
             this.buttonGrid.ImageIndex = 0;
             this.buttonGrid.ImageList = this.imList;
-            this.buttonGrid.Location = new System.Drawing.Point(256, 102);
+            this.buttonGrid.Location = new System.Drawing.Point(255, 102);
             this.buttonGrid.Name = "buttonGrid";
-            this.buttonGrid.Size = new System.Drawing.Size(23, 23);
+            this.buttonGrid.Size = new System.Drawing.Size(28, 28);
             this.buttonGrid.TabIndex = 2;
             this.buttonGrid.UseVisualStyleBackColor = true;
             this.buttonGrid.Click += new System.EventHandler(this.OnButtons_Click);
@@ -463,7 +465,7 @@
             this.tsButtonExit});
             this.toolbar.Location = new System.Drawing.Point(0, 0);
             this.toolbar.Name = "toolbar";
-            this.toolbar.Size = new System.Drawing.Size(285, 25);
+            this.toolbar.Size = new System.Drawing.Size(292, 25);
             this.toolbar.SuppressHighlighting = true;
             this.toolbar.TabIndex = 7;
             this.toolbar.Text = "toolStripEx1";
@@ -541,18 +543,30 @@
             // 
             this.buttonLocateGrid.ImageIndex = 5;
             this.buttonLocateGrid.ImageList = this.imList;
-            this.buttonLocateGrid.Location = new System.Drawing.Point(257, 159);
+            this.buttonLocateGrid.Location = new System.Drawing.Point(255, 163);
             this.buttonLocateGrid.Name = "buttonLocateGrid";
-            this.buttonLocateGrid.Size = new System.Drawing.Size(23, 23);
+            this.buttonLocateGrid.Size = new System.Drawing.Size(28, 28);
             this.buttonLocateGrid.TabIndex = 9;
             this.buttonLocateGrid.UseVisualStyleBackColor = true;
             this.buttonLocateGrid.Click += new System.EventHandler(this.OnButtons_Click);
+            // 
+            // btnOpenLayoutGrid
+            // 
+            this.btnOpenLayoutGrid.ImageIndex = 6;
+            this.btnOpenLayoutGrid.ImageList = this.imList;
+            this.btnOpenLayoutGrid.Location = new System.Drawing.Point(255, 194);
+            this.btnOpenLayoutGrid.Name = "btnOpenLayoutGrid";
+            this.btnOpenLayoutGrid.Size = new System.Drawing.Size(28, 28);
+            this.btnOpenLayoutGrid.TabIndex = 10;
+            this.btnOpenLayoutGrid.UseVisualStyleBackColor = true;
+            this.btnOpenLayoutGrid.Click += new System.EventHandler(this.OnButtons_Click);
             // 
             // Grid25GenerateForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(285, 532);
+            this.ClientSize = new System.Drawing.Size(292, 532);
+            this.Controls.Add(this.btnOpenLayoutGrid);
             this.Controls.Add(this.buttonLocateGrid);
             this.Controls.Add(this.lblGridStatus);
             this.Controls.Add(this.toolbar);
@@ -628,5 +642,6 @@
         private System.Windows.Forms.Button btnLabelsFromKML;
         private System.Windows.Forms.Label lblGridStatus;
         private System.Windows.Forms.Button buttonLocateGrid;
+        private System.Windows.Forms.Button btnOpenLayoutGrid;
     }
 }

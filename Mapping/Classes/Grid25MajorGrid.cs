@@ -83,6 +83,7 @@ namespace FAD3
         public string FolderToSave
         {
             get { return _folderToSave; }
+            set { _folderToSave = value; }
         }
 
         public Grid25LayoutHelper LayoutHelper
@@ -211,10 +212,10 @@ namespace FAD3
                         {
                             string shpIndex = (string)_shapefileMajorGridIntersect.CellValue[_shapefileMajorGridIntersect.FieldIndexByName["hGrid"], n];
                             if (shpIndex.Length > 0)
-                            { 
-                            _listSelectedShapeGridNumbers.Add(int.Parse(shpIndex));
-                            //_listSelectedShapeGridNumbers.Add(shpIndex);
-                        }
+                            {
+                                _listSelectedShapeGridNumbers.Add(int.Parse(shpIndex));
+                                //_listSelectedShapeGridNumbers.Add(shpIndex);
+                            }
                         }
 
                         //get the intersection of the minorGridExtent and the selected major grids
@@ -745,18 +746,37 @@ namespace FAD3
             _axMap.Redraw();
         }
 
+        public void DefineGridLayout()
+        {
+            DefineGridLayout(-1);
+        }
+
         public void DefineGridLayout(int iconHandle)
         {
             if (_layoutHelper == null)
             {
                 _inDefineMinorGrid = false;
-                _hCursorDefineLayout = iconHandle;
                 _enableMapInteraction = false;
-                _layoutHelper = new Grid25LayoutHelper(this, iconHandle);
+                if (iconHandle >= 0)
+                {
+                    _hCursorDefineLayout = iconHandle;
+                    _axMap.CursorMode = tkCursorMode.cmSelection;
+                    _axMap.MapCursor = tkCursor.crsrUserDefined;
+                    _axMap.UDCursorHandle = _hCursorDefineLayout;
+                    _layoutHelper = new Grid25LayoutHelper(this, iconHandle);
+                }
+                else
+                {
+                    _layoutHelper = new Grid25LayoutHelper(this);
+                }
             }
-            _axMap.CursorMode = tkCursorMode.cmSelection;
-            _axMap.MapCursor = tkCursor.crsrUserDefined;
-            _axMap.UDCursorHandle = _hCursorDefineLayout;
+            //else
+            //{
+            //    _hCursorDefineLayout = iconHandle;
+            //    _axMap.CursorMode = tkCursorMode.cmSelection;
+            //    _axMap.MapCursor = tkCursor.crsrUserDefined;
+            //    _axMap.UDCursorHandle = _hCursorDefineLayout;
+            //}
         }
 
         /// <summary>
@@ -1072,7 +1092,7 @@ namespace FAD3
                             for (int n = 0; n < shapes.Length; n++)
                             {
                                 var iShp = _shapefileMajorGridIntersect.EditAddShape(shapes[n]);
-                                if (iShp > 0)
+                                if (iShp >= 0)
                                 {
                                     _shapefileMajorGridIntersect.EditCellValue(ifldMGNo, iShp, gridNo);
                                     _shapefileMajorGridIntersect.EditCellValue(ifldGridHandle, iShp, item);

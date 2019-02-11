@@ -351,7 +351,12 @@ namespace FAD3
                                         }
                                         using (StreamWriter writer = new StreamWriter(layoutFile, true))
                                         {
-                                            writer.WriteLine(_mapLayersHandler.CurrentMapLayer.FishingGridFishingGroundName);
+                                            writer.WriteLine($"Fishing ground:{ global.MappingForm.Grid25MajorGrid.LayoutHelper.FishingGround}");
+                                            writer.WriteLine($"Save folder:{global.MappingForm.Grid25MajorGrid.LayoutHelper.GridFromLayoutSaveFolder}");
+                                            writer.WriteLine($"Rows:{global.MappingForm.Grid25MajorGrid.LayoutHelper.Rows}");
+                                            writer.WriteLine($"Columns:{global.MappingForm.Grid25MajorGrid.LayoutHelper.Columns}");
+                                            writer.WriteLine($"Overlap:{global.MappingForm.Grid25MajorGrid.LayoutHelper.Overlap}");
+                                            //writer.WriteLine(_mapLayersHandler.CurrentMapLayer)
                                         }
                                     }
                                 }

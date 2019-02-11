@@ -23,6 +23,15 @@ namespace FAD3
         private double _dragWidth;
         private double _dragHeight;
         private bool _gridFromFileLoaded;
+        private Grid25LayoutHelperForm _g25lhf;
+
+        public string FishingGround { get; internal set; }
+        public string LayoutGridSaveFolder { get; internal set; }
+
+        public Grid25LayoutHelperForm LayoutHelperForm
+        {
+            get { return _g25lhf; }
+        }
 
         public void set_UTMZone(fadUTMZone utmZone)
         {
@@ -216,23 +225,27 @@ namespace FAD3
 
                 case "buttonLocateGrid":
 
-                    if (_grid25MajorGrid.SelectedShapeGridNumbers.Count > 0)
+                    if (_grid25MajorGrid.SelectedShapeGridNumbers.Count > 0 || _grid25MajorGrid.LayoutHelper != null)
                     {
                         if (txtMinorGridLabelDistance.Text.Length > 0 && txtMinorGridLabelSize.Text.Length > 0)
                         {
                             SetupDictionary();
                             _grid25MajorGrid.LabelAndGridProperties = _labelAndGridProperties;
                             _grid25MajorGrid.DefineGridLayout((int)((Bitmap)imList.Images["gridLayout"]).GetHicon());
-                            Grid25LayoutHelperForm g25lhf = Grid25LayoutHelperForm.GetInstance(_grid25MajorGrid);
+                            _g25lhf = Grid25LayoutHelperForm.GetInstance(_grid25MajorGrid);
 
-                            if (g25lhf.Visible)
+                            if (_g25lhf.Visible)
                             {
-                                g25lhf.BringToFront();
+                                _g25lhf.BringToFront();
                             }
                             else
                             {
-                                // _grid25MajorGrid.DefineGridLayout((int)((Bitmap)imList.Images["gridLayout"]).GetHicon());
-                                g25lhf.Show(this);
+                                _g25lhf.Show(this);
+                            }
+
+                            if (_grid25MajorGrid.LayoutHelper != null && _grid25MajorGrid.LayoutHelper.LayoutShapeFile != null)
+                            {
+                                _g25lhf.SetUpFields();
                             }
                         }
                         else
@@ -244,6 +257,57 @@ namespace FAD3
                     else
                     {
                         MessageBox.Show("No selection in major grid", "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    break;
+
+                case "btnOpenLayoutGrid":
+                    OpenFileDialog ofd = new OpenFileDialog();
+                    ofd.Title = "Open a layout grid template file";
+                    ofd.Filter = "Layout file|*.lay|All files|*.*";
+                    ofd.FilterIndex = 0;
+                    ofd.ShowDialog();
+                    if (ofd.FileName.Length > 0)
+                    {
+                        _grid25MajorGrid.LabelAndGridProperties = _labelAndGridProperties;
+                        _grid25MajorGrid.DefineGridLayout();
+                        if (_grid25MajorGrid.LayoutHelper.OpenLayoutFile(ofd.FileName))
+                        {
+                            string line;
+                            StreamReader file = new StreamReader(ofd.FileName);
+
+                            while ((line = file.ReadLine()) != null)
+                            {
+                                string[] line2 = line.Split(':');
+                                switch (line2[0])
+                                {
+                                    case "Fishing ground":
+                                        _grid25MajorGrid.LayoutHelper.FishingGround = line2[1];
+                                        break;
+
+                                    case "Save folder":
+                                        string folder = $"{line2[1]}:{line2[2]}";
+                                        _grid25MajorGrid.LayoutHelper.GridFromLayoutSaveFolder = folder;
+                                        _grid25MajorGrid.FolderToSave = folder;
+                                        break;
+
+                                    case "Rows":
+                                        _grid25MajorGrid.LayoutHelper.Rows = int.Parse(line2[1]);
+                                        break;
+
+                                    case "Columns":
+                                        _grid25MajorGrid.LayoutHelper.Columns = int.Parse(line2[1]);
+                                        break;
+
+                                    case "Overlap":
+                                        _grid25MajorGrid.LayoutHelper.Overlap = int.Parse(line2[1]);
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Selected file is not valid", "Invalid file", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     break;
             }

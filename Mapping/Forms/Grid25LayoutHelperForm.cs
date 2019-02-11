@@ -35,7 +35,6 @@ namespace FAD3.Mapping.Forms
             e.LayoutSpecs(int.Parse(txtRows.Text), int.Parse(txtColumns.Text), int.Parse(txtOverlap.Text));
         }
 
-        private ListViewItem _lastItemChecked;
         public int PageWidth { get; internal set; }
         public int PageHeight { get; internal set; }
         public int Overlap { get; internal set; }
@@ -51,6 +50,50 @@ namespace FAD3.Mapping.Forms
         private static Grid25LayoutHelperForm _instance;
         private Grid25MajorGrid _majorGrid;
         private string _parentFolder = string.Empty;
+        private string _savePath;
+        private string _fishingGround;
+
+        public void SetUpFields()
+        {
+            _fishingGround = LayoutHelper.FishingGround;
+            textFishingGround.Text = _fishingGround;
+            _savePath = LayoutHelper.GridFromLayoutSaveFolder;
+            textFolderToSave.Text = _savePath;
+            txtRows.Text = LayoutHelper.Rows.ToString();
+            txtColumns.Text = LayoutHelper.Columns.ToString();
+            txtOverlap.Text = LayoutHelper.Overlap.ToString();
+
+            SetupResultsView();
+
+            int panelCount = LayoutHelper.Columns * LayoutHelper.Rows;
+            for (int n = 0; n < panelCount; n++)
+            {
+                int fldTitle = LayoutHelper.LayoutShapeFile.FieldIndexByName["Title"];
+                string panelTitle = LayoutHelper.LayoutShapeFile.CellValue[fldTitle, n].ToString();
+                Extents ext = LayoutHelper.LayoutShapeFile.Shape[n].Extents;
+                if (File.Exists($@"{_savePath}\{_fishingGround}-{panelTitle}_gridlines.shp"))
+                {
+                    ListViewItem lvi = lvResults.Items.Add(panelTitle);
+                    lvi.SubItems.Add(ext.Width.ToString());
+                    lvi.SubItems.Add(ext.Height.ToString());
+                    lvi.Tag = $"{_fishingGround}-{panelTitle}";
+                }
+                else
+                {
+                    lvResults.Items.Add("");
+                }
+            }
+
+            SizeColumns(lvResults, false);
+            lvResults.ItemChecked += OnListItemChecked;
+
+            bool enable = LayoutHelper.LayoutShapeFile == null;
+            txtColumns.Enabled = enable;
+            txtRows.Enabled = enable;
+            txtOverlap.Enabled = enable;
+            txtPageHeight.Enabled = enable;
+            txtPageWidth.Enabled = enable;
+        }
 
         private bool AcceptOptions()
         {
@@ -102,27 +145,6 @@ namespace FAD3.Mapping.Forms
         {
             switch (((Button)(sender)).Name)
             {
-                case "btnOpenLayout":
-                    OpenFileDialog ofd = new OpenFileDialog();
-                    ofd.Title = "Open a layout grid template file";
-                    ofd.Filter = "Layout file|*.lay|All files|*.*";
-                    ofd.FilterIndex = 0;
-                    ofd.ShowDialog();
-                    if (ofd.FileName.Length > 0)
-                    {
-                        if (LayoutHelper.OpenLayoutFile(ofd.FileName))
-                        {
-                            string layoutData = File.ReadAllText(ofd.FileName);
-                            textFishingGround.Text = layoutData;
-                            textFolderToSave.Text = Path.GetDirectoryName(ofd.FileName);
-                        }
-                    }
-                    else
-                    {
-                        MessageBox.Show("Selected file is not valid", "Invalid file", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                    break;
-
                 case "btnSelectFolderSave":
                     FolderBrowserDialog fbd = new FolderBrowserDialog();
                     fbd.Description = "Select folder to save fishing ground grid map";
@@ -152,8 +174,10 @@ namespace FAD3.Mapping.Forms
                                 if (_majorGrid.LayoutHelper.LayerHandle > 0)
                                 {
                                     _majorGrid.LayoutHelper.FishingGround = textFishingGround.Text;
-                                    _majorGrid.MapLayers[_majorGrid.LayoutHelper.LayerHandle].FishingGridFishingGroundName = textFishingGround.Text;
+                                    _majorGrid.LayoutHelper.GridFromLayoutSaveFolder = textFolderToSave.Text;
+
                                     FillResultList();
+                                    _majorGrid.MapLayers.ClearAllSelections();
                                 }
                             }
                         }
@@ -197,7 +221,7 @@ namespace FAD3.Mapping.Forms
             }
         }
 
-        private void FillResultList()
+        private void SetupResultsView()
         {
             lvResults.ItemChecked -= OnListItemChecked;
             lvResults.View = View.Details;
@@ -207,6 +231,11 @@ namespace FAD3.Mapping.Forms
             lvResults.Columns.Add("Height");
             lvResults.CheckBoxes = true;
             SizeColumns(lvResults);
+        }
+
+        private void FillResultList()
+        {
+            SetupResultsView();
 
             lvResults.Items.Clear();
             int fldTitle = LayoutHelper.LayoutShapeFile.FieldIndexByName["Title"];

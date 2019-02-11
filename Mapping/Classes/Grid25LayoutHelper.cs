@@ -25,12 +25,31 @@ namespace FAD3.Mapping.Classes
         public delegate void LayoutCreatededEvent(Grid25LayoutHelper s, Grid25LayoutHelperEventArgs e);
         public event LayoutCreatededEvent LayerCreated;
 
+        public int Rows
+        {
+            get { return _rows; }
+            set { _rows = value; }
+        }
+
+        public int Columns
+        {
+            get { return _columns; }
+            set { _columns = value; }
+        }
+
+        public int Overlap
+        {
+            get { return _overLap; }
+            set { _overLap = value; }
+        }
+
         public int LayerHandle
         {
             get { return _hsfLayout; }
         }
 
         public string FishingGround { get; set; }
+        public string GridFromLayoutSaveFolder { get; set; }
 
         public Extents SelectedMajorGridExtents
         {
@@ -88,23 +107,48 @@ namespace FAD3.Mapping.Classes
             _overLap = overlap;
         }
 
+        public Grid25LayoutHelper(Grid25MajorGrid majorGrid)
+        {
+            SetupClass(majorGrid);
+        }
+
         public Grid25LayoutHelper(Grid25MajorGrid majorGrid, int iconHandle)
+        {
+            //_majorGrid = majorGrid;
+            //_axMap = _majorGrid.MapControl;
+            //_axMap.SelectBoxFinal += OnMapSelectBoxFinal;
+            //_axMap.SendSelectBoxFinal = true;
+            ////_axMap.CursorMode = tkCursorMode.cmSelection;
+            //_hCursorDefineLayout = iconHandle;
+            ////_axMap.MapCursor = tkCursor.crsrUserDefined;
+            ////_axMap.UDCursorHandle = _hCursorDefineLayout;
+            ////_sfLayout = new MapWinGIS.Shapefile();
+            //for (int n = 0; n < _majorGrid.SelectedShapeGridNumbers.Count; n++)
+            //{
+            //    _majorGrid.Grid25Grid.ShapeSelected[_majorGrid.SelectedShapeGridNumbers[n]] = true;
+            //}
+            //_selectedMajorGridShapesExtent = _majorGrid.Grid25Grid.BufferByDistance(0, 0, true, true).Extents;
+            //_majorGrid.Grid25Grid.SelectNone();
+
+            _hCursorDefineLayout = iconHandle;
+            SetupClass(majorGrid);
+        }
+
+        private void SetupClass(Grid25MajorGrid majorGrid)
         {
             _majorGrid = majorGrid;
             _axMap = _majorGrid.MapControl;
             _axMap.SelectBoxFinal += OnMapSelectBoxFinal;
             _axMap.SendSelectBoxFinal = true;
-            //_axMap.CursorMode = tkCursorMode.cmSelection;
-            _hCursorDefineLayout = iconHandle;
-            //_axMap.MapCursor = tkCursor.crsrUserDefined;
-            //_axMap.UDCursorHandle = _hCursorDefineLayout;
-            //_sfLayout = new MapWinGIS.Shapefile();
-            for (int n = 0; n < _majorGrid.SelectedShapeGridNumbers.Count; n++)
+            if (_majorGrid.SelectedShapeGridNumbers.Count > 0)
             {
-                _majorGrid.Grid25Grid.ShapeSelected[_majorGrid.SelectedShapeGridNumbers[n]] = true;
+                for (int n = 0; n < _majorGrid.SelectedShapeGridNumbers.Count; n++)
+                {
+                    _majorGrid.Grid25Grid.ShapeSelected[_majorGrid.SelectedShapeGridNumbers[n]] = true;
+                }
+                _selectedMajorGridShapesExtent = _majorGrid.Grid25Grid.BufferByDistance(0, 0, true, true).Extents;
+                _majorGrid.Grid25Grid.SelectNone();
             }
-            _selectedMajorGridShapesExtent = _majorGrid.Grid25Grid.BufferByDistance(0, 0, true, true).Extents;
-            _majorGrid.Grid25Grid.SelectNone();
         }
 
         private void OnMapSelectBoxFinal(object sender, _DMapEvents_SelectBoxFinalEvent e)

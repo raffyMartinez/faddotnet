@@ -159,6 +159,7 @@ namespace FAD3
                             _minorGridMBRHeight = ((ht / CELLSIDE) * CELLSIDE) + CELLSIDE;
                             _minorGridMBRWidth = ((wdt / CELLSIDE) * CELLSIDE) + CELLSIDE;
                         }
+
                         if (_isIntersect)
                         {
                             if (_minorGridMBRWidth - wdt == CELLSIDE)
@@ -168,6 +169,7 @@ namespace FAD3
                                 _minorGridMBRHeight = ht;
                         }
                     }
+
                     _minorGridRows = (int)_minorGridMBRHeight / CELLSIDE;
                     _minorGridColumns = (int)_minorGridMBRWidth / CELLSIDE;
                     _minorGridOriginX = (int)(_minorGridExtents.xMin / CELLSIDE) * CELLSIDE;
