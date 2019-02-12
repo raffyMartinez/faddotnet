@@ -8,18 +8,22 @@ using MapWinGIS;
 
 namespace FAD3.Mapping.Classes
 {
+    /// <summary>
+    /// Helper class for creating  a template shapefile of grids that define the boundary of a grid map.
+    /// The template shapefile will be used in creating multiple grid25 maps in one go
+    /// </summary>
     public class Grid25LayoutHelper : IDisposable
     {
         private AxMap _axMap;
         private Grid25MajorGrid _majorGrid;
-        private Shapefile _sfLayout;
-        private int _rows;
-        private int _columns;
-        private int _overLap;
+        private Shapefile _sfLayout;                    //the template shapefile
+        private int _rows;                              //number of rows in the template
+        private int _columns;                           //number of columns in the template
+        private int _overLap;                           //number of minor grids of overlap of grid map
         private Extents _layoutExtents;
         private Extents _selectedMajorGridShapesExtent;
         private bool _disposed = false;
-        private int _hsfLayout;
+        private int _hsfLayout;                         //integer handle of the layout shapefile
         private int _hCursorDefineLayout;
 
         public delegate void LayoutCreatededEvent(Grid25LayoutHelper s, Grid25LayoutHelperEventArgs e);
@@ -114,22 +118,6 @@ namespace FAD3.Mapping.Classes
 
         public Grid25LayoutHelper(Grid25MajorGrid majorGrid, int iconHandle)
         {
-            //_majorGrid = majorGrid;
-            //_axMap = _majorGrid.MapControl;
-            //_axMap.SelectBoxFinal += OnMapSelectBoxFinal;
-            //_axMap.SendSelectBoxFinal = true;
-            ////_axMap.CursorMode = tkCursorMode.cmSelection;
-            //_hCursorDefineLayout = iconHandle;
-            ////_axMap.MapCursor = tkCursor.crsrUserDefined;
-            ////_axMap.UDCursorHandle = _hCursorDefineLayout;
-            ////_sfLayout = new MapWinGIS.Shapefile();
-            //for (int n = 0; n < _majorGrid.SelectedShapeGridNumbers.Count; n++)
-            //{
-            //    _majorGrid.Grid25Grid.ShapeSelected[_majorGrid.SelectedShapeGridNumbers[n]] = true;
-            //}
-            //_selectedMajorGridShapesExtent = _majorGrid.Grid25Grid.BufferByDistance(0, 0, true, true).Extents;
-            //_majorGrid.Grid25Grid.SelectNone();
-
             _hCursorDefineLayout = iconHandle;
             SetupClass(majorGrid);
         }
@@ -151,6 +139,12 @@ namespace FAD3.Mapping.Classes
             }
         }
 
+        /// <summary>
+        ///  define the extent of the template shapedfile and pass the extent to the function
+        ///  that will create the individual tiles (polygon shapes) comprising the template
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnMapSelectBoxFinal(object sender, _DMapEvents_SelectBoxFinalEvent e)
         {
             if (_axMap.CursorMode == tkCursorMode.cmSelection && _axMap.UDCursorHandle == _hCursorDefineLayout)
@@ -172,6 +166,7 @@ namespace FAD3.Mapping.Classes
                     (int)(extT / 2000) * 2000,
                     0);
 
+                //modify layout extents using the function called
                 _layoutExtents = IntersectSelectionBoxWithMajorGridSelection();
 
                 if (_layoutExtents != null && LayerCreated != null)
@@ -184,6 +179,11 @@ namespace FAD3.Mapping.Classes
             }
         }
 
+        /// <summary>
+        /// opens an existing template shapefile by looking for the .lay extension
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
         public bool OpenLayoutFile(string fileName)
         {
             bool success = false;
@@ -204,18 +204,26 @@ namespace FAD3.Mapping.Classes
             return success;
         }
 
+        /// <summary>
+        /// returns the extent of the template using a contain or intersect function
+        /// _layoutExtents is actually the selection box extent
+        /// </summary>
+        /// <returns></returns>
         private Extents IntersectSelectionBoxWithMajorGridSelection()
         {
             if (_layoutExtents.ToShape().Contains(_selectedMajorGridShapesExtent.ToShape()))
             {
+                // extent is the extent of the selected major grids
                 return _selectedMajorGridShapesExtent;
             }
             else if (_selectedMajorGridShapesExtent.ToShape().Contains(_layoutExtents.ToShape()))
             {
+                //extent is the selection box extent
                 return _layoutExtents;
             }
             else if (_layoutExtents.ToShape().Intersects(_selectedMajorGridShapesExtent.ToShape()))
             {
+                //extent is the intersection between selected major grids and selection box
                 var results = new object();
                 if (_layoutExtents.ToShape().GetIntersection(_selectedMajorGridShapesExtent.ToShape(), ref results))
                 {
@@ -244,6 +252,10 @@ namespace FAD3.Mapping.Classes
             }
         }
 
+        /// <summary>
+        /// inspects layout shapefile if all Title fields have values
+        /// </summary>
+        /// <returns></returns>
         public bool HasCompletePanelTitles()
         {
             if (_sfLayout.NumShapes == 0)
@@ -265,6 +277,14 @@ namespace FAD3.Mapping.Classes
             return true;
         }
 
+        /// <summary>
+        /// constructs the shapefile consisting of tiles (Polygons) where each individual tile's extents
+        /// will be used to define a grid25 map
+        /// </summary>
+        /// <param name="rows"></param>
+        /// <param name="columns"></param>
+        /// <param name="overlap"></param>
+        /// <returns></returns>
         public bool SetupLayout(int rows, int columns, int overlap)
         {
             if (_layoutExtents != null)
@@ -278,6 +298,7 @@ namespace FAD3.Mapping.Classes
                 int expandTop = 0;
                 int expandBottom = 0;
 
+                //if shapefile already exists (handle >0) then we close the file
                 if (_hsfLayout > 0)
                 {
                     _majorGrid.MapLayers.RemoveLayer(_hsfLayout);
@@ -298,6 +319,8 @@ namespace FAD3.Mapping.Classes
                 _sfLayout.GeoProjection = _axMap.GeoProjection;
                 int fldPanelNo = _sfLayout.EditAddField("PanelNumber", FieldType.INTEGER_FIELD, 0, 2);
                 int fldTitle = _sfLayout.EditAddField("Title", FieldType.STRING_FIELD, 0, 50);
+
+                //set the shapefile's appearance
                 _sfLayout.DefaultDrawingOptions.FillVisible = false;
                 _sfLayout.DefaultDrawingOptions.LineWidth = 2;
                 _sfLayout.DefaultDrawingOptions.LineColor = new Utils().ColorByName(tkMapColor.DarkBlue);
@@ -314,6 +337,8 @@ namespace FAD3.Mapping.Classes
                     int iShp = 0;
                     for (int r = 1; r <= _rows; r++)
                     {
+                        //when expand is 0, no overlap
+                        //when expand is 1 an overlap is added based on the value of _overlap
                         for (int c = 1; c <= _columns; c++)
                         {
                             expandTop = 0;
@@ -341,6 +366,9 @@ namespace FAD3.Mapping.Classes
                             }
 
                             Extents panelExtent = new Extents();
+
+                            //each cell in the grid is computed based on the polygon's lower left and upper right coordinates
+                            //an overlap is added if expand_Side is 1, not added if it is 0
                             panelExtent.SetBounds(
                                 origin.x + ((c - 1) * panelWidth) - (expandLeft * _overLap * 2000),
                                 origin.y + ((r - 1) * panelHeight) - (expandBottom * _overLap * 2000),
@@ -355,10 +383,17 @@ namespace FAD3.Mapping.Classes
                     }
                 }
                 _hsfLayout = _majorGrid.MapLayers.AddLayer(_sfLayout, "Layout frame", true, true);
-                _majorGrid.MapLayers[_hsfLayout].IsFishingGridLayoutTemplate = true;
-                _majorGrid.MapLayers.ClearAllSelections();
-                _axMap.Redraw();
-                return _sfLayout.NumShapes > 0;
+                if (_hsfLayout > 0 && _sfLayout.NumShapes > 0)
+                {
+                    _majorGrid.MapLayers[_hsfLayout].IsFishingGridLayoutTemplate = true;
+                    _majorGrid.MapLayers.ClearAllSelections();
+                    _axMap.Redraw();
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
             }
             else
             {

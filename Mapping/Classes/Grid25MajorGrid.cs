@@ -53,7 +53,6 @@ namespace FAD3
         private string _mapTitle;                                               //title of the fishing ground grid map
         private MapLayer _currentMapLayer;
         private bool _enableMapInteraction;                                     //allows the class to interact with the axMap map control
-        private bool _completeFishingGrid;
         private bool _loadGridInPanel;
         private string _folderToSave;
         private bool _inDefineGridFromLayout;
@@ -67,8 +66,8 @@ namespace FAD3
         public delegate void MapExtentCreated(Grid25MajorGrid s, ExtentDraggedBoxEventArgs e);                          //event raised when an extent is created
         public event MapExtentCreated ExtentCreatedInLayer;
 
-        public delegate void GridLayoutOriginDefined(Grid25MajorGrid s, ExtentDraggedBoxEventArgs e);
-        public event GridLayoutOriginDefined LayoutDefined;
+        //public delegate void GridLayoutOriginDefined(Grid25MajorGrid s, ExtentDraggedBoxEventArgs e);
+        //public event GridLayoutOriginDefined LayoutDefined;
 
         public delegate void GridInPanelCreated(Grid25MajorGrid s, LayerEventArg e);
         public event GridInPanelCreated OnGridInPanelCreated;
@@ -1276,7 +1275,6 @@ namespace FAD3
                             AssignLayerWeight(_mapLayers.LayerDictionary[h]);
                             _listGridLayers.Add(h);
 
-                            _completeFishingGrid = true;
                             ApplyGridSymbology();
 
                             if (ExtentCreatedInLayer != null)
@@ -1304,7 +1302,6 @@ namespace FAD3
         /// <param name="e"></param>
         private void OnMapSelectBoxFinal(object sender, _DMapEvents_SelectBoxFinalEvent e)
         {
-            _completeFishingGrid = false;
             if (_enableMapInteraction && _axMap.CursorMode == tkCursorMode.cmSelection)
             {
                 var extL = 0D;

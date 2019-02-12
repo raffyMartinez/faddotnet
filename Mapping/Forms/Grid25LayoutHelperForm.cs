@@ -160,9 +160,6 @@ namespace FAD3.Mapping.Forms
                     break;
 
                 case "btnSave":
-                    //if (AcceptOptions()
-                    //    && _majorGrid.LayoutHelper.SetupLayout(Rows, Columns, Overlap)
-                    //    && _majorGrid.GenerateMinorGridFromLayout())
                     if (AcceptOptions())
                     {
                         if (_majorGrid.LayoutHelper.LayoutShapeFile.NumShapes > 0
@@ -257,22 +254,52 @@ namespace FAD3.Mapping.Forms
 
         private void OnTextValidating(object sender, CancelEventArgs e)
         {
-            switch (((TextBox)sender).Name)
+            string s = ((TextBox)sender).Text;
+            string msg = "Value must be whole number greater than zero";
+            int v = 0;
+            if (s.Length > 0)
             {
-                case "txtPageWidth":
-                case "txtPageHeight":
-                    break;
+                switch (((TextBox)sender).Name)
+                {
+                    case "txtPageWidth":
+                    case "txtPageHeight":
+                    case "txtRows":
+                    case "txtColumns":
+                        if (int.TryParse(s, out v))
+                        {
+                            e.Cancel = v <= 0;
+                        }
+                        else
+                        {
+                            e.Cancel = true;
+                        }
 
-                case "txtRows":
-                case "txtColumns":
-                    break;
+                        break;
 
-                case "txtOverlap":
-                    break;
+                    case "txtOverlap":
+                        if (int.TryParse(s, out v))
+                        {
+                            e.Cancel = v < 0;
+                            if (e.Cancel)
+                            {
+                                msg = "Value must be a whole number not less than zero";
+                            }
+                        }
+                        else
+                        {
+                            e.Cancel = true;
+                            msg = "Value must be a whole number not less than zero";
+                        }
+                        break;
 
-                case "textFishingGround":
-                    btnSave.Enabled = textFishingGround.Text.Length > 0 && _parentFolder.Length > 0;
-                    break;
+                    case "textFishingGround":
+                        btnSave.Enabled = textFishingGround.Text.Length > 0 && _parentFolder.Length > 0;
+                        break;
+                }
+            }
+            if (e.Cancel)
+            {
+                MessageBox.Show(msg, "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
