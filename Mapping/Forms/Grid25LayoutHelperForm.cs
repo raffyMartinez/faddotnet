@@ -32,7 +32,19 @@ namespace FAD3.Mapping.Forms
 
         private void OnLayoutCreated(Grid25LayoutHelper s, Grid25LayoutHelperEventArgs e)
         {
-            e.LayoutSpecs(int.Parse(txtRows.Text), int.Parse(txtColumns.Text), int.Parse(txtOverlap.Text));
+            if (e.NullLayout)
+            {
+                MessageBox.Show("Selection is outside selected major grid", "Selection error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                e.LayoutSpecs(int.Parse(txtRows.Text), int.Parse(txtColumns.Text), int.Parse(txtOverlap.Text));
+            }
+        }
+
+        public bool AutoExpandSelectedPanel
+        {
+            get { return chkAutoExpand.Checked; }
         }
 
         public int PageWidth { get; internal set; }
@@ -145,6 +157,31 @@ namespace FAD3.Mapping.Forms
         {
             switch (((Button)(sender)).Name)
             {
+                case "btnSaveLayout":
+                    if (LayoutHelper.ValidLayoutTemplateShapefile())
+                    {
+                        var saveAs = new SaveFileDialog();
+                        saveAs.Filter = "Shapefile *.shp|*.shp|All files *.*|*.*";
+                        saveAs.FilterIndex = 1;
+                        saveAs.ShowDialog();
+                        if (saveAs.FileName.Length > 0)
+                        {
+                            if (File.Exists(saveAs.FileName))
+                            {
+                                ShapefileDiskStorageHelper.Delete(saveAs.FileName.Replace(".shp", ""));
+                            }
+                            if (LayoutHelper.SaveLayoutTemplate(saveAs.FileName))
+                            {
+                                MessageBox.Show("Layout template successfuly saved!");
+                            }
+                            else
+                            {
+                                MessageBox.Show("Layout template was not saved");
+                            }
+                        }
+                    }
+                    break;
+
                 case "btnSelectFolderSave":
                     FolderBrowserDialog fbd = new FolderBrowserDialog();
                     fbd.Description = "Select folder to save fishing ground grid map";
@@ -305,10 +342,14 @@ namespace FAD3.Mapping.Forms
 
         private void OnFormLoad(object sender, EventArgs e)
         {
-            var ext = DefinePageExtent(MajorGridSelectionExtent, SelectionBoxExtent);
-            if (ext != null)
-            {
-            }
+            //var ext = DefinePageExtent(MajorGridSelectionExtent, SelectionBoxExtent);
+            //if (ext != null)
+            //{
+            //}
+            global.LoadFormSettings(this, true);
+            txtRows.Text = _majorGrid.LayoutRows.ToString();
+            txtColumns.Text = _majorGrid.LayoutCols.ToString();
+            txtOverlap.Text = _majorGrid.LayoutOverlap.ToString();
         }
 
         private Extents DefinePageExtent(Extents selectedMajorGridShapesExtent, Extents selectionBoxExtent)
@@ -351,9 +392,14 @@ namespace FAD3.Mapping.Forms
 
         private void OnFormClosing(object sender, FormClosingEventArgs e)
         {
-            _majorGrid.ReleaseLayoutHelper();
-            _majorGrid = null;
+            if (_majorGrid != null)
+            {
+                _majorGrid.ReleaseLayoutHelper();
+                _majorGrid = null;
+            }
             _instance = null;
+            global.SaveFormSettings(this);
+            global.MappingForm.SetCursor(tkCursorMode.cmSelection);
         }
 
         private void OnListItemChecked(object sender, ItemCheckedEventArgs e)
@@ -389,7 +435,26 @@ namespace FAD3.Mapping.Forms
             }
 
             //load/hide the grid inside the checked panel
-            _majorGrid.LoadPanelGrid(lve);
+            _majorGrid.LoadPanelGrid(chkAutoExpand.Checked, lve);
+        }
+
+        private void OnTabsSelectionChanged(object sender, EventArgs e)
+        {
+            chkAutoExpand.Visible = false;
+            btnSaveLayout.Visible = false;
+            var t = sender as TabControl;
+            switch (t.SelectedTab.Name)
+            {
+                case "tabResults":
+                    btnSaveLayout.Visible = true;
+                    chkAutoExpand.Visible = true;
+                    btnSaveLayout.Enabled = btnSave.Enabled && lvResults.Items.Count > 0 && _majorGrid.LayoutHelper.HasCompletePanelTitles();
+                    break;
+
+                case "tabSave":
+
+                    break;
+            }
         }
     }
 }

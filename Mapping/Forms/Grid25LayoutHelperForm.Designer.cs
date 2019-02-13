@@ -44,7 +44,7 @@
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.txtPageWidth = new System.Windows.Forms.TextBox();
-            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabsLayout = new System.Windows.Forms.TabControl();
             this.tabLayout = new System.Windows.Forms.TabPage();
             this.tabSave = new System.Windows.Forms.TabPage();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -54,7 +54,9 @@
             this.textFishingGround = new System.Windows.Forms.TextBox();
             this.tabResults = new System.Windows.Forms.TabPage();
             this.lvResults = new System.Windows.Forms.ListView();
-            this.tabControl1.SuspendLayout();
+            this.chkAutoExpand = new System.Windows.Forms.CheckBox();
+            this.btnSaveLayout = new System.Windows.Forms.Button();
+            this.tabsLayout.SuspendLayout();
             this.tabLayout.SuspendLayout();
             this.tabSave.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -122,7 +124,7 @@
             // 
             this.btnApply.ImageKey = "applyGrid";
             this.btnApply.ImageList = this.imageList1;
-            this.btnApply.Location = new System.Drawing.Point(171, 182);
+            this.btnApply.Location = new System.Drawing.Point(329, 184);
             this.btnApply.Name = "btnApply";
             this.btnApply.Size = new System.Drawing.Size(28, 28);
             this.btnApply.TabIndex = 6;
@@ -139,12 +141,13 @@
             this.imageList1.Images.SetKeyName(3, "addToFolder");
             this.imageList1.Images.SetKeyName(4, "addLayout");
             this.imageList1.Images.SetKeyName(5, "openLayoutGrid");
+            this.imageList1.Images.SetKeyName(6, "saveLayout");
             // 
             // btnCancel
             // 
             this.btnCancel.ImageKey = "cancel";
             this.btnCancel.ImageList = this.imageList1;
-            this.btnCancel.Location = new System.Drawing.Point(346, 280);
+            this.btnCancel.Location = new System.Drawing.Point(331, 285);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(28, 28);
             this.btnCancel.TabIndex = 7;
@@ -156,7 +159,7 @@
             this.btnSave.Enabled = false;
             this.btnSave.ImageKey = "save";
             this.btnSave.ImageList = this.imageList1;
-            this.btnSave.Location = new System.Drawing.Point(171, 182);
+            this.btnSave.Location = new System.Drawing.Point(329, 184);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(28, 28);
             this.btnSave.TabIndex = 8;
@@ -201,16 +204,17 @@
             this.txtPageWidth.Text = "1";
             this.txtPageWidth.Validating += new System.ComponentModel.CancelEventHandler(this.OnTextValidating);
             // 
-            // tabControl1
+            // tabsLayout
             // 
-            this.tabControl1.Controls.Add(this.tabLayout);
-            this.tabControl1.Controls.Add(this.tabSave);
-            this.tabControl1.Controls.Add(this.tabResults);
-            this.tabControl1.Location = new System.Drawing.Point(-2, 23);
-            this.tabControl1.Name = "tabControl1";
-            this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(380, 251);
-            this.tabControl1.TabIndex = 13;
+            this.tabsLayout.Controls.Add(this.tabLayout);
+            this.tabsLayout.Controls.Add(this.tabSave);
+            this.tabsLayout.Controls.Add(this.tabResults);
+            this.tabsLayout.Location = new System.Drawing.Point(-2, 23);
+            this.tabsLayout.Name = "tabsLayout";
+            this.tabsLayout.SelectedIndex = 0;
+            this.tabsLayout.Size = new System.Drawing.Size(380, 251);
+            this.tabsLayout.TabIndex = 13;
+            this.tabsLayout.SelectedIndexChanged += new System.EventHandler(this.OnTabsSelectionChanged);
             // 
             // tabLayout
             // 
@@ -314,19 +318,45 @@
             this.lvResults.TabIndex = 0;
             this.lvResults.UseCompatibleStateImageBehavior = false;
             // 
+            // chkAutoExpand
+            // 
+            this.chkAutoExpand.AutoSize = true;
+            this.chkAutoExpand.Location = new System.Drawing.Point(12, 292);
+            this.chkAutoExpand.Name = "chkAutoExpand";
+            this.chkAutoExpand.Size = new System.Drawing.Size(129, 17);
+            this.chkAutoExpand.TabIndex = 14;
+            this.chkAutoExpand.Text = "Auto-expand selected";
+            this.chkAutoExpand.UseVisualStyleBackColor = true;
+            this.chkAutoExpand.Visible = false;
+            // 
+            // btnSaveLayout
+            // 
+            this.btnSaveLayout.Enabled = false;
+            this.btnSaveLayout.ImageKey = "saveLayout";
+            this.btnSaveLayout.ImageList = this.imageList1;
+            this.btnSaveLayout.Location = new System.Drawing.Point(297, 285);
+            this.btnSaveLayout.Name = "btnSaveLayout";
+            this.btnSaveLayout.Size = new System.Drawing.Size(28, 28);
+            this.btnSaveLayout.TabIndex = 15;
+            this.btnSaveLayout.UseVisualStyleBackColor = true;
+            this.btnSaveLayout.Visible = false;
+            this.btnSaveLayout.Click += new System.EventHandler(this.OnButtonClick);
+            // 
             // Grid25LayoutHelperForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(381, 311);
-            this.Controls.Add(this.tabControl1);
+            this.ClientSize = new System.Drawing.Size(381, 321);
+            this.Controls.Add(this.btnSaveLayout);
+            this.Controls.Add(this.chkAutoExpand);
+            this.Controls.Add(this.tabsLayout);
             this.Controls.Add(this.btnCancel);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "Grid25LayoutHelperForm";
             this.Text = "Layout grids";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.OnFormClosing);
             this.Load += new System.EventHandler(this.OnFormLoad);
-            this.tabControl1.ResumeLayout(false);
+            this.tabsLayout.ResumeLayout(false);
             this.tabLayout.ResumeLayout(false);
             this.tabLayout.PerformLayout();
             this.tabSave.ResumeLayout(false);
@@ -335,6 +365,7 @@
             this.groupBox1.PerformLayout();
             this.tabResults.ResumeLayout(false);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -353,7 +384,7 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox txtPageWidth;
-        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabControl tabsLayout;
         private System.Windows.Forms.TabPage tabLayout;
         private System.Windows.Forms.TabPage tabSave;
         private System.Windows.Forms.TextBox textFolderToSave;
@@ -364,5 +395,7 @@
         private System.Windows.Forms.ImageList imageList1;
         private System.Windows.Forms.TabPage tabResults;
         private System.Windows.Forms.ListView lvResults;
+        private System.Windows.Forms.CheckBox chkAutoExpand;
+        private System.Windows.Forms.Button btnSaveLayout;
     }
 }

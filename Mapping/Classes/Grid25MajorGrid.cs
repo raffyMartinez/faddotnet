@@ -72,6 +72,10 @@ namespace FAD3
         public delegate void GridInPanelCreated(Grid25MajorGrid s, LayerEventArg e);
         public event GridInPanelCreated OnGridInPanelCreated;
 
+        public int LayoutRows { get; internal set; }
+        public int LayoutCols { get; internal set; }
+        public int LayoutOverlap { get; internal set; }
+
         private static List<string> _filesToDeleteOnClose = new List<string>();
 
         public bool InDefindeGridFromLayout
@@ -159,12 +163,12 @@ namespace FAD3
             }
         }
 
-        public void LoadPanelGrid(LayerEventArg e)
+        public void LoadPanelGrid(bool autoExpand, LayerEventArg e)
         {
             _loadGridInPanel = true;
             OnFishingGridSelected(null, e);
 
-            if (e.Action == "LoadGridMap")
+            if (e.Action == "LoadGridMap" && autoExpand)
                 FitGridToMap();
         }
 
@@ -322,6 +326,10 @@ namespace FAD3
 
             _grid25MinorGrid = new Grid25MinorGrid(_axMap, this);
             ShapefileDiskStorageHelper.MapControl = _axMap;
+
+            LayoutRows = 1;
+            LayoutCols = 1;
+            LayoutOverlap = 0;
         }
 
         private void OnSelectBoxDrag(object sender, _DMapEvents_SelectBoxDragEvent e)
@@ -739,10 +747,17 @@ namespace FAD3
 
         public void ReleaseLayoutHelper()
         {
-            _layoutHelper.Dispose();
-            _layoutHelper = null;
-            _enableMapInteraction = true;
-            _axMap.Redraw();
+            if (_layoutHelper != null)
+            {
+                LayoutCols = _layoutHelper.Columns;
+                LayoutRows = _layoutHelper.Rows;
+                LayoutOverlap = _layoutHelper.Overlap;
+
+                _layoutHelper.Dispose();
+                _layoutHelper = null;
+                _enableMapInteraction = true;
+                _axMap.Redraw();
+            }
         }
 
         public void DefineGridLayout()
@@ -769,13 +784,6 @@ namespace FAD3
                     _layoutHelper = new Grid25LayoutHelper(this);
                 }
             }
-            //else
-            //{
-            //    _hCursorDefineLayout = iconHandle;
-            //    _axMap.CursorMode = tkCursorMode.cmSelection;
-            //    _axMap.MapCursor = tkCursor.crsrUserDefined;
-            //    _axMap.UDCursorHandle = _hCursorDefineLayout;
-            //}
         }
 
         /// <summary>

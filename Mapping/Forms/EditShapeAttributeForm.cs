@@ -256,7 +256,10 @@ namespace FAD3.Mapping.Forms
         {
             if (_sfSelectedCount != 1)
             {
-                MapInterActionHandler.SelectedShapeIndex = (int)gridAttributes.Rows[e.RowIndex].Tag;
+                if (gridAttributes.Rows[e.RowIndex].Tag != null)
+                {
+                    MapInterActionHandler.SelectedShapeIndex = (int)gridAttributes.Rows[e.RowIndex].Tag;
+                }
             }
         }
 

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AxMapWinGIS;
 using MapWinGIS;
+using System.IO;
 
 namespace FAD3.Mapping.Classes
 {
@@ -28,6 +29,8 @@ namespace FAD3.Mapping.Classes
 
         public delegate void LayoutCreatededEvent(Grid25LayoutHelper s, Grid25LayoutHelperEventArgs e);
         public event LayoutCreatededEvent LayerCreated;
+
+        public int SelectionTransparency { get; set; }
 
         public int Rows
         {
@@ -74,6 +77,68 @@ namespace FAD3.Mapping.Classes
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        public bool SaveLayoutTemplate(string fileName)
+        {
+            bool success = true;
+            if (ValidLayoutTemplateShapefile())
+            {
+                if (_sfLayout.SaveAs(fileName))
+                {
+                    var prjFile = _sfLayout.Filename.Replace(".shp", ".prj");
+                    _sfLayout.GeoProjection.WriteToFile(prjFile);
+
+                    var layoutFile = _sfLayout.Filename.Replace(".shp", ".lay");
+                    if (File.Exists(layoutFile))
+                    {
+                        try
+                        {
+                            File.Delete(layoutFile);
+                        }
+                        catch (IOException ioex)
+                        {
+                            success = false;
+                        }
+                        catch (Exception ex)
+                        {
+                            success = false;
+                        }
+                    }
+                    using (StreamWriter writer = new StreamWriter(layoutFile, true))
+                    {
+                        writer.WriteLine($"Fishing ground:{ global.MappingForm.Grid25MajorGrid.LayoutHelper.FishingGround}");
+                        writer.WriteLine($"Save folder:{global.MappingForm.Grid25MajorGrid.LayoutHelper.GridFromLayoutSaveFolder}");
+                        writer.WriteLine($"Rows:{global.MappingForm.Grid25MajorGrid.LayoutHelper.Rows}");
+                        writer.WriteLine($"Columns:{global.MappingForm.Grid25MajorGrid.LayoutHelper.Columns}");
+                        writer.WriteLine($"Overlap:{global.MappingForm.Grid25MajorGrid.LayoutHelper.Overlap}");
+                        //writer.WriteLine(_mapLayersHandler.CurrentMapLayer)
+                    }
+                }
+            }
+            else
+            {
+                success = false;
+            }
+            return success;
+        }
+
+        public bool ValidLayoutTemplateShapefile()
+        {
+            bool isValid = true;
+            {
+                int fldTitle = _sfLayout.FieldIndexByName["Title"];
+                for (int n = 0; n < _sfLayout.NumShapes; n++)
+                {
+                    if (_sfLayout.CellValue[fldTitle, n].ToString().Length == 0)
+                    {
+                        isValid = false;
+                        break;
+                    }
+                }
+
+                return isValid;
+            }
         }
 
         protected virtual void Dispose(bool disposing)
@@ -137,6 +202,7 @@ namespace FAD3.Mapping.Classes
                 _selectedMajorGridShapesExtent = _majorGrid.Grid25Grid.BufferByDistance(0, 0, true, true).Extents;
                 _majorGrid.Grid25Grid.SelectNone();
             }
+            SelectionTransparency = 75;
         }
 
         /// <summary>
@@ -175,6 +241,14 @@ namespace FAD3.Mapping.Classes
                     LayerCreated(this, lhe);
 
                     SetupLayout(lhe.Rows, lhe.Columns, lhe.Overlap);
+                }
+                else if (_layoutExtents == null)
+                {
+                    if (LayerCreated != null)
+                    {
+                        Grid25LayoutHelperEventArgs gle = new Grid25LayoutHelperEventArgs(nullLayout: true);
+                        LayerCreated(this, gle);
+                    }
                 }
             }
         }
@@ -324,6 +398,7 @@ namespace FAD3.Mapping.Classes
                 _sfLayout.DefaultDrawingOptions.FillVisible = false;
                 _sfLayout.DefaultDrawingOptions.LineWidth = 2;
                 _sfLayout.DefaultDrawingOptions.LineColor = new Utils().ColorByName(tkMapColor.DarkBlue);
+                _sfLayout.SelectionDrawingOptions.FillTransparency = 255 * ((float)SelectionTransparency / 100);
 
                 if (rows == 1 && columns == 1)
                 {

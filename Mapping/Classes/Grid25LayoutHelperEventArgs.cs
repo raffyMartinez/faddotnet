@@ -13,6 +13,7 @@ namespace FAD3.Mapping.Classes
         public int Columns { get; set; }
         public int Overlap { get; set; }
         public Extents LayoutExtent { get; set; }
+        public bool NullLayout { get; internal set; }
 
         public void LayoutSpecs(int rows, int columns, int overlap)
         {
@@ -24,6 +25,11 @@ namespace FAD3.Mapping.Classes
         public Grid25LayoutHelperEventArgs(Extents layoutExtent)
         {
             LayoutExtent = layoutExtent;
+        }
+
+        public Grid25LayoutHelperEventArgs(bool nullLayout)
+        {
+            NullLayout = nullLayout;
         }
     }
 }

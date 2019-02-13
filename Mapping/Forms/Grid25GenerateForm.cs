@@ -240,7 +240,7 @@ namespace FAD3
                             }
                             else
                             {
-                                _g25lhf.Show(this);
+                                _g25lhf.Show(global.MappingForm);
                             }
 
                             if (_grid25MajorGrid.LayoutHelper != null && _grid25MajorGrid.LayoutHelper.LayoutShapeFile != null)
