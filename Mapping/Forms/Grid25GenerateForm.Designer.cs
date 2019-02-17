@@ -543,7 +543,7 @@
             // 
             this.buttonLocateGrid.ImageIndex = 5;
             this.buttonLocateGrid.ImageList = this.imList;
-            this.buttonLocateGrid.Location = new System.Drawing.Point(255, 163);
+            this.buttonLocateGrid.Location = new System.Drawing.Point(255, 174);
             this.buttonLocateGrid.Name = "buttonLocateGrid";
             this.buttonLocateGrid.Size = new System.Drawing.Size(28, 28);
             this.buttonLocateGrid.TabIndex = 9;
@@ -554,7 +554,7 @@
             // 
             this.btnOpenLayoutGrid.ImageIndex = 6;
             this.btnOpenLayoutGrid.ImageList = this.imList;
-            this.btnOpenLayoutGrid.Location = new System.Drawing.Point(255, 194);
+            this.btnOpenLayoutGrid.Location = new System.Drawing.Point(255, 205);
             this.btnOpenLayoutGrid.Name = "btnOpenLayoutGrid";
             this.btnOpenLayoutGrid.Size = new System.Drawing.Size(28, 28);
             this.btnOpenLayoutGrid.TabIndex = 10;

@@ -67,6 +67,30 @@ namespace FAD3
             }
         }
 
+        public void MoveToTop()
+        {
+            _axmap.MoveLayerTop(_axmap.get_LayerPosition(_currentMapLayer.Handle));
+            _axmap.Redraw();
+        }
+
+        public void MoveUp()
+        {
+            _axmap.MoveLayerUp(_axmap.get_LayerPosition(_currentMapLayer.Handle));
+            _axmap.Redraw();
+        }
+
+        public void MoveDown()
+        {
+            _axmap.MoveLayerDown(_axmap.get_LayerPosition(_currentMapLayer.Handle));
+            _axmap.Redraw();
+        }
+
+        public void MoveToBottom()
+        {
+            _axmap.MoveLayerBottom(_axmap.get_LayerPosition(_currentMapLayer.Handle));
+            _axmap.Redraw();
+        }
+
         IEnumerator<MapLayer> IEnumerable<MapLayer>.GetEnumerator()
         {
             return _mapLayerDictionary.Values.GetEnumerator();

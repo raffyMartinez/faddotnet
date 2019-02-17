@@ -46,6 +46,11 @@
             this.buttonAttributes = new System.Windows.Forms.ToolStripButton();
             this.buttonZoomToLayer = new System.Windows.Forms.ToolStripButton();
             this.buttonClose = new System.Windows.Forms.ToolStripButton();
+            this.itemMoveLayer = new System.Windows.Forms.ToolStripMenuItem();
+            this.itemMoveTop = new System.Windows.Forms.ToolStripMenuItem();
+            this.itemMoveUp = new System.Windows.Forms.ToolStripMenuItem();
+            this.itemMoveDown = new System.Windows.Forms.ToolStripMenuItem();
+            this.itemMoveBottom = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.layerGrid)).BeginInit();
             this.menuLayers.SuspendLayout();
             this.toolBar.SuspendLayout();
@@ -107,33 +112,34 @@
             this.itemRemoveLayer,
             this.itemLayerProperty,
             this.itemLayerExport,
-            this.itemOptions});
+            this.itemOptions,
+            this.itemMoveLayer});
             this.menuLayers.Name = "menuLayers";
-            this.menuLayers.Size = new System.Drawing.Size(146, 114);
+            this.menuLayers.Size = new System.Drawing.Size(181, 158);
             this.menuLayers.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnMenuLayers_ItemClicked);
             // 
             // itemAddLayer
             // 
             this.itemAddLayer.Name = "itemAddLayer";
-            this.itemAddLayer.Size = new System.Drawing.Size(145, 22);
+            this.itemAddLayer.Size = new System.Drawing.Size(180, 22);
             this.itemAddLayer.Text = "Add layer...";
             // 
             // itemRemoveLayer
             // 
             this.itemRemoveLayer.Name = "itemRemoveLayer";
-            this.itemRemoveLayer.Size = new System.Drawing.Size(145, 22);
+            this.itemRemoveLayer.Size = new System.Drawing.Size(180, 22);
             this.itemRemoveLayer.Text = "Remove layer";
             // 
             // itemLayerProperty
             // 
             this.itemLayerProperty.Name = "itemLayerProperty";
-            this.itemLayerProperty.Size = new System.Drawing.Size(145, 22);
+            this.itemLayerProperty.Size = new System.Drawing.Size(180, 22);
             this.itemLayerProperty.Text = "Properties...";
             // 
             // itemLayerExport
             // 
             this.itemLayerExport.Name = "itemLayerExport";
-            this.itemLayerExport.Size = new System.Drawing.Size(145, 22);
+            this.itemLayerExport.Size = new System.Drawing.Size(180, 22);
             this.itemLayerExport.Text = "Export...";
             // 
             // itemOptions
@@ -141,14 +147,14 @@
             this.itemOptions.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.itemConvertToGrid25});
             this.itemOptions.Name = "itemOptions";
-            this.itemOptions.Size = new System.Drawing.Size(145, 22);
+            this.itemOptions.Size = new System.Drawing.Size(180, 22);
             this.itemOptions.Text = "Options";
             this.itemOptions.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnoptionsToolStripMenuItem_DropDownItemClicked);
             // 
             // itemConvertToGrid25
             // 
             this.itemConvertToGrid25.Name = "itemConvertToGrid25";
-            this.itemConvertToGrid25.Size = new System.Drawing.Size(167, 22);
+            this.itemConvertToGrid25.Size = new System.Drawing.Size(180, 22);
             this.itemConvertToGrid25.Text = "Convert to Grid25";
             // 
             // toolBar
@@ -214,6 +220,42 @@
             this.buttonClose.Text = "toolStripButton1";
             this.buttonClose.ToolTipText = "Close layers";
             // 
+            // itemMoveLayer
+            // 
+            this.itemMoveLayer.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.itemMoveTop,
+            this.itemMoveUp,
+            this.itemMoveDown,
+            this.itemMoveBottom});
+            this.itemMoveLayer.Name = "itemMoveLayer";
+            this.itemMoveLayer.Size = new System.Drawing.Size(180, 22);
+            this.itemMoveLayer.Text = "Move";
+            this.itemMoveLayer.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnLayerMoveDropDownClick);
+            // 
+            // itemMoveTop
+            // 
+            this.itemMoveTop.Name = "itemMoveTop";
+            this.itemMoveTop.Size = new System.Drawing.Size(180, 22);
+            this.itemMoveTop.Text = "Move to top";
+            // 
+            // itemMoveUp
+            // 
+            this.itemMoveUp.Name = "itemMoveUp";
+            this.itemMoveUp.Size = new System.Drawing.Size(180, 22);
+            this.itemMoveUp.Text = "Move up";
+            // 
+            // itemMoveDown
+            // 
+            this.itemMoveDown.Name = "itemMoveDown";
+            this.itemMoveDown.Size = new System.Drawing.Size(180, 22);
+            this.itemMoveDown.Text = "Move down";
+            // 
+            // itemMoveBottom
+            // 
+            this.itemMoveBottom.Name = "itemMoveBottom";
+            this.itemMoveBottom.Size = new System.Drawing.Size(180, 22);
+            this.itemMoveBottom.Text = "Move to bottom";
+            // 
             // MapLayersForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -256,5 +298,10 @@
         private System.Windows.Forms.DataGridViewCheckBoxColumn Visible;
         private System.Windows.Forms.DataGridViewTextBoxColumn Layer;
         private System.Windows.Forms.DataGridViewImageColumn Symbol;
+        private System.Windows.Forms.ToolStripMenuItem itemMoveLayer;
+        private System.Windows.Forms.ToolStripMenuItem itemMoveTop;
+        private System.Windows.Forms.ToolStripMenuItem itemMoveUp;
+        private System.Windows.Forms.ToolStripMenuItem itemMoveDown;
+        private System.Windows.Forms.ToolStripMenuItem itemMoveBottom;
     }
 }

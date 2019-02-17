@@ -419,36 +419,51 @@ namespace FAD3
             return saveCount == 4;
         }
 
-        /// <summary>
-        /// serialize fishing grid appearance to XML
-        /// </summary>
-        /// <param name="fileName"></param>
         private void Serialize(string fileName)
         {
-            var doc = new XmlDocument();
-            var node = doc.CreateNode("element", "FishingGroundGridMap", "");
+            XmlWriter writer = XmlWriter.Create($"{fileName}_gridstate.xml");
+            writer.WriteStartDocument();
 
-            var att = doc.CreateAttribute("MapTitle");
-            att.Value = _mapTitle;
-            node.Attributes.Append(att);
-
-            att = doc.CreateAttribute("Name");
-            att.Value = Path.GetFileName(fileName);
-            node.Attributes.Append(att);
-
-            att = doc.CreateAttribute("UTMZone");
-            att.Value = _utmZone.ToString();
-            node.Attributes.Append(att);
-
+            writer.WriteStartElement("FishingGroundGridMap");
+            writer.WriteAttributeString("MapTitle", _mapTitle);
+            writer.WriteAttributeString("Name", fileName);
+            writer.WriteAttributeString("UTMZone", _utmZone.ToString());
             foreach (KeyValuePair<string, uint> kv in _gridAndLabelProperties)
             {
-                att = doc.CreateAttribute(kv.Key);
-                att.Value = kv.Value.ToString();
-                node.Attributes.Append(att);
+                writer.WriteAttributeString(kv.Key, kv.Value.ToString());
             }
-            XmlTextWriter w = new XmlTextWriter($"{fileName}_gridstate.xml", null);
-            doc.LoadXml(node.OuterXml);
-            doc.Save(w);
+
+            {
+                if (_inDefineGridFromLayout)
+                {
+                    writer.WriteStartElement("Layout");
+                    writer.WriteAttributeString("FishingGround", _layoutHelper.FishingGround);
+                    writer.WriteAttributeString("LowerLeftCornerXY", $"{_layoutHelper.LayoutExtents.xMin.ToString()},{_layoutHelper.LayoutExtents.yMin.ToString()}");
+                    writer.WriteAttributeString("UpperRightCornerXY", $"{_layoutHelper.LayoutExtents.xMax.ToString()},{_layoutHelper.LayoutExtents.yMax.ToString()}");
+                    writer.WriteAttributeString("Rows", _layoutHelper.Rows.ToString());
+                    writer.WriteAttributeString("Columns", _layoutHelper.Columns.ToString());
+                    writer.WriteAttributeString("Overlap", _layoutHelper.Overlap.ToString());
+
+                    {
+                        writer.WriteStartElement("Cells");
+                        int fldTitle = _layoutHelper.LayoutShapeFile.FieldIndexByName["Title"];
+                        for (int n = 0; n < _layoutHelper.LayoutShapeFile.NumShapes; n++)
+                        {
+                            writer.WriteStartElement("Cell");
+                            writer.WriteAttributeString("Number", n.ToString());
+                            writer.WriteAttributeString("Title", _layoutHelper.LayoutShapeFile.CellValue[fldTitle, n].ToString());
+                            writer.WriteEndElement();
+                        }
+                        writer.WriteEndElement();
+                    }
+
+                    writer.WriteEndElement();
+                }
+            }
+            writer.WriteEndElement();
+
+            writer.WriteEndDocument();
+            writer.Close();
         }
 
         /// <summary>
@@ -820,15 +835,6 @@ namespace FAD3
             GC.SuppressFinalize(this);
         }
 
-        /// <summary>
-        /// saves a finished grid25 map
-        /// </summary>
-        /// <returns></returns>
-        public bool SaveGrid25Map()
-        {
-            return true;
-        }
-
         protected virtual void Dispose(bool disposing)
         {
             if (!_disposed)
@@ -1070,6 +1076,19 @@ namespace FAD3
             }
         }
 
+        private bool MajorGridIntersectTemplatePanel(Extents panelExtent)
+        {
+            var ifldMGNo = 0;
+            var ifldGridHandle = 0;
+            if (_shapefileMajorGridIntersect.CreateNewWithShapeID("", ShpfileType.SHP_POLYGON))
+            {
+                _shapefileMajorGridIntersect.GeoProjection = _axMap.GeoProjection;
+                ifldMGNo = _shapefileMajorGridIntersect.EditAddField("GridNo", FieldType.STRING_FIELD, 1, 4);
+                ifldGridHandle = _shapefileMajorGridIntersect.EditAddField("hGrid", FieldType.STRING_FIELD, 1, 4);
+            }
+            return true;
+        }
+
         /// <summary>
         /// Gets the intersections of each major grid to the minor grid extent
         /// and creates a shapefile of the intersected major grids.
@@ -1224,7 +1243,123 @@ namespace FAD3
             }
         }
 
-        private bool GenerateMinorGridInsideExtent(Extents definitionExtent, string mapTitle = "")
+        public bool GenerateMinorGridInsidePanelExtent(Extents panelExtent, string mapTitle)
+        {
+            _listIntersectedMajorGrids.Clear();
+            _inDefineGridFromLayout = true;
+            var minorGridExtent = panelExtent;
+            int ifldMGNo = 0;
+            int ifldGridHandle = 0;
+            if (mapTitle.Length > 0)
+            {
+                _mapTitle = mapTitle;
+            }
+            _shapefileMajorGridIntersect = new Shapefile();
+            if (_shapefileMajorGridIntersect.CreateNewWithShapeID("", ShpfileType.SHP_POLYGON)
+                && _grid25MinorGrid.SetExtent(panelExtent))
+            {
+                _shapefileMajorGridIntersect.GeoProjection = _axMap.GeoProjection;
+                ifldMGNo = _shapefileMajorGridIntersect.EditAddField("GridNo", FieldType.STRING_FIELD, 1, 4);
+                ifldGridHandle = _shapefileMajorGridIntersect.EditAddField("hGrid", FieldType.STRING_FIELD, 1, 4);
+
+                var definitionSF = new Shapefile();
+                if (definitionSF.CreateNew("", ShpfileType.SHP_POLYGON))
+                {
+                    definitionSF.GeoProjection = _axMap.GeoProjection;
+                    var iShp = definitionSF.EditAddShape(_grid25MinorGrid.MinorGridLinesShapeFile.Extents.ToShape());
+                    if (iShp >= 0)
+                    {
+                        object intersectionResults = new Object();
+
+                        //get indexes of shapes in majorgrid that intersect with the panel extent
+                        if (_shapefileMajorGrid.SelectByShapefile(definitionSF, tkSpatialRelation.srIntersects, false, ref intersectionResults)
+                            && intersectionResults != null)
+                        {
+                            int[] indexes = intersectionResults as int[];
+
+                            //using indexes, get a shape that is an intersection with  panel extents
+                            for (int n = 0; n < indexes.Length; n++)
+                            {
+                                var shapeIntesected = new Object();
+                                if (_shapefileMajorGrid.Shape[indexes[n]].Extents.ToShape().GetIntersection(_grid25MinorGrid.MinorGridLinesShapeFile.Extents.ToShape(), ref intersectionResults))
+                                {
+                                    object[] shapeArray = intersectionResults as object[];
+                                    if (shapeArray != null)
+                                    {
+                                        Shape[] shapes = shapeArray.OfType<Shape>().ToArray();
+
+                                        Extents intersectedExtent = shapes[0].Extents;
+                                        if (intersectedExtent.Width > 0 && intersectedExtent.Height > 0)
+                                        {
+                                            var iShp2 = _shapefileMajorGridIntersect.EditAddShape(shapes[0]);
+                                            _shapefileMajorGridIntersect.EditCellValue(ifldMGNo, iShp2, _shapefileMajorGrid.CellValue[1, indexes[n]]);
+                                            _shapefileMajorGridIntersect.EditCellValue(ifldGridHandle, iShp2, indexes[n]);
+                                            _listIntersectedMajorGrids.Add((int.Parse(_shapefileMajorGrid.CellValue[1, indexes[n]].ToString()), intersectedExtent.Center.x, intersectedExtent.Center.y));
+                                            Console.WriteLine($"grid number:{_shapefileMajorGrid.CellValue[1, indexes[n]]}");
+                                            Console.WriteLine($"width:{intersectedExtent.Width} height:{intersectedExtent.Height}");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (_shapefileMajorGridIntersect.NumShapes > 0 && DefineBoundingRectangle(_grid25MinorGrid.MinorGridLinesShapeFile.Extents))
+            {
+                _shapeFileSelectedMajorGridBuffer = _shapefileMajorGridIntersect.BufferByDistance(0, 1, false, true);
+                _shapeFileSelectedMajorGridBuffer.GeoProjection = _axMap.GeoProjection;
+
+                _grid25LabelManager = new Grid25LabelManager(_axMap.GeoProjection);
+
+                if (_grid25LabelManager.LabelGrid(_shapeFileSelectedMajorGridBuffer, _gridAndLabelProperties, _mapTitle))
+                {
+                    _grid25LabelManager.AddMajorGridLabels(_listIntersectedMajorGrids);
+                    _grid25LabelManager.Grid25Labels.Labels.ApplyCategories();
+
+                    //we add the layers using the maplayer class, then we add the layer handles to listGridLayers
+                    var h = _mapLayers.AddLayer(_grid25MinorGrid.MinorGridLinesShapeFile, "Minor grid", true, true);
+                    _mapLayers.LayerDictionary[h].IsGraticule = true;
+                    _mapLayers.LayerDictionary[h].IsFishingGrid = true;
+                    //_mapLayers.LayerDictionary[h].LayerWeight = 2;
+                    AssignLayerWeight(_mapLayers.LayerDictionary[h]);
+                    _listGridLayers.Add(h);
+
+                    h = _mapLayers.AddLayer(_grid25LabelManager.Grid25Labels, "Labels", true, true);
+                    _mapLayers.LayerDictionary[h].IsFishingGrid = true;
+                    //_mapLayers.LayerDictionary[h].LayerWeight = 1;
+                    AssignLayerWeight(_mapLayers.LayerDictionary[h]);
+                    _listGridLayers.Add(h);
+
+                    h = _mapLayers.AddLayer(_shapefileMajorGridIntersect, "Major grid", true, true);
+                    _mapLayers.LayerDictionary[h].IsGraticule = true;
+                    _mapLayers.LayerDictionary[h].IsFishingGrid = true;
+                    //_mapLayers.LayerDictionary[h].LayerWeight = 4;
+                    AssignLayerWeight(_mapLayers.LayerDictionary[h]);
+                    _listGridLayers.Add(h);
+
+                    h = _mapLayers.AddLayer(_shapefileBoundingRectangle, "MBR", true, true);
+                    _mapLayers.LayerDictionary[h].IsGraticule = true;
+                    _mapLayers.LayerDictionary[h].IsFishingGrid = true;
+                    //_mapLayers.LayerDictionary[h].LayerWeight = 3;
+                    AssignLayerWeight(_mapLayers.LayerDictionary[h]);
+                    _listGridLayers.Add(h);
+
+                    ApplyGridSymbology();
+
+                    if (ExtentCreatedInLayer != null)
+                    {
+                        ExtentDraggedBoxEventArgs arg = new ExtentDraggedBoxEventArgs(_shapefileBoundingRectangle.Extents.yMax, _shapefileBoundingRectangle.Extents.yMin, _shapefileBoundingRectangle.Extents.xMin, _shapefileBoundingRectangle.Extents.xMax, false);
+                        ExtentCreatedInLayer(this, arg);
+                    }
+                }
+                _axMap.MapCursor = tkCursor.crsrMapDefault;
+            }
+            return _shapefileMajorGridIntersect.NumShapes > 0;
+        }
+
+        public bool GenerateMinorGridInsideExtent(Extents definitionExtent, string mapTitle = "")
         {
             bool minorGridCreated = false;
             if (mapTitle.Length > 0)
@@ -1349,7 +1484,9 @@ namespace FAD3
                 && _layoutHelper.HasCompletePanelTitles())
             {
                 _inDefineGridFromLayout = true;
+                _layoutHelper.FishingGround = fishingGround;
                 _folderToSave = folder;
+                _layoutHelper.GridFromLayoutSaveFolder = _folderToSave;
                 _selectedMajorGridShapesExtent = _layoutHelper.SelectedMajorGridExtents;
                 for (int n = 0; n < _layoutHelper.LayoutShapeFile.NumShapes; n++)
                 {

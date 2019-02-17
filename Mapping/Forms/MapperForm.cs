@@ -343,15 +343,6 @@ namespace FAD3
                     break;
 
                 case "tsButtonAttributes":
-                    //var sfa = ShapefileAttributesForm.GetInstance(this, _mapInterActionHandler);
-                    //if (!sfa.Visible)
-                    //{
-                    //    sfa.Show(this);
-                    //}
-                    //else
-                    //{
-                    //    sfa.BringToFront();
-                    //}
 
                     EditShapeAttributeForm esaf = EditShapeAttributeForm.GetInstance(this, _mapInterActionHandler);
                     if (esaf.Visible)

@@ -307,7 +307,10 @@ namespace FAD3
                     }
                     else
                     {
-                        MessageBox.Show("Selected file is not valid", "Invalid file", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        if (ofd.FileName.Length > 0)
+                        {
+                            MessageBox.Show("Selected file is not valid", "Invalid file", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
                     }
                     break;
             }

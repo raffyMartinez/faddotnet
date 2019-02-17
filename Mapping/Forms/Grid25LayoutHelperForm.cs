@@ -64,6 +64,8 @@ namespace FAD3.Mapping.Forms
         private string _parentFolder = string.Empty;
         private string _savePath;
         private string _fishingGround;
+        private int _mouseX;
+        private int _mouseY;
 
         public void SetUpFields()
         {
@@ -207,8 +209,8 @@ namespace FAD3.Mapping.Forms
                             {
                                 if (_majorGrid.LayoutHelper.LayerHandle > 0)
                                 {
-                                    _majorGrid.LayoutHelper.FishingGround = textFishingGround.Text;
-                                    _majorGrid.LayoutHelper.GridFromLayoutSaveFolder = textFolderToSave.Text;
+                                    //_majorGrid.LayoutHelper.FishingGround = textFishingGround.Text;
+                                    //_majorGrid.LayoutHelper.GridFromLayoutSaveFolder = textFolderToSave.Text;
 
                                     FillResultList();
                                     _majorGrid.MapLayers.ClearAllSelections();
@@ -259,6 +261,7 @@ namespace FAD3.Mapping.Forms
         {
             lvResults.ItemChecked -= OnListItemChecked;
             lvResults.View = View.Details;
+            lvResults.FullRowSelect = true;
             lvResults.Columns.Clear();
             lvResults.Columns.Add("Title");
             lvResults.Columns.Add("Width");
@@ -409,11 +412,19 @@ namespace FAD3.Mapping.Forms
             bool itemIsChecked = !item.Checked;
 
             LayerEventArg lve = new LayerEventArg(e.Item.Text);
-            lve.FileName = $"{item.Tag.ToString()}";
-            lve.SelectedIndex = item.Index;
-            if (item.Checked)
+
+            if (e.Item.Text.Length > 0)
             {
-                lve.Action = "LoadGridMap";
+                lve.FileName = $"{item.Tag.ToString()}";
+                lve.SelectedIndex = item.Index;
+                if (item.Checked)
+                {
+                    lve.Action = "LoadGridMap";
+                }
+                else
+                {
+                    lve.Action = "UnloadGridMap";
+                }
             }
             else
             {
@@ -455,6 +466,89 @@ namespace FAD3.Mapping.Forms
 
                     break;
             }
+        }
+
+        private void OnMouseDown(object sender, MouseEventArgs e)
+        {
+            ListView lv = (ListView)sender;
+            _mouseX = e.Location.X;
+            _mouseY = e.Location.Y;
+
+            bool rebuildAll = true;
+            foreach (ListViewItem lvi in lvResults.Items)
+            {
+                if (lvi.Text.Length > 0)
+                {
+                    rebuildAll = false;
+                    break;
+                }
+            }
+
+            ListViewHitTestInfo lvh = lv.HitTest(_mouseX, _mouseY);
+            if (e.Button == MouseButtons.Right)
+            {
+                menuDropDown.Items.Clear();
+
+                if (rebuildAll)
+                {
+                    var tsi = menuDropDown.Items.Add("Rebuild all Grid25 map");
+                    tsi.Name = "menuRebuildAllGrid25";
+                }
+                else
+                {
+                    var tsi = menuDropDown.Items.Add("Rebuild Grid25 map");
+                    tsi.Name = "menuRebuildGrid25";
+                }
+            }
+        }
+
+        private void OnDropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+            e.ClickedItem.Owner.Hide();
+            int fldTitleHandle = _majorGrid.LayoutHelper.LayoutShapeFile.FieldIndexByName["Title"];
+            var panelExtent = new Extents();
+            double w = 0;
+            double h = 0;
+            string panelTitle = "";
+
+            switch (e.ClickedItem.Name)
+            {
+                case "menuRebuildGrid25":
+                    panelExtent = _majorGrid.LayoutHelper.LayoutShapeFile.Shape[lvResults.SelectedItems[0].Index].Extents;
+                    w = panelExtent.Width;
+                    h = panelExtent.Height;
+                    panelTitle = _majorGrid.LayoutHelper.LayoutShapeFile.CellValue[fldTitleHandle, lvResults.SelectedItems[0].Index].ToString();
+                    if (_majorGrid.GenerateMinorGridInsidePanelExtent(panelExtent, panelTitle)
+                        && _majorGrid.Save($@"{textFolderToSave.Text}\{textFishingGround.Text}-{panelTitle}"))
+                    {
+                        lvResults.SelectedItems[0].Text = panelTitle;
+                        lvResults.SelectedItems[0].SubItems.Add(w.ToString());
+                        lvResults.SelectedItems[0].SubItems.Add(h.ToString());
+                        lvResults.SelectedItems[0].Tag = $"{textFishingGround.Text}-{panelTitle}";
+                        lvResults.SelectedItems[0].Checked = true;
+                    }
+                    break;
+
+                case "menuRebuildAllGrid25":
+                    foreach (ListViewItem lvi in lvResults.Items)
+                    {
+                        panelExtent = _majorGrid.LayoutHelper.LayoutShapeFile.Shape[lvi.Index].Extents;
+                        w = panelExtent.Width;
+                        h = panelExtent.Height;
+                        panelTitle = _majorGrid.LayoutHelper.LayoutShapeFile.CellValue[fldTitleHandle, lvi.Index].ToString();
+                        if (_majorGrid.GenerateMinorGridInsidePanelExtent(panelExtent, panelTitle)
+                            && _majorGrid.Save($@"{textFolderToSave.Text}\{textFishingGround.Text}-{panelTitle}"))
+                        {
+                            lvi.Text = panelTitle;
+                            lvi.SubItems.Add(w.ToString());
+                            lvi.SubItems.Add(h.ToString());
+                            lvi.Tag = $"{textFishingGround.Text}-{panelTitle}";
+                            lvi.Checked = true;
+                        }
+                    }
+                    break;
+            }
+            SizeColumns(lvResults, false);
         }
     }
 }

@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.IO;
 using FAD3.Mapping.Classes;
+using FAD3.Mapping.Forms;
 
 namespace FAD3
 {
@@ -41,6 +42,7 @@ namespace FAD3
         {
             global.MappingForm.MapControl.Redraw();
             _mapLayersHandler.RefreshMap();
+            RefreshLayerList();
         }
 
         private void OnLayerGrid_MouseDown(object sender, MouseEventArgs e)
@@ -190,10 +192,16 @@ namespace FAD3
             }
         }
 
+        /// <summary>
+        /// handles the event when a new visible layer is added into the map
+        /// </summary>
+        /// <param name="layer"></param>
+        /// <param name="e"></param>
         private void OnLayerRead(MapLayersHandler layer, LayerEventArg e)
         {
             if (e.ShowInLayerUI)
             {
+                //set the layer preview thumbnail
                 PictureBox pic = new PictureBox
                 {
                     Height = layerGrid.RowTemplate.Height,
@@ -201,8 +209,14 @@ namespace FAD3
                     Visible = false
                 };
                 _mapLayersHandler.LayerSymbol(e.LayerHandle, pic, e.LayerType);
+
+                //we always insert a new layer in the first row of the dataGrid
                 layerGrid.Rows.Insert(0, new object[] { e.LayerVisible, e.LayerName, pic.Image });
+
+                //we assign the layerhandle to the tag of cell 0,0
                 layerGrid[0, 0].Tag = e.LayerHandle;
+
+                //symbolize the current layer by making it bold font
                 MarkCurrentLayerName(0);
             }
         }
@@ -428,14 +442,24 @@ namespace FAD3
                     break;
 
                 case "buttonAttributes":
-                    var sfa = ShapefileAttributesForm.GetInstance(global.MappingForm, global.MappingForm.MapInterActionHandler);
-                    if (!sfa.Visible)
+                    //var sfa = ShapefileAttributesForm.GetInstance(global.MappingForm, global.MappingForm.MapInterActionHandler);
+                    //if (!sfa.Visible)
+                    //{
+                    //    sfa.Show(this);
+                    //}
+                    //else
+                    //{
+                    //    sfa.BringToFront();
+                    //}
+
+                    EditShapeAttributeForm esaf = EditShapeAttributeForm.GetInstance(global.MappingForm, global.MappingForm.MapInterActionHandler);
+                    if (esaf.Visible)
                     {
-                        sfa.Show(this);
+                        esaf.BringToFront();
                     }
                     else
                     {
-                        sfa.BringToFront();
+                        esaf.Show(this);
                     }
                     break;
 
@@ -447,6 +471,36 @@ namespace FAD3
                     Close();
                     break;
             }
+        }
+
+        public void RefreshLayerList()
+        {
+            layerGrid.Rows.Clear();
+            _mapLayersHandler.ReadLayers();
+        }
+
+        private void OnLayerMoveDropDownClick(object sender, ToolStripItemClickedEventArgs e)
+        {
+            e.ClickedItem.OwnerItem.Owner.Hide();
+            switch (e.ClickedItem.Name)
+            {
+                case "itemMoveTop":
+                    _mapLayersHandler.MoveToTop();
+                    break;
+
+                case "itemMoveBottom":
+                    _mapLayersHandler.MoveToBottom();
+                    break;
+
+                case "itemMoveUp":
+                    _mapLayersHandler.MoveUp();
+                    break;
+
+                case "itemMoveDown":
+                    _mapLayersHandler.MoveDown();
+                    break;
+            }
+            RefreshLayerList();
         }
     }
 }

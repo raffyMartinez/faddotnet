@@ -27,6 +27,12 @@ namespace FAD3
 
         private Grid25MajorGrid _grid25MajorGrid;
 
+        public bool SetExtent(Extents ext)
+        {
+            _minorGridExtents = ext;
+            return ConstructMinorGridLines(false);
+        }
+
         /// <summary>
         /// Passes a map control reference.
         /// </summary>

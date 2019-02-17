@@ -56,6 +56,7 @@
             this.lvResults = new System.Windows.Forms.ListView();
             this.chkAutoExpand = new System.Windows.Forms.CheckBox();
             this.btnSaveLayout = new System.Windows.Forms.Button();
+            this.menuDropDown = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.tabsLayout.SuspendLayout();
             this.tabLayout.SuspendLayout();
             this.tabSave.SuspendLayout();
@@ -312,11 +313,13 @@
             // lvResults
             // 
             this.lvResults.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.lvResults.ContextMenuStrip = this.menuDropDown;
             this.lvResults.Location = new System.Drawing.Point(3, 3);
             this.lvResults.Name = "lvResults";
             this.lvResults.Size = new System.Drawing.Size(364, 219);
             this.lvResults.TabIndex = 0;
             this.lvResults.UseCompatibleStateImageBehavior = false;
+            this.lvResults.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnMouseDown);
             // 
             // chkAutoExpand
             // 
@@ -341,6 +344,12 @@
             this.btnSaveLayout.UseVisualStyleBackColor = true;
             this.btnSaveLayout.Visible = false;
             this.btnSaveLayout.Click += new System.EventHandler(this.OnButtonClick);
+            // 
+            // menuDropDown
+            // 
+            this.menuDropDown.Name = "menuDropDown";
+            this.menuDropDown.Size = new System.Drawing.Size(61, 4);
+            this.menuDropDown.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnDropDownItemClicked);
             // 
             // Grid25LayoutHelperForm
             // 
@@ -397,5 +406,6 @@
         private System.Windows.Forms.ListView lvResults;
         private System.Windows.Forms.CheckBox chkAutoExpand;
         private System.Windows.Forms.Button btnSaveLayout;
+        private System.Windows.Forms.ContextMenuStrip menuDropDown;
     }
 }

@@ -67,6 +67,14 @@ namespace FAD3.Mapping.Forms
                 //set up the column headers
                 _sfSelectedCount = 0;
                 Shapefile sf = _currentMapLayer.LayerObject as Shapefile;
+                object queryResult = new object();
+                int[] rowIndices = new int[0];
+                string errMsg = "";
+                if (sf.VisibilityExpression.Length > 0)
+                {
+                    sf.Table.Query(sf.VisibilityExpression, ref queryResult, ref errMsg);
+                    rowIndices = (int[])queryResult;
+                }
                 _sfSelectedCount = sf.NumSelected;
                 if (!chkRemember.Checked)
                 {
@@ -98,23 +106,41 @@ namespace FAD3.Mapping.Forms
                     //reads the data and adds them to the listview
                     if (_sfSelectedCount == 0)
                     {
-                        labelShapeFileName.Text = $"Attribute data of the shapefile (n={sf.NumShapes.ToString()})";
-
-                        //show attributes of all shapes in the shapefile
-                        rows = sf.NumShapes;
-
-                        for (int ishp = 0; ishp < rows; ishp++)
+                        if (sf.VisibilityExpression.Length == 0)
                         {
-                            row = new DataGridViewRow();
-                            row.CreateCells(gridAttributes);
-                            object[] arr = new object[sf.NumFields];
-                            for (int ifld = 0; ifld < sf.NumFields; ifld++)
+                            labelShapeFileName.Text = $"Attribute data of the shapefile (n={sf.NumShapes.ToString()})";
+                            rows = sf.NumShapes;
+                            for (int ishp = 0; ishp < rows; ishp++)
                             {
-                                arr[ifld] = sf.CellValue[ifld, ishp];
+                                row = new DataGridViewRow();
+                                row.CreateCells(gridAttributes);
+                                object[] arr = new object[sf.NumFields];
+                                for (int ifld = 0; ifld < sf.NumFields; ifld++)
+                                {
+                                    arr[ifld] = sf.CellValue[ifld, ishp];
+                                }
+                                row.SetValues(arr);
+                                row.Tag = ishp;
+                                gridAttributes.Rows.Add(row);
                             }
-                            row.SetValues(arr);
-                            row.Tag = ishp;
-                            gridAttributes.Rows.Add(row);
+                        }
+                        else
+                        {
+                            rows = rowIndices.Length;
+                            labelShapeFileName.Text = $"Attribute data of the shapefile (n={rowIndices.Length.ToString()})";
+                            for (int vShp = 0; vShp < rowIndices.Length; vShp++)
+                            {
+                                row = new DataGridViewRow();
+                                row.CreateCells(gridAttributes);
+                                object[] arr = new object[sf.NumFields];
+                                for (int ifld = 0; ifld < sf.NumFields; ifld++)
+                                {
+                                    arr[ifld] = sf.CellValue[ifld, rowIndices[vShp]];
+                                }
+                                row.SetValues(arr);
+                                row.Tag = vShp;
+                                gridAttributes.Rows.Add(row);
+                            }
                         }
                     }
                     else

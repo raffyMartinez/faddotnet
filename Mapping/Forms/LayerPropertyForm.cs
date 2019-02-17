@@ -141,7 +141,14 @@ namespace FAD3
                     break;
 
                 case "btnApplyVisibility":
-                    _shapefileLayer.VisibilityExpression = _mapLayer.ShapesVisibilityExpression;
+                    if (txtVisibilityExpression.Text.Length == 0)
+                    {
+                        _shapefileLayer.VisibilityExpression = "";
+                    }
+                    else
+                    {
+                        _shapefileLayer.VisibilityExpression = _mapLayer.ShapesVisibilityExpression;
+                    }
                     global.MappingForm.MapControl.Redraw();
                     break;
 
