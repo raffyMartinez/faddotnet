@@ -764,6 +764,7 @@ namespace FAD3
         {
             if (_layoutHelper != null)
             {
+                _layoutHelper.ClearLayout();
                 LayoutCols = _layoutHelper.Columns;
                 LayoutRows = _layoutHelper.Rows;
                 LayoutOverlap = _layoutHelper.Overlap;

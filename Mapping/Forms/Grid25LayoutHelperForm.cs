@@ -101,7 +101,7 @@ namespace FAD3.Mapping.Forms
             SizeColumns(lvResults, false);
             lvResults.ItemChecked += OnListItemChecked;
 
-            bool enable = LayoutHelper.LayoutShapeFile == null;
+            bool enable = !LayoutHelper.LayoutTemplateFromFile;
             txtColumns.Enabled = enable;
             txtRows.Enabled = enable;
             txtOverlap.Enabled = enable;

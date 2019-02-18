@@ -214,8 +214,11 @@ namespace FAD3
                     break;
 
                 case "buttonClear":
+                    if (_grid25MajorGrid.LayoutHelper?.LayoutShapeFile?.NumShapes > 0)
+                    {
+                        _grid25MajorGrid.LayoutHelper.ClearLayout();
+                    }
                     _grid25MajorGrid.ClearSelectedGrids();
-                    //_parentForm.SetCursorToSelect();
                     _parentForm.SetCursor(MapWinGIS.tkCursorMode.cmSelection);
                     break;
 

@@ -30,6 +30,9 @@ namespace FAD3.Mapping.Classes
         public delegate void LayoutCreatededEvent(Grid25LayoutHelper s, Grid25LayoutHelperEventArgs e);
         public event LayoutCreatededEvent LayerCreated;
 
+        public delegate void LayoutClearedEvent(Grid25LayoutHelper s, Grid25LayoutHelperEventArgs e);
+        public event LayoutCreatededEvent LayoutCleared;
+
         public int SelectionTransparency { get; set; }
 
         public int Rows
@@ -79,6 +82,29 @@ namespace FAD3.Mapping.Classes
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        /// closes and makes null layout shapefile and sets layout handle to -1
+        /// </summary>
+        public void ClearLayout()
+        {
+            if (_sfLayout != null)
+            {
+                _sfLayout.Close();
+                _sfLayout = null;
+
+                if (_hsfLayout > 0)
+                {
+                    _majorGrid.MapLayers.RemoveLayer(_hsfLayout);
+                }
+                _hsfLayout = -1;
+            }
+        }
+
+        /// <summary>
+        /// Is true if layout shapefile is created from a file and not created from scratch
+        /// </summary>
+        public bool LayoutTemplateFromFile { get; internal set; }
+
         public bool SaveLayoutTemplate(string fileName)
         {
             bool success = true;
@@ -123,6 +149,10 @@ namespace FAD3.Mapping.Classes
             return success;
         }
 
+        /// <summary>
+        /// returns true if all title fields in the shapefile is filled up
+        /// </summary>
+        /// <returns></returns>
         public bool ValidLayoutTemplateShapefile()
         {
             bool isValid = true;
@@ -166,6 +196,7 @@ namespace FAD3.Mapping.Classes
                 _axMap.SelectBoxFinal -= OnMapSelectBoxFinal;
                 _axMap = null;
                 _disposed = true;
+                _hsfLayout = -1;
             }
         }
 
@@ -178,11 +209,13 @@ namespace FAD3.Mapping.Classes
 
         public Grid25LayoutHelper(Grid25MajorGrid majorGrid)
         {
+            LayoutTemplateFromFile = false;
             SetupClass(majorGrid);
         }
 
         public Grid25LayoutHelper(Grid25MajorGrid majorGrid, int iconHandle)
         {
+            LayoutTemplateFromFile = false;
             _hCursorDefineLayout = iconHandle;
             SetupClass(majorGrid);
         }
@@ -250,6 +283,7 @@ namespace FAD3.Mapping.Classes
                         LayerCreated(this, gle);
                     }
                 }
+                LayoutTemplateFromFile = false;
             }
         }
 
@@ -273,6 +307,7 @@ namespace FAD3.Mapping.Classes
                     _majorGrid.MapLayers[_hsfLayout].IsFishingGridLayoutTemplate = true;
                     _axMap.Redraw();
                     success = true;
+                    LayoutTemplateFromFile = true;
                 }
             }
             return success;
@@ -361,7 +396,9 @@ namespace FAD3.Mapping.Classes
         /// <returns></returns>
         public bool SetupLayout(int rows, int columns, int overlap)
         {
-            if (_layoutExtents != null)
+            if (_layoutExtents != null
+                && rows > 0
+                && columns > 0)
             {
                 _overLap = overlap;
                 _rows = rows;

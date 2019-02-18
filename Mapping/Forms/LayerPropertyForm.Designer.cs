@@ -58,6 +58,7 @@
             this.shapeContainer1 = new Microsoft.VisualBasic.PowerPacks.ShapeContainer();
             this.rectangleShape1 = new Microsoft.VisualBasic.PowerPacks.RectangleShape();
             this.btnApply = new System.Windows.Forms.Button();
+            this.btnClear = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabAppearance.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -239,6 +240,7 @@
             // 
             // tabVisibility
             // 
+            this.tabVisibility.Controls.Add(this.btnClear);
             this.tabVisibility.Controls.Add(this.btnApplyVisibility);
             this.tabVisibility.Controls.Add(this.btnDefineVisibilityExpression);
             this.tabVisibility.Controls.Add(this.label23);
@@ -282,10 +284,11 @@
             // 
             // txtVisibilityExpression
             // 
+            this.txtVisibilityExpression.Enabled = false;
             this.txtVisibilityExpression.Location = new System.Drawing.Point(17, 37);
             this.txtVisibilityExpression.Multiline = true;
             this.txtVisibilityExpression.Name = "txtVisibilityExpression";
-            this.txtVisibilityExpression.Size = new System.Drawing.Size(270, 68);
+            this.txtVisibilityExpression.Size = new System.Drawing.Size(270, 107);
             this.txtVisibilityExpression.TabIndex = 50;
             // 
             // tabSelection
@@ -360,6 +363,16 @@
             this.btnApply.UseVisualStyleBackColor = true;
             this.btnApply.Click += new System.EventHandler(this.OnButtonClick);
             // 
+            // btnClear
+            // 
+            this.btnClear.Location = new System.Drawing.Point(293, 107);
+            this.btnClear.Name = "btnClear";
+            this.btnClear.Size = new System.Drawing.Size(52, 24);
+            this.btnClear.TabIndex = 54;
+            this.btnClear.Text = "Clear";
+            this.btnClear.UseVisualStyleBackColor = true;
+            this.btnClear.Click += new System.EventHandler(this.OnButtonClick);
+            // 
             // LayerPropertyForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -429,5 +442,6 @@
         private Microsoft.VisualBasic.PowerPacks.RectangleShape rectangleShape1;
         private Mapping.UserControls.TransparencyControl transpSelection;
         private System.Windows.Forms.Button btnApply;
+        private System.Windows.Forms.Button btnClear;
     }
 }

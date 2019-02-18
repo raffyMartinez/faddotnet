@@ -73,6 +73,12 @@ namespace FAD3
         {
             switch (((Button)sender).Name)
             {
+                case "btnClear":
+                    txtVisibilityExpression.Text = "";
+                    _shapefileLayer.VisibilityExpression = "";
+                    global.MappingForm.MapControl.Redraw();
+                    break;
+
                 case "btnLabelFeatures":
                     var labelsForm = LabelsForm.GetInstance(_mapLayers);
                     if (!labelsForm.Visible)

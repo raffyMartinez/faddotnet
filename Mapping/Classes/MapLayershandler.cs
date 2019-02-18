@@ -428,16 +428,26 @@ namespace FAD3
         /// <param name="layerHandle"></param>
         public void RemoveLayer(int layerHandle)
         {
-            _mapLayerDictionary[layerHandle].Dispose();
-            _mapLayerDictionary.Remove(layerHandle);
-            _axmap.RemoveLayer(layerHandle);
-            _axmap.Redraw();
-
-            //fire the layer deleted event
-            if (LayerRemoved != null)
+            try
             {
-                LayerEventArg lp = new LayerEventArg(layerHandle, layerRemoved: true);
-                LayerRemoved(this, lp);
+                _mapLayerDictionary[layerHandle].Dispose();
+                _mapLayerDictionary.Remove(layerHandle);
+                _axmap.RemoveLayer(layerHandle);
+                _axmap.Redraw();
+                //fire the layer deleted event
+                if (LayerRemoved != null)
+                {
+                    LayerEventArg lp = new LayerEventArg(layerHandle, layerRemoved: true);
+                    LayerRemoved(this, lp);
+                }
+            }
+            catch (KeyNotFoundException knfex)
+            {
+                //ignore
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message, "MapLayersHandler", "RemoveLayer");
             }
         }
 

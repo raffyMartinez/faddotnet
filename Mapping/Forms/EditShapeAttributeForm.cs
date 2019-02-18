@@ -100,10 +100,6 @@ namespace FAD3.Mapping.Forms
                         }
                     }
 
-                    //set all column widths to fit the column text
-                    //SizeColumns(init: true);
-
-                    //reads the data and adds them to the listview
                     if (_sfSelectedCount == 0)
                     {
                         if (sf.VisibilityExpression.Length == 0)
@@ -128,7 +124,7 @@ namespace FAD3.Mapping.Forms
                         {
                             rows = rowIndices.Length;
                             labelShapeFileName.Text = $"Attribute data of the shapefile (n={rowIndices.Length.ToString()})";
-                            for (int vShp = 0; vShp < rowIndices.Length; vShp++)
+                            for (int vShp = 0; vShp < rows; vShp++)
                             {
                                 row = new DataGridViewRow();
                                 row.CreateCells(gridAttributes);
@@ -138,7 +134,7 @@ namespace FAD3.Mapping.Forms
                                     arr[ifld] = sf.CellValue[ifld, rowIndices[vShp]];
                                 }
                                 row.SetValues(arr);
-                                row.Tag = vShp;
+                                row.Tag = rowIndices[vShp];
                                 gridAttributes.Rows.Add(row);
                             }
                         }
@@ -173,32 +169,59 @@ namespace FAD3.Mapping.Forms
                         {
                             if (_currentMapLayer.SelectedIndexes != null)
                             {
-                                labelShapeFileName.Text = $"Attribute data of the selected shapes (n={_currentMapLayer.SelectedIndexes.Length.ToString()})";
-
-                                //show attributes of selected shapes
-                                for (int r = 0; r < _currentMapLayer.SelectedIndexes.Length; r++)
+                                if (sf.VisibilityExpression.Length > 0)
                                 {
-                                    row = new DataGridViewRow();
-                                    row.CreateCells(gridAttributes);
-                                    object[] arr = new object[sf.NumFields];
-
-                                    for (int col = 0; col < sf.NumFields; col++)
+                                    int c = 0;
+                                    var intersect = rowIndices.Intersect(_currentMapLayer.SelectedIndexes);
+                                    foreach (int v in rowIndices.Intersect(_currentMapLayer.SelectedIndexes))
                                     {
-                                        try
+                                        c++;
+                                        row = new DataGridViewRow();
+                                        row.CreateCells(gridAttributes);
+                                        object[] arr = new object[sf.NumFields];
+
+                                        for (int col = 0; col < sf.NumFields; col++)
                                         {
-                                            arr[col] = sf.CellValue[col, _currentMapLayer.SelectedIndexes[r]].ToString();
+                                            try
+                                            {
+                                                arr[col] = sf.CellValue[col, v].ToString();
+                                            }
+                                            catch
+                                            {
+                                                arr[col] = "";
+                                            }
                                         }
-                                        catch
-                                        {
-                                            arr[col] = "";
-                                        }
+                                        row.SetValues(arr);
+                                        row.Tag = v;
+                                        gridAttributes.Rows.Add(row);
                                     }
-                                    row.SetValues(arr);
-                                    row.Tag = _currentMapLayer.SelectedIndexes[r];
-                                    gridAttributes.Rows.Add(row);
-                                    //ListViewItem lvi = new ListViewItem(rowData);
-                                    //lvAttributes.Items.Add(lvi);
-                                    //lvi.Name = _currentMapLayer.SelectedIndexes[row].ToString();
+                                    labelShapeFileName.Text = $"Attribute data of the selected shapes (n={c.ToString()})";
+                                }
+                                else
+                                {
+                                    labelShapeFileName.Text = $"Attribute data of the selected shapes (n={_currentMapLayer.SelectedIndexes.Length.ToString()})";
+                                    //show attributes of selected shapes
+                                    for (int r = 0; r < _currentMapLayer.SelectedIndexes.Length; r++)
+                                    {
+                                        row = new DataGridViewRow();
+                                        row.CreateCells(gridAttributes);
+                                        object[] arr = new object[sf.NumFields];
+
+                                        for (int col = 0; col < sf.NumFields; col++)
+                                        {
+                                            try
+                                            {
+                                                arr[col] = sf.CellValue[col, _currentMapLayer.SelectedIndexes[r]].ToString();
+                                            }
+                                            catch
+                                            {
+                                                arr[col] = "";
+                                            }
+                                        }
+                                        row.SetValues(arr);
+                                        row.Tag = _currentMapLayer.SelectedIndexes[r];
+                                        gridAttributes.Rows.Add(row);
+                                    }
                                 }
                             }
                         }
