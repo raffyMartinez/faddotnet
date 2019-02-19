@@ -23,7 +23,7 @@ What are some of the features of  FAD?
 |-------|----|----|
 |3.1    |Dec 05,2018|[zipped file](https://github.com/raffyMartinez/faddotnet/releases/download/3.1/FAD3.1.setup.zip)|
 
-Please go to the (Releases page)[https://github.com/raffyMartinez/faddotnet/releases] for more details on how to install the software.
+Please go to the [Releases page](https://github.com/raffyMartinez/faddotnet/releases) for more details on how to install the software.
 
 ### Updaters
 |Date | Link  |
