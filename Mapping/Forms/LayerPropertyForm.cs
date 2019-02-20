@@ -2,9 +2,16 @@
 using MapWinGIS;
 using System;
 using System.Windows.Forms;
+using System.IO;
 
 namespace FAD3
 {
+    /// <summary>
+    /// access the properties of a shapefile layer
+    /// labels
+    /// symbols
+    /// visibility query
+    /// </summary>
     public partial class LayerPropertyForm : Form
     {
         private static LayerPropertyForm _instance;
@@ -54,16 +61,52 @@ namespace FAD3
             return _instance;
         }
 
-        private void LayerPropertyForm_Load(object sender, EventArgs e)
+        private void OnLayerPropertyForm_Load(object sender, EventArgs e)
         {
             global.LoadFormSettings(this, true);
 
             ProcessMapLayer(_mapLayer);
             transpSelection.FixLayout();
             btnApply.Enabled = false;
+            lvLayerProps.View = View.Details;
+            lvLayerProps.Columns.Clear();
+            lvLayerProps.Columns.Add("Property");
+            lvLayerProps.Columns.Add("Value");
+            lvLayerProps.FullRowSelect = true;
+            SizeColumns();
+
+            ListViewItem lvi = lvLayerProps.Items.Add("Number of shapes");
+            lvi.SubItems.Add(_shapefileLayer.NumShapes.ToString());
+
+            lvi = lvLayerProps.Items.Add("Extents minimum xy");
+            lvi.SubItems.Add($"{_shapefileLayer.Extents.xMin.ToString()}, {_shapefileLayer.Extents.yMin.ToString()}");
+
+            lvi = lvLayerProps.Items.Add("Extents maximum xy");
+            lvi.SubItems.Add($"{_shapefileLayer.Extents.xMax.ToString()}, {_shapefileLayer.Extents.yMax.ToString()}");
+
+            lvi = lvLayerProps.Items.Add("Centroid xy");
+            lvi.SubItems.Add($"{_shapefileLayer.Extents.Center.x.ToString()}, {_shapefileLayer.Extents.Center.y.ToString()}");
+            SizeColumns(false);
         }
 
-        private void LayerPropertyForm_FormClosed(object sender, FormClosedEventArgs e)
+        private void SizeColumns(bool init = true)
+        {
+            foreach (ColumnHeader c in lvLayerProps.Columns)
+            {
+                if (init)
+                {
+                    c.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
+                    c.Tag = c.Width;
+                }
+                else
+                {
+                    c.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+                    c.Width = c.Width > (int)c.Tag ? c.Width : (int)c.Tag;
+                }
+            }
+        }
+
+        private void OnLayerPropertyForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             _instance = null;
             global.SaveFormSettings(this);
@@ -165,9 +208,50 @@ namespace FAD3
             }
         }
 
-        private void txtLayerName_TextChanged(object sender, EventArgs e)
+        private void OntxtLayerName_TextChanged(object sender, EventArgs e)
         {
             btnApply.Enabled = true;
+        }
+
+        private void OnMenuItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+            e.ClickedItem.Owner.Hide();
+            switch (e.ClickedItem.Name)
+            {
+                case "menuSavePropsToFile":
+                    var sfd = new SaveFileDialog();
+                    sfd.Title = "Save layer propeties to text file";
+                    sfd.Filter = "Text file|*.txt|All files|*.*";
+                    sfd.FilterIndex = 1;
+                    sfd.FileName = $"{_mapLayer.Name}_properties.txt";
+                    sfd.ShowDialog();
+                    if (sfd.FileName.Length > 0)
+                    {
+                        try
+                        {
+                            using (StreamWriter writer = new StreamWriter(sfd.FileName, false))
+                            {
+                                writer.WriteLine($"Layer name: {_mapLayer.Name}");
+                                writer.WriteLine($"Projection: {_mapLayer.GeoProjectionName}");
+                                writer.WriteLine($"Layer type: {_mapLayer.LayerType}");
+                                writer.WriteLine($"Filename: {_mapLayer.FileName}");
+                                foreach (ListViewItem lvi in lvLayerProps.Items)
+                                {
+                                    writer.WriteLine($"{lvi.Text}: {lvi.SubItems[1].Text}");
+                                }
+                            }
+                        }
+                        catch (IOException ioex)
+                        {
+                            MessageBox.Show($"{ioex.Message} Try using another filename", "IO exception error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Log(ex.Message, "LayerPropertyForm.cs", "OnMenuItemClicked.menuSavePropsToFile");
+                        }
+                    }
+                    break;
+            }
         }
     }
 }

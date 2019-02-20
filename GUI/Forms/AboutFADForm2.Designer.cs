@@ -40,7 +40,7 @@
             // button1
             // 
             this.button1.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.button1.Location = new System.Drawing.Point(261, 419);
+            this.button1.Location = new System.Drawing.Point(260, 439);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(66, 22);
             this.button1.TabIndex = 1;
@@ -94,7 +94,7 @@
             this.lblAuthor.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblAuthor.Location = new System.Drawing.Point(-1, 370);
             this.lblAuthor.Name = "lblAuthor";
-            this.lblAuthor.Size = new System.Drawing.Size(337, 34);
+            this.lblAuthor.Size = new System.Drawing.Size(337, 60);
             this.lblAuthor.TabIndex = 9;
             this.lblAuthor.Text = "version";
             this.lblAuthor.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -103,7 +103,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(338, 448);
+            this.ClientSize = new System.Drawing.Size(338, 467);
             this.Controls.Add(this.lblAuthor);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.lblVersion);

@@ -43,7 +43,7 @@
             // button1
             // 
             this.button1.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.button1.Location = new System.Drawing.Point(266, 420);
+            this.button1.Location = new System.Drawing.Point(266, 443);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(66, 22);
             this.button1.TabIndex = 0;
@@ -107,7 +107,7 @@
             this.lblAuthor.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblAuthor.Location = new System.Drawing.Point(24, 378);
             this.lblAuthor.Name = "lblAuthor";
-            this.lblAuthor.Size = new System.Drawing.Size(287, 39);
+            this.lblAuthor.Size = new System.Drawing.Size(287, 62);
             this.lblAuthor.TabIndex = 7;
             this.lblAuthor.Text = "label1";
             this.lblAuthor.TextAlign = System.Drawing.ContentAlignment.TopCenter;
@@ -117,7 +117,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.button1;
-            this.ClientSize = new System.Drawing.Size(338, 448);
+            this.ClientSize = new System.Drawing.Size(338, 468);
             this.Controls.Add(this.lblAuthor);
             this.Controls.Add(this.lblVersion);
             this.Controls.Add(this.panelUI);

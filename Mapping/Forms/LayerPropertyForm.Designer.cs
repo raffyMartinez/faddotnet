@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.txtLayerName = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.txtGeoProjection = new System.Windows.Forms.TextBox();
@@ -47,6 +48,7 @@
             this.btnLabelCategories = new System.Windows.Forms.Button();
             this.tabCategories = new System.Windows.Forms.TabPage();
             this.tabVisibility = new System.Windows.Forms.TabPage();
+            this.btnClear = new System.Windows.Forms.Button();
             this.btnApplyVisibility = new System.Windows.Forms.Button();
             this.btnDefineVisibilityExpression = new System.Windows.Forms.Button();
             this.label23 = new System.Windows.Forms.Label();
@@ -57,14 +59,19 @@
             this.label5 = new System.Windows.Forms.Label();
             this.shapeContainer1 = new Microsoft.VisualBasic.PowerPacks.ShapeContainer();
             this.rectangleShape1 = new Microsoft.VisualBasic.PowerPacks.RectangleShape();
+            this.tabProperties = new System.Windows.Forms.TabPage();
+            this.lvLayerProps = new System.Windows.Forms.ListView();
             this.btnApply = new System.Windows.Forms.Button();
-            this.btnClear = new System.Windows.Forms.Button();
+            this.menuShortCut = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.menuSavePropsToFile = new System.Windows.Forms.ToolStripMenuItem();
             this.tabControl1.SuspendLayout();
             this.tabAppearance.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.tabVisibility.SuspendLayout();
             this.tabSelection.SuspendLayout();
+            this.tabProperties.SuspendLayout();
+            this.menuShortCut.SuspendLayout();
             this.SuspendLayout();
             // 
             // txtLayerName
@@ -73,7 +80,7 @@
             this.txtLayerName.Name = "txtLayerName";
             this.txtLayerName.Size = new System.Drawing.Size(252, 21);
             this.txtLayerName.TabIndex = 0;
-            this.txtLayerName.TextChanged += new System.EventHandler(this.txtLayerName_TextChanged);
+            this.txtLayerName.TextChanged += new System.EventHandler(this.OntxtLayerName_TextChanged);
             // 
             // label1
             // 
@@ -148,6 +155,7 @@
             this.tabControl1.Controls.Add(this.tabCategories);
             this.tabControl1.Controls.Add(this.tabVisibility);
             this.tabControl1.Controls.Add(this.tabSelection);
+            this.tabControl1.Controls.Add(this.tabProperties);
             this.tabControl1.Location = new System.Drawing.Point(4, 135);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
@@ -253,6 +261,16 @@
             this.tabVisibility.Text = "Visibility";
             this.tabVisibility.UseVisualStyleBackColor = true;
             // 
+            // btnClear
+            // 
+            this.btnClear.Location = new System.Drawing.Point(293, 107);
+            this.btnClear.Name = "btnClear";
+            this.btnClear.Size = new System.Drawing.Size(52, 24);
+            this.btnClear.TabIndex = 54;
+            this.btnClear.Text = "Clear";
+            this.btnClear.UseVisualStyleBackColor = true;
+            this.btnClear.Click += new System.EventHandler(this.OnButtonClick);
+            // 
             // btnApplyVisibility
             // 
             this.btnApplyVisibility.Location = new System.Drawing.Point(293, 67);
@@ -352,6 +370,25 @@
             this.rectangleShape1.Name = "rectangleShape1";
             this.rectangleShape1.Size = new System.Drawing.Size(29, 15);
             // 
+            // tabProperties
+            // 
+            this.tabProperties.Controls.Add(this.lvLayerProps);
+            this.tabProperties.Location = new System.Drawing.Point(4, 24);
+            this.tabProperties.Name = "tabProperties";
+            this.tabProperties.Size = new System.Drawing.Size(365, 199);
+            this.tabProperties.TabIndex = 4;
+            this.tabProperties.Text = "Properties";
+            this.tabProperties.UseVisualStyleBackColor = true;
+            // 
+            // lvLayerProps
+            // 
+            this.lvLayerProps.ContextMenuStrip = this.menuShortCut;
+            this.lvLayerProps.Location = new System.Drawing.Point(5, 3);
+            this.lvLayerProps.Name = "lvLayerProps";
+            this.lvLayerProps.Size = new System.Drawing.Size(357, 193);
+            this.lvLayerProps.TabIndex = 0;
+            this.lvLayerProps.UseCompatibleStateImageBehavior = false;
+            // 
             // btnApply
             // 
             this.btnApply.Enabled = false;
@@ -363,15 +400,19 @@
             this.btnApply.UseVisualStyleBackColor = true;
             this.btnApply.Click += new System.EventHandler(this.OnButtonClick);
             // 
-            // btnClear
+            // menuShortCut
             // 
-            this.btnClear.Location = new System.Drawing.Point(293, 107);
-            this.btnClear.Name = "btnClear";
-            this.btnClear.Size = new System.Drawing.Size(52, 24);
-            this.btnClear.TabIndex = 54;
-            this.btnClear.Text = "Clear";
-            this.btnClear.UseVisualStyleBackColor = true;
-            this.btnClear.Click += new System.EventHandler(this.OnButtonClick);
+            this.menuShortCut.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuSavePropsToFile});
+            this.menuShortCut.Name = "menuShortCut";
+            this.menuShortCut.Size = new System.Drawing.Size(181, 48);
+            this.menuShortCut.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnMenuItemClicked);
+            // 
+            // menuSavePropsToFile
+            // 
+            this.menuSavePropsToFile.Name = "menuSavePropsToFile";
+            this.menuSavePropsToFile.Size = new System.Drawing.Size(180, 22);
+            this.menuSavePropsToFile.Text = "Save to file...";
             // 
             // LayerPropertyForm
             // 
@@ -394,9 +435,9 @@
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "LayerPropertyForm";
             this.ShowInTaskbar = false;
-            this.Text = "LayerPropertyForm";
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.LayerPropertyForm_FormClosed);
-            this.Load += new System.EventHandler(this.LayerPropertyForm_Load);
+            this.Text = "Layer properties";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnLayerPropertyForm_FormClosed);
+            this.Load += new System.EventHandler(this.OnLayerPropertyForm_Load);
             this.tabControl1.ResumeLayout(false);
             this.tabAppearance.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
@@ -405,6 +446,8 @@
             this.tabVisibility.PerformLayout();
             this.tabSelection.ResumeLayout(false);
             this.tabSelection.PerformLayout();
+            this.tabProperties.ResumeLayout(false);
+            this.menuShortCut.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -443,5 +486,9 @@
         private Mapping.UserControls.TransparencyControl transpSelection;
         private System.Windows.Forms.Button btnApply;
         private System.Windows.Forms.Button btnClear;
+        private System.Windows.Forms.TabPage tabProperties;
+        private System.Windows.Forms.ListView lvLayerProps;
+        private System.Windows.Forms.ContextMenuStrip menuShortCut;
+        private System.Windows.Forms.ToolStripMenuItem menuSavePropsToFile;
     }
 }

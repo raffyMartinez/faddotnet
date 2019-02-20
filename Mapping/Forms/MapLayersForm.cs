@@ -9,6 +9,9 @@ using FAD3.Mapping.Forms;
 
 namespace FAD3
 {
+    /// <summary>
+    /// shows layers that are on the map window and allows access to each layer's attributes and properties
+    /// </summary>
     public partial class MapLayersForm : Form
     {
         private MapLayersHandler _mapLayersHandler;
@@ -166,18 +169,6 @@ namespace FAD3
             //we only respond to double-click on the name column
             if (e.ColumnIndex == 1)
             {
-                _layerRow = e.RowIndex;
-                _layerCol = e.ColumnIndex;
-                var hLyr = (int)layerGrid[0, e.RowIndex].Tag;
-                var lpf = LayerPropertyForm.GetInstance(this, hLyr);
-                if (!lpf.Visible)
-                {
-                    lpf.Show(this);
-                }
-                else
-                {
-                    lpf.BringToFront();
-                }
             }
         }
 
@@ -300,11 +291,28 @@ namespace FAD3
             layerGrid[1, currentRow].Style.Font = new Font(Font.FontFamily.Name, Font.Size, FontStyle.Bold);
         }
 
+        /// <summary>
+        /// event handler an item in the shortcut menu is clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnMenuLayers_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
             e.ClickedItem.Owner.Hide();
             switch (e.ClickedItem.Name)
             {
+                case "itemAttributes":
+                    var sfa = ShapefileAttributesForm.GetInstance(global.MappingForm, global.MappingForm.MapInterActionHandler);
+                    if (!sfa.Visible)
+                    {
+                        sfa.Show(this);
+                    }
+                    else
+                    {
+                        sfa.BringToFront();
+                    }
+                    break;
+
                 case "itemAddLayer":
                     _parentForm.OpenFileDialog();
                     break;
@@ -314,14 +322,14 @@ namespace FAD3
                     break;
 
                 case "itemLayerProperty":
-                    var sfa = ShapefileAttributesForm.GetInstance(global.MappingForm, global.MappingForm.MapInterActionHandler);
-                    if (!sfa.Visible)
+                    var lpf = LayerPropertyForm.GetInstance(this, (int)layerGrid[0, _rowIndexFromMouseDown].Tag);
+                    if (!lpf.Visible)
                     {
-                        sfa.Show(this);
+                        lpf.Show(this);
                     }
                     else
                     {
-                        sfa.BringToFront();
+                        lpf.BringToFront();
                     }
                     break;
 
@@ -384,6 +392,10 @@ namespace FAD3
             }
         }
 
+        /// <summary>
+        /// returns true if a layout template has all rows in the title field filled up
+        /// </summary>
+        /// <returns></returns>
         private bool ValidLayoutTemplateShapefile()
         {
             bool isValid = true;
@@ -423,8 +435,6 @@ namespace FAD3
                         cgf.BringToFront();
                     }
 
-                    //var sf = ShapefileLayerHelper.ConvertToGrid25((Shapefile)_mapLayersHandler.CurrentMapLayer.LayerObject, global.MappingForm.UTMZone);
-                    //global.MappingForm.MapLayersHandler.AddLayer(sf, "Converted");
                     break;
             }
         }

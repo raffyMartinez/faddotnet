@@ -6,6 +6,9 @@ using FAD3.Mapping.Forms;
 
 namespace FAD3
 {
+    /// <summary>
+    /// non-editable view of the attributes of a shapefile
+    /// </summary>
     public partial class ShapefileAttributesForm : Form
     {
         private static ShapefileAttributesForm _instance;

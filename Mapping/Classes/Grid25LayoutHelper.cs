@@ -10,7 +10,7 @@ using System.IO;
 namespace FAD3.Mapping.Classes
 {
     /// <summary>
-    /// Helper class for creating  a template shapefile of grids that define the boundary of a grid map.
+    /// Helper class for creating  a template shapefile of grids that define the boundary of a grid25 map.
     /// The template shapefile will be used in creating multiple grid25 maps in one go
     /// </summary>
     public class Grid25LayoutHelper : IDisposable

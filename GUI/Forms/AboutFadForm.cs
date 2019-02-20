@@ -25,7 +25,8 @@ namespace FAD3
             lblVersion.Text = $"Version: {Application.ProductVersion}";
             lblAuthor.Text = "";
             lblAuthor.Text += "Written by: Raffy Martinez\r\n";
-            lblAuthor.Text += "raffy.martinez@gmail.com";
+            lblAuthor.Text += "raffy.martinez@gmail.com\r\n";
+            lblAuthor.Text += "https://github.com/raffyMartinez/faddotnet";
             labelCredits.Text = "";
             if (global.HasMPH)
             {
