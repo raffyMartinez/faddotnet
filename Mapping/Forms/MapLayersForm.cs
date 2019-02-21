@@ -169,6 +169,15 @@ namespace FAD3
             //we only respond to double-click on the name column
             if (e.ColumnIndex == 1)
             {
+                var lpf = LayerPropertyForm.GetInstance(this, (int)layerGrid[0, _rowIndexFromMouseDown].Tag);
+                if (!lpf.Visible)
+                {
+                    lpf.Show(this);
+                }
+                else
+                {
+                    lpf.BringToFront();
+                }
             }
         }
 

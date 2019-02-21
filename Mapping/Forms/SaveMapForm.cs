@@ -10,6 +10,7 @@ namespace FAD3
         private bool _saveAsShapefile;
         private static SaveMapForm _instance;
         private Grid25GenerateForm _parentForm;
+        public string MapTitle { get; set; }
 
         public void SaveType(bool SaveAsShapefile)
         {
@@ -45,6 +46,11 @@ namespace FAD3
             if (_saveAsShapefile)
             {
                 txtSave.Text = "file name";
+                if (MapTitle.Length > 0)
+                {
+                    txtSave.Text = MapTitle;
+                }
+
                 txtSave.SelectAll();
                 txtSave.SelectionStart = 0;
             }
@@ -111,6 +117,10 @@ namespace FAD3
                                 {
                                     Logger.Log("Not all grid25 shapefiles were saved.", "Grid25SaveForm", "OnButton_Click");
                                 }
+                                else
+                                {
+                                    DialogResult = DialogResult.OK;
+                                }
                             }
                         }
                         else
@@ -139,7 +149,7 @@ namespace FAD3
                     break;
 
                 case "btnCancel":
-                    Close();
+                    DialogResult = DialogResult.Cancel;
                     break;
             }
         }

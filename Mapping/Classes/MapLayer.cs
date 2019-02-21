@@ -4,7 +4,9 @@ using System;
 using System.Drawing;
 
 namespace FAD3
-{
+{/// <summary>
+/// class for a layer that is shown on a map window
+/// </summary>
     public class MapLayer : IDisposable
     {
         public string Name { get; set; }

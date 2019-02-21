@@ -164,7 +164,8 @@ namespace FAD3
             for (int n = 0; n < _axMap.NumLayers; n++)
             {
                 var h = _axMap.get_LayerHandle(n);
-                if (_axMap.get_GetObject(h).GetType().Name == "ShapefileClass")
+                if (this.MapLayersHandler.get_MapLayer(h).LayerType == "ShapefileClass")
+                //if (_axMap.get_GetObject(h).GetType().Name == "ShapefileClass")
                 {
                     var categoryCount = _axMap.get_Shapefile(h).Categories.Count;
 
@@ -366,7 +367,8 @@ namespace FAD3
                     else
                     {
                         //layers whose weights are null will be placed below layers with weight values
-                        _axMap.get_Shapefile(kv.Key).Labels.VerticalPosition = tkVerticalPosition.vpAboveAllLayers;
+                        //_axMap.get_Shapefile(kv.Key).Labels.VerticalPosition = tkVerticalPosition.vpAboveAllLayers;
+                        _axMap.get_Shapefile(kv.Key).Labels.VerticalPosition = tkVerticalPosition.vpAboveParentLayer;
                     }
                     switch (kv.Value.Name)
                     {
@@ -376,6 +378,7 @@ namespace FAD3
 
                         case "Labels":
                             _handleLabels = kv.Value.Handle;
+
                             break;
 
                         case "Major grid":

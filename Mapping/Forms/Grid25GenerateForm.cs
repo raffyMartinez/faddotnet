@@ -443,9 +443,15 @@ namespace FAD3
                     if (txtMapTitle.Text.Length > 0)
                     {
                         RedoGridLabel();
-                        var saveForm = new SaveMapForm(this);
-                        saveForm.SaveType(e.ClickedItem.Name == "tsButtonSaveShapefile");
-                        saveForm.ShowDialog(this);
+                        using (var saveForm = new SaveMapForm(this))
+                        {
+                            saveForm.SaveType(e.ClickedItem.Name == "tsButtonSaveShapefile");
+                            saveForm.MapTitle = txtMapTitle.Text;
+                            saveForm.ShowDialog(this);
+                            if (saveForm.DialogResult == DialogResult.OK)
+                            {
+                            }
+                        }
                     }
                     else
                     {

@@ -138,7 +138,6 @@ namespace FAD3.Mapping.Classes
                         writer.WriteLine($"Rows:{global.MappingForm.Grid25MajorGrid.LayoutHelper.Rows}");
                         writer.WriteLine($"Columns:{global.MappingForm.Grid25MajorGrid.LayoutHelper.Columns}");
                         writer.WriteLine($"Overlap:{global.MappingForm.Grid25MajorGrid.LayoutHelper.Overlap}");
-                        //writer.WriteLine(_mapLayersHandler.CurrentMapLayer)
                     }
                 }
             }
@@ -150,7 +149,7 @@ namespace FAD3.Mapping.Classes
         }
 
         /// <summary>
-        /// returns true if all title fields in the shapefile is filled up
+        /// returns true if all title fields in the grid25 layout template shapefile is filled up
         /// </summary>
         /// <returns></returns>
         public bool ValidLayoutTemplateShapefile()
