@@ -36,6 +36,7 @@ namespace FAD3
         public Labels Labels { get; internal set; }
         public fad3MappingMode MappingMode { get; set; }
         public bool IsFishingGridLayoutTemplate { get; set; }
+        public bool KeepOnTop { get; set; }
 
         public void RestoreSettingsFromXML()
         {

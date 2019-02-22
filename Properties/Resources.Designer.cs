@@ -1278,6 +1278,16 @@ namespace FAD3.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap xy_point {
+            get {
+                object obj = ResourceManager.GetObject("xy_point", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap zoom_minus {
             get {
                 object obj = ResourceManager.GetObject("zoom_minus", resourceCulture);

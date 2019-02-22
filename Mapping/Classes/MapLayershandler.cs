@@ -493,8 +493,15 @@ namespace FAD3
 
         public string WorldfileExtension(string extension)
         {
-            var arr = extension.ToCharArray();
-            return $"{arr[1]}{arr[3]}w";
+            switch (extension)
+            {
+                case ".tif":
+                    return "tifw";
+
+                default:
+                    var arr = extension.ToCharArray();
+                    return $"{arr[1]}{arr[3]}w";
+            }
         }
 
         /// <summary>

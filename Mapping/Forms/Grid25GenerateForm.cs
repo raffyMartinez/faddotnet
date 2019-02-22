@@ -7,7 +7,8 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using FAD3.Mapping.Forms;
-using MapWinGIS;
+
+//using MapWinGIS;
 
 namespace FAD3
 {
@@ -65,21 +66,6 @@ namespace FAD3
         {
             txtMapTitle.Text = e.LayerName;
         }
-
-        //private void OnGridLayoutDefined(Grid25MajorGrid s, ExtentDraggedBoxEventArgs e)
-        //{
-        //    using (Grid25LayoutHelperForm mglf = new Grid25LayoutHelperForm())
-        //    {
-        //        var ext = new MapWinGIS.Extents();
-        //        ext.SetBounds(e.Left, e.Bottom, 0, e.Right, e.Top, 0);
-        //        mglf.SelectionBoxExtent = ext;
-        //        mglf.MajorGridSelectionExtent = _grid25MajorGrid.SelectedMajorGridShapesExtent;
-        //        mglf.ShowDialog(this);
-        //        if (mglf.DialogResult == DialogResult.OK)
-        //        {
-        //        }
-        //    }
-        //}
 
         private void OnExtentCreated(Grid25MajorGrid s, ExtentDraggedBoxEventArgs e)
         {
@@ -419,6 +405,18 @@ namespace FAD3
         {
             switch (e.ClickedItem.Name)
             {
+                case "tsButtonXY":
+                    var g25MouseCoordForm = Grid25CoordinateForm.GetInstance(global.MappingForm.MapControl, _grid25MajorGrid);
+                    if (g25MouseCoordForm.Visible)
+                    {
+                        g25MouseCoordForm.BringToFront();
+                    }
+                    else
+                    {
+                        g25MouseCoordForm.Show(this);
+                    }
+                    break;
+
                 case "tsButtonMBRs":
                     break;
 

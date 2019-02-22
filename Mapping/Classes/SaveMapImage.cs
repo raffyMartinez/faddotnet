@@ -352,6 +352,7 @@ namespace FAD3
         private bool SaveGrid25MapToImage()
         {
             var layerDictionary = MapLayersHandler.LayerDictionary;
+            List<int> layersOnTop = new List<int>();
 
             //sort the dictionary according to the weight of the layer. Layers with bigger weights are placed below those with smaller weights.
             foreach (KeyValuePair<int, MapLayer> kv in layerDictionary.OrderByDescending(r => r.Value.LayerWeight).Take(layerDictionary.Count))
@@ -389,7 +390,17 @@ namespace FAD3
                             _handleMinorGrid = kv.Value.Handle;
                             break;
                     }
+
+                    if (kv.Value.KeepOnTop)
+                    {
+                        layersOnTop.Add(_axMap.get_LayerPosition(kv.Value.Handle));
+                    }
                 }
+            }
+
+            foreach (int lyr in layersOnTop)
+            {
+                _axMap.MoveLayerTop(lyr);
             }
 
             //add a mask to the map control

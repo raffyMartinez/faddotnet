@@ -234,6 +234,7 @@ namespace FAD3
 
             layerGrid.DefaultCellStyle.SelectionBackColor = SystemColors.Window;
             layerGrid.DefaultCellStyle.SelectionForeColor = SystemColors.WindowText;
+            itemAlwaysKeepOnTop.Visible = global.MappingMode == fad3MappingMode.grid25Mode;
         }
 
         private void MapLayersForm_FormClosed(object sender, FormClosedEventArgs e)
@@ -279,10 +280,14 @@ namespace FAD3
                 //_mapLayersHandler.set_MapLayer((int)layerGrid[0, e.RowIndex].Tag);
                 _mapLayersHandler.set_MapLayer(_layerHandle);
                 itemConvertToGrid25.Enabled = false;
-                if (global.MappingMode == fad3MappingMode.grid25Mode && _mapLayersHandler.CurrentMapLayer.LayerType == "ShapefileClass")
+                if (global.MappingMode == fad3MappingMode.grid25Mode)
                 {
-                    var sf = _mapLayersHandler.CurrentMapLayer.LayerObject as Shapefile;
-                    itemConvertToGrid25.Enabled = sf.ShapefileType == ShpfileType.SHP_POINT;
+                    itemAlwaysKeepOnTop.Checked = _mapLayersHandler.CurrentMapLayer.KeepOnTop;
+                    if (_mapLayersHandler.CurrentMapLayer.LayerType == "ShapefileClass")
+                    {
+                        var sf = _mapLayersHandler.CurrentMapLayer.LayerObject as Shapefile;
+                        itemConvertToGrid25.Enabled = sf.ShapefileType == ShpfileType.SHP_POINT;
+                    }
                 }
             }
         }
@@ -445,6 +450,12 @@ namespace FAD3
                     }
 
                     break;
+
+                case "itemAlwaysKeepOnTop":
+                    ToolStripMenuItem tsmi = (ToolStripMenuItem)e.ClickedItem;
+                    tsmi.Checked = !tsmi.Checked;
+                    _mapLayersHandler.CurrentMapLayer.KeepOnTop = tsmi.Checked;
+                    break;
             }
         }
 
@@ -520,6 +531,10 @@ namespace FAD3
                     break;
             }
             RefreshLayerList();
+        }
+
+        private void onCheckStateChange(object sender, EventArgs e)
+        {
         }
     }
 }

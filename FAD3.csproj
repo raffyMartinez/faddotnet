@@ -380,6 +380,12 @@
     <Compile Include="Mapping\Forms\ColorSchemesForm.designer.cs">
       <DependentUpon>ColorSchemesForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Mapping\Forms\Grid25CoordinateForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Mapping\Forms\Grid25CoordinateForm.Designer.cs">
+      <DependentUpon>Grid25CoordinateForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Mapping\Forms\InstructionsForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -798,6 +804,9 @@
     <EmbeddedResource Include="Mapping\Forms\GraticuleForm.resx">
       <DependentUpon>GraticuleForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Mapping\Forms\Grid25CoordinateForm.resx">
+      <DependentUpon>Grid25CoordinateForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Mapping\Forms\Grid25GenerateForm.resx">
       <DependentUpon>Grid25GenerateForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -981,6 +990,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="FAD3.ico" />
+    <None Include="Resources\xy point.bmp" />
     <None Include="Resources\Save_16x.bmp" />
     <None Include="Resources\set layout.bmp" />
     <None Include="Resources\Ruler_16x.png" />

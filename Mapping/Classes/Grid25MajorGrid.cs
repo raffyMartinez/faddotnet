@@ -1212,7 +1212,13 @@ namespace FAD3
         {
             if (_enableMapInteraction)
             {
-                _selectionFromSelectBox = false;
+                if (e.button == 1)
+                {
+                    _selectionFromSelectBox = false;
+                }
+                else if (e.button == 2)
+                {
+                }
             }
         }
 

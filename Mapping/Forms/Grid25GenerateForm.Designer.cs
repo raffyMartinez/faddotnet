@@ -78,6 +78,7 @@
             this.lblGridStatus = new System.Windows.Forms.Label();
             this.buttonLocateGrid = new System.Windows.Forms.Button();
             this.btnOpenLayoutGrid = new System.Windows.Forms.Button();
+            this.tsButtonXY = new System.Windows.Forms.ToolStripButton();
             this.groupLabels.SuspendLayout();
             this.toolbar.SuspendLayout();
             this.SuspendLayout();
@@ -462,6 +463,7 @@
             this.tsButtonSaveImage,
             this.tsButtonMBRs,
             this.tsButtonRetrieve,
+            this.tsButtonXY,
             this.tsButtonExit});
             this.toolbar.Location = new System.Drawing.Point(0, 0);
             this.toolbar.Name = "toolbar";
@@ -561,6 +563,15 @@
             this.btnOpenLayoutGrid.UseVisualStyleBackColor = true;
             this.btnOpenLayoutGrid.Click += new System.EventHandler(this.OnButtons_Click);
             // 
+            // tsButtonXY
+            // 
+            this.tsButtonXY.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsButtonXY.Image = global::FAD3.Properties.Resources.xy_point;
+            this.tsButtonXY.ImageTransparentColor = System.Drawing.Color.White;
+            this.tsButtonXY.Name = "tsButtonXY";
+            this.tsButtonXY.Size = new System.Drawing.Size(23, 22);
+            this.tsButtonXY.Text = "toolStripButton1";
+            // 
             // Grid25GenerateForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -643,5 +654,6 @@
         private System.Windows.Forms.Label lblGridStatus;
         private System.Windows.Forms.Button buttonLocateGrid;
         private System.Windows.Forms.Button btnOpenLayoutGrid;
+        private System.Windows.Forms.ToolStripButton tsButtonXY;
     }
 }
