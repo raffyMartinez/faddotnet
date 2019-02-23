@@ -141,6 +141,7 @@ namespace FAD3
             _mapLayersHandler.LayerRead += OnLayerRead;
             _mapLayersHandler.LayerRemoved += OnLayerDeleted;
             _mapLayersHandler.OnLayerNameUpdate += OnLayerNameUpdated;
+            _mapLayersHandler.LayerRefreshNeeded += OnLayerRefreshRequest;
             layerGrid.CellClick += OnCellClick;
             layerGrid.CellMouseDown += OnCellMouseDown;
             layerGrid.CellDoubleClick += OnCellDoubleClick;
@@ -148,6 +149,11 @@ namespace FAD3
             layerGrid.DragOver += OnLayerGrid_DragOver;
             layerGrid.MouseDown += OnLayerGrid_MouseDown;
             layerGrid.MouseMove += OnLayerGrid_MouseMove;
+        }
+
+        private void OnLayerRefreshRequest(object sender, EventArgs e)
+        {
+            RefreshLayerList();
         }
 
         private void OnLayerNameUpdated(MapLayersHandler s, LayerEventArg e)

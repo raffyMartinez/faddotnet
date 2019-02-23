@@ -172,6 +172,24 @@ namespace FAD3
                 FitGridToMap();
         }
 
+        public void SetupTopLayers()
+        {
+            bool hasLayerOnTop = false;
+            foreach (var item in _mapLayers)
+            {
+                if (item.KeepOnTop)
+                {
+                    _axMap.MoveLayerTop(_axMap.get_LayerPosition(item.Handle));
+                    hasLayerOnTop = true;
+                }
+            }
+
+            if (hasLayerOnTop)
+            {
+                _mapLayers.RefreshLayers();
+            }
+        }
+
         /// <summary>
         /// Load the fishing map whose booundary was selected in the map control
         /// </summary>
@@ -272,6 +290,8 @@ namespace FAD3
                                 LayerEventArg lp = new LayerEventArg(h, (string)mapName);
                                 GridRetrieved(this, lp);
                             }
+
+                            SetupTopLayers();
                         }
                     }
                 }
@@ -751,7 +771,8 @@ namespace FAD3
                         break;
 
                     default:
-                        _axMap.get_Shapefile(hLyr).EditClear();
+
+                        _axMap.get_Shapefile(hLyr)?.EditClear();
                         break;
                 }
                 _mapLayers.RemoveLayer(hLyr);
@@ -1467,8 +1488,9 @@ namespace FAD3
                 if (_inDefineMinorGrid && _axMap.UDCursorHandle == _hCursorDefineGrid)
                 {
                     //This is where the actual work of constructing the grid map takes place
-                    if (!GenerateMinorGridInsideExtent(selectionBoxExtent))
+                    if (GenerateMinorGridInsideExtent(selectionBoxExtent))
                     {
+                        SetupTopLayers();
                     }
                 }
                 else

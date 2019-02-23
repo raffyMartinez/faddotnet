@@ -36,6 +36,8 @@ namespace FAD3
 
         public event EventHandler MapRedrawNeeded;
 
+        public event EventHandler LayerRefreshNeeded;
+
         public delegate void LayerReadHandler(MapLayersHandler s, LayerEventArg e);                 //an event that is raised when a layer from the mapcontrol is retrieved
         public event LayerReadHandler LayerRead;                                                    //in order for the listener is able to add the layer to the layers list
 
@@ -286,6 +288,11 @@ namespace FAD3
                     return item;
             }
             return null;
+        }
+
+        public void RefreshLayers()
+        {
+            LayerRefreshNeeded?.Invoke(this, EventArgs.Empty);
         }
 
         public void RefreshMap()
@@ -702,7 +709,7 @@ namespace FAD3
         }
 
         /// <summary>
-        /// handles dynmically created shapefiles added to the map
+        /// handles  shapefiles added to the map
         /// </summary>
         /// <param name="layer"></param>
         /// <param name="layerName"></param>
