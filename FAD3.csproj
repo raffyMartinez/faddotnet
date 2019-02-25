@@ -309,11 +309,11 @@
     <Compile Include="Mapping\Classes\MakeGridFromPoints.cs" />
     <Compile Include="Mapping\Classes\OccurenceMapEventArgs.cs" />
     <Compile Include="Mapping\Classes\ShapefileDiskStorageHelper.cs" />
-    <Compile Include="Mapping\Forms\ChlorophyllForm.cs">
+    <Compile Include="Mapping\Forms\SpatioTemporalMappingForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Mapping\Forms\ChlorophyllForm.Designer.cs">
-      <DependentUpon>ChlorophyllForm.cs</DependentUpon>
+    <Compile Include="Mapping\Forms\SpatioTemporalMappingForm.Designer.cs">
+      <DependentUpon>SpatioTemporalMappingForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Mapping\Forms\EditShapeAttributeForm.cs">
       <SubType>Form</SubType>
@@ -759,8 +759,8 @@
     <EmbeddedResource Include="GUI\Forms\AboutFADForm2.resx">
       <DependentUpon>AboutFADForm2.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Mapping\Forms\ChlorophyllForm.resx">
-      <DependentUpon>ChlorophyllForm.cs</DependentUpon>
+    <EmbeddedResource Include="Mapping\Forms\SpatioTemporalMappingForm.resx">
+      <DependentUpon>SpatioTemporalMappingForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Mapping\Forms\EditShapeAttributeForm.resx">
       <DependentUpon>EditShapeAttributeForm.cs</DependentUpon>

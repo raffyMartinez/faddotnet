@@ -14,10 +14,10 @@ using System.Windows.Forms.DataVisualization.Charting;
 
 namespace FAD3.Mapping.Forms
 {
-    public partial class ChlorophyllForm : Form
+    public partial class SpatioTemporalMappingForm : Form
     {
         private string _connString;
-        private static ChlorophyllForm _instance;
+        private static SpatioTemporalMappingForm _instance;
         private string _excelFileName;
         private DataSet _excelData;
         private int _firstColIndex;
@@ -35,13 +35,13 @@ namespace FAD3.Mapping.Forms
         private DataTable _dt;
         private bool _hasMesh;
 
-        public static ChlorophyllForm GetInstance()
+        public static SpatioTemporalMappingForm GetInstance()
         {
-            if (_instance == null) _instance = new ChlorophyllForm();
+            if (_instance == null) _instance = new SpatioTemporalMappingForm();
             return _instance;
         }
 
-        public ChlorophyllForm()
+        public SpatioTemporalMappingForm()
         {
             InitializeComponent();
         }
@@ -68,6 +68,7 @@ namespace FAD3.Mapping.Forms
             }
             txtCategoryCount.Text = "5";
             listSelectedSheets.Enabled = false;
+            Text = "Spatio-Temporal Mapping";
         }
 
         private void OpenFile()
@@ -86,45 +87,56 @@ namespace FAD3.Mapping.Forms
             }
         }
 
-        private string GetConnectionString(bool UseHeader)
-        {
-            Dictionary<string, string> props = new Dictionary<string, string>();
+        //private string GetConnectionString(bool UseHeader)
+        //{
+        //    Dictionary<string, string> props = new Dictionary<string, string>();
 
-            // XLSX - Excel 2007, 2010, 2012, 2013
-            props["Provider"] = "Microsoft.ACE.OLEDB.12.0;";
-            if (UseHeader)
-            {
-                props["Extended Properties"] = @"""Excel 12.0 XML;HDR=YES;IMEX=1"";";
-            }
-            else
-            {
-                props["Extended Properties"] = @"""Excel 12.0 XML;HDR=NO;IMEX=1;"";";
-            }
-            props["Data Source"] = _excelFileName;
+        //    // XLSX - Excel 2007, 2010, 2012, 2013
+        //    props["Provider"] = "Microsoft.ACE.OLEDB.12.0;";
+        //    if (UseHeader)
+        //    {
+        //        props["Extended Properties"] = @"""Excel 12.0 XML;HDR=YES;IMEX=1"";";
+        //    }
+        //    else
+        //    {
+        //        props["Extended Properties"] = @"""Excel 12.0 XML;HDR=NO;IMEX=1;"";";
+        //    }
+        //    props["Data Source"] = _excelFileName;
 
-            StringBuilder sb = new StringBuilder();
+        //    StringBuilder sb = new StringBuilder();
 
-            foreach (KeyValuePair<string, string> prop in props)
-            {
-                sb.Append(prop.Key);
-                sb.Append('=');
-                sb.Append(prop.Value);
-                //sb.Append(';');
-            }
+        //    foreach (KeyValuePair<string, string> prop in props)
+        //    {
+        //        sb.Append(prop.Key);
+        //        sb.Append('=');
+        //        sb.Append(prop.Value);
+        //        //sb.Append(';');
+        //    }
 
-            return sb.ToString();
-        }
+        //    return sb.ToString();
+        //}
 
+        /// <summary>
+        /// reads sheets in an excel workbook
+        /// </summary>
         private async void GetExcelSheets()
         {
             bool result = await ReadExcelFIllAsync();
         }
 
+        /// <summary>
+        /// calls  ReadExcelFile() async
+        /// </summary>
+        /// <returns></returns>
         private Task<bool> ReadExcelFIllAsync()
         {
             return Task.Run(() => ReadExcelFile());
         }
 
+        /// <summary>
+        /// fills up a listview with the names of sheets in an excel workbook
+        /// </summary>
+        /// <returns></returns>
         private bool ReadExcelFile()
         {
             _workBook = new XLWorkbook(_excelFileName, XLEventTracking.Disabled);
@@ -137,8 +149,12 @@ namespace FAD3.Mapping.Forms
             return listSheets.Items.Count > 0;
         }
 
+        /// <summary>
+        /// reads the data inside a sheet and fill up a datatable with the sheet's contents
+        /// </summary>
         private void ReadSheet()
         {
+            _dataPoints = 0;
             var sheetIndex = listSheets.SelectedIndex + 1;
             _workSheet = _workBook.Worksheet(sheetIndex);
             _dt = new DataTable();
@@ -156,6 +172,9 @@ namespace FAD3.Mapping.Forms
                     foreach (IXLCell cell in row.Cells())
                     {
                         _dt.Columns.Add(cell.Value.ToString());
+
+                        //assuming that first 2 column contain x and y value of a point
+                        //we populate Longitude and Latitude comboboxes with the row headers of the x and y column
                         if (_columnCount == 0)
                         {
                             cboLatitude.Items.Add(cell.Value.ToString());
@@ -166,6 +185,8 @@ namespace FAD3.Mapping.Forms
                             cboLatitude.Items.Add(cell.Value.ToString());
                             cboLongitude.Items.Add(cell.Value.ToString());
                         }
+
+                        //we populate first and last data column comboboxes with the value header
                         else
                         {
                             cboFirstData.Items.Add(cell.Value.ToString());
@@ -181,25 +202,31 @@ namespace FAD3.Mapping.Forms
                 }
                 else
                 {
+                    //we add a row to the datatable
                     _dt.Rows.Add();
+
                     int i = 0;
 
+                    //populate each cell of the new row by reading the values of the columns starting from the first going to the last column
                     foreach (IXLCell cell in row.Cells(row.FirstCellUsed().Address.ColumnNumber, row.LastCellUsed().Address.ColumnNumber))
                     {
                         _dt.Rows[_dt.Rows.Count - 1][i] = cell.Value.ToString();
                         i++;
                         if (i > 1) cells++;
                     }
-                    if (txtRows.Text.Length == 0)
-                    {
-                        txtRows.Text = i.ToString();
-                    }
+
+                    //we increment _dataPoint after we finish reading a row
                     _dataPoints++;
                 }
             }
+
+            //we fill up txtRows with the number of datapoints
             txtRows.Text = _dataPoints.ToString();
         }
 
+        /// <summary>
+        /// adds the coordinates of a datapoint to a List<double,double>
+        /// </summary>
         private void listCoordinates()
         {
             _dictGridCentroidCoordinates.Clear();
@@ -249,10 +276,9 @@ namespace FAD3.Mapping.Forms
                     break;
 
                 case "btnReadSheet":
+                    txtRows.Text = "";
                     if (listSheets.SelectedIndex >= 0)
                     {
-                        //ReadSheet();
-                        _dataPoints = 0;
                         ReadSheet();
                     }
                     break;
@@ -310,9 +336,17 @@ namespace FAD3.Mapping.Forms
                 case "btnCancel":
                     Close();
                     break;
+
+                case "btnExport":
+                    ExportSheetsToText();
+                    break;
             }
         }
 
+        /// <summary>
+        /// handles mapping of items when the up and down buttons are pressed
+        /// </summary>
+        /// <param name="forward"></param>
         private void MapSheet(bool forward)
         {
             if (listSelectedSheets.Items.Count > 0)
@@ -368,14 +402,117 @@ namespace FAD3.Mapping.Forms
             }
         }
 
+        /// <summary>
+        /// export as a time series textfile containing categories and number per category
+        /// </summary>
+        private void ExportSheetsToText()
+        {
+            Dictionary<string, int> dictCategory = new Dictionary<string, int>();
+            var saveDialog = new SaveFileDialog();
+            saveDialog.Title = "Export data to time series text file";
+            saveDialog.Filter = "Text file|*.txt|All files|*.*";
+            saveDialog.FilterIndex = 1;
+            saveDialog.ShowDialog();
+            if (saveDialog.FileName.Length > 0)
+            {
+                using (StreamWriter strm = new StreamWriter(saveDialog.FileName, false))
+                {
+                    //write number of datapoints
+                    strm.WriteLine($"Data points: {_dt.Rows.Count.ToString()}");
+
+                    //write category ranges
+                    string categoryRange = "";
+                    for (int brk = 0; brk < dgCategories.RowCount; brk++)
+                    {
+                        if (brk == dgCategories.RowCount - 1)
+                        {
+                            categoryRange = $"{dgCategories.Rows[brk].Cells[0].Value.ToString().Replace("> ", "")} - {txtMaximum.Text}";
+                        }
+                        else
+                        {
+                            categoryRange = dgCategories.Rows[brk].Cells[0].Value.ToString();
+                        }
+                        strm.WriteLine($"Category {brk + 1}: {categoryRange}");
+                    }
+
+                    //setup category dictionay and the same time write column headers
+                    strm.Write("Time period\t");
+                    for (int col = 1; col <= dgCategories.RowCount; col++)
+                    {
+                        strm.Write($"{col.ToString()}\t");
+                        dictCategory.Add(col.ToString(), 0);
+                    }
+                    strm.Write("Null\r\n");
+                    dictCategory.Add("Null", 0);
+
+                    //read entire dataset and categorize the value of the current time period
+                    for (int n = 0; n < listSelectedSheets.Items.Count; n++)
+                    {
+                        string timePeriod = $"{listSelectedSheets.Items[n]}";
+
+                        //reset category dictionary values to zero
+                        for (int col = 1; col <= dgCategories.RowCount; col++)
+                        {
+                            dictCategory[col.ToString()] = 0;
+                        }
+                        dictCategory["Null"] = 0;
+
+                        //read all rows but only pick the value corresponding to the current time period
+                        for (int row = 0; row < _dt.Rows.Count; row++)
+                        {
+                            var arr = _dt.Rows[row].ItemArray;    //put data in current row to an array
+                            var col = n + _firstColIndex + 2;     //col points to the relevant timeperiod
+
+                            double? v = null;
+                            if (arr[col].GetType().Name == "String")
+                            {
+                                if (double.TryParse((string)arr[col], out double d))
+                                {
+                                    v = d;
+                                }
+                            }
+                            else
+                            {
+                                v = arr[col] as double?;
+                            }
+
+                            //increment value of corresponding category
+                            if (v == null)
+                            {
+                                dictCategory["Null"]++;
+                            }
+                            else
+                            {
+                                dictCategory[MakeGridFromPoints.WhatCategory(v).ToString()]++;
+                            }
+                        }
+
+                        //write the current timeperiod and the number of values per category
+                        strm.Write($"{timePeriod}\t");
+                        for (int col = 1; col <= dgCategories.RowCount; col++)
+                        {
+                            strm.Write($"{dictCategory[col.ToString()]}\t");
+                        }
+                        strm.Write($"{dictCategory["Null"]}\r\n");
+                    }
+                }
+                MessageBox.Show("Finished exporting to time series text file");
+            }
+        }
+
+        /// <summary>
+        /// maps the data corresponding to the selected item in the listbox
+        /// </summary>
+        /// <param name="index"> the selected item in the listbox</param>
         private void MapSheet(int index)
         {
             if (_hasMesh)
             {
                 lblMappedSheet.Text = $"{listSelectedSheets.Items[index]}";
                 lblMappedSheet.Visible = true;
-                //var table = _excelData.Tables[0];
-                _columnValues.Clear();
+                _columnValues.Clear();       // _columnValues will contain values corresponding to the item we are interested in
+
+                //read all rows but only select the data point in the row corresponding to the selected listbox item
                 for (int row = 0; row < _dt.Rows.Count; row++)
                 {
                     var arr = _dt.Rows[row].ItemArray;
@@ -394,7 +531,9 @@ namespace FAD3.Mapping.Forms
                     }
                     _columnValues.Add(v);
                 }
-                MakeGridFromPoints.MapColumn(_columnValues, lblMappedSheet.Text.ToString());
+
+                MakeGridFromPoints.MapColumn(_columnValues, lblMappedSheet.Text);
+
                 global.MappingForm.MapControl.Redraw();
 
                 graphSheet.Series.Clear();
@@ -459,6 +598,9 @@ namespace FAD3.Mapping.Forms
             btnReadSheet.Enabled = true;
         }
 
+        /// <summary>
+        /// lists the headers of the data columns in a listbox
+        /// </summary>
         private void listSheetsForMapping()
         {
             listSelectedSheets.Items.Clear();
@@ -483,6 +625,10 @@ namespace FAD3.Mapping.Forms
             }
         }
 
+        /// <summary>
+        /// adds all non-null values to a List<double>
+        /// this List<> will be used for Jenk's Fisher clustering
+        /// </summary>
         private void getDataValues()
         {
             _dataValues.Clear();
@@ -525,6 +671,13 @@ namespace FAD3.Mapping.Forms
             }
         }
 
+        /// <summary>
+        /// returns number of values within a class size
+        /// </summary>
+        /// <param name="value1"></param>
+        /// <param name="value2"></param>
+        /// <param name="greaterThan"></param>
+        /// <returns></returns>
         private int GetClassSize(double value1, double value2 = 0, bool greaterThan = false)
         {
             int count = 0;
@@ -555,6 +708,10 @@ namespace FAD3.Mapping.Forms
             return count;
         }
 
+        /// <summary>
+        /// do a Jenk's-Fisher categorization of the values. The category breaks are found in List<Double> listBreaks
+        /// </summary>
+        /// <returns></returns>
         private bool DoJenksFisher()
         {
             if (txtCategoryCount.Text.Length > 0)
@@ -574,6 +731,8 @@ namespace FAD3.Mapping.Forms
                 MakeGridFromPoints.NumberOfCategories = int.Parse(txtCategoryCount.Text);
                 MakeGridFromPoints.ColorBlend = blend;
 
+                //make categories from the breaks defined in Jenk's-Fisher's
+                //add the category range and color to a datagridview
                 foreach (var item in listBreaks)
                 {
                     if (n > 0)
@@ -586,14 +745,20 @@ namespace FAD3.Mapping.Forms
                     }
                     n++;
                 }
-                txtValuesCount.Text = _dataValues.Count.ToString();
-                txtMinimum.Text = _dataValues.Min().ToString();
-                txtMaximum.Text = _dataValues.Max().ToString();
+                //add the last category to the datagridview
                 color = MakeGridFromPoints.AddCategory(upper, _dataValues.Max() + 1);
                 row = dgCategories.Rows.Add(new object[] { $"> {listBreaks.Max().ToString("N5")}", GetClassSize(listBreaks.Max(), 0, true).ToString(), "" });
                 dgCategories[2, row].Style.BackColor = color;
-                SizeColumns(dgCategories, false, true);
+
+                //add an empty null category
                 MakeGridFromPoints.AddNullCategory();
+
+                //summarize the data
+                txtValuesCount.Text = _dataValues.Count.ToString();
+                txtMinimum.Text = _dataValues.Min().ToString();
+                txtMaximum.Text = _dataValues.Max().ToString();
+
+                SizeColumns(dgCategories, false, true);
                 return listBreaks.Count > 0;
             }
             return false;

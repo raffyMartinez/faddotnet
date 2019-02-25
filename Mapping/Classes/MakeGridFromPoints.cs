@@ -7,25 +7,29 @@ using System.Linq;
 
 namespace FAD3.Mapping.Classes
 {
+    /// <summary>
+    /// helper class that handles point to polygon grid shaapefiles
+    /// </summary>
     public static class MakeGridFromPoints
     {
         public static Shapefile GridShapefile
         {
-            get { return _gridShapeFile; }
+            get { return _meshShapeFile; }
         }
 
         public static Dictionary<int, (double latitude, double longitude)> Coordinates { get; set; }
-        public static Shapefile PointShapefile { get; internal set; }
+        public static Shapefile PointShapefile { get; internal set; }                                         //pointshapefile of datapoints
         public static GeoProjection GeoProjection { get; set; }
         public static MapInterActionHandler MapInteractionHandler { get; set; }
         private static int _iFldRow;
         private static Shape _cell;
-        private static Shapefile _gridShapeFile;
+        private static Shapefile _meshShapeFile;                                                              //polygonal shapefile centered on a datapoint
         private static ShapefileCategories _categories = new ShapefileCategories();
         public static ColorScheme _scheme = new ColorScheme();
         public static ColorBlend _colorBlend = new ColorBlend();
         private static int _numberOfCategories;
         private static LinkedList<(int index, MapWinGIS.Point pt, double distance)> _cell4Points = new LinkedList<(int index, MapWinGIS.Point pt, double distance)>();
+        private static Dictionary<string, int> _sheetMapSummary = new Dictionary<string, int>();
 
         public static int NumberOfCategories
         {
@@ -39,8 +43,6 @@ namespace FAD3.Mapping.Classes
                 _numberOfCategories = value;
             }
         }
-
-        private static Dictionary<string, int> _sheetMapSummary = new Dictionary<string, int>();
 
         public static Dictionary<string, int> SheetMapSummary
         {
@@ -60,7 +62,7 @@ namespace FAD3.Mapping.Classes
 
         public static Color CategoryColor(int index)
         {
-            return Colors.UintToColor(_gridShapeFile.Categories.Item[index].DrawingOptions.FillColor);
+            return Colors.UintToColor(_meshShapeFile.Categories.Item[index].DrawingOptions.FillColor);
         }
 
         public static ShapefileCategories Categories
@@ -68,6 +70,10 @@ namespace FAD3.Mapping.Classes
             get { return _categories; }
         }
 
+        /// <summary>
+        /// create a shape using the 4 selected points
+        /// </summary>
+        /// <returns></returns>
         private static bool DefineGridCell()
         {
             if (PointShapefile?.NumSelected == 4)
@@ -115,6 +121,13 @@ namespace FAD3.Mapping.Classes
             _sheetMapSummary.Add("Null", 0);
         }
 
+        /// <summary>
+        /// add a category where each break from the jenk's fishers is a category
+        /// returns the fill color that was assigned to the category
+        /// </summary>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
+        /// <returns></returns>
         public static Color AddCategory(double min, double max)
         {
             var cat = new ShapefileCategory();
@@ -149,16 +162,40 @@ namespace FAD3.Mapping.Classes
             }
         }
 
+        /// <summary>
+        /// returns index of category that corresponds to the input parameter
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static int WhatCategory(double? value)
+        {
+            int catIndex = 0;
+            for (int c = 0; c < _categories.Count; c++)
+            {
+                if (value >= (double)_categories.Item[c].MinValue && value <= (double)_categories.Item[c].MaxValue)
+                {
+                    catIndex = c + 1;
+                    break;
+                }
+            }
+            return catIndex;
+        }
+
+        /// <summary>
+        /// assign temporal values to all the shapes in the mesh shapefile and categorize the shape
+        /// </summary>
+        /// <param name="values"> a list that contain temporal values for mapping</param>
+        /// <param name="name"></param>
         public static void MapColumn(List<double?> values, string name)
         {
-            if (_gridShapeFile != null)
+            if (_meshShapeFile != null)
             {
                 ClearSummaryValues();
-                _gridShapeFile.EditDeleteField(2, null);
-                var iFld = _gridShapeFile.EditAddField(name, FieldType.DOUBLE_FIELD, 9, 13);
-                for (int n = 0; n < _gridShapeFile.NumShapes; n++)
+                _meshShapeFile.EditDeleteField(2, null);
+                var iFld = _meshShapeFile.EditAddField(name, FieldType.DOUBLE_FIELD, 9, 13);
+                for (int n = 0; n < _meshShapeFile.NumShapes; n++)
                 {
-                    if (_gridShapeFile.EditCellValue(iFld, n, values[n]))
+                    if (_meshShapeFile.EditCellValue(iFld, n, values[n]))
                     {
                         for (int c = 0; c < _categories.Count; c++)
                         {
@@ -166,7 +203,7 @@ namespace FAD3.Mapping.Classes
                             double max = (double)_categories.Item[c].MaxValue;
                             if (values[n] >= min && values[n] < max)
                             {
-                                _gridShapeFile.ShapeCategory[n] = c;
+                                _meshShapeFile.ShapeCategory[n] = c;
 
                                 _sheetMapSummary[_categories.Item[c].Name]++;
                                 break;
@@ -175,21 +212,26 @@ namespace FAD3.Mapping.Classes
                     }
                     else
                     {
-                        _gridShapeFile.ShapeCategory2[n] = "nullCategory";
+                        _meshShapeFile.ShapeCategory2[n] = "nullCategory";
                         _sheetMapSummary["Null"]++;
                     }
                 }
             }
         }
 
+        /// <summary>
+        /// construct a grid using all points, with each point as the center of the grid
+        /// based on a shape polygon constructed from the 4 selected points
+        /// </summary>
+        /// <returns></returns>
         private static bool ConstructGrid()
         {
             int iShp = -1;
-            _gridShapeFile = new Shapefile();
-            if (_gridShapeFile.CreateNewWithShapeID("", ShpfileType.SHP_POLYGON))
+            _meshShapeFile = new Shapefile();
+            if (_meshShapeFile.CreateNewWithShapeID("", ShpfileType.SHP_POLYGON))
             {
-                _gridShapeFile.GeoProjection = GeoProjection;
-                var ifldRowField = _gridShapeFile.EditAddField("row", FieldType.INTEGER_FIELD, 1, 1);
+                _meshShapeFile.GeoProjection = GeoProjection;
+                var ifldRowField = _meshShapeFile.EditAddField("row", FieldType.INTEGER_FIELD, 1, 1);
 
                 for (int n = 0; n < PointShapefile.NumShapes; n++)
                 {
@@ -204,23 +246,27 @@ namespace FAD3.Mapping.Classes
                             gridCell.AddPoint(_cell.Point[c].x, _cell.Point[c].y);
                         }
                         gridCell.AddPoint(_cell.Point[0].x, _cell.Point[0].y);
-                        iShp = _gridShapeFile.EditAddShape(gridCell);
+                        iShp = _meshShapeFile.EditAddShape(gridCell);
                         if (iShp >= 0)
                         {
-                            _gridShapeFile.EditCellValue(ifldRowField, iShp, PointShapefile.CellValue[_iFldRow, n]);
+                            _meshShapeFile.EditCellValue(ifldRowField, iShp, PointShapefile.CellValue[_iFldRow, n]);
                         }
                     }
                 }
             }
             _cell = null;
-            _gridShapeFile.DefaultDrawingOptions.FillColor = new Utils().ColorByName(tkMapColor.White);
-            _gridShapeFile.DefaultDrawingOptions.FillVisible = false;
-            _gridShapeFile.DefaultDrawingOptions.LineColor = new Utils().ColorByName(tkMapColor.DimGray);
-            _gridShapeFile.Categories = _categories;
+            _meshShapeFile.DefaultDrawingOptions.FillColor = new Utils().ColorByName(tkMapColor.White);
+            _meshShapeFile.DefaultDrawingOptions.FillVisible = false;
+            _meshShapeFile.DefaultDrawingOptions.LineColor = new Utils().ColorByName(tkMapColor.DimGray);
+            _meshShapeFile.Categories = _categories;
 
             return iShp >= 0;
         }
 
+        /// <summary>
+        /// make a point shapefile using the coordinates in the data
+        /// </summary>
+        /// <returns></returns>
         public static bool MakePointShapefile()
         {
             int iShp = -1;

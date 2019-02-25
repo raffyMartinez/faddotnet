@@ -1708,16 +1708,16 @@ namespace FAD3
                     global.Grid25GenerateForm?.CreateInlandGridDB();
                     break;
 
-                case "chlorophyll":
-                    var chForm = Mapping.Forms.ChlorophyllForm.GetInstance();
-                    if (chForm.Visible)
+                case "spatio-temporal":
+                    var spatioTemporalMappingForm = Mapping.Forms.SpatioTemporalMappingForm.GetInstance();
+                    if (spatioTemporalMappingForm.Visible)
                     {
-                        chForm.BringToFront();
+                        spatioTemporalMappingForm.BringToFront();
                     }
                     else
 
                     {
-                        chForm.Show(this);
+                        spatioTemporalMappingForm.Show(this);
                     }
                     break;
 
@@ -1737,7 +1737,7 @@ namespace FAD3
 
         public void SetMapDependendMenus()
         {
-            cholorophyllGridMappingToolStripMenuItem.Enabled = global.MapIsOpen;
+            spatioTemporalMapMenuItem.Enabled = global.MapIsOpen;
         }
 
         private void OnToolbar_ItemClicked(object sender, ToolStripItemClickedEventArgs e)

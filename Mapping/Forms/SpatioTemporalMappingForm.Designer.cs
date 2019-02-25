@@ -1,6 +1,6 @@
 ﻿namespace FAD3.Mapping.Forms
 {
-    partial class ChlorophyllForm
+    partial class SpatioTemporalMappingForm
     {
         /// <summary>
         /// Required designer variable.
@@ -32,7 +32,7 @@
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ChlorophyllForm));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SpatioTemporalMappingForm));
             this.tabsPages = new System.Windows.Forms.TabControl();
             this.tabUI = new System.Windows.Forms.TabPage();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -76,6 +76,7 @@
             this.label8 = new System.Windows.Forms.Label();
             this.icbColorScheme = new FAD3.Mapping.UserControls.ImageCombo();
             this.tabExtract = new System.Windows.Forms.TabPage();
+            this.btnExport = new System.Windows.Forms.Button();
             this.graphSheet = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.btnDown = new System.Windows.Forms.Button();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
@@ -540,6 +541,7 @@
             // 
             // tabExtract
             // 
+            this.tabExtract.Controls.Add(this.btnExport);
             this.tabExtract.Controls.Add(this.graphSheet);
             this.tabExtract.Controls.Add(this.btnDown);
             this.tabExtract.Controls.Add(this.btnUp);
@@ -554,6 +556,16 @@
             this.tabExtract.TabIndex = 2;
             this.tabExtract.Text = "Mapping";
             this.tabExtract.UseVisualStyleBackColor = true;
+            // 
+            // btnExport
+            // 
+            this.btnExport.Location = new System.Drawing.Point(23, 353);
+            this.btnExport.Name = "btnExport";
+            this.btnExport.Size = new System.Drawing.Size(121, 25);
+            this.btnExport.TabIndex = 22;
+            this.btnExport.Text = "Export to time series";
+            this.btnExport.UseVisualStyleBackColor = true;
+            this.btnExport.Click += new System.EventHandler(this.OnButtonClick);
             // 
             // graphSheet
             // 
@@ -816,5 +828,6 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn dgcolCategory;
         private System.Windows.Forms.DataGridViewTextBoxColumn dgcolCount;
         private System.Windows.Forms.DataGridViewTextBoxColumn dgCol;
+        private System.Windows.Forms.Button btnExport;
     }
 }

@@ -60,11 +60,12 @@ namespace FAD3
             this.generateGridMapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemZone50 = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemZone51 = new System.Windows.Forms.ToolStripMenuItem();
-            this.cholorophyllGridMappingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.spatioTemporalMapMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemBrowseLGUs = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.onlineManualToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.diagnosticMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.statusPanelDBPath = new System.Windows.Forms.ToolStripStatusLabel();
             this.statusPanelTargetArea = new System.Windows.Forms.ToolStripStatusLabel();
@@ -89,7 +90,6 @@ namespace FAD3
             this.tsButtonReport = new System.Windows.Forms.ToolStripButton();
             this.tsButtonMap = new System.Windows.Forms.ToolStripButton();
             this.tsButtonExit = new System.Windows.Forms.ToolStripButton();
-            this.diagnosticMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMenuBar.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.tblLayout.SuspendLayout();
@@ -228,7 +228,7 @@ namespace FAD3
             this.toolStripSeparator2,
             this.generateInlandDbToolStripMenuItem,
             this.generateGridMapToolStripMenuItem,
-            this.cholorophyllGridMappingToolStripMenuItem,
+            this.spatioTemporalMapMenuItem,
             this.menuItemBrowseLGUs});
             this.menuTools.Name = "menuTools";
             this.menuTools.Size = new System.Drawing.Size(48, 20);
@@ -307,13 +307,13 @@ namespace FAD3
             this.menuItemZone51.Tag = "zone51";
             this.menuItemZone51.Text = "UTM zone 51";
             // 
-            // cholorophyllGridMappingToolStripMenuItem
+            // spatioTemporalMapItem
             // 
-            this.cholorophyllGridMappingToolStripMenuItem.Enabled = false;
-            this.cholorophyllGridMappingToolStripMenuItem.Name = "cholorophyllGridMappingToolStripMenuItem";
-            this.cholorophyllGridMappingToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
-            this.cholorophyllGridMappingToolStripMenuItem.Tag = "chlorophyll";
-            this.cholorophyllGridMappingToolStripMenuItem.Text = "Cholorophyll grid mapping";
+            this.spatioTemporalMapMenuItem.Enabled = false;
+            this.spatioTemporalMapMenuItem.Name = "spatioTemporalMapItem";
+            this.spatioTemporalMapMenuItem.Size = new System.Drawing.Size(218, 22);
+            this.spatioTemporalMapMenuItem.Tag = "spatio-temporal";
+            this.spatioTemporalMapMenuItem.Text = "Spatio-temporal mapping";
             // 
             // menuItemBrowseLGUs
             // 
@@ -346,6 +346,13 @@ namespace FAD3
             this.onlineManualToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
             this.onlineManualToolStripMenuItem.Tag = "onlineManual";
             this.onlineManualToolStripMenuItem.Text = "Online manual";
+            // 
+            // diagnosticMenuItem
+            // 
+            this.diagnosticMenuItem.Name = "diagnosticMenuItem";
+            this.diagnosticMenuItem.Size = new System.Drawing.Size(207, 22);
+            this.diagnosticMenuItem.Tag = "diagnostics";
+            this.diagnosticMenuItem.Text = "Log database diagnostics";
             // 
             // statusStrip1
             // 
@@ -644,13 +651,6 @@ namespace FAD3
             this.tsButtonExit.Text = "toolStripButton6";
             this.tsButtonExit.ToolTipText = "Exit";
             // 
-            // diagnosticMenuItem
-            // 
-            this.diagnosticMenuItem.Name = "diagnosticMenuItem";
-            this.diagnosticMenuItem.Size = new System.Drawing.Size(207, 22);
-            this.diagnosticMenuItem.Tag = "diagnostics";
-            this.diagnosticMenuItem.Text = "Log database diagnostics";
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -720,7 +720,7 @@ namespace FAD3
         private System.Windows.Forms.ToolStripButton tsButtonExit;
         private System.Windows.Forms.ToolStripMenuItem generateInlandDbToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
-        private System.Windows.Forms.ToolStripMenuItem cholorophyllGridMappingToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem spatioTemporalMapMenuItem;
         private System.Windows.Forms.TableLayoutPanel tblLayout;
         private System.Windows.Forms.TreeView treeMain;
         private System.Windows.Forms.Panel panel1;
