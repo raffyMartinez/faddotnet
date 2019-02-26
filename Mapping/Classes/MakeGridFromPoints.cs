@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
+using System.IO;
+using Microsoft.VisualBasic.FileIO;
 
 namespace FAD3.Mapping.Classes
 {
@@ -17,7 +19,8 @@ namespace FAD3.Mapping.Classes
             get { return _meshShapeFile; }
         }
 
-        public static Dictionary<int, (double latitude, double longitude)> Coordinates { get; set; }
+        private static Dictionary<string, Dictionary<int, string>> _dictTemporalValues = new Dictionary<string, Dictionary<int, string>>();
+        public static Dictionary<int, (double latitude, double longitude, bool Inland)> Coordinates { get; set; }
         public static Shapefile PointShapefile { get; internal set; }                                         //pointshapefile of datapoints
         public static GeoProjection GeoProjection { get; set; }
         public static MapInterActionHandler MapInteractionHandler { get; set; }
@@ -25,9 +28,10 @@ namespace FAD3.Mapping.Classes
         private static Shape _cell;
         private static Shapefile _meshShapeFile;                                                              //polygonal shapefile centered on a datapoint
         private static ShapefileCategories _categories = new ShapefileCategories();
-        public static ColorScheme _scheme = new ColorScheme();
-        public static ColorBlend _colorBlend = new ColorBlend();
+        private static ColorScheme _scheme = new ColorScheme();
+        private static ColorBlend _colorBlend = new ColorBlend();
         private static int _numberOfCategories;
+        private static string _singleDimensionCSV;
         private static LinkedList<(int index, MapWinGIS.Point pt, double distance)> _cell4Points = new LinkedList<(int index, MapWinGIS.Point pt, double distance)>();
         private static Dictionary<string, int> _sheetMapSummary = new Dictionary<string, int>();
 
@@ -41,6 +45,84 @@ namespace FAD3.Mapping.Classes
                     _sheetMapSummary.Clear();
                 }
                 _numberOfCategories = value;
+            }
+        }
+
+        public static Dictionary<string, Dictionary<int, string>> DictTemporalValues
+        {
+            get { return _dictTemporalValues; }
+        }
+
+        public static string SingleDimensionCSV
+        {
+            get { return _singleDimensionCSV; }
+            set
+            {
+                _singleDimensionCSV = value;
+                ParseSingleDimensionCSV();
+            }
+        }
+
+        private static void ParseSingleDimensionCSV()
+        {
+            Coordinates = new Dictionary<int, (double latitude, double longitude, bool Inland)>();
+            StreamReader sr = new StreamReader(_singleDimensionCSV, true);
+            string line;
+            Dictionary<int, string> pointValue = new Dictionary<int, string>();
+            string timeEra = "";
+            bool beginTimeEra = true;
+            bool readCoordinates = true;
+            string[] fields;
+            int row = 0;
+
+            while ((line = sr.ReadLine()) != null)
+            {
+                TextFieldParser tfp = new TextFieldParser(new StringReader(line));
+                tfp.HasFieldsEnclosedInQuotes = true;
+                tfp.SetDelimiters(",");
+
+                while (!tfp.EndOfData)
+                {
+                    fields = tfp.ReadFields();
+                    if (fields.Length == 5)
+                    {
+                        switch (fields[0])
+                        {
+                            case "time":
+                            case "UTC":
+                                break;
+
+                            default:
+
+                                if (beginTimeEra)
+                                {
+                                    beginTimeEra = false;
+                                    timeEra = fields[0];
+                                }
+                                else
+                                {
+                                    if (fields[0] != timeEra)
+                                    {
+                                        Dictionary<int, string> pointValueCopy = new Dictionary<int, string>(pointValue);
+                                        _dictTemporalValues.Add(timeEra, pointValueCopy);
+                                        pointValue.Clear();
+                                        readCoordinates = false;
+                                        beginTimeEra = true;
+                                        row = 0;
+                                    }
+                                }
+
+                                pointValue.Add(row, fields[4]);
+                                if (readCoordinates)
+                                {
+                                    Coordinates.Add(row, (double.Parse(fields[2]), double.Parse(fields[3]), false));
+                                }
+                                row++;
+                                break;
+                        }
+                    }
+                }
+                tfp.Close();
             }
         }
 
@@ -192,7 +274,7 @@ namespace FAD3.Mapping.Classes
             {
                 ClearSummaryValues();
                 _meshShapeFile.EditDeleteField(2, null);
-                var iFld = _meshShapeFile.EditAddField(name, FieldType.DOUBLE_FIELD, 9, 13);
+                var iFld = _meshShapeFile.EditAddField(name, MapWinGIS.FieldType.DOUBLE_FIELD, 9, 13);
                 for (int n = 0; n < _meshShapeFile.NumShapes; n++)
                 {
                     if (_meshShapeFile.EditCellValue(iFld, n, values[n]))
@@ -231,7 +313,7 @@ namespace FAD3.Mapping.Classes
             if (_meshShapeFile.CreateNewWithShapeID("", ShpfileType.SHP_POLYGON))
             {
                 _meshShapeFile.GeoProjection = GeoProjection;
-                var ifldRowField = _meshShapeFile.EditAddField("row", FieldType.INTEGER_FIELD, 1, 1);
+                var ifldRowField = _meshShapeFile.EditAddField("row", MapWinGIS.FieldType.INTEGER_FIELD, 1, 1);
 
                 for (int n = 0; n < PointShapefile.NumShapes; n++)
                 {
@@ -274,9 +356,9 @@ namespace FAD3.Mapping.Classes
             double distance = 0;
             if (sf.CreateNewWithShapeID("", ShpfileType.SHP_POINT))
             {
-                _iFldRow = sf.EditAddField("row", FieldType.INTEGER_FIELD, 4, 1);
+                _iFldRow = sf.EditAddField("row", MapWinGIS.FieldType.INTEGER_FIELD, 4, 1);
                 sf.GeoProjection = GeoProjection;
-                foreach (KeyValuePair<int, (double latitude, double longitude)> kv in Coordinates)
+                foreach (KeyValuePair<int, (double latitude, double longitude, bool Inland)> kv in Coordinates)
                 {
                     var shp = new Shape();
                     var pnt = new MapWinGIS.Point();
@@ -346,9 +428,9 @@ namespace FAD3.Mapping.Classes
             var sf = new Shapefile();
             if (sf.CreateNewWithShapeID("", ShpfileType.SHP_POINT))
             {
-                var iRow = sf.EditAddField("row", FieldType.INTEGER_FIELD, 4, 1);
+                var iRow = sf.EditAddField("row", MapWinGIS.FieldType.INTEGER_FIELD, 4, 1);
                 sf.GeoProjection = GeoProjection;
-                foreach (KeyValuePair<int, (double latitude, double longitude)> kv in Coordinates)
+                foreach (KeyValuePair<int, (double latitude, double longitude, bool Inland)> kv in Coordinates)
                 {
                     var shp = new Shape();
                     if (shp.Create(ShpfileType.SHP_POINT) && shp.AddPoint(kv.Value.longitude, kv.Value.latitude) >= 0)

@@ -11,20 +11,23 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
+using sds = Microsoft.Research.Science.Data;
+using Microsoft.Research.Science.Data.Imperative;
 
 namespace FAD3.Mapping.Forms
 {
+    /// <summary>
+    /// interface for mapping spatio-temporal parameters
+    /// </summary>
     public partial class SpatioTemporalMappingForm : Form
     {
-        private string _connString;
         private static SpatioTemporalMappingForm _instance;
-        private string _excelFileName;
-        private DataSet _excelData;
+        private string _dataSourceFileName;
         private int _firstColIndex;
         private int _lastColIndex;
         private int _latitudeColIndex;
         private int _longitudeColIndex;
-        private Dictionary<int, (double latitude, double longitude)> _dictGridCentroidCoordinates = new Dictionary<int, (double latitude, double longitude)>();
+        private Dictionary<int, (double latitude, double longitude, bool Inland)> _dictGridCentroidCoordinates = new Dictionary<int, (double latitude, double longitude, bool Inland)>();
         private List<double> _dataValues = new List<double>();
         private List<double?> _columnValues = new List<double?>();
         private int _dataPoints;
@@ -76,45 +79,16 @@ namespace FAD3.Mapping.Forms
             var fileOpen = new OpenFileDialog
             {
                 Title = "Open MS Excel file",
-                Filter = "Excel file|*.xls;*.xlsx|All file types|*.*",
+                Filter = "Excel file|*.xls;*.xlsx|NetCDF|*.nc|CSV files|*.csv|All file types|*.*",
                 FilterIndex = 1
             };
             fileOpen.ShowDialog();
             if (fileOpen.FileName.Length > 0 && File.Exists(fileOpen.FileName))
             {
-                _excelFileName = fileOpen.FileName;
-                txtFile.Text = _excelFileName;
+                _dataSourceFileName = fileOpen.FileName;
+                txtFile.Text = _dataSourceFileName;
             }
         }
-
-        //private string GetConnectionString(bool UseHeader)
-        //{
-        //    Dictionary<string, string> props = new Dictionary<string, string>();
-
-        //    // XLSX - Excel 2007, 2010, 2012, 2013
-        //    props["Provider"] = "Microsoft.ACE.OLEDB.12.0;";
-        //    if (UseHeader)
-        //    {
-        //        props["Extended Properties"] = @"""Excel 12.0 XML;HDR=YES;IMEX=1"";";
-        //    }
-        //    else
-        //    {
-        //        props["Extended Properties"] = @"""Excel 12.0 XML;HDR=NO;IMEX=1;"";";
-        //    }
-        //    props["Data Source"] = _excelFileName;
-
-        //    StringBuilder sb = new StringBuilder();
-
-        //    foreach (KeyValuePair<string, string> prop in props)
-        //    {
-        //        sb.Append(prop.Key);
-        //        sb.Append('=');
-        //        sb.Append(prop.Value);
-        //        //sb.Append(';');
-        //    }
-
-        //    return sb.ToString();
-        //}
 
         /// <summary>
         /// reads sheets in an excel workbook
@@ -139,14 +113,27 @@ namespace FAD3.Mapping.Forms
         /// <returns></returns>
         private bool ReadExcelFile()
         {
-            _workBook = new XLWorkbook(_excelFileName, XLEventTracking.Disabled);
-
-            foreach (IXLWorksheet worksheet in _workBook.Worksheets)
+            try
             {
-                //listSheets.Items.Add(worksheet.Name);
-                this.Invoke((MethodInvoker)(() => listSheets.Items.Add(worksheet.Name)));
+                _workBook = new XLWorkbook(_dataSourceFileName, XLEventTracking.Disabled);
+
+                foreach (IXLWorksheet worksheet in _workBook.Worksheets)
+                {
+                    //listSheets.Items.Add(worksheet.Name);
+                    this.Invoke((MethodInvoker)(() => listSheets.Items.Add(worksheet.Name)));
+                }
+                return listSheets.Items.Count > 0;
             }
-            return listSheets.Items.Count > 0;
+            catch (IOException iox)
+            {
+                MessageBox.Show(iox.Message);
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message, "SpatioTemporalMappingForm.cs", "ReadExcelFile");
+                return false;
+            }
         }
 
         /// <summary>
@@ -230,34 +217,41 @@ namespace FAD3.Mapping.Forms
         private void listCoordinates()
         {
             _dictGridCentroidCoordinates.Clear();
-            //var table = _excelData.Tables[0];
-
-            for (int row = 0; row < _dt.Rows.Count; row++)
+            switch (Path.GetExtension(_dataSourceFileName))
             {
-                var arr = _dt.Rows[row].ItemArray;
-                var lat = 0d;
-                var lon = 0d;
+                case ".csv":
+                    _dictGridCentroidCoordinates = MakeGridFromPoints.Coordinates;
+                    break;
 
-                IConvertible convert = arr[_latitudeColIndex] as IConvertible;
-                if (convert != null)
-                {
-                    lat = convert.ToDouble(null);
-                }
-                else
-                {
-                    lat = 0d;
-                }
+                case ".xlsx":
+                    for (int row = 0; row < _dt.Rows.Count; row++)
+                    {
+                        var arr = _dt.Rows[row].ItemArray;
+                        var lat = 0d;
+                        var lon = 0d;
 
-                convert = arr[_longitudeColIndex] as IConvertible;
-                if (convert != null)
-                {
-                    lon = convert.ToDouble(null);
-                }
-                else
-                {
-                    lon = 0d;
-                }
-                _dictGridCentroidCoordinates.Add(row, (lat, lon));
+                        IConvertible convert = arr[_latitudeColIndex] as IConvertible;
+                        if (convert != null)
+                        {
+                            lat = convert.ToDouble(null);
+                        }
+                        else
+                        {
+                            lat = 0d;
+                        }
+
+                        convert = arr[_longitudeColIndex] as IConvertible;
+                        if (convert != null)
+                        {
+                            lon = convert.ToDouble(null);
+                        }
+                        else
+                        {
+                            lon = 0d;
+                        }
+                        _dictGridCentroidCoordinates.Add(row, (lat, lon, false));
+                    }
+                    break;
             }
         }
 
@@ -267,12 +261,49 @@ namespace FAD3.Mapping.Forms
             {
                 case "btnOpen":
                     OpenFile();
-                    btnReadWorkbook.Enabled = _excelFileName?.Length > 0 && File.Exists(_excelFileName);
+                    btnReadWorkbook.Enabled = _dataSourceFileName?.Length > 0 && File.Exists(_dataSourceFileName);
                     break;
 
                 case "btnReadWorkbook":
-                    //ReadExcelFile();
-                    GetExcelSheets();
+                    listSheets.Items.Clear();
+                    switch (Path.GetExtension(_dataSourceFileName))
+                    {
+                        case ".nc":
+                        case ".csv":
+                            // var dataSet = Microsoft.Research.Science.Data.DataSet.Open(_dataSourceFileName);
+                            btnReadWorkbook.Enabled = false;
+                            sds.DataSet dataset = sds.DataSet.Open($"{_dataSourceFileName}?openMode=readOnly");
+                            if (dataset.Dimensions.Count == 1)
+                            {
+                                MakeGridFromPoints.SingleDimensionCSV = _dataSourceFileName;
+                                _dataPoints = MakeGridFromPoints.Coordinates.Count;
+                                txtRows.Text = _dataPoints.ToString();
+                                cboLatitude.Enabled = false;
+                                cboLongitude.Enabled = false;
+                                cboLongitude.Items.Add("Longitude");
+                                cboLatitude.Items.Add("Latitude");
+                                cboLatitude.SelectedIndex = 0;
+                                cboLongitude.SelectedIndex = 0;
+                                foreach (var item in MakeGridFromPoints.DictTemporalValues)
+                                {
+                                    cboFirstData.Items.Add(item.Key);
+                                    cboLastData.Items.Add(item.Key);
+                                }
+                                cboFirstData.Enabled = true;
+                                cboLastData.Enabled = true;
+                            }
+                            else if (dataset.Dimensions.Count == 2)
+                            {
+                            }
+                            btnReadWorkbook.Enabled = true;
+                            btnCategorize.Enabled = true;
+                            break;
+
+                        case ".xlsx":
+                            GetExcelSheets();
+                            break;
+                    }
+
                     break;
 
                 case "btnReadSheet":
@@ -285,7 +316,7 @@ namespace FAD3.Mapping.Forms
 
                 case "btnCategorize":
                     if (txtCategoryCount.Text.Length > 0 && cboLatitude.SelectedIndex >= 0
-                        && cboLongitude.SelectedIndex > 0 && cboFirstData.SelectedIndex >= 0
+                        && cboLongitude.SelectedIndex >= 0 && cboFirstData.SelectedIndex >= 0
                         && cboLastData.SelectedIndex >= 0)
                     {
                         listSheetsForMapping();
@@ -511,25 +542,45 @@ namespace FAD3.Mapping.Forms
                 lblMappedSheet.Text = $"{listSelectedSheets.Items[index]}";
                 lblMappedSheet.Visible = true;
                 _columnValues.Clear();       // _columnValues will contain values corresponding to the item we are interested in
-
-                //read all rows but only select the data point in the row corresponding to the selected listbox item
-                for (int row = 0; row < _dt.Rows.Count; row++)
+                double? v = null;
+                switch (Path.GetExtension(_dataSourceFileName))
                 {
-                    var arr = _dt.Rows[row].ItemArray;
-                    var col = index + _firstColIndex + 2;
-                    double? v = null;
-                    if (arr[col].GetType().Name == "String")
-                    {
-                        if (double.TryParse((string)arr[col], out double d))
+                    case ".csv":
+                        foreach (string value in MakeGridFromPoints.DictTemporalValues[lblMappedSheet.Text].Values)
                         {
-                            v = d;
+                            v = null;
+
+                            if (value != "NaN" && double.TryParse(value, out double d))
+                            {
+                                v = d;
+                            }
+
+                            _columnValues.Add(v);
                         }
-                    }
-                    else
-                    {
-                        v = arr[col] as double?;
-                    }
-                    _columnValues.Add(v);
+                        break;
+
+                    case ".xlsx":
+                        //read all rows but only select the data point in the row corresponding to the selected listbox item
+                        for (int row = 0; row < _dt.Rows.Count; row++)
+                        {
+                            v = null;
+                            var arr = _dt.Rows[row].ItemArray;
+                            var col = index + _firstColIndex + 2;
+
+                            if (arr[col].GetType().Name == "String")
+                            {
+                                if (double.TryParse((string)arr[col], out double d))
+                                {
+                                    v = d;
+                                }
+                            }
+                            else
+                            {
+                                v = arr[col] as double?;
+                            }
+                            _columnValues.Add(v);
+                        }
+                        break;
                 }
 
                 MakeGridFromPoints.MapColumn(_columnValues, lblMappedSheet.Text);
@@ -607,20 +658,54 @@ namespace FAD3.Mapping.Forms
             var includeColumn = false;
             if (cboLongitude.Text.Length > 0 && cboLatitude.Text.Length > 0 && cboFirstData.Text.Length > 0 && cboLastData.Text.Length > 0)
             {
-                for (int n = 0; n < _columnCount; n++)
+                switch (Path.GetExtension(_dataSourceFileName))
                 {
-                    if (!includeColumn && (n - 2) == _firstColIndex)
-                    {
-                        includeColumn = true;
-                    }
-                    if (includeColumn)
-                    {
-                        listSelectedSheets.Items.Add(_dt.Columns[n].ColumnName);
-                    }
-                    if (includeColumn && (n - 2) == _lastColIndex)
-                    {
-                        includeColumn = false;
-                    }
+                    case ".csv":
+                        int i = 0;
+                        foreach (string item in MakeGridFromPoints.DictTemporalValues.Keys)
+                        {
+                            if (!includeColumn && i == _firstColIndex)
+                            {
+                                includeColumn = true;
+                            }
+                            if (includeColumn)
+                            {
+                                listSelectedSheets.Items.Add(item);
+                                foreach (string value in MakeGridFromPoints.DictTemporalValues[item].Values)
+                                {
+                                    if (value != "NaN" && double.TryParse(value, out double d))
+                                    {
+                                        _dataValues.Add(d);
+                                    }
+                                }
+                            }
+                            if (includeColumn && i == _lastColIndex)
+                            {
+                                includeColumn = false;
+                            }
+                            i++;
+                        }
+                        break;
+
+                    case ".xlsx":
+
+                        for (int n = 0; n < _columnCount; n++)
+                        {
+                            if (!includeColumn && (n - 2) == _firstColIndex)
+                            {
+                                includeColumn = true;
+                            }
+                            if (includeColumn)
+                            {
+                                listSelectedSheets.Items.Add(_dt.Columns[n].ColumnName);
+                            }
+                            if (includeColumn && (n - 2) == _lastColIndex)
+                            {
+                                includeColumn = false;
+                            }
+                        }
+
+                        break;
                 }
             }
         }
@@ -631,19 +716,26 @@ namespace FAD3.Mapping.Forms
         /// </summary>
         private void getDataValues()
         {
-            _dataValues.Clear();
-            //var table = _excelData.Tables[0];
-
-            for (int row = 0; row < _dt.Rows.Count; row++)
+            switch (Path.GetExtension(_dataSourceFileName))
             {
-                var arr = _dt.Rows[row].ItemArray;
-                for (int col = _firstColIndex + 2; col <= _lastColIndex + 2; col++)
-                {
-                    if (double.TryParse(arr[col].ToString(), out double d))
+                case ".xlsx":
+                    _dataValues.Clear();
+
+                    for (int row = 0; row < _dt.Rows.Count; row++)
                     {
-                        _dataValues.Add(d);
+                        var arr = _dt.Rows[row].ItemArray;
+                        for (int col = _firstColIndex + 2; col <= _lastColIndex + 2; col++)
+                        {
+                            if (double.TryParse(arr[col].ToString(), out double d))
+                            {
+                                _dataValues.Add(d);
+                            }
+                        }
                     }
-                }
+                    break;
+
+                default:
+                    break;
             }
         }
 

@@ -218,6 +218,18 @@ namespace FAD3
             e.ClickedItem.Owner.Hide();
             switch (e.ClickedItem.Name)
             {
+                case "menuCopyToClipboard":
+                    string clipText = $"Layer name: {_mapLayer.Name}\r\n";
+                    clipText += $"Projection: {_mapLayer.GeoProjectionName}\r\n";
+                    clipText += $"Layer type: {_mapLayer.LayerType}\r\n";
+                    clipText += $"Filename: {_mapLayer.FileName}\r\n";
+                    foreach (ListViewItem lvi in lvLayerProps.Items)
+                    {
+                        clipText += $"{lvi.Text}: {lvi.SubItems[1].Text}\r\n";
+                    }
+                    Clipboard.SetText(clipText);
+                    break;
+
                 case "menuSavePropsToFile":
                     var sfd = new SaveFileDialog();
                     sfd.Title = "Save layer propeties to text file";

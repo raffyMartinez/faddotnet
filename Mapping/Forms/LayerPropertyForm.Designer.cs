@@ -61,9 +61,10 @@
             this.rectangleShape1 = new Microsoft.VisualBasic.PowerPacks.RectangleShape();
             this.tabProperties = new System.Windows.Forms.TabPage();
             this.lvLayerProps = new System.Windows.Forms.ListView();
-            this.btnApply = new System.Windows.Forms.Button();
             this.menuShortCut = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.menuSavePropsToFile = new System.Windows.Forms.ToolStripMenuItem();
+            this.btnApply = new System.Windows.Forms.Button();
+            this.menuCopyToClipboard = new System.Windows.Forms.ToolStripMenuItem();
             this.tabControl1.SuspendLayout();
             this.tabAppearance.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -389,6 +390,21 @@
             this.lvLayerProps.TabIndex = 0;
             this.lvLayerProps.UseCompatibleStateImageBehavior = false;
             // 
+            // menuShortCut
+            // 
+            this.menuShortCut.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuSavePropsToFile,
+            this.menuCopyToClipboard});
+            this.menuShortCut.Name = "menuShortCut";
+            this.menuShortCut.Size = new System.Drawing.Size(181, 70);
+            this.menuShortCut.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnMenuItemClicked);
+            // 
+            // menuSavePropsToFile
+            // 
+            this.menuSavePropsToFile.Name = "menuSavePropsToFile";
+            this.menuSavePropsToFile.Size = new System.Drawing.Size(180, 22);
+            this.menuSavePropsToFile.Text = "Save to file...";
+            // 
             // btnApply
             // 
             this.btnApply.Enabled = false;
@@ -400,19 +416,11 @@
             this.btnApply.UseVisualStyleBackColor = true;
             this.btnApply.Click += new System.EventHandler(this.OnButtonClick);
             // 
-            // menuShortCut
+            // menuCopyToClipboard
             // 
-            this.menuShortCut.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuSavePropsToFile});
-            this.menuShortCut.Name = "menuShortCut";
-            this.menuShortCut.Size = new System.Drawing.Size(181, 48);
-            this.menuShortCut.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnMenuItemClicked);
-            // 
-            // menuSavePropsToFile
-            // 
-            this.menuSavePropsToFile.Name = "menuSavePropsToFile";
-            this.menuSavePropsToFile.Size = new System.Drawing.Size(180, 22);
-            this.menuSavePropsToFile.Text = "Save to file...";
+            this.menuCopyToClipboard.Name = "menuCopyToClipboard";
+            this.menuCopyToClipboard.Size = new System.Drawing.Size(180, 22);
+            this.menuCopyToClipboard.Text = "Copy";
             // 
             // LayerPropertyForm
             // 
@@ -490,5 +498,6 @@
         private System.Windows.Forms.ListView lvLayerProps;
         private System.Windows.Forms.ContextMenuStrip menuShortCut;
         private System.Windows.Forms.ToolStripMenuItem menuSavePropsToFile;
+        private System.Windows.Forms.ToolStripMenuItem menuCopyToClipboard;
     }
 }
