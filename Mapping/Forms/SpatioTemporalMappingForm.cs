@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using sds = Microsoft.Research.Science.Data;
-using Microsoft.Research.Science.Data.Imperative;
+using FAD3.Database.Classes;
 
 namespace FAD3.Mapping.Forms
 {
@@ -27,7 +27,6 @@ namespace FAD3.Mapping.Forms
         private int _lastColIndex;
         private int _latitudeColIndex;
         private int _longitudeColIndex;
-        private Dictionary<int, (double latitude, double longitude, bool Inland)> _dictGridCentroidCoordinates = new Dictionary<int, (double latitude, double longitude, bool Inland)>();
         private List<double> _dataValues = new List<double>();
         private List<double?> _columnValues = new List<double?>();
         private int _dataPoints;
@@ -37,6 +36,9 @@ namespace FAD3.Mapping.Forms
         private int _columnCount;
         private DataTable _dt;
         private bool _hasMesh;
+        private fadUTMZone _utmZone;
+        private int _inlandPointsCount;
+        private bool _createFileWithoutInland;
 
         public static SpatioTemporalMappingForm GetInstance()
         {
@@ -72,6 +74,11 @@ namespace FAD3.Mapping.Forms
             txtCategoryCount.Text = "5";
             listSelectedSheets.Enabled = false;
             Text = "Spatio-Temporal Mapping";
+
+            cboClassificationScheme.Items.Add("Jenk's-Fisher's");
+            cboClassificationScheme.Items.Add("Equal interval");
+            cboClassificationScheme.Items.Add("User defined");
+            cboClassificationScheme.SelectedIndex = 0;
         }
 
         private void OpenFile()
@@ -79,7 +86,7 @@ namespace FAD3.Mapping.Forms
             var fileOpen = new OpenFileDialog
             {
                 Title = "Open MS Excel file",
-                Filter = "Excel file|*.xls;*.xlsx|NetCDF|*.nc|CSV files|*.csv|All file types|*.*",
+                Filter = "Excel file|*.xls;*.xlsx|CSV files|*.csv|All file types|*.*",
                 FilterIndex = 1
             };
             fileOpen.ShowDialog();
@@ -119,7 +126,6 @@ namespace FAD3.Mapping.Forms
 
                 foreach (IXLWorksheet worksheet in _workBook.Worksheets)
                 {
-                    //listSheets.Items.Add(worksheet.Name);
                     this.Invoke((MethodInvoker)(() => listSheets.Items.Add(worksheet.Name)));
                 }
                 return listSheets.Items.Count > 0;
@@ -216,11 +222,9 @@ namespace FAD3.Mapping.Forms
         /// </summary>
         private void listCoordinates()
         {
-            _dictGridCentroidCoordinates.Clear();
             switch (Path.GetExtension(_dataSourceFileName))
             {
                 case ".csv":
-                    _dictGridCentroidCoordinates = MakeGridFromPoints.Coordinates;
                     break;
 
                 case ".xlsx":
@@ -249,7 +253,7 @@ namespace FAD3.Mapping.Forms
                         {
                             lon = 0d;
                         }
-                        _dictGridCentroidCoordinates.Add(row, (lat, lon, false));
+                        MakeGridFromPoints.AddCoordinate(row, lat, lon, false, row == 0);
                     }
                     break;
             }
@@ -260,6 +264,8 @@ namespace FAD3.Mapping.Forms
             switch (((Button)sender).Name)
             {
                 case "btnOpen":
+                    MakeGridFromPoints.Reset();
+                    txtRows.Text = "";
                     OpenFile();
                     btnReadWorkbook.Enabled = _dataSourceFileName?.Length > 0 && File.Exists(_dataSourceFileName);
                     break;
@@ -269,34 +275,70 @@ namespace FAD3.Mapping.Forms
                     switch (Path.GetExtension(_dataSourceFileName))
                     {
                         case ".nc":
+                            MessageBox.Show("NetCDF support not yet supported");
+                            break;
+
                         case ".csv":
-                            // var dataSet = Microsoft.Research.Science.Data.DataSet.Open(_dataSourceFileName);
                             btnReadWorkbook.Enabled = false;
-                            sds.DataSet dataset = sds.DataSet.Open($"{_dataSourceFileName}?openMode=readOnly");
-                            if (dataset.Dimensions.Count == 1)
+                            try
                             {
-                                MakeGridFromPoints.SingleDimensionCSV = _dataSourceFileName;
-                                _dataPoints = MakeGridFromPoints.Coordinates.Count;
-                                txtRows.Text = _dataPoints.ToString();
-                                cboLatitude.Enabled = false;
-                                cboLongitude.Enabled = false;
-                                cboLongitude.Items.Add("Longitude");
-                                cboLatitude.Items.Add("Latitude");
-                                cboLatitude.SelectedIndex = 0;
-                                cboLongitude.SelectedIndex = 0;
-                                foreach (var item in MakeGridFromPoints.DictTemporalValues)
+                                sds.DataSet dataset = sds.DataSet.Open($"{_dataSourceFileName}?openMode=readOnly");
+                                if (dataset.Dimensions.Count == 1)
                                 {
-                                    cboFirstData.Items.Add(item.Key);
-                                    cboLastData.Items.Add(item.Key);
+                                    //ask UTMzone of area of interest
+                                    using (SelectUTMZoneForm szf = new SelectUTMZoneForm())
+                                    {
+                                        szf.ShowDialog();
+                                        if (szf.DialogResult == DialogResult.OK)
+                                        {
+                                            _utmZone = szf.UTMZone;
+                                            _createFileWithoutInland = szf.CreateFileWithoutInland;
+                                            MakeGridFromPoints.IgnoreInlandPoints = false;
+                                            MakeGridFromPoints.UTMZone = _utmZone;
+                                            MakeGridFromPoints.CreateFileWithoutInlandPoints = _createFileWithoutInland;
+                                        }
+                                        else if (szf.DialogResult == DialogResult.Cancel)
+                                        {
+                                            MakeGridFromPoints.IgnoreInlandPoints = true;
+                                        }
+                                    }
+                                    MakeGridFromPoints.SingleDimensionCSV = _dataSourceFileName;
+                                    _dataPoints = MakeGridFromPoints.Coordinates.Count;
+                                    txtRows.Text = _dataPoints.ToString();
+                                    _inlandPointsCount = MakeGridFromPoints.InlandPointCount;
+                                    if (MakeGridFromPoints.IgnoreInlandPoints)
+                                    {
+                                        txtInlandPoints.Text = "Ignored";
+                                    }
+                                    else
+                                    {
+                                        txtInlandPoints.Text = _inlandPointsCount.ToString();
+                                    }
+                                    cboLatitude.Enabled = false;
+                                    cboLongitude.Enabled = false;
+                                    cboLongitude.Items.Add("Longitude");
+                                    cboLatitude.Items.Add("Latitude");
+                                    cboLatitude.SelectedIndex = 0;
+                                    cboLongitude.SelectedIndex = 0;
+                                    foreach (var item in MakeGridFromPoints.DictTemporalValues)
+                                    {
+                                        cboFirstData.Items.Add(item.Key);
+                                        cboLastData.Items.Add(item.Key);
+                                    }
+                                    cboFirstData.Enabled = true;
+                                    cboLastData.Enabled = true;
                                 }
-                                cboFirstData.Enabled = true;
-                                cboLastData.Enabled = true;
+                                else if (dataset.Dimensions.Count == 2)
+                                {
+                                }
+                                btnReadWorkbook.Enabled = true;
+                                btnCategorize.Enabled = true;
                             }
-                            else if (dataset.Dimensions.Count == 2)
+                            catch (Exception ex)
                             {
+                                MessageBox.Show(ex.Message);
+                                Logger.Log(ex.Message, "SpatioTemporalMappingForm.cs", "OnButtonClick.btnReadWorkBook.csv");
                             }
-                            btnReadWorkbook.Enabled = true;
-                            btnCategorize.Enabled = true;
                             break;
 
                         case ".xlsx":
@@ -322,7 +364,30 @@ namespace FAD3.Mapping.Forms
                         listSheetsForMapping();
                         listCoordinates();
                         getDataValues();
-                        btnShowGridPoints.Enabled = DoJenksFisher();
+                        switch (cboClassificationScheme.Text)
+                        {
+                            case "Jenk's-Fisher's":
+                                btnShowGridPoints.Enabled = DoJenksFisher();
+                                break;
+
+                            case "Equal interval":
+                            case "User defined":
+                                using (ShapefileClassificationSchemeForm scsf = new ShapefileClassificationSchemeForm())
+                                {
+                                    scsf.ClassificationScheme = cboClassificationScheme.Text;
+                                    scsf.MinimumValue = _dataValues.Min();
+                                    scsf.MaximumValue = _dataValues.Max();
+                                    scsf.NumberOfClasses = int.Parse(txtCategoryCount.Text);
+                                    scsf.ShowDialog();
+                                    if (scsf.DialogResult == DialogResult.OK)
+                                    {
+                                    }
+                                    else if (scsf.DialogResult == DialogResult.Cancel)
+                                    {
+                                    }
+                                }
+                                break;
+                        }
                     }
                     else
                     {
@@ -339,7 +404,7 @@ namespace FAD3.Mapping.Forms
                 case "btnShowGridPolygons":
                     if (MakeGridFromPoints.MakeGridShapefile())
                     {
-                        _hasMesh = global.MappingForm.MapLayersHandler.AddLayer(MakeGridFromPoints.GridShapefile, "Mesh") > 0;
+                        _hasMesh = global.MappingForm.MapLayersHandler.AddLayer(MakeGridFromPoints.GridShapefile, "Mesh", uniqueLayer: true) > 0;
                     }
                     listSelectedSheets.Enabled = _hasMesh;
                     break;
@@ -550,7 +615,11 @@ namespace FAD3.Mapping.Forms
                         {
                             v = null;
 
-                            if (value != "NaN" && double.TryParse(value, out double d))
+                            if (value == "NaN" || value == "-9999999.0")
+                            {
+                                v = null;
+                            }
+                            else if (double.TryParse(value, out double d))
                             {
                                 v = d;
                             }
@@ -610,6 +679,7 @@ namespace FAD3.Mapping.Forms
 
         private void UpdateSheetSummary(Dictionary<string, int> summary)
         {
+            double percent = 0D;
             var row = 0;
             dgSheetSummary.Rows.Clear();
             foreach (KeyValuePair<string, int> kv in summary)
@@ -618,9 +688,15 @@ namespace FAD3.Mapping.Forms
                 if (kv.Key == "Null")
                 {
                     firstColText = "Null";
+                    percent = ((double)(kv.Value - MakeGridFromPoints.InlandPointCount) / (double)(_dataPoints - MakeGridFromPoints.InlandPointCount)) * 100;
+                    row = dgSheetSummary.Rows.Add(new object[] { true, firstColText, (kv.Value - MakeGridFromPoints.InlandPointCount).ToString(), percent.ToString("N1") });
                 }
-                var percent = ((double)kv.Value / (double)_dataPoints) * 100;
-                row = dgSheetSummary.Rows.Add(new object[] { true, firstColText, kv.Value.ToString(), percent.ToString("N1") });
+                else
+                {
+                    percent = ((double)kv.Value / (double)(_dataPoints - MakeGridFromPoints.InlandPointCount)) * 100;
+                    row = dgSheetSummary.Rows.Add(new object[] { true, firstColText, kv.Value.ToString(), percent.ToString("N1") });
+                }
+
                 var pt = graphSheet.Series["summary"].Points.AddY(percent);
                 dgSheetSummary[1, row].Style.BackColor = MakeGridFromPoints.CategoryColor(row);
                 graphSheet.Series["summary"].Points[pt].Color = dgSheetSummary[1, row].Style.BackColor;
@@ -638,9 +714,8 @@ namespace FAD3.Mapping.Forms
         {
             MakeGridFromPoints.MapInteractionHandler = global.MappingForm.MapInterActionHandler;
             MakeGridFromPoints.GeoProjection = global.MappingForm.MapControl.GeoProjection;
-            MakeGridFromPoints.Coordinates = _dictGridCentroidCoordinates;
 
-            if (MakeGridFromPoints.MakePointShapefile())
+            if (MakeGridFromPoints.MakePointShapefile(!MakeGridFromPoints.IgnoreInlandPoints))
                 global.MappingForm.MapLayersHandler.AddLayer(MakeGridFromPoints.PointShapefile, "Grid points");
         }
 

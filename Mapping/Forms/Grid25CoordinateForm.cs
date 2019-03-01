@@ -41,10 +41,10 @@ namespace FAD3.Mapping.Forms
 
         private void OnMapMouseMove(object sender, _DMapEvents_MouseMoveEvent e)
         {
-            double mapX = 0, mapY = 0;
-            _mapControl.PixelToProj(e.x, e.y, ref mapX, ref mapY);
-            var g25Coord = FishingGrid.utmCoordinatesToGrid25(mapX, mapY, _majorGrid.UTMZone);
-            txtCoord.Text = $"UTM: {_utmZone} {mapX.ToString("N0")}, {mapY.ToString("N0")}\r\nGrid25: {g25Coord.grid25Name}";
+            double utmX = 0, utmY = 0;
+            _mapControl.PixelToProj(e.x, e.y, ref utmX, ref utmY);
+            var g25Coord = FishingGrid.utmCoordinatesToGrid25(utmX, utmY, _majorGrid.UTMZone);
+            txtCoord.Text = $"UTM: {_utmZone} {utmX.ToString("N0")}, {utmY.ToString("N0")}\r\nGrid25: {g25Coord.grid25Name}";
         }
 
         private void OnFormClosing(object sender, FormClosingEventArgs e)

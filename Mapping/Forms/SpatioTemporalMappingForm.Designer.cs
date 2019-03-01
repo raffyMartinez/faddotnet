@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SpatioTemporalMappingForm));
             this.tabsPages = new System.Windows.Forms.TabControl();
             this.tabUI = new System.Windows.Forms.TabPage();
@@ -73,8 +73,6 @@
             this.btnCategorize = new System.Windows.Forms.Button();
             this.txtCategoryCount = new System.Windows.Forms.TextBox();
             this.label10 = new System.Windows.Forms.Label();
-            this.label8 = new System.Windows.Forms.Label();
-            this.icbColorScheme = new FAD3.Mapping.UserControls.ImageCombo();
             this.tabExtract = new System.Windows.Forms.TabPage();
             this.btnExport = new System.Windows.Forms.Button();
             this.graphSheet = new System.Windows.Forms.DataVisualization.Charting.Chart();
@@ -92,6 +90,11 @@
             this.btnInstructions = new System.Windows.Forms.Button();
             this.btnOk = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
+            this.txtInlandPoints = new System.Windows.Forms.TextBox();
+            this.label14 = new System.Windows.Forms.Label();
+            this.icbColorScheme = new FAD3.Mapping.UserControls.ImageCombo();
+            this.cboClassificationScheme = new System.Windows.Forms.ComboBox();
+            this.label8 = new System.Windows.Forms.Label();
             this.tabsPages.SuspendLayout();
             this.tabUI.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -112,7 +115,7 @@
             this.tabsPages.Location = new System.Drawing.Point(7, 22);
             this.tabsPages.Name = "tabsPages";
             this.tabsPages.SelectedIndex = 0;
-            this.tabsPages.Size = new System.Drawing.Size(470, 444);
+            this.tabsPages.Size = new System.Drawing.Size(470, 481);
             this.tabsPages.TabIndex = 1;
             // 
             // tabUI
@@ -132,6 +135,8 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.txtInlandPoints);
+            this.groupBox1.Controls.Add(this.label14);
             this.groupBox1.Controls.Add(this.cboLastData);
             this.groupBox1.Controls.Add(this.cboFirstData);
             this.groupBox1.Controls.Add(this.btnReadSheet);
@@ -147,7 +152,7 @@
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Location = new System.Drawing.Point(9, 111);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(434, 223);
+            this.groupBox1.Size = new System.Drawing.Size(434, 248);
             this.groupBox1.TabIndex = 20;
             this.groupBox1.TabStop = false;
             // 
@@ -316,6 +321,8 @@
             // 
             // tabCategorize
             // 
+            this.tabCategorize.Controls.Add(this.label8);
+            this.tabCategorize.Controls.Add(this.cboClassificationScheme);
             this.tabCategorize.Controls.Add(this.groupBox3);
             this.tabCategorize.Controls.Add(this.groupBox2);
             this.tabCategorize.Controls.Add(this.label13);
@@ -324,12 +331,11 @@
             this.tabCategorize.Controls.Add(this.btnCategorize);
             this.tabCategorize.Controls.Add(this.txtCategoryCount);
             this.tabCategorize.Controls.Add(this.label10);
-            this.tabCategorize.Controls.Add(this.label8);
             this.tabCategorize.Controls.Add(this.icbColorScheme);
             this.tabCategorize.Location = new System.Drawing.Point(4, 22);
             this.tabCategorize.Name = "tabCategorize";
             this.tabCategorize.Padding = new System.Windows.Forms.Padding(3);
-            this.tabCategorize.Size = new System.Drawing.Size(462, 418);
+            this.tabCategorize.Size = new System.Drawing.Size(462, 455);
             this.tabCategorize.TabIndex = 3;
             this.tabCategorize.Text = "Categories";
             this.tabCategorize.UseVisualStyleBackColor = true;
@@ -342,7 +348,7 @@
             this.groupBox3.Controls.Add(this.txtMinimum);
             this.groupBox3.Controls.Add(this.txtValuesCount);
             this.groupBox3.Controls.Add(this.label9);
-            this.groupBox3.Location = new System.Drawing.Point(7, 306);
+            this.groupBox3.Location = new System.Drawing.Point(7, 343);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(192, 101);
             this.groupBox3.TabIndex = 28;
@@ -401,7 +407,7 @@
             // 
             this.groupBox2.Controls.Add(this.btnShowGridPoints);
             this.groupBox2.Controls.Add(this.btnShowGridPolygons);
-            this.groupBox2.Location = new System.Drawing.Point(250, 306);
+            this.groupBox2.Location = new System.Drawing.Point(250, 343);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(200, 101);
             this.groupBox2.TabIndex = 27;
@@ -461,11 +467,11 @@
             this.dgcolCount,
             this.dgCol});
             this.dgCategories.GridColor = System.Drawing.SystemColors.Window;
-            this.dgCategories.Location = new System.Drawing.Point(6, 97);
+            this.dgCategories.Location = new System.Drawing.Point(15, 130);
             this.dgCategories.Name = "dgCategories";
             this.dgCategories.ReadOnly = true;
             this.dgCategories.RowHeadersVisible = false;
-            this.dgCategories.Size = new System.Drawing.Size(448, 194);
+            this.dgCategories.Size = new System.Drawing.Size(439, 194);
             this.dgCategories.TabIndex = 22;
             this.dgCategories.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellDblClick);
             // 
@@ -491,7 +497,7 @@
             // 
             // btnCategorize
             // 
-            this.btnCategorize.Location = new System.Drawing.Point(250, 43);
+            this.btnCategorize.Location = new System.Drawing.Point(282, 75);
             this.btnCategorize.Name = "btnCategorize";
             this.btnCategorize.Size = new System.Drawing.Size(90, 25);
             this.btnCategorize.TabIndex = 17;
@@ -501,43 +507,19 @@
             // 
             // txtCategoryCount
             // 
-            this.txtCategoryCount.Location = new System.Drawing.Point(144, 46);
+            this.txtCategoryCount.Location = new System.Drawing.Point(126, 78);
             this.txtCategoryCount.Name = "txtCategoryCount";
-            this.txtCategoryCount.Size = new System.Drawing.Size(91, 20);
+            this.txtCategoryCount.Size = new System.Drawing.Size(146, 20);
             this.txtCategoryCount.TabIndex = 16;
             // 
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(12, 49);
+            this.label10.Location = new System.Drawing.Point(12, 81);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(108, 13);
             this.label10.TabIndex = 15;
             this.label10.Text = "Number of categories";
-            // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(6, 81);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(57, 13);
-            this.label8.TabIndex = 10;
-            this.label8.Text = "Categories";
-            // 
-            // icbColorScheme
-            // 
-            this.icbColorScheme.Color1 = System.Drawing.Color.Gray;
-            this.icbColorScheme.Color2 = System.Drawing.Color.Gray;
-            this.icbColorScheme.ColorSchemes = null;
-            this.icbColorScheme.ComboStyle = FAD3.Mapping.UserControls.ImageComboStyle.ColorSchemeGraduated;
-            this.icbColorScheme.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-            this.icbColorScheme.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.icbColorScheme.FormattingEnabled = true;
-            this.icbColorScheme.Location = new System.Drawing.Point(144, 16);
-            this.icbColorScheme.Name = "icbColorScheme";
-            this.icbColorScheme.OutlineColor = System.Drawing.Color.Black;
-            this.icbColorScheme.Size = new System.Drawing.Size(91, 21);
-            this.icbColorScheme.TabIndex = 24;
             // 
             // tabExtract
             // 
@@ -569,28 +551,28 @@
             // 
             // graphSheet
             // 
-            chartArea1.AxisX.LabelStyle.Enabled = false;
-            chartArea1.AxisX.MajorGrid.Enabled = false;
-            chartArea1.AxisX.MajorTickMark.Enabled = false;
-            chartArea1.AxisY.IsLabelAutoFit = false;
-            chartArea1.AxisY.LabelStyle.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F);
-            chartArea1.AxisY.MajorGrid.Enabled = false;
-            chartArea1.Name = "ChartArea1";
-            chartArea1.Position.Auto = false;
-            chartArea1.Position.Height = 94F;
-            chartArea1.Position.Width = 100F;
-            this.graphSheet.ChartAreas.Add(chartArea1);
-            legend1.Enabled = false;
-            legend1.Name = "Legend1";
-            this.graphSheet.Legends.Add(legend1);
+            chartArea2.AxisX.LabelStyle.Enabled = false;
+            chartArea2.AxisX.MajorGrid.Enabled = false;
+            chartArea2.AxisX.MajorTickMark.Enabled = false;
+            chartArea2.AxisY.IsLabelAutoFit = false;
+            chartArea2.AxisY.LabelStyle.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F);
+            chartArea2.AxisY.MajorGrid.Enabled = false;
+            chartArea2.Name = "ChartArea1";
+            chartArea2.Position.Auto = false;
+            chartArea2.Position.Height = 94F;
+            chartArea2.Position.Width = 100F;
+            this.graphSheet.ChartAreas.Add(chartArea2);
+            legend2.Enabled = false;
+            legend2.Name = "Legend1";
+            this.graphSheet.Legends.Add(legend2);
             this.graphSheet.Location = new System.Drawing.Point(189, 273);
             this.graphSheet.Name = "graphSheet";
-            series1.ChartArea = "ChartArea1";
-            series1.IsVisibleInLegend = false;
-            series1.Legend = "Legend1";
-            series1.Name = "Series1";
-            series1.YValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.Double;
-            this.graphSheet.Series.Add(series1);
+            series2.ChartArea = "ChartArea1";
+            series2.IsVisibleInLegend = false;
+            series2.Legend = "Legend1";
+            series2.Name = "Series1";
+            series2.YValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.Double;
+            this.graphSheet.Series.Add(series2);
             this.graphSheet.Size = new System.Drawing.Size(265, 105);
             this.graphSheet.TabIndex = 24;
             this.graphSheet.Text = "chart1";
@@ -708,7 +690,7 @@
             // 
             // btnInstructions
             // 
-            this.btnInstructions.Location = new System.Drawing.Point(7, 472);
+            this.btnInstructions.Location = new System.Drawing.Point(7, 509);
             this.btnInstructions.Name = "btnInstructions";
             this.btnInstructions.Size = new System.Drawing.Size(77, 25);
             this.btnInstructions.TabIndex = 21;
@@ -718,7 +700,7 @@
             // 
             // btnOk
             // 
-            this.btnOk.Location = new System.Drawing.Point(421, 472);
+            this.btnOk.Location = new System.Drawing.Point(421, 509);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(45, 25);
             this.btnOk.TabIndex = 2;
@@ -727,7 +709,7 @@
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(365, 472);
+            this.btnCancel.Location = new System.Drawing.Point(365, 509);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(50, 25);
             this.btnCancel.TabIndex = 3;
@@ -735,17 +717,68 @@
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.OnButtonClick);
             // 
-            // ChlorophyllForm
+            // txtInlandPoints
+            // 
+            this.txtInlandPoints.BackColor = System.Drawing.SystemColors.Window;
+            this.txtInlandPoints.Enabled = false;
+            this.txtInlandPoints.Location = new System.Drawing.Point(299, 213);
+            this.txtInlandPoints.Name = "txtInlandPoints";
+            this.txtInlandPoints.ReadOnly = true;
+            this.txtInlandPoints.Size = new System.Drawing.Size(113, 20);
+            this.txtInlandPoints.TabIndex = 23;
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(179, 216);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(67, 13);
+            this.label14.TabIndex = 22;
+            this.label14.Text = "Inland points";
+            // 
+            // icbColorScheme
+            // 
+            this.icbColorScheme.Color1 = System.Drawing.Color.Gray;
+            this.icbColorScheme.Color2 = System.Drawing.Color.Gray;
+            this.icbColorScheme.ColorSchemes = null;
+            this.icbColorScheme.ComboStyle = FAD3.Mapping.UserControls.ImageComboStyle.ColorSchemeGraduated;
+            this.icbColorScheme.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.icbColorScheme.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.icbColorScheme.FormattingEnabled = true;
+            this.icbColorScheme.Location = new System.Drawing.Point(126, 16);
+            this.icbColorScheme.Name = "icbColorScheme";
+            this.icbColorScheme.OutlineColor = System.Drawing.Color.Black;
+            this.icbColorScheme.Size = new System.Drawing.Size(146, 21);
+            this.icbColorScheme.TabIndex = 24;
+            // 
+            // cboClassificationScheme
+            // 
+            this.cboClassificationScheme.FormattingEnabled = true;
+            this.cboClassificationScheme.Location = new System.Drawing.Point(126, 47);
+            this.cboClassificationScheme.Name = "cboClassificationScheme";
+            this.cboClassificationScheme.Size = new System.Drawing.Size(145, 21);
+            this.cboClassificationScheme.TabIndex = 29;
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(12, 50);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(108, 13);
+            this.label8.TabIndex = 30;
+            this.label8.Text = "Classification scheme";
+            // 
+            // SpatioTemporalMappingForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(473, 504);
+            this.ClientSize = new System.Drawing.Size(473, 541);
             this.Controls.Add(this.btnInstructions);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnOk);
             this.Controls.Add(this.tabsPages);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
-            this.Name = "ChlorophyllForm";
+            this.Name = "SpatioTemporalMappingForm";
             this.ShowInTaskbar = false;
             this.Text = "ChlorophyllForm";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnFormClosed);
@@ -795,7 +828,6 @@
         private System.Windows.Forms.ComboBox cboFirstData;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.TabPage tabCategorize;
-        private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Button btnShowGridPoints;
         private System.Windows.Forms.Button btnCategorize;
         private System.Windows.Forms.TextBox txtCategoryCount;
@@ -829,5 +861,9 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn dgcolCount;
         private System.Windows.Forms.DataGridViewTextBoxColumn dgCol;
         private System.Windows.Forms.Button btnExport;
+        private System.Windows.Forms.TextBox txtInlandPoints;
+        private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.ComboBox cboClassificationScheme;
     }
 }

@@ -68,14 +68,21 @@ namespace FAD3
             {
                 var ll2UTM = new LatLngUTMConverter(datumName);
                 var result = ll2UTM.convertLatLngToUtm(latitude, longitude);
-                double mgEasting = result.UTMEasting;
-                double mgNorthing = result.UTMNorthing;
+                double mgEasting = result.Easting;
+                double mgNorthing = result.Northing;
                 var minorGridResult = utmCoordinatesToGrid25(mgEasting, mgNorthing, utmZone);
                 return (minorGridResult.grid25Name, minorGridResult.Easting, minorGridResult.Northing, true);
             }
             return ("", 0, 0, proceed);
         }
 
+        /// <summary>
+        /// given a point with xy coordinates in UTM with zone, gives out equivalent grid25 name and UTM coordinates of grid25 centroid
+        /// </summary>
+        /// <param name="easting"></param>
+        /// <param name="northing"></param>
+        /// <param name="utmZone"></param>
+        /// <returns></returns>
         public static (string grid25Name, int Easting, int Northing) utmCoordinatesToGrid25(double easting, double northing, fadUTMZone utmZone)
         {
             SetGrid25Parameters(utmZone);
@@ -476,6 +483,37 @@ namespace FAD3
                 OleDbCommand update = new OleDbCommand(sql, conn);
                 conn.Open();
                 return update.ExecuteNonQuery() > 0;
+            }
+        }
+
+        public static List<string> InlandPoints
+        {
+            get
+            {
+                List<string> inlandPoints = new List<string>();
+                var conString = $@"Provider=Microsoft.JET.OLEDB.4.0;data source= {_appPath}\grid25inland.mdb";
+                using (var con = new OleDbConnection(conString))
+                {
+                    try
+                    {
+                        con.Open();
+                        string query = $"Select grid_name from tblGrid25Inland where [zone] = '{UTMZoneName}'";
+                        using (var dt = new DataTable())
+                        {
+                            var adapter = new OleDbDataAdapter(query, con);
+                            adapter.Fill(dt);
+                            foreach (DataRow row in dt.Rows)
+                            {
+                                inlandPoints.Add(row["grid_name"].ToString());
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log(ex.Message, "FishingGrid.cs", "MinorGridIsInland");
+                    }
+                }
+                return inlandPoints;
             }
         }
 
