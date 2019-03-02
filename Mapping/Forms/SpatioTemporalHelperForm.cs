@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
+using System.Threading.Tasks;
 
 namespace FAD3.Mapping.Forms
 {
@@ -41,6 +42,18 @@ namespace FAD3.Mapping.Forms
             InitializeComponent();
         }
 
+        private void OnGridSummaryCellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.ColumnIndex == 0)
+            {
+                bool isVisible = (bool)dgSheetSummary[0, e.RowIndex].Value;
+                dgSheetSummary[0, e.RowIndex].Value = !isVisible;
+                MakeGridFromPoints.GridShapefile.Categories.Item[e.RowIndex].DrawingOptions.FillVisible = !isVisible;
+                MakeGridFromPoints.GridShapefile.Categories.Item[e.RowIndex].DrawingOptions.LineVisible = !isVisible;
+                global.MappingForm.MapControl.Redraw();
+            }
+        }
+
         private void OpenFile()
         {
             var fileOpen = new OpenFileDialog
@@ -56,6 +69,12 @@ namespace FAD3.Mapping.Forms
                 txtFile.Text = _dataSourceFileName;
                 MakeGridFromPoints.SingleDimensionCSV = _dataSourceFileName;
                 List<string> csvFields = MakeGridFromPoints.GetFields();
+
+                cboLatitude.Items.Clear();
+                cboLongitude.Items.Clear();
+                cboTemporal.Items.Clear();
+                cboValue.Items.Clear();
+
                 foreach (string item in csvFields)
                 {
                     cboLatitude.Items.Add(item);
@@ -69,6 +88,31 @@ namespace FAD3.Mapping.Forms
             cboLongitude.Enabled = true;
             cboValue.Enabled = true;
             cboTemporal.Enabled = true;
+        }
+
+        private async void ReadCVSFile()
+        {
+            bool result = await ReadCVSFileTask();
+            _dataPoints = MakeGridFromPoints.Coordinates.Count;
+            txtRows.Text = _dataPoints.ToString();
+
+            cboFirstData.Items.Clear();
+            cboLastData.Items.Clear();
+            foreach (var item in MakeGridFromPoints.DictTemporalValues.Keys)
+            {
+                cboFirstData.Items.Add(item);
+                cboLastData.Items.Add(item);
+            }
+            cboFirstData.Enabled = cboFirstData.Items.Count > 0;
+            cboLastData.Enabled = cboLastData.Items.Count > 0;
+
+            txtInlandPoints.Text = MakeGridFromPoints.InlandPointCount.ToString();
+            btnReadFile.Enabled = true;
+        }
+
+        private Task<bool> ReadCVSFileTask()
+        {
+            return Task.Run(() => MakeGridFromPoints.ParseSingleDimensionCSV());
         }
 
         private void OnButtonClick(object sender, EventArgs e)
@@ -108,22 +152,25 @@ namespace FAD3.Mapping.Forms
 
                     lblParameter.Text = cboValue.Text;
 
-                    MakeGridFromPoints.ParseSingleDimensionCSV();
-                    _dataPoints = MakeGridFromPoints.Coordinates.Count;
-                    txtRows.Text = _dataPoints.ToString();
+                    // if (MakeGridFromPoints.ParseSingleDimensionCSV())
+                    // {
+                    ReadCVSFile();
+                    //_dataPoints = MakeGridFromPoints.Coordinates.Count;
+                    //txtRows.Text = _dataPoints.ToString();
 
-                    cboFirstData.Items.Clear();
-                    cboLastData.Items.Clear();
-                    foreach (var item in MakeGridFromPoints.DictTemporalValues.Keys)
-                    {
-                        cboFirstData.Items.Add(item);
-                        cboLastData.Items.Add(item);
-                    }
-                    cboFirstData.Enabled = cboFirstData.Items.Count > 0;
-                    cboLastData.Enabled = cboLastData.Items.Count > 0;
+                    //cboFirstData.Items.Clear();
+                    //cboLastData.Items.Clear();
+                    //foreach (var item in MakeGridFromPoints.DictTemporalValues.Keys)
+                    //{
+                    //    cboFirstData.Items.Add(item);
+                    //    cboLastData.Items.Add(item);
+                    //}
+                    //cboFirstData.Enabled = cboFirstData.Items.Count > 0;
+                    //cboLastData.Enabled = cboLastData.Items.Count > 0;
 
-                    txtInlandPoints.Text = MakeGridFromPoints.InlandPointCount.ToString();
-                    btnReadFile.Enabled = true;
+                    //txtInlandPoints.Text = MakeGridFromPoints.InlandPointCount.ToString();
+                    //btnReadFile.Enabled = true;
+                    //}
                     break;
 
                 case "btnCategorize":

@@ -118,7 +118,7 @@ namespace FAD3.Mapping.Classes
             return csvFields;
         }
 
-        public static void ParseSingleDimensionCSV()
+        public static bool ParseSingleDimensionCSV()
         {
             _dictTemporalValues.Clear();
 
@@ -168,26 +168,29 @@ namespace FAD3.Mapping.Classes
                             {
                                 if (fields[TemporalColumn] != timeEra)
                                 {
+                                    if (inlandPoints != null)
+                                    {
+                                        inlandPoints.Clear();
+                                        inlandPoints = null;
+                                    }
                                     pointValueCopy = new Dictionary<int, double?>(pointValue);
                                     _dictTemporalValues.Add(timeEra, pointValueCopy);
                                     pointValue.Clear();
                                     readCoordinates = false;
                                     beginTimeEra = true;
                                     row = 0;
+                                    Console.WriteLine($"read period:  { timeEra} at {DateTime.Now.ToString()}");
                                 }
                             }
 
-                            //double? v = null;
                             if (double.TryParse(fields[ValuesColumn], out double vv))
                             {
                                 if (double.IsNaN(vv))
                                 {
                                     pointValue.Add(row, null);
-                                    //v = null;
                                 }
                                 else if (vv != -999999)
                                 {
-                                    //v = vv;
                                     pointValue.Add(row, vv);
                                 }
                                 else
@@ -195,10 +198,13 @@ namespace FAD3.Mapping.Classes
                                     pointValue.Add(row, null);
                                 }
                             }
-                            //pointValue.Add(row, v);
 
                             if (readCoordinates)
                             {
+                                if (Coordinates.Count == 0)
+                                {
+                                    Console.WriteLine($"start filling coordinates at  {DateTime.Now.ToString()}");
+                                }
                                 double lat = double.Parse(fields[LatitudeColumn]);
                                 double lon = double.Parse(fields[LongitudeColumn]);
                                 bool isInland = false;
@@ -225,9 +231,11 @@ namespace FAD3.Mapping.Classes
                 pointValueCopy = new Dictionary<int, double?>(pointValue);
                 _dictTemporalValues.Add(timeEra, pointValueCopy);
                 pointValue.Clear();
+                Console.WriteLine($"read period:  { timeEra} at {DateTime.Now.ToString()}");
             }
             sr.Close();
             sr = null;
+            return Coordinates.Count > 0;
         }
 
         public static void Reset()
