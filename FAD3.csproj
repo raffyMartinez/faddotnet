@@ -308,6 +308,7 @@
     <Compile Include="Mapping\Classes\JenksFisher.cs" />
     <Compile Include="Mapping\Classes\MakeGridFromPoints.cs" />
     <Compile Include="Mapping\Classes\OccurenceMapEventArgs.cs" />
+    <Compile Include="Mapping\Classes\ParseCSVEventArgs.cs" />
     <Compile Include="Mapping\Classes\ShapefileDiskStorageHelper.cs" />
     <Compile Include="Mapping\Forms\SelectUTMZoneForm.cs">
       <SubType>Form</SubType>
@@ -320,6 +321,12 @@
     </Compile>
     <Compile Include="Mapping\Forms\ShapefileClassificationSchemeForm.Designer.cs">
       <DependentUpon>ShapefileClassificationSchemeForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Mapping\Forms\SpatioTemporalHelperForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Mapping\Forms\SpatioTemporalHelperForm.Designer.cs">
+      <DependentUpon>SpatioTemporalHelperForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Mapping\Forms\SpatioTemporalMappingForm.cs">
       <SubType>Form</SubType>
@@ -776,6 +783,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Mapping\Forms\ShapefileClassificationSchemeForm.resx">
       <DependentUpon>ShapefileClassificationSchemeForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Mapping\Forms\SpatioTemporalHelperForm.resx">
+      <DependentUpon>SpatioTemporalHelperForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Mapping\Forms\SpatioTemporalMappingForm.resx">
       <DependentUpon>SpatioTemporalMappingForm.cs</DependentUpon>

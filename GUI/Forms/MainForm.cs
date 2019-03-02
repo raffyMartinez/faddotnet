@@ -1709,7 +1709,7 @@ namespace FAD3
                     break;
 
                 case "spatio-temporal":
-                    var spatioTemporalMappingForm = Mapping.Forms.SpatioTemporalMappingForm.GetInstance();
+                    var spatioTemporalMappingForm = Mapping.Forms.SpatioTemporalHelperForm.GetInstance();
                     if (spatioTemporalMappingForm.Visible)
                     {
                         spatioTemporalMappingForm.BringToFront();
@@ -1717,7 +1717,7 @@ namespace FAD3
                     else
 
                     {
-                        spatioTemporalMappingForm.Show(this);
+                        spatioTemporalMappingForm.Show(global.MappingForm);
                     }
                     break;
 

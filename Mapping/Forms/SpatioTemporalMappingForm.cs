@@ -13,6 +13,7 @@ using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using sds = Microsoft.Research.Science.Data;
 using FAD3.Database.Classes;
+using Microsoft.VisualBasic.FileIO;
 
 namespace FAD3.Mapping.Forms
 {
@@ -267,10 +268,17 @@ namespace FAD3.Mapping.Forms
                     MakeGridFromPoints.Reset();
                     txtRows.Text = "";
                     OpenFile();
-                    btnReadWorkbook.Enabled = _dataSourceFileName?.Length > 0 && File.Exists(_dataSourceFileName);
+                    btnReadFile.Enabled = _dataSourceFileName?.Length > 0 && File.Exists(_dataSourceFileName);
+                    if (Path.GetExtension(_dataSourceFileName) == ".csv")
+                    {
+                        sds.DataSet dataset = sds.DataSet.Open($"{_dataSourceFileName}?openMode=readOnly");
+                        if (dataset.Dimensions.Count == 1)
+                        {
+                        }
+                    }
                     break;
 
-                case "btnReadWorkbook":
+                case "btnReadFile":
                     listSheets.Items.Clear();
                     switch (Path.GetExtension(_dataSourceFileName))
                     {
@@ -279,7 +287,7 @@ namespace FAD3.Mapping.Forms
                             break;
 
                         case ".csv":
-                            btnReadWorkbook.Enabled = false;
+                            btnReadFile.Enabled = false;
                             try
                             {
                                 sds.DataSet dataset = sds.DataSet.Open($"{_dataSourceFileName}?openMode=readOnly");
@@ -302,6 +310,7 @@ namespace FAD3.Mapping.Forms
                                             MakeGridFromPoints.IgnoreInlandPoints = true;
                                         }
                                     }
+
                                     MakeGridFromPoints.SingleDimensionCSV = _dataSourceFileName;
                                     _dataPoints = MakeGridFromPoints.Coordinates.Count;
                                     txtRows.Text = _dataPoints.ToString();
@@ -314,10 +323,7 @@ namespace FAD3.Mapping.Forms
                                     {
                                         txtInlandPoints.Text = _inlandPointsCount.ToString();
                                     }
-                                    cboLatitude.Enabled = false;
-                                    cboLongitude.Enabled = false;
-                                    cboLongitude.Items.Add("Longitude");
-                                    cboLatitude.Items.Add("Latitude");
+
                                     cboLatitude.SelectedIndex = 0;
                                     cboLongitude.SelectedIndex = 0;
                                     foreach (var item in MakeGridFromPoints.DictTemporalValues)
@@ -331,7 +337,7 @@ namespace FAD3.Mapping.Forms
                                 else if (dataset.Dimensions.Count == 2)
                                 {
                                 }
-                                btnReadWorkbook.Enabled = true;
+                                btnReadFile.Enabled = true;
                                 btnCategorize.Enabled = true;
                             }
                             catch (Exception ex)
@@ -436,6 +442,16 @@ namespace FAD3.Mapping.Forms
                 case "btnExport":
                     ExportSheetsToText();
                     break;
+            }
+        }
+
+        private void OnCSVReadEvent(object sender, ParseCSVEventArgs e)
+        {
+            string[] fields = e.Fields;
+            for (int n = 0; n < fields.Length; n++)
+            {
+                cboLatitude.Items.Add(fields[n]);
+                cboLongitude.Items.Add(fields[n]);
             }
         }
 
@@ -611,20 +627,9 @@ namespace FAD3.Mapping.Forms
                 switch (Path.GetExtension(_dataSourceFileName))
                 {
                     case ".csv":
-                        foreach (string value in MakeGridFromPoints.DictTemporalValues[lblMappedSheet.Text].Values)
+                        foreach (double? value in MakeGridFromPoints.DictTemporalValues[lblMappedSheet.Text].Values)
                         {
-                            v = null;
-
-                            if (value == "NaN" || value == "-9999999.0")
-                            {
-                                v = null;
-                            }
-                            else if (double.TryParse(value, out double d))
-                            {
-                                v = d;
-                            }
-
-                            _columnValues.Add(v);
+                            _columnValues.Add(value);
                         }
                         break;
 
@@ -746,12 +751,14 @@ namespace FAD3.Mapping.Forms
                             if (includeColumn)
                             {
                                 listSelectedSheets.Items.Add(item);
-                                foreach (string value in MakeGridFromPoints.DictTemporalValues[item].Values)
+                                foreach (double? value in MakeGridFromPoints.DictTemporalValues[item].Values)
                                 {
-                                    if (value != "NaN" && double.TryParse(value, out double d))
-                                    {
-                                        _dataValues.Add(d);
-                                    }
+                                    //if (value != "NaN" && double.TryParse(value, out double d))
+                                    //{
+                                    //    _dataValues.Add(d);
+                                    //}
+                                    if (value != null)
+                                        _dataValues.Add((double)value);
                                 }
                             }
                             if (includeColumn && i == _lastColIndex)

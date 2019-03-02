@@ -6,6 +6,7 @@ using System.Drawing.Drawing2D;
 using System.Linq;
 using System.IO;
 using Microsoft.VisualBasic.FileIO;
+using System;
 
 namespace FAD3.Mapping.Classes
 {
@@ -19,7 +20,7 @@ namespace FAD3.Mapping.Classes
             get { return _meshShapeFile; }
         }
 
-        private static Dictionary<string, Dictionary<int, string>> _dictTemporalValues = new Dictionary<string, Dictionary<int, string>>();
+        private static Dictionary<string, Dictionary<int, double?>> _dictTemporalValues = new Dictionary<string, Dictionary<int, double?>>();
         public static Dictionary<int, (double latitude, double longitude, bool Inland)> Coordinates { get; set; }
         public static Shapefile PointShapefile { get; internal set; }                                         //pointshapefile of datapoints
         public static GeoProjection GeoProjection { get; set; }
@@ -39,6 +40,11 @@ namespace FAD3.Mapping.Classes
         public static fadUTMZone UTMZone { get; set; }
         public static bool CreateFileWithoutInlandPoints { get; set; }
         public static bool IgnoreInlandPoints { get; set; }
+
+        public static int LatitudeColumn { get; set; }
+        public static int LongitudeColumn { get; set; }
+        public static int TemporalColumn { get; set; }
+        public static int ValuesColumn { get; set; }
 
         static MakeGridFromPoints()
         {
@@ -67,7 +73,7 @@ namespace FAD3.Mapping.Classes
             }
         }
 
-        public static Dictionary<string, Dictionary<int, string>> DictTemporalValues
+        public static Dictionary<string, Dictionary<int, double?>> DictTemporalValues
         {
             get { return _dictTemporalValues; }
         }
@@ -78,18 +84,50 @@ namespace FAD3.Mapping.Classes
             set
             {
                 _singleDimensionCSV = value;
-                ParseSingleDimensionCSV();
+                //ParseSingleDimensionCSV();
             }
         }
 
-        private static void ParseSingleDimensionCSV()
+        public static List<string> GetFields()
         {
+            List<string> csvFields = new List<string>();
+            string[] fields;
+            string line;
+            StreamReader sr = new StreamReader(_singleDimensionCSV, true);
+
+            line = sr.ReadLine();
+            if (line != null)
+            {
+                TextFieldParser tfp = new TextFieldParser(new StringReader(line));
+                tfp.HasFieldsEnclosedInQuotes = true;
+                tfp.SetDelimiters(",");
+
+                while (!tfp.EndOfData)
+                {
+                    fields = tfp.ReadFields();
+                    for (int n = 0; n < fields.Length; n++)
+                    {
+                        csvFields.Add(fields[n]);
+                    }
+                }
+                tfp.Close();
+                tfp = null;
+                sr.Close();
+                sr = null;
+            }
+            return csvFields;
+        }
+
+        public static void ParseSingleDimensionCSV()
+        {
+            _dictTemporalValues.Clear();
+
             FishingGrid.UTMZone = UTMZone;
             Coordinates = new Dictionary<int, (double latitude, double longitude, bool Inland)>();
             StreamReader sr = new StreamReader(_singleDimensionCSV, true);
             string line;
-            Dictionary<int, string> pointValue = new Dictionary<int, string>();
-            Dictionary<int, string> pointValueCopy = new Dictionary<int, string>(pointValue);
+            Dictionary<int, double?> pointValue = new Dictionary<int, double?>();
+            Dictionary<int, double?> pointValueCopy = new Dictionary<int, double?>(pointValue);
             string timeEra = "";
             bool beginTimeEra = true;
             bool readCoordinates = true;
@@ -110,65 +148,86 @@ namespace FAD3.Mapping.Classes
                 while (!tfp.EndOfData)
                 {
                     fields = tfp.ReadFields();
-                    if (fields.Length == 5)
+
+                    switch (fields[TemporalColumn])
                     {
-                        switch (fields[0])
-                        {
-                            case "time":
-                            case "UTC":
-                                break;
+                        case "time":
+                        case "UTC":
+                        case "time (UTC)":
 
-                            default:
+                            break;
 
-                                if (beginTimeEra)
+                        default:
+
+                            if (beginTimeEra)
+                            {
+                                beginTimeEra = false;
+                                timeEra = fields[TemporalColumn];
+                            }
+                            else
+                            {
+                                if (fields[TemporalColumn] != timeEra)
                                 {
-                                    beginTimeEra = false;
-                                    timeEra = fields[0];
+                                    pointValueCopy = new Dictionary<int, double?>(pointValue);
+                                    _dictTemporalValues.Add(timeEra, pointValueCopy);
+                                    pointValue.Clear();
+                                    readCoordinates = false;
+                                    beginTimeEra = true;
+                                    row = 0;
+                                }
+                            }
+
+                            //double? v = null;
+                            if (double.TryParse(fields[ValuesColumn], out double vv))
+                            {
+                                if (double.IsNaN(vv))
+                                {
+                                    pointValue.Add(row, null);
+                                    //v = null;
+                                }
+                                else if (vv != -999999)
+                                {
+                                    //v = vv;
+                                    pointValue.Add(row, vv);
                                 }
                                 else
                                 {
-                                    if (fields[0] != timeEra)
-                                    {
-                                        pointValueCopy = new Dictionary<int, string>(pointValue);
-                                        _dictTemporalValues.Add(timeEra, pointValueCopy);
-                                        pointValue.Clear();
-                                        readCoordinates = false;
-                                        beginTimeEra = true;
-                                        row = 0;
-                                    }
+                                    pointValue.Add(row, null);
                                 }
+                            }
+                            //pointValue.Add(row, v);
 
-                                pointValue.Add(row, fields[4]);
-
-                                if (readCoordinates)
+                            if (readCoordinates)
+                            {
+                                double lat = double.Parse(fields[LatitudeColumn]);
+                                double lon = double.Parse(fields[LongitudeColumn]);
+                                bool isInland = false;
+                                if (!IgnoreInlandPoints)
                                 {
-                                    double lat = double.Parse(fields[2]);
-                                    double lon = double.Parse(fields[3]);
-                                    bool isInland = false;
-                                    if (!IgnoreInlandPoints)
+                                    var grid25Point = FishingGrid.LongLatToGrid25(lon, lat, UTMZone);
+                                    isInland = inlandPoints.Contains(grid25Point.grid25Grid);
+                                    if (isInland)
                                     {
-                                        var grid25Point = FishingGrid.LongLatToGrid25(lon, lat, UTMZone);
-                                        isInland = inlandPoints.Contains(grid25Point.grid25Grid);
-                                        if (isInland)
-                                        {
-                                            InlandPointCount++;
-                                        }
+                                        InlandPointCount++;
                                     }
-                                    Coordinates.Add(row, (lat, lon, isInland));
                                 }
-                                row++;
-                                break;
-                        }
+                                Coordinates.Add(row, (lat, lon, isInland));
+                            }
+                            row++;
+                            break;
                     }
                 }
                 tfp.Close();
+                tfp = null;
             }
             if (pointValue.Count > 0)
             {
-                pointValueCopy = new Dictionary<int, string>(pointValue);
+                pointValueCopy = new Dictionary<int, double?>(pointValue);
                 _dictTemporalValues.Add(timeEra, pointValueCopy);
                 pointValue.Clear();
             }
+            sr.Close();
+            sr = null;
         }
 
         public static void Reset()

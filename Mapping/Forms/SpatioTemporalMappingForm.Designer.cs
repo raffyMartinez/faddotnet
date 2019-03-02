@@ -36,6 +36,8 @@
             this.tabsPages = new System.Windows.Forms.TabControl();
             this.tabUI = new System.Windows.Forms.TabPage();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.txtInlandPoints = new System.Windows.Forms.TextBox();
+            this.label14 = new System.Windows.Forms.Label();
             this.cboLastData = new System.Windows.Forms.ComboBox();
             this.cboFirstData = new System.Windows.Forms.ComboBox();
             this.btnReadSheet = new System.Windows.Forms.Button();
@@ -49,11 +51,13 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.btnReadWorkbook = new System.Windows.Forms.Button();
+            this.btnReadFile = new System.Windows.Forms.Button();
             this.txtFile = new System.Windows.Forms.TextBox();
             this.chkHasHeader = new System.Windows.Forms.CheckBox();
             this.btnOpen = new System.Windows.Forms.Button();
             this.tabCategorize = new System.Windows.Forms.TabPage();
+            this.label8 = new System.Windows.Forms.Label();
+            this.cboClassificationScheme = new System.Windows.Forms.ComboBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.label12 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
@@ -73,6 +77,7 @@
             this.btnCategorize = new System.Windows.Forms.Button();
             this.txtCategoryCount = new System.Windows.Forms.TextBox();
             this.label10 = new System.Windows.Forms.Label();
+            this.icbColorScheme = new FAD3.Mapping.UserControls.ImageCombo();
             this.tabExtract = new System.Windows.Forms.TabPage();
             this.btnExport = new System.Windows.Forms.Button();
             this.graphSheet = new System.Windows.Forms.DataVisualization.Charting.Chart();
@@ -90,11 +95,6 @@
             this.btnInstructions = new System.Windows.Forms.Button();
             this.btnOk = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
-            this.txtInlandPoints = new System.Windows.Forms.TextBox();
-            this.label14 = new System.Windows.Forms.Label();
-            this.icbColorScheme = new FAD3.Mapping.UserControls.ImageCombo();
-            this.cboClassificationScheme = new System.Windows.Forms.ComboBox();
-            this.label8 = new System.Windows.Forms.Label();
             this.tabsPages.SuspendLayout();
             this.tabUI.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -121,14 +121,14 @@
             // tabUI
             // 
             this.tabUI.Controls.Add(this.groupBox1);
-            this.tabUI.Controls.Add(this.btnReadWorkbook);
+            this.tabUI.Controls.Add(this.btnReadFile);
             this.tabUI.Controls.Add(this.txtFile);
             this.tabUI.Controls.Add(this.chkHasHeader);
             this.tabUI.Controls.Add(this.btnOpen);
             this.tabUI.Location = new System.Drawing.Point(4, 22);
             this.tabUI.Name = "tabUI";
             this.tabUI.Padding = new System.Windows.Forms.Padding(3);
-            this.tabUI.Size = new System.Drawing.Size(462, 418);
+            this.tabUI.Size = new System.Drawing.Size(462, 455);
             this.tabUI.TabIndex = 1;
             this.tabUI.Text = "Start";
             this.tabUI.UseVisualStyleBackColor = true;
@@ -155,6 +155,25 @@
             this.groupBox1.Size = new System.Drawing.Size(434, 248);
             this.groupBox1.TabIndex = 20;
             this.groupBox1.TabStop = false;
+            // 
+            // txtInlandPoints
+            // 
+            this.txtInlandPoints.BackColor = System.Drawing.SystemColors.Window;
+            this.txtInlandPoints.Enabled = false;
+            this.txtInlandPoints.Location = new System.Drawing.Point(299, 213);
+            this.txtInlandPoints.Name = "txtInlandPoints";
+            this.txtInlandPoints.ReadOnly = true;
+            this.txtInlandPoints.Size = new System.Drawing.Size(113, 20);
+            this.txtInlandPoints.TabIndex = 23;
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(179, 216);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(67, 13);
+            this.label14.TabIndex = 22;
+            this.label14.Text = "Inland points";
             // 
             // cboLastData
             // 
@@ -279,16 +298,16 @@
             this.label1.TabIndex = 6;
             this.label1.Text = "Longitude data column";
             // 
-            // btnReadWorkbook
+            // btnReadFile
             // 
-            this.btnReadWorkbook.Enabled = false;
-            this.btnReadWorkbook.Location = new System.Drawing.Point(260, 69);
-            this.btnReadWorkbook.Name = "btnReadWorkbook";
-            this.btnReadWorkbook.Size = new System.Drawing.Size(98, 25);
-            this.btnReadWorkbook.TabIndex = 19;
-            this.btnReadWorkbook.Text = "Read workbook";
-            this.btnReadWorkbook.UseVisualStyleBackColor = true;
-            this.btnReadWorkbook.Click += new System.EventHandler(this.OnButtonClick);
+            this.btnReadFile.Enabled = false;
+            this.btnReadFile.Location = new System.Drawing.Point(260, 69);
+            this.btnReadFile.Name = "btnReadFile";
+            this.btnReadFile.Size = new System.Drawing.Size(63, 25);
+            this.btnReadFile.TabIndex = 19;
+            this.btnReadFile.Text = "Read file";
+            this.btnReadFile.UseVisualStyleBackColor = true;
+            this.btnReadFile.Click += new System.EventHandler(this.OnButtonClick);
             // 
             // txtFile
             // 
@@ -339,6 +358,23 @@
             this.tabCategorize.TabIndex = 3;
             this.tabCategorize.Text = "Categories";
             this.tabCategorize.UseVisualStyleBackColor = true;
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(12, 50);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(108, 13);
+            this.label8.TabIndex = 30;
+            this.label8.Text = "Classification scheme";
+            // 
+            // cboClassificationScheme
+            // 
+            this.cboClassificationScheme.FormattingEnabled = true;
+            this.cboClassificationScheme.Location = new System.Drawing.Point(126, 47);
+            this.cboClassificationScheme.Name = "cboClassificationScheme";
+            this.cboClassificationScheme.Size = new System.Drawing.Size(145, 21);
+            this.cboClassificationScheme.TabIndex = 29;
             // 
             // groupBox3
             // 
@@ -521,6 +557,21 @@
             this.label10.TabIndex = 15;
             this.label10.Text = "Number of categories";
             // 
+            // icbColorScheme
+            // 
+            this.icbColorScheme.Color1 = System.Drawing.Color.Gray;
+            this.icbColorScheme.Color2 = System.Drawing.Color.Gray;
+            this.icbColorScheme.ColorSchemes = null;
+            this.icbColorScheme.ComboStyle = FAD3.Mapping.UserControls.ImageComboStyle.ColorSchemeGraduated;
+            this.icbColorScheme.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.icbColorScheme.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.icbColorScheme.FormattingEnabled = true;
+            this.icbColorScheme.Location = new System.Drawing.Point(126, 16);
+            this.icbColorScheme.Name = "icbColorScheme";
+            this.icbColorScheme.OutlineColor = System.Drawing.Color.Black;
+            this.icbColorScheme.Size = new System.Drawing.Size(146, 21);
+            this.icbColorScheme.TabIndex = 24;
+            // 
             // tabExtract
             // 
             this.tabExtract.Controls.Add(this.btnExport);
@@ -534,7 +585,7 @@
             this.tabExtract.Location = new System.Drawing.Point(4, 22);
             this.tabExtract.Name = "tabExtract";
             this.tabExtract.Padding = new System.Windows.Forms.Padding(3);
-            this.tabExtract.Size = new System.Drawing.Size(462, 418);
+            this.tabExtract.Size = new System.Drawing.Size(462, 455);
             this.tabExtract.TabIndex = 2;
             this.tabExtract.Text = "Mapping";
             this.tabExtract.UseVisualStyleBackColor = true;
@@ -660,11 +711,10 @@
             // 
             // lblMappedSheet
             // 
-            this.lblMappedSheet.AutoSize = true;
             this.lblMappedSheet.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblMappedSheet.Location = new System.Drawing.Point(270, 381);
+            this.lblMappedSheet.Location = new System.Drawing.Point(200, 381);
             this.lblMappedSheet.Name = "lblMappedSheet";
-            this.lblMappedSheet.Size = new System.Drawing.Size(113, 18);
+            this.lblMappedSheet.Size = new System.Drawing.Size(254, 18);
             this.lblMappedSheet.TabIndex = 18;
             this.lblMappedSheet.Text = "Mapped sheet";
             this.lblMappedSheet.TextAlign = System.Drawing.ContentAlignment.TopCenter;
@@ -716,57 +766,6 @@
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.OnButtonClick);
-            // 
-            // txtInlandPoints
-            // 
-            this.txtInlandPoints.BackColor = System.Drawing.SystemColors.Window;
-            this.txtInlandPoints.Enabled = false;
-            this.txtInlandPoints.Location = new System.Drawing.Point(299, 213);
-            this.txtInlandPoints.Name = "txtInlandPoints";
-            this.txtInlandPoints.ReadOnly = true;
-            this.txtInlandPoints.Size = new System.Drawing.Size(113, 20);
-            this.txtInlandPoints.TabIndex = 23;
-            // 
-            // label14
-            // 
-            this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(179, 216);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(67, 13);
-            this.label14.TabIndex = 22;
-            this.label14.Text = "Inland points";
-            // 
-            // icbColorScheme
-            // 
-            this.icbColorScheme.Color1 = System.Drawing.Color.Gray;
-            this.icbColorScheme.Color2 = System.Drawing.Color.Gray;
-            this.icbColorScheme.ColorSchemes = null;
-            this.icbColorScheme.ComboStyle = FAD3.Mapping.UserControls.ImageComboStyle.ColorSchemeGraduated;
-            this.icbColorScheme.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-            this.icbColorScheme.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.icbColorScheme.FormattingEnabled = true;
-            this.icbColorScheme.Location = new System.Drawing.Point(126, 16);
-            this.icbColorScheme.Name = "icbColorScheme";
-            this.icbColorScheme.OutlineColor = System.Drawing.Color.Black;
-            this.icbColorScheme.Size = new System.Drawing.Size(146, 21);
-            this.icbColorScheme.TabIndex = 24;
-            // 
-            // cboClassificationScheme
-            // 
-            this.cboClassificationScheme.FormattingEnabled = true;
-            this.cboClassificationScheme.Location = new System.Drawing.Point(126, 47);
-            this.cboClassificationScheme.Name = "cboClassificationScheme";
-            this.cboClassificationScheme.Size = new System.Drawing.Size(145, 21);
-            this.cboClassificationScheme.TabIndex = 29;
-            // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(12, 50);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(108, 13);
-            this.label8.TabIndex = 30;
-            this.label8.Text = "Classification scheme";
             // 
             // SpatioTemporalMappingForm
             // 
@@ -823,7 +822,7 @@
         private System.Windows.Forms.ListBox listSheets;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Button btnReadSheet;
-        private System.Windows.Forms.Button btnReadWorkbook;
+        private System.Windows.Forms.Button btnReadFile;
         private System.Windows.Forms.ComboBox cboLastData;
         private System.Windows.Forms.ComboBox cboFirstData;
         private System.Windows.Forms.Label label7;
