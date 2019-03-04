@@ -10,6 +10,7 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using System.Threading.Tasks;
+using Microsoft.Win32;
 
 namespace FAD3.Mapping.Forms
 {
@@ -30,6 +31,8 @@ namespace FAD3.Mapping.Forms
         private int _selectionIndex = 0;
         private fadUTMZone _utmZone;
         private bool _createFileWithoutInland;
+        private bool _hasReadCoordinates;
+        private string _ERDDAPMetadataFolder;
 
         public static SpatioTemporalHelperForm GetInstance()
         {
@@ -54,12 +57,15 @@ namespace FAD3.Mapping.Forms
             }
         }
 
+        /// <summary>
+        /// opens a data file and fills up comboboxes with column headers
+        /// </summary>
         private void OpenFile()
         {
             var fileOpen = new OpenFileDialog
             {
                 Title = "Open MS Excel file",
-                Filter = "Excel file|*.xls;*.xlsx|CSV files|*.csv|All file types|*.*",
+                Filter = "CSV (comma separated values) file|*.csv|Excel file|*.xls;*.xlsx|All file types|*.*",
                 FilterIndex = 1
             };
             fileOpen.ShowDialog();
@@ -67,32 +73,47 @@ namespace FAD3.Mapping.Forms
             {
                 _dataSourceFileName = fileOpen.FileName;
                 txtFile.Text = _dataSourceFileName;
-                MakeGridFromPoints.SingleDimensionCSV = _dataSourceFileName;
-                List<string> csvFields = MakeGridFromPoints.GetFields();
-
-                cboLatitude.Items.Clear();
-                cboLongitude.Items.Clear();
-                cboTemporal.Items.Clear();
-                cboValue.Items.Clear();
-
-                foreach (string item in csvFields)
+                switch (Path.GetExtension(_dataSourceFileName))
                 {
-                    cboLatitude.Items.Add(item);
-                    cboLongitude.Items.Add(item);
-                    cboTemporal.Items.Add(item);
-                    cboValue.Items.Add(item);
+                    case ".xlsx":
+                        MessageBox.Show("Excel file not yet supported");
+                        break;
+
+                    case ".csv":
+                        MakeGridFromPoints.SingleDimensionCSV = _dataSourceFileName;
+                        List<string> csvFields = MakeGridFromPoints.GetFields();
+
+                        cboLatitude.Items.Clear();
+                        cboLongitude.Items.Clear();
+                        cboTemporal.Items.Clear();
+                        cboValue.Items.Clear();
+
+                        foreach (string item in csvFields)
+                        {
+                            cboLatitude.Items.Add(item);
+                            cboLongitude.Items.Add(item);
+                            cboTemporal.Items.Add(item);
+                            cboValue.Items.Add(item);
+                        }
+
+                        cboLatitude.Enabled = true;
+                        cboLongitude.Enabled = true;
+                        cboValue.Enabled = true;
+                        cboTemporal.Enabled = true;
+                        break;
                 }
             }
-
-            cboLatitude.Enabled = true;
-            cboLongitude.Enabled = true;
-            cboValue.Enabled = true;
-            cboTemporal.Enabled = true;
         }
 
-        private async void ReadCVSFile()
+        /// <summary>
+        /// calls method that reads csv data as a separate process. When reading of CSV is done, it will update the fields
+        /// </summary>
+        private async void ReadCSVFile()
         {
             bool result = await ReadCVSFileTask();
+
+            //this will wait until ReadCVSFileTask() is finished then
+            //the fields and comboBoxes is filled up
             _dataPoints = MakeGridFromPoints.Coordinates.Count;
             txtRows.Text = _dataPoints.ToString();
 
@@ -110,6 +131,10 @@ namespace FAD3.Mapping.Forms
             btnReadFile.Enabled = true;
         }
 
+        /// <summary>
+        /// reads CSV data as a separate process
+        /// </summary>
+        /// <returns></returns>
         private Task<bool> ReadCVSFileTask()
         {
             return Task.Run(() => MakeGridFromPoints.ParseSingleDimensionCSV());
@@ -119,6 +144,34 @@ namespace FAD3.Mapping.Forms
         {
             switch (((Button)sender).Name)
             {
+                case "btnGetMetadataFolder":
+                    var folderBrowser = new FolderBrowserDialog();
+                    folderBrowser.ShowNewFolderButton = true;
+                    if (_ERDDAPMetadataFolder == "")
+                    {
+                        folderBrowser.SelectedPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                    }
+                    else
+                    {
+                        folderBrowser.SelectedPath = _ERDDAPMetadataFolder;
+                    }
+                    folderBrowser.Description = "Locate folder containing ERDDAP metadata";
+                    DialogResult result = FolderBrowserLauncher.ShowFolderBrowser(folderBrowser);
+                    if (result == DialogResult.OK)
+                    {
+                        ERDDAPMetadataHandler.MetadataDirectory = folderBrowser.SelectedPath;
+                        ERDDAPMetadataHandler.ReadISO9115Metadata();
+                        ERDDAPMetadataHandler.SaveMetadataDirectorySetting(folderBrowser.SelectedPath);
+                    }
+                    break;
+
+                case "btnCreateExtent":
+
+                    MakeGridFromPoints.MapLayers = global.MappingForm.MapLayersHandler;
+                    MakeGridFromPoints.MakeExtentShapeFile();
+
+                    break;
+
                 case "btnOpen":
                     MakeGridFromPoints.Reset();
                     txtRows.Text = "";
@@ -126,6 +179,9 @@ namespace FAD3.Mapping.Forms
                     break;
 
                 case "btnReadFile":
+
+                    //reads the file that was opened
+
                     btnReadFile.Enabled = false;
                     MakeGridFromPoints.LatitudeColumn = cboLatitude.SelectedIndex;
                     MakeGridFromPoints.LongitudeColumn = cboLongitude.SelectedIndex;
@@ -152,33 +208,20 @@ namespace FAD3.Mapping.Forms
 
                     lblParameter.Text = cboValue.Text;
 
-                    // if (MakeGridFromPoints.ParseSingleDimensionCSV())
-                    // {
-                    ReadCVSFile();
-                    //_dataPoints = MakeGridFromPoints.Coordinates.Count;
-                    //txtRows.Text = _dataPoints.ToString();
+                    //reads csv data in a separate thread
+                    ReadCSVFile();
 
-                    //cboFirstData.Items.Clear();
-                    //cboLastData.Items.Clear();
-                    //foreach (var item in MakeGridFromPoints.DictTemporalValues.Keys)
-                    //{
-                    //    cboFirstData.Items.Add(item);
-                    //    cboLastData.Items.Add(item);
-                    //}
-                    //cboFirstData.Enabled = cboFirstData.Items.Count > 0;
-                    //cboLastData.Enabled = cboLastData.Items.Count > 0;
-
-                    //txtInlandPoints.Text = MakeGridFromPoints.InlandPointCount.ToString();
-                    //btnReadFile.Enabled = true;
-                    //}
                     break;
 
                 case "btnCategorize":
+                    btnCategorize.Enabled = false;
+
                     if (txtCategoryCount.Text.Length > 0 && cboLatitude.SelectedIndex >= 0
                         && cboLongitude.SelectedIndex >= 0 && cboFirstData.SelectedIndex >= 0
                         && cboLastData.SelectedIndex >= 0)
                     {
-                        listSheetsForMapping();
+                        lblStatus.Text = "Start categorizing data";
+                        listTimePeriodsForMapping();
                         listCoordinates();
                         getDataValues();
                         switch (cboClassificationScheme.Text)
@@ -205,25 +248,32 @@ namespace FAD3.Mapping.Forms
                                 }
                                 break;
                         }
+                        lblStatus.Text = "Finished categorizing data";
                     }
                     else
                     {
                         MessageBox.Show("Specify longitude, latitude, and, first and last data columns",
                                         "Required data is missing", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
-
+                    btnCategorize.Enabled = true;
                     break;
 
                 case "btnShowGridPoints":
+
+                    //shows the data points of the data
+
                     MapGridPoints();
                     break;
 
                 case "btnShowGridPolygons":
+
+                    //creates a grid with the datapoints at the center of the grid
+
                     if (MakeGridFromPoints.MakeGridShapefile())
                     {
                         _hasMesh = global.MappingForm.MapLayersHandler.AddLayer(MakeGridFromPoints.GridShapefile, "Mesh", uniqueLayer: true) > 0;
                     }
-                    listSelectedSheets.Enabled = _hasMesh;
+                    listSelectedTimePeriods.Enabled = _hasMesh;
                     break;
 
                 case "btnUp":
@@ -242,7 +292,9 @@ namespace FAD3.Mapping.Forms
             MakeGridFromPoints.GeoProjection = global.MappingForm.MapControl.GeoProjection;
 
             if (MakeGridFromPoints.MakePointShapefile(!MakeGridFromPoints.IgnoreInlandPoints))
+            {
                 global.MappingForm.MapLayersHandler.AddLayer(MakeGridFromPoints.PointShapefile, "Grid points");
+            }
         }
 
         /// <summary>
@@ -369,7 +421,7 @@ namespace FAD3.Mapping.Forms
 
         private void OnSelectedSheetsClick(object sender, EventArgs e)
         {
-            MapSheet(listSelectedSheets.SelectedIndices[0]);
+            MapSheet(listSelectedTimePeriods.SelectedIndices[0]);
         }
 
         private void listCoordinates()
@@ -414,9 +466,9 @@ namespace FAD3.Mapping.Forms
         /// <summary>
         /// lists the headers of the data columns in a listbox
         /// </summary>
-        private void listSheetsForMapping()
+        private void listTimePeriodsForMapping()
         {
-            listSelectedSheets.Items.Clear();
+            listSelectedTimePeriods.Items.Clear();
             var includeColumn = false;
             if (cboLongitude.Text.Length > 0 && cboLatitude.Text.Length > 0 && cboFirstData.Text.Length > 0 && cboLastData.Text.Length > 0)
             {
@@ -432,15 +484,13 @@ namespace FAD3.Mapping.Forms
                             }
                             if (includeColumn)
                             {
-                                listSelectedSheets.Items.Add(item);
+                                listSelectedTimePeriods.Items.Add(item);
                                 foreach (double? value in MakeGridFromPoints.DictTemporalValues[item].Values)
                                 {
-                                    //if (value != "NaN" && double.TryParse(value, out double d))
-                                    //{
-                                    //    _dataValues.Add(d);
-                                    //}
                                     if (value != null)
+                                    {
                                         _dataValues.Add((double)value);
+                                    }
                                 }
                             }
                             if (includeColumn && i == _lastColIndex)
@@ -461,7 +511,7 @@ namespace FAD3.Mapping.Forms
                             }
                             if (includeColumn)
                             {
-                                listSelectedSheets.Items.Add(_dt.Columns[n].ColumnName);
+                                listSelectedTimePeriods.Items.Add(_dt.Columns[n].ColumnName);
                             }
                             if (includeColumn && (n - 2) == _lastColIndex)
                             {
@@ -482,7 +532,7 @@ namespace FAD3.Mapping.Forms
         {
             if (_hasMesh)
             {
-                lblMappedSheet.Text = $"{listSelectedSheets.Items[index]}";
+                lblMappedSheet.Text = $"{listSelectedTimePeriods.Items[index]}";
                 lblMappedSheet.Visible = true;
                 _columnValues.Clear();       // _columnValues will contain values corresponding to the item we are interested in
                 double? v = null;
@@ -577,14 +627,14 @@ namespace FAD3.Mapping.Forms
             dgSheetSummary.ClearSelection();
         }
 
-        private void MapSheet(bool forward)
+        private void MapSheet(bool forward, bool fromArrowKeys = false)
         {
-            if (listSelectedSheets.Items.Count > 0)
+            if (listSelectedTimePeriods.Items.Count > 0)
             {
-                if (listSelectedSheets.SelectedItems.Count == 1)
+                if (listSelectedTimePeriods.SelectedItems.Count == 1)
                 {
-                    var selection = listSelectedSheets.SelectedIndex;
-                    listSelectedSheets.SelectedItems.Clear();
+                    var selection = listSelectedTimePeriods.SelectedIndex;
+                    listSelectedTimePeriods.SelectedItems.Clear();
                     if (forward)
                     {
                         selection++;
@@ -593,20 +643,31 @@ namespace FAD3.Mapping.Forms
                     {
                         selection--;
                     }
-                    listSelectedSheets.SelectedIndex = selection;
+                    if (selection == -1)
+                    {
+                        listSelectedTimePeriods.SelectedIndex = listSelectedTimePeriods.Items.Count - 1;
+                    }
+                    else if (listSelectedTimePeriods.Items.Count > selection)
+                    {
+                        listSelectedTimePeriods.SelectedIndex = selection;
+                    }
+                    else
+                    {
+                        listSelectedTimePeriods.SelectedIndex = 0;
+                    }
                     _selectionIndex = 0;
                 }
-                else if (listSelectedSheets.SelectedItems.Count == 0)
+                else if (listSelectedTimePeriods.SelectedItems.Count == 0)
                 {
-                    listSelectedSheets.SelectedIndex = 0;
+                    listSelectedTimePeriods.SelectedIndex = 0;
                     _selectionIndex = 0;
                 }
-                else if (listSelectedSheets.SelectedItems.Count > 1)
+                else if (listSelectedTimePeriods.SelectedItems.Count > 1)
                 {
                     if (forward)
                     {
                         _selectionIndex++;
-                        if (_selectionIndex == listSelectedSheets.SelectedIndices.Count)
+                        if (_selectionIndex == listSelectedTimePeriods.SelectedIndices.Count)
                         {
                             _selectionIndex = 0;
                         }
@@ -616,14 +677,14 @@ namespace FAD3.Mapping.Forms
                         _selectionIndex--;
                         if (_selectionIndex == -1)
                         {
-                            _selectionIndex = listSelectedSheets.SelectedIndices.Count - 1;
+                            _selectionIndex = listSelectedTimePeriods.SelectedIndices.Count - 1;
                         }
                     }
                 }
 
-                if (listSelectedSheets.SelectedIndices.Count > 0 && _selectionIndex <= listSelectedSheets.SelectedIndices.Count)
+                if (listSelectedTimePeriods.SelectedIndices.Count > 0 && _selectionIndex <= listSelectedTimePeriods.SelectedIndices.Count)
                 {
-                    MapSheet(listSelectedSheets.SelectedIndices[_selectionIndex]);
+                    MapSheet(listSelectedTimePeriods.SelectedIndices[_selectionIndex]);
                 }
                 else
                 {
@@ -680,6 +741,26 @@ namespace FAD3.Mapping.Forms
         /// <summary>
         /// Sizes all columns so that it fits the widest column content or the column header content
         /// </summary>
+        private void SizeColumns(ListView lv, bool init = true)
+        {
+            foreach (ColumnHeader c in lv.Columns)
+            {
+                if (init)
+                {
+                    c.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
+                    c.Tag = c.Width;
+                }
+                else
+                {
+                    c.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+                    c.Width = c.Width > (int)c.Tag ? c.Width : (int)c.Tag;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sizes all columns so that it fits the widest column content or the column header content
+        /// </summary>
         private void SizeColumns(DataGridView dg, bool init = true, bool PreserveLastColWidth = false)
         {
             var n = 0;
@@ -718,18 +799,158 @@ namespace FAD3.Mapping.Forms
                 icbColorScheme.SelectedIndex = 0;
             }
             txtCategoryCount.Text = "5";
-            listSelectedSheets.Enabled = false;
+            listSelectedTimePeriods.Enabled = false;
             Text = "Spatio-Temporal Mapping";
-
+            global.LoadFormSettings(this, true);
+            ERDDAPMetadataHandler.OnMetadataRead += OnERDDAPMetadataRead;
+            _ERDDAPMetadataFolder = ERDDAPMetadataHandler.GetMetadataDirectorySetting();
+            txtMetadataFolderPath.Text = _ERDDAPMetadataFolder;
+            if (_ERDDAPMetadataFolder.Length > 0)
+            {
+                ERDDAPMetadataHandler.MetadataDirectory = _ERDDAPMetadataFolder;
+                ERDDAPMetadataHandler.ReadISO9115Metadata();
+            }
             cboClassificationScheme.Items.Add("Jenk's-Fisher's");
             cboClassificationScheme.Items.Add("Equal interval");
             cboClassificationScheme.Items.Add("User defined");
             cboClassificationScheme.SelectedIndex = 0;
+            MakeGridFromPoints.OnCSVRead += OnReadCSV;
+            MakeGridFromPoints.OnExtentDefined += OnExtentDefined;
+
+            lvERDDAP.Columns.Clear();
+            lvERDDAP.Columns.Add("Title");
+            lvERDDAP.Columns.Add("Data start");
+            lvERDDAP.Columns.Add("Data end");
+            lvERDDAP.Columns.Add("Frequency");
+            lvERDDAP.Columns.Add("Cell size");
+            lvERDDAP.ShowItemToolTips = true;
+            SizeColumns(lvERDDAP);
+        }
+
+        private void OnERDDAPMetadataRead(object sender, ERDDAPMetadataReadEventArgs e)
+        {
+            var item = lvERDDAP.Items.Add(e.FileIdentifier, e.DataTitle, null);
+            item.SubItems.Add(e.DateStart.ToShortDateString());
+            item.SubItems.Add(e.DateEnd.ToShortDateString());
+            TimeSpan diff = e.DateEnd - e.DateStart;
+            double days = diff.TotalDays;
+            var freq = Math.Round(days / e.TemporalSize, MidpointRounding.AwayFromZero);
+            string dataFreq = "Daily";
+            switch (freq)
+            {
+                case 1:
+                    break;
+
+                case 30:
+                    dataFreq = "Monthly";
+                    break;
+
+                default:
+                    dataFreq = $"Every {freq} days";
+                    break;
+            }
+            item.SubItems.Add(dataFreq);
+            item.SubItems.Add(e.RowSize.ToString("N4"));
+            item.ToolTipText = e.DataAbstract;
+            SizeColumns(lvERDDAP, false);
+        }
+
+        private void OnExtentDefined(object sender, ExtentDraggedBoxEventArgs e)
+        {
+            txtMaxLat.Text = e.Top.ToString();
+            txtMinLat.Text = e.Bottom.ToString();
+            txtMinLon.Text = e.Left.ToString();
+            txtMaxLon.Text = e.Right.ToString();
+            if (!e.InDrag)
+            {
+                MakeGridFromPoints.MapLayers = global.MappingForm.MapLayersHandler;
+                MakeGridFromPoints.MakeExtentShapeFile();
+            }
+        }
+
+        private void OnReadCSV(object sender, ParseCSVEventArgs e)
+        {
+            try
+            {
+                lblStatus.Invoke((MethodInvoker)delegate
+                {
+                    if (!_hasReadCoordinates)
+                    {
+                        _hasReadCoordinates = true;
+                        txtRows.Text = e.CoordinatesRead.ToString();
+                    }
+
+                    if (e.FinishedRead)
+                    {
+                        lblStatus.Text = "Finished reading data";
+                    }
+                    else
+                    {
+                        lblStatus.Text = $"Read time period: {e.TimePeriodProcessed}";
+                    }
+                });
+            }
+            catch
+            {
+                //ignore
+            }
         }
 
         private void OnFormClosed(object sender, FormClosedEventArgs e)
         {
             _instance = null;
+            MakeGridFromPoints.Cleanup();
+        }
+
+        private void OnListBoxKeyDown(object sender, KeyEventArgs e)
+        {
+        }
+
+        private void OnListBoxKeyUp(object sender, KeyEventArgs e)
+        {
+            //switch (e.KeyCode)
+            //{
+            //    case Keys.Up:
+            //        MapSheet(false, fromArrowKeys: true);
+            //        break;
+
+            //    case Keys.Down:
+            //        MapSheet(true, fromArrowKeys: true);
+            //        break;
+            //}
+            OnSelectedSheetsClick(null, null);
+        }
+
+        private void UnsetMap()
+        {
+            if (MakeGridFromPoints.MapControl != null)
+            {
+                MakeGridFromPoints.UnsetMap();
+                global.MappingForm.MapInterActionHandler.EnableMapInteraction = true;
+            }
+        }
+
+        private void OnRadioButtonCheckChange(object sender, EventArgs e)
+        {
+            switch (((RadioButton)sender).Name)
+            {
+                case "rbtnUseSelectionBox":
+                    global.MappingForm.MapInterActionHandler.EnableMapInteraction = false;
+                    MakeGridFromPoints.MapControl = global.MappingForm.MapControl;
+                    break;
+
+                case "rbtnUseSelectedLayer":
+                    UnsetMap();
+                    break;
+
+                case "rbtnManual":
+                    UnsetMap();
+                    break;
+            }
+        }
+
+        private void OnTabMapIndexChanged(object sender, EventArgs e)
+        {
         }
     }
 }

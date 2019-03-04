@@ -1,5 +1,6 @@
 ﻿using FAD3.Database.Classes;
 using MapWinGIS;
+using AxMapWinGIS;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -45,6 +46,76 @@ namespace FAD3.Mapping.Classes
         public static int LongitudeColumn { get; set; }
         public static int TemporalColumn { get; set; }
         public static int ValuesColumn { get; set; }
+        private static AxMap _mapControl;
+        private static bool _enableMapInteraction;
+        private static Extents _extents;
+        public static int ExtentShapefileHandle { get; internal set; }
+
+        public static EventHandler<ParseCSVEventArgs> OnCSVRead;
+        public static EventHandler<ExtentDraggedBoxEventArgs> OnExtentDefined;
+        public static MapLayersHandler MapLayers { get; set; }
+
+        public static AxMap MapControl
+        {
+            get { return _mapControl; }
+            set
+            {
+                _mapControl = value;
+                _enableMapInteraction = true;
+                _mapControl.SelectBoxFinal += OnSelectBoxFinal;
+            }
+        }
+
+        public static void MakeExtentShapeFile()
+        {
+            var sfExtent = new Shapefile();
+            if (sfExtent.CreateNew("", ShpfileType.SHP_POLYGON))
+            {
+                var iShp = sfExtent.EditAddShape(_extents.ToShape());
+                if (iShp >= 0)
+                {
+                    ExtentShapefileHandle = MapLayers.AddLayer(sfExtent, "ExtentForDownload", true, true);
+                    sfExtent.DefaultDrawingOptions.FillVisible = false;
+                    sfExtent.DefaultDrawingOptions.LineWidth = 1.5f;
+                    sfExtent.DefaultDrawingOptions.LineColor = new Utils().ColorByName(tkMapColor.DarkBlue);
+                    MapControl.Redraw();
+                }
+            }
+        }
+
+        public static void Cleanup()
+        {
+            _extents = null;
+            Reset();
+            if (_mapControl != null)
+            {
+                _mapControl = null;
+            }
+        }
+
+        public static void UnsetMap()
+        {
+            _enableMapInteraction = false;
+            _mapControl.SelectBoxFinal -= OnSelectBoxFinal;
+            _mapControl = null;
+        }
+
+        private static void OnSelectBoxFinal(object sender, _DMapEvents_SelectBoxFinalEvent e)
+        {
+            if (_enableMapInteraction && MapControl.CursorMode == tkCursorMode.cmSelection)
+            {
+                _extents = new Extents();
+
+                double minLat = 0;
+                double maxLat = 0;
+                double minLon = 0;
+                double maxLon = 0;
+                _mapControl.PixelToDegrees(e.left, e.bottom, ref minLon, ref minLat);
+                _mapControl.PixelToDegrees(e.right, e.top, ref maxLon, ref maxLat);
+                _extents.SetBounds(minLon, minLat, 0, maxLon, maxLat, 0);
+                OnExtentDefined?.Invoke(null, new ExtentDraggedBoxEventArgs(maxLat, minLat, minLon, maxLon, false));
+            }
+        }
 
         static MakeGridFromPoints()
         {
@@ -176,10 +247,22 @@ namespace FAD3.Mapping.Classes
                                     pointValueCopy = new Dictionary<int, double?>(pointValue);
                                     _dictTemporalValues.Add(timeEra, pointValueCopy);
                                     pointValue.Clear();
+
+                                    EventHandler<ParseCSVEventArgs> readCSVEvent = OnCSVRead;
+                                    if (readCSVEvent != null)
+                                    {
+                                        if (readCoordinates)
+                                        {
+                                            readCSVEvent(null, new ParseCSVEventArgs(Coordinates.Count, timeEra));
+                                        }
+                                        else
+                                        {
+                                            readCSVEvent(null, new ParseCSVEventArgs(timeEra, false));
+                                        }
+                                    }
                                     readCoordinates = false;
                                     beginTimeEra = true;
                                     row = 0;
-                                    Console.WriteLine($"read period:  { timeEra} at {DateTime.Now.ToString()}");
                                 }
                             }
 
@@ -201,10 +284,6 @@ namespace FAD3.Mapping.Classes
 
                             if (readCoordinates)
                             {
-                                if (Coordinates.Count == 0)
-                                {
-                                    Console.WriteLine($"start filling coordinates at  {DateTime.Now.ToString()}");
-                                }
                                 double lat = double.Parse(fields[LatitudeColumn]);
                                 double lon = double.Parse(fields[LongitudeColumn]);
                                 bool isInland = false;
@@ -231,7 +310,8 @@ namespace FAD3.Mapping.Classes
                 pointValueCopy = new Dictionary<int, double?>(pointValue);
                 _dictTemporalValues.Add(timeEra, pointValueCopy);
                 pointValue.Clear();
-                Console.WriteLine($"read period:  { timeEra} at {DateTime.Now.ToString()}");
+
+                OnCSVRead?.Invoke(null, new ParseCSVEventArgs(timeEra, true));
             }
             sr.Close();
             sr = null;
@@ -487,7 +567,7 @@ namespace FAD3.Mapping.Classes
         }
 
         /// <summary>
-        /// make a point shapefile using the coordinates in the data
+        /// make a point shapefile using the coordinates in the data and setup its appearance
         /// </summary>
         /// <returns></returns>
         public static bool MakePointShapefile(bool ShowInland = false)
@@ -571,7 +651,7 @@ namespace FAD3.Mapping.Classes
                     sf.Categories.Item[0].DrawingOptions.PointShape = tkPointShapeType.ptShapeCircle;
                     sf.Categories.Item[0].DrawingOptions.FillColor = new Utils().ColorByName(tkMapColor.Red);
                     sf.Categories.Item[0].DrawingOptions.PointShape = tkPointShapeType.ptShapeCircle;
-                    sf.Categories.Item[0].DrawingOptions.PointSize = 5;
+                    sf.Categories.Item[0].DrawingOptions.PointSize = 4;
                     sf.Categories.Item[0].DrawingOptions.LineVisible = false;
 
                     sf.Categories.Add("NotInland");
@@ -579,7 +659,7 @@ namespace FAD3.Mapping.Classes
                     sf.Categories.Item[1].DrawingOptions.PointShape = tkPointShapeType.ptShapeCircle;
                     sf.Categories.Item[1].DrawingOptions.FillColor = new Utils().ColorByName(tkMapColor.Blue);
                     sf.Categories.Item[1].DrawingOptions.PointShape = tkPointShapeType.ptShapeCircle;
-                    sf.Categories.Item[1].DrawingOptions.PointSize = 5;
+                    sf.Categories.Item[1].DrawingOptions.PointSize = 4;
                     sf.Categories.Item[1].DrawingOptions.LineVisible = false;
 
                     sf.Categories.ApplyExpressions();

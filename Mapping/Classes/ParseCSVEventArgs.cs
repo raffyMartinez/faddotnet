@@ -13,6 +13,10 @@ namespace FAD3.Mapping.Classes
         public int LongitudeField { get; internal set; }
         public string[] Fields { get; internal set; }
         public bool ProceedRead { get; internal set; }
+        public string TimePeriodProcessed { get; internal set; }
+        public int CoordinatesRead { get; internal set; }
+        public bool FinishedRead { get; internal set; }
+        public string StatusText { get; internal set; }
 
         public void SetColumns(int latitudeColumn, int longitudeColumn)
         {
@@ -31,6 +35,23 @@ namespace FAD3.Mapping.Classes
         public ParseCSVEventArgs(string[] fields)
         {
             Fields = fields;
+        }
+
+        public ParseCSVEventArgs(int coordinatesRead, string timePeriod)
+        {
+            CoordinatesRead = coordinatesRead;
+            TimePeriodProcessed = timePeriod;
+        }
+
+        public ParseCSVEventArgs(string timePeriod, bool finishRead)
+        {
+            TimePeriodProcessed = timePeriod;
+            FinishedRead = finishRead;
+        }
+
+        public ParseCSVEventArgs(string statusText)
+        {
+            StatusText = statusText;
         }
     }
 }

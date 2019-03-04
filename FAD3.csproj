@@ -298,6 +298,8 @@
     </Compile>
     <Compile Include="Mapping\Classes\Colors.cs" />
     <Compile Include="Mapping\Classes\ColorSchemes.cs" />
+    <Compile Include="Mapping\Classes\ERDDAPMetadataHandler.cs" />
+    <Compile Include="Mapping\Classes\ERDDAPMetadataReadEventArgs.cs" />
     <Compile Include="Mapping\Classes\ExtentDraggedBoxEventArgs.cs" />
     <Compile Include="Mapping\Classes\Grid25LayoutHelper.cs" />
     <Compile Include="Mapping\Classes\Grid25LayoutHelperEventArgs.cs" />

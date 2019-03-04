@@ -76,7 +76,6 @@
             this.btnCategorize = new System.Windows.Forms.Button();
             this.txtCategoryCount = new System.Windows.Forms.TextBox();
             this.label10 = new System.Windows.Forms.Label();
-            this.icbColorScheme = new FAD3.Mapping.UserControls.ImageCombo();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.lblParameter = new System.Windows.Forms.Label();
             this.btnExport = new System.Windows.Forms.Button();
@@ -90,9 +89,32 @@
             this.colCount = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colPercent = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.lblMappedSheet = new System.Windows.Forms.Label();
-            this.listSelectedSheets = new System.Windows.Forms.ListBox();
+            this.listSelectedTimePeriods = new System.Windows.Forms.ListBox();
             this.label15 = new System.Windows.Forms.Label();
+            this.tabDownload = new System.Windows.Forms.TabPage();
             this.btnOk = new System.Windows.Forms.Button();
+            this.lblStatus = new System.Windows.Forms.Label();
+            this.icbColorScheme = new FAD3.Mapping.UserControls.ImageCombo();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.rbtnUseSelectionBox = new System.Windows.Forms.RadioButton();
+            this.rbtnUseSelectedLayer = new System.Windows.Forms.RadioButton();
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.btnCreateExtent = new System.Windows.Forms.Button();
+            this.rbtnManual = new System.Windows.Forms.RadioButton();
+            this.label16 = new System.Windows.Forms.Label();
+            this.label17 = new System.Windows.Forms.Label();
+            this.label18 = new System.Windows.Forms.Label();
+            this.label19 = new System.Windows.Forms.Label();
+            this.txtMinLat = new System.Windows.Forms.TextBox();
+            this.txtMaxLat = new System.Windows.Forms.TextBox();
+            this.txtMinLon = new System.Windows.Forms.TextBox();
+            this.txtMaxLon = new System.Windows.Forms.TextBox();
+            this.tabCitation = new System.Windows.Forms.TabPage();
+            this.lvERDDAP = new System.Windows.Forms.ListView();
+            this.btnDownload = new System.Windows.Forms.Button();
+            this.label20 = new System.Windows.Forms.Label();
+            this.txtMetadataFolderPath = new System.Windows.Forms.TextBox();
+            this.btnGetMetadataFolder = new System.Windows.Forms.Button();
             this.tabMap.SuspendLayout();
             this.tabStart.SuspendLayout();
             this.tabCategorize.SuspendLayout();
@@ -102,6 +124,9 @@
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.graphSheet)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgSheetSummary)).BeginInit();
+            this.tabDownload.SuspendLayout();
+            this.groupBox1.SuspendLayout();
+            this.groupBox4.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabMap
@@ -109,11 +134,14 @@
             this.tabMap.Controls.Add(this.tabStart);
             this.tabMap.Controls.Add(this.tabCategorize);
             this.tabMap.Controls.Add(this.tabPage1);
+            this.tabMap.Controls.Add(this.tabDownload);
+            this.tabMap.Controls.Add(this.tabCitation);
             this.tabMap.Location = new System.Drawing.Point(2, 38);
             this.tabMap.Name = "tabMap";
             this.tabMap.SelectedIndex = 0;
             this.tabMap.Size = new System.Drawing.Size(454, 477);
             this.tabMap.TabIndex = 0;
+            this.tabMap.SelectedIndexChanged += new System.EventHandler(this.OnTabMapIndexChanged);
             // 
             // tabStart
             // 
@@ -209,18 +237,18 @@
             this.label6.AutoSize = true;
             this.label6.Location = new System.Drawing.Point(33, 351);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(88, 13);
+            this.label6.Size = new System.Drawing.Size(80, 13);
             this.label6.TabIndex = 29;
-            this.label6.Text = "Last data column";
+            this.label6.Text = "End time period";
             // 
             // label7
             // 
             this.label7.AutoSize = true;
             this.label7.Location = new System.Drawing.Point(33, 315);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(87, 13);
+            this.label7.Size = new System.Drawing.Size(83, 13);
             this.label7.TabIndex = 28;
-            this.label7.Text = "First data column";
+            this.label7.Text = "Start time period";
             // 
             // btnReadFile
             // 
@@ -553,21 +581,6 @@
             this.label10.TabIndex = 31;
             this.label10.Text = "Number of categories";
             // 
-            // icbColorScheme
-            // 
-            this.icbColorScheme.Color1 = System.Drawing.Color.Gray;
-            this.icbColorScheme.Color2 = System.Drawing.Color.Gray;
-            this.icbColorScheme.ColorSchemes = null;
-            this.icbColorScheme.ComboStyle = FAD3.Mapping.UserControls.ImageComboStyle.ColorSchemeGraduated;
-            this.icbColorScheme.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-            this.icbColorScheme.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.icbColorScheme.FormattingEnabled = true;
-            this.icbColorScheme.Location = new System.Drawing.Point(112, 6);
-            this.icbColorScheme.Name = "icbColorScheme";
-            this.icbColorScheme.OutlineColor = System.Drawing.Color.Black;
-            this.icbColorScheme.Size = new System.Drawing.Size(146, 21);
-            this.icbColorScheme.TabIndex = 36;
-            // 
             // tabPage1
             // 
             this.tabPage1.Controls.Add(this.lblParameter);
@@ -577,7 +590,7 @@
             this.tabPage1.Controls.Add(this.btnUp);
             this.tabPage1.Controls.Add(this.dgSheetSummary);
             this.tabPage1.Controls.Add(this.lblMappedSheet);
-            this.tabPage1.Controls.Add(this.listSelectedSheets);
+            this.tabPage1.Controls.Add(this.listSelectedTimePeriods);
             this.tabPage1.Controls.Add(this.label15);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
@@ -725,15 +738,17 @@
             this.lblMappedSheet.Text = "Mapped sheet";
             this.lblMappedSheet.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
-            // listSelectedSheets
+            // listSelectedTimePeriods
             // 
-            this.listSelectedSheets.FormattingEnabled = true;
-            this.listSelectedSheets.Location = new System.Drawing.Point(5, 50);
-            this.listSelectedSheets.Name = "listSelectedSheets";
-            this.listSelectedSheets.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-            this.listSelectedSheets.Size = new System.Drawing.Size(143, 303);
-            this.listSelectedSheets.TabIndex = 26;
-            this.listSelectedSheets.Click += new System.EventHandler(this.OnSelectedSheetsClick);
+            this.listSelectedTimePeriods.FormattingEnabled = true;
+            this.listSelectedTimePeriods.Location = new System.Drawing.Point(5, 50);
+            this.listSelectedTimePeriods.Name = "listSelectedTimePeriods";
+            this.listSelectedTimePeriods.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
+            this.listSelectedTimePeriods.Size = new System.Drawing.Size(143, 303);
+            this.listSelectedTimePeriods.TabIndex = 26;
+            this.listSelectedTimePeriods.Click += new System.EventHandler(this.OnSelectedSheetsClick);
+            this.listSelectedTimePeriods.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnListBoxKeyDown);
+            this.listSelectedTimePeriods.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OnListBoxKeyUp);
             // 
             // label15
             // 
@@ -744,21 +759,256 @@
             this.label15.TabIndex = 25;
             this.label15.Text = "Sheets";
             // 
+            // tabDownload
+            // 
+            this.tabDownload.Controls.Add(this.groupBox4);
+            this.tabDownload.Controls.Add(this.groupBox1);
+            this.tabDownload.Location = new System.Drawing.Point(4, 22);
+            this.tabDownload.Name = "tabDownload";
+            this.tabDownload.Padding = new System.Windows.Forms.Padding(3);
+            this.tabDownload.Size = new System.Drawing.Size(446, 451);
+            this.tabDownload.TabIndex = 3;
+            this.tabDownload.Text = "Download";
+            this.tabDownload.UseVisualStyleBackColor = true;
+            // 
             // btnOk
             // 
             this.btnOk.Enabled = false;
-            this.btnOk.Location = new System.Drawing.Point(368, 526);
+            this.btnOk.Location = new System.Drawing.Point(389, 526);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(63, 25);
             this.btnOk.TabIndex = 28;
             this.btnOk.Text = "Ok";
             this.btnOk.UseVisualStyleBackColor = true;
             // 
+            // lblStatus
+            // 
+            this.lblStatus.Location = new System.Drawing.Point(3, 532);
+            this.lblStatus.Name = "lblStatus";
+            this.lblStatus.Size = new System.Drawing.Size(343, 18);
+            this.lblStatus.TabIndex = 29;
+            // 
+            // icbColorScheme
+            // 
+            this.icbColorScheme.Color1 = System.Drawing.Color.Gray;
+            this.icbColorScheme.Color2 = System.Drawing.Color.Gray;
+            this.icbColorScheme.ColorSchemes = null;
+            this.icbColorScheme.ComboStyle = FAD3.Mapping.UserControls.ImageComboStyle.ColorSchemeGraduated;
+            this.icbColorScheme.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.icbColorScheme.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.icbColorScheme.FormattingEnabled = true;
+            this.icbColorScheme.Location = new System.Drawing.Point(112, 6);
+            this.icbColorScheme.Name = "icbColorScheme";
+            this.icbColorScheme.OutlineColor = System.Drawing.Color.Black;
+            this.icbColorScheme.Size = new System.Drawing.Size(146, 21);
+            this.icbColorScheme.TabIndex = 36;
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.txtMaxLon);
+            this.groupBox1.Controls.Add(this.txtMinLon);
+            this.groupBox1.Controls.Add(this.txtMaxLat);
+            this.groupBox1.Controls.Add(this.txtMinLat);
+            this.groupBox1.Controls.Add(this.label19);
+            this.groupBox1.Controls.Add(this.label18);
+            this.groupBox1.Controls.Add(this.label17);
+            this.groupBox1.Controls.Add(this.label16);
+            this.groupBox1.Controls.Add(this.rbtnManual);
+            this.groupBox1.Controls.Add(this.btnCreateExtent);
+            this.groupBox1.Controls.Add(this.rbtnUseSelectedLayer);
+            this.groupBox1.Controls.Add(this.rbtnUseSelectionBox);
+            this.groupBox1.Location = new System.Drawing.Point(6, 19);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(432, 145);
+            this.groupBox1.TabIndex = 0;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Set extents";
+            // 
+            // rbtnUseSelectionBox
+            // 
+            this.rbtnUseSelectionBox.AutoSize = true;
+            this.rbtnUseSelectionBox.Location = new System.Drawing.Point(12, 22);
+            this.rbtnUseSelectionBox.Name = "rbtnUseSelectionBox";
+            this.rbtnUseSelectionBox.Size = new System.Drawing.Size(118, 17);
+            this.rbtnUseSelectionBox.TabIndex = 0;
+            this.rbtnUseSelectionBox.TabStop = true;
+            this.rbtnUseSelectionBox.Text = "Use a selection box";
+            this.rbtnUseSelectionBox.UseVisualStyleBackColor = true;
+            this.rbtnUseSelectionBox.CheckedChanged += new System.EventHandler(this.OnRadioButtonCheckChange);
+            // 
+            // rbtnUseSelectedLayer
+            // 
+            this.rbtnUseSelectedLayer.AutoSize = true;
+            this.rbtnUseSelectedLayer.Location = new System.Drawing.Point(12, 45);
+            this.rbtnUseSelectedLayer.Name = "rbtnUseSelectedLayer";
+            this.rbtnUseSelectedLayer.Size = new System.Drawing.Size(112, 17);
+            this.rbtnUseSelectedLayer.TabIndex = 1;
+            this.rbtnUseSelectedLayer.TabStop = true;
+            this.rbtnUseSelectedLayer.Text = "Use selected layer";
+            this.rbtnUseSelectedLayer.UseVisualStyleBackColor = true;
+            this.rbtnUseSelectedLayer.CheckedChanged += new System.EventHandler(this.OnRadioButtonCheckChange);
+            // 
+            // groupBox4
+            // 
+            this.groupBox4.Controls.Add(this.txtMetadataFolderPath);
+            this.groupBox4.Controls.Add(this.label20);
+            this.groupBox4.Controls.Add(this.btnGetMetadataFolder);
+            this.groupBox4.Controls.Add(this.btnDownload);
+            this.groupBox4.Controls.Add(this.lvERDDAP);
+            this.groupBox4.Location = new System.Drawing.Point(6, 181);
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.Size = new System.Drawing.Size(432, 264);
+            this.groupBox4.TabIndex = 1;
+            this.groupBox4.TabStop = false;
+            this.groupBox4.Text = "Data to download";
+            // 
+            // btnCreateExtent
+            // 
+            this.btnCreateExtent.Location = new System.Drawing.Point(22, 99);
+            this.btnCreateExtent.Name = "btnCreateExtent";
+            this.btnCreateExtent.Size = new System.Drawing.Size(78, 27);
+            this.btnCreateExtent.TabIndex = 2;
+            this.btnCreateExtent.Text = "Create extent";
+            this.btnCreateExtent.UseVisualStyleBackColor = true;
+            this.btnCreateExtent.Click += new System.EventHandler(this.OnButtonClick);
+            // 
+            // rbtnManual
+            // 
+            this.rbtnManual.AutoSize = true;
+            this.rbtnManual.Location = new System.Drawing.Point(12, 68);
+            this.rbtnManual.Name = "rbtnManual";
+            this.rbtnManual.Size = new System.Drawing.Size(100, 17);
+            this.rbtnManual.TabIndex = 3;
+            this.rbtnManual.TabStop = true;
+            this.rbtnManual.Text = "Define manually";
+            this.rbtnManual.UseVisualStyleBackColor = true;
+            this.rbtnManual.CheckedChanged += new System.EventHandler(this.OnRadioButtonCheckChange);
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(154, 25);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(64, 13);
+            this.label16.TabIndex = 4;
+            this.label16.Text = "Min. latitude";
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Location = new System.Drawing.Point(154, 53);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(67, 13);
+            this.label17.TabIndex = 5;
+            this.label17.Text = "Max. latitude";
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(154, 79);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(73, 13);
+            this.label18.TabIndex = 6;
+            this.label18.Text = "Min. longitude";
+            // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
+            this.label19.Location = new System.Drawing.Point(154, 106);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(76, 13);
+            this.label19.TabIndex = 7;
+            this.label19.Text = "Max. longitude";
+            // 
+            // txtMinLat
+            // 
+            this.txtMinLat.Location = new System.Drawing.Point(236, 22);
+            this.txtMinLat.Name = "txtMinLat";
+            this.txtMinLat.Size = new System.Drawing.Size(155, 20);
+            this.txtMinLat.TabIndex = 8;
+            // 
+            // txtMaxLat
+            // 
+            this.txtMaxLat.Location = new System.Drawing.Point(236, 50);
+            this.txtMaxLat.Name = "txtMaxLat";
+            this.txtMaxLat.Size = new System.Drawing.Size(155, 20);
+            this.txtMaxLat.TabIndex = 9;
+            // 
+            // txtMinLon
+            // 
+            this.txtMinLon.Location = new System.Drawing.Point(236, 76);
+            this.txtMinLon.Name = "txtMinLon";
+            this.txtMinLon.Size = new System.Drawing.Size(155, 20);
+            this.txtMinLon.TabIndex = 10;
+            // 
+            // txtMaxLon
+            // 
+            this.txtMaxLon.Location = new System.Drawing.Point(236, 103);
+            this.txtMaxLon.Name = "txtMaxLon";
+            this.txtMaxLon.Size = new System.Drawing.Size(155, 20);
+            this.txtMaxLon.TabIndex = 11;
+            // 
+            // tabCitation
+            // 
+            this.tabCitation.Location = new System.Drawing.Point(4, 22);
+            this.tabCitation.Name = "tabCitation";
+            this.tabCitation.Padding = new System.Windows.Forms.Padding(3);
+            this.tabCitation.Size = new System.Drawing.Size(446, 451);
+            this.tabCitation.TabIndex = 4;
+            this.tabCitation.Text = "Citation";
+            this.tabCitation.UseVisualStyleBackColor = true;
+            // 
+            // lvERDDAP
+            // 
+            this.lvERDDAP.CheckBoxes = true;
+            this.lvERDDAP.Location = new System.Drawing.Point(12, 50);
+            this.lvERDDAP.Name = "lvERDDAP";
+            this.lvERDDAP.Size = new System.Drawing.Size(408, 175);
+            this.lvERDDAP.TabIndex = 0;
+            this.lvERDDAP.UseCompatibleStateImageBehavior = false;
+            this.lvERDDAP.View = System.Windows.Forms.View.Details;
+            // 
+            // btnDownload
+            // 
+            this.btnDownload.Location = new System.Drawing.Point(347, 231);
+            this.btnDownload.Name = "btnDownload";
+            this.btnDownload.Size = new System.Drawing.Size(73, 27);
+            this.btnDownload.TabIndex = 12;
+            this.btnDownload.Text = "Download";
+            this.btnDownload.UseVisualStyleBackColor = true;
+            // 
+            // label20
+            // 
+            this.label20.AutoSize = true;
+            this.label20.Location = new System.Drawing.Point(14, 25);
+            this.label20.Name = "label20";
+            this.label20.Size = new System.Drawing.Size(36, 13);
+            this.label20.TabIndex = 15;
+            this.label20.Text = "Folder";
+            // 
+            // txtMetadataFolderPath
+            // 
+            this.txtMetadataFolderPath.Location = new System.Drawing.Point(58, 20);
+            this.txtMetadataFolderPath.Name = "txtMetadataFolderPath";
+            this.txtMetadataFolderPath.Size = new System.Drawing.Size(325, 20);
+            this.txtMetadataFolderPath.TabIndex = 16;
+            // 
+            // btnGetMetadataFolder
+            // 
+            this.btnGetMetadataFolder.Location = new System.Drawing.Point(393, 20);
+            this.btnGetMetadataFolder.Name = "btnGetMetadataFolder";
+            this.btnGetMetadataFolder.Size = new System.Drawing.Size(27, 24);
+            this.btnGetMetadataFolder.TabIndex = 14;
+            this.btnGetMetadataFolder.Text = "F";
+            this.btnGetMetadataFolder.UseVisualStyleBackColor = true;
+            this.btnGetMetadataFolder.Click += new System.EventHandler(this.OnButtonClick);
+            // 
             // SpatioTemporalHelperForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(456, 567);
+            this.Controls.Add(this.lblStatus);
             this.Controls.Add(this.btnOk);
             this.Controls.Add(this.tabMap);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
@@ -779,6 +1029,11 @@
             this.tabPage1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.graphSheet)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgSheetSummary)).EndInit();
+            this.tabDownload.ResumeLayout(false);
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
+            this.groupBox4.ResumeLayout(false);
+            this.groupBox4.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -841,9 +1096,31 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn colCount;
         private System.Windows.Forms.DataGridViewTextBoxColumn colPercent;
         private System.Windows.Forms.Label lblMappedSheet;
-        private System.Windows.Forms.ListBox listSelectedSheets;
+        private System.Windows.Forms.ListBox listSelectedTimePeriods;
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.Label lblParameter;
         private System.Windows.Forms.ImageList imageList1;
+        private System.Windows.Forms.Label lblStatus;
+        private System.Windows.Forms.TabPage tabDownload;
+        private System.Windows.Forms.GroupBox groupBox4;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.RadioButton rbtnUseSelectedLayer;
+        private System.Windows.Forms.RadioButton rbtnUseSelectionBox;
+        private System.Windows.Forms.TextBox txtMaxLon;
+        private System.Windows.Forms.TextBox txtMinLon;
+        private System.Windows.Forms.TextBox txtMaxLat;
+        private System.Windows.Forms.TextBox txtMinLat;
+        private System.Windows.Forms.Label label19;
+        private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.Label label17;
+        private System.Windows.Forms.Label label16;
+        private System.Windows.Forms.RadioButton rbtnManual;
+        private System.Windows.Forms.Button btnCreateExtent;
+        private System.Windows.Forms.TabPage tabCitation;
+        private System.Windows.Forms.Button btnDownload;
+        private System.Windows.Forms.ListView lvERDDAP;
+        private System.Windows.Forms.TextBox txtMetadataFolderPath;
+        private System.Windows.Forms.Label label20;
+        private System.Windows.Forms.Button btnGetMetadataFolder;
     }
 }
