@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SpatioTemporalHelperForm));
             this.tabMap = new System.Windows.Forms.TabControl();
             this.tabStart = new System.Windows.Forms.TabPage();
@@ -76,6 +76,7 @@
             this.btnCategorize = new System.Windows.Forms.Button();
             this.txtCategoryCount = new System.Windows.Forms.TextBox();
             this.label10 = new System.Windows.Forms.Label();
+            this.icbColorScheme = new FAD3.Mapping.UserControls.ImageCombo();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.lblParameter = new System.Windows.Forms.Label();
             this.btnExport = new System.Windows.Forms.Button();
@@ -92,29 +93,28 @@
             this.listSelectedTimePeriods = new System.Windows.Forms.ListBox();
             this.label15 = new System.Windows.Forms.Label();
             this.tabDownload = new System.Windows.Forms.TabPage();
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.txtMetadataFolderPath = new System.Windows.Forms.TextBox();
+            this.label20 = new System.Windows.Forms.Label();
+            this.btnGetMetadataFolder = new System.Windows.Forms.Button();
+            this.btnDownload = new System.Windows.Forms.Button();
+            this.lvERDDAP = new System.Windows.Forms.ListView();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.txtMaxLon = new System.Windows.Forms.TextBox();
+            this.txtMinLon = new System.Windows.Forms.TextBox();
+            this.txtMaxLat = new System.Windows.Forms.TextBox();
+            this.txtMinLat = new System.Windows.Forms.TextBox();
+            this.label19 = new System.Windows.Forms.Label();
+            this.label18 = new System.Windows.Forms.Label();
+            this.label17 = new System.Windows.Forms.Label();
+            this.label16 = new System.Windows.Forms.Label();
+            this.rbtnManual = new System.Windows.Forms.RadioButton();
+            this.btnCreateExtent = new System.Windows.Forms.Button();
+            this.rbtnUseSelectedLayer = new System.Windows.Forms.RadioButton();
+            this.rbtnUseSelectionBox = new System.Windows.Forms.RadioButton();
+            this.tabCitation = new System.Windows.Forms.TabPage();
             this.btnOk = new System.Windows.Forms.Button();
             this.lblStatus = new System.Windows.Forms.Label();
-            this.icbColorScheme = new FAD3.Mapping.UserControls.ImageCombo();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.rbtnUseSelectionBox = new System.Windows.Forms.RadioButton();
-            this.rbtnUseSelectedLayer = new System.Windows.Forms.RadioButton();
-            this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.btnCreateExtent = new System.Windows.Forms.Button();
-            this.rbtnManual = new System.Windows.Forms.RadioButton();
-            this.label16 = new System.Windows.Forms.Label();
-            this.label17 = new System.Windows.Forms.Label();
-            this.label18 = new System.Windows.Forms.Label();
-            this.label19 = new System.Windows.Forms.Label();
-            this.txtMinLat = new System.Windows.Forms.TextBox();
-            this.txtMaxLat = new System.Windows.Forms.TextBox();
-            this.txtMinLon = new System.Windows.Forms.TextBox();
-            this.txtMaxLon = new System.Windows.Forms.TextBox();
-            this.tabCitation = new System.Windows.Forms.TabPage();
-            this.lvERDDAP = new System.Windows.Forms.ListView();
-            this.btnDownload = new System.Windows.Forms.Button();
-            this.label20 = new System.Windows.Forms.Label();
-            this.txtMetadataFolderPath = new System.Windows.Forms.TextBox();
-            this.btnGetMetadataFolder = new System.Windows.Forms.Button();
             this.tabMap.SuspendLayout();
             this.tabStart.SuspendLayout();
             this.tabCategorize.SuspendLayout();
@@ -125,8 +125,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.graphSheet)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgSheetSummary)).BeginInit();
             this.tabDownload.SuspendLayout();
-            this.groupBox1.SuspendLayout();
             this.groupBox4.SuspendLayout();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabMap
@@ -581,6 +581,21 @@
             this.label10.TabIndex = 31;
             this.label10.Text = "Number of categories";
             // 
+            // icbColorScheme
+            // 
+            this.icbColorScheme.Color1 = System.Drawing.Color.Gray;
+            this.icbColorScheme.Color2 = System.Drawing.Color.Gray;
+            this.icbColorScheme.ColorSchemes = null;
+            this.icbColorScheme.ComboStyle = FAD3.Mapping.UserControls.ImageComboStyle.ColorSchemeGraduated;
+            this.icbColorScheme.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.icbColorScheme.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.icbColorScheme.FormattingEnabled = true;
+            this.icbColorScheme.Location = new System.Drawing.Point(112, 6);
+            this.icbColorScheme.Name = "icbColorScheme";
+            this.icbColorScheme.OutlineColor = System.Drawing.Color.Black;
+            this.icbColorScheme.Size = new System.Drawing.Size(146, 21);
+            this.icbColorScheme.TabIndex = 36;
+            // 
             // tabPage1
             // 
             this.tabPage1.Controls.Add(this.lblParameter);
@@ -621,28 +636,28 @@
             // 
             // graphSheet
             // 
-            chartArea1.AxisX.LabelStyle.Enabled = false;
-            chartArea1.AxisX.MajorGrid.Enabled = false;
-            chartArea1.AxisX.MajorTickMark.Enabled = false;
-            chartArea1.AxisY.IsLabelAutoFit = false;
-            chartArea1.AxisY.LabelStyle.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F);
-            chartArea1.AxisY.MajorGrid.Enabled = false;
-            chartArea1.Name = "ChartArea1";
-            chartArea1.Position.Auto = false;
-            chartArea1.Position.Height = 94F;
-            chartArea1.Position.Width = 100F;
-            this.graphSheet.ChartAreas.Add(chartArea1);
-            legend1.Enabled = false;
-            legend1.Name = "Legend1";
-            this.graphSheet.Legends.Add(legend1);
+            chartArea3.AxisX.LabelStyle.Enabled = false;
+            chartArea3.AxisX.MajorGrid.Enabled = false;
+            chartArea3.AxisX.MajorTickMark.Enabled = false;
+            chartArea3.AxisY.IsLabelAutoFit = false;
+            chartArea3.AxisY.LabelStyle.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F);
+            chartArea3.AxisY.MajorGrid.Enabled = false;
+            chartArea3.Name = "ChartArea1";
+            chartArea3.Position.Auto = false;
+            chartArea3.Position.Height = 94F;
+            chartArea3.Position.Width = 100F;
+            this.graphSheet.ChartAreas.Add(chartArea3);
+            legend3.Enabled = false;
+            legend3.Name = "Legend1";
+            this.graphSheet.Legends.Add(legend3);
             this.graphSheet.Location = new System.Drawing.Point(179, 291);
             this.graphSheet.Name = "graphSheet";
-            series1.ChartArea = "ChartArea1";
-            series1.IsVisibleInLegend = false;
-            series1.Legend = "Legend1";
-            series1.Name = "Series1";
-            series1.YValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.Double;
-            this.graphSheet.Series.Add(series1);
+            series3.ChartArea = "ChartArea1";
+            series3.IsVisibleInLegend = false;
+            series3.Legend = "Legend1";
+            series3.Name = "Series1";
+            series3.YValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.Double;
+            this.graphSheet.Series.Add(series3);
             this.graphSheet.Size = new System.Drawing.Size(265, 105);
             this.graphSheet.TabIndex = 32;
             this.graphSheet.Text = "chart1";
@@ -771,37 +786,65 @@
             this.tabDownload.Text = "Download";
             this.tabDownload.UseVisualStyleBackColor = true;
             // 
-            // btnOk
+            // groupBox4
             // 
-            this.btnOk.Enabled = false;
-            this.btnOk.Location = new System.Drawing.Point(389, 526);
-            this.btnOk.Name = "btnOk";
-            this.btnOk.Size = new System.Drawing.Size(63, 25);
-            this.btnOk.TabIndex = 28;
-            this.btnOk.Text = "Ok";
-            this.btnOk.UseVisualStyleBackColor = true;
+            this.groupBox4.Controls.Add(this.txtMetadataFolderPath);
+            this.groupBox4.Controls.Add(this.label20);
+            this.groupBox4.Controls.Add(this.btnGetMetadataFolder);
+            this.groupBox4.Controls.Add(this.btnDownload);
+            this.groupBox4.Controls.Add(this.lvERDDAP);
+            this.groupBox4.Location = new System.Drawing.Point(6, 181);
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.Size = new System.Drawing.Size(432, 264);
+            this.groupBox4.TabIndex = 1;
+            this.groupBox4.TabStop = false;
+            this.groupBox4.Text = "Data to download";
             // 
-            // lblStatus
+            // txtMetadataFolderPath
             // 
-            this.lblStatus.Location = new System.Drawing.Point(3, 532);
-            this.lblStatus.Name = "lblStatus";
-            this.lblStatus.Size = new System.Drawing.Size(343, 18);
-            this.lblStatus.TabIndex = 29;
+            this.txtMetadataFolderPath.Location = new System.Drawing.Point(58, 20);
+            this.txtMetadataFolderPath.Name = "txtMetadataFolderPath";
+            this.txtMetadataFolderPath.Size = new System.Drawing.Size(325, 20);
+            this.txtMetadataFolderPath.TabIndex = 16;
             // 
-            // icbColorScheme
+            // label20
             // 
-            this.icbColorScheme.Color1 = System.Drawing.Color.Gray;
-            this.icbColorScheme.Color2 = System.Drawing.Color.Gray;
-            this.icbColorScheme.ColorSchemes = null;
-            this.icbColorScheme.ComboStyle = FAD3.Mapping.UserControls.ImageComboStyle.ColorSchemeGraduated;
-            this.icbColorScheme.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-            this.icbColorScheme.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.icbColorScheme.FormattingEnabled = true;
-            this.icbColorScheme.Location = new System.Drawing.Point(112, 6);
-            this.icbColorScheme.Name = "icbColorScheme";
-            this.icbColorScheme.OutlineColor = System.Drawing.Color.Black;
-            this.icbColorScheme.Size = new System.Drawing.Size(146, 21);
-            this.icbColorScheme.TabIndex = 36;
+            this.label20.AutoSize = true;
+            this.label20.Location = new System.Drawing.Point(14, 25);
+            this.label20.Name = "label20";
+            this.label20.Size = new System.Drawing.Size(36, 13);
+            this.label20.TabIndex = 15;
+            this.label20.Text = "Folder";
+            // 
+            // btnGetMetadataFolder
+            // 
+            this.btnGetMetadataFolder.Location = new System.Drawing.Point(393, 20);
+            this.btnGetMetadataFolder.Name = "btnGetMetadataFolder";
+            this.btnGetMetadataFolder.Size = new System.Drawing.Size(27, 24);
+            this.btnGetMetadataFolder.TabIndex = 14;
+            this.btnGetMetadataFolder.Text = "F";
+            this.btnGetMetadataFolder.UseVisualStyleBackColor = true;
+            this.btnGetMetadataFolder.Click += new System.EventHandler(this.OnButtonClick);
+            // 
+            // btnDownload
+            // 
+            this.btnDownload.Location = new System.Drawing.Point(347, 231);
+            this.btnDownload.Name = "btnDownload";
+            this.btnDownload.Size = new System.Drawing.Size(73, 27);
+            this.btnDownload.TabIndex = 12;
+            this.btnDownload.Text = "Download";
+            this.btnDownload.UseVisualStyleBackColor = true;
+            this.btnDownload.Click += new System.EventHandler(this.OnButtonClick);
+            // 
+            // lvERDDAP
+            // 
+            this.lvERDDAP.CheckBoxes = true;
+            this.lvERDDAP.Location = new System.Drawing.Point(12, 50);
+            this.lvERDDAP.Name = "lvERDDAP";
+            this.lvERDDAP.Size = new System.Drawing.Size(408, 175);
+            this.lvERDDAP.TabIndex = 0;
+            this.lvERDDAP.UseCompatibleStateImageBehavior = false;
+            this.lvERDDAP.View = System.Windows.Forms.View.Details;
             // 
             // groupBox1
             // 
@@ -824,53 +867,69 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Set extents";
             // 
-            // rbtnUseSelectionBox
+            // txtMaxLon
             // 
-            this.rbtnUseSelectionBox.AutoSize = true;
-            this.rbtnUseSelectionBox.Location = new System.Drawing.Point(12, 22);
-            this.rbtnUseSelectionBox.Name = "rbtnUseSelectionBox";
-            this.rbtnUseSelectionBox.Size = new System.Drawing.Size(118, 17);
-            this.rbtnUseSelectionBox.TabIndex = 0;
-            this.rbtnUseSelectionBox.TabStop = true;
-            this.rbtnUseSelectionBox.Text = "Use a selection box";
-            this.rbtnUseSelectionBox.UseVisualStyleBackColor = true;
-            this.rbtnUseSelectionBox.CheckedChanged += new System.EventHandler(this.OnRadioButtonCheckChange);
+            this.txtMaxLon.Location = new System.Drawing.Point(236, 103);
+            this.txtMaxLon.Name = "txtMaxLon";
+            this.txtMaxLon.Size = new System.Drawing.Size(155, 20);
+            this.txtMaxLon.TabIndex = 11;
             // 
-            // rbtnUseSelectedLayer
+            // txtMinLon
             // 
-            this.rbtnUseSelectedLayer.AutoSize = true;
-            this.rbtnUseSelectedLayer.Location = new System.Drawing.Point(12, 45);
-            this.rbtnUseSelectedLayer.Name = "rbtnUseSelectedLayer";
-            this.rbtnUseSelectedLayer.Size = new System.Drawing.Size(112, 17);
-            this.rbtnUseSelectedLayer.TabIndex = 1;
-            this.rbtnUseSelectedLayer.TabStop = true;
-            this.rbtnUseSelectedLayer.Text = "Use selected layer";
-            this.rbtnUseSelectedLayer.UseVisualStyleBackColor = true;
-            this.rbtnUseSelectedLayer.CheckedChanged += new System.EventHandler(this.OnRadioButtonCheckChange);
+            this.txtMinLon.Location = new System.Drawing.Point(236, 76);
+            this.txtMinLon.Name = "txtMinLon";
+            this.txtMinLon.Size = new System.Drawing.Size(155, 20);
+            this.txtMinLon.TabIndex = 10;
             // 
-            // groupBox4
+            // txtMaxLat
             // 
-            this.groupBox4.Controls.Add(this.txtMetadataFolderPath);
-            this.groupBox4.Controls.Add(this.label20);
-            this.groupBox4.Controls.Add(this.btnGetMetadataFolder);
-            this.groupBox4.Controls.Add(this.btnDownload);
-            this.groupBox4.Controls.Add(this.lvERDDAP);
-            this.groupBox4.Location = new System.Drawing.Point(6, 181);
-            this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(432, 264);
-            this.groupBox4.TabIndex = 1;
-            this.groupBox4.TabStop = false;
-            this.groupBox4.Text = "Data to download";
+            this.txtMaxLat.Location = new System.Drawing.Point(236, 50);
+            this.txtMaxLat.Name = "txtMaxLat";
+            this.txtMaxLat.Size = new System.Drawing.Size(155, 20);
+            this.txtMaxLat.TabIndex = 9;
             // 
-            // btnCreateExtent
+            // txtMinLat
             // 
-            this.btnCreateExtent.Location = new System.Drawing.Point(22, 99);
-            this.btnCreateExtent.Name = "btnCreateExtent";
-            this.btnCreateExtent.Size = new System.Drawing.Size(78, 27);
-            this.btnCreateExtent.TabIndex = 2;
-            this.btnCreateExtent.Text = "Create extent";
-            this.btnCreateExtent.UseVisualStyleBackColor = true;
-            this.btnCreateExtent.Click += new System.EventHandler(this.OnButtonClick);
+            this.txtMinLat.Location = new System.Drawing.Point(236, 22);
+            this.txtMinLat.Name = "txtMinLat";
+            this.txtMinLat.Size = new System.Drawing.Size(155, 20);
+            this.txtMinLat.TabIndex = 8;
+            // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
+            this.label19.Location = new System.Drawing.Point(154, 106);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(76, 13);
+            this.label19.TabIndex = 7;
+            this.label19.Text = "Max. longitude";
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(154, 79);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(73, 13);
+            this.label18.TabIndex = 6;
+            this.label18.Text = "Min. longitude";
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Location = new System.Drawing.Point(154, 53);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(67, 13);
+            this.label17.TabIndex = 5;
+            this.label17.Text = "Max. latitude";
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(154, 25);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(64, 13);
+            this.label16.TabIndex = 4;
+            this.label16.Text = "Min. latitude";
             // 
             // rbtnManual
             // 
@@ -884,69 +943,39 @@
             this.rbtnManual.UseVisualStyleBackColor = true;
             this.rbtnManual.CheckedChanged += new System.EventHandler(this.OnRadioButtonCheckChange);
             // 
-            // label16
+            // btnCreateExtent
             // 
-            this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(154, 25);
-            this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(64, 13);
-            this.label16.TabIndex = 4;
-            this.label16.Text = "Min. latitude";
+            this.btnCreateExtent.Location = new System.Drawing.Point(22, 99);
+            this.btnCreateExtent.Name = "btnCreateExtent";
+            this.btnCreateExtent.Size = new System.Drawing.Size(78, 27);
+            this.btnCreateExtent.TabIndex = 2;
+            this.btnCreateExtent.Text = "Create extent";
+            this.btnCreateExtent.UseVisualStyleBackColor = true;
+            this.btnCreateExtent.Click += new System.EventHandler(this.OnButtonClick);
             // 
-            // label17
+            // rbtnUseSelectedLayer
             // 
-            this.label17.AutoSize = true;
-            this.label17.Location = new System.Drawing.Point(154, 53);
-            this.label17.Name = "label17";
-            this.label17.Size = new System.Drawing.Size(67, 13);
-            this.label17.TabIndex = 5;
-            this.label17.Text = "Max. latitude";
+            this.rbtnUseSelectedLayer.AutoSize = true;
+            this.rbtnUseSelectedLayer.Location = new System.Drawing.Point(12, 45);
+            this.rbtnUseSelectedLayer.Name = "rbtnUseSelectedLayer";
+            this.rbtnUseSelectedLayer.Size = new System.Drawing.Size(112, 17);
+            this.rbtnUseSelectedLayer.TabIndex = 1;
+            this.rbtnUseSelectedLayer.TabStop = true;
+            this.rbtnUseSelectedLayer.Text = "Use selected layer";
+            this.rbtnUseSelectedLayer.UseVisualStyleBackColor = true;
+            this.rbtnUseSelectedLayer.CheckedChanged += new System.EventHandler(this.OnRadioButtonCheckChange);
             // 
-            // label18
+            // rbtnUseSelectionBox
             // 
-            this.label18.AutoSize = true;
-            this.label18.Location = new System.Drawing.Point(154, 79);
-            this.label18.Name = "label18";
-            this.label18.Size = new System.Drawing.Size(73, 13);
-            this.label18.TabIndex = 6;
-            this.label18.Text = "Min. longitude";
-            // 
-            // label19
-            // 
-            this.label19.AutoSize = true;
-            this.label19.Location = new System.Drawing.Point(154, 106);
-            this.label19.Name = "label19";
-            this.label19.Size = new System.Drawing.Size(76, 13);
-            this.label19.TabIndex = 7;
-            this.label19.Text = "Max. longitude";
-            // 
-            // txtMinLat
-            // 
-            this.txtMinLat.Location = new System.Drawing.Point(236, 22);
-            this.txtMinLat.Name = "txtMinLat";
-            this.txtMinLat.Size = new System.Drawing.Size(155, 20);
-            this.txtMinLat.TabIndex = 8;
-            // 
-            // txtMaxLat
-            // 
-            this.txtMaxLat.Location = new System.Drawing.Point(236, 50);
-            this.txtMaxLat.Name = "txtMaxLat";
-            this.txtMaxLat.Size = new System.Drawing.Size(155, 20);
-            this.txtMaxLat.TabIndex = 9;
-            // 
-            // txtMinLon
-            // 
-            this.txtMinLon.Location = new System.Drawing.Point(236, 76);
-            this.txtMinLon.Name = "txtMinLon";
-            this.txtMinLon.Size = new System.Drawing.Size(155, 20);
-            this.txtMinLon.TabIndex = 10;
-            // 
-            // txtMaxLon
-            // 
-            this.txtMaxLon.Location = new System.Drawing.Point(236, 103);
-            this.txtMaxLon.Name = "txtMaxLon";
-            this.txtMaxLon.Size = new System.Drawing.Size(155, 20);
-            this.txtMaxLon.TabIndex = 11;
+            this.rbtnUseSelectionBox.AutoSize = true;
+            this.rbtnUseSelectionBox.Location = new System.Drawing.Point(12, 22);
+            this.rbtnUseSelectionBox.Name = "rbtnUseSelectionBox";
+            this.rbtnUseSelectionBox.Size = new System.Drawing.Size(118, 17);
+            this.rbtnUseSelectionBox.TabIndex = 0;
+            this.rbtnUseSelectionBox.TabStop = true;
+            this.rbtnUseSelectionBox.Text = "Use a selection box";
+            this.rbtnUseSelectionBox.UseVisualStyleBackColor = true;
+            this.rbtnUseSelectionBox.CheckedChanged += new System.EventHandler(this.OnRadioButtonCheckChange);
             // 
             // tabCitation
             // 
@@ -958,50 +987,22 @@
             this.tabCitation.Text = "Citation";
             this.tabCitation.UseVisualStyleBackColor = true;
             // 
-            // lvERDDAP
+            // btnOk
             // 
-            this.lvERDDAP.CheckBoxes = true;
-            this.lvERDDAP.Location = new System.Drawing.Point(12, 50);
-            this.lvERDDAP.Name = "lvERDDAP";
-            this.lvERDDAP.Size = new System.Drawing.Size(408, 175);
-            this.lvERDDAP.TabIndex = 0;
-            this.lvERDDAP.UseCompatibleStateImageBehavior = false;
-            this.lvERDDAP.View = System.Windows.Forms.View.Details;
+            this.btnOk.Enabled = false;
+            this.btnOk.Location = new System.Drawing.Point(389, 526);
+            this.btnOk.Name = "btnOk";
+            this.btnOk.Size = new System.Drawing.Size(63, 25);
+            this.btnOk.TabIndex = 28;
+            this.btnOk.Text = "Ok";
+            this.btnOk.UseVisualStyleBackColor = true;
             // 
-            // btnDownload
+            // lblStatus
             // 
-            this.btnDownload.Location = new System.Drawing.Point(347, 231);
-            this.btnDownload.Name = "btnDownload";
-            this.btnDownload.Size = new System.Drawing.Size(73, 27);
-            this.btnDownload.TabIndex = 12;
-            this.btnDownload.Text = "Download";
-            this.btnDownload.UseVisualStyleBackColor = true;
-            // 
-            // label20
-            // 
-            this.label20.AutoSize = true;
-            this.label20.Location = new System.Drawing.Point(14, 25);
-            this.label20.Name = "label20";
-            this.label20.Size = new System.Drawing.Size(36, 13);
-            this.label20.TabIndex = 15;
-            this.label20.Text = "Folder";
-            // 
-            // txtMetadataFolderPath
-            // 
-            this.txtMetadataFolderPath.Location = new System.Drawing.Point(58, 20);
-            this.txtMetadataFolderPath.Name = "txtMetadataFolderPath";
-            this.txtMetadataFolderPath.Size = new System.Drawing.Size(325, 20);
-            this.txtMetadataFolderPath.TabIndex = 16;
-            // 
-            // btnGetMetadataFolder
-            // 
-            this.btnGetMetadataFolder.Location = new System.Drawing.Point(393, 20);
-            this.btnGetMetadataFolder.Name = "btnGetMetadataFolder";
-            this.btnGetMetadataFolder.Size = new System.Drawing.Size(27, 24);
-            this.btnGetMetadataFolder.TabIndex = 14;
-            this.btnGetMetadataFolder.Text = "F";
-            this.btnGetMetadataFolder.UseVisualStyleBackColor = true;
-            this.btnGetMetadataFolder.Click += new System.EventHandler(this.OnButtonClick);
+            this.lblStatus.Location = new System.Drawing.Point(3, 532);
+            this.lblStatus.Name = "lblStatus";
+            this.lblStatus.Size = new System.Drawing.Size(343, 18);
+            this.lblStatus.TabIndex = 29;
             // 
             // SpatioTemporalHelperForm
             // 
@@ -1030,10 +1031,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.graphSheet)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgSheetSummary)).EndInit();
             this.tabDownload.ResumeLayout(false);
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
 
         }

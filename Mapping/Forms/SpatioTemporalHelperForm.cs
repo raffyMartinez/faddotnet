@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using System.Threading.Tasks;
 using Microsoft.Win32;
+using MapWinGIS;
 
 namespace FAD3.Mapping.Forms
 {
@@ -33,6 +34,10 @@ namespace FAD3.Mapping.Forms
         private bool _createFileWithoutInland;
         private bool _hasReadCoordinates;
         private string _ERDDAPMetadataFolder;
+        private Extents _selectionExtent;
+
+        private Dictionary<string, (Dictionary<string, (string unit, string description)> parameters, string title, Extents gridExtents, string url, string credits, string legalConstraint, string dataAbstract, Dictionary<string, (string name, int size, double spacing)> dimensions, DateTime beginPosition, DateTime endPosition)> _dictERDDAP =
+            new Dictionary<string, (Dictionary<string, (string unit, string description)> parameters, string title, Extents gridExtents, string url, string credits, string legalConstraint, string dataAbstract, Dictionary<string, (string name, int size, double spacing)> dimensions, DateTime beginPosition, DateTime endPosition)>();
 
         public static SpatioTemporalHelperForm GetInstance()
         {
@@ -144,6 +149,36 @@ namespace FAD3.Mapping.Forms
         {
             switch (((Button)sender).Name)
             {
+                case "btnDownload":
+                    if (txtMinLat.Text.Length > 0
+                        && txtMaxLat.Text.Length > 0
+                        && txtMinLon.Text.Length > 0
+                        && txtMaxLon.Text.Length > 0
+                        && lvERDDAP.SelectedItems.Count > 0)
+                    {
+                        ERDDAPDownloadForm edf = ERDDAPDownloadForm.GetInstance();
+                        if (edf.Visible)
+                        {
+                            edf.BringToFront();
+                        }
+                        else
+                        {
+                            string identifier = lvERDDAP.SelectedItems[0].Name;
+                            edf.BeginPosition = _dictERDDAP[identifier].beginPosition;
+                            edf.EndPosition = _dictERDDAP[identifier].endPosition;
+                            edf.Dimensions = _dictERDDAP[identifier].dimensions;
+                            edf.DataExtents = _selectionExtent;
+                            edf.GridParameters = _dictERDDAP[identifier].parameters;
+                            edf.Credits = _dictERDDAP[identifier].credits;
+                            edf.Title = _dictERDDAP[identifier].title;
+                            edf.DataAbstract = _dictERDDAP[identifier].dataAbstract;
+                            edf.LegalConstraint = _dictERDDAP[identifier].legalConstraint;
+                            edf.GridExtents = _dictERDDAP[identifier].gridExtents;
+                            edf.Show(this);
+                        }
+                    }
+                    break;
+
                 case "btnGetMetadataFolder":
                     var folderBrowser = new FolderBrowserDialog();
                     folderBrowser.ShowNewFolderButton = true;
@@ -802,14 +837,22 @@ namespace FAD3.Mapping.Forms
             listSelectedTimePeriods.Enabled = false;
             Text = "Spatio-Temporal Mapping";
             global.LoadFormSettings(this, true);
+
+            //ERDDAP data download
             ERDDAPMetadataHandler.OnMetadataRead += OnERDDAPMetadataRead;
             _ERDDAPMetadataFolder = ERDDAPMetadataHandler.GetMetadataDirectorySetting();
             txtMetadataFolderPath.Text = _ERDDAPMetadataFolder;
+
+            _dictERDDAP.Clear();
             if (_ERDDAPMetadataFolder.Length > 0)
             {
+                //the xml metadatafiles in the metadata folder determines what FAD3 can download from ERDDAP
                 ERDDAPMetadataHandler.MetadataDirectory = _ERDDAPMetadataFolder;
+
+                //read xml metadata for ERDDAP download
                 ERDDAPMetadataHandler.ReadISO9115Metadata();
             }
+
             cboClassificationScheme.Items.Add("Jenk's-Fisher's");
             cboClassificationScheme.Items.Add("Equal interval");
             cboClassificationScheme.Items.Add("User defined");
@@ -830,9 +873,9 @@ namespace FAD3.Mapping.Forms
         private void OnERDDAPMetadataRead(object sender, ERDDAPMetadataReadEventArgs e)
         {
             var item = lvERDDAP.Items.Add(e.FileIdentifier, e.DataTitle, null);
-            item.SubItems.Add(e.DateStart.ToShortDateString());
-            item.SubItems.Add(e.DateEnd.ToShortDateString());
-            TimeSpan diff = e.DateEnd - e.DateStart;
+            item.SubItems.Add(e.BeginPosition.ToShortDateString());
+            item.SubItems.Add(e.EndPosition.ToShortDateString());
+            TimeSpan diff = e.EndPosition - e.BeginPosition;
             double days = diff.TotalDays;
             var freq = Math.Round(days / e.TemporalSize, MidpointRounding.AwayFromZero);
             string dataFreq = "Daily";
@@ -852,6 +895,9 @@ namespace FAD3.Mapping.Forms
             item.SubItems.Add(dataFreq);
             item.SubItems.Add(e.RowSize.ToString("N4"));
             item.ToolTipText = e.DataAbstract;
+            Extents ext = new Extents();
+            ext.SetBounds(e.EastBound, e.SouthBound, 0, e.WestBound, e.NorthBound, 0);
+            _dictERDDAP.Add(e.FileIdentifier, (e.DataParameters, e.DataTitle, ext, e.URL, e.Credit, e.LegalConstraints, e.DataAbstract, e.Dimensions, e.BeginPosition, e.EndPosition));
             SizeColumns(lvERDDAP, false);
         }
 
@@ -861,6 +907,8 @@ namespace FAD3.Mapping.Forms
             txtMinLat.Text = e.Bottom.ToString();
             txtMinLon.Text = e.Left.ToString();
             txtMaxLon.Text = e.Right.ToString();
+            _selectionExtent = new Extents();
+            _selectionExtent.SetBounds(e.Left, e.Bottom, 0, e.Right, e.Top, 0);
             if (!e.InDrag)
             {
                 MakeGridFromPoints.MapLayers = global.MappingForm.MapLayersHandler;
@@ -899,6 +947,7 @@ namespace FAD3.Mapping.Forms
         private void OnFormClosed(object sender, FormClosedEventArgs e)
         {
             _instance = null;
+            _dictERDDAP.Clear();
             MakeGridFromPoints.Cleanup();
         }
 
