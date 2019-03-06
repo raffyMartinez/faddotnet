@@ -177,6 +177,10 @@ namespace FAD3.Mapping.Forms
                             edf.Show(this);
                         }
                     }
+                    else
+                    {
+                        MessageBox.Show("Data extents must be provided and data to download must be selected");
+                    }
                     break;
 
                 case "btnGetMetadataFolder":
@@ -211,6 +215,14 @@ namespace FAD3.Mapping.Forms
                     MakeGridFromPoints.Reset();
                     txtRows.Text = "";
                     OpenFile();
+                    if (MakeGridFromPoints.IsNCCSVFormat)
+                    {
+                        txtMetadata.Text = MakeGridFromPoints.Metadata;
+                    }
+                    else
+                    {
+                        txtMetadata.Text = "No metadata avalailable in this file format\r\nNCCVS format includes data and metadata";
+                    }
                     break;
 
                 case "btnReadFile":
@@ -221,7 +233,8 @@ namespace FAD3.Mapping.Forms
                     MakeGridFromPoints.LatitudeColumn = cboLatitude.SelectedIndex;
                     MakeGridFromPoints.LongitudeColumn = cboLongitude.SelectedIndex;
                     MakeGridFromPoints.TemporalColumn = cboTemporal.SelectedIndex;
-                    MakeGridFromPoints.ValuesColumn = cboValue.SelectedIndex;
+                    MakeGridFromPoints.ParameterColumn = cboValue.SelectedIndex;
+                    MakeGridFromPoints.SelectedParameter = cboValue.Text;
 
                     //ask UTMzone of area of interest
                     using (SelectUTMZoneForm szf = new SelectUTMZoneForm())
@@ -245,7 +258,6 @@ namespace FAD3.Mapping.Forms
 
                     //reads csv data in a separate thread
                     ReadCSVFile();
-
                     break;
 
                 case "btnCategorize":

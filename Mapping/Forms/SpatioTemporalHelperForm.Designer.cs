@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SpatioTemporalHelperForm));
             this.tabMap = new System.Windows.Forms.TabControl();
             this.tabStart = new System.Windows.Forms.TabPage();
@@ -76,7 +76,6 @@
             this.btnCategorize = new System.Windows.Forms.Button();
             this.txtCategoryCount = new System.Windows.Forms.TextBox();
             this.label10 = new System.Windows.Forms.Label();
-            this.icbColorScheme = new FAD3.Mapping.UserControls.ImageCombo();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.lblParameter = new System.Windows.Forms.Label();
             this.btnExport = new System.Windows.Forms.Button();
@@ -112,9 +111,12 @@
             this.btnCreateExtent = new System.Windows.Forms.Button();
             this.rbtnUseSelectedLayer = new System.Windows.Forms.RadioButton();
             this.rbtnUseSelectionBox = new System.Windows.Forms.RadioButton();
-            this.tabCitation = new System.Windows.Forms.TabPage();
             this.btnOk = new System.Windows.Forms.Button();
             this.lblStatus = new System.Windows.Forms.Label();
+            this.tabMetadata = new System.Windows.Forms.TabPage();
+            this.txtMetadata = new System.Windows.Forms.TextBox();
+            this.label21 = new System.Windows.Forms.Label();
+            this.icbColorScheme = new FAD3.Mapping.UserControls.ImageCombo();
             this.tabMap.SuspendLayout();
             this.tabStart.SuspendLayout();
             this.tabCategorize.SuspendLayout();
@@ -127,15 +129,16 @@
             this.tabDownload.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.groupBox1.SuspendLayout();
+            this.tabMetadata.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabMap
             // 
             this.tabMap.Controls.Add(this.tabStart);
+            this.tabMap.Controls.Add(this.tabMetadata);
             this.tabMap.Controls.Add(this.tabCategorize);
             this.tabMap.Controls.Add(this.tabPage1);
             this.tabMap.Controls.Add(this.tabDownload);
-            this.tabMap.Controls.Add(this.tabCitation);
             this.tabMap.Location = new System.Drawing.Point(2, 38);
             this.tabMap.Name = "tabMap";
             this.tabMap.SelectedIndex = 0;
@@ -581,21 +584,6 @@
             this.label10.TabIndex = 31;
             this.label10.Text = "Number of categories";
             // 
-            // icbColorScheme
-            // 
-            this.icbColorScheme.Color1 = System.Drawing.Color.Gray;
-            this.icbColorScheme.Color2 = System.Drawing.Color.Gray;
-            this.icbColorScheme.ColorSchemes = null;
-            this.icbColorScheme.ComboStyle = FAD3.Mapping.UserControls.ImageComboStyle.ColorSchemeGraduated;
-            this.icbColorScheme.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-            this.icbColorScheme.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.icbColorScheme.FormattingEnabled = true;
-            this.icbColorScheme.Location = new System.Drawing.Point(112, 6);
-            this.icbColorScheme.Name = "icbColorScheme";
-            this.icbColorScheme.OutlineColor = System.Drawing.Color.Black;
-            this.icbColorScheme.Size = new System.Drawing.Size(146, 21);
-            this.icbColorScheme.TabIndex = 36;
-            // 
             // tabPage1
             // 
             this.tabPage1.Controls.Add(this.lblParameter);
@@ -636,28 +624,28 @@
             // 
             // graphSheet
             // 
-            chartArea3.AxisX.LabelStyle.Enabled = false;
-            chartArea3.AxisX.MajorGrid.Enabled = false;
-            chartArea3.AxisX.MajorTickMark.Enabled = false;
-            chartArea3.AxisY.IsLabelAutoFit = false;
-            chartArea3.AxisY.LabelStyle.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F);
-            chartArea3.AxisY.MajorGrid.Enabled = false;
-            chartArea3.Name = "ChartArea1";
-            chartArea3.Position.Auto = false;
-            chartArea3.Position.Height = 94F;
-            chartArea3.Position.Width = 100F;
-            this.graphSheet.ChartAreas.Add(chartArea3);
-            legend3.Enabled = false;
-            legend3.Name = "Legend1";
-            this.graphSheet.Legends.Add(legend3);
+            chartArea1.AxisX.LabelStyle.Enabled = false;
+            chartArea1.AxisX.MajorGrid.Enabled = false;
+            chartArea1.AxisX.MajorTickMark.Enabled = false;
+            chartArea1.AxisY.IsLabelAutoFit = false;
+            chartArea1.AxisY.LabelStyle.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F);
+            chartArea1.AxisY.MajorGrid.Enabled = false;
+            chartArea1.Name = "ChartArea1";
+            chartArea1.Position.Auto = false;
+            chartArea1.Position.Height = 94F;
+            chartArea1.Position.Width = 100F;
+            this.graphSheet.ChartAreas.Add(chartArea1);
+            legend1.Enabled = false;
+            legend1.Name = "Legend1";
+            this.graphSheet.Legends.Add(legend1);
             this.graphSheet.Location = new System.Drawing.Point(179, 291);
             this.graphSheet.Name = "graphSheet";
-            series3.ChartArea = "ChartArea1";
-            series3.IsVisibleInLegend = false;
-            series3.Legend = "Legend1";
-            series3.Name = "Series1";
-            series3.YValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.Double;
-            this.graphSheet.Series.Add(series3);
+            series1.ChartArea = "ChartArea1";
+            series1.IsVisibleInLegend = false;
+            series1.Legend = "Legend1";
+            series1.Name = "Series1";
+            series1.YValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.Double;
+            this.graphSheet.Series.Add(series1);
             this.graphSheet.Size = new System.Drawing.Size(265, 105);
             this.graphSheet.TabIndex = 32;
             this.graphSheet.Text = "chart1";
@@ -679,6 +667,9 @@
             this.imageList1.TransparentColor = System.Drawing.Color.Transparent;
             this.imageList1.Images.SetKeyName(0, "go-down.png");
             this.imageList1.Images.SetKeyName(1, "go-up.png");
+            this.imageList1.Images.SetKeyName(2, "system-file-manager.png");
+            this.imageList1.Images.SetKeyName(3, "Folder_16x.png");
+            this.imageList1.Images.SetKeyName(4, "WebFile_16x.png");
             // 
             // btnUp
             // 
@@ -804,7 +795,7 @@
             // 
             this.txtMetadataFolderPath.Location = new System.Drawing.Point(58, 20);
             this.txtMetadataFolderPath.Name = "txtMetadataFolderPath";
-            this.txtMetadataFolderPath.Size = new System.Drawing.Size(325, 20);
+            this.txtMetadataFolderPath.Size = new System.Drawing.Size(319, 20);
             this.txtMetadataFolderPath.TabIndex = 16;
             // 
             // label20
@@ -818,27 +809,31 @@
             // 
             // btnGetMetadataFolder
             // 
-            this.btnGetMetadataFolder.Location = new System.Drawing.Point(393, 20);
+            this.btnGetMetadataFolder.ImageKey = "Folder_16x.png";
+            this.btnGetMetadataFolder.ImageList = this.imageList1;
+            this.btnGetMetadataFolder.Location = new System.Drawing.Point(390, 16);
             this.btnGetMetadataFolder.Name = "btnGetMetadataFolder";
-            this.btnGetMetadataFolder.Size = new System.Drawing.Size(27, 24);
+            this.btnGetMetadataFolder.Size = new System.Drawing.Size(30, 30);
             this.btnGetMetadataFolder.TabIndex = 14;
-            this.btnGetMetadataFolder.Text = "F";
             this.btnGetMetadataFolder.UseVisualStyleBackColor = true;
             this.btnGetMetadataFolder.Click += new System.EventHandler(this.OnButtonClick);
             // 
             // btnDownload
             // 
-            this.btnDownload.Location = new System.Drawing.Point(347, 231);
+            this.btnDownload.ImageKey = "WebFile_16x.png";
+            this.btnDownload.ImageList = this.imageList1;
+            this.btnDownload.Location = new System.Drawing.Point(387, 231);
             this.btnDownload.Name = "btnDownload";
-            this.btnDownload.Size = new System.Drawing.Size(73, 27);
+            this.btnDownload.Size = new System.Drawing.Size(30, 30);
             this.btnDownload.TabIndex = 12;
-            this.btnDownload.Text = "Download";
             this.btnDownload.UseVisualStyleBackColor = true;
             this.btnDownload.Click += new System.EventHandler(this.OnButtonClick);
             // 
             // lvERDDAP
             // 
             this.lvERDDAP.CheckBoxes = true;
+            this.lvERDDAP.FullRowSelect = true;
+            this.lvERDDAP.HideSelection = false;
             this.lvERDDAP.Location = new System.Drawing.Point(12, 50);
             this.lvERDDAP.Name = "lvERDDAP";
             this.lvERDDAP.Size = new System.Drawing.Size(408, 175);
@@ -977,16 +972,6 @@
             this.rbtnUseSelectionBox.UseVisualStyleBackColor = true;
             this.rbtnUseSelectionBox.CheckedChanged += new System.EventHandler(this.OnRadioButtonCheckChange);
             // 
-            // tabCitation
-            // 
-            this.tabCitation.Location = new System.Drawing.Point(4, 22);
-            this.tabCitation.Name = "tabCitation";
-            this.tabCitation.Padding = new System.Windows.Forms.Padding(3);
-            this.tabCitation.Size = new System.Drawing.Size(446, 451);
-            this.tabCitation.TabIndex = 4;
-            this.tabCitation.Text = "Citation";
-            this.tabCitation.UseVisualStyleBackColor = true;
-            // 
             // btnOk
             // 
             this.btnOk.Enabled = false;
@@ -1003,6 +988,52 @@
             this.lblStatus.Name = "lblStatus";
             this.lblStatus.Size = new System.Drawing.Size(343, 18);
             this.lblStatus.TabIndex = 29;
+            // 
+            // tabMetadata
+            // 
+            this.tabMetadata.Controls.Add(this.label21);
+            this.tabMetadata.Controls.Add(this.txtMetadata);
+            this.tabMetadata.Location = new System.Drawing.Point(4, 22);
+            this.tabMetadata.Name = "tabMetadata";
+            this.tabMetadata.Padding = new System.Windows.Forms.Padding(3);
+            this.tabMetadata.Size = new System.Drawing.Size(446, 451);
+            this.tabMetadata.TabIndex = 5;
+            this.tabMetadata.Text = "Metadata";
+            this.tabMetadata.UseVisualStyleBackColor = true;
+            // 
+            // txtMetadata
+            // 
+            this.txtMetadata.Location = new System.Drawing.Point(6, 32);
+            this.txtMetadata.Multiline = true;
+            this.txtMetadata.Name = "txtMetadata";
+            this.txtMetadata.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.txtMetadata.Size = new System.Drawing.Size(432, 398);
+            this.txtMetadata.TabIndex = 0;
+            this.txtMetadata.Text = "Metadata is only available in NCCVS file type";
+            // 
+            // label21
+            // 
+            this.label21.AutoSize = true;
+            this.label21.Location = new System.Drawing.Point(6, 16);
+            this.label21.Name = "label21";
+            this.label21.Size = new System.Drawing.Size(52, 13);
+            this.label21.TabIndex = 1;
+            this.label21.Text = "Metadata";
+            // 
+            // icbColorScheme
+            // 
+            this.icbColorScheme.Color1 = System.Drawing.Color.Gray;
+            this.icbColorScheme.Color2 = System.Drawing.Color.Gray;
+            this.icbColorScheme.ColorSchemes = null;
+            this.icbColorScheme.ComboStyle = FAD3.Mapping.UserControls.ImageComboStyle.ColorSchemeGraduated;
+            this.icbColorScheme.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.icbColorScheme.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.icbColorScheme.FormattingEnabled = true;
+            this.icbColorScheme.Location = new System.Drawing.Point(112, 6);
+            this.icbColorScheme.Name = "icbColorScheme";
+            this.icbColorScheme.OutlineColor = System.Drawing.Color.Black;
+            this.icbColorScheme.Size = new System.Drawing.Size(146, 21);
+            this.icbColorScheme.TabIndex = 36;
             // 
             // SpatioTemporalHelperForm
             // 
@@ -1035,6 +1066,8 @@
             this.groupBox4.PerformLayout();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            this.tabMetadata.ResumeLayout(false);
+            this.tabMetadata.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -1117,11 +1150,13 @@
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.RadioButton rbtnManual;
         private System.Windows.Forms.Button btnCreateExtent;
-        private System.Windows.Forms.TabPage tabCitation;
         private System.Windows.Forms.Button btnDownload;
         private System.Windows.Forms.ListView lvERDDAP;
         private System.Windows.Forms.TextBox txtMetadataFolderPath;
         private System.Windows.Forms.Label label20;
         private System.Windows.Forms.Button btnGetMetadataFolder;
+        private System.Windows.Forms.TabPage tabMetadata;
+        private System.Windows.Forms.Label label21;
+        private System.Windows.Forms.TextBox txtMetadata;
     }
 }

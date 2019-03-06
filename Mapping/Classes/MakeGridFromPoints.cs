@@ -45,7 +45,8 @@ namespace FAD3.Mapping.Classes
         public static int LatitudeColumn { get; set; }
         public static int LongitudeColumn { get; set; }
         public static int TemporalColumn { get; set; }
-        public static int ValuesColumn { get; set; }
+        public static int ParameterColumn { get; set; }
+        public static string Metadata { get; internal set; }
         private static AxMap _mapControl;
         private static bool _enableMapInteraction;
         private static Extents _extents;
@@ -54,6 +55,11 @@ namespace FAD3.Mapping.Classes
         public static EventHandler<ParseCSVEventArgs> OnCSVRead;
         public static EventHandler<ExtentDraggedBoxEventArgs> OnExtentDefined;
         public static MapLayersHandler MapLayers { get; set; }
+        public static bool IsNCCSVFormat { get; internal set; }
+        private static int _metadataRows;
+        public static string SelectedParameter { get; set; }
+
+        private static Dictionary<string, (string dataType, string fillValue, string longName, string missingValue, string units)> _dictValueParameters = new Dictionary<string, (string dataType, string fillValue, string longName, string missingValue, string units)>();
 
         public static AxMap MapControl
         {
@@ -159,17 +165,30 @@ namespace FAD3.Mapping.Classes
             }
         }
 
-        public static List<string> GetFields()
+        private static List<string> ReadNCCSVMetadata()
         {
+            _dictValueParameters.Clear();
             List<string> csvFields = new List<string>();
+            _metadataRows = 0;
             string[] fields;
             string line;
+            string currentValue = "";
             StreamReader sr = new StreamReader(_singleDimensionCSV, true);
+            TextFieldParser tfp = new TextFieldParser(new StringReader(""));
 
-            line = sr.ReadLine();
-            if (line != null)
+            string dataType = "";
+            string fillValue = "";
+            string longName = "";
+            string missingValue = "";
+            string units = "";
+            bool addToDict = false;
+
+            //read until end of metadata
+            while ((line = sr.ReadLine()) != "*END_METADATA*")
             {
-                TextFieldParser tfp = new TextFieldParser(new StringReader(line));
+                Metadata += $"{line}\r\n";
+
+                tfp = new TextFieldParser(new StringReader(line));
                 tfp.HasFieldsEnclosedInQuotes = true;
                 tfp.SetDelimiters(",");
 
@@ -178,14 +197,113 @@ namespace FAD3.Mapping.Classes
                     fields = tfp.ReadFields();
                     for (int n = 0; n < fields.Length; n++)
                     {
-                        csvFields.Add(fields[n]);
+                        switch (fields[0])
+                        {
+                            case "*GLOBAL*":
+                            case "time":
+                            case "altitude":
+                            case "latitude":
+                            case "longitude":
+                                break;
+
+                            default:
+                                if (!_dictValueParameters.Keys.Contains(fields[0]))
+                                {
+                                    currentValue = fields[0];
+                                    addToDict = true;
+                                }
+                                switch (fields[1])
+                                {
+                                    case "*DATA_TYPE*":
+                                        dataType = fields[2];
+                                        break;
+
+                                    case "_FillValue":
+                                        fillValue = fields[2];
+                                        break;
+
+                                    case "long_name":
+                                        longName = fields[2];
+                                        break;
+
+                                    case "missing_value":
+                                        missingValue = fields[2];
+                                        break;
+
+                                    case "units":
+                                        units = fields[2];
+                                        if (addToDict)
+                                        {
+                                            _dictValueParameters.Add(currentValue, (dataType, fillValue, longName, missingValue, units));
+                                            addToDict = false;
+                                        }
+                                        break;
+                                }
+                                break;
+                        }
                     }
                 }
+                _metadataRows++;
+            }
+
+            //read fields
+            line = sr.ReadLine();
+            tfp = new TextFieldParser(new StringReader(line));
+            tfp.HasFieldsEnclosedInQuotes = true;
+            tfp.SetDelimiters(",");
+            while (!tfp.EndOfData)
+            {
+                fields = tfp.ReadFields();
+                for (int n = 0; n < fields.Length; n++)
+                {
+                    csvFields.Add(fields[n]);
+                }
+            }
+            sr.Close();
+            sr = null;
+            return csvFields;
+        }
+
+        public static List<string> GetFields()
+        {
+            List<string> csvFields = new List<string>();
+            string[] fields;
+            string line;
+            StreamReader sr = new StreamReader(_singleDimensionCSV, true);
+
+            while ((line = sr.ReadLine()) != null)
+            {
+                TextFieldParser tfp = new TextFieldParser(new StringReader(line));
+                tfp.HasFieldsEnclosedInQuotes = true;
+                tfp.SetDelimiters(",");
+
+                while (!tfp.EndOfData)
+                {
+                    fields = tfp.ReadFields();
+                    if (fields[0] == "*GLOBAL*" && fields[1] == "Conventions")
+                    {
+                        var arr = fields[2].Split(new char[] { ',', ' ' });
+                        if (arr[arr.Length - 1] == "NCCSV-1.0")
+                        {
+                            IsNCCSVFormat = true;
+                            csvFields = ReadNCCSVMetadata();
+                        }
+                    }
+                    else
+                    {
+                        for (int n = 0; n < fields.Length; n++)
+                        {
+                            csvFields.Add(fields[n]);
+                        }
+                    }
+                }
+
                 tfp.Close();
                 tfp = null;
-                sr.Close();
-                sr = null;
+                break;
             }
+            sr.Close();
+            sr = null;
             return csvFields;
         }
 
@@ -196,7 +314,7 @@ namespace FAD3.Mapping.Classes
             FishingGrid.UTMZone = UTMZone;
             Coordinates = new Dictionary<int, (double latitude, double longitude, bool Inland)>();
             StreamReader sr = new StreamReader(_singleDimensionCSV, true);
-            string line;
+            string line = "";
             Dictionary<int, double?> pointValue = new Dictionary<int, double?>();
             Dictionary<int, double?> pointValueCopy = new Dictionary<int, double?>(pointValue);
             string timeEra = "";
@@ -210,6 +328,60 @@ namespace FAD3.Mapping.Classes
             {
                 inlandPoints = FishingGrid.InlandPoints;
             }
+
+            //skip metadata lines
+            if (_metadataRows > 0)
+            {
+                _metadataRows++;
+                for (int r = 0; r < _metadataRows; r++)
+                {
+                    sr.ReadLine();
+                }
+            }
+
+            string fv = "";
+            string mv = "";
+            string dataType = "double";
+            if (IsNCCSVFormat)
+            {
+                dataType = _dictValueParameters[SelectedParameter].dataType;
+
+                fv = _dictValueParameters[SelectedParameter].fillValue;
+                mv = _dictValueParameters[SelectedParameter].missingValue;
+                if (mv.Length == 0)
+                {
+                    mv = fv;
+                }
+
+                if (fv.Last() > '0')
+                {
+                    fv = fv.Trim(fv.Last());
+                }
+
+                if (mv.Last() > '0')
+                {
+                    mv = mv.Trim(mv.Last());
+                }
+
+                double fillValue = 0;
+                double missingValue = 0;
+                string fillValueb = "";
+                string missingValueb = "";
+                switch (dataType)
+                {
+                    case "float":
+                    case "double":
+                        fillValue = double.Parse(fv);
+                        missingValue = double.Parse(mv);
+                        break;
+
+                    case "byte":
+                        fillValueb = fv;
+                        missingValueb = mv;
+                        break;
+                }
+            }
+
             while ((line = sr.ReadLine()) != null)
             {
                 TextFieldParser tfp = new TextFieldParser(new StringReader(line));
@@ -225,7 +397,7 @@ namespace FAD3.Mapping.Classes
                         case "time":
                         case "UTC":
                         case "time (UTC)":
-
+                        case "*END_DATA*":
                             break;
 
                         default:
@@ -266,20 +438,44 @@ namespace FAD3.Mapping.Classes
                                 }
                             }
 
-                            if (double.TryParse(fields[ValuesColumn], out double vv))
+                            switch (dataType)
                             {
-                                if (double.IsNaN(vv))
-                                {
-                                    pointValue.Add(row, null);
-                                }
-                                else if (vv != -999999)
-                                {
-                                    pointValue.Add(row, vv);
-                                }
-                                else
-                                {
-                                    pointValue.Add(row, null);
-                                }
+                                case "float":
+                                case "double":
+                                    if (fields[ParameterColumn] == fv || fields[ParameterColumn] == mv)
+                                    {
+                                        pointValue.Add(row, null);
+                                    }
+                                    else if (double.TryParse(fields[ParameterColumn], out double vv))
+                                    {
+                                        if (double.IsNaN(vv))
+                                        {
+                                            pointValue.Add(row, null);
+                                        }
+                                        //else if (vv != missingValue && vv != fillValue)
+                                        //{
+                                        //    pointValue.Add(row, vv);
+                                        //}
+                                        else
+                                        {
+                                            pointValue.Add(row, vv);
+                                        }
+                                    }
+                                    break;
+
+                                case "byte":
+                                    if (fields[ParameterColumn] == fv || fields[ParameterColumn] == mv)
+                                    {
+                                        pointValue.Add(row, null);
+                                    }
+                                    else
+                                    {
+                                        if (byte.TryParse(fields[ParameterColumn], out byte bb))
+                                        {
+                                            pointValue.Add(row, bb);
+                                        }
+                                    }
+                                    break;
                             }
 
                             if (readCoordinates)

@@ -46,12 +46,17 @@
             this.lblCredits = new System.Windows.Forms.LinkLabel();
             this.lblURL = new System.Windows.Forms.LinkLabel();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.txtAltitudeStride = new System.Windows.Forms.TextBox();
+            this.txtStartAltitude = new System.Windows.Forms.TextBox();
+            this.btnAltitudeHelp = new System.Windows.Forms.Button();
+            this.btnTimeHelp = new System.Windows.Forms.Button();
             this.lblLonSpacing = new System.Windows.Forms.Label();
             this.lblLonSize = new System.Windows.Forms.Label();
             this.lblLatSpacing = new System.Windows.Forms.Label();
             this.lblLatSize = new System.Windows.Forms.Label();
             this.lblTimeSpacing = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
+            this.btnLonHelp = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.label15 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
@@ -62,16 +67,11 @@
             this.chkLat = new System.Windows.Forms.CheckBox();
             this.chkLon = new System.Windows.Forms.CheckBox();
             this.lblTimeSize = new System.Windows.Forms.Label();
-            this.btnTimeHelp = new System.Windows.Forms.Button();
-            this.btnLatHelp = new System.Windows.Forms.Button();
-            this.btnLonHelp = new System.Windows.Forms.Button();
             this.chkAltitude = new System.Windows.Forms.CheckBox();
-            this.btnAltitudeHelp = new System.Windows.Forms.Button();
-            this.txtStartAltitude = new System.Windows.Forms.TextBox();
-            this.txtAltitudeStride = new System.Windows.Forms.TextBox();
             this.txtEndAltitude = new System.Windows.Forms.TextBox();
             this.lblAltitudeSize = new System.Windows.Forms.Label();
             this.lblAltitudeSpacing = new System.Windows.Forms.Label();
+            this.btnLatHelp = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -288,6 +288,40 @@
             this.tableLayoutPanel1.Size = new System.Drawing.Size(652, 135);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
+            // txtAltitudeStride
+            // 
+            this.txtAltitudeStride.Location = new System.Drawing.Point(256, 57);
+            this.txtAltitudeStride.Name = "txtAltitudeStride";
+            this.txtAltitudeStride.Size = new System.Drawing.Size(61, 20);
+            this.txtAltitudeStride.TabIndex = 22;
+            this.txtAltitudeStride.Text = "1";
+            // 
+            // txtStartAltitude
+            // 
+            this.txtStartAltitude.Location = new System.Drawing.Point(122, 57);
+            this.txtStartAltitude.Name = "txtStartAltitude";
+            this.txtStartAltitude.Size = new System.Drawing.Size(123, 20);
+            this.txtStartAltitude.TabIndex = 21;
+            // 
+            // btnAltitudeHelp
+            // 
+            this.btnAltitudeHelp.Location = new System.Drawing.Point(97, 57);
+            this.btnAltitudeHelp.Name = "btnAltitudeHelp";
+            this.btnAltitudeHelp.Size = new System.Drawing.Size(18, 20);
+            this.btnAltitudeHelp.TabIndex = 43;
+            this.btnAltitudeHelp.Text = "?";
+            this.btnAltitudeHelp.UseVisualStyleBackColor = true;
+            // 
+            // btnTimeHelp
+            // 
+            this.btnTimeHelp.Location = new System.Drawing.Point(97, 30);
+            this.btnTimeHelp.Name = "btnTimeHelp";
+            this.btnTimeHelp.Size = new System.Drawing.Size(18, 20);
+            this.btnTimeHelp.TabIndex = 21;
+            this.btnTimeHelp.Text = "?";
+            this.btnTimeHelp.UseVisualStyleBackColor = true;
+            this.btnTimeHelp.Click += new System.EventHandler(this.OnButtonClick);
+            // 
             // lblLonSpacing
             // 
             this.lblLonSpacing.AutoSize = true;
@@ -353,6 +387,16 @@
             this.label2.Size = new System.Drawing.Size(94, 27);
             this.label2.TabIndex = 33;
             this.label2.Text = "Spacing";
+            // 
+            // btnLonHelp
+            // 
+            this.btnLonHelp.Location = new System.Drawing.Point(97, 111);
+            this.btnLonHelp.Name = "btnLonHelp";
+            this.btnLonHelp.Size = new System.Drawing.Size(18, 20);
+            this.btnLonHelp.TabIndex = 41;
+            this.btnLonHelp.Text = "?";
+            this.btnLonHelp.UseVisualStyleBackColor = true;
+            this.btnLonHelp.Click += new System.EventHandler(this.OnButtonClick);
             // 
             // label1
             // 
@@ -466,36 +510,6 @@
             this.lblTimeSize.Text = "time size";
             this.lblTimeSize.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // btnTimeHelp
-            // 
-            this.btnTimeHelp.Location = new System.Drawing.Point(97, 30);
-            this.btnTimeHelp.Name = "btnTimeHelp";
-            this.btnTimeHelp.Size = new System.Drawing.Size(18, 20);
-            this.btnTimeHelp.TabIndex = 21;
-            this.btnTimeHelp.Text = "?";
-            this.btnTimeHelp.UseVisualStyleBackColor = true;
-            this.btnTimeHelp.Click += new System.EventHandler(this.OnButtonClick);
-            // 
-            // btnLatHelp
-            // 
-            this.btnLatHelp.Location = new System.Drawing.Point(97, 84);
-            this.btnLatHelp.Name = "btnLatHelp";
-            this.btnLatHelp.Size = new System.Drawing.Size(18, 20);
-            this.btnLatHelp.TabIndex = 40;
-            this.btnLatHelp.Text = "?";
-            this.btnLatHelp.UseVisualStyleBackColor = true;
-            this.btnLatHelp.Click += new System.EventHandler(this.OnButtonClick);
-            // 
-            // btnLonHelp
-            // 
-            this.btnLonHelp.Location = new System.Drawing.Point(97, 111);
-            this.btnLonHelp.Name = "btnLonHelp";
-            this.btnLonHelp.Size = new System.Drawing.Size(18, 20);
-            this.btnLonHelp.TabIndex = 41;
-            this.btnLonHelp.Text = "?";
-            this.btnLonHelp.UseVisualStyleBackColor = true;
-            this.btnLonHelp.Click += new System.EventHandler(this.OnButtonClick);
-            // 
             // chkAltitude
             // 
             this.chkAltitude.AutoSize = true;
@@ -507,30 +521,6 @@
             this.chkAltitude.TabIndex = 42;
             this.chkAltitude.Text = "Altitude";
             this.chkAltitude.UseVisualStyleBackColor = true;
-            // 
-            // btnAltitudeHelp
-            // 
-            this.btnAltitudeHelp.Location = new System.Drawing.Point(97, 57);
-            this.btnAltitudeHelp.Name = "btnAltitudeHelp";
-            this.btnAltitudeHelp.Size = new System.Drawing.Size(18, 20);
-            this.btnAltitudeHelp.TabIndex = 43;
-            this.btnAltitudeHelp.Text = "?";
-            this.btnAltitudeHelp.UseVisualStyleBackColor = true;
-            // 
-            // txtStartAltitude
-            // 
-            this.txtStartAltitude.Location = new System.Drawing.Point(122, 57);
-            this.txtStartAltitude.Name = "txtStartAltitude";
-            this.txtStartAltitude.Size = new System.Drawing.Size(123, 20);
-            this.txtStartAltitude.TabIndex = 21;
-            // 
-            // txtAltitudeStride
-            // 
-            this.txtAltitudeStride.Location = new System.Drawing.Point(256, 57);
-            this.txtAltitudeStride.Name = "txtAltitudeStride";
-            this.txtAltitudeStride.Size = new System.Drawing.Size(61, 20);
-            this.txtAltitudeStride.TabIndex = 22;
-            this.txtAltitudeStride.Text = "1";
             // 
             // txtEndAltitude
             // 
@@ -560,6 +550,16 @@
             this.lblAltitudeSpacing.TabIndex = 46;
             this.lblAltitudeSpacing.Text = "altitude spacing";
             this.lblAltitudeSpacing.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // btnLatHelp
+            // 
+            this.btnLatHelp.Location = new System.Drawing.Point(97, 84);
+            this.btnLatHelp.Name = "btnLatHelp";
+            this.btnLatHelp.Size = new System.Drawing.Size(18, 20);
+            this.btnLatHelp.TabIndex = 40;
+            this.btnLatHelp.Text = "?";
+            this.btnLatHelp.UseVisualStyleBackColor = true;
+            this.btnLatHelp.Click += new System.EventHandler(this.OnButtonClick);
             // 
             // ERDDAPDownloadForm
             // 

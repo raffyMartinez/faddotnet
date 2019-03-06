@@ -145,6 +145,9 @@ namespace FAD3.Mapping.Forms
                 case "Credits":
                     MessageBox.Show(Credits, "Credits");
                     break;
+
+                case "Download URL":
+                    break;
             }
         }
 
