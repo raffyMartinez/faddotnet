@@ -21,7 +21,6 @@ namespace FAD3.Mapping.Forms
             InitializeComponent();
             _url = url;
             _fileName = fileName;
-            lblDownloadFile.Text = _fileName;
         }
 
         private void DownloadFile()
@@ -57,6 +56,7 @@ namespace FAD3.Mapping.Forms
 
         private void OnFormLoad(object sender, EventArgs e)
         {
+            lblDownloadFile.Text = _fileName;
             DownloadFile();
             Text = $"Downloading {_fileName}";
         }

@@ -1721,6 +1721,19 @@ namespace FAD3
                     }
                     break;
 
+                case "downloadSpatioTemporal":
+                    var downloadSpTempForm = Mapping.Forms.DownloadSpatioTemporalDataForm.GetInstance();
+                    if (downloadSpTempForm.Visible)
+                    {
+                        downloadSpTempForm.BringToFront();
+                    }
+                    else
+
+                    {
+                        downloadSpTempForm.Show(global.MappingForm);
+                    }
+                    break;
+
                 case "browseLGUs":
                     LGUSForm lf = LGUSForm.GetInstance();
                     if (lf.Visible)
@@ -1738,6 +1751,7 @@ namespace FAD3
         public void SetMapDependendMenus()
         {
             spatioTemporalMapMenuItem.Enabled = global.MapIsOpen;
+            downloadSpatiotemporalDataToolStripMenuItem.Enabled = global.MapIsOpen;
         }
 
         private void OnToolbar_ItemClicked(object sender, ToolStripItemClickedEventArgs e)

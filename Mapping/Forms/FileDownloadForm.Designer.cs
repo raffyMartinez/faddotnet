@@ -43,17 +43,19 @@
             // 
             // lblDownloadFile
             // 
-            this.lblDownloadFile.Location = new System.Drawing.Point(12, 71);
+            this.lblDownloadFile.Location = new System.Drawing.Point(12, 46);
             this.lblDownloadFile.Name = "lblDownloadFile";
-            this.lblDownloadFile.Size = new System.Drawing.Size(287, 31);
+            this.lblDownloadFile.Size = new System.Drawing.Size(287, 56);
             this.lblDownloadFile.TabIndex = 1;
-            this.lblDownloadFile.Text = "label1";
+            this.lblDownloadFile.Text = "this is a long label just to test how alignment looks alike when the text is long" +
+    " enough";
+            this.lblDownloadFile.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
             // 
             // lblTitle
             // 
             this.lblTitle.AutoSize = true;
             this.lblTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblTitle.Location = new System.Drawing.Point(100, 49);
+            this.lblTitle.Location = new System.Drawing.Point(99, 18);
             this.lblTitle.Name = "lblTitle";
             this.lblTitle.Size = new System.Drawing.Size(115, 15);
             this.lblTitle.TabIndex = 2;

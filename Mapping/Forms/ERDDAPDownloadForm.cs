@@ -32,15 +32,15 @@ namespace FAD3.Mapping.Forms
         public string Identifier { get; set; }
         public string MetadataFileName { get; set; }
         private string _freq;
-        private SpatioTemporalHelperForm _parent;
+        private DownloadSpatioTemporalDataForm _parent;
 
-        public ERDDAPDownloadForm(SpatioTemporalHelperForm parent)
+        public ERDDAPDownloadForm(DownloadSpatioTemporalDataForm parent)
         {
             InitializeComponent();
             _parent = parent;
         }
 
-        public static ERDDAPDownloadForm GetInstance(SpatioTemporalHelperForm parent)
+        public static ERDDAPDownloadForm GetInstance(DownloadSpatioTemporalDataForm parent)
         {
             if (_instance == null) _instance = new ERDDAPDownloadForm(parent);
             return _instance;

@@ -318,6 +318,12 @@
     <Compile Include="Mapping\Forms\DisplayCopyableTextForm.Designer.cs">
       <DependentUpon>DisplayCopyableTextForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Mapping\Forms\DownloadSpatioTemporalDataForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Mapping\Forms\DownloadSpatioTemporalDataForm.Designer.cs">
+      <DependentUpon>DownloadSpatioTemporalDataForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Mapping\Forms\ERDDAPDownloadForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -800,6 +806,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Mapping\Forms\DisplayCopyableTextForm.resx">
       <DependentUpon>DisplayCopyableTextForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Mapping\Forms\DownloadSpatioTemporalDataForm.resx">
+      <DependentUpon>DownloadSpatioTemporalDataForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Mapping\Forms\ERDDAPDownloadForm.resx">
       <DependentUpon>ERDDAPDownloadForm.cs</DependentUpon>
