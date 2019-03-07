@@ -312,11 +312,23 @@
     <Compile Include="Mapping\Classes\OccurenceMapEventArgs.cs" />
     <Compile Include="Mapping\Classes\ParseCSVEventArgs.cs" />
     <Compile Include="Mapping\Classes\ShapefileDiskStorageHelper.cs" />
+    <Compile Include="Mapping\Forms\DisplayCopyableTextForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Mapping\Forms\DisplayCopyableTextForm.Designer.cs">
+      <DependentUpon>DisplayCopyableTextForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Mapping\Forms\ERDDAPDownloadForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Mapping\Forms\ERDDAPDownloadForm.Designer.cs">
       <DependentUpon>ERDDAPDownloadForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Mapping\Forms\FileDownloadForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Mapping\Forms\FileDownloadForm.Designer.cs">
+      <DependentUpon>FileDownloadForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Mapping\Forms\SelectUTMZoneForm.cs">
       <SubType>Form</SubType>
@@ -786,8 +798,14 @@
     <EmbeddedResource Include="GUI\Forms\AboutFADForm2.resx">
       <DependentUpon>AboutFADForm2.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Mapping\Forms\DisplayCopyableTextForm.resx">
+      <DependentUpon>DisplayCopyableTextForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Mapping\Forms\ERDDAPDownloadForm.resx">
       <DependentUpon>ERDDAPDownloadForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Mapping\Forms\FileDownloadForm.resx">
+      <DependentUpon>FileDownloadForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Mapping\Forms\SelectUTMZoneForm.resx">
       <DependentUpon>SelectUTMZoneForm.cs</DependentUpon>

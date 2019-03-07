@@ -35,9 +35,11 @@ namespace FAD3.Mapping.Forms
         private bool _hasReadCoordinates;
         private string _ERDDAPMetadataFolder;
         private Extents _selectionExtent;
+        private bool _willUpdateEndPosition;
+        private string _identiferToUpdate;
 
-        private Dictionary<string, (Dictionary<string, (string unit, string description)> parameters, string title, Extents gridExtents, string url, string credits, string legalConstraint, string dataAbstract, Dictionary<string, (string name, int size, double spacing)> dimensions, DateTime beginPosition, DateTime endPosition)> _dictERDDAP =
-            new Dictionary<string, (Dictionary<string, (string unit, string description)> parameters, string title, Extents gridExtents, string url, string credits, string legalConstraint, string dataAbstract, Dictionary<string, (string name, int size, double spacing)> dimensions, DateTime beginPosition, DateTime endPosition)>();
+        private Dictionary<string, (Dictionary<string, (string unit, string description)> parameters, string title, Extents gridExtents, string url, string credits, string legalConstraint, string dataAbstract, Dictionary<string, (string name, int size, double spacing)> dimensions, DateTime beginPosition, DateTime endPosition, string metadataFileName)> _dictERDDAP =
+            new Dictionary<string, (Dictionary<string, (string unit, string description)> parameters, string title, Extents gridExtents, string url, string credits, string legalConstraint, string dataAbstract, Dictionary<string, (string name, int size, double spacing)> dimensions, DateTime beginPosition, DateTime endPosition, string metadataFileName)>();
 
         public static SpatioTemporalHelperForm GetInstance()
         {
@@ -145,6 +147,13 @@ namespace FAD3.Mapping.Forms
             return Task.Run(() => MakeGridFromPoints.ParseSingleDimensionCSV());
         }
 
+        public void UpdateEndPosition(string fileName, string identifier, string endPosition)
+        {
+            _willUpdateEndPosition = true;
+            _identiferToUpdate = identifier;
+            ERDDAPMetadataHandler.UpdateMetadataEndPosition(fileName, endPosition);
+        }
+
         private void OnButtonClick(object sender, EventArgs e)
         {
             switch (((Button)sender).Name)
@@ -156,7 +165,7 @@ namespace FAD3.Mapping.Forms
                         && txtMaxLon.Text.Length > 0
                         && lvERDDAP.SelectedItems.Count > 0)
                     {
-                        ERDDAPDownloadForm edf = ERDDAPDownloadForm.GetInstance();
+                        ERDDAPDownloadForm edf = ERDDAPDownloadForm.GetInstance(this);
                         if (edf.Visible)
                         {
                             edf.BringToFront();
@@ -174,6 +183,9 @@ namespace FAD3.Mapping.Forms
                             edf.DataAbstract = _dictERDDAP[identifier].dataAbstract;
                             edf.LegalConstraint = _dictERDDAP[identifier].legalConstraint;
                             edf.GridExtents = _dictERDDAP[identifier].gridExtents;
+                            edf.URL = _dictERDDAP[identifier].url;
+                            edf.Identifier = identifier;
+                            edf.MetadataFileName = _dictERDDAP[identifier].metadataFileName;
                             edf.Show(this);
                         }
                     }
@@ -884,6 +896,14 @@ namespace FAD3.Mapping.Forms
 
         private void OnERDDAPMetadataRead(object sender, ERDDAPMetadataReadEventArgs e)
         {
+            if (_willUpdateEndPosition)
+            {
+                if (_dictERDDAP.Remove(_identiferToUpdate))
+                {
+                    lvERDDAP.Items.Remove(lvERDDAP.Items[_identiferToUpdate]);
+                    _identiferToUpdate = "";
+                }
+            }
             var item = lvERDDAP.Items.Add(e.FileIdentifier, e.DataTitle, null);
             item.SubItems.Add(e.BeginPosition.ToShortDateString());
             item.SubItems.Add(e.EndPosition.ToShortDateString());
@@ -909,8 +929,9 @@ namespace FAD3.Mapping.Forms
             item.ToolTipText = e.DataAbstract;
             Extents ext = new Extents();
             ext.SetBounds(e.EastBound, e.SouthBound, 0, e.WestBound, e.NorthBound, 0);
-            _dictERDDAP.Add(e.FileIdentifier, (e.DataParameters, e.DataTitle, ext, e.URL, e.Credit, e.LegalConstraints, e.DataAbstract, e.Dimensions, e.BeginPosition, e.EndPosition));
+            _dictERDDAP.Add(e.FileIdentifier, (e.DataParameters, e.DataTitle, ext, e.URL, e.Credit, e.LegalConstraints, e.DataAbstract, e.Dimensions, e.BeginPosition, e.EndPosition, e.MetaDataFilename));
             SizeColumns(lvERDDAP, false);
+            _willUpdateEndPosition = false;
         }
 
         private void OnExtentDefined(object sender, ExtentDraggedBoxEventArgs e)

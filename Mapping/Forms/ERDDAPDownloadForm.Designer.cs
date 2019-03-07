@@ -72,6 +72,9 @@
             this.lblAltitudeSize = new System.Windows.Forms.Label();
             this.lblAltitudeSpacing = new System.Windows.Forms.Label();
             this.btnLatHelp = new System.Windows.Forms.Button();
+            this.cboFileType = new System.Windows.Forms.ComboBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.btnRefresh = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -88,21 +91,23 @@
             // 
             // btnOk
             // 
-            this.btnOk.Location = new System.Drawing.Point(618, 484);
+            this.btnOk.Location = new System.Drawing.Point(618, 539);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(55, 28);
             this.btnOk.TabIndex = 3;
             this.btnOk.Text = "Ok";
             this.btnOk.UseVisualStyleBackColor = true;
+            this.btnOk.Click += new System.EventHandler(this.OnButtonClick);
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(557, 484);
+            this.btnCancel.Location = new System.Drawing.Point(557, 539);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(55, 28);
             this.btnCancel.TabIndex = 4;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
+            this.btnCancel.Click += new System.EventHandler(this.OnButtonClick);
             // 
             // txtboundNorth
             // 
@@ -225,12 +230,13 @@
             // 
             this.lblURL.AutoSize = true;
             this.lblURL.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblURL.Location = new System.Drawing.Point(15, 490);
+            this.lblURL.Location = new System.Drawing.Point(15, 528);
             this.lblURL.Name = "lblURL";
             this.lblURL.Size = new System.Drawing.Size(102, 17);
             this.lblURL.TabIndex = 20;
             this.lblURL.TabStop = true;
             this.lblURL.Text = "Download URL";
+            this.lblURL.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.OnLinkClick);
             // 
             // tableLayoutPanel1
             // 
@@ -561,11 +567,42 @@
             this.btnLatHelp.UseVisualStyleBackColor = true;
             this.btnLatHelp.Click += new System.EventHandler(this.OnButtonClick);
             // 
+            // cboFileType
+            // 
+            this.cboFileType.FormattingEnabled = true;
+            this.cboFileType.Location = new System.Drawing.Point(67, 485);
+            this.cboFileType.Name = "cboFileType";
+            this.cboFileType.Size = new System.Drawing.Size(500, 21);
+            this.cboFileType.TabIndex = 21;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(15, 488);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(46, 13);
+            this.label3.TabIndex = 38;
+            this.label3.Text = "File type";
+            this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // btnRefresh
+            // 
+            this.btnRefresh.Location = new System.Drawing.Point(496, 539);
+            this.btnRefresh.Name = "btnRefresh";
+            this.btnRefresh.Size = new System.Drawing.Size(55, 28);
+            this.btnRefresh.TabIndex = 39;
+            this.btnRefresh.Text = "Refresh";
+            this.btnRefresh.UseVisualStyleBackColor = true;
+            this.btnRefresh.Click += new System.EventHandler(this.OnButtonClick);
+            // 
             // ERDDAPDownloadForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(682, 521);
+            this.ClientSize = new System.Drawing.Size(682, 577);
+            this.Controls.Add(this.btnRefresh);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.cboFileType);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Controls.Add(this.lblURL);
             this.Controls.Add(this.lblCredits);
@@ -634,5 +671,8 @@
         private System.Windows.Forms.TextBox txtEndAltitude;
         private System.Windows.Forms.Label lblAltitudeSize;
         private System.Windows.Forms.Label lblAltitudeSpacing;
+        private System.Windows.Forms.ComboBox cboFileType;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Button btnRefresh;
     }
 }

@@ -313,14 +313,12 @@ namespace FAD3.Mapping.Classes
 
             FishingGrid.UTMZone = UTMZone;
             Coordinates = new Dictionary<int, (double latitude, double longitude, bool Inland)>();
-            StreamReader sr = new StreamReader(_singleDimensionCSV, true);
-            string line = "";
             Dictionary<int, double?> pointValue = new Dictionary<int, double?>();
             Dictionary<int, double?> pointValueCopy = new Dictionary<int, double?>(pointValue);
             string timeEra = "";
             bool beginTimeEra = true;
             bool readCoordinates = true;
-            string[] fields;
+
             int row = 0;
             InlandPointCount = 0;
             List<string> inlandPoints = new List<string>();
@@ -328,6 +326,8 @@ namespace FAD3.Mapping.Classes
             {
                 inlandPoints = FishingGrid.InlandPoints;
             }
+
+            StreamReader sr = new StreamReader(_singleDimensionCSV, true);
 
             //skip metadata lines
             if (_metadataRows > 0)
@@ -381,6 +381,9 @@ namespace FAD3.Mapping.Classes
                         break;
                 }
             }
+
+            string[] fields;
+            string line = "";
 
             while ((line = sr.ReadLine()) != null)
             {

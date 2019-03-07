@@ -17,6 +17,7 @@ using System.Drawing;
 using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
+using System.Net;
 
 namespace FAD3
 {
@@ -55,6 +56,29 @@ namespace FAD3
         }
 
         public static Grid25GenerateForm Grid25GenerateForm { get; set; }
+
+        public static bool HasInternetConnection()
+        {
+            try
+            {
+                if (System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable())
+                {
+                    using (var client = new WebClient())
+                    using (client.OpenRead("http://clients3.google.com/generate_204"))
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
 
         public static fad3MappingMode MappingMode { get; set; }
 

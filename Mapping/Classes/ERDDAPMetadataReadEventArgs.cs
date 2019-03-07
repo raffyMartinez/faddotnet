@@ -24,6 +24,7 @@ namespace FAD3.Mapping.Classes
         public double SouthBound { get; internal set; }
         public double EastBound { get; internal set; }
         public double WestBound { get; internal set; }
+        public string MetaDataFilename { get; internal set; }
         public Dictionary<string, (string name, int size, double spacing)> Dimensions { get; set; }
 
         public void SetBounds(double west, double east, double north, double south)
@@ -36,7 +37,7 @@ namespace FAD3.Mapping.Classes
 
         public ERDDAPMetadataReadEventArgs(string dataTitle, string dataAbstract, DateTime beginPosition,
                 DateTime endPosition, string fileIdentifier, string url, string credit,
-                int temporalSize, Dictionary<string, (string unit, string description)> dataParameters)
+                int temporalSize, Dictionary<string, (string unit, string description)> dataParameters, string metadataFilename)
         {
             DataTitle = dataTitle;
             DataAbstract = dataAbstract;
@@ -47,6 +48,7 @@ namespace FAD3.Mapping.Classes
             DataParameters = dataParameters;
             Credit = credit;
             TemporalSize = temporalSize;
+            MetaDataFilename = metadataFilename;
         }
     }
 }
