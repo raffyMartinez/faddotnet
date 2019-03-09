@@ -51,12 +51,14 @@
             this.rbtnUseSelectedLayer = new System.Windows.Forms.RadioButton();
             this.rbtnUseSelectionBox = new System.Windows.Forms.RadioButton();
             this.btnOk = new System.Windows.Forms.Button();
+            this.lblItemsCount = new System.Windows.Forms.Label();
             this.groupBox4.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox4
             // 
+            this.groupBox4.Controls.Add(this.lblItemsCount);
             this.groupBox4.Controls.Add(this.txtMetadataFolderPath);
             this.groupBox4.Controls.Add(this.label20);
             this.groupBox4.Controls.Add(this.btnGetMetadataFolder);
@@ -117,7 +119,6 @@
             // 
             // lvERDDAP
             // 
-            this.lvERDDAP.CheckBoxes = true;
             this.lvERDDAP.FullRowSelect = true;
             this.lvERDDAP.HideSelection = false;
             this.lvERDDAP.Location = new System.Drawing.Point(12, 61);
@@ -154,6 +155,7 @@
             this.txtMaxLon.Name = "txtMaxLon";
             this.txtMaxLon.Size = new System.Drawing.Size(155, 20);
             this.txtMaxLon.TabIndex = 11;
+            this.txtMaxLon.Tag = "extent";
             // 
             // txtMinLon
             // 
@@ -161,6 +163,7 @@
             this.txtMinLon.Name = "txtMinLon";
             this.txtMinLon.Size = new System.Drawing.Size(155, 20);
             this.txtMinLon.TabIndex = 10;
+            this.txtMinLon.Tag = "extent";
             // 
             // txtMaxLat
             // 
@@ -168,6 +171,7 @@
             this.txtMaxLat.Name = "txtMaxLat";
             this.txtMaxLat.Size = new System.Drawing.Size(155, 20);
             this.txtMaxLat.TabIndex = 9;
+            this.txtMaxLat.Tag = "extent";
             // 
             // txtMinLat
             // 
@@ -175,6 +179,7 @@
             this.txtMinLat.Name = "txtMinLat";
             this.txtMinLat.Size = new System.Drawing.Size(155, 20);
             this.txtMinLat.TabIndex = 8;
+            this.txtMinLat.Tag = "extent";
             // 
             // label19
             // 
@@ -269,6 +274,15 @@
             this.btnOk.UseVisualStyleBackColor = true;
             this.btnOk.Click += new System.EventHandler(this.OnButtonClick);
             // 
+            // lblItemsCount
+            // 
+            this.lblItemsCount.AutoSize = true;
+            this.lblItemsCount.Location = new System.Drawing.Point(9, 251);
+            this.lblItemsCount.Name = "lblItemsCount";
+            this.lblItemsCount.Size = new System.Drawing.Size(92, 13);
+            this.lblItemsCount.TabIndex = 17;
+            this.lblItemsCount.Text = "No items in the list";
+            // 
             // DownloadSpatioTemporalDataForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -313,5 +327,6 @@
         private System.Windows.Forms.RadioButton rbtnUseSelectionBox;
         private System.Windows.Forms.ImageList imageList1;
         private System.Windows.Forms.Button btnOk;
+        private System.Windows.Forms.Label lblItemsCount;
     }
 }

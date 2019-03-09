@@ -12,6 +12,7 @@ using System.Net;
 using System.IO;
 using System.Xml;
 using Microsoft.VisualBasic.FileIO;
+using FAD3.Mapping.Classes;
 
 namespace FAD3.Mapping.Forms
 {
@@ -33,6 +34,7 @@ namespace FAD3.Mapping.Forms
         public string MetadataFileName { get; set; }
         private string _freq;
         private DownloadSpatioTemporalDataForm _parent;
+        private Extents _selectionExtent;
 
         public ERDDAPDownloadForm(DownloadSpatioTemporalDataForm parent)
         {
@@ -74,6 +76,8 @@ namespace FAD3.Mapping.Forms
             txtboundWest.Text = DataExtents.xMax.ToString();
             txtboundNorth.Text = DataExtents.yMax.ToString();
             txtboundSouth.Text = DataExtents.yMin.ToString();
+
+            ValidateExtents();
 
             lvGridParameters.View = View.Details;
             lvGridParameters.Columns.Clear();
@@ -161,9 +165,37 @@ namespace FAD3.Mapping.Forms
 
             dtPickerEnd.Value = EndPosition;
             dtPickerStart.Value = EndPosition;
+            MakeGridFromPoints.OnExtentDefined += OnExtentDefined;
+            Text = "Setup ERDDAP>griddap data access";
         }
 
-        private void updateMetadataXML(string updateValue)
+        /// <summary>
+        /// responds to a the selection box dragged in the map and updates the corresponding fields in the form
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnExtentDefined(object sender, ExtentDraggedBoxEventArgs e)
+        {
+            txtboundNorth.Text = e.Top.ToString();
+            txtboundSouth.Text = e.Bottom.ToString();
+            txtboundEast.Text = e.Left.ToString();
+            txtboundWest.Text = e.Right.ToString();
+            _selectionExtent = new Extents();
+            _selectionExtent.SetBounds(e.Left, e.Bottom, 0, e.Right, e.Top, 0);
+            if (!e.InDrag)
+            {
+                MakeGridFromPoints.MapLayers = global.MappingForm.MapLayersHandler;
+                MakeGridFromPoints.MakeExtentShapeFile();
+            }
+            ValidateExtents();
+        }
+
+        /// <summary>
+        /// edits metadata of current dataset and updates all values of gml:endPosition node
+        /// gml:endPosition is the value of the latest date of the dataset
+        /// </summary>
+        /// <param name="updateValue"></param>
+        private void updateMetadataXML(string identifier, string updateValue)
         {
             XmlDocument doc = new XmlDocument();
             doc.Load(MetadataFileName);
@@ -172,11 +204,17 @@ namespace FAD3.Mapping.Forms
                 nd.InnerXml = updateValue;
             }
             doc.Save(MetadataFileName);
-            _parent.UpdateEndPosition(MetadataFileName, Identifier, updateValue);
+            _parent.UpdateEndPosition(identifier, updateValue);
         }
 
+        /// <summary>
+        /// download the .das file of the current dataset and locates value of "time_coverage_end" property
+        /// updates corresponding temporal end position of xml metadata of current dataset
+        /// </summary>
         private void RefreshMetadata()
         {
+            string msg = "";
+            string titleString = "";
             if (global.HasInternetConnection())
             {
                 WebClient wc = new WebClient();
@@ -184,13 +222,24 @@ namespace FAD3.Mapping.Forms
                 {
                     string dasText = wc.DownloadString($"{URL}.das");
                     string updateEndPosition = GetDateCoverageEnd(dasText);
-                    if (EndPosition != DateTime.Parse(updateEndPosition))
+                    bool updateStart = dtPickerStart.Value == EndPosition;
+                    if (EndPosition.Date != DateTime.Parse(updateEndPosition).Date)
                     {
                         EndPosition = DateTime.Parse(updateEndPosition);
 
-                        updateMetadataXML(updateEndPosition);
-                        dtPickerStart.Value = EndPosition;
+                        if (updateStart)
+                        {
+                            dtPickerStart.Value = EndPosition;
+                        }
                         dtPickerEnd.Value = EndPosition;
+                        updateMetadataXML(Identifier, updateEndPosition);
+                        msg = "Metadata was successfuly updated";
+                        titleString = "Update successful";
+                    }
+                    else
+                    {
+                        msg = "Metadata does not have any update";
+                        titleString = "No update for metadata";
                     }
                 }
                 catch (WebException wex)
@@ -202,6 +251,12 @@ namespace FAD3.Mapping.Forms
                     Logger.Log(ex.Message, "ERDDAPDownloadForm.cs", "RefreshMetadata");
                 }
             }
+            else
+            {
+                msg = "Computer is not connected to the internet";
+                titleString = "No connection";
+            }
+            MessageBox.Show(msg, titleString, MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private static Stream GenerateStreamFromString(string s)
@@ -229,6 +284,11 @@ namespace FAD3.Mapping.Forms
             }
         }
 
+        /// <summary>
+        /// searches downloaded .das file for occurence of time_coverage_end and returns corresponding value
+        /// </summary>
+        /// <param name="dasText"></param>
+        /// <returns></returns>
         private string GetDateCoverageEnd(string dasText)
         {
             string returnDate = getBetween(dasText, "time_coverage_end ", ";");
@@ -244,6 +304,11 @@ namespace FAD3.Mapping.Forms
             _instance = null;
         }
 
+        /// <summary>
+        /// handles clicks on link labels
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnLinkClick(object sender, LinkLabelLinkClickedEventArgs e)
         {
             switch (((LinkLabel)sender).Text)
@@ -261,7 +326,7 @@ namespace FAD3.Mapping.Forms
                     break;
 
                 case "Download URL":
-                    if (ValidateDownload())
+                    if (ValidateForm())
                     {
                         DisplayCopyableTextForm dcf = DisplayCopyableTextForm.GetInstance();
                         if (dcf.Visible)
@@ -279,85 +344,61 @@ namespace FAD3.Mapping.Forms
             }
         }
 
-        private bool ValidateDownload()
+        private bool ValidateTime()
         {
-            string msg = "";
-            bool isValid = true;
-            if (chkAltitude.Enabled)
-            {
-                isValid = txtAltitudeStride.Text.Length > 0
-                    && txtStartAltitude.Text.Length > 0
-                    && txtEndAltitude.Text.Length > 0;
+            VisibleErrorLabels(false);
+            bool isStartDateValid = DateTime.Compare(dtPickerStart.Value, BeginPosition) >= 0
+                && DateTime.Compare(dtPickerStart.Value, EndPosition) <= 0
+                && DateTime.Compare(dtPickerStart.Value, dtPickerEnd.Value) <= 0;
+            lblErrStartTime.Visible = !isStartDateValid;
 
-                if (!isValid)
-                {
-                    msg = "Altitude parameters must be completed";
-                }
-            }
-            if (isValid)
-            {
-                isValid = txtboundEast.Text.Length > 0
-                    && txtboundNorth.Text.Length > 0
-                    && txtboundSouth.Text.Length > 0
-                    && txtboundWest.Text.Length > 0
-                    && txtLatStride.Text.Length > 0
-                    && txtLonStride.Text.Length > 0;
+            bool isEndDateValid = DateTime.Compare(dtPickerEnd.Value, BeginPosition) >= 0
+                && DateTime.Compare(dtPickerEnd.Value, EndPosition) <= 0
+                && DateTime.Compare(dtPickerStart.Value, dtPickerEnd.Value) <= 0;
+            lblErrEndTime.Visible = !isEndDateValid;
 
-                if (!isValid)
-                {
-                    msg = "Longitude and altitude parameters must be completed";
-                }
-            }
+            return isStartDateValid && isEndDateValid;
+        }
+
+        private bool ValidateForm()
+        {
+            bool isValid = ValidateExtents();
+
             if (isValid)
             {
-                isValid = lvGridParameters.CheckedItems.Count > 0;
-                if (!isValid)
-                {
-                    msg = "At least one grid variable must be checked";
-                }
-            }
-            if (isValid)
-            {
-                isValid = BeginPosition <= DateTime.Parse(dtPickerStart.Value.ToString("yyyy-MM-ddT12:00:00Z"));
+                isValid = ValidateTime();
                 if (isValid)
                 {
-                    isValid = dtPickerEnd.Value <= DateTime.Now;
-                    if (!isValid)
-                    {
-                        msg = "End date must not be a future date";
-                    }
+                    isValid = ValidateStrides();
                     if (isValid)
                     {
-                        isValid = dtPickerEnd.Value >= dtPickerStart.Value;
-                        if (!isValid)
+                        isValid = txtboundEast.Text.Length > 0
+                            && txtboundNorth.Text.Length > 0
+                            && txtboundSouth.Text.Length > 0
+                            && txtboundWest.Text.Length > 0
+                            && txtLatStride.Text.Length > 0
+                            && txtLonStride.Text.Length > 0
+                            && txtTimeStride.Text.Length > 0;
+
+                        if (isValid && chkAltitude.Checked)
                         {
-                            msg = $"End date ({dtPickerEnd.Text}) must be the same or after start date ({dtPickerStart.Text})";
+                            isValid = txtStartAltitude.Text.Length > 0
+                                && txtEndAltitude.Text.Length > 0
+                                && txtAltitudeStride.Text.Length > 0;
                         }
                     }
                 }
-                else
-                {
-                    msg = $"Start date ({dtPickerStart.Text}) must not be earlier than beginning date of data ({BeginPosition.ToString("MMM-dd-yyyy")})";
-                }
-            }
-            if (isValid)
-            {
-                isValid = dtPickerEnd.Value <= EndPosition;
-                if (!isValid)
-                {
-                    msg = $"End date ({dtPickerEnd.Text}) must not be after end position of data ({EndPosition.ToString("MMM-dd-yyyy")})";
-                }
-            }
-            if (!isValid)
-            {
-                MessageBox.Show(msg, "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
             return isValid;
         }
 
+        /// <summary>
+        /// returns the URL for downloading gridded data
+        /// </summary>
+        /// <returns></returns>
         private string GetDownloadURL()
         {
-            if (ValidateDownload())
+            if (ValidateForm())
             {
                 string startUTC = "";
                 string endUTC = "";
@@ -391,10 +432,15 @@ namespace FAD3.Mapping.Forms
             }
             else
             {
+                MessageBox.Show("Please check fields for errors marked by exclamation points", "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return "";
             }
         }
 
+        /// <summary>
+        /// opens the form that downloads data using ERDDAP
+        /// </summary>
+        /// <param name="url"></param>
         private void DownloadERDDAPData(string url)
         {
             SaveFileDialog sfd = new SaveFileDialog();
@@ -441,6 +487,213 @@ namespace FAD3.Mapping.Forms
                     }
                     break;
             }
+        }
+
+        private void OnFieldValidate(object sender, CancelEventArgs e)
+        {
+            string ctlName = ((Control)sender).Name;
+            string s = "";
+            string msg = "";
+            switch (((Control)sender).GetType().Name)
+            {
+                case "TextBox":
+                case "DateTimePicker":
+                    s = ((Control)sender).Text;
+                    break;
+            }
+
+            if (s.Length > 0)
+            {
+                switch (ctlName)
+                {
+                    case "dtPickerStart":
+                    case "dtPickerEnd":
+                        e.Cancel = !ValidateTime();
+                        break;
+
+                    case "txtTimeStride":
+                    case "txtAltitudeStride":
+                    case "txtLatStride":
+                    case "txtLonStride":
+                        e.Cancel = !ValidateStrides();
+                        break;
+
+                    case "txtStartAltitude":
+                        break;
+
+                    case "txtEndAltitude":
+                        break;
+
+                    case "txtboundNorth":
+                    case "txtboundSouth":
+                    case "txtboundEast":
+                    case "txtboundWest":
+
+                        e.Cancel = !ValidateExtents();
+
+                        break;
+                }
+            }
+        }
+
+        private bool ValidateStrides()
+
+        {
+            VisibleErrorLabels(false);
+            bool isValid = true;
+            bool returnValue = true;
+            string s = "";
+            foreach (Control ctl in tableLayoutPanel1.Controls)
+            {
+                switch (ctl.Name)
+                {
+                    case "txtTimeStride":
+                    case "txtLatStride":
+                    case "txtLonStride":
+                    case "txtAltitudeStride":
+                        s = ctl.Text;
+                        if (s.Length > 0)
+                        {
+                            if (int.TryParse(s, out int v))
+                            {
+                                switch (ctl.Name)
+                                {
+                                    case "txtTimeStride":
+                                        isValid = v <= Dimensions["temporal"].size && v > 0;
+                                        lblErrStrideTime.Visible = !isValid;
+                                        break;
+
+                                    case "txtLatStride":
+
+                                        isValid = v <= Dimensions["row"].size && v > 0;
+                                        lblErrStrideLatitude.Visible = !isValid;
+                                        break;
+
+                                    case "txtLonStride":
+
+                                        isValid = v <= Dimensions["column"].size && v > 0;
+                                        lblErrStrideLongitude.Visible = !isValid;
+                                        break;
+
+                                    case "txtAltitudeStride":
+                                        isValid = v <= Dimensions["vertical"].size && v > 0;
+                                        lblErrStrideAltitude.Visible = !isValid;
+                                        break;
+                                }
+                            }
+                            else
+                            {
+                                MessageBox.Show("Expected values are whole numbers greater than zero", "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                isValid = false;
+                            }
+                            if (returnValue)
+                            {
+                                returnValue = isValid;
+                            }
+                        }
+                        break;
+                }
+            }
+
+            return returnValue;
+        }
+
+        private void VisibleErrorLabels(bool labelsVisible = true)
+        {
+            lblErrStartLatitude.Visible = labelsVisible;
+            lblErrEndLatitude.Visible = labelsVisible;
+            lblErrStartLongitude.Visible = labelsVisible;
+            lblErrEndLongitude.Visible = labelsVisible;
+            lblErrStartAltitude.Visible = labelsVisible;
+            lblErrEndAltitude.Visible = labelsVisible;
+            lblErrStartTime.Visible = labelsVisible;
+            lblErrEndTime.Visible = labelsVisible;
+            lblErrStrideAltitude.Visible = labelsVisible;
+            lblErrStrideLatitude.Visible = labelsVisible;
+            lblErrStrideLongitude.Visible = labelsVisible;
+            lblErrStrideTime.Visible = labelsVisible;
+        }
+
+        private bool ValidateExtents(bool hideErrorLables = false)
+        {
+            VisibleErrorLabels(false);
+            bool isValid = true;
+            string msg = "";
+            string s = "";
+
+            foreach (Control c in tableLayoutPanel1.Controls)
+            {
+                if (c.Tag?.ToString() == "extent")
+                {
+                    s = c.Text;
+                    if (s.Length > 0)
+                    {
+                        if (double.TryParse(s, out double dbl))
+                        {
+                            switch (c.Name)
+                            {
+                                case "txtboundNorth":
+                                    if (dbl < GridExtents.yMin || dbl > GridExtents.yMax)
+                                    {
+                                        isValid = false;
+                                        lblErrStartLatitude.Visible = !isValid;
+                                    }
+                                    break;
+
+                                case "txtboundSouth":
+                                    if (dbl < GridExtents.yMin || dbl > GridExtents.yMax)
+                                    {
+                                        isValid = false;
+                                        lblErrEndLatitude.Visible = !isValid;
+                                    }
+                                    break;
+
+                                case "txtboundEast":
+                                    if (dbl < GridExtents.xMin || dbl > GridExtents.xMax)
+                                    {
+                                        isValid = false;
+                                        lblErrStartLongitude.Visible = !isValid;
+                                    }
+                                    break;
+
+                                case "txtboundWest":
+                                    if (dbl < GridExtents.xMin || dbl > GridExtents.xMax)
+                                    {
+                                        isValid = false;
+                                        lblErrEndLongitude.Visible = !isValid;
+                                    }
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            msg += $"{c.Name.Replace("txtbound", string.Empty) + "ern"} extent value must be a number";
+                            isValid = false;
+                            switch (c.Name)
+                            {
+                                case "txtboundNorth":
+                                    lblErrStartLatitude.Visible = true;
+                                    break;
+
+                                case "txtboundSouth":
+                                    lblErrEndLatitude.Visible = true;
+                                    break;
+
+                                case "txtboundEast":
+                                    lblErrStartLongitude.Visible = true;
+                                    break;
+
+                                case "txtboundWest":
+                                    lblErrEndLongitude.Visible = true;
+                                    break;
+                            }
+                            MessageBox.Show(msg, "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                    }
+                }
+            }
+
+            return isValid;
         }
     }
 }

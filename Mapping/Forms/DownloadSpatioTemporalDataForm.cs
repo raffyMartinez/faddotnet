@@ -16,12 +16,7 @@ namespace FAD3.Mapping.Forms
     {
         private string _ERDDAPMetadataFolder;
         private static DownloadSpatioTemporalDataForm _instance;
-        private bool _willUpdateEndPosition;
-        private string _identiferToUpdate;
         private Extents _selectionExtent;
-
-        private Dictionary<string, (Dictionary<string, (string unit, string description)> parameters, string title, Extents gridExtents, string url, string credits, string legalConstraint, string dataAbstract, Dictionary<string, (string name, int size, double spacing)> dimensions, DateTime beginPosition, DateTime endPosition, string metadataFileName)> _dictERDDAP =
-           new Dictionary<string, (Dictionary<string, (string unit, string description)> parameters, string title, Extents gridExtents, string url, string credits, string legalConstraint, string dataAbstract, Dictionary<string, (string name, int size, double spacing)> dimensions, DateTime beginPosition, DateTime endPosition, string metadataFileName)>();
 
         public static DownloadSpatioTemporalDataForm GetInstance()
         {
@@ -81,20 +76,7 @@ namespace FAD3.Mapping.Forms
         {
             global.LoadFormSettings(this, true);
 
-            //ERDDAP data download
-            ERDDAPMetadataHandler.OnMetadataRead += OnERDDAPMetadataRead;
-            _ERDDAPMetadataFolder = ERDDAPMetadataHandler.GetMetadataDirectorySetting();
-            txtMetadataFolderPath.Text = _ERDDAPMetadataFolder;
-
-            _dictERDDAP.Clear();
-            if (_ERDDAPMetadataFolder.Length > 0)
-            {
-                //the xml metadatafiles in the metadata folder determines what FAD3 can download from ERDDAP
-                ERDDAPMetadataHandler.MetadataDirectory = _ERDDAPMetadataFolder;
-
-                //read xml metadata for ERDDAP download
-                ERDDAPMetadataHandler.ReadISO9115Metadata();
-            }
+            lvERDDAP.Visible = false;
 
             lvERDDAP.Columns.Clear();
             lvERDDAP.Columns.Add("Title");
@@ -105,20 +87,45 @@ namespace FAD3.Mapping.Forms
             lvERDDAP.ShowItemToolTips = true;
             SizeColumns(lvERDDAP);
 
+            //ERDDAP data download
+            ERDDAPMetadataFiles.OnMetadataRead += OnERDDAPMetadataRead;
+            _ERDDAPMetadataFolder = ERDDAPMetadataFiles.GetMetadataDirectorySetting();
+            txtMetadataFolderPath.Text = _ERDDAPMetadataFolder;
+
+            if (_ERDDAPMetadataFolder.Length > 0)
+            {
+                //the xml metadatafiles in the metadata folder determines what FAD3 can download from ERDDAP
+                ERDDAPMetadataFiles.MetadataDirectory = _ERDDAPMetadataFolder;
+
+                //read xml metadata for ERDDAP download
+                ERDDAPMetadataFiles.ReadISO9115Metadata();
+            }
+
+            lvERDDAP.Visible = true;
+
             MakeGridFromPoints.OnExtentDefined += OnExtentDefined;
             Text = "Download gridded, oceanographic, spatio-temporal data using ERDDAP";
+            UpdateDataSetCount();
         }
 
-        private void OnERDDAPMetadataRead(object sender, ERDDAPMetadataReadEventArgs e)
+        private void UpdateDataSetCount()
         {
-            if (_willUpdateEndPosition)
+            if (lvERDDAP.Items.Count == 0)
             {
-                if (_dictERDDAP.Remove(_identiferToUpdate))
-                {
-                    lvERDDAP.Items.Remove(lvERDDAP.Items[_identiferToUpdate]);
-                    _identiferToUpdate = "";
-                }
+                lblItemsCount.Text = "There are no items in the list";
             }
+            else if (lvERDDAP.Items.Count == 1)
+            {
+                lblItemsCount.Text = "There is one item in the list";
+            }
+            else
+            {
+                lblItemsCount.Text = $"There are {lvERDDAP.Items.Count} items in the list";
+            }
+        }
+
+        private void OnERDDAPMetadataRead(object sender, ERDDAPMetadataFile e)
+        {
             var item = lvERDDAP.Items.Add(e.FileIdentifier, e.DataTitle, null);
             item.SubItems.Add(e.BeginPosition.ToShortDateString());
             item.SubItems.Add(e.EndPosition.ToShortDateString());
@@ -144,9 +151,7 @@ namespace FAD3.Mapping.Forms
             item.ToolTipText = e.DataAbstract;
             Extents ext = new Extents();
             ext.SetBounds(e.EastBound, e.SouthBound, 0, e.WestBound, e.NorthBound, 0);
-            _dictERDDAP.Add(e.FileIdentifier, (e.DataParameters, e.DataTitle, ext, e.URL, e.Credit, e.LegalConstraints, e.DataAbstract, e.Dimensions, e.BeginPosition, e.EndPosition, e.MetaDataFilename));
             SizeColumns(lvERDDAP, false);
-            _willUpdateEndPosition = false;
         }
 
         /// <summary>
@@ -169,17 +174,15 @@ namespace FAD3.Mapping.Forms
             }
         }
 
-        public void UpdateEndPosition(string fileName, string identifier, string endPosition)
+        public void UpdateEndPosition(string identifier, string endPosition)
         {
-            _willUpdateEndPosition = true;
-            _identiferToUpdate = identifier;
-            ERDDAPMetadataHandler.UpdateMetadataEndPosition(fileName, endPosition);
+            ERDDAPMetadataFiles.UpdateMetadataEndPosition(identifier, endPosition);
+            lvERDDAP.Items[identifier].SubItems[2].Text = DateTime.Parse(endPosition).ToShortDateString();
         }
 
         private void OnFormClosed(object sender, FormClosedEventArgs e)
         {
             _instance = null;
-            _dictERDDAP.Clear();
             global.SaveFormSettings(this);
         }
 
@@ -213,9 +216,15 @@ namespace FAD3.Mapping.Forms
                     DialogResult result = FolderBrowserLauncher.ShowFolderBrowser(folderBrowser);
                     if (result == DialogResult.OK)
                     {
-                        ERDDAPMetadataHandler.MetadataDirectory = folderBrowser.SelectedPath;
-                        ERDDAPMetadataHandler.ReadISO9115Metadata();
-                        ERDDAPMetadataHandler.SaveMetadataDirectorySetting(folderBrowser.SelectedPath);
+                        ERDDAPMetadataFiles.MetadataFiles.Clear();
+                        lvERDDAP.Visible = false;
+                        lvERDDAP.Items.Clear();
+                        ERDDAPMetadataFiles.MetadataDirectory = folderBrowser.SelectedPath;
+                        ERDDAPMetadataFiles.ReadISO9115Metadata();
+                        ERDDAPMetadataFiles.SaveMetadataDirectorySetting(folderBrowser.SelectedPath);
+                        txtMetadataFolderPath.Text = folderBrowser.SelectedPath;
+                        lvERDDAP.Visible = true;
+                        UpdateDataSetCount();
                     }
                     break;
 
@@ -234,19 +243,19 @@ namespace FAD3.Mapping.Forms
                         else
                         {
                             string identifier = lvERDDAP.SelectedItems[0].Name;
-                            edf.BeginPosition = _dictERDDAP[identifier].beginPosition;
-                            edf.EndPosition = _dictERDDAP[identifier].endPosition;
-                            edf.Dimensions = _dictERDDAP[identifier].dimensions;
+                            edf.BeginPosition = ERDDAPMetadataFiles.MetadataFiles[identifier].BeginPosition;
+                            edf.EndPosition = ERDDAPMetadataFiles.MetadataFiles[identifier].EndPosition;
+                            edf.Dimensions = ERDDAPMetadataFiles.MetadataFiles[identifier].Dimensions;
                             edf.DataExtents = _selectionExtent;
-                            edf.GridParameters = _dictERDDAP[identifier].parameters;
-                            edf.Credits = _dictERDDAP[identifier].credits;
-                            edf.Title = _dictERDDAP[identifier].title;
-                            edf.DataAbstract = _dictERDDAP[identifier].dataAbstract;
-                            edf.LegalConstraint = _dictERDDAP[identifier].legalConstraint;
-                            edf.GridExtents = _dictERDDAP[identifier].gridExtents;
-                            edf.URL = _dictERDDAP[identifier].url;
+                            edf.GridParameters = ERDDAPMetadataFiles.MetadataFiles[identifier].DataParameters;
+                            edf.Credits = ERDDAPMetadataFiles.MetadataFiles[identifier].Credits;
+                            edf.Title = ERDDAPMetadataFiles.MetadataFiles[identifier].DataTitle;
+                            edf.DataAbstract = ERDDAPMetadataFiles.MetadataFiles[identifier].DataAbstract;
+                            edf.LegalConstraint = ERDDAPMetadataFiles.MetadataFiles[identifier].LegalConstraints;
+                            edf.GridExtents = ERDDAPMetadataFiles.MetadataFiles[identifier].Extents;
+                            edf.URL = ERDDAPMetadataFiles.MetadataFiles[identifier].URL;
                             edf.Identifier = identifier;
-                            edf.MetadataFileName = _dictERDDAP[identifier].metadataFileName;
+                            edf.MetadataFileName = ERDDAPMetadataFiles.MetadataFiles[identifier].MetaDataFilename;
                             edf.Show(this);
                         }
                     }
