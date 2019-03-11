@@ -58,8 +58,29 @@ namespace FAD3.Mapping.Classes
         public static bool IsNCCSVFormat { get; internal set; }
         private static int _metadataRows;
         public static string SelectedParameter { get; set; }
+        private static HashSet<double> _hashSet = new HashSet<double>();
+        public static double ParsingTimeSeconds { get; internal set; }
+        public static int CountNonNullValues { get; internal set; }
+
+        public static double MaximumValue
+        {
+            get
+            {
+                return _hashSet.Max();
+            }
+        }
+
+        public static double MinimumValue
+        {
+            get
+            {
+                return _hashSet.Min();
+            }
+        }
 
         private static Dictionary<string, (string dataType, string fillValue, string longName, string missingValue, string units)> _dictValueParameters = new Dictionary<string, (string dataType, string fillValue, string longName, string missingValue, string units)>();
+
+        public static HashSet<double> HashedValues { get { return _hashSet; } }
 
         public static AxMap MapControl
         {
@@ -108,21 +129,27 @@ namespace FAD3.Mapping.Classes
 
         private static void OnSelectBoxFinal(object sender, _DMapEvents_SelectBoxFinalEvent e)
         {
-            if (_enableMapInteraction && MapControl.CursorMode == tkCursorMode.cmSelection)
+            if (MapControl != null)
             {
-                _extents = new Extents();
+                if (_enableMapInteraction && MapControl.CursorMode == tkCursorMode.cmSelection)
+                {
+                    _extents = new Extents();
 
-                double minLat = 0;
-                double maxLat = 0;
-                double minLon = 0;
-                double maxLon = 0;
-                _mapControl.PixelToDegrees(e.left, e.bottom, ref minLon, ref minLat);
-                _mapControl.PixelToDegrees(e.right, e.top, ref maxLon, ref maxLat);
-                _extents.SetBounds(minLon, minLat, 0, maxLon, maxLat, 0);
-                OnExtentDefined?.Invoke(null, new ExtentDraggedBoxEventArgs(maxLat, minLat, minLon, maxLon, false));
+                    double minLat = 0;
+                    double maxLat = 0;
+                    double minLon = 0;
+                    double maxLon = 0;
+                    _mapControl.PixelToDegrees(e.left, e.bottom, ref minLon, ref minLat);
+                    _mapControl.PixelToDegrees(e.right, e.top, ref maxLon, ref maxLat);
+                    _extents.SetBounds(minLon, minLat, 0, maxLon, maxLat, 0);
+                    OnExtentDefined?.Invoke(null, new ExtentDraggedBoxEventArgs(maxLat, minLat, minLon, maxLon, false));
+                }
             }
         }
 
+        /// <summary>
+        /// constructor
+        /// </summary>
         static MakeGridFromPoints()
         {
             UTMZone = fadUTMZone.utmZone51N;
@@ -309,7 +336,11 @@ namespace FAD3.Mapping.Classes
 
         public static bool ParseSingleDimensionCSV()
         {
+            CountNonNullValues = 0;
+            DateTime start = DateTime.Now;
+            Console.WriteLine($"timing parse start: {start}");
             _dictTemporalValues.Clear();
+            _hashSet.Clear();
 
             FishingGrid.UTMZone = UTMZone;
             Coordinates = new Dictionary<int, (double latitude, double longitude, bool Inland)>();
@@ -462,6 +493,8 @@ namespace FAD3.Mapping.Classes
                                         else
                                         {
                                             pointValue.Add(row, vv);
+                                            CountNonNullValues++;
+                                            _hashSet.Add(vv);
                                         }
                                     }
                                     break;
@@ -476,6 +509,8 @@ namespace FAD3.Mapping.Classes
                                         if (byte.TryParse(fields[ParameterColumn], out byte bb))
                                         {
                                             pointValue.Add(row, bb);
+                                            CountNonNullValues++;
+                                            _hashSet.Add(bb);
                                         }
                                     }
                                     break;
@@ -514,6 +549,8 @@ namespace FAD3.Mapping.Classes
             }
             sr.Close();
             sr = null;
+            ParsingTimeSeconds = (DateTime.Now - start).TotalSeconds;
+            Console.WriteLine($"time parse end: {ParsingTimeSeconds.ToString()} seconds");
             return Coordinates.Count > 0;
         }
 
@@ -637,6 +674,22 @@ namespace FAD3.Mapping.Classes
             return Colors.UintToColor(cat.DrawingOptions.FillColor);
         }
 
+        public static Color AddUniqueItemCategory(double categoryItem)
+        {
+            var cat = new ShapefileCategory();
+            cat.MinValue = categoryItem;
+            cat.Name = categoryItem.ToString();
+            cat.ValueType = tkCategoryValue.cvSingleValue;
+            _categories.Add2(cat);
+
+            cat.DrawingOptions.FillColor = _scheme.get_GraduatedColor((double)(_categories.Count) / (double)_numberOfCategories);
+            cat.DrawingOptions.LineColor = cat.DrawingOptions.FillColor;
+            cat.DrawingOptions.LineWidth = 1.1F;
+            _sheetMapSummary.Add(cat.Name, 0);
+
+            return Colors.UintToColor(cat.DrawingOptions.FillColor);
+        }
+
         public static bool MakeGridShapefile()
         {
             if (DefineGridCell())
@@ -678,30 +731,56 @@ namespace FAD3.Mapping.Classes
         /// </summary>
         /// <param name="values"> a list that contain temporal values for mapping</param>
         /// <param name="name"></param>
-        public static void MapColumn(List<double?> values, string name)
+        public static void MapColumn(List<double?> values, string name, string categorizationOption = "Jenk's-Fisher's")
+
         {
             if (_meshShapeFile != null)
             {
                 ClearSummaryValues();
+
                 if (_ifldDateColumn > 0)
                 {
                     _meshShapeFile.EditDeleteField(_ifldDateColumn, null);
                 }
+
                 //_meshShapeFile.EditDeleteField(2, null);
                 _ifldDateColumn = _meshShapeFile.EditAddField(name, MapWinGIS.FieldType.DOUBLE_FIELD, 9, 13);
                 for (int n = 0; n < _meshShapeFile.NumShapes; n++)
                 {
                     if (_meshShapeFile.EditCellValue(_ifldDateColumn, n, values[n]))
                     {
+                        bool isFound = false;
                         for (int c = 0; c < _categories.Count; c++)
                         {
                             double min = (double)_categories.Item[c].MinValue;
-                            double max = (double)_categories.Item[c].MaxValue;
-                            if (values[n] >= min && values[n] < max)
-                            {
-                                _meshShapeFile.ShapeCategory[n] = c;
 
-                                _sheetMapSummary[_categories.Item[c].Name]++;
+                            switch (categorizationOption)
+                            {
+                                case "Unique values":
+                                    if (values[n] == min)
+                                    {
+                                        _meshShapeFile.ShapeCategory[n] = c;
+
+                                        _sheetMapSummary[_categories.Item[c].Name]++;
+                                        isFound = true;
+                                        break;
+                                    }
+                                    break;
+
+                                case "Jenk's-Fisher's":
+                                    double max = (double)_categories.Item[c].MaxValue;
+                                    if (values[n] >= min && values[n] < max)
+                                    {
+                                        _meshShapeFile.ShapeCategory[n] = c;
+
+                                        _sheetMapSummary[_categories.Item[c].Name]++;
+                                        isFound = true;
+                                        break;
+                                    }
+                                    break;
+                            }
+                            if (isFound)
+                            {
                                 break;
                             }
                         }

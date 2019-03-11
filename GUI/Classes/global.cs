@@ -57,6 +57,22 @@ namespace FAD3
 
         public static Grid25GenerateForm Grid25GenerateForm { get; set; }
 
+        public static void ShowCopyableText(string title, string text, Form parentForm)
+        {
+            GUI.Forms.DisplayCopyableTextForm dcf = new GUI.Forms.DisplayCopyableTextForm();
+            if (dcf.Visible)
+            {
+                dcf.BringToFront();
+            }
+            else
+            {
+                dcf.Show(parentForm);
+            }
+
+            dcf.TextToDisplay = text;
+            dcf.Title = title;
+        }
+
         public static bool HasInternetConnection()
         {
             try

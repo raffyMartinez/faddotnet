@@ -1,4 +1,4 @@
-﻿namespace FAD3.Mapping.Forms
+﻿namespace FAD3.GUI.Forms
 {
     partial class DisplayCopyableTextForm
     {
@@ -37,6 +37,7 @@
             this.txtDisplay.Location = new System.Drawing.Point(0, 0);
             this.txtDisplay.Multiline = true;
             this.txtDisplay.Name = "txtDisplay";
+            this.txtDisplay.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.txtDisplay.Size = new System.Drawing.Size(353, 273);
             this.txtDisplay.TabIndex = 0;
             // 

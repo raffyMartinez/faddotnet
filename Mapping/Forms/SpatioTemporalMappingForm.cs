@@ -1,4 +1,4 @@
-﻿using ClosedXML.Excel;
+﻿using FAD3.Database.Classes;
 using FAD3.Mapping.Classes;
 using System;
 using System.Collections.Generic;
@@ -7,39 +7,38 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
-using sds = Microsoft.Research.Science.Data;
-using FAD3.Database.Classes;
-using Microsoft.VisualBasic.FileIO;
+using System.Threading.Tasks;
+using Microsoft.Win32;
+using MapWinGIS;
 
 namespace FAD3.Mapping.Forms
 {
-    /// <summary>
-    /// interface for mapping spatio-temporal parameters
-    /// </summary>
     public partial class SpatioTemporalMappingForm : Form
     {
-        private static SpatioTemporalMappingForm _instance;
         private string _dataSourceFileName;
+        private static SpatioTemporalMappingForm _instance;
+        private List<double> _dataValues = new List<double>();
+        private DataTable _dt;
         private int _firstColIndex;
         private int _lastColIndex;
         private int _latitudeColIndex;
         private int _longitudeColIndex;
-        private List<double> _dataValues = new List<double>();
+        private int _columnCount;
+        private bool _hasMesh;
         private List<double?> _columnValues = new List<double?>();
         private int _dataPoints;
-        private XLWorkbook _workBook;
-        private IXLWorksheet _workSheet;
         private int _selectionIndex = 0;
-        private int _columnCount;
-        private DataTable _dt;
-        private bool _hasMesh;
         private fadUTMZone _utmZone;
-        private int _inlandPointsCount;
         private bool _createFileWithoutInland;
+        private bool _hasReadCoordinates;
+        private string _ERDDAPMetadataFolder;
+        private Extents _selectionExtent;
+        private bool _willUpdateEndPosition;
+        private string _identiferToUpdate;
+        private HashSet<double> _hashSelectedValues = new HashSet<double>();
+        private string _classificationScheme;
 
         public static SpatioTemporalMappingForm GetInstance()
         {
@@ -52,42 +51,27 @@ namespace FAD3.Mapping.Forms
             InitializeComponent();
         }
 
-        private void OnFormClosed(object sender, FormClosedEventArgs e)
+        private void OnGridSummaryCellClick(object sender, DataGridViewCellEventArgs e)
         {
-            _instance = null;
-        }
-
-        private void OnFormLoad(object sender, EventArgs e)
-        {
-            btnOk.Enabled = false;
-            btnReadSheet.Enabled = false;
-            btnCategorize.Enabled = false;
-            btnShowGridPoints.Enabled = false;
-            lblMappedSheet.Visible = false;
-            SizeColumns(dgCategories);
-            SizeColumns(dgSheetSummary);
-            icbColorScheme.ComboStyle = UserControls.ImageComboStyle.ColorSchemeGraduated;
-            icbColorScheme.ColorSchemes = global.MappingForm.MapLayersHandler.LayerColors;
-            if (icbColorScheme.Items.Count > 0)
+            if (e.ColumnIndex == 0)
             {
-                icbColorScheme.SelectedIndex = 0;
+                bool isVisible = (bool)dgSheetSummary[0, e.RowIndex].Value;
+                dgSheetSummary[0, e.RowIndex].Value = !isVisible;
+                MakeGridFromPoints.GridShapefile.Categories.Item[e.RowIndex].DrawingOptions.FillVisible = !isVisible;
+                MakeGridFromPoints.GridShapefile.Categories.Item[e.RowIndex].DrawingOptions.LineVisible = !isVisible;
+                global.MappingForm.MapControl.Redraw();
             }
-            txtCategoryCount.Text = "5";
-            listSelectedSheets.Enabled = false;
-            Text = "Spatio-Temporal Mapping";
-
-            cboClassificationScheme.Items.Add("Jenk's-Fisher's");
-            cboClassificationScheme.Items.Add("Equal interval");
-            cboClassificationScheme.Items.Add("User defined");
-            cboClassificationScheme.SelectedIndex = 0;
         }
 
+        /// <summary>
+        /// opens a data file and fills up comboboxes with column headers
+        /// </summary>
         private void OpenFile()
         {
             var fileOpen = new OpenFileDialog
             {
                 Title = "Open MS Excel file",
-                Filter = "Excel file|*.xls;*.xlsx|CSV files|*.csv|All file types|*.*",
+                Filter = "CSV (comma separated values) file|*.csv|Excel file|*.xls;*.xlsx|All file types|*.*",
                 FilterIndex = 1
             };
             fileOpen.ShowDialog();
@@ -95,132 +79,398 @@ namespace FAD3.Mapping.Forms
             {
                 _dataSourceFileName = fileOpen.FileName;
                 txtFile.Text = _dataSourceFileName;
-            }
-        }
-
-        /// <summary>
-        /// reads sheets in an excel workbook
-        /// </summary>
-        private async void GetExcelSheets()
-        {
-            bool result = await ReadExcelFIllAsync();
-        }
-
-        /// <summary>
-        /// calls  ReadExcelFile() async
-        /// </summary>
-        /// <returns></returns>
-        private Task<bool> ReadExcelFIllAsync()
-        {
-            return Task.Run(() => ReadExcelFile());
-        }
-
-        /// <summary>
-        /// fills up a listview with the names of sheets in an excel workbook
-        /// </summary>
-        /// <returns></returns>
-        private bool ReadExcelFile()
-        {
-            try
-            {
-                _workBook = new XLWorkbook(_dataSourceFileName, XLEventTracking.Disabled);
-
-                foreach (IXLWorksheet worksheet in _workBook.Worksheets)
+                switch (Path.GetExtension(_dataSourceFileName))
                 {
-                    this.Invoke((MethodInvoker)(() => listSheets.Items.Add(worksheet.Name)));
-                }
-                return listSheets.Items.Count > 0;
-            }
-            catch (IOException iox)
-            {
-                MessageBox.Show(iox.Message);
-                return false;
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(ex.Message, "SpatioTemporalMappingForm.cs", "ReadExcelFile");
-                return false;
-            }
-        }
+                    case ".xlsx":
+                        MessageBox.Show("Excel file not yet supported");
+                        break;
 
-        /// <summary>
-        /// reads the data inside a sheet and fill up a datatable with the sheet's contents
-        /// </summary>
-        private void ReadSheet()
-        {
-            _dataPoints = 0;
-            var sheetIndex = listSheets.SelectedIndex + 1;
-            _workSheet = _workBook.Worksheet(sheetIndex);
-            _dt = new DataTable();
-            bool firstRow = true;
-            _columnCount = 0;
-            var cells = 0;
-            foreach (IXLRow row in _workSheet.Rows())
-            {
-                if (firstRow)
-                {
-                    cboLatitude.Items.Clear();
-                    cboLongitude.Items.Clear();
-                    cboFirstData.Items.Clear();
-                    cboLastData.Items.Clear();
-                    foreach (IXLCell cell in row.Cells())
-                    {
-                        _dt.Columns.Add(cell.Value.ToString());
+                    case ".csv":
+                        MakeGridFromPoints.SingleDimensionCSV = _dataSourceFileName;
+                        List<string> csvFields = MakeGridFromPoints.GetFields();
 
-                        //assuming that first 2 column contain x and y value of a point
-                        //we populate Longitude and Latitude comboboxes with the row headers of the x and y column
-                        if (_columnCount == 0)
+                        cboLatitude.Items.Clear();
+                        cboLongitude.Items.Clear();
+                        cboTemporal.Items.Clear();
+                        cboValue.Items.Clear();
+
+                        foreach (string item in csvFields)
                         {
-                            cboLatitude.Items.Add(cell.Value.ToString());
-                            cboLongitude.Items.Add(cell.Value.ToString());
-                        }
-                        else if (_columnCount == 1)
-                        {
-                            cboLatitude.Items.Add(cell.Value.ToString());
-                            cboLongitude.Items.Add(cell.Value.ToString());
+                            cboLatitude.Items.Add(item);
+                            cboLongitude.Items.Add(item);
+                            cboTemporal.Items.Add(item);
+                            cboValue.Items.Add(item);
                         }
 
-                        //we populate first and last data column comboboxes with the value header
-                        else
-                        {
-                            cboFirstData.Items.Add(cell.Value.ToString());
-                            cboLastData.Items.Add(cell.Value.ToString());
-                        }
-                        _columnCount++;
-                    }
-                    firstRow = false;
-                    cboLatitude.Enabled = true;
-                    cboLongitude.Enabled = true;
-                    cboFirstData.Enabled = true;
-                    cboLastData.Enabled = true;
-                }
-                else
-                {
-                    //we add a row to the datatable
-                    _dt.Rows.Add();
-
-                    int i = 0;
-
-                    //populate each cell of the new row by reading the values of the columns starting from the first going to the last column
-                    foreach (IXLCell cell in row.Cells(row.FirstCellUsed().Address.ColumnNumber, row.LastCellUsed().Address.ColumnNumber))
-                    {
-                        _dt.Rows[_dt.Rows.Count - 1][i] = cell.Value.ToString();
-                        i++;
-                        if (i > 1) cells++;
-                    }
-
-                    //we increment _dataPoint after we finish reading a row
-                    _dataPoints++;
+                        cboLatitude.Enabled = true;
+                        cboLongitude.Enabled = true;
+                        cboValue.Enabled = true;
+                        cboTemporal.Enabled = true;
+                        break;
                 }
             }
+        }
 
-            //we fill up txtRows with the number of datapoints
+        /// <summary>
+        /// calls method that reads csv data as a separate process. When reading of CSV is done, it will update the fields
+        /// </summary>
+        private async void ReadCSVFile()
+        {
+            bool result = await ReadCVSFileTask();
+
+            //this will wait until ReadCVSFileTask() is finished then
+            //the fields and comboBoxes is filled up
+            _dataPoints = MakeGridFromPoints.Coordinates.Count;
             txtRows.Text = _dataPoints.ToString();
+
+            cboFirstData.Items.Clear();
+            cboLastData.Items.Clear();
+            foreach (var item in MakeGridFromPoints.DictTemporalValues.Keys)
+            {
+                cboFirstData.Items.Add(item);
+                cboLastData.Items.Add(item);
+            }
+            cboFirstData.Enabled = cboFirstData.Items.Count > 0;
+            cboLastData.Enabled = cboLastData.Items.Count > 0;
+
+            txtInlandPoints.Text = MakeGridFromPoints.InlandPointCount.ToString();
+            txtDatasetUniqueCount.Text = MakeGridFromPoints.HashedValues.Count.ToString();
+            txtDatasetNumberValues.Text = MakeGridFromPoints.CountNonNullValues.ToString();
+            txtDatasetMax.Text = MakeGridFromPoints.MaximumValue.ToString();
+            txtDatasetMin.Text = MakeGridFromPoints.MinimumValue.ToString();
+            lblStatus.Text = $"Finished reading data in {MakeGridFromPoints.ParsingTimeSeconds.ToString("N2")} seconds";
+            btnReadFile.Enabled = true;
         }
 
         /// <summary>
-        /// adds the coordinates of a datapoint to a List<double,double>
+        /// reads CSV data as a separate process
         /// </summary>
+        /// <returns></returns>
+        private Task<bool> ReadCVSFileTask()
+        {
+            return Task.Run(() => MakeGridFromPoints.ParseSingleDimensionCSV());
+        }
+
+        private void OnButtonClick(object sender, EventArgs e)
+        {
+            switch (((Button)sender).Name)
+            {
+                case "btnExclude":
+                    break;
+
+                case "btnShowMetadata":
+                    global.ShowCopyableText("Metadata", txtMetadata.Text, this);
+                    break;
+
+                case "btnOpen":
+                    MakeGridFromPoints.Reset();
+                    txtRows.Text = "";
+                    OpenFile();
+                    if (MakeGridFromPoints.IsNCCSVFormat)
+                    {
+                        txtMetadata.Text = MakeGridFromPoints.Metadata;
+                    }
+                    else
+                    {
+                        txtMetadata.Text = "No metadata avalailable in this file format\r\nNCCVS format includes data and metadata";
+                    }
+                    break;
+
+                case "btnReadFile":
+
+                    //reads the file that was opened
+
+                    btnReadFile.Enabled = false;
+                    MakeGridFromPoints.LatitudeColumn = cboLatitude.SelectedIndex;
+                    MakeGridFromPoints.LongitudeColumn = cboLongitude.SelectedIndex;
+                    MakeGridFromPoints.TemporalColumn = cboTemporal.SelectedIndex;
+                    MakeGridFromPoints.ParameterColumn = cboValue.SelectedIndex;
+                    MakeGridFromPoints.SelectedParameter = cboValue.Text;
+
+                    //ask UTMzone of area of interest
+                    using (SelectUTMZoneForm szf = new SelectUTMZoneForm())
+                    {
+                        szf.ShowDialog();
+                        if (szf.DialogResult == DialogResult.OK)
+                        {
+                            _utmZone = szf.UTMZone;
+                            _createFileWithoutInland = szf.CreateFileWithoutInland;
+                            MakeGridFromPoints.IgnoreInlandPoints = false;
+                            MakeGridFromPoints.UTMZone = _utmZone;
+                            MakeGridFromPoints.CreateFileWithoutInlandPoints = _createFileWithoutInland;
+                        }
+                        else if (szf.DialogResult == DialogResult.Cancel)
+                        {
+                            MakeGridFromPoints.IgnoreInlandPoints = true;
+                        }
+                    }
+
+                    lblParameter.Text = cboValue.Text;
+
+                    //reads csv data in a separate thread
+                    ReadCSVFile();
+                    break;
+
+                case "btnCategorize":
+                    btnCategorize.Enabled = false;
+
+                    if (txtCategoryCount.Text.Length > 0 && cboLatitude.SelectedIndex >= 0
+                        && cboLongitude.SelectedIndex >= 0 && cboFirstData.SelectedIndex >= 0
+                        && cboLastData.SelectedIndex >= 0)
+                    {
+                        lblStatus.Text = "Start categorizing data";
+                        listTimePeriodsForMapping();
+                        listCoordinates();
+                        getDataValues();
+                        _classificationScheme = cboClassificationScheme.Text;
+                        switch (_classificationScheme)
+                        {
+                            case "Jenk's-Fisher's":
+                                btnShowGridPoints.Enabled = DoJenksFisherCategorization();
+                                break;
+
+                            case "Unique values":
+                                btnShowGridPoints.Enabled = DoUniqueValuesCategorization();
+                                break;
+
+                            case "Equal interval":
+
+                            case "User defined":
+                                using (ShapefileClassificationSchemeForm scsf = new ShapefileClassificationSchemeForm())
+                                {
+                                    scsf.ClassificationScheme = cboClassificationScheme.Text;
+                                    scsf.MinimumValue = _dataValues.Min();
+                                    scsf.MaximumValue = _dataValues.Max();
+                                    scsf.NumberOfClasses = int.Parse(txtCategoryCount.Text);
+                                    scsf.ShowDialog();
+                                    if (scsf.DialogResult == DialogResult.OK)
+                                    {
+                                    }
+                                    else if (scsf.DialogResult == DialogResult.Cancel)
+                                    {
+                                    }
+                                }
+                                MessageBox.Show("Not yet implemented", "Not functioning", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                break;
+                        }
+                        //summarize the data
+                        txtSelectedValuesCount.Text = _dataValues.Count.ToString();
+                        txtSelectedMinimum.Text = _dataValues.Min().ToString();
+                        txtSelectedMaximum.Text = _dataValues.Max().ToString();
+                        txtSelectedUnique.Text = _hashSelectedValues.Count.ToString();
+                        lblStatus.Text = "Finished categorizing data";
+                    }
+                    else
+                    {
+                        MessageBox.Show("Specify longitude, latitude, and, first and last data columns",
+                                        "Required data is missing", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    btnCategorize.Enabled = true;
+                    break;
+
+                case "btnShowGridPoints":
+
+                    //shows the data points of the data
+
+                    MapGridPoints();
+                    break;
+
+                case "btnShowGridPolygons":
+
+                    //creates a grid with the datapoints at the center of the grid
+
+                    if (MakeGridFromPoints.MakeGridShapefile())
+                    {
+                        _hasMesh = global.MappingForm.MapLayersHandler.AddLayer(MakeGridFromPoints.GridShapefile, "Mesh", uniqueLayer: true) > 0;
+                    }
+                    listSelectedTimePeriods.Enabled = _hasMesh;
+                    break;
+
+                case "btnUp":
+                    MapSheet(false);
+                    break;
+
+                case "btnDown":
+                    MapSheet(true);
+                    break;
+
+                case "btnOk":
+                    Close();
+                    break;
+            }
+        }
+
+        private void MapGridPoints()
+        {
+            MakeGridFromPoints.MapInteractionHandler = global.MappingForm.MapInterActionHandler;
+            MakeGridFromPoints.GeoProjection = global.MappingForm.MapControl.GeoProjection;
+
+            if (MakeGridFromPoints.MakePointShapefile(!MakeGridFromPoints.IgnoreInlandPoints))
+            {
+                global.MappingForm.MapLayersHandler.AddLayer(MakeGridFromPoints.PointShapefile, "Grid points");
+            }
+        }
+
+        /// <summary>
+        /// returns number of values within a class size
+        /// </summary>
+        /// <param name="value1"></param>
+        /// <param name="value2"></param>
+        /// <param name="greaterThan"></param>
+        /// <returns></returns>
+        private int GetClassSize(double value1, double value2 = 0, bool greaterThan = false)
+        {
+            int count = 0;
+            if (!greaterThan)
+            {
+                foreach (var item in _dataValues)
+                {
+                    if (item >= value1 && item < value2)
+                    {
+                        count++;
+                    }
+                    else if (item == value2)
+                    {
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                foreach (var item in _dataValues)
+                {
+                    if (item >= value1)
+                    {
+                        count++;
+                    }
+                }
+            }
+            return count;
+        }
+
+        private int GetClassSize(double uniqueValue)
+        {
+            var g = _dataValues.GroupBy(i => i);
+            foreach (var grp in g)
+            {
+                if (grp.Key == uniqueValue)
+                {
+                    return grp.Count();
+                }
+            }
+            return 0;
+        }
+
+        private bool DoUniqueValuesCategorization()
+        {
+            if (_hashSelectedValues.Count > 0)
+            {
+                dgCategories.Rows.Clear();
+                int row;
+                Color color;
+
+                MakeGridFromPoints.Categories.Clear();
+                ColorBlend blend = (ColorBlend)icbColorScheme.ColorSchemes.List[icbColorScheme.SelectedIndex];
+                MakeGridFromPoints.NumberOfCategories = _hashSelectedValues.Count;
+                MakeGridFromPoints.ColorBlend = blend;
+
+                foreach (var item in _hashSelectedValues)
+                {
+                    color = MakeGridFromPoints.AddUniqueItemCategory(item);
+                    row = dgCategories.Rows.Add(new object[] { item.ToString(), GetClassSize(item), "" });
+                    dgCategories[2, row].Style.BackColor = color;
+                }
+                //add an empty null category
+                MakeGridFromPoints.AddNullCategory();
+            }
+            return _hashSelectedValues.Count > 0;
+        }
+
+        /// <summary>
+        /// do a Jenk's-Fisher categorization of the values. The category breaks are found in List<Double> listBreaks
+        /// </summary>
+        /// <returns></returns>
+        private bool DoJenksFisherCategorization()
+        {
+            if (txtCategoryCount.Text.Length > 0)
+            {
+                dgCategories.Rows.Clear();
+                _dataValues.Sort();
+                var listBreaks = JenksFisher.CreateJenksFisherBreaksArray(_dataValues, int.Parse(txtCategoryCount.Text));
+                var n = 0;
+                var lower = listBreaks.Min();
+                var upper = 0D;
+                int row;
+
+                Color color;
+
+                MakeGridFromPoints.Categories.Clear();
+                ColorBlend blend = (ColorBlend)icbColorScheme.ColorSchemes.List[icbColorScheme.SelectedIndex];
+                MakeGridFromPoints.NumberOfCategories = int.Parse(txtCategoryCount.Text);
+                MakeGridFromPoints.ColorBlend = blend;
+
+                //make categories from the breaks defined in Jenk's-Fisher's
+                //add the category range and color to a datagridview
+                foreach (var item in listBreaks)
+                {
+                    if (n > 0)
+                    {
+                        upper = item;
+                        color = MakeGridFromPoints.AddCategory(lower, upper);
+                        row = dgCategories.Rows.Add(new object[] { $"{lower.ToString("N5")} - {upper.ToString("N5")}", GetClassSize(lower, upper).ToString(), "" });
+                        dgCategories[2, row].Style.BackColor = color;
+                        lower = item;
+                    }
+                    n++;
+                }
+                //add the last category to the datagridview
+                color = MakeGridFromPoints.AddCategory(upper, _dataValues.Max() + 1);
+                row = dgCategories.Rows.Add(new object[] { $"> {listBreaks.Max().ToString("N5")}", GetClassSize(listBreaks.Max(), 0, true).ToString(), "" });
+                dgCategories[2, row].Style.BackColor = color;
+
+                //add an empty null category
+                MakeGridFromPoints.AddNullCategory();
+
+                SizeColumns(dgCategories, false, true);
+                return listBreaks.Count > 0;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// adds all non-null values to a List<double>
+        /// this List<> will be used for Jenk's Fisher clustering
+        /// </summary>
+        private void getDataValues()
+        {
+            switch (Path.GetExtension(_dataSourceFileName))
+            {
+                case ".xlsx":
+                    _dataValues.Clear();
+
+                    for (int row = 0; row < _dt.Rows.Count; row++)
+                    {
+                        var arr = _dt.Rows[row].ItemArray;
+                        for (int col = _firstColIndex + 2; col <= _lastColIndex + 2; col++)
+                        {
+                            if (double.TryParse(arr[col].ToString(), out double d))
+                            {
+                                _dataValues.Add(d);
+                            }
+                        }
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        private void OnSelectedSheetsClick(object sender, EventArgs e)
+        {
+            MapSheet(listSelectedTimePeriods.SelectedIndices[0]);
+        }
+
         private void listCoordinates()
         {
             switch (Path.GetExtension(_dataSourceFileName))
@@ -260,355 +510,67 @@ namespace FAD3.Mapping.Forms
             }
         }
 
-        private void OnButtonClick(object sender, EventArgs e)
-        {
-            switch (((Button)sender).Name)
-            {
-                case "btnOpen":
-                    MakeGridFromPoints.Reset();
-                    txtRows.Text = "";
-                    OpenFile();
-                    btnReadFile.Enabled = _dataSourceFileName?.Length > 0 && File.Exists(_dataSourceFileName);
-                    if (Path.GetExtension(_dataSourceFileName) == ".csv")
-                    {
-                        sds.DataSet dataset = sds.DataSet.Open($"{_dataSourceFileName}?openMode=readOnly");
-                        if (dataset.Dimensions.Count == 1)
-                        {
-                        }
-                    }
-                    break;
-
-                case "btnReadFile":
-                    listSheets.Items.Clear();
-                    switch (Path.GetExtension(_dataSourceFileName))
-                    {
-                        case ".nc":
-                            MessageBox.Show("NetCDF support not yet supported");
-                            break;
-
-                        case ".csv":
-                            btnReadFile.Enabled = false;
-                            try
-                            {
-                                sds.DataSet dataset = sds.DataSet.Open($"{_dataSourceFileName}?openMode=readOnly");
-                                if (dataset.Dimensions.Count == 1)
-                                {
-                                    //ask UTMzone of area of interest
-                                    using (SelectUTMZoneForm szf = new SelectUTMZoneForm())
-                                    {
-                                        szf.ShowDialog();
-                                        if (szf.DialogResult == DialogResult.OK)
-                                        {
-                                            _utmZone = szf.UTMZone;
-                                            _createFileWithoutInland = szf.CreateFileWithoutInland;
-                                            MakeGridFromPoints.IgnoreInlandPoints = false;
-                                            MakeGridFromPoints.UTMZone = _utmZone;
-                                            MakeGridFromPoints.CreateFileWithoutInlandPoints = _createFileWithoutInland;
-                                        }
-                                        else if (szf.DialogResult == DialogResult.Cancel)
-                                        {
-                                            MakeGridFromPoints.IgnoreInlandPoints = true;
-                                        }
-                                    }
-
-                                    MakeGridFromPoints.SingleDimensionCSV = _dataSourceFileName;
-                                    _dataPoints = MakeGridFromPoints.Coordinates.Count;
-                                    txtRows.Text = _dataPoints.ToString();
-                                    _inlandPointsCount = MakeGridFromPoints.InlandPointCount;
-                                    if (MakeGridFromPoints.IgnoreInlandPoints)
-                                    {
-                                        txtInlandPoints.Text = "Ignored";
-                                    }
-                                    else
-                                    {
-                                        txtInlandPoints.Text = _inlandPointsCount.ToString();
-                                    }
-
-                                    cboLatitude.SelectedIndex = 0;
-                                    cboLongitude.SelectedIndex = 0;
-                                    foreach (var item in MakeGridFromPoints.DictTemporalValues)
-                                    {
-                                        cboFirstData.Items.Add(item.Key);
-                                        cboLastData.Items.Add(item.Key);
-                                    }
-                                    cboFirstData.Enabled = true;
-                                    cboLastData.Enabled = true;
-                                }
-                                else if (dataset.Dimensions.Count == 2)
-                                {
-                                }
-                                btnReadFile.Enabled = true;
-                                btnCategorize.Enabled = true;
-                            }
-                            catch (Exception ex)
-                            {
-                                MessageBox.Show(ex.Message);
-                                Logger.Log(ex.Message, "SpatioTemporalMappingForm.cs", "OnButtonClick.btnReadWorkBook.csv");
-                            }
-                            break;
-
-                        case ".xlsx":
-                            GetExcelSheets();
-                            break;
-                    }
-
-                    break;
-
-                case "btnReadSheet":
-                    txtRows.Text = "";
-                    if (listSheets.SelectedIndex >= 0)
-                    {
-                        ReadSheet();
-                    }
-                    break;
-
-                case "btnCategorize":
-                    if (txtCategoryCount.Text.Length > 0 && cboLatitude.SelectedIndex >= 0
-                        && cboLongitude.SelectedIndex >= 0 && cboFirstData.SelectedIndex >= 0
-                        && cboLastData.SelectedIndex >= 0)
-                    {
-                        listSheetsForMapping();
-                        listCoordinates();
-                        getDataValues();
-                        switch (cboClassificationScheme.Text)
-                        {
-                            case "Jenk's-Fisher's":
-                                btnShowGridPoints.Enabled = DoJenksFisher();
-                                break;
-
-                            case "Equal interval":
-                            case "User defined":
-                                using (ShapefileClassificationSchemeForm scsf = new ShapefileClassificationSchemeForm())
-                                {
-                                    scsf.ClassificationScheme = cboClassificationScheme.Text;
-                                    scsf.MinimumValue = _dataValues.Min();
-                                    scsf.MaximumValue = _dataValues.Max();
-                                    scsf.NumberOfClasses = int.Parse(txtCategoryCount.Text);
-                                    scsf.ShowDialog();
-                                    if (scsf.DialogResult == DialogResult.OK)
-                                    {
-                                    }
-                                    else if (scsf.DialogResult == DialogResult.Cancel)
-                                    {
-                                    }
-                                }
-                                break;
-                        }
-                    }
-                    else
-                    {
-                        MessageBox.Show("Specify longitude, latitude, and, first and last data columns",
-                                        "Required data is missing", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-
-                    break;
-
-                case "btnShowGridPoints":
-                    MapGridPoints();
-                    break;
-
-                case "btnShowGridPolygons":
-                    if (MakeGridFromPoints.MakeGridShapefile())
-                    {
-                        _hasMesh = global.MappingForm.MapLayersHandler.AddLayer(MakeGridFromPoints.GridShapefile, "Mesh", uniqueLayer: true) > 0;
-                    }
-                    listSelectedSheets.Enabled = _hasMesh;
-                    break;
-
-                case "btnUp":
-                    MapSheet(false);
-                    break;
-
-                case "btnDown":
-                    MapSheet(true);
-                    break;
-
-                case "btnInstructions":
-                    InstructionsForm form = new InstructionsForm();
-                    form.ShowDialog(this);
-                    break;
-
-                case "btnColorScheme":
-                    ColorSchemesForm csf = new ColorSchemesForm(ref global.MappingForm.MapLayersHandler.LayerColors);
-                    break;
-
-                case "btnOk":
-                    break;
-
-                case "btnCancel":
-                    Close();
-                    break;
-
-                case "btnExport":
-                    ExportSheetsToText();
-                    break;
-            }
-        }
-
-        private void OnCSVReadEvent(object sender, ParseCSVEventArgs e)
-        {
-            string[] fields = e.Fields;
-            for (int n = 0; n < fields.Length; n++)
-            {
-                cboLatitude.Items.Add(fields[n]);
-                cboLongitude.Items.Add(fields[n]);
-            }
-        }
-
         /// <summary>
-        /// handles mapping of items when the up and down buttons are pressed
+        /// lists the headers of the data columns in a listbox
         /// </summary>
-        /// <param name="forward"></param>
-        private void MapSheet(bool forward)
+        private void listTimePeriodsForMapping()
         {
-            if (listSelectedSheets.Items.Count > 0)
+            _hashSelectedValues.Clear();
+            _dataValues.Clear();
+            listSelectedTimePeriods.Items.Clear();
+            var includeColumn = false;
+            if (cboLongitude.Text.Length > 0 && cboLatitude.Text.Length > 0 && cboFirstData.Text.Length > 0 && cboLastData.Text.Length > 0)
             {
-                if (listSelectedSheets.SelectedItems.Count == 1)
+                switch (Path.GetExtension(_dataSourceFileName))
                 {
-                    var selection = listSelectedSheets.SelectedIndex;
-                    listSelectedSheets.SelectedItems.Clear();
-                    if (forward)
-                    {
-                        selection++;
-                    }
-                    else
-                    {
-                        selection--;
-                    }
-                    listSelectedSheets.SelectedIndex = selection;
-                    _selectionIndex = 0;
-                }
-                else if (listSelectedSheets.SelectedItems.Count == 0)
-                {
-                    listSelectedSheets.SelectedIndex = 0;
-                    _selectionIndex = 0;
-                }
-                else if (listSelectedSheets.SelectedItems.Count > 1)
-                {
-                    if (forward)
-                    {
-                        _selectionIndex++;
-                        if (_selectionIndex == listSelectedSheets.SelectedIndices.Count)
+                    case ".csv":
+                        int i = 0;
+                        foreach (string item in MakeGridFromPoints.DictTemporalValues.Keys)
                         {
-                            _selectionIndex = 0;
-                        }
-                    }
-                    else
-                    {
-                        _selectionIndex--;
-                        if (_selectionIndex == -1)
-                        {
-                            _selectionIndex = listSelectedSheets.SelectedIndices.Count - 1;
-                        }
-                    }
-                }
-
-                if (listSelectedSheets.SelectedIndices.Count > 0 && _selectionIndex <= listSelectedSheets.SelectedIndices.Count)
-                {
-                    MapSheet(listSelectedSheets.SelectedIndices[_selectionIndex]);
-                }
-                else
-                {
-                    _selectionIndex = 0;
-                }
-            }
-        }
-
-        /// <summary>
-        /// export as a time series textfile containing categories and number per category
-        /// </summary>
-        private void ExportSheetsToText()
-        {
-            Dictionary<string, int> dictCategory = new Dictionary<string, int>();
-            var saveDialog = new SaveFileDialog();
-            saveDialog.Title = "Export data to time series text file";
-            saveDialog.Filter = "Text file|*.txt|All files|*.*";
-            saveDialog.FilterIndex = 1;
-            saveDialog.ShowDialog();
-            if (saveDialog.FileName.Length > 0)
-            {
-                using (StreamWriter strm = new StreamWriter(saveDialog.FileName, false))
-                {
-                    //write number of datapoints
-                    strm.WriteLine($"Data points: {_dt.Rows.Count.ToString()}");
-
-                    //write category ranges
-                    string categoryRange = "";
-                    for (int brk = 0; brk < dgCategories.RowCount; brk++)
-                    {
-                        if (brk == dgCategories.RowCount - 1)
-                        {
-                            categoryRange = $"{dgCategories.Rows[brk].Cells[0].Value.ToString().Replace("> ", "")} - {txtMaximum.Text}";
-                        }
-                        else
-                        {
-                            categoryRange = dgCategories.Rows[brk].Cells[0].Value.ToString();
-                        }
-                        strm.WriteLine($"Category {brk + 1}: {categoryRange}");
-                    }
-
-                    //setup category dictionay and the same time write column headers
-                    strm.Write("Time period\t");
-                    for (int col = 1; col <= dgCategories.RowCount; col++)
-                    {
-                        strm.Write($"{col.ToString()}\t");
-                        dictCategory.Add(col.ToString(), 0);
-                    }
-                    strm.Write("Null\r\n");
-                    dictCategory.Add("Null", 0);
-
-                    //read entire dataset and categorize the value of the current time period
-                    for (int n = 0; n < listSelectedSheets.Items.Count; n++)
-                    {
-                        string timePeriod = $"{listSelectedSheets.Items[n]}";
-
-                        //reset category dictionary values to zero
-                        for (int col = 1; col <= dgCategories.RowCount; col++)
-                        {
-                            dictCategory[col.ToString()] = 0;
-                        }
-                        dictCategory["Null"] = 0;
-
-                        //read all rows but only pick the value corresponding to the current time period
-                        for (int row = 0; row < _dt.Rows.Count; row++)
-                        {
-                            var arr = _dt.Rows[row].ItemArray;    //put data in current row to an array
-                            var col = n + _firstColIndex + 2;     //col points to the relevant timeperiod
-
-                            double? v = null;
-                            if (arr[col].GetType().Name == "String")
+                            if (!includeColumn && i == _firstColIndex)
                             {
-                                if (double.TryParse((string)arr[col], out double d))
+                                includeColumn = true;
+                            }
+                            if (includeColumn)
+                            {
+                                listSelectedTimePeriods.Items.Add(item);
+                                foreach (double? value in MakeGridFromPoints.DictTemporalValues[item].Values)
                                 {
-                                    v = d;
+                                    if (value != null)
+                                    {
+                                        _dataValues.Add((double)value);
+                                        _hashSelectedValues.Add((double)value);
+                                    }
                                 }
                             }
-                            else
+                            if (includeColumn && i == _lastColIndex)
                             {
-                                v = arr[col] as double?;
+                                includeColumn = false;
                             }
-
-                            //increment value of corresponding category
-                            if (v == null)
-                            {
-                                dictCategory["Null"]++;
-                            }
-                            else
-                            {
-                                dictCategory[MakeGridFromPoints.WhatCategory(v).ToString()]++;
-                            }
+                            i++;
                         }
+                        break;
 
-                        //write the current timeperiod and the number of values per category
-                        strm.Write($"{timePeriod}\t");
-                        for (int col = 1; col <= dgCategories.RowCount; col++)
+                    case ".xlsx":
+
+                        for (int n = 0; n < _columnCount; n++)
                         {
-                            strm.Write($"{dictCategory[col.ToString()]}\t");
+                            if (!includeColumn && (n - 2) == _firstColIndex)
+                            {
+                                includeColumn = true;
+                            }
+                            if (includeColumn)
+                            {
+                                listSelectedTimePeriods.Items.Add(_dt.Columns[n].ColumnName);
+                            }
+                            if (includeColumn && (n - 2) == _lastColIndex)
+                            {
+                                includeColumn = false;
+                            }
                         }
-                        strm.Write($"{dictCategory["Null"]}\r\n");
-                    }
+
+                        break;
                 }
-                MessageBox.Show("Finished exporting to time series text file");
             }
         }
 
@@ -620,7 +582,7 @@ namespace FAD3.Mapping.Forms
         {
             if (_hasMesh)
             {
-                lblMappedSheet.Text = $"{listSelectedSheets.Items[index]}";
+                lblMappedSheet.Text = $"{listSelectedTimePeriods.Items[index]}";
                 lblMappedSheet.Visible = true;
                 _columnValues.Clear();       // _columnValues will contain values corresponding to the item we are interested in
                 double? v = null;
@@ -657,7 +619,7 @@ namespace FAD3.Mapping.Forms
                         break;
                 }
 
-                MakeGridFromPoints.MapColumn(_columnValues, lblMappedSheet.Text);
+                MakeGridFromPoints.MapColumn(_columnValues, lblMappedSheet.Text, _classificationScheme);
 
                 global.MappingForm.MapControl.Redraw();
 
@@ -715,114 +677,139 @@ namespace FAD3.Mapping.Forms
             dgSheetSummary.ClearSelection();
         }
 
-        private void MapGridPoints()
+        private void MapSheet(bool forward, bool fromArrowKeys = false)
         {
-            MakeGridFromPoints.MapInteractionHandler = global.MappingForm.MapInterActionHandler;
-            MakeGridFromPoints.GeoProjection = global.MappingForm.MapControl.GeoProjection;
+            if (listSelectedTimePeriods.Items.Count > 0)
+            {
+                if (listSelectedTimePeriods.SelectedItems.Count == 1)
+                {
+                    var selection = listSelectedTimePeriods.SelectedIndex;
+                    listSelectedTimePeriods.SelectedItems.Clear();
+                    if (forward)
+                    {
+                        selection++;
+                    }
+                    else
+                    {
+                        selection--;
+                    }
+                    if (selection == -1)
+                    {
+                        listSelectedTimePeriods.SelectedIndex = listSelectedTimePeriods.Items.Count - 1;
+                    }
+                    else if (listSelectedTimePeriods.Items.Count > selection)
+                    {
+                        listSelectedTimePeriods.SelectedIndex = selection;
+                    }
+                    else
+                    {
+                        listSelectedTimePeriods.SelectedIndex = 0;
+                    }
+                    _selectionIndex = 0;
+                }
+                else if (listSelectedTimePeriods.SelectedItems.Count == 0)
+                {
+                    listSelectedTimePeriods.SelectedIndex = 0;
+                    _selectionIndex = 0;
+                }
+                else if (listSelectedTimePeriods.SelectedItems.Count > 1)
+                {
+                    if (forward)
+                    {
+                        _selectionIndex++;
+                        if (_selectionIndex == listSelectedTimePeriods.SelectedIndices.Count)
+                        {
+                            _selectionIndex = 0;
+                        }
+                    }
+                    else
+                    {
+                        _selectionIndex--;
+                        if (_selectionIndex == -1)
+                        {
+                            _selectionIndex = listSelectedTimePeriods.SelectedIndices.Count - 1;
+                        }
+                    }
+                }
 
-            if (MakeGridFromPoints.MakePointShapefile(!MakeGridFromPoints.IgnoreInlandPoints))
-                global.MappingForm.MapLayersHandler.AddLayer(MakeGridFromPoints.PointShapefile, "Grid points");
+                if (listSelectedTimePeriods.SelectedIndices.Count > 0 && _selectionIndex <= listSelectedTimePeriods.SelectedIndices.Count)
+                {
+                    MapSheet(listSelectedTimePeriods.SelectedIndices[_selectionIndex]);
+                }
+                else
+                {
+                    _selectionIndex = 0;
+                }
+            }
         }
 
-        private void OnListBoxClick(object sender, EventArgs e)
+        private void OnComboSelectionIndexChanged(object sender, EventArgs e)
         {
-            btnReadSheet.Enabled = true;
+            List<int> columns = new List<int>();
+            btnReadFile.Enabled = false;
+            if (cboLatitude.Text.Length > 0
+                && cboLongitude.Text.Length > 0
+                && cboTemporal.Text.Length > 0
+                && cboValue.Text.Length > 0)
+            {
+                int c = 0;
+                foreach (Control ctl in tabStart.Controls)
+                {
+                    if (ctl.Tag?.ToString() == "dc")
+                    {
+                        c = ((ComboBox)ctl).SelectedIndex;
+                        if (columns.Count > 0 && columns.Contains(c))
+                        {
+                            MessageBox.Show("All selected fields must be unique");
+                        }
+                        else if (columns.Count == 3)
+                        {
+                            btnReadFile.Enabled = true;
+                        }
+                        else
+                        {
+                            columns.Add(c);
+                        }
+                    }
+                }
+            }
+
+            btnCategorize.Enabled = cboFirstData.Text.Length > 0
+                && cboLastData.Text.Length > 0;
+
+            if (cboFirstData.Text.Length > 0)
+            {
+                _firstColIndex = cboFirstData.SelectedIndex;
+            }
+
+            if (cboLastData.Text.Length > 0)
+            {
+                _lastColIndex = cboLastData.SelectedIndex;
+            }
         }
 
         /// <summary>
-        /// lists the headers of the data columns in a listbox
+        /// Sizes all columns of listview so that it fits the widest column content or the column header content
         /// </summary>
-        private void listSheetsForMapping()
+        private void SizeColumns(ListView lv, bool init = true)
         {
-            listSelectedSheets.Items.Clear();
-            var includeColumn = false;
-            if (cboLongitude.Text.Length > 0 && cboLatitude.Text.Length > 0 && cboFirstData.Text.Length > 0 && cboLastData.Text.Length > 0)
+            foreach (ColumnHeader c in lv.Columns)
             {
-                switch (Path.GetExtension(_dataSourceFileName))
+                if (init)
                 {
-                    case ".csv":
-                        int i = 0;
-                        foreach (string item in MakeGridFromPoints.DictTemporalValues.Keys)
-                        {
-                            if (!includeColumn && i == _firstColIndex)
-                            {
-                                includeColumn = true;
-                            }
-                            if (includeColumn)
-                            {
-                                listSelectedSheets.Items.Add(item);
-                                foreach (double? value in MakeGridFromPoints.DictTemporalValues[item].Values)
-                                {
-                                    //if (value != "NaN" && double.TryParse(value, out double d))
-                                    //{
-                                    //    _dataValues.Add(d);
-                                    //}
-                                    if (value != null)
-                                        _dataValues.Add((double)value);
-                                }
-                            }
-                            if (includeColumn && i == _lastColIndex)
-                            {
-                                includeColumn = false;
-                            }
-                            i++;
-                        }
-                        break;
-
-                    case ".xlsx":
-
-                        for (int n = 0; n < _columnCount; n++)
-                        {
-                            if (!includeColumn && (n - 2) == _firstColIndex)
-                            {
-                                includeColumn = true;
-                            }
-                            if (includeColumn)
-                            {
-                                listSelectedSheets.Items.Add(_dt.Columns[n].ColumnName);
-                            }
-                            if (includeColumn && (n - 2) == _lastColIndex)
-                            {
-                                includeColumn = false;
-                            }
-                        }
-
-                        break;
+                    c.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
+                    c.Tag = c.Width;
+                }
+                else
+                {
+                    c.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+                    c.Width = c.Width > (int)c.Tag ? c.Width : (int)c.Tag;
                 }
             }
         }
 
         /// <summary>
-        /// adds all non-null values to a List<double>
-        /// this List<> will be used for Jenk's Fisher clustering
-        /// </summary>
-        private void getDataValues()
-        {
-            switch (Path.GetExtension(_dataSourceFileName))
-            {
-                case ".xlsx":
-                    _dataValues.Clear();
-
-                    for (int row = 0; row < _dt.Rows.Count; row++)
-                    {
-                        var arr = _dt.Rows[row].ItemArray;
-                        for (int col = _firstColIndex + 2; col <= _lastColIndex + 2; col++)
-                        {
-                            if (double.TryParse(arr[col].ToString(), out double d))
-                            {
-                                _dataValues.Add(d);
-                            }
-                        }
-                    }
-                    break;
-
-                default:
-                    break;
-            }
-        }
-
-        /// <summary>
-        /// Sizes all columns so that it fits the widest column content or the column header content
+        /// Sizes all columns of the gridview so that it fits the widest column content or the column header content
         /// </summary>
         private void SizeColumns(DataGridView dg, bool init = true, bool PreserveLastColWidth = false)
         {
@@ -845,157 +832,110 @@ namespace FAD3.Mapping.Forms
             }
         }
 
-        /// <summary>
-        /// returns number of values within a class size
-        /// </summary>
-        /// <param name="value1"></param>
-        /// <param name="value2"></param>
-        /// <param name="greaterThan"></param>
-        /// <returns></returns>
-        private int GetClassSize(double value1, double value2 = 0, bool greaterThan = false)
+        private void OnFormLoad(object sender, EventArgs e)
         {
-            int count = 0;
-            if (!greaterThan)
+            SetUpTooltips();
+            btnReadFile.Enabled = false;
+            btnCategorize.Enabled = false;
+            btnShowGridPoints.Enabled = false;
+            lblMappedSheet.Visible = false;
+            SizeColumns(dgCategories);
+            SizeColumns(dgSheetSummary);
+            icbColorScheme.ComboStyle = UserControls.ImageComboStyle.ColorSchemeGraduated;
+            icbColorScheme.ColorSchemes = global.MappingForm.MapLayersHandler.LayerColors;
+            if (icbColorScheme.Items.Count > 0)
             {
-                foreach (var item in _dataValues)
+                icbColorScheme.SelectedIndex = 0;
+            }
+            txtCategoryCount.Text = "5";
+            listSelectedTimePeriods.Enabled = false;
+            Text = "Spatio-Temporal Mapping";
+            global.LoadFormSettings(this, true);
+
+            cboClassificationScheme.Items.Add("Jenk's-Fisher's");
+            cboClassificationScheme.Items.Add("Equal interval");
+            cboClassificationScheme.Items.Add("Unique values");
+            cboClassificationScheme.Items.Add("User defined");
+            cboClassificationScheme.SelectedIndex = 0;
+            MakeGridFromPoints.OnCSVRead += OnReadCSV;
+        }
+
+        private void SetUpTooltips()
+        {
+            // Create the ToolTip and associate with the Form container.
+            ToolTip tt = new ToolTip();
+
+            // Set up the delays for the ToolTip.
+            tt.AutoPopDelay = 5000;
+            tt.InitialDelay = 1000;
+            tt.ReshowDelay = 500;
+            // Force the ToolTip text to be displayed whether or not the form is active.
+            tt.ShowAlways = true;
+
+            tt.SetToolTip(cboLongitude, "Column in the data representing longitude");
+            tt.SetToolTip(cboLatitude, "Column in the data representing latitude");
+            tt.SetToolTip(cboTemporal, "Column in the data representing time");
+            tt.SetToolTip(cboValue, "Column in the data representing the value to map");
+            tt.SetToolTip(cboFirstData, "First time slice to include in the map");
+            tt.SetToolTip(cboLastData, "Last time slice to include in the map");
+            tt.SetToolTip(txtRows, "Number of point coordinates in the map");
+            tt.SetToolTip(txtInlandPoints, "Number of point coordinates that are inland");
+            tt.SetToolTip(btnOpen, "Loads and then opens a data file");
+            tt.SetToolTip(btnReadFile, "Reads the loaded data file");
+            tt.SetToolTip(btnOk, "Closes this window");
+            tt.SetToolTip(txtMetadata, "Metadata of the dataset, if available");
+            tt.SetToolTip(txtFile, "Filename of the currenty loaded dataset");
+            tt.SetToolTip(icbColorScheme, "Select color scheme to symbolize categories");
+            tt.SetToolTip(cboClassificationScheme, "Select classification scheme for creating categories");
+            tt.SetToolTip(txtCategoryCount, "Number of categories to create");
+            tt.SetToolTip(btnCategorize, "Click to create categories using selected classificaton scheme");
+        }
+
+        private void OnReadCSV(object sender, ParseCSVEventArgs e)
+        {
+            try
+            {
+                lblStatus.Invoke((MethodInvoker)delegate
                 {
-                    if (item >= value1 && item < value2)
+                    if (!_hasReadCoordinates)
                     {
-                        count++;
+                        _hasReadCoordinates = true;
+                        txtRows.Text = e.CoordinatesRead.ToString();
                     }
-                    else if (item == value2)
+
+                    if (e.FinishedRead)
                     {
-                        break;
+                        lblStatus.Text = $"Finished reading data in {MakeGridFromPoints.ParsingTimeSeconds.ToString()} seconds";
                     }
-                }
-            }
-            else
-            {
-                foreach (var item in _dataValues)
-                {
-                    if (item >= value1)
+                    else
                     {
-                        count++;
+                        lblStatus.Text = $"Read time period: {e.TimePeriodProcessed}";
                     }
-                }
+                });
             }
-            return count;
-        }
-
-        /// <summary>
-        /// do a Jenk's-Fisher categorization of the values. The category breaks are found in List<Double> listBreaks
-        /// </summary>
-        /// <returns></returns>
-        private bool DoJenksFisher()
-        {
-            if (txtCategoryCount.Text.Length > 0)
+            catch
             {
-                dgCategories.Rows.Clear();
-                _dataValues.Sort();
-                var listBreaks = JenksFisher.CreateJenksFisherBreaksArray(_dataValues, int.Parse(txtCategoryCount.Text));
-                var n = 0;
-                var lower = listBreaks.Min();
-                var upper = 0D;
-                int row;
-
-                Color color;
-
-                MakeGridFromPoints.Categories.Clear();
-                ColorBlend blend = (ColorBlend)icbColorScheme.ColorSchemes.List[icbColorScheme.SelectedIndex];
-                MakeGridFromPoints.NumberOfCategories = int.Parse(txtCategoryCount.Text);
-                MakeGridFromPoints.ColorBlend = blend;
-
-                //make categories from the breaks defined in Jenk's-Fisher's
-                //add the category range and color to a datagridview
-                foreach (var item in listBreaks)
-                {
-                    if (n > 0)
-                    {
-                        upper = item;
-                        color = MakeGridFromPoints.AddCategory(lower, upper);
-                        row = dgCategories.Rows.Add(new object[] { $"{lower.ToString("N5")} - {upper.ToString("N5")}", GetClassSize(lower, upper).ToString(), "" });
-                        dgCategories[2, row].Style.BackColor = color;
-                        lower = item;
-                    }
-                    n++;
-                }
-                //add the last category to the datagridview
-                color = MakeGridFromPoints.AddCategory(upper, _dataValues.Max() + 1);
-                row = dgCategories.Rows.Add(new object[] { $"> {listBreaks.Max().ToString("N5")}", GetClassSize(listBreaks.Max(), 0, true).ToString(), "" });
-                dgCategories[2, row].Style.BackColor = color;
-
-                //add an empty null category
-                MakeGridFromPoints.AddNullCategory();
-
-                //summarize the data
-                txtValuesCount.Text = _dataValues.Count.ToString();
-                txtMinimum.Text = _dataValues.Min().ToString();
-                txtMaximum.Text = _dataValues.Max().ToString();
-
-                SizeColumns(dgCategories, false, true);
-                return listBreaks.Count > 0;
-            }
-            return false;
-        }
-
-        private void OnComboIndexChanged(object sender, EventArgs e)
-        {
-            var cbo = (ComboBox)sender;
-            switch (cbo.Name)
-            {
-                case "cboFirstData":
-                    _firstColIndex = cbo.SelectedIndex;
-                    break;
-
-                case "cboLastData":
-                    _lastColIndex = cbo.SelectedIndex;
-                    break;
-
-                case "cboLongitude":
-                    _longitudeColIndex = cbo.SelectedIndex;
-                    break;
-
-                case "cboLatitude":
-                    _latitudeColIndex = cbo.SelectedIndex;
-                    break;
-            }
-
-            btnCategorize.Enabled = cboFirstData.SelectedIndex >= 0 && cboLastData.SelectedIndex >= 0 && cboLatitude.SelectedIndex >= 0 && cboLongitude.SelectedIndex >= 0;
-        }
-
-        private void OnCellDblClick(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.ColumnIndex == 2)
-            {
-                ColorDialog cd = new ColorDialog()
-                {
-                    AllowFullOpen = true,
-                    AnyColor = true,
-                    Color = dgCategories[e.ColumnIndex, e.RowIndex].Style.BackColor
-                };
-                dgCategories.ClearSelection();
-                cd.ShowDialog();
-                dgCategories[e.ColumnIndex, e.RowIndex].Style.BackColor = cd.Color;
-                MakeGridFromPoints.Categories.Item[e.RowIndex].DrawingOptions.FillColor = Colors.ColorToUInteger(cd.Color);
-                MakeGridFromPoints.Categories.Item[e.RowIndex].DrawingOptions.LineColor = MakeGridFromPoints.Categories.Item[e.RowIndex].DrawingOptions.FillColor;
+                //ignore
             }
         }
 
-        private void OnSelectedSheetsClick(object sender, EventArgs e)
+        private void OnFormClosed(object sender, FormClosedEventArgs e)
         {
-            MapSheet(listSelectedSheets.SelectedIndices[0]);
+            _instance = null;
+            MakeGridFromPoints.Cleanup();
         }
 
-        private void OnGridSummaryCellClick(object sender, DataGridViewCellEventArgs e)
+        private void OnListBoxKeyDown(object sender, KeyEventArgs e)
         {
-            if (e.ColumnIndex == 0)
-            {
-                bool isVisible = (bool)dgSheetSummary[0, e.RowIndex].Value;
-                dgSheetSummary[0, e.RowIndex].Value = !isVisible;
-                MakeGridFromPoints.GridShapefile.Categories.Item[e.RowIndex].DrawingOptions.FillVisible = !isVisible;
-                MakeGridFromPoints.GridShapefile.Categories.Item[e.RowIndex].DrawingOptions.LineVisible = !isVisible;
-                global.MappingForm.MapControl.Redraw();
-            }
+        }
+
+        private void OnListBoxKeyUp(object sender, KeyEventArgs e)
+        {
+            OnSelectedSheetsClick(null, null);
+        }
+
+        private void OnTabMapIndexChanged(object sender, EventArgs e)
+        {
         }
     }
 }

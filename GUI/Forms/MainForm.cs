@@ -1709,7 +1709,7 @@ namespace FAD3
                     break;
 
                 case "spatio-temporal":
-                    var spatioTemporalMappingForm = Mapping.Forms.SpatioTemporalHelperForm.GetInstance();
+                    var spatioTemporalMappingForm = Mapping.Forms.SpatioTemporalMappingForm.GetInstance();
                     if (spatioTemporalMappingForm.Visible)
                     {
                         spatioTemporalMappingForm.BringToFront();
@@ -1722,7 +1722,7 @@ namespace FAD3
                     break;
 
                 case "downloadSpatioTemporal":
-                    var downloadSpTempForm = Mapping.Forms.DownloadSpatioTemporalDataForm.GetInstance();
+                    var downloadSpTempForm = Mapping.Forms.ERDDAPSelectDatasetForm.GetInstance();
                     if (downloadSpTempForm.Visible)
                     {
                         downloadSpTempForm.BringToFront();

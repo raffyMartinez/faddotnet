@@ -38,14 +38,14 @@
             // 
             this.progressBar.Location = new System.Drawing.Point(12, 109);
             this.progressBar.Name = "progressBar";
-            this.progressBar.Size = new System.Drawing.Size(287, 20);
+            this.progressBar.Size = new System.Drawing.Size(362, 20);
             this.progressBar.TabIndex = 0;
             // 
             // lblDownloadFile
             // 
             this.lblDownloadFile.Location = new System.Drawing.Point(12, 46);
             this.lblDownloadFile.Name = "lblDownloadFile";
-            this.lblDownloadFile.Size = new System.Drawing.Size(287, 56);
+            this.lblDownloadFile.Size = new System.Drawing.Size(362, 56);
             this.lblDownloadFile.TabIndex = 1;
             this.lblDownloadFile.Text = "this is a long label just to test how alignment looks alike when the text is long" +
     " enough";
@@ -64,7 +64,7 @@
             // 
             // btnOk
             // 
-            this.btnOk.Location = new System.Drawing.Point(262, 145);
+            this.btnOk.Location = new System.Drawing.Point(337, 154);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(37, 27);
             this.btnOk.TabIndex = 3;
@@ -76,7 +76,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(311, 193);
+            this.ClientSize = new System.Drawing.Size(386, 193);
             this.Controls.Add(this.btnOk);
             this.Controls.Add(this.lblTitle);
             this.Controls.Add(this.lblDownloadFile);

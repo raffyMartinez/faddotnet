@@ -16,9 +16,9 @@ using FAD3.Mapping.Classes;
 
 namespace FAD3.Mapping.Forms
 {
-    public partial class ERDDAPDownloadForm : Form
+    public partial class ERDDAPConfigureDownloadForm : Form
     {
-        private static ERDDAPDownloadForm _instance;
+        private static ERDDAPConfigureDownloadForm _instance;
         public Dictionary<string, (string unit, string description)> GridParameters { get; set; }
         public Dictionary<string, (string name, int size, double spacing)> Dimensions { get; set; }
         public string Title { get; set; }
@@ -33,18 +33,23 @@ namespace FAD3.Mapping.Forms
         public string Identifier { get; set; }
         public string MetadataFileName { get; set; }
         private string _freq;
-        private DownloadSpatioTemporalDataForm _parent;
+        private ERDDAPSelectDatasetForm _parent;
         private Extents _selectionExtent;
+        private bool _isNonNumeric = false;
+        private bool _validNS;
+        private bool _validEW;
+        private bool _validAltitiude;
+        private bool _validTime;
 
-        public ERDDAPDownloadForm(DownloadSpatioTemporalDataForm parent)
+        public ERDDAPConfigureDownloadForm(ERDDAPSelectDatasetForm parent)
         {
             InitializeComponent();
             _parent = parent;
         }
 
-        public static ERDDAPDownloadForm GetInstance(DownloadSpatioTemporalDataForm parent)
+        public static ERDDAPConfigureDownloadForm GetInstance(ERDDAPSelectDatasetForm parent)
         {
-            if (_instance == null) _instance = new ERDDAPDownloadForm(parent);
+            if (_instance == null) _instance = new ERDDAPConfigureDownloadForm(parent);
             return _instance;
         }
 
@@ -68,8 +73,50 @@ namespace FAD3.Mapping.Forms
             }
         }
 
+        private void SetupTooltips()
+        {
+            // Create the ToolTip and associate with the Form container.
+            ToolTip tt = new ToolTip();
+
+            // Set up the delays for the ToolTip.
+            tt.AutoPopDelay = 5000;
+            tt.InitialDelay = 1000;
+            tt.ReshowDelay = 500;
+            // Force the ToolTip text to be displayed whether or not the form is active.
+            tt.ShowAlways = true;
+
+            // Set up the ToolTip text for the Button and Checkbox.
+            tt.SetToolTip(btnCancel, "Closes this window");
+            tt.SetToolTip(btnDownload, "Download selected data using ERDDAP");
+            tt.SetToolTip(btnRefresh, "Refresh metadata by downloading updates over the interet");
+            tt.SetToolTip(btnAltitudeHelp, "Shows minimum and maximum altitude for this dataset");
+            tt.SetToolTip(btnLatHelp, "Shows minimum and maximum latitude for this dataset");
+            tt.SetToolTip(btnLonHelp, "Shows minimum and maximum longitude for this dataset");
+            tt.SetToolTip(btnTimeHelp, "Shows time start and time end for this dataset");
+            tt.SetToolTip(chkAltitude, "Check to include altitude data in downloaded data");
+            tt.SetToolTip(chkLat, "Check to include latitude data in downloaded data");
+            tt.SetToolTip(chkLon, "Check to include longitude data in downloaded data");
+            tt.SetToolTip(chkTime, "Check to include temporal data in downloaded data");
+            tt.SetToolTip(dtPickerEnd, "Ending time period of data to download");
+            tt.SetToolTip(dtPickerStart, "Starting time period of data to download");
+            tt.SetToolTip(txtTimeStride, "1 - downloads all time periods in the dataset\r\nOther values - skips n-1 periods to download");
+            tt.SetToolTip(txtLatStride, "1 - downloads all latitude rows in the dataset\r\nOther values - skips n-1 rows to download");
+            tt.SetToolTip(txtLonStride, "1 - downloads all longitude columns in the dataset\r\nOther values - skips n-1 columns to download");
+            tt.SetToolTip(txtAltitudeStride, "1 - downloads all altitude levels in the dataset\r\nOther values - skips n-1 levels to download");
+            tt.SetToolTip(txtboundEast, "Left longitude of the bounding box enclosing the dataset to download");
+            tt.SetToolTip(txtboundWest, "Right longitude of the bounding box enclosing the dataset to download");
+            tt.SetToolTip(txtboundNorth, "Upper latitude of the bounding box enclosing the dataset to download");
+            tt.SetToolTip(txtboundSouth, "Lower latitude of the bounding box enclosing the dataset to download");
+            tt.SetToolTip(txtStartAltitude, "If applicable, sets the lowest horizontal slice of the dataset");
+            tt.SetToolTip(txtEndAltitude, "If applicable, sets the topmost horizontal slice of the dataset");
+            tt.SetToolTip(lvGridParameters, "Lists all downloadble grid variables of the dataset");
+            tt.SetToolTip(cboFileType, "Select filetype of downloaded data");
+        }
+
         private void OnFormLoad(object sender, EventArgs e)
         {
+            SetupTooltips();
+
             lblTitle.Text = Title;
             lblTitle.BorderStyle = BorderStyle.None;
             txtboundEast.Text = DataExtents.xMin.ToString();
@@ -222,12 +269,12 @@ namespace FAD3.Mapping.Forms
                 {
                     string dasText = wc.DownloadString($"{URL}.das");
                     string updateEndPosition = GetDateCoverageEnd(dasText);
-                    bool updateStart = dtPickerStart.Value == EndPosition;
+                    bool updateStartPosition = dtPickerStart.Value == EndPosition;
                     if (EndPosition.Date != DateTime.Parse(updateEndPosition).Date)
                     {
                         EndPosition = DateTime.Parse(updateEndPosition);
 
-                        if (updateStart)
+                        if (updateStartPosition)
                         {
                             dtPickerStart.Value = EndPosition;
                         }
@@ -314,31 +361,25 @@ namespace FAD3.Mapping.Forms
             switch (((LinkLabel)sender).Text)
             {
                 case "Abstract":
-                    MessageBox.Show(DataAbstract, "Abstract");
+                    global.ShowCopyableText("Abstract", DataAbstract, this);
                     break;
 
                 case "Legal constraints":
-                    MessageBox.Show(LegalConstraint, "Legal constraints");
+                    global.ShowCopyableText("Legal constraints", LegalConstraint, this);
                     break;
 
                 case "Credits":
-                    MessageBox.Show(Credits, "Credits");
+                    global.ShowCopyableText("Credits", Credits, this);
                     break;
 
                 case "Download URL":
                     if (ValidateForm())
                     {
-                        DisplayCopyableTextForm dcf = DisplayCopyableTextForm.GetInstance();
-                        if (dcf.Visible)
-                        {
-                            dcf.BringToFront();
-                        }
-                        else
-                        {
-                            dcf.Show(this);
-                        }
-
-                        dcf.TextToDisplay = GetDownloadURL();
+                        global.ShowCopyableText("URL to download dataset using ERDDAP server", GetDownloadURL(), this);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Check for blank fields and errors marked by exclamation points\r\nAt least one grid variable must be checked\r\nStart values must not exceed end values", "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     break;
             }
@@ -346,7 +387,7 @@ namespace FAD3.Mapping.Forms
 
         private bool ValidateTime()
         {
-            VisibleErrorLabels(false);
+            VisibleErrorLabels(false, includeExtents: false, includeVertical: false, includeStrides: false);
             bool isStartDateValid = DateTime.Compare(dtPickerStart.Value, BeginPosition) >= 0
                 && DateTime.Compare(dtPickerStart.Value, EndPosition) <= 0
                 && DateTime.Compare(dtPickerStart.Value, dtPickerEnd.Value) <= 0;
@@ -372,19 +413,42 @@ namespace FAD3.Mapping.Forms
                     isValid = ValidateStrides();
                     if (isValid)
                     {
-                        isValid = txtboundEast.Text.Length > 0
-                            && txtboundNorth.Text.Length > 0
-                            && txtboundSouth.Text.Length > 0
-                            && txtboundWest.Text.Length > 0
-                            && txtLatStride.Text.Length > 0
-                            && txtLonStride.Text.Length > 0
-                            && txtTimeStride.Text.Length > 0;
-
-                        if (isValid && chkAltitude.Checked)
+                        isValid = ValidateAltitudes();
+                        if (isValid)
                         {
-                            isValid = txtStartAltitude.Text.Length > 0
-                                && txtEndAltitude.Text.Length > 0
-                                && txtAltitudeStride.Text.Length > 0;
+                            isValid = txtboundEast.Text.Length > 0
+                                && txtboundNorth.Text.Length > 0
+                                && txtboundSouth.Text.Length > 0
+                                && txtboundWest.Text.Length > 0
+                                && txtLatStride.Text.Length > 0
+                                && txtLonStride.Text.Length > 0
+                                && txtTimeStride.Text.Length > 0;
+
+                            if (isValid && chkAltitude.Enabled)
+                            {
+                                isValid = txtStartAltitude.Text.Length > 0
+                                    && txtEndAltitude.Text.Length > 0
+                                    && txtAltitudeStride.Text.Length > 0;
+                                if (isValid)
+                                {
+                                    isValid = lvGridParameters.CheckedItems.Count > 0;
+                                    if (isValid)
+                                    {
+                                        _validEW = (double.Parse(txtboundEast.Text) < double.Parse(txtboundWest.Text));
+                                        _validNS = (double.Parse(txtboundSouth.Text) < double.Parse(txtboundNorth.Text));
+                                        _validTime = DateTime.Compare(dtPickerStart.Value, dtPickerEnd.Value) <= 0;
+                                        if (chkAltitude.Enabled)
+                                        {
+                                            _validAltitiude = (double.Parse(txtStartAltitude.Text) <= double.Parse(txtEndAltitude.Text));
+                                        }
+                                        else
+                                        {
+                                            _validAltitiude = true;
+                                        }
+                                        isValid = _validAltitiude && _validEW && _validNS && _validTime;
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -432,7 +496,7 @@ namespace FAD3.Mapping.Forms
             }
             else
             {
-                MessageBox.Show("Please check fields for errors marked by exclamation points", "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Check for blank fields and errors marked by exclamation points\r\nAt least one grid variable must be checked\r\nStart values must not exceed end values", "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return "";
             }
         }
@@ -443,15 +507,23 @@ namespace FAD3.Mapping.Forms
         /// <param name="url"></param>
         private void DownloadERDDAPData(string url)
         {
-            SaveFileDialog sfd = new SaveFileDialog();
-            sfd.Title = "Save data file";
-            sfd.FileName = $"{Identifier}_{DateTime.Now.ToString("MMM-dd-yyyy")}_nccsv.csv";
-            sfd.ShowDialog();
-            if (sfd.FileName.Length > 0)
+            if (global.HasInternetConnection())
             {
-                FileDownloadForm fdf = new FileDownloadForm(url, sfd.FileName);
-                fdf.StartPosition = FormStartPosition.CenterScreen;
-                fdf.Show(this);
+                SaveFileDialog sfd = new SaveFileDialog();
+
+                sfd.Title = "Save data file";
+                sfd.FileName = $"{Identifier}_{dtPickerStart.Value.ToString("MMM-dd-yyyy")}_{dtPickerEnd.Value.ToString("MMM-dd-yyyy")}_nccsv.csv";
+                DialogResult result = sfd.ShowDialog();
+                if (result == DialogResult.OK && sfd.FileName.Length > 0)
+                {
+                    FileDownloadForm fdf = new FileDownloadForm(url, sfd.FileName);
+                    fdf.StartPosition = FormStartPosition.CenterScreen;
+                    fdf.Show(this);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Computer is not connected to the internet", "No connection", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
@@ -479,7 +551,7 @@ namespace FAD3.Mapping.Forms
                     Close();
                     break;
 
-                case "btnOk":
+                case "btnDownload":
                     string downloadURL = GetDownloadURL();
                     if (downloadURL.Length > 0)
                     {
@@ -508,20 +580,19 @@ namespace FAD3.Mapping.Forms
                 {
                     case "dtPickerStart":
                     case "dtPickerEnd":
-                        e.Cancel = !ValidateTime();
+                        ValidateTime();
                         break;
 
                     case "txtTimeStride":
                     case "txtAltitudeStride":
                     case "txtLatStride":
                     case "txtLonStride":
-                        e.Cancel = !ValidateStrides();
+                        ValidateStrides();
                         break;
 
                     case "txtStartAltitude":
-                        break;
-
                     case "txtEndAltitude":
+                        ValidateAltitudes();
                         break;
 
                     case "txtboundNorth":
@@ -529,21 +600,76 @@ namespace FAD3.Mapping.Forms
                     case "txtboundEast":
                     case "txtboundWest":
 
-                        e.Cancel = !ValidateExtents();
+                        ValidateExtents();
 
                         break;
                 }
             }
+            e.Cancel = _isNonNumeric;
+        }
+
+        private bool ValidateAltitudes()
+        {
+            _isNonNumeric = false;
+            bool isValid = true;
+            VisibleErrorLabels(false, includeTemporal: false, includeExtents: false, includeStrides: false);
+            foreach (Control ctl in Controls)
+            {
+                switch (ctl.Name)
+                {
+                    case "txtStartAltitude":
+                    case "txtEndAltitude":
+                        string s = ctl.Text;
+                        if (chkAltitude.Enabled && s.Length > 0)
+                        {
+                            if (int.TryParse(s, out int v))
+                            {
+                                switch (ctl.Name)
+                                {
+                                    case "txtStartAltitude":
+                                        isValid = v <= Dimensions["vertical"].size && v >= 0;
+                                        lblErrStartAltitude.Visible = !isValid;
+                                        break;
+
+                                    case "txtEndAltitude":
+
+                                        isValid = v <= Dimensions["vertical"].size && v >= 0;
+                                        lblErrEndAltitude.Visible = !isValid;
+                                        break;
+                                }
+                            }
+                            else
+                            {
+                                MessageBox.Show("Expected values are whole numbers starting from zero", "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                isValid = false;
+                                _isNonNumeric = true;
+                                switch (ctl.Name)
+                                {
+                                    case "txtStartAltitude":
+                                        lblErrStartAltitude.Visible = true;
+                                        break;
+
+                                    case "txtEndAltitude":
+                                        lblErrEndAltitude.Visible = true;
+                                        break;
+                                }
+                            }
+                        }
+                        break;
+                }
+            }
+            return isValid;
         }
 
         private bool ValidateStrides()
 
         {
-            VisibleErrorLabels(false);
+            _isNonNumeric = false;
+            VisibleErrorLabels(false, includeTemporal: false, includeExtents: false, includeVertical: false);
             bool isValid = true;
             bool returnValue = true;
             string s = "";
-            foreach (Control ctl in tableLayoutPanel1.Controls)
+            foreach (Control ctl in Controls)
             {
                 switch (ctl.Name)
                 {
@@ -585,43 +711,75 @@ namespace FAD3.Mapping.Forms
                             {
                                 MessageBox.Show("Expected values are whole numbers greater than zero", "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Information);
                                 isValid = false;
-                            }
-                            if (returnValue)
-                            {
-                                returnValue = isValid;
+                                _isNonNumeric = true;
+                                switch (ctl.Name)
+                                {
+                                    case "txtTimeStride":
+                                        lblErrStrideTime.Visible = true;
+                                        break;
+
+                                    case "txtLatStride":
+                                        lblErrStrideLatitude.Visible = true;
+                                        break;
+
+                                    case "txtLonStride":
+                                        lblErrStrideLongitude.Visible = true;
+                                        break;
+
+                                    case "txtAltitudeStride":
+                                        lblErrStrideAltitude.Visible = true;
+                                        break;
+                                }
                             }
                         }
                         break;
+                }
+                if (returnValue)
+                {
+                    returnValue = isValid;
                 }
             }
 
             return returnValue;
         }
 
-        private void VisibleErrorLabels(bool labelsVisible = true)
+        private void VisibleErrorLabels(bool labelsVisible = true, bool includeExtents = true, bool includeTemporal = true, bool includeVertical = true, bool includeStrides = true)
         {
-            lblErrStartLatitude.Visible = labelsVisible;
-            lblErrEndLatitude.Visible = labelsVisible;
-            lblErrStartLongitude.Visible = labelsVisible;
-            lblErrEndLongitude.Visible = labelsVisible;
-            lblErrStartAltitude.Visible = labelsVisible;
-            lblErrEndAltitude.Visible = labelsVisible;
-            lblErrStartTime.Visible = labelsVisible;
-            lblErrEndTime.Visible = labelsVisible;
-            lblErrStrideAltitude.Visible = labelsVisible;
-            lblErrStrideLatitude.Visible = labelsVisible;
-            lblErrStrideLongitude.Visible = labelsVisible;
-            lblErrStrideTime.Visible = labelsVisible;
+            if (includeExtents)
+            {
+                lblErrStartLatitude.Visible = labelsVisible;
+                lblErrEndLatitude.Visible = labelsVisible;
+                lblErrStartLongitude.Visible = labelsVisible;
+                lblErrEndLongitude.Visible = labelsVisible;
+            }
+            if (includeTemporal)
+            {
+                lblErrStartTime.Visible = labelsVisible;
+                lblErrEndTime.Visible = labelsVisible;
+            }
+            if (includeVertical)
+            {
+                lblErrStartAltitude.Visible = labelsVisible;
+                lblErrEndAltitude.Visible = labelsVisible;
+            }
+            if (includeStrides)
+            {
+                lblErrStrideLatitude.Visible = labelsVisible;
+                lblErrStrideLongitude.Visible = labelsVisible;
+                lblErrStrideAltitude.Visible = labelsVisible;
+                lblErrStrideTime.Visible = labelsVisible;
+            }
         }
 
         private bool ValidateExtents(bool hideErrorLables = false)
         {
-            VisibleErrorLabels(false);
+            _isNonNumeric = false;
+            VisibleErrorLabels(false, includeTemporal: false, includeVertical: false, includeStrides: false);
             bool isValid = true;
             string msg = "";
             string s = "";
 
-            foreach (Control c in tableLayoutPanel1.Controls)
+            foreach (Control c in Controls)
             {
                 if (c.Tag?.ToString() == "extent")
                 {
@@ -669,6 +827,7 @@ namespace FAD3.Mapping.Forms
                         {
                             msg += $"{c.Name.Replace("txtbound", string.Empty) + "ern"} extent value must be a number";
                             isValid = false;
+                            _isNonNumeric = true;
                             switch (c.Name)
                             {
                                 case "txtboundNorth":

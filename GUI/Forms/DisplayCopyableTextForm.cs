@@ -8,12 +8,23 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace FAD3.Mapping.Forms
+namespace FAD3.GUI.Forms
 {
     public partial class DisplayCopyableTextForm : Form
     {
         private static DisplayCopyableTextForm _instance;
         private string _textToDisplay;
+        private string _title;
+
+        public string Title
+        {
+            get { return _title; }
+            set
+            {
+                _title = value;
+                Text = _title;
+            }
+        }
 
         public string TextToDisplay
         {
@@ -40,6 +51,7 @@ namespace FAD3.Mapping.Forms
         {
             global.LoadFormSettings(this);
             txtDisplay.Text = _textToDisplay;
+            Title = _title;
         }
 
         private void OnFormClosing(object sender, FormClosingEventArgs e)

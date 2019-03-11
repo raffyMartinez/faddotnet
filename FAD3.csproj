@@ -303,6 +303,7 @@
     <Compile Include="Mapping\Classes\ExtentDraggedBoxEventArgs.cs" />
     <Compile Include="Mapping\Classes\Grid25LayoutHelper.cs" />
     <Compile Include="Mapping\Classes\Grid25LayoutHelperEventArgs.cs" />
+    <Compile Include="Mapping\Classes\MapEditor.cs" />
     <Compile Include="Mapping\Classes\OccurenceMapping.cs" />
     <Compile Include="Mapping\Classes\MapTextGraticuleHelper.cs" />
     <Compile Include="Mapping\Classes\Discretizer.cs" />
@@ -312,23 +313,23 @@
     <Compile Include="Mapping\Classes\OccurenceMapEventArgs.cs" />
     <Compile Include="Mapping\Classes\ParseCSVEventArgs.cs" />
     <Compile Include="Mapping\Classes\ShapefileDiskStorageHelper.cs" />
-    <Compile Include="Mapping\Forms\DisplayCopyableTextForm.cs">
+    <Compile Include="GUI\Forms\DisplayCopyableTextForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Mapping\Forms\DisplayCopyableTextForm.Designer.cs">
+    <Compile Include="GUI\Forms\DisplayCopyableTextForm.Designer.cs">
       <DependentUpon>DisplayCopyableTextForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Mapping\Forms\DownloadSpatioTemporalDataForm.cs">
+    <Compile Include="Mapping\Forms\ERDDAPSelectDatasetForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Mapping\Forms\DownloadSpatioTemporalDataForm.Designer.cs">
-      <DependentUpon>DownloadSpatioTemporalDataForm.cs</DependentUpon>
+    <Compile Include="Mapping\Forms\ERDDAPSelectDatasetForm.Designer.cs">
+      <DependentUpon>ERDDAPSelectDatasetForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Mapping\Forms\ERDDAPDownloadForm.cs">
+    <Compile Include="Mapping\Forms\ERDDAPConfigureDownloadForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Mapping\Forms\ERDDAPDownloadForm.Designer.cs">
-      <DependentUpon>ERDDAPDownloadForm.cs</DependentUpon>
+    <Compile Include="Mapping\Forms\ERDDAPConfigureDownloadForm.Designer.cs">
+      <DependentUpon>ERDDAPConfigureDownloadForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Mapping\Forms\FileDownloadForm.cs">
       <SubType>Form</SubType>
@@ -347,12 +348,6 @@
     </Compile>
     <Compile Include="Mapping\Forms\ShapefileClassificationSchemeForm.Designer.cs">
       <DependentUpon>ShapefileClassificationSchemeForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Mapping\Forms\SpatioTemporalHelperForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Mapping\Forms\SpatioTemporalHelperForm.Designer.cs">
-      <DependentUpon>SpatioTemporalHelperForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Mapping\Forms\SpatioTemporalMappingForm.cs">
       <SubType>Form</SubType>
@@ -804,14 +799,14 @@
     <EmbeddedResource Include="GUI\Forms\AboutFADForm2.resx">
       <DependentUpon>AboutFADForm2.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Mapping\Forms\DisplayCopyableTextForm.resx">
+    <EmbeddedResource Include="GUI\Forms\DisplayCopyableTextForm.resx">
       <DependentUpon>DisplayCopyableTextForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Mapping\Forms\DownloadSpatioTemporalDataForm.resx">
-      <DependentUpon>DownloadSpatioTemporalDataForm.cs</DependentUpon>
+    <EmbeddedResource Include="Mapping\Forms\ERDDAPSelectDatasetForm.resx">
+      <DependentUpon>ERDDAPSelectDatasetForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Mapping\Forms\ERDDAPDownloadForm.resx">
-      <DependentUpon>ERDDAPDownloadForm.cs</DependentUpon>
+    <EmbeddedResource Include="Mapping\Forms\ERDDAPConfigureDownloadForm.resx">
+      <DependentUpon>ERDDAPConfigureDownloadForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Mapping\Forms\FileDownloadForm.resx">
       <DependentUpon>FileDownloadForm.cs</DependentUpon>
@@ -821,9 +816,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Mapping\Forms\ShapefileClassificationSchemeForm.resx">
       <DependentUpon>ShapefileClassificationSchemeForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Mapping\Forms\SpatioTemporalHelperForm.resx">
-      <DependentUpon>SpatioTemporalHelperForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Mapping\Forms\SpatioTemporalMappingForm.resx">
       <DependentUpon>SpatioTemporalMappingForm.cs</DependentUpon>

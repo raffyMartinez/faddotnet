@@ -1,6 +1,6 @@
 ﻿namespace FAD3.Mapping.Forms
 {
-    partial class DownloadSpatioTemporalDataForm
+    partial class ERDDAPSelectDatasetForm
     {
         /// <summary>
         /// Required designer variable.
@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DownloadSpatioTemporalDataForm));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ERDDAPSelectDatasetForm));
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.txtMetadataFolderPath = new System.Windows.Forms.TextBox();
             this.label20 = new System.Windows.Forms.Label();

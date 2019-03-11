@@ -12,19 +12,19 @@ using MapWinGIS;
 
 namespace FAD3.Mapping.Forms
 {
-    public partial class DownloadSpatioTemporalDataForm : Form
+    public partial class ERDDAPSelectDatasetForm : Form
     {
         private string _ERDDAPMetadataFolder;
-        private static DownloadSpatioTemporalDataForm _instance;
+        private static ERDDAPSelectDatasetForm _instance;
         private Extents _selectionExtent;
 
-        public static DownloadSpatioTemporalDataForm GetInstance()
+        public static ERDDAPSelectDatasetForm GetInstance()
         {
-            if (_instance == null) _instance = new DownloadSpatioTemporalDataForm();
+            if (_instance == null) _instance = new ERDDAPSelectDatasetForm();
             return _instance;
         }
 
-        public DownloadSpatioTemporalDataForm()
+        public ERDDAPSelectDatasetForm()
         {
             InitializeComponent();
         }
@@ -182,6 +182,7 @@ namespace FAD3.Mapping.Forms
 
         private void OnFormClosed(object sender, FormClosedEventArgs e)
         {
+            UnsetMap();
             _instance = null;
             global.SaveFormSettings(this);
         }
@@ -235,7 +236,7 @@ namespace FAD3.Mapping.Forms
                         && txtMaxLon.Text.Length > 0
                         && lvERDDAP.SelectedItems.Count > 0)
                     {
-                        ERDDAPDownloadForm edf = ERDDAPDownloadForm.GetInstance(this);
+                        ERDDAPConfigureDownloadForm edf = ERDDAPConfigureDownloadForm.GetInstance(this);
                         if (edf.Visible)
                         {
                             edf.BringToFront();
