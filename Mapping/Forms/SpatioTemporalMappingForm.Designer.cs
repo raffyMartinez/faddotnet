@@ -54,10 +54,35 @@
             this.tabMetadata = new System.Windows.Forms.TabPage();
             this.label21 = new System.Windows.Forms.Label();
             this.txtMetadata = new System.Windows.Forms.TextBox();
+            this.tabSummary = new System.Windows.Forms.TabPage();
+            this.txtDatasetNumberOfTimePeriods = new System.Windows.Forms.TextBox();
+            this.label19 = new System.Windows.Forms.Label();
+            this.txtDatasetMin = new System.Windows.Forms.TextBox();
+            this.label20 = new System.Windows.Forms.Label();
+            this.txtDatasetMax = new System.Windows.Forms.TextBox();
+            this.lblMax = new System.Windows.Forms.Label();
+            this.txtDatasetNumberValues = new System.Windows.Forms.TextBox();
+            this.label17 = new System.Windows.Forms.Label();
+            this.label16 = new System.Windows.Forms.Label();
+            this.txtDatasetUniqueCount = new System.Windows.Forms.TextBox();
+            this.txtInlandPoints = new System.Windows.Forms.TextBox();
+            this.label14 = new System.Windows.Forms.Label();
+            this.txtRows = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
             this.tabCategorize = new System.Windows.Forms.TabPage();
             this.label8 = new System.Windows.Forms.Label();
             this.cboClassificationScheme = new System.Windows.Forms.ComboBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.txtSelectedNumberOfPeriods = new System.Windows.Forms.TextBox();
+            this.label22 = new System.Windows.Forms.Label();
+            this.label18 = new System.Windows.Forms.Label();
+            this.txtSelectedUnique = new System.Windows.Forms.TextBox();
+            this.label12 = new System.Windows.Forms.Label();
+            this.label11 = new System.Windows.Forms.Label();
+            this.txtSelectedMaximum = new System.Windows.Forms.TextBox();
+            this.txtSelectedMinimum = new System.Windows.Forms.TextBox();
+            this.txtSelectedValuesCount = new System.Windows.Forms.TextBox();
+            this.label9 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.btnShowGridPoints = new System.Windows.Forms.Button();
             this.btnShowGridPolygons = new System.Windows.Forms.Button();
@@ -70,6 +95,7 @@
             this.btnCategorize = new System.Windows.Forms.Button();
             this.txtCategoryCount = new System.Windows.Forms.TextBox();
             this.label10 = new System.Windows.Forms.Label();
+            this.icbColorScheme = new FAD3.Mapping.UserControls.ImageCombo();
             this.tabMapping = new System.Windows.Forms.TabPage();
             this.lblParameter = new System.Windows.Forms.Label();
             this.btnExport = new System.Windows.Forms.Button();
@@ -87,31 +113,11 @@
             this.label15 = new System.Windows.Forms.Label();
             this.btnOk = new System.Windows.Forms.Button();
             this.lblStatus = new System.Windows.Forms.Label();
-            this.icbColorScheme = new FAD3.Mapping.UserControls.ImageCombo();
-            this.tabSummary = new System.Windows.Forms.TabPage();
-            this.label16 = new System.Windows.Forms.Label();
-            this.txtDatasetUniqueCount = new System.Windows.Forms.TextBox();
-            this.txtInlandPoints = new System.Windows.Forms.TextBox();
-            this.label14 = new System.Windows.Forms.Label();
-            this.txtRows = new System.Windows.Forms.TextBox();
-            this.label5 = new System.Windows.Forms.Label();
-            this.txtDatasetNumberValues = new System.Windows.Forms.TextBox();
-            this.label17 = new System.Windows.Forms.Label();
-            this.label12 = new System.Windows.Forms.Label();
-            this.label11 = new System.Windows.Forms.Label();
-            this.txtSelectedMaximum = new System.Windows.Forms.TextBox();
-            this.txtSelectedMinimum = new System.Windows.Forms.TextBox();
-            this.txtSelectedValuesCount = new System.Windows.Forms.TextBox();
-            this.label9 = new System.Windows.Forms.Label();
-            this.label18 = new System.Windows.Forms.Label();
-            this.txtSelectedUnique = new System.Windows.Forms.TextBox();
-            this.txtDatasetMax = new System.Windows.Forms.TextBox();
-            this.lblMax = new System.Windows.Forms.Label();
-            this.txtDatasetMin = new System.Windows.Forms.TextBox();
-            this.label20 = new System.Windows.Forms.Label();
+            this.chkViewTimeSeriesChart = new System.Windows.Forms.CheckBox();
             this.tabMap.SuspendLayout();
             this.tabStart.SuspendLayout();
             this.tabMetadata.SuspendLayout();
+            this.tabSummary.SuspendLayout();
             this.tabCategorize.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -119,7 +125,6 @@
             this.tabMapping.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.graphSheet)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgSheetSummary)).BeginInit();
-            this.tabSummary.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabMap
@@ -132,7 +137,7 @@
             this.tabMap.Location = new System.Drawing.Point(2, 38);
             this.tabMap.Name = "tabMap";
             this.tabMap.SelectedIndex = 0;
-            this.tabMap.Size = new System.Drawing.Size(463, 477);
+            this.tabMap.Size = new System.Drawing.Size(463, 488);
             this.tabMap.TabIndex = 0;
             this.tabMap.SelectedIndexChanged += new System.EventHandler(this.OnTabMapIndexChanged);
             // 
@@ -157,7 +162,7 @@
             this.tabStart.Location = new System.Drawing.Point(4, 22);
             this.tabStart.Name = "tabStart";
             this.tabStart.Padding = new System.Windows.Forms.Padding(3);
-            this.tabStart.Size = new System.Drawing.Size(455, 451);
+            this.tabStart.Size = new System.Drawing.Size(455, 462);
             this.tabStart.TabIndex = 0;
             this.tabStart.Text = "Start";
             this.tabStart.UseVisualStyleBackColor = true;
@@ -335,7 +340,7 @@
             this.tabMetadata.Location = new System.Drawing.Point(4, 22);
             this.tabMetadata.Name = "tabMetadata";
             this.tabMetadata.Padding = new System.Windows.Forms.Padding(3);
-            this.tabMetadata.Size = new System.Drawing.Size(455, 451);
+            this.tabMetadata.Size = new System.Drawing.Size(455, 462);
             this.tabMetadata.TabIndex = 5;
             this.tabMetadata.Text = "Metadata";
             this.tabMetadata.UseVisualStyleBackColor = true;
@@ -359,6 +364,148 @@
             this.txtMetadata.TabIndex = 0;
             this.txtMetadata.Text = "Metadata is only available in NCCVS file type";
             // 
+            // tabSummary
+            // 
+            this.tabSummary.Controls.Add(this.txtDatasetNumberOfTimePeriods);
+            this.tabSummary.Controls.Add(this.label19);
+            this.tabSummary.Controls.Add(this.txtDatasetMin);
+            this.tabSummary.Controls.Add(this.label20);
+            this.tabSummary.Controls.Add(this.txtDatasetMax);
+            this.tabSummary.Controls.Add(this.lblMax);
+            this.tabSummary.Controls.Add(this.txtDatasetNumberValues);
+            this.tabSummary.Controls.Add(this.label17);
+            this.tabSummary.Controls.Add(this.label16);
+            this.tabSummary.Controls.Add(this.txtDatasetUniqueCount);
+            this.tabSummary.Controls.Add(this.txtInlandPoints);
+            this.tabSummary.Controls.Add(this.label14);
+            this.tabSummary.Controls.Add(this.txtRows);
+            this.tabSummary.Controls.Add(this.label5);
+            this.tabSummary.Location = new System.Drawing.Point(4, 22);
+            this.tabSummary.Name = "tabSummary";
+            this.tabSummary.Padding = new System.Windows.Forms.Padding(3);
+            this.tabSummary.Size = new System.Drawing.Size(455, 462);
+            this.tabSummary.TabIndex = 6;
+            this.tabSummary.Text = "Dataset Summary";
+            this.tabSummary.UseVisualStyleBackColor = true;
+            // 
+            // txtDatasetNumberOfTimePeriods
+            // 
+            this.txtDatasetNumberOfTimePeriods.BackColor = System.Drawing.SystemColors.Window;
+            this.txtDatasetNumberOfTimePeriods.Location = new System.Drawing.Point(196, 50);
+            this.txtDatasetNumberOfTimePeriods.Name = "txtDatasetNumberOfTimePeriods";
+            this.txtDatasetNumberOfTimePeriods.ReadOnly = true;
+            this.txtDatasetNumberOfTimePeriods.Size = new System.Drawing.Size(185, 20);
+            this.txtDatasetNumberOfTimePeriods.TabIndex = 58;
+            // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
+            this.label19.Location = new System.Drawing.Point(44, 53);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(115, 13);
+            this.label19.TabIndex = 57;
+            this.label19.Text = "Number of time periods";
+            // 
+            // txtDatasetMin
+            // 
+            this.txtDatasetMin.Location = new System.Drawing.Point(196, 332);
+            this.txtDatasetMin.Name = "txtDatasetMin";
+            this.txtDatasetMin.Size = new System.Drawing.Size(185, 20);
+            this.txtDatasetMin.TabIndex = 56;
+            // 
+            // label20
+            // 
+            this.label20.AutoSize = true;
+            this.label20.Location = new System.Drawing.Point(44, 335);
+            this.label20.Name = "label20";
+            this.label20.Size = new System.Drawing.Size(52, 13);
+            this.label20.TabIndex = 55;
+            this.label20.Text = "Minumum";
+            // 
+            // txtDatasetMax
+            // 
+            this.txtDatasetMax.Location = new System.Drawing.Point(196, 285);
+            this.txtDatasetMax.Name = "txtDatasetMax";
+            this.txtDatasetMax.Size = new System.Drawing.Size(185, 20);
+            this.txtDatasetMax.TabIndex = 54;
+            // 
+            // lblMax
+            // 
+            this.lblMax.AutoSize = true;
+            this.lblMax.Location = new System.Drawing.Point(44, 288);
+            this.lblMax.Name = "lblMax";
+            this.lblMax.Size = new System.Drawing.Size(51, 13);
+            this.lblMax.TabIndex = 53;
+            this.lblMax.Text = "Maximum";
+            // 
+            // txtDatasetNumberValues
+            // 
+            this.txtDatasetNumberValues.Location = new System.Drawing.Point(196, 194);
+            this.txtDatasetNumberValues.Name = "txtDatasetNumberValues";
+            this.txtDatasetNumberValues.Size = new System.Drawing.Size(185, 20);
+            this.txtDatasetNumberValues.TabIndex = 52;
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Location = new System.Drawing.Point(44, 197);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(90, 13);
+            this.label17.TabIndex = 51;
+            this.label17.Text = "Number of values";
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(44, 244);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(125, 13);
+            this.label16.TabIndex = 44;
+            this.label16.Text = "Number of unique values";
+            // 
+            // txtDatasetUniqueCount
+            // 
+            this.txtDatasetUniqueCount.Location = new System.Drawing.Point(196, 241);
+            this.txtDatasetUniqueCount.Name = "txtDatasetUniqueCount";
+            this.txtDatasetUniqueCount.Size = new System.Drawing.Size(185, 20);
+            this.txtDatasetUniqueCount.TabIndex = 43;
+            // 
+            // txtInlandPoints
+            // 
+            this.txtInlandPoints.BackColor = System.Drawing.SystemColors.Window;
+            this.txtInlandPoints.Location = new System.Drawing.Point(196, 144);
+            this.txtInlandPoints.Name = "txtInlandPoints";
+            this.txtInlandPoints.ReadOnly = true;
+            this.txtInlandPoints.Size = new System.Drawing.Size(185, 20);
+            this.txtInlandPoints.TabIndex = 42;
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(44, 147);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(67, 13);
+            this.label14.TabIndex = 41;
+            this.label14.Text = "Inland points";
+            // 
+            // txtRows
+            // 
+            this.txtRows.BackColor = System.Drawing.SystemColors.Window;
+            this.txtRows.Location = new System.Drawing.Point(196, 97);
+            this.txtRows.Name = "txtRows";
+            this.txtRows.ReadOnly = true;
+            this.txtRows.Size = new System.Drawing.Size(185, 20);
+            this.txtRows.TabIndex = 40;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(44, 100);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(140, 13);
+            this.label5.TabIndex = 39;
+            this.label5.Text = "Number of point coordinates";
+            // 
             // tabCategorize
             // 
             this.tabCategorize.Controls.Add(this.label8);
@@ -375,7 +522,7 @@
             this.tabCategorize.Location = new System.Drawing.Point(4, 22);
             this.tabCategorize.Name = "tabCategorize";
             this.tabCategorize.Padding = new System.Windows.Forms.Padding(3);
-            this.tabCategorize.Size = new System.Drawing.Size(455, 451);
+            this.tabCategorize.Size = new System.Drawing.Size(455, 462);
             this.tabCategorize.TabIndex = 1;
             this.tabCategorize.Text = "Categorize";
             this.tabCategorize.UseVisualStyleBackColor = true;
@@ -383,7 +530,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(-2, 40);
+            this.label8.Location = new System.Drawing.Point(2, 40);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(108, 13);
             this.label8.TabIndex = 41;
@@ -392,13 +539,15 @@
             // cboClassificationScheme
             // 
             this.cboClassificationScheme.FormattingEnabled = true;
-            this.cboClassificationScheme.Location = new System.Drawing.Point(112, 37);
+            this.cboClassificationScheme.Location = new System.Drawing.Point(116, 37);
             this.cboClassificationScheme.Name = "cboClassificationScheme";
             this.cboClassificationScheme.Size = new System.Drawing.Size(145, 21);
             this.cboClassificationScheme.TabIndex = 40;
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.txtSelectedNumberOfPeriods);
+            this.groupBox3.Controls.Add(this.label22);
             this.groupBox3.Controls.Add(this.label18);
             this.groupBox3.Controls.Add(this.txtSelectedUnique);
             this.groupBox3.Controls.Add(this.label12);
@@ -407,18 +556,98 @@
             this.groupBox3.Controls.Add(this.txtSelectedMinimum);
             this.groupBox3.Controls.Add(this.txtSelectedValuesCount);
             this.groupBox3.Controls.Add(this.label9);
-            this.groupBox3.Location = new System.Drawing.Point(-7, 309);
+            this.groupBox3.Location = new System.Drawing.Point(6, 299);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(198, 136);
+            this.groupBox3.Size = new System.Drawing.Size(198, 156);
             this.groupBox3.TabIndex = 39;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Summary of selected time periods";
+            // 
+            // txtSelectedNumberOfPeriods
+            // 
+            this.txtSelectedNumberOfPeriods.Location = new System.Drawing.Point(109, 25);
+            this.txtSelectedNumberOfPeriods.Name = "txtSelectedNumberOfPeriods";
+            this.txtSelectedNumberOfPeriods.Size = new System.Drawing.Size(62, 20);
+            this.txtSelectedNumberOfPeriods.TabIndex = 60;
+            // 
+            // label22
+            // 
+            this.label22.AutoSize = true;
+            this.label22.Location = new System.Drawing.Point(13, 28);
+            this.label22.Name = "label22";
+            this.label22.Size = new System.Drawing.Size(93, 13);
+            this.label22.TabIndex = 59;
+            this.label22.Text = "Number of periods";
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(13, 133);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(75, 13);
+            this.label18.TabIndex = 58;
+            this.label18.Text = "Unique values";
+            // 
+            // txtSelectedUnique
+            // 
+            this.txtSelectedUnique.Location = new System.Drawing.Point(109, 130);
+            this.txtSelectedUnique.Name = "txtSelectedUnique";
+            this.txtSelectedUnique.Size = new System.Drawing.Size(62, 20);
+            this.txtSelectedUnique.TabIndex = 57;
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(13, 107);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(51, 13);
+            this.label12.TabIndex = 56;
+            this.label12.Text = "Maximum";
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(13, 81);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(48, 13);
+            this.label11.TabIndex = 55;
+            this.label11.Text = "Minimum";
+            // 
+            // txtSelectedMaximum
+            // 
+            this.txtSelectedMaximum.Location = new System.Drawing.Point(109, 104);
+            this.txtSelectedMaximum.Name = "txtSelectedMaximum";
+            this.txtSelectedMaximum.Size = new System.Drawing.Size(62, 20);
+            this.txtSelectedMaximum.TabIndex = 54;
+            // 
+            // txtSelectedMinimum
+            // 
+            this.txtSelectedMinimum.Location = new System.Drawing.Point(109, 78);
+            this.txtSelectedMinimum.Name = "txtSelectedMinimum";
+            this.txtSelectedMinimum.Size = new System.Drawing.Size(62, 20);
+            this.txtSelectedMinimum.TabIndex = 53;
+            // 
+            // txtSelectedValuesCount
+            // 
+            this.txtSelectedValuesCount.Location = new System.Drawing.Point(109, 52);
+            this.txtSelectedValuesCount.Name = "txtSelectedValuesCount";
+            this.txtSelectedValuesCount.Size = new System.Drawing.Size(62, 20);
+            this.txtSelectedValuesCount.TabIndex = 52;
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(13, 55);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(90, 13);
+            this.label9.TabIndex = 51;
+            this.label9.Text = "Number of values";
             // 
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.btnShowGridPoints);
             this.groupBox2.Controls.Add(this.btnShowGridPolygons);
-            this.groupBox2.Location = new System.Drawing.Point(236, 309);
+            this.groupBox2.Location = new System.Drawing.Point(236, 300);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(200, 101);
             this.groupBox2.TabIndex = 38;
@@ -448,7 +677,7 @@
             // label13
             // 
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(-2, 8);
+            this.label13.Location = new System.Drawing.Point(2, 8);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(76, 13);
             this.label13.TabIndex = 37;
@@ -477,12 +706,13 @@
             this.dgcolCount,
             this.dgCol});
             this.dgCategories.GridColor = System.Drawing.SystemColors.Window;
-            this.dgCategories.Location = new System.Drawing.Point(1, 105);
+            this.dgCategories.Location = new System.Drawing.Point(5, 99);
             this.dgCategories.Name = "dgCategories";
             this.dgCategories.ReadOnly = true;
             this.dgCategories.RowHeadersVisible = false;
             this.dgCategories.Size = new System.Drawing.Size(439, 194);
             this.dgCategories.TabIndex = 34;
+            this.dgCategories.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellDblClick);
             // 
             // dgcolCategory
             // 
@@ -506,7 +736,7 @@
             // 
             // btnCategorize
             // 
-            this.btnCategorize.Location = new System.Drawing.Point(268, 65);
+            this.btnCategorize.Location = new System.Drawing.Point(272, 65);
             this.btnCategorize.Name = "btnCategorize";
             this.btnCategorize.Size = new System.Drawing.Size(90, 25);
             this.btnCategorize.TabIndex = 33;
@@ -516,7 +746,7 @@
             // 
             // txtCategoryCount
             // 
-            this.txtCategoryCount.Location = new System.Drawing.Point(112, 68);
+            this.txtCategoryCount.Location = new System.Drawing.Point(116, 68);
             this.txtCategoryCount.Name = "txtCategoryCount";
             this.txtCategoryCount.Size = new System.Drawing.Size(146, 20);
             this.txtCategoryCount.TabIndex = 32;
@@ -524,14 +754,30 @@
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(-2, 71);
+            this.label10.Location = new System.Drawing.Point(2, 71);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(108, 13);
             this.label10.TabIndex = 31;
             this.label10.Text = "Number of categories";
             // 
+            // icbColorScheme
+            // 
+            this.icbColorScheme.Color1 = System.Drawing.Color.Gray;
+            this.icbColorScheme.Color2 = System.Drawing.Color.Gray;
+            this.icbColorScheme.ColorSchemes = null;
+            this.icbColorScheme.ComboStyle = FAD3.Mapping.UserControls.ImageComboStyle.ColorSchemeGraduated;
+            this.icbColorScheme.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.icbColorScheme.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.icbColorScheme.FormattingEnabled = true;
+            this.icbColorScheme.Location = new System.Drawing.Point(116, 6);
+            this.icbColorScheme.Name = "icbColorScheme";
+            this.icbColorScheme.OutlineColor = System.Drawing.Color.Black;
+            this.icbColorScheme.Size = new System.Drawing.Size(146, 21);
+            this.icbColorScheme.TabIndex = 36;
+            // 
             // tabMapping
             // 
+            this.tabMapping.Controls.Add(this.chkViewTimeSeriesChart);
             this.tabMapping.Controls.Add(this.lblParameter);
             this.tabMapping.Controls.Add(this.btnExport);
             this.tabMapping.Controls.Add(this.graphSheet);
@@ -544,7 +790,7 @@
             this.tabMapping.Location = new System.Drawing.Point(4, 22);
             this.tabMapping.Name = "tabMapping";
             this.tabMapping.Padding = new System.Windows.Forms.Padding(3);
-            this.tabMapping.Size = new System.Drawing.Size(455, 451);
+            this.tabMapping.Size = new System.Drawing.Size(455, 462);
             this.tabMapping.TabIndex = 2;
             this.tabMapping.Text = "Mapping";
             this.tabMapping.UseVisualStyleBackColor = true;
@@ -561,12 +807,13 @@
             // 
             // btnExport
             // 
-            this.btnExport.Location = new System.Drawing.Point(17, 409);
+            this.btnExport.Location = new System.Drawing.Point(17, 403);
             this.btnExport.Name = "btnExport";
             this.btnExport.Size = new System.Drawing.Size(121, 25);
             this.btnExport.TabIndex = 29;
             this.btnExport.Text = "Export to time series";
             this.btnExport.UseVisualStyleBackColor = true;
+            this.btnExport.Click += new System.EventHandler(this.OnButtonClick);
             // 
             // graphSheet
             // 
@@ -716,7 +963,7 @@
             // 
             this.btnOk.ImageKey = "im_exit.bmp";
             this.btnOk.ImageList = this.imageList1;
-            this.btnOk.Location = new System.Drawing.Point(424, 525);
+            this.btnOk.Location = new System.Drawing.Point(424, 532);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(30, 30);
             this.btnOk.TabIndex = 28;
@@ -730,206 +977,17 @@
             this.lblStatus.Size = new System.Drawing.Size(343, 18);
             this.lblStatus.TabIndex = 29;
             // 
-            // icbColorScheme
+            // chkViewTimeSeriesChart
             // 
-            this.icbColorScheme.Color1 = System.Drawing.Color.Gray;
-            this.icbColorScheme.Color2 = System.Drawing.Color.Gray;
-            this.icbColorScheme.ColorSchemes = null;
-            this.icbColorScheme.ComboStyle = FAD3.Mapping.UserControls.ImageComboStyle.ColorSchemeGraduated;
-            this.icbColorScheme.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-            this.icbColorScheme.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.icbColorScheme.FormattingEnabled = true;
-            this.icbColorScheme.Location = new System.Drawing.Point(112, 6);
-            this.icbColorScheme.Name = "icbColorScheme";
-            this.icbColorScheme.OutlineColor = System.Drawing.Color.Black;
-            this.icbColorScheme.Size = new System.Drawing.Size(146, 21);
-            this.icbColorScheme.TabIndex = 36;
-            // 
-            // tabSummary
-            // 
-            this.tabSummary.Controls.Add(this.txtDatasetMin);
-            this.tabSummary.Controls.Add(this.label20);
-            this.tabSummary.Controls.Add(this.txtDatasetMax);
-            this.tabSummary.Controls.Add(this.lblMax);
-            this.tabSummary.Controls.Add(this.txtDatasetNumberValues);
-            this.tabSummary.Controls.Add(this.label17);
-            this.tabSummary.Controls.Add(this.label16);
-            this.tabSummary.Controls.Add(this.txtDatasetUniqueCount);
-            this.tabSummary.Controls.Add(this.txtInlandPoints);
-            this.tabSummary.Controls.Add(this.label14);
-            this.tabSummary.Controls.Add(this.txtRows);
-            this.tabSummary.Controls.Add(this.label5);
-            this.tabSummary.Location = new System.Drawing.Point(4, 22);
-            this.tabSummary.Name = "tabSummary";
-            this.tabSummary.Padding = new System.Windows.Forms.Padding(3);
-            this.tabSummary.Size = new System.Drawing.Size(455, 451);
-            this.tabSummary.TabIndex = 6;
-            this.tabSummary.Text = "Dataset Summary";
-            this.tabSummary.UseVisualStyleBackColor = true;
-            // 
-            // label16
-            // 
-            this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(37, 217);
-            this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(125, 13);
-            this.label16.TabIndex = 44;
-            this.label16.Text = "Number of unique values";
-            // 
-            // txtDatasetUniqueCount
-            // 
-            this.txtDatasetUniqueCount.Location = new System.Drawing.Point(189, 214);
-            this.txtDatasetUniqueCount.Name = "txtDatasetUniqueCount";
-            this.txtDatasetUniqueCount.Size = new System.Drawing.Size(185, 20);
-            this.txtDatasetUniqueCount.TabIndex = 43;
-            // 
-            // txtInlandPoints
-            // 
-            this.txtInlandPoints.BackColor = System.Drawing.SystemColors.Window;
-            this.txtInlandPoints.Location = new System.Drawing.Point(189, 117);
-            this.txtInlandPoints.Name = "txtInlandPoints";
-            this.txtInlandPoints.ReadOnly = true;
-            this.txtInlandPoints.Size = new System.Drawing.Size(185, 20);
-            this.txtInlandPoints.TabIndex = 42;
-            // 
-            // label14
-            // 
-            this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(37, 120);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(67, 13);
-            this.label14.TabIndex = 41;
-            this.label14.Text = "Inland points";
-            // 
-            // txtRows
-            // 
-            this.txtRows.BackColor = System.Drawing.SystemColors.Window;
-            this.txtRows.Location = new System.Drawing.Point(189, 70);
-            this.txtRows.Name = "txtRows";
-            this.txtRows.ReadOnly = true;
-            this.txtRows.Size = new System.Drawing.Size(185, 20);
-            this.txtRows.TabIndex = 40;
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(37, 73);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(140, 13);
-            this.label5.TabIndex = 39;
-            this.label5.Text = "Number of point coordinates";
-            // 
-            // txtDatasetNumberValues
-            // 
-            this.txtDatasetNumberValues.Location = new System.Drawing.Point(189, 167);
-            this.txtDatasetNumberValues.Name = "txtDatasetNumberValues";
-            this.txtDatasetNumberValues.Size = new System.Drawing.Size(185, 20);
-            this.txtDatasetNumberValues.TabIndex = 52;
-            // 
-            // label17
-            // 
-            this.label17.AutoSize = true;
-            this.label17.Location = new System.Drawing.Point(37, 170);
-            this.label17.Name = "label17";
-            this.label17.Size = new System.Drawing.Size(90, 13);
-            this.label17.TabIndex = 51;
-            this.label17.Text = "Number of values";
-            // 
-            // label12
-            // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(13, 78);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(51, 13);
-            this.label12.TabIndex = 56;
-            this.label12.Text = "Maximum";
-            // 
-            // label11
-            // 
-            this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(13, 52);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(48, 13);
-            this.label11.TabIndex = 55;
-            this.label11.Text = "Minimum";
-            // 
-            // txtSelectedMaximum
-            // 
-            this.txtSelectedMaximum.Location = new System.Drawing.Point(109, 75);
-            this.txtSelectedMaximum.Name = "txtSelectedMaximum";
-            this.txtSelectedMaximum.Size = new System.Drawing.Size(62, 20);
-            this.txtSelectedMaximum.TabIndex = 54;
-            // 
-            // txtSelectedMinimum
-            // 
-            this.txtSelectedMinimum.Location = new System.Drawing.Point(109, 49);
-            this.txtSelectedMinimum.Name = "txtSelectedMinimum";
-            this.txtSelectedMinimum.Size = new System.Drawing.Size(62, 20);
-            this.txtSelectedMinimum.TabIndex = 53;
-            // 
-            // txtSelectedValuesCount
-            // 
-            this.txtSelectedValuesCount.Location = new System.Drawing.Point(109, 23);
-            this.txtSelectedValuesCount.Name = "txtSelectedValuesCount";
-            this.txtSelectedValuesCount.Size = new System.Drawing.Size(62, 20);
-            this.txtSelectedValuesCount.TabIndex = 52;
-            // 
-            // label9
-            // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(13, 26);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(90, 13);
-            this.label9.TabIndex = 51;
-            this.label9.Text = "Number of values";
-            // 
-            // label18
-            // 
-            this.label18.AutoSize = true;
-            this.label18.Location = new System.Drawing.Point(13, 104);
-            this.label18.Name = "label18";
-            this.label18.Size = new System.Drawing.Size(75, 13);
-            this.label18.TabIndex = 58;
-            this.label18.Text = "Unique values";
-            // 
-            // txtSelectedUnique
-            // 
-            this.txtSelectedUnique.Location = new System.Drawing.Point(109, 101);
-            this.txtSelectedUnique.Name = "txtSelectedUnique";
-            this.txtSelectedUnique.Size = new System.Drawing.Size(62, 20);
-            this.txtSelectedUnique.TabIndex = 57;
-            // 
-            // txtDatasetMax
-            // 
-            this.txtDatasetMax.Location = new System.Drawing.Point(189, 258);
-            this.txtDatasetMax.Name = "txtDatasetMax";
-            this.txtDatasetMax.Size = new System.Drawing.Size(185, 20);
-            this.txtDatasetMax.TabIndex = 54;
-            // 
-            // lblMax
-            // 
-            this.lblMax.AutoSize = true;
-            this.lblMax.Location = new System.Drawing.Point(37, 261);
-            this.lblMax.Name = "lblMax";
-            this.lblMax.Size = new System.Drawing.Size(51, 13);
-            this.lblMax.TabIndex = 53;
-            this.lblMax.Text = "Maximum";
-            // 
-            // txtDatasetMin
-            // 
-            this.txtDatasetMin.Location = new System.Drawing.Point(189, 305);
-            this.txtDatasetMin.Name = "txtDatasetMin";
-            this.txtDatasetMin.Size = new System.Drawing.Size(185, 20);
-            this.txtDatasetMin.TabIndex = 56;
-            // 
-            // label20
-            // 
-            this.label20.AutoSize = true;
-            this.label20.Location = new System.Drawing.Point(37, 308);
-            this.label20.Name = "label20";
-            this.label20.Size = new System.Drawing.Size(52, 13);
-            this.label20.TabIndex = 55;
-            this.label20.Text = "Minumum";
+            this.chkViewTimeSeriesChart.AutoSize = true;
+            this.chkViewTimeSeriesChart.Checked = true;
+            this.chkViewTimeSeriesChart.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkViewTimeSeriesChart.Location = new System.Drawing.Point(17, 434);
+            this.chkViewTimeSeriesChart.Name = "chkViewTimeSeriesChart";
+            this.chkViewTimeSeriesChart.Size = new System.Drawing.Size(82, 17);
+            this.chkViewTimeSeriesChart.TabIndex = 34;
+            this.chkViewTimeSeriesChart.Text = "View results";
+            this.chkViewTimeSeriesChart.UseVisualStyleBackColor = true;
             // 
             // SpatioTemporalMappingForm
             // 
@@ -949,6 +1007,8 @@
             this.tabStart.PerformLayout();
             this.tabMetadata.ResumeLayout(false);
             this.tabMetadata.PerformLayout();
+            this.tabSummary.ResumeLayout(false);
+            this.tabSummary.PerformLayout();
             this.tabCategorize.ResumeLayout(false);
             this.tabCategorize.PerformLayout();
             this.groupBox3.ResumeLayout(false);
@@ -959,8 +1019,6 @@
             this.tabMapping.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.graphSheet)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgSheetSummary)).EndInit();
-            this.tabSummary.ResumeLayout(false);
-            this.tabSummary.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -1043,5 +1101,10 @@
         private System.Windows.Forms.Label label20;
         private System.Windows.Forms.TextBox txtDatasetMax;
         private System.Windows.Forms.Label lblMax;
+        private System.Windows.Forms.TextBox txtDatasetNumberOfTimePeriods;
+        private System.Windows.Forms.Label label19;
+        private System.Windows.Forms.TextBox txtSelectedNumberOfPeriods;
+        private System.Windows.Forms.Label label22;
+        private System.Windows.Forms.CheckBox chkViewTimeSeriesChart;
     }
 }

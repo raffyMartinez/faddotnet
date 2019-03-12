@@ -338,7 +338,6 @@ namespace FAD3.Mapping.Classes
         {
             CountNonNullValues = 0;
             DateTime start = DateTime.Now;
-            Console.WriteLine($"timing parse start: {start}");
             _dictTemporalValues.Clear();
             _hashSet.Clear();
 
@@ -550,7 +549,6 @@ namespace FAD3.Mapping.Classes
             sr.Close();
             sr = null;
             ParsingTimeSeconds = (DateTime.Now - start).TotalSeconds;
-            Console.WriteLine($"time parse end: {ParsingTimeSeconds.ToString()} seconds");
             return Coordinates.Count > 0;
         }
 
@@ -712,17 +710,34 @@ namespace FAD3.Mapping.Classes
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static int WhatCategory(double? value)
+        public static int WhatCategory(double? value, string classificationUsed)
         {
             int catIndex = 0;
-            for (int c = 0; c < _categories.Count; c++)
+            switch (classificationUsed)
             {
-                if (value >= (double)_categories.Item[c].MinValue && value <= (double)_categories.Item[c].MaxValue)
-                {
-                    catIndex = c + 1;
+                case "Jenk's-Fisher's":
+                    for (int c = 0; c < _categories.Count; c++)
+                    {
+                        if (value >= (double)_categories.Item[c].MinValue && value <= (double)_categories.Item[c].MaxValue)
+                        {
+                            catIndex = c + 1;
+                            break;
+                        }
+                    }
                     break;
-                }
+
+                case "Unique values":
+                    for (int c = 0; c < _categories.Count; c++)
+                    {
+                        if (value == (double)_categories.Item[c].MinValue)
+                        {
+                            catIndex = c + 1;
+                            break;
+                        }
+                    }
+                    break;
             }
+
             return catIndex;
         }
 

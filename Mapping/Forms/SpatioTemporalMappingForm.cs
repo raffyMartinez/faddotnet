@@ -1,5 +1,6 @@
 ﻿using FAD3.Database.Classes;
 using FAD3.Mapping.Classes;
+using FAD3.GUI.Forms;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -39,6 +40,7 @@ namespace FAD3.Mapping.Forms
         private string _identiferToUpdate;
         private HashSet<double> _hashSelectedValues = new HashSet<double>();
         private string _classificationScheme;
+        private string _exportedTimeSeriesFileName;
 
         public static SpatioTemporalMappingForm GetInstance()
         {
@@ -138,6 +140,7 @@ namespace FAD3.Mapping.Forms
             txtDatasetNumberValues.Text = MakeGridFromPoints.CountNonNullValues.ToString();
             txtDatasetMax.Text = MakeGridFromPoints.MaximumValue.ToString();
             txtDatasetMin.Text = MakeGridFromPoints.MinimumValue.ToString();
+            txtDatasetNumberOfTimePeriods.Text = MakeGridFromPoints.DictTemporalValues.Count.ToString();
             lblStatus.Text = $"Finished reading data in {MakeGridFromPoints.ParsingTimeSeconds.ToString("N2")} seconds";
             btnReadFile.Enabled = true;
         }
@@ -258,6 +261,7 @@ namespace FAD3.Mapping.Forms
                         txtSelectedMinimum.Text = _dataValues.Min().ToString();
                         txtSelectedMaximum.Text = _dataValues.Max().ToString();
                         txtSelectedUnique.Text = _hashSelectedValues.Count.ToString();
+                        txtSelectedNumberOfPeriods.Text = listSelectedTimePeriods.Items.Count.ToString();
                         lblStatus.Text = "Finished categorizing data";
                     }
                     else
@@ -297,6 +301,161 @@ namespace FAD3.Mapping.Forms
                 case "btnOk":
                     Close();
                     break;
+
+                case "btnExport":
+                    ExportSheetsToText();
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// export as a time series textfile containing categories and number per category
+        /// </summary>
+        private void ExportSheetsToText()
+        {
+            Dictionary<string, int> dictCategory = new Dictionary<string, int>();
+            var saveDialog = new SaveFileDialog();
+            saveDialog.Title = "Export data to time series text file";
+            saveDialog.Filter = "Text file|*.txt|All files|*.*";
+            saveDialog.FilterIndex = 1;
+            saveDialog.FileName = $"time_series_{cboValue.Text}_{DateTime.Parse(cboFirstData.Text).ToString("MMM-dd-yyyy")}-{DateTime.Parse(cboLastData.Text).ToString("MMM-dd-yyyy")}.txt";
+            saveDialog.ShowDialog();
+            if (saveDialog.FileName.Length > 0)
+            {
+                _exportedTimeSeriesFileName = saveDialog.FileName;
+                using (StreamWriter strm = new StreamWriter(_exportedTimeSeriesFileName, false))
+                {
+                    //write number of datapoints
+                    strm.WriteLine($"Data filename: {_dataSourceFileName}");
+                    strm.WriteLine($"Data points: {txtRows.Text}");
+                    strm.WriteLine($"Time periods: {txtSelectedNumberOfPeriods.Text}");
+                    strm.WriteLine($"Grid variable: {cboValue.Text}");
+                    strm.WriteLine($"Classification used: {_classificationScheme}");
+                    strm.WriteLine($"Number of classes: {dgCategories.Rows.Count.ToString()}");
+                    //write category ranges
+                    string categoryRange = "";
+                    for (int brk = 0; brk < dgCategories.RowCount; brk++)
+                    {
+                        if (brk == dgCategories.RowCount - 1)
+                        {
+                            categoryRange = $"{dgCategories.Rows[brk].Cells[0].Value.ToString().Replace("> ", "")} - {txtSelectedMaximum.Text}";
+                        }
+                        else
+                        {
+                            categoryRange = dgCategories.Rows[brk].Cells[0].Value.ToString();
+                        }
+                        strm.WriteLine($"Category {brk + 1}: {categoryRange}");
+                    }
+                    strm.WriteLine($"Category {dgCategories.RowCount + 1}: Null");
+                    strm.WriteLine("#BeginData#");
+                    //setup category dictionay and the same time write column headers
+                    strm.Write("Time period\t");
+                    for (int col = 1; col <= dgCategories.RowCount; col++)
+                    {
+                        strm.Write($"{col.ToString()}\t");
+                        dictCategory.Add(col.ToString(), 0);
+                    }
+                    strm.Write("Null\r\n");
+                    dictCategory.Add("Null", 0);
+
+                    //read entire dataset and categorize the value of the current time period
+                    for (int n = 0; n < listSelectedTimePeriods.Items.Count; n++)
+                    {
+                        string timePeriod = $"{listSelectedTimePeriods.Items[n]}";
+
+                        //reset category dictionary values to zero
+                        for (int col = 1; col <= dgCategories.RowCount; col++)
+                        {
+                            dictCategory[col.ToString()] = 0;
+                        }
+                        dictCategory["Null"] = 0;
+
+                        switch (Path.GetExtension(_dataSourceFileName))
+                        {
+                            case ".xlsx":
+                                //read all rows but only pick the value corresponding to the current time period
+                                for (int row = 0; row < _dt.Rows.Count; row++)
+                                {
+                                    var arr = _dt.Rows[row].ItemArray;    //put data in current row to an array
+                                    var col = n + _firstColIndex + 2;     //col points to the relevant timeperiod
+
+                                    double? v = null;
+                                    if (arr[col].GetType().Name == "String")
+                                    {
+                                        if (double.TryParse((string)arr[col], out double d))
+                                        {
+                                            v = d;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        v = arr[col] as double?;
+                                    }
+
+                                    //increment value of corresponding category
+                                    if (v == null)
+                                    {
+                                        dictCategory["Null"]++;
+                                    }
+                                    else
+                                    {
+                                        dictCategory[MakeGridFromPoints.WhatCategory(v, _classificationScheme).ToString()]++;
+                                    }
+                                }
+                                break;
+
+                            case ".csv":
+                                foreach (var item in MakeGridFromPoints.DictTemporalValues[timePeriod].Values)
+                                {
+                                    if (item == null)
+                                    {
+                                        dictCategory["Null"]++;
+                                    }
+                                    else
+                                    {
+                                        dictCategory[MakeGridFromPoints.WhatCategory(item, _classificationScheme).ToString()]++;
+                                    }
+                                }
+                                break;
+                        }
+
+                        //write the current timeperiod and the number of values per category
+                        strm.Write($"{timePeriod}\t");
+                        for (int col = 1; col <= dgCategories.RowCount; col++)
+                        {
+                            strm.Write($"{dictCategory[col.ToString()]}\t");
+                        }
+                        strm.Write($"{dictCategory["Null"]}\r\n");
+                    }
+                    strm.WriteLine("#EndData#");
+                }
+
+                MessageBox.Show("Finished exporting to time series text file");
+                if (chkViewTimeSeriesChart.Checked)
+                {
+                    GraphForm gf = new GraphForm();
+                    gf.DataFile = _exportedTimeSeriesFileName;
+                    gf.MapDataFile(SeriesChartType.StackedArea100);
+                    gf.Show(this);
+                }
+            }
+        }
+
+        private void OnCellDblClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.ColumnIndex == 2)
+            {
+                ColorDialog cd = new ColorDialog()
+                {
+                    AllowFullOpen = true,
+                    AnyColor = true,
+                    Color = dgCategories[e.ColumnIndex, e.RowIndex].Style.BackColor
+                };
+                dgCategories.ClearSelection();
+                cd.ShowDialog();
+                dgCategories[e.ColumnIndex, e.RowIndex].Style.BackColor = cd.Color;
+                MakeGridFromPoints.Categories.Item[e.RowIndex].DrawingOptions.FillColor = Colors.ColorToUInteger(cd.Color);
+                MakeGridFromPoints.Categories.Item[e.RowIndex].DrawingOptions.LineColor = MakeGridFromPoints.Categories.Item[e.RowIndex].DrawingOptions.FillColor;
             }
         }
 
@@ -366,6 +525,7 @@ namespace FAD3.Mapping.Forms
             if (_hashSelectedValues.Count > 0)
             {
                 dgCategories.Rows.Clear();
+                // SizeColumns(dgCategories);
                 int row;
                 Color color;
 
@@ -382,6 +542,7 @@ namespace FAD3.Mapping.Forms
                 }
                 //add an empty null category
                 MakeGridFromPoints.AddNullCategory();
+                SizeColumns(dgCategories, false, true);
             }
             return _hashSelectedValues.Count > 0;
         }
@@ -827,6 +988,7 @@ namespace FAD3.Mapping.Forms
                     if (n == dg.ColumnCount && PreserveLastColWidth) return;
 
                     c.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCellsExceptHeader;
+                    c.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
                     c.Width = c.Width > (int)c.Tag ? c.Width : (int)c.Tag;
                 }
             }
