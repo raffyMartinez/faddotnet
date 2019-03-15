@@ -41,7 +41,31 @@ namespace FAD3.Mapping.Forms
                 }
                 catch (WebException wex)
                 {
-                    MessageBox.Show(wex.Message, "Web error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    if (wex.Status != WebExceptionStatus.ProtocolError)
+                    {
+                        throw;
+                    }
+
+                    var response = wex.Response as HttpWebResponse;
+
+                    if (response.StatusCode == HttpStatusCode.GatewayTimeout ||
+                        response.StatusCode == HttpStatusCode.Forbidden)
+                    {
+                        lblDownloadError.Visible = true;
+                        switch (response.StatusCode)
+                        {
+                            case HttpStatusCode.GatewayTimeout:
+                                lblDownloadError.Text = "Error 504: Gateway Timeout";
+                                break;
+
+                            case HttpStatusCode.Forbidden:
+                                lblDownloadError.Text = "Error 43: Forbidden";
+                                break;
+                        }
+                        return;
+                    }
+
+                    //MessageBox.Show(wex.Message, "Web error", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 catch (InvalidOperationException ioex)
                 {
@@ -59,6 +83,7 @@ namespace FAD3.Mapping.Forms
             lblDownloadFile.Text = _fileName;
             DownloadFile();
             Text = $"Downloading {_fileName}";
+            lblDownloadError.Visible = false;
         }
 
         // Event to track the progress

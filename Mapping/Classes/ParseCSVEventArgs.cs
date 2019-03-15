@@ -17,6 +17,7 @@ namespace FAD3.Mapping.Classes
         public int CoordinatesRead { get; internal set; }
         public bool FinishedRead { get; internal set; }
         public string StatusText { get; internal set; }
+        public bool ReadingCoordinates { get; internal set; }
 
         public void SetColumns(int latitudeColumn, int longitudeColumn)
         {
@@ -35,6 +36,11 @@ namespace FAD3.Mapping.Classes
         public ParseCSVEventArgs(string[] fields)
         {
             Fields = fields;
+        }
+
+        public ParseCSVEventArgs(bool readingCoordinates)
+        {
+            ReadingCoordinates = readingCoordinates;
         }
 
         public ParseCSVEventArgs(int coordinatesRead, string timePeriod)

@@ -25,6 +25,10 @@ namespace FAD3.Mapping.Forms
         {
             switch (((Button)sender).Name)
             {
+                case "btnIgnore":
+                    DialogResult = DialogResult.Ignore;
+                    break;
+
                 case "btnOk":
                     if (rbtnZone50N.Checked)
                     {

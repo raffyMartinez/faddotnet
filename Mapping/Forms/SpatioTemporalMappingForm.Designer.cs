@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SpatioTemporalMappingForm));
             this.tabMap = new System.Windows.Forms.TabControl();
             this.tabStart = new System.Windows.Forms.TabPage();
@@ -72,7 +72,7 @@
             this.tabCategorize = new System.Windows.Forms.TabPage();
             this.label8 = new System.Windows.Forms.Label();
             this.cboClassificationScheme = new System.Windows.Forms.ComboBox();
-            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.groupBoxSummary = new System.Windows.Forms.GroupBox();
             this.txtSelectedNumberOfPeriods = new System.Windows.Forms.TextBox();
             this.label22 = new System.Windows.Forms.Label();
             this.label18 = new System.Windows.Forms.Label();
@@ -97,6 +97,7 @@
             this.label10 = new System.Windows.Forms.Label();
             this.icbColorScheme = new FAD3.Mapping.UserControls.ImageCombo();
             this.tabMapping = new System.Windows.Forms.TabPage();
+            this.chkViewTimeSeriesChart = new System.Windows.Forms.CheckBox();
             this.lblParameter = new System.Windows.Forms.Label();
             this.btnExport = new System.Windows.Forms.Button();
             this.graphSheet = new System.Windows.Forms.DataVisualization.Charting.Chart();
@@ -113,13 +114,12 @@
             this.label15 = new System.Windows.Forms.Label();
             this.btnOk = new System.Windows.Forms.Button();
             this.lblStatus = new System.Windows.Forms.Label();
-            this.chkViewTimeSeriesChart = new System.Windows.Forms.CheckBox();
             this.tabMap.SuspendLayout();
             this.tabStart.SuspendLayout();
             this.tabMetadata.SuspendLayout();
             this.tabSummary.SuspendLayout();
             this.tabCategorize.SuspendLayout();
-            this.groupBox3.SuspendLayout();
+            this.groupBoxSummary.SuspendLayout();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgCategories)).BeginInit();
             this.tabMapping.SuspendLayout();
@@ -510,7 +510,7 @@
             // 
             this.tabCategorize.Controls.Add(this.label8);
             this.tabCategorize.Controls.Add(this.cboClassificationScheme);
-            this.tabCategorize.Controls.Add(this.groupBox3);
+            this.tabCategorize.Controls.Add(this.groupBoxSummary);
             this.tabCategorize.Controls.Add(this.groupBox2);
             this.tabCategorize.Controls.Add(this.label13);
             this.tabCategorize.Controls.Add(this.btnColorScheme);
@@ -544,24 +544,24 @@
             this.cboClassificationScheme.Size = new System.Drawing.Size(145, 21);
             this.cboClassificationScheme.TabIndex = 40;
             // 
-            // groupBox3
+            // groupBoxSummary
             // 
-            this.groupBox3.Controls.Add(this.txtSelectedNumberOfPeriods);
-            this.groupBox3.Controls.Add(this.label22);
-            this.groupBox3.Controls.Add(this.label18);
-            this.groupBox3.Controls.Add(this.txtSelectedUnique);
-            this.groupBox3.Controls.Add(this.label12);
-            this.groupBox3.Controls.Add(this.label11);
-            this.groupBox3.Controls.Add(this.txtSelectedMaximum);
-            this.groupBox3.Controls.Add(this.txtSelectedMinimum);
-            this.groupBox3.Controls.Add(this.txtSelectedValuesCount);
-            this.groupBox3.Controls.Add(this.label9);
-            this.groupBox3.Location = new System.Drawing.Point(6, 299);
-            this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(198, 156);
-            this.groupBox3.TabIndex = 39;
-            this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "Summary of selected time periods";
+            this.groupBoxSummary.Controls.Add(this.txtSelectedNumberOfPeriods);
+            this.groupBoxSummary.Controls.Add(this.label22);
+            this.groupBoxSummary.Controls.Add(this.label18);
+            this.groupBoxSummary.Controls.Add(this.txtSelectedUnique);
+            this.groupBoxSummary.Controls.Add(this.label12);
+            this.groupBoxSummary.Controls.Add(this.label11);
+            this.groupBoxSummary.Controls.Add(this.txtSelectedMaximum);
+            this.groupBoxSummary.Controls.Add(this.txtSelectedMinimum);
+            this.groupBoxSummary.Controls.Add(this.txtSelectedValuesCount);
+            this.groupBoxSummary.Controls.Add(this.label9);
+            this.groupBoxSummary.Location = new System.Drawing.Point(6, 299);
+            this.groupBoxSummary.Name = "groupBoxSummary";
+            this.groupBoxSummary.Size = new System.Drawing.Size(198, 156);
+            this.groupBoxSummary.TabIndex = 39;
+            this.groupBoxSummary.TabStop = false;
+            this.groupBoxSummary.Text = "Summary of selected time periods";
             // 
             // txtSelectedNumberOfPeriods
             // 
@@ -795,6 +795,18 @@
             this.tabMapping.Text = "Mapping";
             this.tabMapping.UseVisualStyleBackColor = true;
             // 
+            // chkViewTimeSeriesChart
+            // 
+            this.chkViewTimeSeriesChart.AutoSize = true;
+            this.chkViewTimeSeriesChart.Checked = true;
+            this.chkViewTimeSeriesChart.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkViewTimeSeriesChart.Location = new System.Drawing.Point(17, 434);
+            this.chkViewTimeSeriesChart.Name = "chkViewTimeSeriesChart";
+            this.chkViewTimeSeriesChart.Size = new System.Drawing.Size(82, 17);
+            this.chkViewTimeSeriesChart.TabIndex = 34;
+            this.chkViewTimeSeriesChart.Text = "View results";
+            this.chkViewTimeSeriesChart.UseVisualStyleBackColor = true;
+            // 
             // lblParameter
             // 
             this.lblParameter.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -817,28 +829,28 @@
             // 
             // graphSheet
             // 
-            chartArea1.AxisX.LabelStyle.Enabled = false;
-            chartArea1.AxisX.MajorGrid.Enabled = false;
-            chartArea1.AxisX.MajorTickMark.Enabled = false;
-            chartArea1.AxisY.IsLabelAutoFit = false;
-            chartArea1.AxisY.LabelStyle.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F);
-            chartArea1.AxisY.MajorGrid.Enabled = false;
-            chartArea1.Name = "ChartArea1";
-            chartArea1.Position.Auto = false;
-            chartArea1.Position.Height = 94F;
-            chartArea1.Position.Width = 100F;
-            this.graphSheet.ChartAreas.Add(chartArea1);
-            legend1.Enabled = false;
-            legend1.Name = "Legend1";
-            this.graphSheet.Legends.Add(legend1);
+            chartArea2.AxisX.LabelStyle.Enabled = false;
+            chartArea2.AxisX.MajorGrid.Enabled = false;
+            chartArea2.AxisX.MajorTickMark.Enabled = false;
+            chartArea2.AxisY.IsLabelAutoFit = false;
+            chartArea2.AxisY.LabelStyle.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F);
+            chartArea2.AxisY.MajorGrid.Enabled = false;
+            chartArea2.Name = "ChartArea1";
+            chartArea2.Position.Auto = false;
+            chartArea2.Position.Height = 94F;
+            chartArea2.Position.Width = 100F;
+            this.graphSheet.ChartAreas.Add(chartArea2);
+            legend2.Enabled = false;
+            legend2.Name = "Legend1";
+            this.graphSheet.Legends.Add(legend2);
             this.graphSheet.Location = new System.Drawing.Point(179, 280);
             this.graphSheet.Name = "graphSheet";
-            series1.ChartArea = "ChartArea1";
-            series1.IsVisibleInLegend = false;
-            series1.Legend = "Legend1";
-            series1.Name = "Series1";
-            series1.YValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.Double;
-            this.graphSheet.Series.Add(series1);
+            series2.ChartArea = "ChartArea1";
+            series2.IsVisibleInLegend = false;
+            series2.Legend = "Legend1";
+            series2.Name = "Series1";
+            series2.YValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.Double;
+            this.graphSheet.Series.Add(series2);
             this.graphSheet.Size = new System.Drawing.Size(265, 105);
             this.graphSheet.TabIndex = 32;
             this.graphSheet.Text = "chart1";
@@ -972,22 +984,10 @@
             // 
             // lblStatus
             // 
-            this.lblStatus.Location = new System.Drawing.Point(3, 532);
+            this.lblStatus.Location = new System.Drawing.Point(3, 540);
             this.lblStatus.Name = "lblStatus";
             this.lblStatus.Size = new System.Drawing.Size(343, 18);
             this.lblStatus.TabIndex = 29;
-            // 
-            // chkViewTimeSeriesChart
-            // 
-            this.chkViewTimeSeriesChart.AutoSize = true;
-            this.chkViewTimeSeriesChart.Checked = true;
-            this.chkViewTimeSeriesChart.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkViewTimeSeriesChart.Location = new System.Drawing.Point(17, 434);
-            this.chkViewTimeSeriesChart.Name = "chkViewTimeSeriesChart";
-            this.chkViewTimeSeriesChart.Size = new System.Drawing.Size(82, 17);
-            this.chkViewTimeSeriesChart.TabIndex = 34;
-            this.chkViewTimeSeriesChart.Text = "View results";
-            this.chkViewTimeSeriesChart.UseVisualStyleBackColor = true;
             // 
             // SpatioTemporalMappingForm
             // 
@@ -1011,8 +1011,8 @@
             this.tabSummary.PerformLayout();
             this.tabCategorize.ResumeLayout(false);
             this.tabCategorize.PerformLayout();
-            this.groupBox3.ResumeLayout(false);
-            this.groupBox3.PerformLayout();
+            this.groupBoxSummary.ResumeLayout(false);
+            this.groupBoxSummary.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgCategories)).EndInit();
             this.tabMapping.ResumeLayout(false);
@@ -1047,7 +1047,7 @@
         private System.Windows.Forms.Button btnOk;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.ComboBox cboClassificationScheme;
-        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.GroupBox groupBoxSummary;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Button btnShowGridPoints;
         private System.Windows.Forms.Button btnShowGridPolygons;

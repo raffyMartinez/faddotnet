@@ -32,6 +32,7 @@
             this.lblDownloadFile = new System.Windows.Forms.Label();
             this.lblTitle = new System.Windows.Forms.Label();
             this.btnOk = new System.Windows.Forms.Button();
+            this.lblDownloadError = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // progressBar
@@ -55,7 +56,7 @@
             // 
             this.lblTitle.AutoSize = true;
             this.lblTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblTitle.Location = new System.Drawing.Point(99, 18);
+            this.lblTitle.Location = new System.Drawing.Point(136, 22);
             this.lblTitle.Name = "lblTitle";
             this.lblTitle.Size = new System.Drawing.Size(115, 15);
             this.lblTitle.TabIndex = 2;
@@ -64,7 +65,7 @@
             // 
             // btnOk
             // 
-            this.btnOk.Location = new System.Drawing.Point(337, 154);
+            this.btnOk.Location = new System.Drawing.Point(337, 184);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(37, 27);
             this.btnOk.TabIndex = 3;
@@ -72,11 +73,21 @@
             this.btnOk.UseVisualStyleBackColor = true;
             this.btnOk.Click += new System.EventHandler(this.OnButtonClick);
             // 
+            // lblDownloadError
+            // 
+            this.lblDownloadError.Location = new System.Drawing.Point(12, 132);
+            this.lblDownloadError.Name = "lblDownloadError";
+            this.lblDownloadError.Size = new System.Drawing.Size(362, 49);
+            this.lblDownloadError.TabIndex = 4;
+            this.lblDownloadError.Text = "This is a download error";
+            this.lblDownloadError.Visible = false;
+            // 
             // FileDownloadForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(386, 193);
+            this.ClientSize = new System.Drawing.Size(386, 223);
+            this.Controls.Add(this.lblDownloadError);
             this.Controls.Add(this.btnOk);
             this.Controls.Add(this.lblTitle);
             this.Controls.Add(this.lblDownloadFile);
@@ -96,5 +107,6 @@
         private System.Windows.Forms.Label lblDownloadFile;
         private System.Windows.Forms.Label lblTitle;
         private System.Windows.Forms.Button btnOk;
+        private System.Windows.Forms.Label lblDownloadError;
     }
 }

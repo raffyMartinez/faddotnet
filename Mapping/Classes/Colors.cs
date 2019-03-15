@@ -3,8 +3,13 @@ using System.Drawing;
 
 namespace FAD3.Mapping
 {
-    internal class Colors
+    public static class Colors
     {
+        public static Color FromARGBString(string argb)
+        {
+            return Color.FromArgb(Convert.ToInt32(argb));
+        }
+
         public static Color UintToColor(uint val)
         {
             int r, g, b;

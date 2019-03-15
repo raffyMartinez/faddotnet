@@ -34,6 +34,7 @@
             this.btnOk = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.chkCreateFile = new System.Windows.Forms.CheckBox();
+            this.btnIgnore = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // rbtnZone50N
@@ -69,7 +70,7 @@
             // 
             // btnOk
             // 
-            this.btnOk.Location = new System.Drawing.Point(251, 131);
+            this.btnOk.Location = new System.Drawing.Point(257, 131);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(42, 25);
             this.btnOk.TabIndex = 4;
@@ -79,7 +80,7 @@
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(196, 131);
+            this.btnCancel.Location = new System.Drawing.Point(88, 131);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(49, 25);
             this.btnCancel.TabIndex = 5;
@@ -97,11 +98,22 @@
             this.chkCreateFile.Text = "Create file without inland points";
             this.chkCreateFile.UseVisualStyleBackColor = true;
             // 
+            // btnIgnore
+            // 
+            this.btnIgnore.Location = new System.Drawing.Point(143, 131);
+            this.btnIgnore.Name = "btnIgnore";
+            this.btnIgnore.Size = new System.Drawing.Size(102, 25);
+            this.btnIgnore.TabIndex = 7;
+            this.btnIgnore.Text = "Ignore UTM zone";
+            this.btnIgnore.UseVisualStyleBackColor = true;
+            this.btnIgnore.Click += new System.EventHandler(this.OnButtonClick);
+            // 
             // SelectUTMZoneForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(305, 165);
+            this.Controls.Add(this.btnIgnore);
             this.Controls.Add(this.chkCreateFile);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnOk);
@@ -124,5 +136,6 @@
         private System.Windows.Forms.Button btnOk;
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.CheckBox chkCreateFile;
+        private System.Windows.Forms.Button btnIgnore;
     }
 }

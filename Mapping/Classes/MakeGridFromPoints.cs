@@ -51,6 +51,7 @@ namespace FAD3.Mapping.Classes
         private static bool _enableMapInteraction;
         private static Extents _extents;
         public static int ExtentShapefileHandle { get; internal set; }
+        public static string OtherTimeUnit { get; set; }
 
         public static EventHandler<ParseCSVEventArgs> OnCSVRead;
         public static EventHandler<ExtentDraggedBoxEventArgs> OnExtentDefined;
@@ -61,6 +62,8 @@ namespace FAD3.Mapping.Classes
         private static HashSet<double> _hashSet = new HashSet<double>();
         public static double ParsingTimeSeconds { get; internal set; }
         public static int CountNonNullValues { get; internal set; }
+        private static bool _newCSVFile;
+        public static string CSVReadError { get; internal set; }
 
         public static double MaximumValue
         {
@@ -110,9 +113,11 @@ namespace FAD3.Mapping.Classes
             }
         }
 
+        //public static void Cleanup(int gridPointLayerHandle, int gridMeshPointLayerHandle)
         public static void Cleanup()
         {
             _extents = null;
+            //Reset(gridPointLayerHandle, gridMeshPointLayerHandle);
             Reset();
             if (_mapControl != null)
             {
@@ -125,6 +130,11 @@ namespace FAD3.Mapping.Classes
             _enableMapInteraction = false;
             _mapControl.SelectBoxFinal -= OnSelectBoxFinal;
             _mapControl = null;
+        }
+
+        public static void SetDataSetExtent(Extents ext)
+        {
+            _extents = ext;
         }
 
         private static void OnSelectBoxFinal(object sender, _DMapEvents_SelectBoxFinalEvent e)
@@ -187,8 +197,8 @@ namespace FAD3.Mapping.Classes
             get { return _singleDimensionCSV; }
             set
             {
+                _newCSVFile = value != _singleDimensionCSV;
                 _singleDimensionCSV = value;
-                //ParseSingleDimensionCSV();
             }
         }
 
@@ -293,56 +303,72 @@ namespace FAD3.Mapping.Classes
 
         public static List<string> GetFields()
         {
+            CSVReadError = "";
             List<string> csvFields = new List<string>();
             string[] fields;
             string line;
-            StreamReader sr = new StreamReader(_singleDimensionCSV, true);
-
-            while ((line = sr.ReadLine()) != null)
+            try
             {
-                TextFieldParser tfp = new TextFieldParser(new StringReader(line));
-                tfp.HasFieldsEnclosedInQuotes = true;
-                tfp.SetDelimiters(",");
+                StreamReader sr = new StreamReader(_singleDimensionCSV, true);
 
-                while (!tfp.EndOfData)
+                while ((line = sr.ReadLine()) != null)
                 {
-                    fields = tfp.ReadFields();
-                    if (fields[0] == "*GLOBAL*" && fields[1] == "Conventions")
-                    {
-                        var arr = fields[2].Split(new char[] { ',', ' ' });
-                        if (arr[arr.Length - 1] == "NCCSV-1.0")
-                        {
-                            IsNCCSVFormat = true;
-                            csvFields = ReadNCCSVMetadata();
-                        }
-                    }
-                    else
-                    {
-                        for (int n = 0; n < fields.Length; n++)
-                        {
-                            csvFields.Add(fields[n]);
-                        }
-                    }
-                }
+                    TextFieldParser tfp = new TextFieldParser(new StringReader(line));
+                    tfp.HasFieldsEnclosedInQuotes = true;
+                    tfp.SetDelimiters(",");
 
-                tfp.Close();
-                tfp = null;
-                break;
+                    while (!tfp.EndOfData)
+                    {
+                        fields = tfp.ReadFields();
+                        if (fields[0] == "*GLOBAL*" && fields[1] == "Conventions")
+                        {
+                            var arr = fields[2].Split(new char[] { ',', ' ' });
+                            if (arr[arr.Length - 1] == "NCCSV-1.0")
+                            {
+                                IsNCCSVFormat = true;
+                                csvFields = ReadNCCSVMetadata();
+                            }
+                        }
+                        else
+                        {
+                            for (int n = 0; n < fields.Length; n++)
+                            {
+                                csvFields.Add(fields[n]);
+                            }
+                        }
+                    }
+
+                    tfp.Close();
+                    tfp = null;
+                    break;
+                }
+                sr.Close();
+                sr = null;
             }
-            sr.Close();
-            sr = null;
+            catch (IOException ioex)
+            {
+                CSVReadError = ioex.Message;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message, "MakeGridFromPoints.cs", "GeFields");
+            }
             return csvFields;
         }
 
         public static bool ParseSingleDimensionCSV()
         {
+            CSVReadError = "";
             CountNonNullValues = 0;
             DateTime start = DateTime.Now;
             _dictTemporalValues.Clear();
             _hashSet.Clear();
 
             FishingGrid.UTMZone = UTMZone;
-            Coordinates = new Dictionary<int, (double latitude, double longitude, bool Inland)>();
+            if (_newCSVFile)
+            {
+                Coordinates = new Dictionary<int, (double latitude, double longitude, bool Inland)>();
+            }
             Dictionary<int, double?> pointValue = new Dictionary<int, double?>();
             Dictionary<int, double?> pointValueCopy = new Dictionary<int, double?>(pointValue);
             string timeEra = "";
@@ -437,8 +463,15 @@ namespace FAD3.Mapping.Classes
 
                             if (beginTimeEra)
                             {
-                                beginTimeEra = false;
-                                timeEra = fields[TemporalColumn];
+                                if (fields[TemporalColumn] == OtherTimeUnit)
+                                {
+                                    break;
+                                }
+                                else
+                                {
+                                    beginTimeEra = false;
+                                    timeEra = fields[TemporalColumn];
+                                }
                             }
                             else
                             {
@@ -466,6 +499,7 @@ namespace FAD3.Mapping.Classes
                                         }
                                     }
                                     readCoordinates = false;
+                                    _newCSVFile = false;
                                     beginTimeEra = true;
                                     row = 0;
                                 }
@@ -515,8 +549,9 @@ namespace FAD3.Mapping.Classes
                                     break;
                             }
 
-                            if (readCoordinates)
+                            if (_newCSVFile && readCoordinates)
                             {
+                                //_newCSVFile = false;
                                 double lat = double.Parse(fields[LatitudeColumn]);
                                 double lon = double.Parse(fields[LongitudeColumn]);
                                 bool isInland = false;
@@ -530,6 +565,7 @@ namespace FAD3.Mapping.Classes
                                     }
                                 }
                                 Coordinates.Add(row, (lat, lon, isInland));
+                                OnCSVRead?.Invoke(null, new ParseCSVEventArgs(true));
                             }
                             row++;
                             break;
@@ -552,8 +588,11 @@ namespace FAD3.Mapping.Classes
             return Coordinates.Count > 0;
         }
 
+        //public static void Reset(int gridPointLayerHandle, int gridMeshLayerHandle)
         public static void Reset()
         {
+            IsNCCSVFormat = false;
+            _categories.Clear();
             InlandPointCount = 0;
             if (Coordinates != null)
             {
@@ -686,6 +725,11 @@ namespace FAD3.Mapping.Classes
             _sheetMapSummary.Add(cat.Name, 0);
 
             return Colors.UintToColor(cat.DrawingOptions.FillColor);
+        }
+
+        public static void SetMeshCategories()
+        {
+            _meshShapeFile.Categories = _categories;
         }
 
         public static bool MakeGridShapefile()
@@ -854,7 +898,7 @@ namespace FAD3.Mapping.Classes
             _meshShapeFile.DefaultDrawingOptions.FillColor = new Utils().ColorByName(tkMapColor.White);
             _meshShapeFile.DefaultDrawingOptions.FillVisible = false;
             _meshShapeFile.DefaultDrawingOptions.LineColor = new Utils().ColorByName(tkMapColor.DimGray);
-            _meshShapeFile.Categories = _categories;
+            // _meshShapeFile.Categories = _categories;
 
             return iShp >= 0;
         }

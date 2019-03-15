@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using System.IO;
 using Microsoft.VisualBasic.FileIO;
+using FAD3.Mapping.Classes;
 
 namespace FAD3.GUI.Forms
 {
@@ -57,6 +58,7 @@ namespace FAD3.GUI.Forms
                 chart.Series.Clear();
                 TextFieldParser tfp = new TextFieldParser(new StringReader(""));
                 StreamReader strm = new StreamReader(DataFile, true);
+                int inlandPoints = 0;
                 string line;
                 while ((line = strm.ReadLine()) != null)
                 {
@@ -73,7 +75,11 @@ namespace FAD3.GUI.Forms
                         chart.ChartAreas[0].AxisX.IsLabelAutoFit = false;
                         chart.ChartAreas[0].AxisX.LabelStyle.Angle = -90;
                         chart.ChartAreas[0].AxisX.LabelStyle.Interval = 1;
-                        chart.Series["Null"].Color = Color.AntiqueWhite;
+                        //chart.Series["Null"].Color = Color.AntiqueWhite;
+                    }
+                    else if (line.Contains("Inland points:"))
+                    {
+                        inlandPoints = int.Parse(getAfter(line, "Inland points:").Trim());
                     }
                     else if (line.Contains("Grid variable:"))
                     {
@@ -81,9 +87,10 @@ namespace FAD3.GUI.Forms
                     }
                     else if (line.Contains("Category "))
                     {
-                        string seriesName = getAfter(line, ": ");
+                        string seriesName = getBetween(line, ": ", " Color");
                         _series.Add(seriesNo, seriesName);
                         var chartSeries = chart.Series.Add(seriesName);
+                        chartSeries.Color = Mapping.Colors.FromARGBString($"{getAfter(line, "Color:")}");
                         chartSeries.ChartType = chartType;
                         seriesNo++;
                     }
@@ -104,7 +111,15 @@ namespace FAD3.GUI.Forms
                             {
                                 for (int n = 1; n < fields.Count(); n++)
                                 {
-                                    var dp = chart.Series[_series[n - 1]].Points.Add(int.Parse(fields[n]));
+                                    var dp = new DataPoint();
+                                    if (n == fields.Count() - 1)
+                                    {
+                                        dp = chart.Series[_series[n - 1]].Points.Add(int.Parse(fields[n]) - inlandPoints);
+                                    }
+                                    else
+                                    {
+                                        dp = chart.Series[_series[n - 1]].Points.Add(int.Parse(fields[n]));
+                                    }
                                     dp.AxisLabel = DateTime.Parse(fields[0]).ToString("MMM-dd-yyyy");
                                 }
                             }

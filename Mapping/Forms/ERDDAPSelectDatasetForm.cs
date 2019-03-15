@@ -17,6 +17,7 @@ namespace FAD3.Mapping.Forms
         private string _ERDDAPMetadataFolder;
         private static ERDDAPSelectDatasetForm _instance;
         private Extents _selectionExtent;
+        private MapLayersHandler _layersHandler;
 
         public static ERDDAPSelectDatasetForm GetInstance()
         {
@@ -55,26 +56,59 @@ namespace FAD3.Mapping.Forms
 
         private void OnRadioButtonCheckChange(object sender, EventArgs e)
         {
-            switch (((RadioButton)sender).Name)
+            txtMaxLat.Text = "";
+            txtMaxLon.Text = "";
+            txtMinLat.Text = "";
+            txtMinLon.Text = "";
+            UnsetMap();
+            var rbtn = (RadioButton)sender;
+            if (rbtn.Checked)
             {
-                case "rbtnUseSelectionBox":
-                    global.MappingForm.MapInterActionHandler.EnableMapInteraction = false;
-                    MakeGridFromPoints.MapControl = global.MappingForm.MapControl;
-                    break;
+                switch (rbtn.Name)
+                {
+                    case "rbtnUseSelectionBox":
+                        global.MappingForm.MapInterActionHandler.EnableMapInteraction = false;
+                        MakeGridFromPoints.MapControl = global.MappingForm.MapControl;
+                        break;
 
-                case "rbtnUseSelectedLayer":
-                    UnsetMap();
-                    break;
+                    case "rbtnUseSelectedLayer":
+                        if (_layersHandler.CurrentMapLayer?.LayerType == "ShapefileClass")
+                        {
+                            var shp = _layersHandler.CurrentMapLayer.LayerObject as Shapefile;
+                            var ext = shp.Extents;
+                            txtMaxLat.Text = ext.yMax.ToString();
+                            txtMaxLon.Text = ext.xMax.ToString();
+                            txtMinLat.Text = ext.yMin.ToString();
+                            txtMinLon.Text = ext.xMin.ToString();
 
-                case "rbtnManual":
-                    UnsetMap();
-                    break;
+                            _selectionExtent = new Extents();
+                            _selectionExtent.SetBounds(
+                                double.Parse(txtMinLon.Text),
+                                double.Parse(txtMinLat.Text),
+                                0,
+                                double.Parse(txtMaxLon.Text),
+                                double.Parse(txtMaxLat.Text),
+                                0);
+                            MakeGridFromPoints.MapLayers = global.MappingForm.MapLayersHandler;
+                            MakeGridFromPoints.SetDataSetExtent(_selectionExtent);
+                            MakeGridFromPoints.MakeExtentShapeFile();
+                        }
+
+                        break;
+
+                    case "rbtnManual":
+
+                        break;
+                }
             }
         }
 
         private void OnFormLoad(object sender, EventArgs e)
         {
             global.LoadFormSettings(this, true);
+
+            _layersHandler = global.MappingForm.MapLayersHandler;
+            _layersHandler.CurrentLayer += OnCurrentLayer;
 
             lvERDDAP.Visible = false;
 
@@ -106,6 +140,22 @@ namespace FAD3.Mapping.Forms
             MakeGridFromPoints.OnExtentDefined += OnExtentDefined;
             Text = "Download gridded, oceanographic, spatio-temporal data using ERDDAP";
             UpdateDataSetCount();
+        }
+
+        private void OnCurrentLayer(MapLayersHandler s, LayerEventArg e)
+        {
+            if (rbtnUseSelectedLayer.Checked)
+            {
+                if (_layersHandler.CurrentMapLayer?.LayerType == "ShapefileClass")
+                {
+                    var shp = _layersHandler.CurrentMapLayer.LayerObject as Shapefile;
+                    var ext = shp.Extents;
+                    txtMaxLat.Text = ext.yMax.ToString();
+                    txtMaxLon.Text = ext.xMax.ToString();
+                    txtMinLat.Text = ext.yMin.ToString();
+                    txtMinLon.Text = ext.xMin.ToString();
+                }
+            }
         }
 
         private void UpdateDataSetCount()
@@ -184,6 +234,8 @@ namespace FAD3.Mapping.Forms
         {
             UnsetMap();
             _instance = null;
+            _layersHandler.CurrentLayer -= OnCurrentLayer;
+            _layersHandler = null;
             global.SaveFormSettings(this);
         }
 

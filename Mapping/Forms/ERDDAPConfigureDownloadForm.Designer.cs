@@ -32,6 +32,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ERDDAPConfigureDownloadForm));
             this.lblTitle = new System.Windows.Forms.Label();
             this.btnDownload = new System.Windows.Forms.Button();
+            this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.btnCancel = new System.Windows.Forms.Button();
             this.txtboundNorth = new System.Windows.Forms.TextBox();
             this.txtboundSouth = new System.Windows.Forms.TextBox();
@@ -88,7 +89,6 @@
             this.cboFileType = new System.Windows.Forms.ComboBox();
             this.label3 = new System.Windows.Forms.Label();
             this.btnRefresh = new System.Windows.Forms.Button();
-            this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.SuspendLayout();
             // 
             // lblTitle
@@ -106,19 +106,27 @@
             // 
             this.btnDownload.ImageKey = "Download_16x.png";
             this.btnDownload.ImageList = this.imageList1;
-            this.btnDownload.Location = new System.Drawing.Point(637, 539);
+            this.btnDownload.Location = new System.Drawing.Point(592, 539);
             this.btnDownload.Name = "btnDownload";
             this.btnDownload.Size = new System.Drawing.Size(30, 30);
             this.btnDownload.TabIndex = 3;
             this.btnDownload.UseVisualStyleBackColor = true;
             this.btnDownload.Click += new System.EventHandler(this.OnButtonClick);
             // 
+            // imageList1
+            // 
+            this.imageList1.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList1.ImageStream")));
+            this.imageList1.TransparentColor = System.Drawing.Color.Transparent;
+            this.imageList1.Images.SetKeyName(0, "im_exit.bmp");
+            this.imageList1.Images.SetKeyName(1, "Refresh_16x.png");
+            this.imageList1.Images.SetKeyName(2, "Download_16x.png");
+            // 
             // btnCancel
             // 
             this.btnCancel.CausesValidation = false;
             this.btnCancel.ImageKey = "im_exit.bmp";
             this.btnCancel.ImageList = this.imageList1;
-            this.btnCancel.Location = new System.Drawing.Point(600, 539);
+            this.btnCancel.Location = new System.Drawing.Point(640, 539);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(30, 30);
             this.btnCancel.TabIndex = 4;
@@ -709,22 +717,14 @@
             this.btnRefresh.CausesValidation = false;
             this.btnRefresh.ImageKey = "Refresh_16x.png";
             this.btnRefresh.ImageList = this.imageList1;
-            this.btnRefresh.Location = new System.Drawing.Point(563, 539);
+            this.btnRefresh.Location = new System.Drawing.Point(556, 539);
             this.btnRefresh.Name = "btnRefresh";
             this.btnRefresh.Size = new System.Drawing.Size(30, 30);
             this.btnRefresh.TabIndex = 39;
             this.btnRefresh.UseVisualStyleBackColor = true;
             this.btnRefresh.Click += new System.EventHandler(this.OnButtonClick);
             // 
-            // imageList1
-            // 
-            this.imageList1.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList1.ImageStream")));
-            this.imageList1.TransparentColor = System.Drawing.Color.Transparent;
-            this.imageList1.Images.SetKeyName(0, "im_exit.bmp");
-            this.imageList1.Images.SetKeyName(1, "Refresh_16x.png");
-            this.imageList1.Images.SetKeyName(2, "Download_16x.png");
-            // 
-            // ERDDAPDownloadForm
+            // ERDDAPConfigureDownloadForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -788,7 +788,7 @@
             this.Controls.Add(this.lblErrStartLongitude);
             this.Controls.Add(this.lblErrStrideTime);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
-            this.Name = "ERDDAPDownloadForm";
+            this.Name = "ERDDAPConfigureDownloadForm";
             this.Text = "ERDDAPDownloadForm";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnFormClosed);
             this.Load += new System.EventHandler(this.OnFormLoad);
