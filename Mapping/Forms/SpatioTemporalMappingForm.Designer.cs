@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SpatioTemporalMappingForm));
             this.tabMap = new System.Windows.Forms.TabControl();
             this.tabStart = new System.Windows.Forms.TabPage();
@@ -89,13 +89,9 @@
             this.label13 = new System.Windows.Forms.Label();
             this.btnColorScheme = new System.Windows.Forms.Button();
             this.dgCategories = new System.Windows.Forms.DataGridView();
-            this.dgcolCategory = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dgcolCount = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dgCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.btnCategorize = new System.Windows.Forms.Button();
             this.txtCategoryCount = new System.Windows.Forms.TextBox();
             this.label10 = new System.Windows.Forms.Label();
-            this.icbColorScheme = new FAD3.Mapping.UserControls.ImageCombo();
             this.tabMapping = new System.Windows.Forms.TabPage();
             this.chkViewTimeSeriesChart = new System.Windows.Forms.CheckBox();
             this.lblParameter = new System.Windows.Forms.Label();
@@ -105,15 +101,20 @@
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.btnUp = new System.Windows.Forms.Button();
             this.dgSheetSummary = new System.Windows.Forms.DataGridView();
-            this.colVisible = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.colSymbol = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colCount = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colPercent = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.lblMappedSheet = new System.Windows.Forms.Label();
             this.listSelectedTimePeriods = new System.Windows.Forms.ListBox();
             this.label15 = new System.Windows.Forms.Label();
             this.btnOk = new System.Windows.Forms.Button();
             this.lblStatus = new System.Windows.Forms.Label();
+            this.icbColorScheme = new FAD3.Mapping.UserControls.ImageCombo();
+            this.dgcolCategory = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dgcolCount = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dgCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colVisible = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.colCategory = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colSymbol = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colCount = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colPercent = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tabMap.SuspendLayout();
             this.tabStart.SuspendLayout();
             this.tabMetadata.SuspendLayout();
@@ -137,7 +138,7 @@
             this.tabMap.Location = new System.Drawing.Point(2, 38);
             this.tabMap.Name = "tabMap";
             this.tabMap.SelectedIndex = 0;
-            this.tabMap.Size = new System.Drawing.Size(463, 488);
+            this.tabMap.Size = new System.Drawing.Size(494, 488);
             this.tabMap.TabIndex = 0;
             this.tabMap.SelectedIndexChanged += new System.EventHandler(this.OnTabMapIndexChanged);
             // 
@@ -162,7 +163,7 @@
             this.tabStart.Location = new System.Drawing.Point(4, 22);
             this.tabStart.Name = "tabStart";
             this.tabStart.Padding = new System.Windows.Forms.Padding(3);
-            this.tabStart.Size = new System.Drawing.Size(455, 462);
+            this.tabStart.Size = new System.Drawing.Size(493, 462);
             this.tabStart.TabIndex = 0;
             this.tabStart.Text = "Start";
             this.tabStart.UseVisualStyleBackColor = true;
@@ -340,7 +341,7 @@
             this.tabMetadata.Location = new System.Drawing.Point(4, 22);
             this.tabMetadata.Name = "tabMetadata";
             this.tabMetadata.Padding = new System.Windows.Forms.Padding(3);
-            this.tabMetadata.Size = new System.Drawing.Size(455, 462);
+            this.tabMetadata.Size = new System.Drawing.Size(493, 462);
             this.tabMetadata.TabIndex = 5;
             this.tabMetadata.Text = "Metadata";
             this.tabMetadata.UseVisualStyleBackColor = true;
@@ -383,7 +384,7 @@
             this.tabSummary.Location = new System.Drawing.Point(4, 22);
             this.tabSummary.Name = "tabSummary";
             this.tabSummary.Padding = new System.Windows.Forms.Padding(3);
-            this.tabSummary.Size = new System.Drawing.Size(455, 462);
+            this.tabSummary.Size = new System.Drawing.Size(493, 462);
             this.tabSummary.TabIndex = 6;
             this.tabSummary.Text = "Dataset Summary";
             this.tabSummary.UseVisualStyleBackColor = true;
@@ -522,7 +523,7 @@
             this.tabCategorize.Location = new System.Drawing.Point(4, 22);
             this.tabCategorize.Name = "tabCategorize";
             this.tabCategorize.Padding = new System.Windows.Forms.Padding(3);
-            this.tabCategorize.Size = new System.Drawing.Size(455, 462);
+            this.tabCategorize.Size = new System.Drawing.Size(517, 462);
             this.tabCategorize.TabIndex = 1;
             this.tabCategorize.Text = "Categorize";
             this.tabCategorize.UseVisualStyleBackColor = true;
@@ -714,26 +715,6 @@
             this.dgCategories.TabIndex = 34;
             this.dgCategories.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellDblClick);
             // 
-            // dgcolCategory
-            // 
-            this.dgcolCategory.HeaderText = "Category";
-            this.dgcolCategory.Name = "dgcolCategory";
-            this.dgcolCategory.ReadOnly = true;
-            // 
-            // dgcolCount
-            // 
-            this.dgcolCount.HeaderText = "Count";
-            this.dgcolCount.Name = "dgcolCount";
-            this.dgcolCount.ReadOnly = true;
-            // 
-            // dgCol
-            // 
-            this.dgCol.HeaderText = "Symbol";
-            this.dgCol.Name = "dgCol";
-            this.dgCol.ReadOnly = true;
-            this.dgCol.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.dgCol.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
             // btnCategorize
             // 
             this.btnCategorize.Location = new System.Drawing.Point(272, 65);
@@ -760,21 +741,6 @@
             this.label10.TabIndex = 31;
             this.label10.Text = "Number of categories";
             // 
-            // icbColorScheme
-            // 
-            this.icbColorScheme.Color1 = System.Drawing.Color.Gray;
-            this.icbColorScheme.Color2 = System.Drawing.Color.Gray;
-            this.icbColorScheme.ColorSchemes = null;
-            this.icbColorScheme.ComboStyle = FAD3.Mapping.UserControls.ImageComboStyle.ColorSchemeGraduated;
-            this.icbColorScheme.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-            this.icbColorScheme.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.icbColorScheme.FormattingEnabled = true;
-            this.icbColorScheme.Location = new System.Drawing.Point(116, 6);
-            this.icbColorScheme.Name = "icbColorScheme";
-            this.icbColorScheme.OutlineColor = System.Drawing.Color.Black;
-            this.icbColorScheme.Size = new System.Drawing.Size(146, 21);
-            this.icbColorScheme.TabIndex = 36;
-            // 
             // tabMapping
             // 
             this.tabMapping.Controls.Add(this.chkViewTimeSeriesChart);
@@ -790,7 +756,7 @@
             this.tabMapping.Location = new System.Drawing.Point(4, 22);
             this.tabMapping.Name = "tabMapping";
             this.tabMapping.Padding = new System.Windows.Forms.Padding(3);
-            this.tabMapping.Size = new System.Drawing.Size(455, 462);
+            this.tabMapping.Size = new System.Drawing.Size(486, 462);
             this.tabMapping.TabIndex = 2;
             this.tabMapping.Text = "Mapping";
             this.tabMapping.UseVisualStyleBackColor = true;
@@ -829,29 +795,29 @@
             // 
             // graphSheet
             // 
-            chartArea2.AxisX.LabelStyle.Enabled = false;
-            chartArea2.AxisX.MajorGrid.Enabled = false;
-            chartArea2.AxisX.MajorTickMark.Enabled = false;
-            chartArea2.AxisY.IsLabelAutoFit = false;
-            chartArea2.AxisY.LabelStyle.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F);
-            chartArea2.AxisY.MajorGrid.Enabled = false;
-            chartArea2.Name = "ChartArea1";
-            chartArea2.Position.Auto = false;
-            chartArea2.Position.Height = 94F;
-            chartArea2.Position.Width = 100F;
-            this.graphSheet.ChartAreas.Add(chartArea2);
-            legend2.Enabled = false;
-            legend2.Name = "Legend1";
-            this.graphSheet.Legends.Add(legend2);
+            chartArea1.AxisX.LabelStyle.Enabled = false;
+            chartArea1.AxisX.MajorGrid.Enabled = false;
+            chartArea1.AxisX.MajorTickMark.Enabled = false;
+            chartArea1.AxisY.IsLabelAutoFit = false;
+            chartArea1.AxisY.LabelStyle.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F);
+            chartArea1.AxisY.MajorGrid.Enabled = false;
+            chartArea1.Name = "ChartArea1";
+            chartArea1.Position.Auto = false;
+            chartArea1.Position.Height = 94F;
+            chartArea1.Position.Width = 100F;
+            this.graphSheet.ChartAreas.Add(chartArea1);
+            legend1.Enabled = false;
+            legend1.Name = "Legend1";
+            this.graphSheet.Legends.Add(legend1);
             this.graphSheet.Location = new System.Drawing.Point(179, 280);
             this.graphSheet.Name = "graphSheet";
-            series2.ChartArea = "ChartArea1";
-            series2.IsVisibleInLegend = false;
-            series2.Legend = "Legend1";
-            series2.Name = "Series1";
-            series2.YValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.Double;
-            this.graphSheet.Series.Add(series2);
-            this.graphSheet.Size = new System.Drawing.Size(265, 105);
+            series1.ChartArea = "ChartArea1";
+            series1.IsVisibleInLegend = false;
+            series1.Legend = "Legend1";
+            series1.Name = "Series1";
+            series1.YValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.Double;
+            this.graphSheet.Series.Add(series1);
+            this.graphSheet.Size = new System.Drawing.Size(299, 105);
             this.graphSheet.TabIndex = 32;
             this.graphSheet.Text = "chart1";
             // 
@@ -898,6 +864,7 @@
             this.dgSheetSummary.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgSheetSummary.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.colVisible,
+            this.colCategory,
             this.colSymbol,
             this.colCount,
             this.colPercent});
@@ -905,40 +872,9 @@
             this.dgSheetSummary.Name = "dgSheetSummary";
             this.dgSheetSummary.ReadOnly = true;
             this.dgSheetSummary.RowHeadersVisible = false;
-            this.dgSheetSummary.Size = new System.Drawing.Size(254, 249);
+            this.dgSheetSummary.Size = new System.Drawing.Size(288, 249);
             this.dgSheetSummary.TabIndex = 28;
             this.dgSheetSummary.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnGridSummaryCellClick);
-            // 
-            // colVisible
-            // 
-            this.colVisible.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.colVisible.Frozen = true;
-            this.colVisible.HeaderText = "";
-            this.colVisible.MinimumWidth = 25;
-            this.colVisible.Name = "colVisible";
-            this.colVisible.ReadOnly = true;
-            this.colVisible.Width = 25;
-            // 
-            // colSymbol
-            // 
-            this.colSymbol.Frozen = true;
-            this.colSymbol.HeaderText = "Symbol";
-            this.colSymbol.Name = "colSymbol";
-            this.colSymbol.ReadOnly = true;
-            // 
-            // colCount
-            // 
-            this.colCount.Frozen = true;
-            this.colCount.HeaderText = "Count";
-            this.colCount.Name = "colCount";
-            this.colCount.ReadOnly = true;
-            // 
-            // colPercent
-            // 
-            this.colPercent.Frozen = true;
-            this.colPercent.HeaderText = "Percent";
-            this.colPercent.Name = "colPercent";
-            this.colPercent.ReadOnly = true;
             // 
             // lblMappedSheet
             // 
@@ -975,7 +911,7 @@
             // 
             this.btnOk.ImageKey = "im_exit.bmp";
             this.btnOk.ImageList = this.imageList1;
-            this.btnOk.Location = new System.Drawing.Point(424, 532);
+            this.btnOk.Location = new System.Drawing.Point(460, 532);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(30, 30);
             this.btnOk.TabIndex = 28;
@@ -989,11 +925,89 @@
             this.lblStatus.Size = new System.Drawing.Size(343, 18);
             this.lblStatus.TabIndex = 29;
             // 
+            // icbColorScheme
+            // 
+            this.icbColorScheme.Color1 = System.Drawing.Color.Gray;
+            this.icbColorScheme.Color2 = System.Drawing.Color.Gray;
+            this.icbColorScheme.ColorSchemes = null;
+            this.icbColorScheme.ComboStyle = FAD3.Mapping.UserControls.ImageComboStyle.ColorSchemeGraduated;
+            this.icbColorScheme.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.icbColorScheme.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.icbColorScheme.FormattingEnabled = true;
+            this.icbColorScheme.Location = new System.Drawing.Point(116, 6);
+            this.icbColorScheme.Name = "icbColorScheme";
+            this.icbColorScheme.OutlineColor = System.Drawing.Color.Black;
+            this.icbColorScheme.Size = new System.Drawing.Size(146, 21);
+            this.icbColorScheme.TabIndex = 36;
+            // 
+            // dgcolCategory
+            // 
+            this.dgcolCategory.HeaderText = "Category";
+            this.dgcolCategory.Name = "dgcolCategory";
+            this.dgcolCategory.ReadOnly = true;
+            // 
+            // dgcolCount
+            // 
+            this.dgcolCount.HeaderText = "Count";
+            this.dgcolCount.Name = "dgcolCount";
+            this.dgcolCount.ReadOnly = true;
+            this.dgcolCount.Width = 75;
+            // 
+            // dgCol
+            // 
+            this.dgCol.HeaderText = "Symbol";
+            this.dgCol.Name = "dgCol";
+            this.dgCol.ReadOnly = true;
+            this.dgCol.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgCol.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.dgCol.Width = 75;
+            // 
+            // colVisible
+            // 
+            this.colVisible.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colVisible.Frozen = true;
+            this.colVisible.HeaderText = "";
+            this.colVisible.MinimumWidth = 25;
+            this.colVisible.Name = "colVisible";
+            this.colVisible.ReadOnly = true;
+            this.colVisible.Width = 25;
+            // 
+            // colCategory
+            // 
+            this.colCategory.Frozen = true;
+            this.colCategory.HeaderText = "Category";
+            this.colCategory.Name = "colCategory";
+            this.colCategory.ReadOnly = true;
+            // 
+            // colSymbol
+            // 
+            this.colSymbol.Frozen = true;
+            this.colSymbol.HeaderText = "Symbol";
+            this.colSymbol.Name = "colSymbol";
+            this.colSymbol.ReadOnly = true;
+            this.colSymbol.Width = 50;
+            // 
+            // colCount
+            // 
+            this.colCount.Frozen = true;
+            this.colCount.HeaderText = "n";
+            this.colCount.Name = "colCount";
+            this.colCount.ReadOnly = true;
+            this.colCount.Width = 50;
+            // 
+            // colPercent
+            // 
+            this.colPercent.Frozen = true;
+            this.colPercent.HeaderText = "%";
+            this.colPercent.Name = "colPercent";
+            this.colPercent.ReadOnly = true;
+            this.colPercent.Width = 50;
+            // 
             // SpatioTemporalMappingForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(466, 567);
+            this.ClientSize = new System.Drawing.Size(496, 567);
             this.Controls.Add(this.lblStatus);
             this.Controls.Add(this.btnOk);
             this.Controls.Add(this.tabMap);
@@ -1054,9 +1068,6 @@
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.Button btnColorScheme;
         private System.Windows.Forms.DataGridView dgCategories;
-        private System.Windows.Forms.DataGridViewTextBoxColumn dgcolCategory;
-        private System.Windows.Forms.DataGridViewTextBoxColumn dgcolCount;
-        private System.Windows.Forms.DataGridViewTextBoxColumn dgCol;
         private System.Windows.Forms.Button btnCategorize;
         private System.Windows.Forms.TextBox txtCategoryCount;
         private System.Windows.Forms.Label label10;
@@ -1066,10 +1077,6 @@
         private System.Windows.Forms.Button btnDown;
         private System.Windows.Forms.Button btnUp;
         private System.Windows.Forms.DataGridView dgSheetSummary;
-        private System.Windows.Forms.DataGridViewCheckBoxColumn colVisible;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colSymbol;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colCount;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colPercent;
         private System.Windows.Forms.Label lblMappedSheet;
         private System.Windows.Forms.ListBox listSelectedTimePeriods;
         private System.Windows.Forms.Label label15;
@@ -1106,5 +1113,13 @@
         private System.Windows.Forms.TextBox txtSelectedNumberOfPeriods;
         private System.Windows.Forms.Label label22;
         private System.Windows.Forms.CheckBox chkViewTimeSeriesChart;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dgcolCategory;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dgcolCount;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dgCol;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn colVisible;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colCategory;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colSymbol;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colCount;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colPercent;
     }
 }

@@ -42,8 +42,8 @@ namespace FAD3.Mapping.Forms
         private string _classificationScheme;
         private string _exportedTimeSeriesFileName;
         private bool _datafileRead;
-        private int _hgridPointLayer;
-        private int _hgridMeshLayer;
+        private string _startTimePeriod = "";
+        private string _endTimePeriod = "";
 
         public static SpatioTemporalMappingForm GetInstance()
         {
@@ -156,7 +156,15 @@ namespace FAD3.Mapping.Forms
             txtDatasetNumberOfTimePeriods.Text = MakeGridFromPoints.DictTemporalValues.Count.ToString();
             lblStatus.Text = $"Finished reading data in {MakeGridFromPoints.ParsingTimeSeconds.ToString("N2")} seconds";
             btnReadFile.Enabled = true;
-            //btnShowGridPoints.Enabled = true;
+
+            if (_startTimePeriod.Length > 0)
+            {
+                cboFirstData.Text = _startTimePeriod;
+            }
+            if (_endTimePeriod.Length > 0)
+            {
+                cboLastData.Text = _endTimePeriod;
+            }
             _datafileRead = true;
         }
 
@@ -169,18 +177,40 @@ namespace FAD3.Mapping.Forms
             return Task.Run(() => MakeGridFromPoints.ParseSingleDimensionCSV());
         }
 
-        private void RemoveMappingLayers()
-        {
-            global.MappingForm.MapLayersHandler.RemoveLayer("Grid points");
-            global.MappingForm.MapLayersHandler.RemoveLayer("Mesh");
-        }
-
         private void RemoveMappingResults()
         {
             listSelectedTimePeriods.Items.Clear();
             dgCategories.Rows.Clear();
             dgSheetSummary.Rows.Clear();
             graphSheet.Series.Clear();
+            foreach (Control c in groupBoxSummary.Controls)
+            {
+                if (c.GetType().Name == "TextBox")
+                {
+                    c.Text = "";
+                }
+            }
+        }
+
+        private void ClearSummary()
+        {
+            foreach (Control c in tabSummary.Controls)
+            {
+                if (c.GetType().Name == "TextBox")
+                {
+                    c.Text = "";
+                }
+            }
+        }
+
+        private void ResetCategoryAndMappingResults()
+        {
+            dgCategories.Rows.Clear();
+            dgSheetSummary.Rows.Clear();
+            listSelectedTimePeriods.Items.Clear();
+            graphSheet.Series.Clear();
+            lblParameter.Text = "";
+            lblMappedSheet.Text = "";
             foreach (Control c in groupBoxSummary.Controls)
             {
                 if (c.GetType().Name == "TextBox")
@@ -204,13 +234,12 @@ namespace FAD3.Mapping.Forms
                 case "btnOpen":
                     cboFirstData.Items.Clear();
                     cboLastData.Items.Clear();
-                    _hgridPointLayer = 0;
-                    _hgridMeshLayer = 0;
                     txtRows.Text = "";
-                    MakeGridFromPoints.Reset();
+                    MakeGridFromPoints.Reset(false);
                     if (OpenFile())
                     {
-                        RemoveMappingLayers();
+                        ClearSummary();
+                        MakeGridFromPoints.RemoveMappingLayers();
                         txtMetadata.Text = "";
                         if (MakeGridFromPoints.IsNCCSVFormat)
                         {
@@ -227,7 +256,8 @@ namespace FAD3.Mapping.Forms
                         btnExport.Enabled = false;
                         lblStatus.Text = "";
                         _hasMesh = false;
-                        RemoveMappingResults();
+                        //RemoveMappingResults();
+                        ResetCategoryAndMappingResults();
                         _datafileRead = false;
                     }
                     break;
@@ -268,12 +298,14 @@ namespace FAD3.Mapping.Forms
                         }
                     }
 
-                    lblParameter.Text = cboValue.Text;
-
                     if (proceedReadFile)
                     {
+                        ResetCategoryAndMappingResults();
+
                         //reads csv data in a separate thread
                         ReadCSVFile();
+
+                        lblParameter.Text = cboValue.Text;
                     }
                     break;
 
@@ -355,8 +387,7 @@ namespace FAD3.Mapping.Forms
 
                     if (MakeGridFromPoints.MakeGridShapefile())
                     {
-                        _hgridMeshLayer = global.MappingForm.MapLayersHandler.AddLayer(MakeGridFromPoints.GridShapefile, "Mesh", uniqueLayer: true);
-                        _hasMesh = _hgridMeshLayer > 0;
+                        _hasMesh = MakeGridFromPoints.MeshShapefileHandle > 0;
                         if (_hasMesh)
                         {
                             //MakeGridFromPoints.SetMeshCategories();
@@ -412,8 +443,6 @@ namespace FAD3.Mapping.Forms
             {
                 lastDate = cboLastData.Text;
             }
-
-            //saveDialog.FileName = $"time_series_{cboValue.Text}_{DateTime.Parse(cboFirstData.Text).ToString("MMM-dd-yyyy")}-{DateTime.Parse(cboLastData.Text).ToString("MMM-dd-yyyy")}.txt";
             saveDialog.FileName = $"time_series_{cboValue.Text}_{firstDate}-{lastDate}.txt";
             DialogResult dr = saveDialog.ShowDialog();
             if (dr == DialogResult.OK)
@@ -430,7 +459,7 @@ namespace FAD3.Mapping.Forms
                         strm.WriteLine($"Grid variable: {cboValue.Text}");
                         strm.WriteLine($"Classification used: {_classificationScheme}");
                         strm.WriteLine($"Number of classes: {dgCategories.Rows.Count.ToString()}");
-                        strm.WriteLine($"Inland points: {txtInlandPoints.Text.ToString()}");
+                        strm.WriteLine($"Inland points: {txtInlandPoints.Text}");
                         //write category ranges
                         string categoryRange = "";
                         for (int brk = 0; brk < dgCategories.RowCount; brk++)
@@ -454,6 +483,7 @@ namespace FAD3.Mapping.Forms
                         }
                         strm.WriteLine($"Category {dgCategories.RowCount + 1}: Null Color:{Color.White.ToArgb().ToString()}");
                         strm.WriteLine("#BeginData#");
+
                         //setup category dictionay and the same time write column headers
                         strm.Write("Time period\t");
                         for (int col = 1; col <= dgCategories.RowCount; col++)
@@ -545,8 +575,7 @@ namespace FAD3.Mapping.Forms
 
             if (MakeGridFromPoints.MakePointShapefile(!MakeGridFromPoints.IgnoreInlandPoints))
             {
-                _hgridPointLayer = global.MappingForm.MapLayersHandler.AddLayer(MakeGridFromPoints.PointShapefile, "Grid points", uniqueLayer: true);
-                return _hgridPointLayer > 0;
+                return MakeGridFromPoints.GridPointShapefileHandle > 0;
             }
             return false;
         }
@@ -606,7 +635,6 @@ namespace FAD3.Mapping.Forms
             if (_hashSelectedValues.Count > 0)
             {
                 dgCategories.Rows.Clear();
-                // SizeColumns(dgCategories);
                 int row;
                 Color color;
 
@@ -615,7 +643,9 @@ namespace FAD3.Mapping.Forms
                 MakeGridFromPoints.NumberOfCategories = _hashSelectedValues.Count;
                 MakeGridFromPoints.ColorBlend = blend;
 
-                foreach (var item in _hashSelectedValues)
+                List<double> values = _hashSelectedValues.ToList();
+                values.Sort();
+                foreach (var item in values)
                 {
                     color = MakeGridFromPoints.AddUniqueItemCategory(item);
                     row = dgCategories.Rows.Add(new object[] { item.ToString(), GetClassSize(item), "" });
@@ -623,7 +653,7 @@ namespace FAD3.Mapping.Forms
                 }
                 //add an empty null category
                 MakeGridFromPoints.AddNullCategory();
-                SizeColumns(dgCategories, false, true);
+                //SizeColumns(dgCategories, false, true);
             }
             return _hashSelectedValues.Count > 0;
         }
@@ -673,7 +703,7 @@ namespace FAD3.Mapping.Forms
                 //add an empty null category
                 MakeGridFromPoints.AddNullCategory();
 
-                SizeColumns(dgCategories, false, true);
+                //SizeColumns(dgCategories, false, true);
                 return listBreaks.Count > 0;
             }
             return false;
@@ -893,22 +923,27 @@ namespace FAD3.Mapping.Forms
             dgSheetSummary.Rows.Clear();
             foreach (KeyValuePair<string, int> kv in summary)
             {
-                var firstColText = "";
+                // string category = dgCategories[0, row].Value.ToString();
+                //var col2Text = "";
                 if (kv.Key == "Null")
                 {
-                    firstColText = "Null";
+                    //col2Text = "Null";
                     percent = ((double)(kv.Value - MakeGridFromPoints.InlandPointCount) / (double)(_dataPoints - MakeGridFromPoints.InlandPointCount)) * 100;
-                    row = dgSheetSummary.Rows.Add(new object[] { true, firstColText, (kv.Value - MakeGridFromPoints.InlandPointCount).ToString(), percent.ToString("N1") });
+                    row = dgSheetSummary.Rows.Add(new object[] { true, "Null", "", (kv.Value - MakeGridFromPoints.InlandPointCount).ToString(), percent.ToString("N1") });
                 }
                 else
                 {
                     percent = ((double)kv.Value / (double)(_dataPoints - MakeGridFromPoints.InlandPointCount)) * 100;
-                    row = dgSheetSummary.Rows.Add(new object[] { true, firstColText, kv.Value.ToString(), percent.ToString("N1") });
+                    row = dgSheetSummary.Rows.Add(new object[] { true, "", "", kv.Value.ToString(), percent.ToString("N1") });
                 }
 
                 var pt = graphSheet.Series["summary"].Points.AddY(percent);
-                dgSheetSummary[1, row].Style.BackColor = MakeGridFromPoints.CategoryColor(row);
-                graphSheet.Series["summary"].Points[pt].Color = dgSheetSummary[1, row].Style.BackColor;
+                if (row < dgCategories.Rows.Count)
+                {
+                    dgSheetSummary[1, row].Value = dgCategories[0, row].Value.ToString();
+                }
+                dgSheetSummary[2, row].Style.BackColor = MakeGridFromPoints.CategoryColor(row);
+                graphSheet.Series["summary"].Points[pt].Color = dgSheetSummary[2, row].Style.BackColor;
                 graphSheet.Series["summary"].Points[pt].BorderColor = Color.Black;
                 dgSheetSummary[0, row].Value = MakeGridFromPoints.GridShapefile.Categories.Item[row].DrawingOptions.FillVisible;
                 if (MakeGridFromPoints.GridShapefile.Categories.Item[row].Name == "nullCategory")
@@ -917,6 +952,9 @@ namespace FAD3.Mapping.Forms
                 }
             }
             dgSheetSummary.ClearSelection();
+            dgSheetSummary.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCellsExceptHeader;
+            dgSheetSummary.Columns[1].MinimumWidth = 100;
+            //SizeColumns(dgSheetSummary, false);
         }
 
         private void MapSheet(bool forward, bool fromArrowKeys = false)
@@ -1015,23 +1053,23 @@ namespace FAD3.Mapping.Forms
                     }
                 }
             }
-            btnShowGridPoints.Enabled = _datafileRead
-                && cboFirstData.Text.Length > 0
-                && cboLastData.Text.Length > 0;
-
-            btnCategorize.Enabled = _hasMesh
-                && cboFirstData.Text.Length > 0
-                && cboLastData.Text.Length > 0;
-
-            if (cboFirstData.Text.Length > 0)
+            if (cboFirstData.Text.Length > 0 && cboLastData.Text.Length > 0)
             {
+                btnShowGridPoints.Enabled = _datafileRead;
+                btnCategorize.Enabled = _hasMesh;
+                _startTimePeriod = cboFirstData.Text;
+                _endTimePeriod = cboLastData.Text;
                 _firstColIndex = cboFirstData.SelectedIndex;
-            }
-
-            if (cboLastData.Text.Length > 0)
-            {
                 _lastColIndex = cboLastData.SelectedIndex;
             }
+
+            //if (cboFirstData.Text.Length > 0)
+            //{
+            //}
+
+            //if (cboLastData.Text.Length > 0)
+            //{
+            //}
         }
 
         /// <summary>
@@ -1088,8 +1126,12 @@ namespace FAD3.Mapping.Forms
             btnShowGridPolygons.Enabled = false;
             btnExport.Enabled = false;
             lblMappedSheet.Visible = false;
-            SizeColumns(dgCategories);
-            SizeColumns(dgSheetSummary);
+            //SizeColumns(dgCategories);
+            //SizeColumns(dgSheetSummary);
+            dgCategories.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCellsExceptHeader;
+            dgCategories.Columns[0].MinimumWidth = 100;
+            dgSheetSummary.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCellsExceptHeader;
+            dgSheetSummary.Columns[1].MinimumWidth = 100;
             icbColorScheme.ComboStyle = UserControls.ImageComboStyle.ColorSchemeGraduated;
             icbColorScheme.ColorSchemes = global.MappingForm.MapLayersHandler.LayerColors;
             if (icbColorScheme.Items.Count > 0)
@@ -1108,7 +1150,8 @@ namespace FAD3.Mapping.Forms
             cboClassificationScheme.Items.Add("User defined");
             cboClassificationScheme.SelectedIndex = 0;
             MakeGridFromPoints.OnCSVRead += OnReadCSV;
-            MakeGridFromPoints.MapLayers = global.MappingForm.MapLayersHandler;
+            MakeGridFromPoints.MapLayersHandler = global.MappingForm.MapLayersHandler;
+            ResetCategoryAndMappingResults();
         }
 
         private void SetUpTooltips()
@@ -1178,7 +1221,6 @@ namespace FAD3.Mapping.Forms
         {
             _instance = null;
             MakeGridFromPoints.Cleanup();
-            RemoveMappingLayers();
         }
 
         private void OnListBoxKeyDown(object sender, KeyEventArgs e)

@@ -40,7 +40,7 @@ namespace FAD3.Mapping.Forms
             _selectionExtent.SetBounds(e.Left, e.Bottom, 0, e.Right, e.Top, 0);
             if (!e.InDrag)
             {
-                MakeGridFromPoints.MapLayers = global.MappingForm.MapLayersHandler;
+                //MakeGridFromPoints.MapLayersHandler = global.MappingForm.MapLayersHandler;
                 MakeGridFromPoints.MakeExtentShapeFile();
             }
         }
@@ -89,7 +89,7 @@ namespace FAD3.Mapping.Forms
                                 double.Parse(txtMaxLon.Text),
                                 double.Parse(txtMaxLat.Text),
                                 0);
-                            MakeGridFromPoints.MapLayers = global.MappingForm.MapLayersHandler;
+                            //MakeGridFromPoints.MapLayersHandler = global.MappingForm.MapLayersHandler;
                             MakeGridFromPoints.SetDataSetExtent(_selectionExtent);
                             MakeGridFromPoints.MakeExtentShapeFile();
                         }
@@ -137,6 +137,7 @@ namespace FAD3.Mapping.Forms
 
             lvERDDAP.Visible = true;
 
+            MakeGridFromPoints.MapLayersHandler = global.MappingForm.MapLayersHandler;
             MakeGridFromPoints.OnExtentDefined += OnExtentDefined;
             Text = "Download gridded, oceanographic, spatio-temporal data using ERDDAP";
             UpdateDataSetCount();
@@ -237,6 +238,7 @@ namespace FAD3.Mapping.Forms
             _layersHandler.CurrentLayer -= OnCurrentLayer;
             _layersHandler = null;
             global.SaveFormSettings(this);
+            MakeGridFromPoints.Cleanup();
         }
 
         private void OnButtonClick(object sender, EventArgs e)
@@ -245,7 +247,7 @@ namespace FAD3.Mapping.Forms
             {
                 case "btnCreateExtent":
 
-                    MakeGridFromPoints.MapLayers = global.MappingForm.MapLayersHandler;
+                    //MakeGridFromPoints.MapLayersHandler = global.MappingForm.MapLayersHandler;
                     MakeGridFromPoints.MakeExtentShapeFile();
 
                     break;

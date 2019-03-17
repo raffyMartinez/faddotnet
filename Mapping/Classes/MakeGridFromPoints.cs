@@ -1,13 +1,13 @@
-﻿using FAD3.Database.Classes;
+﻿using AxMapWinGIS;
+using FAD3.Database.Classes;
 using MapWinGIS;
-using AxMapWinGIS;
+using Microsoft.VisualBasic.FileIO;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Linq;
 using System.IO;
-using Microsoft.VisualBasic.FileIO;
-using System;
+using System.Linq;
 
 namespace FAD3.Mapping.Classes
 {
@@ -51,11 +51,14 @@ namespace FAD3.Mapping.Classes
         private static bool _enableMapInteraction;
         private static Extents _extents;
         public static int ExtentShapefileHandle { get; internal set; }
+        public static int GridPointShapefileHandle { get; internal set; }
+        public static int MeshShapefileHandle { get; internal set; }
         public static string OtherTimeUnit { get; set; }
+        public static int PointCountPerTimeEra { get { return _pointCountPerTimeEra; } }
 
         public static EventHandler<ParseCSVEventArgs> OnCSVRead;
         public static EventHandler<ExtentDraggedBoxEventArgs> OnExtentDefined;
-        public static MapLayersHandler MapLayers { get; set; }
+        public static MapLayersHandler MapLayersHandler { get; set; }
         public static bool IsNCCSVFormat { get; internal set; }
         private static int _metadataRows;
         public static string SelectedParameter { get; set; }
@@ -64,6 +67,7 @@ namespace FAD3.Mapping.Classes
         public static int CountNonNullValues { get; internal set; }
         private static bool _newCSVFile;
         public static string CSVReadError { get; internal set; }
+        private static int _pointCountPerTimeEra;
 
         public static double MaximumValue
         {
@@ -104,11 +108,12 @@ namespace FAD3.Mapping.Classes
                 var iShp = sfExtent.EditAddShape(_extents.ToShape());
                 if (iShp >= 0)
                 {
-                    ExtentShapefileHandle = MapLayers.AddLayer(sfExtent, "ExtentForDownload", true, true);
+                    ExtentShapefileHandle = MapLayersHandler.AddLayer(sfExtent, "ExtentForDownload", true, true);
                     sfExtent.DefaultDrawingOptions.FillVisible = false;
                     sfExtent.DefaultDrawingOptions.LineWidth = 1.5f;
                     sfExtent.DefaultDrawingOptions.LineColor = new Utils().ColorByName(tkMapColor.DarkBlue);
-                    MapControl.Redraw();
+                    // MapControl.Redraw();
+                    MapLayersHandler.MapControl.Redraw();
                 }
             }
         }
@@ -123,6 +128,27 @@ namespace FAD3.Mapping.Classes
             {
                 _mapControl = null;
             }
+
+            if (ExtentShapefileHandle > 0)
+            {
+                MapLayersHandler.RemoveLayer(ExtentShapefileHandle);
+                ExtentShapefileHandle = 0;
+            }
+
+            if (MeshShapefileHandle > 0)
+            {
+                MapLayersHandler.RemoveLayer(MeshShapefileHandle);
+                MeshShapefileHandle = 0;
+            }
+
+            if (GridPointShapefileHandle > 0)
+            {
+                MapLayersHandler.RemoveLayer(GridPointShapefileHandle);
+                GridPointShapefileHandle = 0;
+            }
+
+            MapLayersHandler = null;
+            _newCSVFile = true;
         }
 
         public static void UnsetMap()
@@ -288,14 +314,33 @@ namespace FAD3.Mapping.Classes
             tfp = new TextFieldParser(new StringReader(line));
             tfp.HasFieldsEnclosedInQuotes = true;
             tfp.SetDelimiters(",");
-            while (!tfp.EndOfData)
+            fields = tfp.ReadFields();
+            for (int n = 0; n < fields.Length; n++)
             {
-                fields = tfp.ReadFields();
-                for (int n = 0; n < fields.Length; n++)
+                csvFields.Add(fields[n]);
+            }
+
+            //find out how many coordinate points are in a time period
+            line = sr.ReadLine();
+            tfp = new TextFieldParser(new StringReader(line));
+            tfp.HasFieldsEnclosedInQuotes = true;
+            tfp.SetDelimiters(",");
+            string initTime = tfp.ReadFields()[0];
+            while ((line = sr.ReadLine()) != null)
+            {
+                tfp = new TextFieldParser(new StringReader(line));
+                tfp.HasFieldsEnclosedInQuotes = true;
+                tfp.SetDelimiters(",");
+                if (tfp.ReadFields()[0] == initTime)
                 {
-                    csvFields.Add(fields[n]);
+                    _pointCountPerTimeEra++;
+                }
+                else
+                {
+                    break;
                 }
             }
+            _pointCountPerTimeEra++;
             sr.Close();
             sr = null;
             return csvFields;
@@ -356,8 +401,39 @@ namespace FAD3.Mapping.Classes
             return csvFields;
         }
 
+        public static void RemoveMappingLayers()
+        {
+            if (GridPointShapefileHandle > 0)
+            {
+                MapLayersHandler.RemoveLayer(GridPointShapefileHandle);
+                GridPointShapefileHandle = 0;
+            }
+            if (MeshShapefileHandle > 0)
+            {
+                MapLayersHandler.RemoveLayer(MeshShapefileHandle);
+                MeshShapefileHandle = 0;
+            }
+        }
+
+        private static void ResetMesh()
+        {
+            if (_meshShapeFile?.NumShapes > 0)
+            {
+                _meshShapeFile.Categories.Clear();
+                _meshShapeFile.DefaultDrawingOptions.FillVisible = false;
+                _meshShapeFile.DefaultDrawingOptions.LineColor = new Utils().ColorByName(tkMapColor.Black);
+                _meshShapeFile.DefaultDrawingOptions.LineWidth = 1.1f;
+                MapLayersHandler.MapControl.Redraw();
+            }
+        }
+
+        /// <summary>
+        /// parse the csv file and extract the spatio-temporal data
+        /// </summary>
+        /// <returns></returns>
         public static bool ParseSingleDimensionCSV()
         {
+            ResetMesh();
             CSVReadError = "";
             CountNonNullValues = 0;
             DateTime start = DateTime.Now;
@@ -376,23 +452,10 @@ namespace FAD3.Mapping.Classes
             bool readCoordinates = true;
 
             int row = 0;
-            InlandPointCount = 0;
             List<string> inlandPoints = new List<string>();
             if (!IgnoreInlandPoints)
             {
                 inlandPoints = FishingGrid.InlandPoints;
-            }
-
-            StreamReader sr = new StreamReader(_singleDimensionCSV, true);
-
-            //skip metadata lines
-            if (_metadataRows > 0)
-            {
-                _metadataRows++;
-                for (int r = 0; r < _metadataRows; r++)
-                {
-                    sr.ReadLine();
-                }
             }
 
             string fv = "";
@@ -441,135 +504,151 @@ namespace FAD3.Mapping.Classes
             string[] fields;
             string line = "";
 
+            StreamReader sr = new StreamReader(_singleDimensionCSV, true);
+
+            //skip metadata lines because we already read the metadata
+            if (_metadataRows > 0)
+            {
+                for (int r = 0; r < _metadataRows + 1; r++)
+                {
+                    sr.ReadLine();
+                }
+            }
+
+            //we read the all the non-metadata rows of the csv file
             while ((line = sr.ReadLine()) != null)
             {
+                //each row we put in a textfieldparser
                 TextFieldParser tfp = new TextFieldParser(new StringReader(line));
                 tfp.HasFieldsEnclosedInQuotes = true;
                 tfp.SetDelimiters(",");
 
-                while (!tfp.EndOfData)
+                //get an array from the current row
+                fields = tfp.ReadFields();
+
+                switch (fields[TemporalColumn])
                 {
-                    fields = tfp.ReadFields();
+                    case "time":
+                    case "UTC":
+                    case "time (UTC)":
+                    case "*END_DATA*":
+                        break;
 
-                    switch (fields[TemporalColumn])
-                    {
-                        case "time":
-                        case "UTC":
-                        case "time (UTC)":
-                        case "*END_DATA*":
-                            break;
+                    default:
 
-                        default:
-
-                            if (beginTimeEra)
+                        if (beginTimeEra)
+                        {
+                            //we are entering rows with a new time era
+                            if (fields[TemporalColumn] == OtherTimeUnit)
                             {
-                                if (fields[TemporalColumn] == OtherTimeUnit)
-                                {
-                                    break;
-                                }
-                                else
-                                {
-                                    beginTimeEra = false;
-                                    timeEra = fields[TemporalColumn];
-                                }
+                                break;
                             }
                             else
                             {
-                                if (fields[TemporalColumn] != timeEra)
-                                {
-                                    if (inlandPoints != null)
-                                    {
-                                        inlandPoints.Clear();
-                                        inlandPoints = null;
-                                    }
-                                    pointValueCopy = new Dictionary<int, double?>(pointValue);
-                                    _dictTemporalValues.Add(timeEra, pointValueCopy);
-                                    pointValue.Clear();
-
-                                    EventHandler<ParseCSVEventArgs> readCSVEvent = OnCSVRead;
-                                    if (readCSVEvent != null)
-                                    {
-                                        if (readCoordinates)
-                                        {
-                                            readCSVEvent(null, new ParseCSVEventArgs(Coordinates.Count, timeEra));
-                                        }
-                                        else
-                                        {
-                                            readCSVEvent(null, new ParseCSVEventArgs(timeEra, false));
-                                        }
-                                    }
-                                    readCoordinates = false;
-                                    _newCSVFile = false;
-                                    beginTimeEra = true;
-                                    row = 0;
-                                }
+                                beginTimeEra = false;
+                                timeEra = fields[TemporalColumn];
                             }
-
-                            switch (dataType)
+                        }
+                        else
+                        {
+                            if (fields[TemporalColumn] != timeEra)
                             {
-                                case "float":
-                                case "double":
-                                    if (fields[ParameterColumn] == fv || fields[ParameterColumn] == mv)
-                                    {
-                                        pointValue.Add(row, null);
-                                    }
-                                    else if (double.TryParse(fields[ParameterColumn], out double vv))
-                                    {
-                                        if (double.IsNaN(vv))
-                                        {
-                                            pointValue.Add(row, null);
-                                        }
-                                        //else if (vv != missingValue && vv != fillValue)
-                                        //{
-                                        //    pointValue.Add(row, vv);
-                                        //}
-                                        else
-                                        {
-                                            pointValue.Add(row, vv);
-                                            CountNonNullValues++;
-                                            _hashSet.Add(vv);
-                                        }
-                                    }
-                                    break;
+                                //we are in rows with a different time era so we put all values that we have
+                                //read so far into _dictTemporalValues
+                                if (inlandPoints != null)
+                                {
+                                    inlandPoints.Clear();
+                                    inlandPoints = null;
+                                }
 
-                                case "byte":
-                                    if (fields[ParameterColumn] == fv || fields[ParameterColumn] == mv)
+                                pointValueCopy = new Dictionary<int, double?>(pointValue);
+                                _dictTemporalValues.Add(timeEra, pointValueCopy);
+                                pointValue.Clear();
+
+                                EventHandler<ParseCSVEventArgs> readCSVEvent = OnCSVRead;
+                                if (readCSVEvent != null)
+                                {
+                                    if (readCoordinates)
+                                    {
+                                        readCSVEvent(null, new ParseCSVEventArgs(Coordinates.Count, timeEra));
+                                    }
+                                    else
+                                    {
+                                        readCSVEvent(null, new ParseCSVEventArgs(timeEra, false));
+                                    }
+                                }
+
+                                //we set this to false so that we wont re-read the same coordinates for the next
+                                //time period
+                                readCoordinates = false;
+                                _newCSVFile = false;
+
+                                //set this to true because we will be entering another set of rows with a different time period
+                                beginTimeEra = true;
+
+                                row = 0;
+                            }
+                        }
+
+                        switch (dataType)
+                        {
+                            case "float":
+                            case "double":
+                                if (fields[ParameterColumn] == fv || fields[ParameterColumn] == mv)
+                                {
+                                    pointValue.Add(row, null);
+                                }
+                                else if (double.TryParse(fields[ParameterColumn], out double vv))
+                                {
+                                    if (double.IsNaN(vv))
                                     {
                                         pointValue.Add(row, null);
                                     }
                                     else
                                     {
-                                        if (byte.TryParse(fields[ParameterColumn], out byte bb))
-                                        {
-                                            pointValue.Add(row, bb);
-                                            CountNonNullValues++;
-                                            _hashSet.Add(bb);
-                                        }
-                                    }
-                                    break;
-                            }
-
-                            if (_newCSVFile && readCoordinates)
-                            {
-                                //_newCSVFile = false;
-                                double lat = double.Parse(fields[LatitudeColumn]);
-                                double lon = double.Parse(fields[LongitudeColumn]);
-                                bool isInland = false;
-                                if (!IgnoreInlandPoints)
-                                {
-                                    var grid25Point = FishingGrid.LongLatToGrid25(lon, lat, UTMZone);
-                                    isInland = inlandPoints.Contains(grid25Point.grid25Grid);
-                                    if (isInland)
-                                    {
-                                        InlandPointCount++;
+                                        pointValue.Add(row, vv);
+                                        CountNonNullValues++;
+                                        _hashSet.Add(vv);
                                     }
                                 }
-                                Coordinates.Add(row, (lat, lon, isInland));
-                                OnCSVRead?.Invoke(null, new ParseCSVEventArgs(true));
+                                break;
+
+                            case "byte":
+                                if (fields[ParameterColumn] == fv || fields[ParameterColumn] == mv)
+                                {
+                                    pointValue.Add(row, null);
+                                }
+                                else
+                                {
+                                    if (byte.TryParse(fields[ParameterColumn], out byte bb))
+                                    {
+                                        pointValue.Add(row, bb);
+                                        CountNonNullValues++;
+                                        _hashSet.Add(bb);
+                                    }
+                                }
+                                break;
+                        }
+
+                        if (_newCSVFile && readCoordinates)
+                        {
+                            double lat = double.Parse(fields[LatitudeColumn]);
+                            double lon = double.Parse(fields[LongitudeColumn]);
+                            bool isInland = false;
+                            if (!IgnoreInlandPoints)
+                            {
+                                var grid25Point = FishingGrid.LongLatToGrid25(lon, lat, UTMZone);
+                                isInland = inlandPoints.Contains(grid25Point.grid25Grid);
+                                if (isInland)
+                                {
+                                    InlandPointCount++;
+                                }
                             }
-                            row++;
-                            break;
-                    }
+                            Coordinates.Add(row, (lat, lon, isInland));
+                            OnCSVRead?.Invoke(null, new ParseCSVEventArgs(true));
+                        }
+                        row++;
+                        break;
                 }
                 tfp.Close();
                 tfp = null;
@@ -588,13 +667,13 @@ namespace FAD3.Mapping.Classes
             return Coordinates.Count > 0;
         }
 
-        //public static void Reset(int gridPointLayerHandle, int gridMeshLayerHandle)
-        public static void Reset()
+        public static void Reset(bool resetCoordinates = true)
         {
             IsNCCSVFormat = false;
+            _pointCountPerTimeEra = 0;
             _categories.Clear();
             InlandPointCount = 0;
-            if (Coordinates != null)
+            if (resetCoordinates && Coordinates != null)
             {
                 Coordinates.Clear();
             }
@@ -626,9 +705,21 @@ namespace FAD3.Mapping.Classes
             }
         }
 
+        /// <summary>
+        /// this function will bug out
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
         public static Color CategoryColor(int index)
         {
-            return Colors.UintToColor(_meshShapeFile.Categories.Item[index].DrawingOptions.FillColor);
+            if (_meshShapeFile.Categories.Count > 0)
+            {
+                return Colors.UintToColor(_meshShapeFile.Categories.Item[index].DrawingOptions.FillColor);
+            }
+            else
+            {
+                return Color.White;
+            }
         }
 
         public static ShapefileCategories Categories
@@ -898,9 +989,9 @@ namespace FAD3.Mapping.Classes
             _meshShapeFile.DefaultDrawingOptions.FillColor = new Utils().ColorByName(tkMapColor.White);
             _meshShapeFile.DefaultDrawingOptions.FillVisible = false;
             _meshShapeFile.DefaultDrawingOptions.LineColor = new Utils().ColorByName(tkMapColor.DimGray);
-            // _meshShapeFile.Categories = _categories;
+            MeshShapefileHandle = MapLayersHandler.AddLayer(_meshShapeFile, "Mesh", true, true);
 
-            return iShp >= 0;
+            return MeshShapefileHandle >= 0;
         }
 
         /// <summary>
@@ -1009,8 +1100,9 @@ namespace FAD3.Mapping.Classes
                     sf.DefaultDrawingOptions.LineVisible = false;
                 }
                 PointShapefile = sf;
+                GridPointShapefileHandle = MapLayersHandler.AddLayer(PointShapefile, "Grid points", true, true);
             }
-            return iShp >= 0;
+            return GridPointShapefileHandle >= 0;
         }
 
         private static void GridPoints(Shapefile pointSF)

@@ -213,6 +213,7 @@ namespace FAD3.Mapping.Forms
             dtPickerEnd.Value = EndPosition;
             dtPickerStart.Value = EndPosition;
             MakeGridFromPoints.OnExtentDefined += OnExtentDefined;
+            MakeGridFromPoints.MapLayersHandler = global.MappingForm.MapLayersHandler;
             Text = "Setup ERDDAP>griddap data access";
         }
 
@@ -231,7 +232,7 @@ namespace FAD3.Mapping.Forms
             _selectionExtent.SetBounds(e.Left, e.Bottom, 0, e.Right, e.Top, 0);
             if (!e.InDrag)
             {
-                MakeGridFromPoints.MapLayers = global.MappingForm.MapLayersHandler;
+                //MakeGridFromPoints.MapLayersHandler = global.MappingForm.MapLayersHandler;
                 MakeGridFromPoints.MakeExtentShapeFile();
             }
             ValidateExtents();
