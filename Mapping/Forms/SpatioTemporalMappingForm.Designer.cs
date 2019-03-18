@@ -89,9 +89,13 @@
             this.label13 = new System.Windows.Forms.Label();
             this.btnColorScheme = new System.Windows.Forms.Button();
             this.dgCategories = new System.Windows.Forms.DataGridView();
+            this.dgcolCategory = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dgcolCount = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dgCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.btnCategorize = new System.Windows.Forms.Button();
             this.txtCategoryCount = new System.Windows.Forms.TextBox();
             this.label10 = new System.Windows.Forms.Label();
+            this.icbColorScheme = new FAD3.Mapping.UserControls.ImageCombo();
             this.tabMapping = new System.Windows.Forms.TabPage();
             this.chkViewTimeSeriesChart = new System.Windows.Forms.CheckBox();
             this.lblParameter = new System.Windows.Forms.Label();
@@ -101,20 +105,16 @@
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.btnUp = new System.Windows.Forms.Button();
             this.dgSheetSummary = new System.Windows.Forms.DataGridView();
-            this.lblMappedSheet = new System.Windows.Forms.Label();
-            this.listSelectedTimePeriods = new System.Windows.Forms.ListBox();
-            this.label15 = new System.Windows.Forms.Label();
-            this.btnOk = new System.Windows.Forms.Button();
-            this.lblStatus = new System.Windows.Forms.Label();
-            this.icbColorScheme = new FAD3.Mapping.UserControls.ImageCombo();
-            this.dgcolCategory = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dgcolCount = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dgCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colVisible = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.colCategory = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colSymbol = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colCount = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colPercent = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.lblMappedSheet = new System.Windows.Forms.Label();
+            this.listSelectedTimePeriods = new System.Windows.Forms.ListBox();
+            this.label15 = new System.Windows.Forms.Label();
+            this.btnOk = new System.Windows.Forms.Button();
+            this.lblStatus = new System.Windows.Forms.Label();
             this.tabMap.SuspendLayout();
             this.tabStart.SuspendLayout();
             this.tabMetadata.SuspendLayout();
@@ -163,7 +163,7 @@
             this.tabStart.Location = new System.Drawing.Point(4, 22);
             this.tabStart.Name = "tabStart";
             this.tabStart.Padding = new System.Windows.Forms.Padding(3);
-            this.tabStart.Size = new System.Drawing.Size(493, 462);
+            this.tabStart.Size = new System.Drawing.Size(486, 462);
             this.tabStart.TabIndex = 0;
             this.tabStart.Text = "Start";
             this.tabStart.UseVisualStyleBackColor = true;
@@ -341,7 +341,7 @@
             this.tabMetadata.Location = new System.Drawing.Point(4, 22);
             this.tabMetadata.Name = "tabMetadata";
             this.tabMetadata.Padding = new System.Windows.Forms.Padding(3);
-            this.tabMetadata.Size = new System.Drawing.Size(493, 462);
+            this.tabMetadata.Size = new System.Drawing.Size(486, 462);
             this.tabMetadata.TabIndex = 5;
             this.tabMetadata.Text = "Metadata";
             this.tabMetadata.UseVisualStyleBackColor = true;
@@ -384,7 +384,7 @@
             this.tabSummary.Location = new System.Drawing.Point(4, 22);
             this.tabSummary.Name = "tabSummary";
             this.tabSummary.Padding = new System.Windows.Forms.Padding(3);
-            this.tabSummary.Size = new System.Drawing.Size(493, 462);
+            this.tabSummary.Size = new System.Drawing.Size(486, 462);
             this.tabSummary.TabIndex = 6;
             this.tabSummary.Text = "Dataset Summary";
             this.tabSummary.UseVisualStyleBackColor = true;
@@ -523,7 +523,7 @@
             this.tabCategorize.Location = new System.Drawing.Point(4, 22);
             this.tabCategorize.Name = "tabCategorize";
             this.tabCategorize.Padding = new System.Windows.Forms.Padding(3);
-            this.tabCategorize.Size = new System.Drawing.Size(517, 462);
+            this.tabCategorize.Size = new System.Drawing.Size(486, 462);
             this.tabCategorize.TabIndex = 1;
             this.tabCategorize.Text = "Categorize";
             this.tabCategorize.UseVisualStyleBackColor = true;
@@ -715,6 +715,28 @@
             this.dgCategories.TabIndex = 34;
             this.dgCategories.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellDblClick);
             // 
+            // dgcolCategory
+            // 
+            this.dgcolCategory.HeaderText = "Category";
+            this.dgcolCategory.Name = "dgcolCategory";
+            this.dgcolCategory.ReadOnly = true;
+            // 
+            // dgcolCount
+            // 
+            this.dgcolCount.HeaderText = "Count";
+            this.dgcolCount.Name = "dgcolCount";
+            this.dgcolCount.ReadOnly = true;
+            this.dgcolCount.Width = 75;
+            // 
+            // dgCol
+            // 
+            this.dgCol.HeaderText = "Symbol";
+            this.dgCol.Name = "dgCol";
+            this.dgCol.ReadOnly = true;
+            this.dgCol.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgCol.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.dgCol.Width = 75;
+            // 
             // btnCategorize
             // 
             this.btnCategorize.Location = new System.Drawing.Point(272, 65);
@@ -740,6 +762,21 @@
             this.label10.Size = new System.Drawing.Size(108, 13);
             this.label10.TabIndex = 31;
             this.label10.Text = "Number of categories";
+            // 
+            // icbColorScheme
+            // 
+            this.icbColorScheme.Color1 = System.Drawing.Color.Gray;
+            this.icbColorScheme.Color2 = System.Drawing.Color.Gray;
+            this.icbColorScheme.ColorSchemes = null;
+            this.icbColorScheme.ComboStyle = FAD3.Mapping.UserControls.ImageComboStyle.ColorSchemeGraduated;
+            this.icbColorScheme.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.icbColorScheme.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.icbColorScheme.FormattingEnabled = true;
+            this.icbColorScheme.Location = new System.Drawing.Point(116, 6);
+            this.icbColorScheme.Name = "icbColorScheme";
+            this.icbColorScheme.OutlineColor = System.Drawing.Color.Black;
+            this.icbColorScheme.Size = new System.Drawing.Size(146, 21);
+            this.icbColorScheme.TabIndex = 36;
             // 
             // tabMapping
             // 
@@ -776,7 +813,7 @@
             // lblParameter
             // 
             this.lblParameter.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblParameter.Location = new System.Drawing.Point(188, 410);
+            this.lblParameter.Location = new System.Drawing.Point(190, 434);
             this.lblParameter.Name = "lblParameter";
             this.lblParameter.Size = new System.Drawing.Size(254, 18);
             this.lblParameter.TabIndex = 33;
@@ -809,7 +846,7 @@
             legend1.Enabled = false;
             legend1.Name = "Legend1";
             this.graphSheet.Legends.Add(legend1);
-            this.graphSheet.Location = new System.Drawing.Point(179, 280);
+            this.graphSheet.Location = new System.Drawing.Point(181, 304);
             this.graphSheet.Name = "graphSheet";
             series1.ChartArea = "ChartArea1";
             series1.IsVisibleInLegend = false;
@@ -872,14 +909,55 @@
             this.dgSheetSummary.Name = "dgSheetSummary";
             this.dgSheetSummary.ReadOnly = true;
             this.dgSheetSummary.RowHeadersVisible = false;
-            this.dgSheetSummary.Size = new System.Drawing.Size(288, 249);
+            this.dgSheetSummary.Size = new System.Drawing.Size(288, 273);
             this.dgSheetSummary.TabIndex = 28;
             this.dgSheetSummary.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnGridSummaryCellClick);
+            // 
+            // colVisible
+            // 
+            this.colVisible.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colVisible.Frozen = true;
+            this.colVisible.HeaderText = "";
+            this.colVisible.MinimumWidth = 25;
+            this.colVisible.Name = "colVisible";
+            this.colVisible.ReadOnly = true;
+            this.colVisible.Width = 25;
+            // 
+            // colCategory
+            // 
+            this.colCategory.Frozen = true;
+            this.colCategory.HeaderText = "Category";
+            this.colCategory.Name = "colCategory";
+            this.colCategory.ReadOnly = true;
+            // 
+            // colSymbol
+            // 
+            this.colSymbol.Frozen = true;
+            this.colSymbol.HeaderText = "Symbol";
+            this.colSymbol.Name = "colSymbol";
+            this.colSymbol.ReadOnly = true;
+            this.colSymbol.Width = 50;
+            // 
+            // colCount
+            // 
+            this.colCount.Frozen = true;
+            this.colCount.HeaderText = "n";
+            this.colCount.Name = "colCount";
+            this.colCount.ReadOnly = true;
+            this.colCount.Width = 50;
+            // 
+            // colPercent
+            // 
+            this.colPercent.Frozen = true;
+            this.colPercent.HeaderText = "%";
+            this.colPercent.Name = "colPercent";
+            this.colPercent.ReadOnly = true;
+            this.colPercent.Width = 50;
             // 
             // lblMappedSheet
             // 
             this.lblMappedSheet.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblMappedSheet.Location = new System.Drawing.Point(190, 388);
+            this.lblMappedSheet.Location = new System.Drawing.Point(192, 412);
             this.lblMappedSheet.Name = "lblMappedSheet";
             this.lblMappedSheet.Size = new System.Drawing.Size(254, 18);
             this.lblMappedSheet.TabIndex = 27;
@@ -924,84 +1002,6 @@
             this.lblStatus.Name = "lblStatus";
             this.lblStatus.Size = new System.Drawing.Size(343, 18);
             this.lblStatus.TabIndex = 29;
-            // 
-            // icbColorScheme
-            // 
-            this.icbColorScheme.Color1 = System.Drawing.Color.Gray;
-            this.icbColorScheme.Color2 = System.Drawing.Color.Gray;
-            this.icbColorScheme.ColorSchemes = null;
-            this.icbColorScheme.ComboStyle = FAD3.Mapping.UserControls.ImageComboStyle.ColorSchemeGraduated;
-            this.icbColorScheme.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-            this.icbColorScheme.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.icbColorScheme.FormattingEnabled = true;
-            this.icbColorScheme.Location = new System.Drawing.Point(116, 6);
-            this.icbColorScheme.Name = "icbColorScheme";
-            this.icbColorScheme.OutlineColor = System.Drawing.Color.Black;
-            this.icbColorScheme.Size = new System.Drawing.Size(146, 21);
-            this.icbColorScheme.TabIndex = 36;
-            // 
-            // dgcolCategory
-            // 
-            this.dgcolCategory.HeaderText = "Category";
-            this.dgcolCategory.Name = "dgcolCategory";
-            this.dgcolCategory.ReadOnly = true;
-            // 
-            // dgcolCount
-            // 
-            this.dgcolCount.HeaderText = "Count";
-            this.dgcolCount.Name = "dgcolCount";
-            this.dgcolCount.ReadOnly = true;
-            this.dgcolCount.Width = 75;
-            // 
-            // dgCol
-            // 
-            this.dgCol.HeaderText = "Symbol";
-            this.dgCol.Name = "dgCol";
-            this.dgCol.ReadOnly = true;
-            this.dgCol.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.dgCol.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.dgCol.Width = 75;
-            // 
-            // colVisible
-            // 
-            this.colVisible.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.colVisible.Frozen = true;
-            this.colVisible.HeaderText = "";
-            this.colVisible.MinimumWidth = 25;
-            this.colVisible.Name = "colVisible";
-            this.colVisible.ReadOnly = true;
-            this.colVisible.Width = 25;
-            // 
-            // colCategory
-            // 
-            this.colCategory.Frozen = true;
-            this.colCategory.HeaderText = "Category";
-            this.colCategory.Name = "colCategory";
-            this.colCategory.ReadOnly = true;
-            // 
-            // colSymbol
-            // 
-            this.colSymbol.Frozen = true;
-            this.colSymbol.HeaderText = "Symbol";
-            this.colSymbol.Name = "colSymbol";
-            this.colSymbol.ReadOnly = true;
-            this.colSymbol.Width = 50;
-            // 
-            // colCount
-            // 
-            this.colCount.Frozen = true;
-            this.colCount.HeaderText = "n";
-            this.colCount.Name = "colCount";
-            this.colCount.ReadOnly = true;
-            this.colCount.Width = 50;
-            // 
-            // colPercent
-            // 
-            this.colPercent.Frozen = true;
-            this.colPercent.HeaderText = "%";
-            this.colPercent.Name = "colPercent";
-            this.colPercent.ReadOnly = true;
-            this.colPercent.Width = 50;
             // 
             // SpatioTemporalMappingForm
             // 

@@ -135,7 +135,7 @@ namespace FAD3.Mapping.Forms
 
             //this will wait until ReadCVSFileTask() is finished then
             //the fields and comboBoxes is filled up
-            _dataPoints = MakeGridFromPoints.Coordinates.Count;
+            _dataPoints = MakeGridFromPoints.PointCountPerTimeEra;
             txtRows.Text = _dataPoints.ToString();
 
             cboFirstData.Items.Clear();
@@ -333,9 +333,12 @@ namespace FAD3.Mapping.Forms
                                 DoUniqueValuesCategorization();
                                 break;
 
+                            case "User defined":
+                                MessageBox.Show("Not yet implemented", "Not functioning", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                break;
+
                             case "Equal interval":
 
-                            case "User defined":
                                 using (ShapefileClassificationSchemeForm scsf = new ShapefileClassificationSchemeForm())
                                 {
                                     scsf.ClassificationScheme = cboClassificationScheme.Text;
@@ -350,7 +353,7 @@ namespace FAD3.Mapping.Forms
                                     {
                                     }
                                 }
-                                MessageBox.Show("Not yet implemented", "Not functioning", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
                                 break;
                         }
                         //summarize the data
@@ -378,7 +381,16 @@ namespace FAD3.Mapping.Forms
 
                     //shows the data points of the data
 
-                    btnShowGridPolygons.Enabled = MapGridPoints();
+                    if (MakeGridFromPoints.RegularShapeGrid)
+                    {
+                        btnCategorize.Enabled = MapGridPoints();
+                        listSelectedTimePeriods.Enabled = _hasMesh;
+                    }
+                    else
+                    {
+                        btnShowGridPolygons.Enabled = MapGridPoints();
+                    }
+                    txtInlandPoints.Text = MakeGridFromPoints.InlandPointCount.ToString();
                     break;
 
                 case "btnShowGridPolygons":
@@ -573,10 +585,22 @@ namespace FAD3.Mapping.Forms
             MakeGridFromPoints.MapInteractionHandler = global.MappingForm.MapInterActionHandler;
             MakeGridFromPoints.GeoProjection = global.MappingForm.MapControl.GeoProjection;
 
-            if (MakeGridFromPoints.MakePointShapefile(!MakeGridFromPoints.IgnoreInlandPoints))
+            if (MakeGridFromPoints.RegularShapeGrid)
             {
-                return MakeGridFromPoints.GridPointShapefileHandle > 0;
+                if (MakeGridFromPoints.MakePointShapefile(true, !MakeGridFromPoints.IgnoreInlandPoints))
+                {
+                    _hasMesh = MakeGridFromPoints.MeshShapefileHandle > 0;
+                    return _hasMesh;
+                }
             }
+            else
+            {
+                if (MakeGridFromPoints.MakePointShapefile(!MakeGridFromPoints.IgnoreInlandPoints))
+                {
+                    return MakeGridFromPoints.GridPointShapefileHandle > 0;
+                }
+            }
+
             return false;
         }
 
@@ -776,7 +800,7 @@ namespace FAD3.Mapping.Forms
                         {
                             lon = 0d;
                         }
-                        MakeGridFromPoints.AddCoordinate(row, lat, lon, false, row == 0);
+                        MakeGridFromPoints.AddCoordinate(row, lat, lon, row == 0);
                     }
                     break;
             }

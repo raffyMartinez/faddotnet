@@ -8,6 +8,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
+using System.Globalization;
 
 namespace FAD3.Mapping.Classes
 {
@@ -22,12 +23,13 @@ namespace FAD3.Mapping.Classes
         }
 
         private static Dictionary<string, Dictionary<int, double?>> _dictTemporalValues = new Dictionary<string, Dictionary<int, double?>>();
-        public static Dictionary<int, (double latitude, double longitude, bool Inland)> Coordinates { get; set; }
+        public static Dictionary<int, (double latitude, double longitude)> Coordinates { get; set; }
         public static Shapefile PointShapefile { get; internal set; }                                         //pointshapefile of datapoints
         public static GeoProjection GeoProjection { get; set; }
         public static MapInterActionHandler MapInteractionHandler { get; set; }
         private static int _iFldRow;
         private static int _ifldDateColumn;
+        private static int _ifldInlandColumn;
         private static Shape _cell;
         private static Shapefile _meshShapeFile;                                                              //polygonal shapefile centered on a datapoint
         private static ShapefileCategories _categories = new ShapefileCategories();
@@ -68,6 +70,10 @@ namespace FAD3.Mapping.Classes
         private static bool _newCSVFile;
         public static string CSVReadError { get; internal set; }
         private static int _pointCountPerTimeEra;
+
+        private static List<double> _latList = new List<double>();
+        private static List<double> _lonList = new List<double>();
+        public static bool RegularShapeGrid { get; internal set; }
 
         public static double MaximumValue
         {
@@ -191,13 +197,13 @@ namespace FAD3.Mapping.Classes
             UTMZone = fadUTMZone.utmZone51N;
         }
 
-        public static void AddCoordinate(int key, double lat, double lon, bool inland, bool initial = false)
+        public static void AddCoordinate(int key, double lat, double lon, bool initial = false)
         {
             if (initial)
             {
-                Coordinates = new Dictionary<int, (double latitude, double longitude, bool Inland)>();
+                Coordinates = new Dictionary<int, (double latitude, double longitude)>();
             }
-            Coordinates.Add(key, (lat, lon, inland));
+            Coordinates.Add(key, (lat, lon));
         }
 
         public static int NumberOfCategories
@@ -348,33 +354,84 @@ namespace FAD3.Mapping.Classes
 
         public static List<string> GetFields()
         {
+            _pointCountPerTimeEra = 0;
+            int timeRow = 0;
             CSVReadError = "";
             List<string> csvFields = new List<string>();
             string[] fields;
             string line;
+            string timeEra = "";
+            int timeCol = 0;
+            bool timeColSet = false;
             try
             {
                 StreamReader sr = new StreamReader(_singleDimensionCSV, true);
 
-                while ((line = sr.ReadLine()) != null)
+                while ((line = sr.ReadLine()) != null && line.Length > 0)
                 {
                     TextFieldParser tfp = new TextFieldParser(new StringReader(line));
                     tfp.HasFieldsEnclosedInQuotes = true;
                     tfp.SetDelimiters(",");
 
-                    while (!tfp.EndOfData)
+                    fields = tfp.ReadFields();
+
+                    if (fields[0] == "*GLOBAL*" && fields[1] == "Conventions")
                     {
-                        fields = tfp.ReadFields();
-                        if (fields[0] == "*GLOBAL*" && fields[1] == "Conventions")
+                        var arr = fields[2].Split(new char[] { ',', ' ' });
+                        if (arr[arr.Length - 1] == "NCCSV-1.0")
                         {
-                            var arr = fields[2].Split(new char[] { ',', ' ' });
-                            if (arr[arr.Length - 1] == "NCCSV-1.0")
+                            IsNCCSVFormat = true;
+                            csvFields = ReadNCCSVMetadata();
+                            break;
+                        }
+                    }
+                    else if (csvFields.Count > 0 && !timeColSet)
+                    {
+                        for (int n = 0; n < fields.Length; n++)
+                        {
+                            if (DateTime.TryParseExact(fields[n], "yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dt) && dt.Year > 1970)
                             {
-                                IsNCCSVFormat = true;
-                                csvFields = ReadNCCSVMetadata();
+                                timeCol = n;
+                                timeColSet = true;
+                                _pointCountPerTimeEra = 1;
+                                break;
+                            }
+                            else if (DateTime.TryParse(fields[n], out dt) && dt.Year > 1970)
+                            {
+                                bool proceed = false;
+                                if (dt.Year == DateTime.Now.Year && fields[n].Contains(dt.Year.ToString()))
+                                {
+                                    proceed = true;
+                                }
+                                else if (dt.Year < DateTime.Now.Year)
+                                {
+                                    proceed = true;
+                                }
+                                if (proceed)
+                                {
+                                    timeCol = n;
+                                    timeColSet = true;
+                                    _pointCountPerTimeEra = 1;
+                                    break;
+                                }
                             }
                         }
-                        else
+                    }
+                    else if (timeColSet)
+                    {
+                        if (_pointCountPerTimeEra == 1)
+                        {
+                            timeEra = fields[timeCol];
+                        }
+                        if (timeEra != fields[timeCol])
+                        {
+                            break;
+                        }
+                        _pointCountPerTimeEra++;
+                    }
+                    else
+                    {
+                        if (csvFields.Count == 0)
                         {
                             for (int n = 0; n < fields.Length; n++)
                             {
@@ -385,7 +442,7 @@ namespace FAD3.Mapping.Classes
 
                     tfp.Close();
                     tfp = null;
-                    break;
+                    //break;
                 }
                 sr.Close();
                 sr = null;
@@ -443,7 +500,9 @@ namespace FAD3.Mapping.Classes
             FishingGrid.UTMZone = UTMZone;
             if (_newCSVFile)
             {
-                Coordinates = new Dictionary<int, (double latitude, double longitude, bool Inland)>();
+                Coordinates = new Dictionary<int, (double latitude, double longitude)>();
+                _latList = new List<double>();
+                _lonList = new List<double>();
             }
             Dictionary<int, double?> pointValue = new Dictionary<int, double?>();
             Dictionary<int, double?> pointValueCopy = new Dictionary<int, double?>(pointValue);
@@ -570,7 +629,7 @@ namespace FAD3.Mapping.Classes
                                 {
                                     if (readCoordinates)
                                     {
-                                        readCSVEvent(null, new ParseCSVEventArgs(Coordinates.Count, timeEra));
+                                        readCSVEvent(null, new ParseCSVEventArgs(_pointCountPerTimeEra, timeEra));
                                     }
                                     else
                                     {
@@ -634,17 +693,26 @@ namespace FAD3.Mapping.Classes
                         {
                             double lat = double.Parse(fields[LatitudeColumn]);
                             double lon = double.Parse(fields[LongitudeColumn]);
-                            bool isInland = false;
-                            if (!IgnoreInlandPoints)
+                            if (!_latList.Contains(lat))
                             {
-                                var grid25Point = FishingGrid.LongLatToGrid25(lon, lat, UTMZone);
-                                isInland = inlandPoints.Contains(grid25Point.grid25Grid);
-                                if (isInland)
-                                {
-                                    InlandPointCount++;
-                                }
+                                _latList.Add(lat);
                             }
-                            Coordinates.Add(row, (lat, lon, isInland));
+                            if (!_lonList.Contains(lon))
+                            {
+                                _lonList.Add(lon);
+                            }
+                            //bool isInland = false;
+                            //if (!IgnoreInlandPoints)
+                            //{
+                            //    var grid25Point = FishingGrid.LongLatToGrid25(lon, lat, UTMZone);
+                            //    isInland = inlandPoints.Contains(grid25Point.grid25Grid);
+                            //    if (isInland)
+                            //    {
+                            //        InlandPointCount++;
+                            //    }
+                            //}
+                            //Coordinates.Add(row, (lat, lon, isInland));
+                            Coordinates.Add(row, (lat, lon));
                             OnCSVRead?.Invoke(null, new ParseCSVEventArgs(true));
                         }
                         row++;
@@ -664,7 +732,17 @@ namespace FAD3.Mapping.Classes
             sr.Close();
             sr = null;
             ParsingTimeSeconds = (DateTime.Now - start).TotalSeconds;
-            return Coordinates.Count > 0;
+            if (Coordinates.Count == (_latList.Count * _lonList.Count))
+            {
+                RegularShapeGrid = true;
+                Coordinates.Clear();
+                Coordinates = null;
+            }
+            if (_pointCountPerTimeEra == 0)
+            {
+                _pointCountPerTimeEra = _lonList.Count * _latList.Count;
+            }
+            return _pointCountPerTimeEra > 0;
         }
 
         public static void Reset(bool resetCoordinates = true)
@@ -886,6 +964,7 @@ namespace FAD3.Mapping.Classes
         {
             if (_meshShapeFile != null)
             {
+                _ifldInlandColumn = _meshShapeFile.FieldIndexByName["inland"];
                 ClearSummaryValues();
 
                 if (_ifldDateColumn > 0)
@@ -897,7 +976,13 @@ namespace FAD3.Mapping.Classes
                 _ifldDateColumn = _meshShapeFile.EditAddField(name, MapWinGIS.FieldType.DOUBLE_FIELD, 9, 13);
                 for (int n = 0; n < _meshShapeFile.NumShapes; n++)
                 {
-                    if (_meshShapeFile.EditCellValue(_ifldDateColumn, n, values[n]))
+                    if (_meshShapeFile.CellValue[_ifldInlandColumn, n].ToString() == "T")
+                    {
+                        _meshShapeFile.EditCellValue(_ifldDateColumn, n, null);
+                        _meshShapeFile.ShapeCategory2[n] = "nullCategory";
+                        _sheetMapSummary["Null"]++;
+                    }
+                    else if (_meshShapeFile.EditCellValue(_ifldDateColumn, n, values[n]))
                     {
                         bool isFound = false;
                         for (int c = 0; c < _categories.Count; c++)
@@ -994,27 +1079,177 @@ namespace FAD3.Mapping.Classes
             return MeshShapefileHandle >= 0;
         }
 
+        public static bool MakePointShapefile(bool createMesh = true, bool showInland = false)
+        {
+            List<string> inlandPoints = new List<string>();
+            int latCount = 0;
+            int lonCount = 0;
+            var ifldRowField = 0; ;
+            var ifldLatField = 0;
+            var ifldLonField = 0;
+            var ifldInlandField = 0;
+            var ifldSourceInlandField = 0;
+            double distanceLat = 0;
+            double distanceLon = 0;
+            bool isInland = false;
+            if (!IgnoreInlandPoints)
+            {
+                inlandPoints = FishingGrid.InlandPoints;
+            }
+
+            if (createMesh)
+            {
+                _meshShapeFile = new Shapefile();
+                if (_meshShapeFile.CreateNewWithShapeID("", ShpfileType.SHP_POLYGON))
+                {
+                    _meshShapeFile.GeoProjection = GeoProjection;
+                    ifldRowField = _meshShapeFile.EditAddField("row", MapWinGIS.FieldType.INTEGER_FIELD, 1, 1);
+                    ifldLatField = _meshShapeFile.EditAddField("lat", MapWinGIS.FieldType.DOUBLE_FIELD, 9, 12);
+                    ifldLonField = _meshShapeFile.EditAddField("lon", MapWinGIS.FieldType.DOUBLE_FIELD, 9, 13);
+                    ifldInlandField = _meshShapeFile.EditAddField("inland", MapWinGIS.FieldType.STRING_FIELD, 1, 1);
+                    //var ifldSourceInlandField = PointShapefile.FieldIndexByName["inland"];
+                }
+            }
+            int row = 1;
+            int iShp = -1;
+            int iMeshShp = -1;
+            int ifldInland = -1;
+            var sfPoints = new Shapefile();
+            if (sfPoints.CreateNewWithShapeID("", ShpfileType.SHP_POINT))
+            {
+                sfPoints.GeoProjection = GeoProjection;
+                _iFldRow = sfPoints.EditAddField("row", MapWinGIS.FieldType.INTEGER_FIELD, 4, 1);
+                if (showInland)
+                {
+                    ifldInland = sfPoints.EditAddField("inland", MapWinGIS.FieldType.STRING_FIELD, 1, 1);
+                }
+                foreach (double lat in _latList)
+                {
+                    foreach (double lon in _lonList)
+                    {
+                        var shp = new Shape();
+                        var pnt = new MapWinGIS.Point();
+                        pnt.x = lon;
+                        pnt.y = lat;
+
+                        if (shp.Create(ShpfileType.SHP_POINT) && shp.AddPoint(pnt.x, pnt.y) >= 0)
+                        {
+                            iShp = sfPoints.EditAddShape(shp);
+                            if (sfPoints.EditCellValue(_iFldRow, iShp, row))
+                            {
+                                if (showInland)
+                                {
+                                    var grid25Point = FishingGrid.LongLatToGrid25(lon, lat, UTMZone);
+                                    isInland = inlandPoints.Contains(grid25Point.grid25Grid);
+                                    if (isInland)
+                                    {
+                                        InlandPointCount++;
+                                    }
+                                    //sf.EditCellValue(ifldInland, iShp, isInland ? "T" : "F");
+                                }
+
+                                if (createMesh)
+                                {
+                                    var gridCell = new Shape();
+                                    if (gridCell.Create(ShpfileType.SHP_POLYGON))
+                                    {
+                                        if (latCount < _latList.Count - 1)
+                                        {
+                                            distanceLat = Math.Abs(_latList[latCount + 1] - lat);
+                                        }
+                                        if (lonCount < _lonList.Count - 1)
+                                        {
+                                            distanceLon = Math.Abs(_lonList[lonCount + 1] - lon);
+                                        }
+                                        var gridExtent = new Extents();
+                                        gridExtent.SetBounds(lon - distanceLon / 2, lat - distanceLat / 2, 0, lon + distanceLon / 2, lat + distanceLat / 2, 0);
+                                        gridCell = gridExtent.ToShape();
+                                        iMeshShp = _meshShapeFile.EditAddShape(gridCell);
+                                        if (iMeshShp >= 0)
+                                        {
+                                            _meshShapeFile.EditCellValue(ifldRowField, iShp, row);
+                                            _meshShapeFile.EditCellValue(ifldInlandField, iShp, isInland ? "T" : "F");
+                                            _meshShapeFile.EditCellValue(ifldLonField, iShp, lon);
+                                            _meshShapeFile.EditCellValue(ifldLatField, iShp, lat);
+                                        }
+                                    }
+                                }
+                                row++;
+                            }
+                        }
+                        lonCount++;
+                    }
+                    latCount++;
+                }
+            }
+
+            //if (iShp >= 0)
+            //{
+            if (createMesh && iMeshShp > 0)
+            {
+                _meshShapeFile.DefaultDrawingOptions.FillColor = new Utils().ColorByName(tkMapColor.White);
+                _meshShapeFile.DefaultDrawingOptions.FillVisible = false;
+                _meshShapeFile.DefaultDrawingOptions.LineColor = new Utils().ColorByName(tkMapColor.DimGray);
+                MeshShapefileHandle = MapLayersHandler.AddLayer(_meshShapeFile, "Mesh", true, true);
+            }
+            //if (showInland)
+            //{
+            //    sf.Categories.Add("Inland");
+            //    sf.Categories.Item[0].Expression = $@"[inland] =  ""T""";
+            //    sf.Categories.Item[0].DrawingOptions.PointShape = tkPointShapeType.ptShapeCircle;
+            //    sf.Categories.Item[0].DrawingOptions.FillColor = new Utils().ColorByName(tkMapColor.Red);
+            //    sf.Categories.Item[0].DrawingOptions.PointShape = tkPointShapeType.ptShapeCircle;
+            //    sf.Categories.Item[0].DrawingOptions.PointSize = 4;
+            //    sf.Categories.Item[0].DrawingOptions.LineVisible = false;
+
+            //    sf.Categories.Add("NotInland");
+            //    sf.Categories.Item[1].Expression = $@"[inland] =  ""F""";
+            //    sf.Categories.Item[1].DrawingOptions.PointShape = tkPointShapeType.ptShapeCircle;
+            //    sf.Categories.Item[1].DrawingOptions.FillColor = new Utils().ColorByName(tkMapColor.Blue);
+            //    sf.Categories.Item[1].DrawingOptions.PointShape = tkPointShapeType.ptShapeCircle;
+            //    sf.Categories.Item[1].DrawingOptions.PointSize = 4;
+            //    sf.Categories.Item[1].DrawingOptions.LineVisible = false;
+
+            //    sf.Categories.ApplyExpressions();
+            //}
+            //else
+            //{
+            //    sf.DefaultDrawingOptions.PointShape = tkPointShapeType.ptShapeCircle;
+            //    sf.DefaultDrawingOptions.PointSize = 4;
+            //    sf.DefaultDrawingOptions.FillColor = new Utils().ColorByName(tkMapColor.Red);
+            //    sf.DefaultDrawingOptions.LineVisible = false;
+            //}
+            //PointShapefile = sf;
+            //GridPointShapefileHandle = MapLayersHandler.AddLayer(PointShapefile, "Grid points", true, true);
+            //}
+            sfPoints.EditClear();
+            sfPoints = null;
+            return MeshShapefileHandle >= 0;
+        }
+
         /// <summary>
         /// make a point shapefile using the coordinates in the data and setup its appearance
         /// </summary>
         /// <returns></returns>
         public static bool MakePointShapefile(bool ShowInland = false)
         {
+            List<string> inlandPoints = new List<string>();
             int iShp = -1;
             int ifldInland = -1;
             var sf = new Shapefile();
-            double distance = 0;
+            //double distance = 0;
             if (sf.CreateNewWithShapeID("", ShpfileType.SHP_POINT))
             {
                 _iFldRow = sf.EditAddField("row", MapWinGIS.FieldType.INTEGER_FIELD, 4, 1);
 
                 if (ShowInland)
                 {
+                    inlandPoints = FishingGrid.InlandPoints;
                     ifldInland = sf.EditAddField("inland", MapWinGIS.FieldType.STRING_FIELD, 1, 1);
                 }
 
                 sf.GeoProjection = GeoProjection;
-                foreach (KeyValuePair<int, (double latitude, double longitude, bool inland)> kv in Coordinates)
+                foreach (KeyValuePair<int, (double latitude, double longitude)> kv in Coordinates)
                 {
                     var shp = new Shape();
                     var pnt = new MapWinGIS.Point();
@@ -1027,45 +1262,46 @@ namespace FAD3.Mapping.Classes
 
                         if (ShowInland)
                         {
-                            string isInland = "F";
-                            if (kv.Value.inland)
+                            var grid25Point = FishingGrid.LongLatToGrid25(pnt.x, pnt.y, UTMZone);
+                            bool isInland = inlandPoints.Contains(grid25Point.grid25Grid);
+                            if (isInland)
                             {
-                                isInland = "T";
+                                InlandPointCount++;
                             }
-                            sf.EditCellValue(ifldInland, iShp, isInland);
+                            sf.EditCellValue(ifldInland, iShp, isInland ? "T" : "F");
                         }
 
-                        if (iShp != 0)
-                        {
-                            distance = new Utils().GeodesicDistance(_cell4Points.First.Value.pt.y, _cell4Points.First.Value.pt.x, pnt.y, pnt.x);
-                        }
+                        //if (iShp != 0)
+                        //{
+                        //    distance = new Utils().GeodesicDistance(_cell4Points.First.Value.pt.y, _cell4Points.First.Value.pt.x, pnt.y, pnt.x);
+                        //}
 
-                        if (_cell4Points.Count == 0)
-                        {
-                            _cell4Points.AddFirst((iShp, pnt, 0));
-                        }
-                        else if (_cell4Points.Count == 4)
-                        {
-                            if (distance < _cell4Points.ElementAt(1).distance)
-                            {
-                                _cell4Points.AddAfter(_cell4Points.First, (iShp, pnt, distance));
-                                _cell4Points.RemoveLast();
-                            }
-                            else if (distance < _cell4Points.ElementAt(2).distance)
-                            {
-                                _cell4Points.AddAfter(_cell4Points.First.Next, (iShp, pnt, distance));
-                                _cell4Points.RemoveLast();
-                            }
-                            else if (distance < _cell4Points.Last.Value.distance)
-                            {
-                                _cell4Points.AddBefore(_cell4Points.Last, (iShp, pnt, distance));
-                                _cell4Points.RemoveLast();
-                            }
-                        }
-                        else
-                        {
-                            _cell4Points.AddLast((iShp, pnt, distance));
-                        }
+                        //if (_cell4Points.Count == 0)
+                        //{
+                        //    _cell4Points.AddFirst((iShp, pnt, 0));
+                        //}
+                        //else if (_cell4Points.Count == 4)
+                        //{
+                        //    if (distance < _cell4Points.ElementAt(1).distance)
+                        //    {
+                        //        _cell4Points.AddAfter(_cell4Points.First, (iShp, pnt, distance));
+                        //        _cell4Points.RemoveLast();
+                        //    }
+                        //    else if (distance < _cell4Points.ElementAt(2).distance)
+                        //    {
+                        //        _cell4Points.AddAfter(_cell4Points.First.Next, (iShp, pnt, distance));
+                        //        _cell4Points.RemoveLast();
+                        //    }
+                        //    else if (distance < _cell4Points.Last.Value.distance)
+                        //    {
+                        //        _cell4Points.AddBefore(_cell4Points.Last, (iShp, pnt, distance));
+                        //        _cell4Points.RemoveLast();
+                        //    }
+                        //}
+                        //else
+                        //{
+                        //    _cell4Points.AddLast((iShp, pnt, distance));
+                        //}
                     }
                 }
             }
@@ -1120,7 +1356,7 @@ namespace FAD3.Mapping.Classes
             {
                 var iRow = sf.EditAddField("row", MapWinGIS.FieldType.INTEGER_FIELD, 4, 1);
                 sf.GeoProjection = GeoProjection;
-                foreach (KeyValuePair<int, (double latitude, double longitude, bool Inland)> kv in Coordinates)
+                foreach (KeyValuePair<int, (double latitude, double longitude)> kv in Coordinates)
                 {
                     var shp = new Shape();
                     if (shp.Create(ShpfileType.SHP_POINT) && shp.AddPoint(kv.Value.longitude, kv.Value.latitude) >= 0)

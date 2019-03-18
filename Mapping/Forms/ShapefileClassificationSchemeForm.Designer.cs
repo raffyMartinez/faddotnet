@@ -30,14 +30,23 @@
         {
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabEqualInterval = new System.Windows.Forms.TabPage();
+            this.btnMakeIntervals = new System.Windows.Forms.Button();
+            this.lblMaxValue = new System.Windows.Forms.Label();
+            this.lblMinValue = new System.Windows.Forms.Label();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.txtSize = new System.Windows.Forms.TextBox();
+            this.txtNumber = new System.Windows.Forms.TextBox();
+            this.rbtnSetSize = new System.Windows.Forms.RadioButton();
+            this.rbtnSetNumber = new System.Windows.Forms.RadioButton();
+            this.listView1 = new System.Windows.Forms.ListView();
             this.tabUserDefined = new System.Windows.Forms.TabPage();
             this.btnOk = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.txtStartValue = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.listView1 = new System.Windows.Forms.ListView();
             this.tabControl.SuspendLayout();
             this.tabEqualInterval.SuspendLayout();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControl
@@ -47,35 +56,127 @@
             this.tabControl.Location = new System.Drawing.Point(0, 12);
             this.tabControl.Name = "tabControl";
             this.tabControl.SelectedIndex = 0;
-            this.tabControl.Size = new System.Drawing.Size(334, 211);
+            this.tabControl.Size = new System.Drawing.Size(334, 297);
             this.tabControl.TabIndex = 0;
             // 
             // tabEqualInterval
             // 
+            this.tabEqualInterval.Controls.Add(this.btnMakeIntervals);
+            this.tabEqualInterval.Controls.Add(this.lblMaxValue);
+            this.tabEqualInterval.Controls.Add(this.lblMinValue);
+            this.tabEqualInterval.Controls.Add(this.groupBox1);
             this.tabEqualInterval.Controls.Add(this.listView1);
-            this.tabEqualInterval.Controls.Add(this.label1);
-            this.tabEqualInterval.Controls.Add(this.textBox1);
             this.tabEqualInterval.Location = new System.Drawing.Point(4, 22);
             this.tabEqualInterval.Name = "tabEqualInterval";
             this.tabEqualInterval.Padding = new System.Windows.Forms.Padding(3);
-            this.tabEqualInterval.Size = new System.Drawing.Size(326, 185);
+            this.tabEqualInterval.Size = new System.Drawing.Size(326, 271);
             this.tabEqualInterval.TabIndex = 0;
             this.tabEqualInterval.Text = "Equal interval";
             this.tabEqualInterval.UseVisualStyleBackColor = true;
+            // 
+            // btnMakeIntervals
+            // 
+            this.btnMakeIntervals.Image = global::FAD3.Properties.Resources.right_arrow;
+            this.btnMakeIntervals.Location = new System.Drawing.Point(170, 122);
+            this.btnMakeIntervals.Name = "btnMakeIntervals";
+            this.btnMakeIntervals.Size = new System.Drawing.Size(24, 24);
+            this.btnMakeIntervals.TabIndex = 6;
+            this.btnMakeIntervals.UseVisualStyleBackColor = true;
+            this.btnMakeIntervals.Click += new System.EventHandler(this.OnButtonClick);
+            // 
+            // lblMaxValue
+            // 
+            this.lblMaxValue.AutoSize = true;
+            this.lblMaxValue.Location = new System.Drawing.Point(17, 38);
+            this.lblMaxValue.Name = "lblMaxValue";
+            this.lblMaxValue.Size = new System.Drawing.Size(83, 13);
+            this.lblMaxValue.TabIndex = 5;
+            this.lblMaxValue.Text = "Maximum value:";
+            // 
+            // lblMinValue
+            // 
+            this.lblMinValue.AutoSize = true;
+            this.lblMinValue.Location = new System.Drawing.Point(17, 16);
+            this.lblMinValue.Name = "lblMinValue";
+            this.lblMinValue.Size = new System.Drawing.Size(80, 13);
+            this.lblMinValue.TabIndex = 4;
+            this.lblMinValue.Text = "Minimum value:";
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.label1);
+            this.groupBox1.Controls.Add(this.txtStartValue);
+            this.groupBox1.Controls.Add(this.txtSize);
+            this.groupBox1.Controls.Add(this.txtNumber);
+            this.groupBox1.Controls.Add(this.rbtnSetSize);
+            this.groupBox1.Controls.Add(this.rbtnSetNumber);
+            this.groupBox1.Location = new System.Drawing.Point(11, 62);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(148, 203);
+            this.groupBox1.TabIndex = 3;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Create intervals";
+            // 
+            // txtSize
+            // 
+            this.txtSize.Location = new System.Drawing.Point(34, 106);
+            this.txtSize.Name = "txtSize";
+            this.txtSize.Size = new System.Drawing.Size(40, 20);
+            this.txtSize.TabIndex = 3;
+            // 
+            // txtNumber
+            // 
+            this.txtNumber.Location = new System.Drawing.Point(34, 49);
+            this.txtNumber.Name = "txtNumber";
+            this.txtNumber.Size = new System.Drawing.Size(40, 20);
+            this.txtNumber.TabIndex = 2;
+            // 
+            // rbtnSetSize
+            // 
+            this.rbtnSetSize.AutoSize = true;
+            this.rbtnSetSize.Location = new System.Drawing.Point(9, 85);
+            this.rbtnSetSize.Name = "rbtnSetSize";
+            this.rbtnSetSize.Size = new System.Drawing.Size(99, 17);
+            this.rbtnSetSize.TabIndex = 1;
+            this.rbtnSetSize.TabStop = true;
+            this.rbtnSetSize.Text = "Set interval size";
+            this.rbtnSetSize.UseVisualStyleBackColor = true;
+            this.rbtnSetSize.CheckedChanged += new System.EventHandler(this.OnCheckStateChanged);
+            // 
+            // rbtnSetNumber
+            // 
+            this.rbtnSetNumber.AutoSize = true;
+            this.rbtnSetNumber.Location = new System.Drawing.Point(9, 26);
+            this.rbtnSetNumber.Name = "rbtnSetNumber";
+            this.rbtnSetNumber.Size = new System.Drawing.Size(133, 17);
+            this.rbtnSetNumber.TabIndex = 0;
+            this.rbtnSetNumber.TabStop = true;
+            this.rbtnSetNumber.Text = "Set number of intervals";
+            this.rbtnSetNumber.UseVisualStyleBackColor = true;
+            this.rbtnSetNumber.CheckedChanged += new System.EventHandler(this.OnCheckStateChanged);
+            // 
+            // listView1
+            // 
+            this.listView1.Location = new System.Drawing.Point(210, 69);
+            this.listView1.Name = "listView1";
+            this.listView1.Size = new System.Drawing.Size(108, 196);
+            this.listView1.TabIndex = 2;
+            this.listView1.UseCompatibleStateImageBehavior = false;
+            this.listView1.View = System.Windows.Forms.View.Details;
             // 
             // tabUserDefined
             // 
             this.tabUserDefined.Location = new System.Drawing.Point(4, 22);
             this.tabUserDefined.Name = "tabUserDefined";
             this.tabUserDefined.Padding = new System.Windows.Forms.Padding(3);
-            this.tabUserDefined.Size = new System.Drawing.Size(326, 185);
+            this.tabUserDefined.Size = new System.Drawing.Size(326, 232);
             this.tabUserDefined.TabIndex = 1;
             this.tabUserDefined.Text = "User defined";
             this.tabUserDefined.UseVisualStyleBackColor = true;
             // 
             // btnOk
             // 
-            this.btnOk.Location = new System.Drawing.Point(278, 229);
+            this.btnOk.Location = new System.Drawing.Point(286, 315);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(44, 25);
             this.btnOk.TabIndex = 1;
@@ -85,7 +186,7 @@
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(221, 229);
+            this.btnCancel.Location = new System.Drawing.Point(229, 315);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(51, 25);
             this.btnCancel.TabIndex = 2;
@@ -93,36 +194,27 @@
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.OnButtonClick);
             // 
-            // textBox1
+            // txtStartValue
             // 
-            this.textBox1.Location = new System.Drawing.Point(108, 21);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(40, 20);
-            this.textBox1.TabIndex = 0;
+            this.txtStartValue.Location = new System.Drawing.Point(9, 169);
+            this.txtStartValue.Name = "txtStartValue";
+            this.txtStartValue.Size = new System.Drawing.Size(99, 20);
+            this.txtStartValue.TabIndex = 4;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(8, 24);
+            this.label1.Location = new System.Drawing.Point(10, 150);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(94, 13);
-            this.label1.TabIndex = 1;
-            this.label1.Text = "Number of classes";
-            // 
-            // listView1
-            // 
-            this.listView1.Location = new System.Drawing.Point(11, 47);
-            this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(307, 132);
-            this.listView1.TabIndex = 2;
-            this.listView1.UseCompatibleStateImageBehavior = false;
-            this.listView1.View = System.Windows.Forms.View.Details;
+            this.label1.Size = new System.Drawing.Size(58, 13);
+            this.label1.TabIndex = 6;
+            this.label1.Text = "Start value";
             // 
             // ShapefileClassificationSchemeForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(334, 262);
+            this.ClientSize = new System.Drawing.Size(334, 347);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnOk);
             this.Controls.Add(this.tabControl);
@@ -133,6 +225,8 @@
             this.tabControl.ResumeLayout(false);
             this.tabEqualInterval.ResumeLayout(false);
             this.tabEqualInterval.PerformLayout();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -145,7 +239,15 @@
         private System.Windows.Forms.Button btnOk;
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.ListView listView1;
+        private System.Windows.Forms.Label lblMaxValue;
+        private System.Windows.Forms.Label lblMinValue;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.TextBox txtSize;
+        private System.Windows.Forms.TextBox txtNumber;
+        private System.Windows.Forms.RadioButton rbtnSetSize;
+        private System.Windows.Forms.RadioButton rbtnSetNumber;
+        private System.Windows.Forms.Button btnMakeIntervals;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox txtStartValue;
     }
 }
