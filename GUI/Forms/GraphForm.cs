@@ -52,75 +52,78 @@ namespace FAD3.GUI.Forms
 
         public void MapDataFile(SeriesChartType chartType)
         {
+            //chartType = SeriesChartType.StackedColumn100;
             if (DataFile.Length > 0)
             {
                 int seriesNo = 0;
                 chart.Series.Clear();
                 TextFieldParser tfp = new TextFieldParser(new StringReader(""));
-                StreamReader strm = new StreamReader(DataFile, true);
-                int inlandPoints = 0;
-                string line;
-                while ((line = strm.ReadLine()) != null)
+                using (StreamReader strm = new StreamReader(DataFile, true))
                 {
-                    if (line == "#BeginData#")
+                    int inlandPoints = 0;
+                    string line;
+                    while ((line = strm.ReadLine()) != null)
                     {
-                        _readingDataLines = true;
-                    }
-                    else if (line == "#EndData#")
-                    {
-                        _readingDataLines = false;
-                        chart.ChartAreas[0].AxisY.Minimum = 0;
-                        chart.ChartAreas[0].AxisY.Maximum = 100;
-                        chart.ChartAreas[0].AxisX.Title = _xVariableName;
-                        chart.ChartAreas[0].AxisX.IsLabelAutoFit = false;
-                        chart.ChartAreas[0].AxisX.LabelStyle.Angle = -90;
-                        chart.ChartAreas[0].AxisX.LabelStyle.Interval = 1;
-                        //chart.Series["Null"].Color = Color.AntiqueWhite;
-                    }
-                    else if (line.Contains("Inland points:"))
-                    {
-                        inlandPoints = int.Parse(getAfter(line, "Inland points:").Trim());
-                    }
-                    else if (line.Contains("Grid variable:"))
-                    {
-                        _xVariableName = line.Substring(line.IndexOf("Grid variable:") + "Grid Variable:".Length, line.Length - (line.IndexOf("Grid variable:") + "Grid Variable:".Length)).Trim();
-                    }
-                    else if (line.Contains("Category "))
-                    {
-                        string seriesName = getBetween(line, ": ", " Color");
-                        _series.Add(seriesNo, seriesName);
-                        var chartSeries = chart.Series.Add(seriesName);
-                        chartSeries.Color = Mapping.Colors.FromARGBString($"{getAfter(line, "Color:")}");
-                        chartSeries.ChartType = chartType;
-                        seriesNo++;
-                    }
-                    else if (_readingDataLines)
-                    {
-                        string[] fields;
-                        tfp = new TextFieldParser(new StringReader(line));
-                        tfp.HasFieldsEnclosedInQuotes = true;
-                        tfp.SetDelimiters("\t");
-
-                        while (!tfp.EndOfData)
+                        if (line == "#BeginData#")
                         {
-                            fields = tfp.ReadFields();
-                            if (fields[0] == "Time period")
+                            _readingDataLines = true;
+                        }
+                        else if (line == "#EndData#")
+                        {
+                            _readingDataLines = false;
+                            chart.ChartAreas[0].AxisY.Minimum = 0;
+                            chart.ChartAreas[0].AxisY.Maximum = 100;
+                            chart.ChartAreas[0].AxisX.Title = _xVariableName;
+                            chart.ChartAreas[0].AxisX.IsLabelAutoFit = false;
+                            chart.ChartAreas[0].AxisX.LabelStyle.Angle = -90;
+                            chart.ChartAreas[0].AxisX.LabelStyle.Interval = 1;
+                            //chart.Series["Null"].Color = Color.AntiqueWhite;
+                        }
+                        else if (line.Contains("Inland points:"))
+                        {
+                            inlandPoints = int.Parse(getAfter(line, "Inland points:").Trim());
+                        }
+                        else if (line.Contains("Grid variable:"))
+                        {
+                            _xVariableName = line.Substring(line.IndexOf("Grid variable:") + "Grid Variable:".Length, line.Length - (line.IndexOf("Grid variable:") + "Grid Variable:".Length)).Trim();
+                        }
+                        else if (line.Contains("Category "))
+                        {
+                            string seriesName = getBetween(line, ": ", " Color");
+                            _series.Add(seriesNo, seriesName);
+                            var chartSeries = chart.Series.Add(seriesName);
+                            chartSeries.Color = Mapping.Colors.FromARGBString($"{getAfter(line, "Color:")}");
+                            chartSeries.ChartType = chartType;
+                            seriesNo++;
+                        }
+                        else if (_readingDataLines)
+                        {
+                            string[] fields;
+                            tfp = new TextFieldParser(new StringReader(line));
+                            tfp.HasFieldsEnclosedInQuotes = true;
+                            tfp.SetDelimiters("\t");
+
+                            while (!tfp.EndOfData)
                             {
-                            }
-                            else
-                            {
-                                for (int n = 1; n < fields.Count(); n++)
+                                fields = tfp.ReadFields();
+                                if (fields[0] == "Time period")
                                 {
-                                    var dp = new DataPoint();
-                                    if (n == fields.Count() - 1)
+                                }
+                                else
+                                {
+                                    for (int n = 1; n < fields.Count(); n++)
                                     {
-                                        dp = chart.Series[_series[n - 1]].Points.Add(int.Parse(fields[n]) - inlandPoints);
+                                        var dp = new DataPoint();
+                                        if (n == fields.Count() - 1)
+                                        {
+                                            dp = chart.Series[_series[n - 1]].Points.Add(int.Parse(fields[n]) - inlandPoints);
+                                        }
+                                        else
+                                        {
+                                            dp = chart.Series[_series[n - 1]].Points.Add(int.Parse(fields[n]));
+                                        }
+                                        dp.AxisLabel = DateTime.Parse(fields[0]).ToString("MMM-dd-yyyy");
                                     }
-                                    else
-                                    {
-                                        dp = chart.Series[_series[n - 1]].Points.Add(int.Parse(fields[n]));
-                                    }
-                                    dp.AxisLabel = DateTime.Parse(fields[0]).ToString("MMM-dd-yyyy");
                                 }
                             }
                         }

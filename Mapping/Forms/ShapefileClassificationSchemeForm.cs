@@ -12,10 +12,13 @@ namespace FAD3.Mapping.Forms
 {
     public partial class ShapefileClassificationSchemeForm : Form
     {
+        public int NumberOfCategories { get { return _intervals.Count; } }
         public double MinimumValue { get; set; }
         public double MaximumValue { get; set; }
-        public int NumberOfClasses { get; set; }
         public string ClassificationScheme { get; set; }
+        public string ParameterToClassify { get; set; }
+        private List<double> _intervals;
+        public List<double> Intervals { get { return _intervals; } }
 
         public ShapefileClassificationSchemeForm()
         {
@@ -24,38 +27,94 @@ namespace FAD3.Mapping.Forms
 
         private void OnButtonClick(object sender, EventArgs e)
         {
-            string msg = "";
             switch (((Button)sender).Name)
             {
                 case "btnMakeIntervals":
-                    if (rbtnSetNumber.Checked)
+                    string msg = "";
+                    double startTarget = 0;
+                    double stepSize = 0;
+                    double endTarget = 0;
+                    int steps = 0;
+                    txtIntervals.Text = "";
+                    if (txtStartValue.Text.Length > 0 && double.TryParse(txtStartValue.Text, out double st))
                     {
-                        if (txtNumber.Text.Length > 0 && int.TryParse(txtNumber.Text, out int v))
+                        startTarget = st;
+                    }
+                    else
+                    {
+                        msg += "Please provide start target\r\n";
+                    }
+
+                    if (txtSize.Text.Length > 0 && double.TryParse(txtSize.Text, out double vv))
+                    {
+                        stepSize = vv;
+                    }
+                    else
+                    {
+                        msg += "Please provide size of step\r\n";
+                    }
+
+                    if (rbtnEndTarget.Checked)
+                    {
+                        if (txtEndTarget.Text.Length > 0 && double.TryParse(txtEndTarget.Text, out double et))
                         {
+                            endTarget = et;
+                            steps = (int)((endTarget - startTarget) / stepSize);
                         }
                         else
                         {
-                            msg = "Please provide number of intervals (whole number is expected)";
+                            msg += "Provide end target";
                         }
                     }
-                    else if (rbtnSetSize.Checked)
+                    else
                     {
-                        if (txtSize.Text.Length > 0 && double.TryParse(txtSize.Text, out double vv))
+                        if (txtNumberOfSteps.Text.Length > 0 && int.TryParse(txtNumberOfSteps.Text, out int ns))
                         {
+                            steps = ns;
                         }
                         else
                         {
-                            msg = "Please provide size of interval";
+                            msg += "Please provide number of steps (whole number is expected)\r\n";
                         }
                     }
+
                     if (msg.Length > 0)
                     {
-                        MessageBox.Show(msg, "A value is required", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBox.Show(msg, "One or more values are required", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        _intervals = new List<double>();
+                        double stepValue = startTarget;
+                        _intervals.Add(stepValue);
+                        for (int n = 0; n < steps; n++)
+                        {
+                            stepValue += stepSize;
+                            _intervals.Add(stepValue);
+                        }
+                        if (rbtnEndTarget.Checked && _intervals.Last() < endTarget)
+                        {
+                            stepValue += stepSize;
+                            _intervals.Add(stepValue);
+                        }
+                        string intervalList = "";
+                        foreach (double item in _intervals)
+                        {
+                            intervalList += $"{item.ToString()}\r\n";
+                        }
+                        txtIntervals.Text = intervalList;
                     }
                     break;
 
                 case "btnOk":
-                    DialogResult = DialogResult.OK;
+                    if (txtIntervals.Text.Length > 0)
+                    {
+                        DialogResult = DialogResult.OK;
+                    }
+                    else
+                    {
+                        MessageBox.Show("Provide list of intervals", "Intervals not found", MessageBoxButtons.OK, MessageBoxIcon.Information); ;
+                    }
                     break;
 
                 case "btnCancel":
@@ -81,30 +140,17 @@ namespace FAD3.Mapping.Forms
                     tabControl.TabPages["tabUserDefined"].Select();
                     break;
             }
-            txtNumber.Enabled = false;
-            txtSize.Enabled = false;
+            Text = ParameterToClassify;
+            txtEndTarget.Enabled = false;
+            txtNumberOfSteps.Enabled = false;
         }
 
-        private void OnCheckStateChanged(object sender, EventArgs e)
+        private void OnCheckChanged(object sender, EventArgs e)
         {
-            txtNumber.Enabled = false;
-            txtSize.Enabled = false;
-            txtSize.Text = "";
-            txtNumber.Text = "";
-            RadioButton rb = (RadioButton)sender;
-            if (rb.Checked)
-            {
-                switch (rb.Name)
-                {
-                    case "rbtnSetNumber":
-                        txtNumber.Enabled = true;
-                        break;
-
-                    case "rbtnSetSize":
-                        txtSize.Enabled = true;
-                        break;
-                }
-            }
+            txtEndTarget.Text = "";
+            txtNumberOfSteps.Text = "";
+            txtEndTarget.Enabled = rbtnEndTarget.Checked;
+            txtNumberOfSteps.Enabled = rbtnNumberOfSteps.Checked;
         }
     }
 }

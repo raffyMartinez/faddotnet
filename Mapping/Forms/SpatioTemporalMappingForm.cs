@@ -44,6 +44,7 @@ namespace FAD3.Mapping.Forms
         private bool _datafileRead;
         private string _startTimePeriod = "";
         private string _endTimePeriod = "";
+        private bool _classificationCancelled = false;
 
         public static SpatioTemporalMappingForm GetInstance()
         {
@@ -83,6 +84,7 @@ namespace FAD3.Mapping.Forms
             DialogResult dr = fileOpen.ShowDialog();
             if (dr == DialogResult.OK && fileOpen.FileName.Length > 0 && File.Exists(fileOpen.FileName))
             {
+                MakeGridFromPoints.Reset(true);
                 _dataSourceFileName = fileOpen.FileName;
                 txtFile.Text = _dataSourceFileName;
                 switch (Path.GetExtension(_dataSourceFileName))
@@ -232,10 +234,15 @@ namespace FAD3.Mapping.Forms
                     break;
 
                 case "btnOpen":
+                    _startTimePeriod = "";
+                    _endTimePeriod = "";
                     cboFirstData.Items.Clear();
                     cboLastData.Items.Clear();
+                    cboFirstData.Text = "";
+                    cboLastData.Text = "";
                     txtRows.Text = "";
-                    MakeGridFromPoints.Reset(false);
+                    txtMetadata.Text = "";
+                    //MakeGridFromPoints.Reset(true);
                     if (OpenFile())
                     {
                         ClearSummary();
@@ -311,6 +318,8 @@ namespace FAD3.Mapping.Forms
 
                 case "btnCategorize":
                     btnCategorize.Enabled = false;
+                    bool categorizationSuccess = false;
+                    _classificationCancelled = false;
 
                     if (txtCategoryCount.Text.Length > 0 && cboLatitude.SelectedIndex >= 0
                         && cboLongitude.SelectedIndex >= 0 && cboFirstData.SelectedIndex >= 0
@@ -325,12 +334,13 @@ namespace FAD3.Mapping.Forms
                         {
                             case "Jenk's-Fisher's":
                                 //btnShowGridPolygons.Enabled = DoJenksFisherCategorization();
-                                DoJenksFisherCategorization();
+                                categorizationSuccess = DoJenksFisherCategorization();
                                 break;
 
                             case "Unique values":
                                 //btnShowGridPolygons.Enabled = DoUniqueValuesCategorization();
-                                DoUniqueValuesCategorization();
+                                categorizationSuccess = DoUniqueValuesCategorization();
+                                txtCategoryCount.Text = _hashSelectedValues.Count.ToString();
                                 break;
 
                             case "User defined":
@@ -341,33 +351,46 @@ namespace FAD3.Mapping.Forms
 
                                 using (ShapefileClassificationSchemeForm scsf = new ShapefileClassificationSchemeForm())
                                 {
+                                    scsf.ParameterToClassify = cboValue.Text;
                                     scsf.ClassificationScheme = cboClassificationScheme.Text;
                                     scsf.MinimumValue = _dataValues.Min();
                                     scsf.MaximumValue = _dataValues.Max();
-                                    scsf.NumberOfClasses = int.Parse(txtCategoryCount.Text);
                                     scsf.ShowDialog();
                                     if (scsf.DialogResult == DialogResult.OK)
                                     {
+                                        categorizationSuccess = DoEqualIntervalCategorization(scsf.Intervals);
+                                        txtCategoryCount.Text = (scsf.NumberOfCategories - 1).ToString();
                                     }
                                     else if (scsf.DialogResult == DialogResult.Cancel)
                                     {
+                                        _classificationCancelled = true;
                                     }
                                 }
 
                                 break;
                         }
                         //summarize the data
-                        txtSelectedValuesCount.Text = _dataValues.Count.ToString();
-                        txtSelectedMinimum.Text = _dataValues.Min().ToString();
-                        txtSelectedMaximum.Text = _dataValues.Max().ToString();
-                        txtSelectedUnique.Text = _hashSelectedValues.Count.ToString();
-                        txtSelectedNumberOfPeriods.Text = listSelectedTimePeriods.Items.Count.ToString();
-                        if (_hasMesh)
+                        if (categorizationSuccess)
                         {
-                            MakeGridFromPoints.SetMeshCategories();
-                            btnExport.Enabled = true;
+                            txtSelectedValuesCount.Text = _dataValues.Count.ToString();
+                            txtSelectedMinimum.Text = _dataValues.Min().ToString();
+                            txtSelectedMaximum.Text = _dataValues.Max().ToString();
+                            txtSelectedUnique.Text = _hashSelectedValues.Count.ToString();
+                            txtSelectedNumberOfPeriods.Text = listSelectedTimePeriods.Items.Count.ToString();
+                            if (_hasMesh)
+                            {
+                                MakeGridFromPoints.SetMeshCategories();
+                                btnExport.Enabled = true;
+                            }
+                            lblStatus.Text = "Finished categorizing data";
                         }
-                        lblStatus.Text = "Finished categorizing data";
+                        else
+                        {
+                            if (!_classificationCancelled)
+                            {
+                                MessageBox.Show("Categorization was not successful. Please close this window and try again", "Categrorization failed", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            }
+                        }
                     }
                     else
                     {
@@ -549,7 +572,6 @@ namespace FAD3.Mapping.Forms
                         }
                         strm.WriteLine("#EndData#");
                     }
-
                     MessageBox.Show("Finished exporting to time series text file");
                     if (chkViewTimeSeriesChart.Checked)
                     {
@@ -587,7 +609,7 @@ namespace FAD3.Mapping.Forms
 
             if (MakeGridFromPoints.RegularShapeGrid)
             {
-                if (MakeGridFromPoints.MakePointShapefile(true, !MakeGridFromPoints.IgnoreInlandPoints))
+                if (MakeGridFromPoints.MakeMeshShapefile(!MakeGridFromPoints.IgnoreInlandPoints))
                 {
                     _hasMesh = MakeGridFromPoints.MeshShapefileHandle > 0;
                     return _hasMesh;
@@ -654,8 +676,64 @@ namespace FAD3.Mapping.Forms
             return 0;
         }
 
+        private bool DoEqualIntervalCategorization(List<double> ListOfIntervals)
+        {
+            if (ListOfIntervals.Count > 0)
+            {
+                dgCategories.Rows.Clear();
+                _dataValues.Sort();
+                var n = 0;
+                var lower = ListOfIntervals.Min();
+                var upper = 0D;
+                int row;
+
+                Color color;
+
+                MakeGridFromPoints.Categories.Clear();
+                ColorBlend blend = (ColorBlend)icbColorScheme.ColorSchemes.List[icbColorScheme.SelectedIndex];
+                MakeGridFromPoints.NumberOfCategories = ListOfIntervals.Count;
+                MakeGridFromPoints.ColorBlend = blend;
+
+                //make categories from the breaks defined in Jenk's-Fisher's
+                //add the category range and color to a datagridview
+                foreach (var item in ListOfIntervals)
+                {
+                    if (n > 0)
+                    {
+                        upper = item;
+                        color = MakeGridFromPoints.AddCategory(lower, upper);
+                        row = dgCategories.Rows.Add(new object[] { $"{lower.ToString("N5")} - {upper.ToString("N5")}", GetClassSize(lower, upper).ToString(), "" });
+                        dgCategories[2, row].Style.BackColor = color;
+                        lower = item;
+                    }
+                    n++;
+                }
+                ////add the last category to the datagridview
+                //color = MakeGridFromPoints.AddCategory(upper, _dataValues.Max() + 1);
+                //row = dgCategories.Rows.Add(new object[] { $"> {ListOfIntervals.Max().ToString("N5")}", GetClassSize(ListOfIntervals.Max(), 0, true).ToString(), "" });
+                //dgCategories[2, row].Style.BackColor = color;
+
+                //add an empty null category
+                MakeGridFromPoints.AddNullCategory();
+                return MakeGridFromPoints.Categories.Count > 0;
+            }
+            return false;
+        }
+
         private bool DoUniqueValuesCategorization()
         {
+            int uniqueValuesCount = int.Parse(txtDatasetUniqueCount.Text);
+            if (uniqueValuesCount > 50)
+            {
+                DialogResult dr = MessageBox.Show($"Dataset contains {uniqueValuesCount} unique values.\r\n Proceed in doing unique values classification?",
+                    "Continue with unique value classification", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+
+                if (dr == DialogResult.No)
+                {
+                    _classificationCancelled = true;
+                    return false;
+                }
+            }
             if (_hashSelectedValues.Count > 0)
             {
                 dgCategories.Rows.Clear();
@@ -677,9 +755,8 @@ namespace FAD3.Mapping.Forms
                 }
                 //add an empty null category
                 MakeGridFromPoints.AddNullCategory();
-                //SizeColumns(dgCategories, false, true);
             }
-            return _hashSelectedValues.Count > 0;
+            return MakeGridFromPoints.Categories.Count > 0;
         }
 
         /// <summary>
@@ -728,7 +805,7 @@ namespace FAD3.Mapping.Forms
                 MakeGridFromPoints.AddNullCategory();
 
                 //SizeColumns(dgCategories, false, true);
-                return listBreaks.Count > 0;
+                return MakeGridFromPoints.Categories.Count > 0;
             }
             return false;
         }
@@ -915,9 +992,11 @@ namespace FAD3.Mapping.Forms
                         break;
                 }
 
+                //update mesh with values from the selected month then categorize the column
                 MakeGridFromPoints.MapColumn(_columnValues, lblMappedSheet.Text, _classificationScheme);
 
-                global.MappingForm.MapControl.Redraw();
+                //redraw the map to show the newly edited categories
+                //global.MappingForm.MapControl.Redraw();
 
                 graphSheet.Series.Clear();
                 graphSheet.ChartAreas[0].AxisY.Minimum = 0;
@@ -942,43 +1021,50 @@ namespace FAD3.Mapping.Forms
 
         private void UpdateSheetSummary(Dictionary<string, int> summary)
         {
-            double percent = 0D;
-            var row = 0;
-            dgSheetSummary.Rows.Clear();
-            foreach (KeyValuePair<string, int> kv in summary)
+            if (MakeGridFromPoints.Categories.Count > 0)
             {
-                // string category = dgCategories[0, row].Value.ToString();
-                //var col2Text = "";
-                if (kv.Key == "Null")
+                double percent = 0D;
+                var row = 0;
+                dgSheetSummary.Rows.Clear();
+                foreach (KeyValuePair<string, int> kv in summary)
                 {
-                    //col2Text = "Null";
-                    percent = ((double)(kv.Value - MakeGridFromPoints.InlandPointCount) / (double)(_dataPoints - MakeGridFromPoints.InlandPointCount)) * 100;
-                    row = dgSheetSummary.Rows.Add(new object[] { true, "Null", "", (kv.Value - MakeGridFromPoints.InlandPointCount).ToString(), percent.ToString("N1") });
-                }
-                else
-                {
-                    percent = ((double)kv.Value / (double)(_dataPoints - MakeGridFromPoints.InlandPointCount)) * 100;
-                    row = dgSheetSummary.Rows.Add(new object[] { true, "", "", kv.Value.ToString(), percent.ToString("N1") });
-                }
+                    // string category = dgCategories[0, row].Value.ToString();
+                    //var col2Text = "";
+                    if (kv.Key == "Null")
+                    {
+                        //col2Text = "Null";
+                        percent = ((double)(kv.Value - MakeGridFromPoints.InlandPointCount) / (double)(_dataPoints - MakeGridFromPoints.InlandPointCount)) * 100;
+                        row = dgSheetSummary.Rows.Add(new object[] { true, "Null", "", (kv.Value - MakeGridFromPoints.InlandPointCount).ToString(), percent.ToString("N1") });
+                    }
+                    else
+                    {
+                        percent = ((double)kv.Value / (double)(_dataPoints - MakeGridFromPoints.InlandPointCount)) * 100;
+                        row = dgSheetSummary.Rows.Add(new object[] { true, "", "", kv.Value.ToString(), percent.ToString("N1") });
+                    }
 
-                var pt = graphSheet.Series["summary"].Points.AddY(percent);
-                if (row < dgCategories.Rows.Count)
-                {
-                    dgSheetSummary[1, row].Value = dgCategories[0, row].Value.ToString();
+                    var pt = graphSheet.Series["summary"].Points.AddY(percent);
+                    if (row < dgCategories.Rows.Count)
+                    {
+                        dgSheetSummary[1, row].Value = dgCategories[0, row].Value.ToString();
+                    }
+                    dgSheetSummary[2, row].Style.BackColor = MakeGridFromPoints.CategoryColor(row);
+                    graphSheet.Series["summary"].Points[pt].Color = dgSheetSummary[2, row].Style.BackColor;
+                    graphSheet.Series["summary"].Points[pt].BorderColor = Color.Black;
+                    dgSheetSummary[0, row].Value = MakeGridFromPoints.GridShapefile.Categories.Item[row].DrawingOptions.FillVisible;
+                    if (MakeGridFromPoints.GridShapefile.Categories.Item[row].Name == "nullCategory")
+                    {
+                        dgSheetSummary[0, row].Value = !MakeGridFromPoints.GridShapefile.Categories.Item[row].DrawingOptions.FillVisible;
+                    }
                 }
-                dgSheetSummary[2, row].Style.BackColor = MakeGridFromPoints.CategoryColor(row);
-                graphSheet.Series["summary"].Points[pt].Color = dgSheetSummary[2, row].Style.BackColor;
-                graphSheet.Series["summary"].Points[pt].BorderColor = Color.Black;
-                dgSheetSummary[0, row].Value = MakeGridFromPoints.GridShapefile.Categories.Item[row].DrawingOptions.FillVisible;
-                if (MakeGridFromPoints.GridShapefile.Categories.Item[row].Name == "nullCategory")
-                {
-                    dgSheetSummary[0, row].Value = !MakeGridFromPoints.GridShapefile.Categories.Item[row].DrawingOptions.FillVisible;
-                }
+                dgSheetSummary.ClearSelection();
+                dgSheetSummary.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCellsExceptHeader;
+                dgSheetSummary.Columns[1].MinimumWidth = 100;
+                //SizeColumns(dgSheetSummary, false);
             }
-            dgSheetSummary.ClearSelection();
-            dgSheetSummary.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCellsExceptHeader;
-            dgSheetSummary.Columns[1].MinimumWidth = 100;
-            //SizeColumns(dgSheetSummary, false);
+            else
+            {
+                Logger.Log("mesh shapefile categories was not created");
+            }
         }
 
         private void MapSheet(bool forward, bool fromArrowKeys = false)
