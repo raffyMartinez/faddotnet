@@ -147,6 +147,7 @@
             this.txtEndTarget.Name = "txtEndTarget";
             this.txtEndTarget.Size = new System.Drawing.Size(79, 20);
             this.txtEndTarget.TabIndex = 9;
+            this.txtEndTarget.Validating += new System.ComponentModel.CancelEventHandler(this.OnTextValidating);
             // 
             // rbtnNumberOfSteps
             // 
@@ -184,6 +185,7 @@
             this.txtStartValue.Name = "txtStartValue";
             this.txtStartValue.Size = new System.Drawing.Size(79, 20);
             this.txtStartValue.TabIndex = 4;
+            this.txtStartValue.Validating += new System.ComponentModel.CancelEventHandler(this.OnTextValidating);
             // 
             // txtSize
             // 
@@ -191,6 +193,7 @@
             this.txtSize.Name = "txtSize";
             this.txtSize.Size = new System.Drawing.Size(79, 20);
             this.txtSize.TabIndex = 3;
+            this.txtSize.Validating += new System.ComponentModel.CancelEventHandler(this.OnTextValidating);
             // 
             // txtNumberOfSteps
             // 
@@ -198,6 +201,7 @@
             this.txtNumberOfSteps.Name = "txtNumberOfSteps";
             this.txtNumberOfSteps.Size = new System.Drawing.Size(79, 20);
             this.txtNumberOfSteps.TabIndex = 2;
+            this.txtNumberOfSteps.Validating += new System.ComponentModel.CancelEventHandler(this.OnTextValidating);
             // 
             // tabUserDefined
             // 

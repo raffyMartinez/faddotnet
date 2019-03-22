@@ -495,6 +495,11 @@ namespace FAD3.Mapping.Forms
                         strm.WriteLine($"Classification used: {_classificationScheme}");
                         strm.WriteLine($"Number of classes: {dgCategories.Rows.Count.ToString()}");
                         strm.WriteLine($"Inland points: {txtInlandPoints.Text}");
+                        if (MakeGridFromPoints.Metadata?.Length > 0)
+                        {
+                            strm.WriteLine($"Variable long name: { MakeGridFromPoints.ValueParametersDictionary[MakeGridFromPoints.SelectedParameter].longName}");
+                            strm.WriteLine($"Variable unit: {MakeGridFromPoints.ValueParametersDictionary[MakeGridFromPoints.SelectedParameter].units}");
+                        }
                         //write category ranges
                         string categoryRange = "";
                         for (int brk = 0; brk < dgCategories.RowCount; brk++)
@@ -507,7 +512,8 @@ namespace FAD3.Mapping.Forms
                                 }
                                 else
                                 {
-                                    categoryRange = $"{dgCategories.Rows[brk].Cells[0].Value.ToString().Replace("> ", "")} - {txtSelectedMaximum.Text}";
+                                    //categoryRange = $"{dgCategories.Rows[brk].Cells[0].Value.ToString().Replace("> ", "")} - {txtSelectedMaximum.Text}";
+                                    categoryRange = $"{dgCategories.Rows[brk].Cells[0].Value.ToString().Replace("> ", "")}";
                                 }
                             }
                             else
@@ -575,10 +581,17 @@ namespace FAD3.Mapping.Forms
                     MessageBox.Show("Finished exporting to time series text file");
                     if (chkViewTimeSeriesChart.Checked)
                     {
-                        GraphForm gf = new GraphForm();
-                        gf.DataFile = _exportedTimeSeriesFileName;
-                        gf.MapDataFile(SeriesChartType.StackedArea100);
-                        gf.Show(this);
+                        GraphForm gf = GraphForm.GetInstance();
+                        if (gf.Visible)
+                        {
+                            gf.BringToFront();
+                        }
+                        else
+                        {
+                            gf.DataFile = _exportedTimeSeriesFileName;
+                            gf.MapSpatioTemporalData(SeriesChartType.StackedArea100);
+                            gf.Show(this);
+                        }
                     }
                 }
             }
@@ -798,13 +811,12 @@ namespace FAD3.Mapping.Forms
                 }
                 //add the last category to the datagridview
                 color = MakeGridFromPoints.AddCategory(upper, _dataValues.Max() + 1);
-                row = dgCategories.Rows.Add(new object[] { $"> {listBreaks.Max().ToString("N5")}", GetClassSize(listBreaks.Max(), 0, true).ToString(), "" });
+                row = dgCategories.Rows.Add(new object[] { $"{listBreaks.Max().ToString("N5")} - {_dataValues.Max().ToString("N5")}", GetClassSize(listBreaks.Max(), 0, true).ToString(), "" });
                 dgCategories[2, row].Style.BackColor = color;
 
                 //add an empty null category
                 MakeGridFromPoints.AddNullCategory();
 
-                //SizeColumns(dgCategories, false, true);
                 return MakeGridFromPoints.Categories.Count > 0;
             }
             return false;
@@ -884,7 +896,8 @@ namespace FAD3.Mapping.Forms
         }
 
         /// <summary>
-        /// lists the headers of the data columns in a listbox
+        /// lists the time periods of the data columns in a listbox and puts all the associated
+        /// grid parameter values in a list<double> and a hashset<>.  The list will be used for subsequent classification.
         /// </summary>
         private void listTimePeriodsForMapping()
         {
@@ -994,9 +1007,6 @@ namespace FAD3.Mapping.Forms
 
                 //update mesh with values from the selected month then categorize the column
                 MakeGridFromPoints.MapColumn(_columnValues, lblMappedSheet.Text, _classificationScheme);
-
-                //redraw the map to show the newly edited categories
-                //global.MappingForm.MapControl.Redraw();
 
                 graphSheet.Series.Clear();
                 graphSheet.ChartAreas[0].AxisY.Minimum = 0;
@@ -1248,7 +1258,7 @@ namespace FAD3.Mapping.Forms
             {
                 icbColorScheme.SelectedIndex = 0;
             }
-            txtMetadata.Text = "";
+            txtMetadata.Text = "Only NCCVS format includes  metadata";
             txtCategoryCount.Text = "5";
             listSelectedTimePeriods.Enabled = false;
             Text = "Spatio-Temporal Mapping";

@@ -56,7 +56,7 @@ namespace FAD3.Mapping.Forms
 
                     if (rbtnEndTarget.Checked)
                     {
-                        if (txtEndTarget.Text.Length > 0 && double.TryParse(txtEndTarget.Text, out double et))
+                        if (txtSize.Text.Length > 0 && txtEndTarget.Text.Length > 0 && double.TryParse(txtEndTarget.Text, out double et))
                         {
                             endTarget = et;
                             steps = (int)((endTarget - startTarget) / stepSize);
@@ -68,7 +68,7 @@ namespace FAD3.Mapping.Forms
                     }
                     else
                     {
-                        if (txtNumberOfSteps.Text.Length > 0 && int.TryParse(txtNumberOfSteps.Text, out int ns))
+                        if (txtSize.Text.Length > 0 && txtNumberOfSteps.Text.Length > 0 && int.TryParse(txtNumberOfSteps.Text, out int ns))
                         {
                             steps = ns;
                         }
@@ -151,6 +151,43 @@ namespace FAD3.Mapping.Forms
             txtNumberOfSteps.Text = "";
             txtEndTarget.Enabled = rbtnEndTarget.Checked;
             txtNumberOfSteps.Enabled = rbtnNumberOfSteps.Checked;
+        }
+
+        private void OnTextValidating(object sender, CancelEventArgs e)
+        {
+            string s = ((TextBox)sender).Text;
+            string msg = "";
+            if (s.Length > 0)
+            {
+                switch (((TextBox)sender).Name)
+                {
+                    case "txtStartValue":
+                    case "txtEndTarget":
+                    case "txtSize":
+                        e.Cancel = !double.TryParse(s, out double d);
+                        if (e.Cancel)
+                        {
+                            msg = "Expected value is a number";
+                        }
+                        break;
+
+                    case "txtNumberOfSteps":
+                        e.Cancel = !int.TryParse(s, out int i);
+                        if (!e.Cancel)
+                        {
+                            e.Cancel = i <= 0;
+                        }
+                        if (e.Cancel)
+                        {
+                            msg = "Expected value is a whole numeber greater than zero";
+                        }
+                        break;
+                }
+            }
+            if (e.Cancel)
+            {
+                MessageBox.Show(msg, "Validationg error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
     }
 }

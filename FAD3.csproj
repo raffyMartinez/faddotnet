@@ -1057,6 +1057,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="FAD3.ico" />
+    <None Include="Resources\label+.bmp" />
+    <None Include="Resources\label-.bmp" />
     <None Include="Resources\right arrow.bmp" />
     <None Include="Resources\left arrow.bmp" />
     <None Include="Resources\xy point.bmp" />

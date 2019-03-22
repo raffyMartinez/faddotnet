@@ -46,6 +46,14 @@ namespace FAD3
             get { return _grid25.MajorGridSizeMeters; }
         }
 
+        /// <summary>
+        /// given a long-lat pair and UTM zone, returns a tuple that contains the grid25 cell name and the UTM coordinates of the centroid of the grid25 cell
+        /// </summary>
+        /// <param name="longitude"></param>
+        /// <param name="latitude"></param>
+        /// <param name="utmZone"></param>
+        /// <param name="datumName"></param>
+        /// <returns></returns>
         public static (string grid25Grid, double easting, double northing, bool isValid) LongLatToGrid25(double longitude, double latitude, fadUTMZone utmZone = fadUTMZone.utmZone51N, string datumName = "WGS 84")
         {
             bool proceed = true;

@@ -20,6 +20,15 @@ namespace FAD3.GUI.Forms
         private bool _readingDataLines;
         private string _xVariableName;
         private Dictionary<int, string> _series;
+        private bool _hasLongName;
+        private static GraphForm _instance;
+        private Font _newFont;
+
+        public static GraphForm GetInstance()
+        {
+            if (_instance == null) _instance = new GraphForm();
+            return _instance;
+        }
 
         private string getAfter(string strSource, string strStart)
         {
@@ -50,11 +59,14 @@ namespace FAD3.GUI.Forms
             }
         }
 
-        public void MapDataFile(SeriesChartType chartType)
+        public void MapSpatioTemporalData(SeriesChartType chartType)
         {
             //chartType = SeriesChartType.StackedColumn100;
             if (DataFile.Length > 0)
             {
+                _hasLongName = false;
+                string variableLongName = "";
+                string variableUnit = "";
                 int seriesNo = 0;
                 chart.Series.Clear();
                 TextFieldParser tfp = new TextFieldParser(new StringReader(""));
@@ -76,12 +88,23 @@ namespace FAD3.GUI.Forms
                             chart.ChartAreas[0].AxisX.Title = _xVariableName;
                             chart.ChartAreas[0].AxisX.IsLabelAutoFit = false;
                             chart.ChartAreas[0].AxisX.LabelStyle.Angle = -90;
-                            chart.ChartAreas[0].AxisX.LabelStyle.Interval = 1;
                             //chart.Series["Null"].Color = Color.AntiqueWhite;
                         }
                         else if (line.Contains("Inland points:"))
                         {
                             inlandPoints = int.Parse(getAfter(line, "Inland points:").Trim());
+                        }
+                        else if (line.Contains("Variable unit:"))
+                        {
+                            variableUnit = getAfter(line, "Variable unit:").Trim();
+                            chart.Legends[0].Name = variableUnit;
+                            chart.Legends[0].Title = variableUnit;
+                        }
+                        else if (line.Contains("Variable long name:"))
+                        {
+                            _hasLongName = true;
+                            variableLongName = getAfter(line, "Variable long name:").Trim();
+                            Text = $"Time series: {variableLongName}";
                         }
                         else if (line.Contains("Grid variable:"))
                         {
@@ -129,6 +152,10 @@ namespace FAD3.GUI.Forms
                         }
                     }
                 }
+                if (!_hasLongName)
+                {
+                    Text = $"Time series: {_xVariableName}";
+                }
             }
         }
 
@@ -141,11 +168,47 @@ namespace FAD3.GUI.Forms
         private void OnFormLoad(object sender, EventArgs e)
         {
             global.LoadFormSettings(this);
+            chart.ChartAreas[0].AxisX.LabelStyle.Interval = 1;
+            txtLabelInterval.Text = chart.ChartAreas[0].AxisX.LabelStyle.Interval.ToString();
+            chart.ChartAreas[0].AxisX.MinorTickMark.Enabled = true;
+            chart.ChartAreas[0].AxisX.MinorTickMark.Interval = 1;
+            txtMinorGridInterval.Text = chart.ChartAreas[0].AxisX.MinorTickMark.Interval.ToString();
+            chart.ChartAreas[0].AxisX.MinorTickMark.Size = 1;
         }
 
         private void OnFormClosed(object sender, FormClosedEventArgs e)
         {
             global.SaveFormSettings(this);
+            _instance = null;
+        }
+
+        private void OnButtonClick(object sender, EventArgs e)
+        {
+            switch (((Button)sender).Name)
+            {
+                case "btnApply":
+                    chart.ChartAreas[0].AxisX.LabelStyle.Interval = int.Parse(txtLabelInterval.Text);
+                    chart.ChartAreas[0].AxisX.MinorTickMark.Interval = int.Parse(txtMinorGridInterval.Text);
+                    if (_newFont != null)
+                    {
+                        chart.ChartAreas[0].AxisX.LabelStyle.Font = _newFont;
+                    }
+                    tabsChart.SelectedTab = tabsChart.TabPages["tabGraph"];
+                    _newFont = null;
+                    //tabGraph.Select();
+                    break;
+
+                case "btnXaxisLabelFont":
+                    _newFont = null;
+                    FontDialog fd = new FontDialog();
+                    fd.Font = chart.ChartAreas[0].AxisX.LabelStyle.Font;
+                    DialogResult dr = fd.ShowDialog();
+                    if (dr == DialogResult.OK)
+                    {
+                        _newFont = fd.Font;
+                    }
+                    break;
+            }
         }
     }
 }

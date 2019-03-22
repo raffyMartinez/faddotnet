@@ -24,7 +24,7 @@ namespace FAD3.Mapping.Classes
 
         private static Dictionary<string, Dictionary<int, double?>> _dictTemporalValues = new Dictionary<string, Dictionary<int, double?>>();
         public static Dictionary<int, (double latitude, double longitude)> Coordinates { get; internal set; }
-        public static Dictionary<int, bool> RowsInland { get; internal set; }
+        private static Dictionary<int, bool> _rowsInland;
         public static Shapefile PointShapefile { get; internal set; }                                         //pointshapefile of datapoints
         public static GeoProjection GeoProjection { get; set; }
         public static MapInterActionHandler MapInteractionHandler { get; set; }
@@ -92,6 +92,8 @@ namespace FAD3.Mapping.Classes
                 return _hashSet.Min();
             }
         }
+
+        public static Dictionary<string, (string dataType, string fillValue, string longName, string missingValue, string units)> ValueParametersDictionary { get { return _dictValueParameters; } }
 
         private static Dictionary<string, (string dataType, string fillValue, string longName, string missingValue, string units)> _dictValueParameters = new Dictionary<string, (string dataType, string fillValue, string longName, string missingValue, string units)>();
 
@@ -318,6 +320,12 @@ namespace FAD3.Mapping.Classes
                 _metadataRows++;
             }
 
+            //if (addToDict)
+            //{
+            //    _dictValueParameters.Add(currentValue, (dataType, fillValue, longName, missingValue, units));
+            //    addToDict = false;
+            //}
+
             //read fields
             line = sr.ReadLine();
             tfp = new TextFieldParser(new StringReader(line));
@@ -357,6 +365,7 @@ namespace FAD3.Mapping.Classes
 
         public static List<string> GetFields()
         {
+            Metadata = "";
             _pointCountPerTimeEra = 0;
             int timeRow = 0;
             CSVReadError = "";
@@ -500,7 +509,7 @@ namespace FAD3.Mapping.Classes
             if (_newCSVFile)
             {
                 Coordinates = new Dictionary<int, (double latitude, double longitude)>();
-                RowsInland = new Dictionary<int, bool>();
+                _rowsInland = new Dictionary<int, bool>();
                 _latList = new List<double>();
                 _lonList = new List<double>();
                 _inlandCoordinates = new List<(double lon, double lat)>();
@@ -582,6 +591,7 @@ namespace FAD3.Mapping.Classes
                 int row = 0;
                 bool proceesCoordinates = true;
 
+                //read the rest of the file until EOF
                 while ((line = sr.ReadLine()) != null)
                 {
                     //each row we put in a textfieldparser
@@ -597,11 +607,18 @@ namespace FAD3.Mapping.Classes
                     {
                         if (row == _pointCountPerTimeEra)
                         {
+                            //we reached the number of rows per time period
+
                             row = 0;
+
+                            //we stop reading coordinates for the next set of time periods
                             proceesCoordinates = false;
 
                             pointValueCopy = new Dictionary<int, double?>(pointValue);
+
+                            //add the grid variable values to a dictionary keyed by timeperiod
                             _dictTemporalValues.Add(timeEra, pointValueCopy);
+
                             pointValue.Clear();
 
                             EventHandler<ParseCSVEventArgs> readCSVEvent = OnCSVRead;
@@ -646,7 +663,7 @@ namespace FAD3.Mapping.Classes
                         }
                     }
 
-                    //we process each column of a data row
+                    //we process grid variables and coordinates here
                     if (inData)
                     {
                         //we only process coordinates for the first time slice of the data
@@ -663,23 +680,28 @@ namespace FAD3.Mapping.Classes
                                 _lonList.Add(lon);
                             }
 
+                            //process inland points here.
                             if (!IgnoreInlandPoints)
                             {
+                                //we find out what grid25 cell contains a coordinate
                                 var grid25Point = FishingGrid.LongLatToGrid25(lon, lat, UTMZone);
+
+                                //if the grid25 name is in the inlandPoints list then that coordinate is inland
                                 bool isInland = inlandPoints.Contains(grid25Point.grid25Grid);
+
                                 if (isInland)
                                 {
                                     _inlandCoordinates.Add((lon, lat));
                                     InlandPointCount++;
                                 }
-                                RowsInland.Add(row, isInland);
+                                _rowsInland.Add(row, isInland);
                             }
 
                             Coordinates.Add(row, (lat, lon));
                             OnCSVRead?.Invoke(null, new ParseCSVEventArgs(true));
                         }
 
-                        //we process the grid variable of the data
+                        //we process the grid variables of the data
                         switch (dataType)
                         {
                             case "float":
@@ -698,7 +720,7 @@ namespace FAD3.Mapping.Classes
                                     {
                                         if (!IgnoreInlandPoints)
                                         {
-                                            if (RowsInland[row])
+                                            if (_rowsInland[row])
                                             {
                                                 //if the datapoint is inland we change its value to null
                                                 pointValue.Add(row, null);
@@ -731,7 +753,7 @@ namespace FAD3.Mapping.Classes
                                     {
                                         if (!IgnoreInlandPoints)
                                         {
-                                            if (RowsInland[row])
+                                            if (_rowsInland[row])
                                             {
                                                 //if the datapoint is inland we change its value to null
                                                 pointValue.Add(row, null);
@@ -753,12 +775,12 @@ namespace FAD3.Mapping.Classes
                                 }
                                 break;
                         }
-
                         row++;
                     }
                 }
             }
 
+            //special case when data only contains one time period
             if (_dictTemporalValues.Count == 0)
             {
                 pointValueCopy = new Dictionary<int, double?>(pointValue);
@@ -766,12 +788,14 @@ namespace FAD3.Mapping.Classes
                 pointValue.Clear();
             }
 
+            //determine if data grid is a regularly shaped grid with rectangular shaped cells
             if (_newCSVFile && Coordinates.Count == (_latList.Count * _lonList.Count))
             {
                 RegularShapeGrid = true;
-                //Coordinates.Clear();
-                //Coordinates = null;
+                Coordinates.Clear();
+                Coordinates = null;
             }
+
             ParsingTimeSeconds = (DateTime.Now - start).TotalSeconds;
             _newCSVFile = false;
 
@@ -783,11 +807,12 @@ namespace FAD3.Mapping.Classes
             IsNCCSVFormat = false;
             _pointCountPerTimeEra = 0;
             _categories.Clear();
+            _metadataRows = 0;
             InlandPointCount = 0;
             if (resetCoordinates && Coordinates != null)
             {
                 Coordinates.Clear();
-                RowsInland.Clear();
+                _rowsInland.Clear();
             }
             if (PointShapefile != null)
             {
@@ -1169,7 +1194,8 @@ namespace FAD3.Mapping.Classes
                 }
 
                 int iMeshShp = -1;
-
+                //_latList.Sort();
+                //_lonList.Sort();
                 foreach (double lat in _latList)
                 {
                     foreach (double lon in _lonList)
