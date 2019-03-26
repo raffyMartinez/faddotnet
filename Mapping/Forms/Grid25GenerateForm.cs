@@ -25,9 +25,13 @@ namespace FAD3
         private double _dragHeight;
         private bool _gridFromFileLoaded;
         private Grid25LayoutHelperForm _g25lhf;
+        private bool _hasSubGrid;
+        private int _subGridCount;
 
         public string FishingGround { get; internal set; }
         public string LayoutGridSaveFolder { get; internal set; }
+        public bool HasSubGrid { get { return _hasSubGrid; } }
+        public int SubGridCount { get { return _subGridCount; } }
 
         public Grid25LayoutHelperForm LayoutHelperForm
         {
@@ -119,6 +123,8 @@ namespace FAD3
             _labelAndGridProperties.Add("minorGridLineColor", ColorToUInt(shapeMinorGridLineColor.FillColor));
             _labelAndGridProperties.Add("minorGridLabelFontBold", (uint)(chkBold.Checked ? 1 : 0));
             _labelAndGridProperties.Add("minorGridLabelWrapped", (uint)(chkWrapLabels.Checked ? 1 : 0));
+            _labelAndGridProperties.Add("subGridLineThickness", FactorBy100(txtSubGridThickness.Text));
+            _labelAndGridProperties.Add("subGridLineColor", ColorToUInt(shapeSubGridLineColor.FillColor));
         }
 
         public void GridMapStatusUpdate(double top, double left, double right, double bottom,
@@ -167,6 +173,21 @@ namespace FAD3
         {
             switch (((Button)sender).Name)
             {
+                case "buttonSubGrid":
+                    _hasSubGrid = false;
+                    using (Grid25SubGridForm sgf = new Grid25SubGridForm())
+                    {
+                        sgf.SubGridCount = _subGridCount;
+                        sgf.ShowDialog();
+                        if (sgf.DialogResult == DialogResult.OK)
+                        {
+                            _hasSubGrid = true;
+                            _subGridCount = sgf.SubGridCount;
+                        }
+                    }
+
+                    break;
+
                 //updates the grid labels with changes inputted into the properies dictionary
                 case "buttonLabel":
                     if (_grid25MajorGrid.grid25LabelManager != null && _grid25MajorGrid.grid25LabelManager.Grid25Labels.NumShapes > 0)
@@ -181,7 +202,8 @@ namespace FAD3
                     if (txtMinorGridLabelDistance.Text.Length > 0 && txtMinorGridLabelSize.Text.Length > 0)
                     {
                         SetupDictionary();
-
+                        _grid25MajorGrid.HasSubgrid = _hasSubGrid;
+                        _grid25MajorGrid.SubGridCount = _subGridCount;
                         if (_grid25MajorGrid.DefineMinorGrid((int)((Bitmap)imList.Images["gridCursor"]).GetHicon()))
                         {
                             _grid25MajorGrid.LabelAndGridProperties = _labelAndGridProperties;
@@ -206,6 +228,7 @@ namespace FAD3
                     }
                     _grid25MajorGrid.ClearSelectedGrids();
                     _parentForm.SetCursor(MapWinGIS.tkCursorMode.cmSelection);
+                    _hasSubGrid = false;
                     break;
 
                 case "buttonClose":
@@ -221,7 +244,7 @@ namespace FAD3
                             SetupDictionary();
                             _grid25MajorGrid.LabelAndGridProperties = _labelAndGridProperties;
                             _grid25MajorGrid.DefineGridLayout((int)((Bitmap)imList.Images["gridLayout"]).GetHicon());
-                            _g25lhf = Grid25LayoutHelperForm.GetInstance(_grid25MajorGrid);
+                            _g25lhf = Grid25LayoutHelperForm.GetInstance(_grid25MajorGrid, this);
 
                             if (_g25lhf.Visible)
                             {
@@ -380,6 +403,8 @@ namespace FAD3
             txtBorderThickness.Text = "2";
             txtMajorGridThickness.Text = "2";
             txtMinorGridThickness.Text = "1";
+            txtSubGridThickness.Text = "1";
+            _subGridCount = 0;
             chkLeft.Checked = true;
             chkTop.Checked = true;
             chkRight.Checked = true;

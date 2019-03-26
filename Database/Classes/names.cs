@@ -139,6 +139,7 @@ namespace FAD3
                                 if (xmlReader.Name == "LocalName")
                                 {
                                     localNameGuid = xmlReader.GetAttribute("guid");
+                                    localName = xmlReader.GetAttribute("value");
                                     elementCounter++;
                                 }
 
@@ -289,6 +290,7 @@ namespace FAD3
                                 if (xmlReader.Name == "Language")
                                 {
                                     languageGuid = xmlReader.GetAttribute("guid");
+                                    language = xmlReader.GetAttribute("value");
                                     elementCounter++;
                                 }
 
@@ -1346,7 +1348,7 @@ namespace FAD3
 
         public static Dictionary<string, CatchName> RetrieveScientificNames(Dictionary<string, string> filters = null, bool selectOnlyWithRecords = false)
         {
-            System.Windows.Forms.MessageBox.Show(MethodBase.GetCurrentMethod().DeclaringType.Name + MethodBase.GetCurrentMethod().Name);
+            //System.Windows.Forms.MessageBox.Show(MethodBase.GetCurrentMethod().DeclaringType.Name + MethodBase.GetCurrentMethod().Name);
             var catchNames = new Dictionary<string, CatchName>();
             var filter = "";
             if (filters != null)

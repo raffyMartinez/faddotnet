@@ -512,7 +512,6 @@ namespace FAD3.Mapping.Forms
                                 }
                                 else
                                 {
-                                    //categoryRange = $"{dgCategories.Rows[brk].Cells[0].Value.ToString().Replace("> ", "")} - {txtSelectedMaximum.Text}";
                                     categoryRange = $"{dgCategories.Rows[brk].Cells[0].Value.ToString().Replace("> ", "")}";
                                 }
                             }

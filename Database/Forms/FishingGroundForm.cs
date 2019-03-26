@@ -15,6 +15,8 @@ namespace FAD3
         private List<string> _FishingGrounds;
         private ListViewItem _selectedItem;
         private SamplingForm _parent_form;
+        public int? SubGrid { get; internal set; }
+        public string GridName { get; internal set; }
 
         public FishingGroundForm(string AOIGuid, SamplingForm Parent)
         {
@@ -76,6 +78,9 @@ namespace FAD3
             {
                 tabFG.TabPages["tabGridOther"].Select();
             }
+
+            textBoxSubGrid.Enabled = FishingGrid.SubGridStyle != fadSubgridSyle.SubgridStyleNone;
+            lblSubGrid.Enabled = textBoxSubGrid.Enabled;
 
             global.LoadFormSettings(this, true);
             global.MapperOpen += OnMapperOpened;
@@ -158,6 +163,42 @@ namespace FAD3
                             msg = "Expected value is a number from 1 to 25";
                         }
                         break;
+
+                    case "textBoxSubGrid":
+                        if (int.TryParse(textBoxSubGrid.Text, out int sg) && sg > 1 && sg < 10)
+                        {
+                            switch (FishingGrid.SubGridStyle)
+                            {
+                                case fadSubgridSyle.SubgridStyle4:
+                                    if (sg > 4)
+                                    {
+                                        msg = "Expected value is a number from 1 to 4";
+                                    }
+                                    break;
+
+                                case fadSubgridSyle.SubgridStyle9:
+                                    if (sg > 9)
+                                    {
+                                        msg = "Expected value is a number from 1 to 9";
+                                    }
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            e.Cancel = true;
+                            switch (FishingGrid.SubGridStyle)
+                            {
+                                case fadSubgridSyle.SubgridStyle4:
+                                    msg = "Expected value is a number from 1 to 4";
+                                    break;
+
+                                case fadSubgridSyle.SubgridStyle9:
+                                    msg = "Expected value is a number from 1 to 9";
+                                    break;
+                            }
+                        }
+                        break;
                 }
             }
 
@@ -170,8 +211,9 @@ namespace FAD3
 
         private void OnbuttonGrid25_Click(object sender, EventArgs e)
         {
+            bool gridNameAccepted = false;
             var msg = "";
-            var gridName = "";
+            bool proceed = true;
             switch (((Button)sender).Name)
             {
                 case "buttonAdd":
@@ -179,73 +221,124 @@ namespace FAD3
                         textBoxGridNo.Text.Length > 0 &&
                         textBoxRow.Text.Length > 0)
                     {
-                        gridName = textBoxGridNo.Text + "-" + textBoxColumn.Text + textBoxRow.Text;
+                        GridName = textBoxGridNo.Text + "-" + textBoxColumn.Text + textBoxRow.Text;
 
-                        if (lvGrids.Items.ContainsKey(gridName))
+                        if (FishingGrid.SubGridStyle == fadSubgridSyle.SubgridStyleNone && lvGrids.Items.ContainsKey(GridName))
                         {
                             msg = "Grid name already exists. Please use another";
+                            proceed = false;
                         }
-                        else
+                        else if (FishingGrid.SubGridStyle != fadSubgridSyle.SubgridStyleNone)
                         {
-                            if (FishingGrid.MinorGridIsInland(gridName))
+                            if (textBoxSubGrid.Text.Length > 0)
                             {
-                                if (global.MapIsOpen)
+                                if (lvGrids.Items.ContainsKey($"{GridName}-{textBoxSubGrid.Text}"))
                                 {
-                                    global.MappingForm.MapFishingGround(gridName, FishingGrid.UTMZone, gridName, true);
-                                    DialogResult dr = MessageBox.Show($"{gridName} is located inland\r\n\r\n" +
-
-                                        "Accept this location?",
-                                          "Verify fishing ground location",
-                                          MessageBoxButtons.YesNo,
-                                          MessageBoxIcon.Information);
-
-                                    if (dr == DialogResult.Yes)
-                                    {
-                                        var lvi = lvGrids.Items.Add(gridName, gridName, null);
-                                        lvi.Tag = "new";
-                                        textBoxColumn.Text = "";
-                                        textBoxRow.Text = "";
-                                        textBoxGridNo.Text = "";
-                                        textBoxGridNo.Select();
-                                    }
-                                    else
-                                    {
-                                        global.MappingForm.MapLayersHandler.RemoveLayer(gridName);
-                                    }
-                                }
-                                else
-                                {
-                                    msg = $"{gridName} is not accepted because it is located inland";
+                                    msg = "Grid name already exists. Please use another";
+                                    proceed = false;
                                 }
                             }
                             else
                             {
-                                if (global.MapIsOpen)
+                                if (lvGrids.Items.ContainsKey(GridName))
                                 {
-                                    global.MappingForm.MapFishingGround(gridName, FishingGrid.UTMZone, gridName);
+                                    msg = "Grid name already exists. Please use another";
+                                    proceed = false;
                                 }
-                                if (_selectedItem != null)
-                                    lvGrids.Items[_selectedItem.Name].With(o =>
+                            }
+                        }
+
+                        if (proceed && FishingGrid.MinorGridIsInland(GridName))
+                        {
+                            if (global.MapIsOpen)
+                            {
+                                global.MappingForm.MapFishingGround(GridName, FishingGrid.UTMZone, GridName, true);
+                                DialogResult dr = MessageBox.Show($"{GridName} is located inland\r\n\r\n" +
+
+                                    "Accept this location?",
+                                      "Verify fishing ground location",
+                                      MessageBoxButtons.YesNo,
+                                      MessageBoxIcon.Information);
+
+                                if (dr == DialogResult.Yes)
+                                {
+                                    ListViewItem lvi = new ListViewItem();
+                                    if (FishingGrid.SubGridStyle != fadSubgridSyle.SubgridStyleNone)
                                     {
-                                        o.Text = gridName;
-                                        o.Name = gridName;
-                                        _selectedItem = null;
-                                    });
+                                        lvi = lvGrids.Items.Add($"{GridName}-{textBoxSubGrid.Text}", $"{GridName}-{textBoxSubGrid.Text}", null);
+                                    }
+                                    else
+                                    {
+                                        lvi = lvGrids.Items.Add(GridName, GridName, null);
+                                    }
+                                    gridNameAccepted = true;
+                                    lvi.Tag = "new";
+                                    textBoxColumn.Text = "";
+                                    textBoxRow.Text = "";
+                                    textBoxGridNo.Text = "";
+                                    textBoxSubGrid.Text = "";
+                                    textBoxGridNo.Select();
+                                }
                                 else
                                 {
-                                    var lvi = lvGrids.Items.Add(gridName, gridName, null);
+                                    global.MappingForm.MapLayersHandler.RemoveLayer(GridName);
+                                }
+                            }
+                            else
+                            {
+                                msg = $"{GridName} is not accepted because it is located inland";
+                            }
+                        }
+                        else if (proceed)
+                        {
+                            if (global.MapIsOpen)
+                            {
+                                global.MappingForm.MapFishingGround(GridName, FishingGrid.UTMZone, GridName);
+                            }
+                            if (_selectedItem != null)
+                                lvGrids.Items[_selectedItem.Name].With(o =>
+                                {
+                                    o.Text = GridName;
+                                    o.Name = GridName;
+                                    _selectedItem = null;
+                                });
+                            else
+                            {
+                                ListViewItem lvi = new ListViewItem();
+                                if (FishingGrid.SubGridStyle == fadSubgridSyle.SubgridStyleNone)
+                                {
+                                    lvi = lvGrids.Items.Add(GridName, GridName, null);
                                     lvi.Tag = "new";
                                 }
-                                textBoxColumn.Text = "";
-                                textBoxRow.Text = "";
-                                textBoxGridNo.Text = "";
-                                textBoxGridNo.Select();
+                                else
+                                {
+                                    if (textBoxSubGrid.Text.Length == 0)
+                                    {
+                                        lvi = lvGrids.Items.Add(GridName, GridName, null);
+                                    }
+                                    else
+                                    {
+                                        lvi = lvGrids.Items.Add($"{GridName}-{textBoxSubGrid.Text}", $"{GridName}-{textBoxSubGrid.Text}", null);
+                                    }
+                                    lvi.Tag = "new";
+                                }
                             }
+                            gridNameAccepted = true;
+                            textBoxColumn.Text = "";
+                            textBoxRow.Text = "";
+                            textBoxGridNo.Text = "";
+                            textBoxSubGrid.Text = "";
+                            textBoxGridNo.Select();
                         }
                     }
                     else
                     {
                         msg = "Please fill up all fields";
+                    }
+
+                    if (gridNameAccepted && textBoxSubGrid.Text.Length > 0)
+                    {
+                        SubGrid = int.Parse(textBoxSubGrid.Text);
                     }
                     break;
 
@@ -304,6 +397,7 @@ namespace FAD3
                         _FishingGrounds.Add(item.Text);
                     }
                     Parent_form.FishingGrounds = _FishingGrounds;
+                    DialogResult = DialogResult.OK;
                     Close();
                     break;
 
@@ -318,6 +412,7 @@ namespace FAD3
                             }
                         }
                     }
+                    DialogResult = DialogResult.Cancel;
                     Close();
                     break;
 

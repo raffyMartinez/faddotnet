@@ -68,17 +68,22 @@
             this.buttonClose = new System.Windows.Forms.Button();
             this.buttonClear = new System.Windows.Forms.Button();
             this.buttonGrid = new System.Windows.Forms.Button();
+            this.lblGridStatus = new System.Windows.Forms.Label();
+            this.buttonLocateGrid = new System.Windows.Forms.Button();
+            this.btnOpenLayoutGrid = new System.Windows.Forms.Button();
+            this.buttonSubGrid = new System.Windows.Forms.Button();
             this.toolbar = new ToolStripExtensions.ToolStripEx();
             this.tsButtonFitMap = new System.Windows.Forms.ToolStripButton();
             this.tsButtonSaveShapefile = new System.Windows.Forms.ToolStripButton();
             this.tsButtonSaveImage = new System.Windows.Forms.ToolStripButton();
             this.tsButtonMBRs = new System.Windows.Forms.ToolStripButton();
             this.tsButtonRetrieve = new System.Windows.Forms.ToolStripButton();
-            this.tsButtonExit = new System.Windows.Forms.ToolStripButton();
-            this.lblGridStatus = new System.Windows.Forms.Label();
-            this.buttonLocateGrid = new System.Windows.Forms.Button();
-            this.btnOpenLayoutGrid = new System.Windows.Forms.Button();
             this.tsButtonXY = new System.Windows.Forms.ToolStripButton();
+            this.tsButtonExit = new System.Windows.Forms.ToolStripButton();
+            this.label13 = new System.Windows.Forms.Label();
+            this.txtSubGridThickness = new System.Windows.Forms.TextBox();
+            this.label14 = new System.Windows.Forms.Label();
+            this.shapeSubGridLineColor = new Microsoft.VisualBasic.PowerPacks.RectangleShape();
             this.groupLabels.SuspendLayout();
             this.toolbar.SuspendLayout();
             this.SuspendLayout();
@@ -102,6 +107,9 @@
             // 
             // groupLabels
             // 
+            this.groupLabels.Controls.Add(this.label13);
+            this.groupLabels.Controls.Add(this.txtSubGridThickness);
+            this.groupLabels.Controls.Add(this.label14);
             this.groupLabels.Controls.Add(this.btnLabelsFromKML);
             this.groupLabels.Controls.Add(this.buttonLabel);
             this.groupLabels.Controls.Add(this.label12);
@@ -130,7 +138,7 @@
             this.groupLabels.Controls.Add(this.shapeContainer1);
             this.groupLabels.Location = new System.Drawing.Point(4, 89);
             this.groupLabels.Name = "groupLabels";
-            this.groupLabels.Size = new System.Drawing.Size(245, 363);
+            this.groupLabels.Size = new System.Drawing.Size(245, 399);
             this.groupLabels.TabIndex = 4;
             this.groupLabels.TabStop = false;
             this.groupLabels.Text = "Labels";
@@ -139,7 +147,7 @@
             // 
             this.btnLabelsFromKML.ImageKey = "label_add";
             this.btnLabelsFromKML.ImageList = this.imList;
-            this.btnLabelsFromKML.Location = new System.Drawing.Point(169, 323);
+            this.btnLabelsFromKML.Location = new System.Drawing.Point(169, 363);
             this.btnLabelsFromKML.Name = "btnLabelsFromKML";
             this.btnLabelsFromKML.Size = new System.Drawing.Size(28, 28);
             this.btnLabelsFromKML.TabIndex = 27;
@@ -156,12 +164,13 @@
             this.imList.Images.SetKeyName(4, "Ruler_16x.png");
             this.imList.Images.SetKeyName(5, "gridLayout");
             this.imList.Images.SetKeyName(6, "openLayoutGrid");
+            this.imList.Images.SetKeyName(7, "subgrid");
             // 
             // buttonLabel
             // 
             this.buttonLabel.ImageKey = "label";
             this.buttonLabel.ImageList = this.imList;
-            this.buttonLabel.Location = new System.Drawing.Point(201, 323);
+            this.buttonLabel.Location = new System.Drawing.Point(201, 363);
             this.buttonLabel.Name = "buttonLabel";
             this.buttonLabel.Size = new System.Drawing.Size(28, 28);
             this.buttonLabel.TabIndex = 26;
@@ -370,12 +379,13 @@
             this.shapeContainer1.Margin = new System.Windows.Forms.Padding(0);
             this.shapeContainer1.Name = "shapeContainer1";
             this.shapeContainer1.Shapes.AddRange(new Microsoft.VisualBasic.PowerPacks.Shape[] {
+            this.shapeSubGridLineColor,
             this.shapeMinorGridLineColor,
             this.shapeMajorGridLineColor,
             this.shapeBorderColor,
             this.shapeMajorGridLabelColor,
             this.shapeMinorGridLabelColor});
-            this.shapeContainer1.Size = new System.Drawing.Size(239, 343);
+            this.shapeContainer1.Size = new System.Drawing.Size(239, 379);
             this.shapeContainer1.TabIndex = 25;
             this.shapeContainer1.TabStop = false;
             // 
@@ -424,7 +434,7 @@
             // 
             // buttonClose
             // 
-            this.buttonClose.Location = new System.Drawing.Point(225, 480);
+            this.buttonClose.Location = new System.Drawing.Point(229, 514);
             this.buttonClose.Name = "buttonClose";
             this.buttonClose.Size = new System.Drawing.Size(48, 28);
             this.buttonClose.TabIndex = 5;
@@ -453,6 +463,47 @@
             this.buttonGrid.TabIndex = 2;
             this.buttonGrid.UseVisualStyleBackColor = true;
             this.buttonGrid.Click += new System.EventHandler(this.OnButtons_Click);
+            // 
+            // lblGridStatus
+            // 
+            this.lblGridStatus.Location = new System.Drawing.Point(4, 491);
+            this.lblGridStatus.Name = "lblGridStatus";
+            this.lblGridStatus.Size = new System.Drawing.Size(215, 68);
+            this.lblGridStatus.TabIndex = 8;
+            this.lblGridStatus.Text = "Grid status:";
+            // 
+            // buttonLocateGrid
+            // 
+            this.buttonLocateGrid.ImageIndex = 5;
+            this.buttonLocateGrid.ImageList = this.imList;
+            this.buttonLocateGrid.Location = new System.Drawing.Point(255, 174);
+            this.buttonLocateGrid.Name = "buttonLocateGrid";
+            this.buttonLocateGrid.Size = new System.Drawing.Size(28, 28);
+            this.buttonLocateGrid.TabIndex = 9;
+            this.buttonLocateGrid.UseVisualStyleBackColor = true;
+            this.buttonLocateGrid.Click += new System.EventHandler(this.OnButtons_Click);
+            // 
+            // btnOpenLayoutGrid
+            // 
+            this.btnOpenLayoutGrid.ImageIndex = 6;
+            this.btnOpenLayoutGrid.ImageList = this.imList;
+            this.btnOpenLayoutGrid.Location = new System.Drawing.Point(255, 205);
+            this.btnOpenLayoutGrid.Name = "btnOpenLayoutGrid";
+            this.btnOpenLayoutGrid.Size = new System.Drawing.Size(28, 28);
+            this.btnOpenLayoutGrid.TabIndex = 10;
+            this.btnOpenLayoutGrid.UseVisualStyleBackColor = true;
+            this.btnOpenLayoutGrid.Click += new System.EventHandler(this.OnButtons_Click);
+            // 
+            // buttonSubGrid
+            // 
+            this.buttonSubGrid.ImageKey = "subgrid";
+            this.buttonSubGrid.ImageList = this.imList;
+            this.buttonSubGrid.Location = new System.Drawing.Point(257, 259);
+            this.buttonSubGrid.Name = "buttonSubGrid";
+            this.buttonSubGrid.Size = new System.Drawing.Size(28, 28);
+            this.buttonSubGrid.TabIndex = 11;
+            this.buttonSubGrid.UseVisualStyleBackColor = true;
+            this.buttonSubGrid.Click += new System.EventHandler(this.OnButtons_Click);
             // 
             // toolbar
             // 
@@ -523,6 +574,15 @@
             this.tsButtonRetrieve.Text = "toolStripButton1";
             this.tsButtonRetrieve.ToolTipText = "Get grid boundaries";
             // 
+            // tsButtonXY
+            // 
+            this.tsButtonXY.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsButtonXY.Image = global::FAD3.Properties.Resources.xy_point;
+            this.tsButtonXY.ImageTransparentColor = System.Drawing.Color.White;
+            this.tsButtonXY.Name = "tsButtonXY";
+            this.tsButtonXY.Size = new System.Drawing.Size(23, 22);
+            this.tsButtonXY.Text = "toolStripButton1";
+            // 
             // tsButtonExit
             // 
             this.tsButtonExit.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -533,50 +593,45 @@
             this.tsButtonExit.Text = "toolStripButton1";
             this.tsButtonExit.ToolTipText = "Close";
             // 
-            // lblGridStatus
+            // label13
             // 
-            this.lblGridStatus.Location = new System.Drawing.Point(4, 455);
-            this.lblGridStatus.Name = "lblGridStatus";
-            this.lblGridStatus.Size = new System.Drawing.Size(215, 68);
-            this.lblGridStatus.TabIndex = 8;
-            this.lblGridStatus.Text = "Grid status:";
+            this.label13.Location = new System.Drawing.Point(144, 324);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(43, 37);
+            this.label13.TabIndex = 30;
+            this.label13.Text = "Line color";
             // 
-            // buttonLocateGrid
+            // txtSubGridThickness
             // 
-            this.buttonLocateGrid.ImageIndex = 5;
-            this.buttonLocateGrid.ImageList = this.imList;
-            this.buttonLocateGrid.Location = new System.Drawing.Point(255, 174);
-            this.buttonLocateGrid.Name = "buttonLocateGrid";
-            this.buttonLocateGrid.Size = new System.Drawing.Size(28, 28);
-            this.buttonLocateGrid.TabIndex = 9;
-            this.buttonLocateGrid.UseVisualStyleBackColor = true;
-            this.buttonLocateGrid.Click += new System.EventHandler(this.OnButtons_Click);
+            this.txtSubGridThickness.Location = new System.Drawing.Point(71, 328);
+            this.txtSubGridThickness.Margin = new System.Windows.Forms.Padding(4);
+            this.txtSubGridThickness.Name = "txtSubGridThickness";
+            this.txtSubGridThickness.Size = new System.Drawing.Size(50, 21);
+            this.txtSubGridThickness.TabIndex = 29;
             // 
-            // btnOpenLayoutGrid
+            // label14
             // 
-            this.btnOpenLayoutGrid.ImageIndex = 6;
-            this.btnOpenLayoutGrid.ImageList = this.imList;
-            this.btnOpenLayoutGrid.Location = new System.Drawing.Point(255, 205);
-            this.btnOpenLayoutGrid.Name = "btnOpenLayoutGrid";
-            this.btnOpenLayoutGrid.Size = new System.Drawing.Size(28, 28);
-            this.btnOpenLayoutGrid.TabIndex = 10;
-            this.btnOpenLayoutGrid.UseVisualStyleBackColor = true;
-            this.btnOpenLayoutGrid.Click += new System.EventHandler(this.OnButtons_Click);
+            this.label14.Location = new System.Drawing.Point(5, 323);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(72, 30);
+            this.label14.TabIndex = 28;
+            this.label14.Text = "Subgrid thickness";
             // 
-            // tsButtonXY
+            // shapeSubGridLineColor
             // 
-            this.tsButtonXY.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsButtonXY.Image = global::FAD3.Properties.Resources.xy_point;
-            this.tsButtonXY.ImageTransparentColor = System.Drawing.Color.White;
-            this.tsButtonXY.Name = "tsButtonXY";
-            this.tsButtonXY.Size = new System.Drawing.Size(23, 22);
-            this.tsButtonXY.Text = "toolStripButton1";
+            this.shapeSubGridLineColor.FillColor = System.Drawing.SystemColors.AppWorkspace;
+            this.shapeSubGridLineColor.FillStyle = Microsoft.VisualBasic.PowerPacks.FillStyle.Solid;
+            this.shapeSubGridLineColor.Location = new System.Drawing.Point(197, 314);
+            this.shapeSubGridLineColor.Name = "shapeSubGridLineColor";
+            this.shapeSubGridLineColor.Size = new System.Drawing.Size(23, 18);
+            this.shapeSubGridLineColor.DoubleClick += new System.EventHandler(this.OnShapeColor_DoubleClick);
             // 
             // Grid25GenerateForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(292, 532);
+            this.ClientSize = new System.Drawing.Size(292, 564);
+            this.Controls.Add(this.buttonSubGrid);
             this.Controls.Add(this.btnOpenLayoutGrid);
             this.Controls.Add(this.buttonLocateGrid);
             this.Controls.Add(this.lblGridStatus);
@@ -655,5 +710,10 @@
         private System.Windows.Forms.Button buttonLocateGrid;
         private System.Windows.Forms.Button btnOpenLayoutGrid;
         private System.Windows.Forms.ToolStripButton tsButtonXY;
+        private System.Windows.Forms.Button buttonSubGrid;
+        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.TextBox txtSubGridThickness;
+        private System.Windows.Forms.Label label14;
+        private Microsoft.VisualBasic.PowerPacks.RectangleShape shapeSubGridLineColor;
     }
 }

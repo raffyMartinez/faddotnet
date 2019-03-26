@@ -309,6 +309,7 @@
     <Compile Include="Mapping\Classes\ExtentDraggedBoxEventArgs.cs" />
     <Compile Include="Mapping\Classes\Grid25LayoutHelper.cs" />
     <Compile Include="Mapping\Classes\Grid25LayoutHelperEventArgs.cs" />
+    <Compile Include="Mapping\Classes\Grid25MinorGrid.cs" />
     <Compile Include="Mapping\Classes\MapEditor.cs" />
     <Compile Include="Mapping\Classes\OccurenceMapping.cs" />
     <Compile Include="Mapping\Classes\MapTextGraticuleHelper.cs" />
@@ -342,6 +343,12 @@
     </Compile>
     <Compile Include="Mapping\Forms\FileDownloadForm.Designer.cs">
       <DependentUpon>FileDownloadForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Mapping\Forms\Grid25SubGridForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Mapping\Forms\Grid25SubGridForm.Designer.cs">
+      <DependentUpon>Grid25SubGridForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Mapping\Forms\SelectUTMZoneForm.cs">
       <SubType>Form</SubType>
@@ -464,7 +471,6 @@
       <DependentUpon>Grid25GenerateForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Mapping\Classes\Grid25MajorGrid.cs" />
-    <Compile Include="Mapping\Classes\Grid25MinorGrid.cs" />
     <Compile Include="Mapping\Classes\Grid25LabelManager.cs" />
     <Compile Include="Mapping\Forms\InlandGridCreateDBForm.cs">
       <SubType>Form</SubType>
@@ -819,6 +825,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Mapping\Forms\FileDownloadForm.resx">
       <DependentUpon>FileDownloadForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Mapping\Forms\Grid25SubGridForm.resx">
+      <DependentUpon>Grid25SubGridForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Mapping\Forms\SelectUTMZoneForm.resx">
       <DependentUpon>SelectUTMZoneForm.cs</DependentUpon>

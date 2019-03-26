@@ -128,7 +128,6 @@ namespace FAD3.Mapping.Classes
             }
         }
 
-        //public static void Cleanup(int gridPointLayerHandle, int gridMeshPointLayerHandle)
         public static void Cleanup()
         {
             _extents = null;
@@ -160,6 +159,7 @@ namespace FAD3.Mapping.Classes
             MapLayersHandler = null;
             _newCSVFile = true;
             _singleDimensionCSV = "";
+            _metadataRows = 0;
         }
 
         public static void UnsetMap()

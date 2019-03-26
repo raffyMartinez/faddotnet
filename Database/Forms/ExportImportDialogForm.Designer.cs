@@ -35,7 +35,7 @@
             // 
             // btnOk
             // 
-            this.btnOk.Location = new System.Drawing.Point(174, 109);
+            this.btnOk.Location = new System.Drawing.Point(206, 109);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(40, 25);
             this.btnOk.TabIndex = 1;
@@ -45,7 +45,7 @@
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(110, 109);
+            this.btnCancel.Location = new System.Drawing.Point(142, 109);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(58, 25);
             this.btnCancel.TabIndex = 2;
@@ -68,7 +68,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(223, 138);
+            this.ClientSize = new System.Drawing.Size(252, 138);
             this.Controls.Add(this.rdButton);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnOk);

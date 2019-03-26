@@ -2,6 +2,7 @@
 using MapWinGIS;
 using System;
 using System.Linq;
+using FAD3.Database.Classes;
 
 namespace FAD3
 {
@@ -24,7 +25,7 @@ namespace FAD3
         private int _minorGridRows;                                         //number of minor grid rows
         private int _minorGridColumns;                                      //number of minor grid columns
         private const int CELLSIDE = 2000;                                  //length of one side of a minor grid
-
+        private int _ifldLineType = -1;
         private Grid25MajorGrid _grid25MajorGrid;
 
         public bool SetExtent(Extents ext)
@@ -136,6 +137,7 @@ namespace FAD3
         {
             var success = false;
             _shapefileMinorGridLines = new Shapefile();
+            int subgridCount = 0;
             if (_shapefileMinorGridLines.CreateNewWithShapeID("", ShpfileType.SHP_POLYLINE))
             {
                 _shapefileMinorGridLines.GeoProjection = _axMap.GeoProjection;
@@ -143,7 +145,7 @@ namespace FAD3
                 {
                     var ifldBoundary = sf.EditAddField("isBoundary", FieldType.STRING_FIELD, 1, 1);
                     var iFldDirection = sf.EditAddField("RowOrCol", FieldType.STRING_FIELD, 1, 1);
-                    var ifldLineType = sf.EditAddField("LineType", FieldType.STRING_FIELD, 1, 2);
+                    _ifldLineType = sf.EditAddField("LineType", FieldType.STRING_FIELD, 1, 2);
 
                     var ht = (int)Math.Abs(_minorGridExtents.yMax - _minorGridExtents.yMin);
                     var wdt = (int)Math.Abs(_minorGridExtents.xMax - _minorGridExtents.xMin);
@@ -184,6 +186,12 @@ namespace FAD3
                     _minorGridExtents.SetBounds(_minorGridOriginX, _minorGridOriginY, 0, _minorGridMBRWidth, _minorGridMBRHeight, 0);
 
                     //now construct the row lines of the minor grid
+                    var shpIndex = -1;
+                    if (_grid25MajorGrid.HasSubgrid)
+                    {
+                        AddSubgrid(SubGridType.Row, 0, iFldDirection, ifldBoundary, _ifldLineType);
+                        AddSubgrid(SubGridType.Column, 0, iFldDirection, ifldBoundary, _ifldLineType);
+                    }
                     for (int row = 1; row < _minorGridRows; row++)
                     {
                         Shape shp = new Shape();
@@ -197,18 +205,32 @@ namespace FAD3
                             ptY = (row * CELLSIDE) + _minorGridOriginY;
                             shp.AddPoint(ptX, ptY);
 
-                            var shpIndex = _shapefileMinorGridLines.EditAddShape(shp);
-                            _shapefileMinorGridLines.EditCellValue(iFldDirection, shpIndex, "R");
-                            _shapefileMinorGridLines.EditCellValue(ifldBoundary, shpIndex, "F");
+                            shpIndex = _shapefileMinorGridLines.EditAddShape(shp);
+                            if (shpIndex >= 0)
+                            {
+                                _shapefileMinorGridLines.EditCellValue(iFldDirection, shpIndex, "R");
+                                _shapefileMinorGridLines.EditCellValue(ifldBoundary, shpIndex, "F");
 
-                            if (ptY % FishingGrid.MajorGridSizeMeters == 0)
-                                _shapefileMinorGridLines.EditCellValue(ifldLineType, shpIndex, "MG");
+                                if (!_grid25MajorGrid.HasSubgrid && ptY % FishingGrid.MajorGridSizeMeters == 0)
+                                {
+                                    _shapefileMinorGridLines.EditCellValue(_ifldLineType, shpIndex, "MG");
+                                }
+                                else
+                                {
+                                    _shapefileMinorGridLines.EditCellValue(_ifldLineType, shpIndex, "MG");
+                                }
 
-                            if (row == 1)
-                                _shapefileMinorGridLines.EditCellValue(ifldBoundary, shpIndex, "T");
+                                if (row == 1)
+                                    _shapefileMinorGridLines.EditCellValue(ifldBoundary, shpIndex, "T");
 
-                            if (row == _minorGridRows)
-                                _shapefileMinorGridLines.EditCellValue(ifldBoundary, shpIndex, "T");
+                                if (row == _minorGridRows)
+                                    _shapefileMinorGridLines.EditCellValue(ifldBoundary, shpIndex, "T");
+
+                                if (_grid25MajorGrid.HasSubgrid)
+                                {
+                                    AddSubgrid(SubGridType.Row, row, iFldDirection, ifldBoundary, _ifldLineType);
+                                }
+                            }
                         }
                     }
 
@@ -226,26 +248,118 @@ namespace FAD3
                             ptY = _minorGridOriginY + _minorGridMBRHeight;
                             shp.AddPoint(ptX, ptY);
 
-                            var shpIndex = _shapefileMinorGridLines.EditAddShape(shp);
+                            shpIndex = _shapefileMinorGridLines.EditAddShape(shp);
                             _shapefileMinorGridLines.EditCellValue(iFldDirection, shpIndex, "C");
                             _shapefileMinorGridLines.EditCellValue(ifldBoundary, shpIndex, "F");
 
-                            if (ptX % FishingGrid.MajorGridSizeMeters == 0)
-                                _shapefileMinorGridLines.EditCellValue(ifldLineType, shpIndex, "MG");
+                            if (!_grid25MajorGrid.HasSubgrid && ptX % FishingGrid.MajorGridSizeMeters == 0)
+                            {
+                                _shapefileMinorGridLines.EditCellValue(_ifldLineType, shpIndex, "MG");
+                            }
+                            else
+                            {
+                                _shapefileMinorGridLines.EditCellValue(_ifldLineType, shpIndex, "MG");
+                            }
 
                             if (col == 1)
                                 _shapefileMinorGridLines.EditCellValue(ifldBoundary, shpIndex, "T");
 
                             if (col == _minorGridColumns)
                                 _shapefileMinorGridLines.EditCellValue(ifldBoundary, shpIndex, "T");
+
+                            if (_grid25MajorGrid.HasSubgrid)
+                            {
+                                AddSubgrid(SubGridType.Column, col, iFldDirection, ifldBoundary, _ifldLineType);
+                            }
                         }
                     }
 
                     success = true;
+                    //var cat = _shapefileMinorGridLines.Categories.Add("minorGrid");
+                    //cat.Expression = @"[LineType] = ""MG""";
+                    //cat.DrawingOptions.LineColor = _grid25MajorGrid.LabelAndGridProperties["minorGridLineColor"];
+                    //cat.DrawingOptions.LineWidth = _grid25MajorGrid.LabelAndGridProperties["minorGridThickness"];
+
+                    //var cat1 = _shapefileMinorGridLines.Categories.Add("subGrid");
+                    //cat1.Expression = @"[LineType] = ""SG""";
+                    //cat1.DrawingOptions.LineColor = _grid25MajorGrid.LabelAndGridProperties["subGridLineColor"];
+                    //cat1.DrawingOptions.LineWidth = _grid25MajorGrid.LabelAndGridProperties["subGridLineThickness"];
                 });
             }
 
             return success;
+        }
+
+        public bool CatergorizeLines()
+        {
+            if (_shapefileMinorGridLines.Categories.Generate(_ifldLineType, tkClassificationType.ctUniqueValues, 2))
+            {
+                for (int n = 0; n < _shapefileMinorGridLines.Categories.Count; n++)
+                {
+                    var category = _shapefileMinorGridLines.Categories.Item[n];
+                    switch (category.Expression)
+                    {
+                        case @"[LineType] = ""MG""":
+                            category.DrawingOptions.LineWidth = (float)_grid25MajorGrid.LabelAndGridProperties["minorGridThickness"] / 100;
+                            category.DrawingOptions.LineColor = _grid25MajorGrid.LabelAndGridProperties["minorGridLineColor"];
+                            break;
+
+                        case @"[LineType] = ""SG""":
+                            category.DrawingOptions.LineWidth = (float)_grid25MajorGrid.LabelAndGridProperties["subGridLineThickness"] / 100;
+                            category.DrawingOptions.LineColor = _grid25MajorGrid.LabelAndGridProperties["subGridLineColor"];
+                            break;
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+
+        public int AddSubgrid(SubGridType subgridType, int position, int iFldDirection, int ifldBoundary, int ifldLineType)
+        {
+            int shpIndex = -1;
+            int ptX = 0;
+            int ptY = 0;
+            string lineType = subgridType == SubGridType.Row ? "R" : "C";
+            int subgridCount = (int)Math.Sqrt(_grid25MajorGrid.SubGridCount);
+
+            for (int r = 0; r < subgridCount - 1; r++)
+            {
+                Shape shp = new Shape();
+                if (shp.Create(ShpfileType.SHP_POLYLINE))
+                {
+                    if (subgridType == SubGridType.Column)
+                    {
+                        ptX = (position * CELLSIDE) + _minorGridOriginX + ((CELLSIDE / subgridCount) * (r + 1));
+                        ptY = _minorGridOriginY;
+                        shp.AddPoint(ptX, ptY);
+
+                        ptX = (position * CELLSIDE) + _minorGridOriginX + ((CELLSIDE / subgridCount) * (r + 1));
+                        ptY = _minorGridOriginY + _minorGridMBRHeight;
+                        shp.AddPoint(ptX, ptY);
+                    }
+                    else
+                    {
+                        ptX = _minorGridOriginX;
+                        ptY = (position * CELLSIDE) + _minorGridOriginY + ((CELLSIDE / subgridCount) * (r + 1));
+                        shp.AddPoint(ptX, ptY);
+
+                        ptX = _minorGridOriginX + _minorGridMBRWidth;
+                        ptY = (position * CELLSIDE) + _minorGridOriginY + ((CELLSIDE / subgridCount) * (r + 1));
+                        shp.AddPoint(ptX, ptY);
+                    }
+
+                    shpIndex = _shapefileMinorGridLines.EditAddShape(shp);
+                    if (shpIndex >= 0)
+                    {
+                        _shapefileMinorGridLines.EditCellValue(iFldDirection, shpIndex, lineType);
+                        _shapefileMinorGridLines.EditCellValue(ifldBoundary, shpIndex, "F");
+                        _shapefileMinorGridLines.EditCellValue(ifldLineType, shpIndex, "SG");
+                        Console.WriteLine($"added subgrid {r + 1.ToString()} with xy of {_shapefileMinorGridLines.Shape[shpIndex].Point[0].x.ToString()},{_shapefileMinorGridLines.Shape[shpIndex].Point[0].y.ToString()}");
+                    }
+                }
+            }
+            return shpIndex;
         }
 
         public void Dispose()

@@ -32,6 +32,12 @@
         Gear
     }
 
+    public enum SubGridType
+    {
+        Row,
+        Column
+    }
+
     public enum DataFileType
     {
         None = 0,
@@ -63,7 +69,8 @@
         GearInventory = 512,
         Enumerators = 1024,
         GearInventoryDataSelect = 2048,
-        GearsRefCode = 4096
+        GearsRefCode = 4096,
+        CatchNameAll = 8192
     }
 
     public enum EditActionType

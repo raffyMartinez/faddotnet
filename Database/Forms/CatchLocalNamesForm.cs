@@ -816,6 +816,20 @@ namespace FAD3.Database.Forms
                                         break;
                                 }
                             }
+
+                            if ((eidf.Selection & ExportImportDataType.CatchNameAll) == ExportImportDataType.CatchNameAll)
+                            {
+                                switch (actionType)
+                                {
+                                    case ExportImportAction.ActionExport:
+                                        ExportData(ExportImportDataType.CatchNameAll, "Export entire language, local name and scientific name database");
+                                        break;
+
+                                    case ExportImportAction.ActionImport:
+                                        ImportData(ExportImportDataType.CatchNameAll, "Import entire language, local name and scientific name database");
+                                        break;
+                                }
+                            }
                         }
                     }
                     break;
@@ -834,6 +848,9 @@ namespace FAD3.Database.Forms
             {
                 switch (dataType)
                 {
+                    case ExportImportDataType.CatchNameAll:
+                        break;
+
                     case ExportImportDataType.CatchLocalNames:
                         GetImportedRows(fileName, ExportImportDataType.CatchLocalNames);
                         break;
@@ -855,26 +872,9 @@ namespace FAD3.Database.Forms
                                 break;
 
                             default:
-                                //var importedCount = Names.ImportLocalNamestoScientificNames(fileName);
-                                //MessageBox.Show($"{importedCount} local names-species names-languages saved to the database");
                                 GetImportedRows(fileName, ExportImportDataType.CatchLocalNameSpeciesNamePair);
                                 break;
                         }
-                        //switch (Path.GetExtension(fileName))
-                        //{
-                        //    case ".txt":
-
-                        //        int fail = 0;
-                        //        var nameCount = Names.ImportLocalNamestoScientificNames(fileName, ref fail);
-                        //        var msg = $"{nameCount} local names to scientific name pairs were added to the database";
-                        //        if (fail > 0)
-                        //        {
-                        //            msg += $"\r\n There were also {fail} records not saved because of key violations";
-                        //        }
-                        //        MessageBox.Show(msg, "Fininshed importing local name - scientific name pairs", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        //        break;
-
-                        //}
                         break;
 
                     case ExportImportDataType.LocalNameLanguages:
@@ -912,6 +912,234 @@ namespace FAD3.Database.Forms
             MessageBox.Show($"{_rowsImported} local name - species name pairs were saved to the database", "Import successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
+        private int ExportLocalNames(string fileName, bool append = false)
+        {
+            var count = Names.LocalNameListDict.Count;
+            XmlWriter writer = XmlWriter.Create(fileName);
+            if (count > 0)
+            {
+                var n = 0;
+                writer.WriteStartDocument();
+                writer.WriteStartElement("LocalNames");
+                foreach (var localName in Names.LocalNameListDict)
+                {
+                    writer.WriteStartElement("LocalName");
+                    writer.WriteAttributeString("guid", localName.Key);
+                    writer.WriteString(localName.Value);
+                    if (count == 1)
+                    {
+                        writer.WriteEndDocument();
+                    }
+                    else
+                    {
+                        if (n < (count - 1))
+                        {
+                            writer.WriteEndElement();
+                        }
+                        else
+                        {
+                            writer.WriteEndDocument();
+                        }
+                    }
+                    n++;
+                }
+                writer.Close();
+                if (!append && n > 0 && count > 0)
+                {
+                    MessageBox.Show($"Succesfully exported {count} local names", "Export successful");
+                }
+            }
+            return count;
+        }
+
+        private int ExportLocalNameScientificNames(string fileName, bool append = false)
+        {
+            var list = Names.GetLocalNameSpeciesNameLanguage();
+            var count = list.Count;
+            if (count > 0)
+            {
+                var n = 0;
+                XmlWriter writer = XmlWriter.Create(fileName);
+                writer.WriteStartDocument();
+                writer.WriteStartElement("LocalNamesSpeciesNamesLanguages");
+                foreach (var item in list)
+                {
+                    writer.WriteStartElement("LocalNameSpeciesNameLanguage");
+                    writer.WriteAttributeString("localNameGuid", item.localNameGuid);
+                    writer.WriteAttributeString("speciesNameGuid", item.speciesNameGuid);
+                    writer.WriteAttributeString("languageGuid", item.languageGuid);
+                    if (count == 1)
+                    {
+                        writer.WriteEndDocument();
+                    }
+                    else
+                    {
+                        if (n < (count - 1))
+                        {
+                            writer.WriteEndElement();
+                        }
+                        else
+                        {
+                            writer.WriteEndDocument();
+                        }
+                    }
+                    n++;
+                }
+                writer.Close();
+                if (!append && n > 0 && count > 0)
+                {
+                    MessageBox.Show($"Succesfully exported {count} local names - species names - languages", "Export successful");
+                }
+            }
+            return count;
+        }
+
+        private int ExportLocalNameLanguages(string fileName, bool append = false)
+        {
+            var count = Names.Languages.Count;
+
+            if (count > 0)
+            {
+                var n = 0;
+                XmlWriter writer = XmlWriter.Create(fileName);
+                writer.WriteStartDocument();
+                writer.WriteStartElement("Languages");
+                foreach (var language in Names.Languages)
+                {
+                    writer.WriteStartElement("Language");
+                    writer.WriteAttributeString("guid", language.Key);
+                    writer.WriteString(language.Value);
+                    if (count == 1)
+                    {
+                        writer.WriteEndDocument();
+                    }
+                    else
+                    {
+                        if (n < (count - 1))
+                        {
+                            writer.WriteEndElement();
+                        }
+                        else
+                        {
+                            writer.WriteEndDocument();
+                        }
+                    }
+                    n++;
+                }
+                writer.Close();
+                if (!append && n > 0 && count > 0)
+                {
+                    MessageBox.Show($"Succesfully exported {count} languages", "Export successful");
+                }
+            }
+            return count;
+        }
+
+        private void ExportNames(string fileName, bool exportLanguage = true, bool exportLocalNames = true, bool exportLNSNPair = true)
+        {
+            int n = 0;
+            int languageCount = 0;
+            int localNameCount = 0;
+            int lnsnPairCount = 0;
+            bool exportAll = false;
+            if (exportLanguage || exportLocalNames || exportLNSNPair)
+            {
+                XmlWriter writer = XmlWriter.Create(fileName);
+                writer.WriteStartDocument();
+                writer.WriteStartElement("ExportNamesData");
+                if (exportLanguage)
+                {
+                    languageCount = Names.Languages.Count;
+
+                    if (languageCount > 0)
+                    {
+                        writer.WriteStartElement("Languages");
+                        foreach (var language in Names.Languages)
+                        {
+                            writer.WriteStartElement("Language");
+                            writer.WriteAttributeString("guid", language.Key);
+                            writer.WriteAttributeString("value", language.Value);
+                            writer.WriteEndElement();
+                        }
+                        writer.WriteEndElement();
+                    }
+                    exportAll = true;
+                }
+
+                if (exportLocalNames)
+                {
+                    localNameCount = Names.LocalNameList.Count;
+                    if (localNameCount > 0)
+                    {
+                        writer.WriteStartElement("LocalNames");
+                        foreach (var localName in Names.LocalNameListDict)
+                        {
+                            writer.WriteStartElement("LocalName");
+                            writer.WriteAttributeString("guid", localName.Key);
+                            writer.WriteAttributeString("value", localName.Value);
+                            writer.WriteEndElement();
+                        }
+                        writer.WriteEndElement();
+                    }
+                    exportAll = exportLocalNames && exportAll;
+                }
+                else
+                {
+                    exportAll = false;
+                }
+
+                if (exportLNSNPair)
+                {
+                    var list = Names.GetLocalNameSpeciesNameLanguage();
+                    lnsnPairCount = list.Count;
+                    if (lnsnPairCount > 0)
+                    {
+                        writer.WriteStartElement("LocalNamesSpeciesNamesLanguages");
+                        foreach (var item in list)
+                        {
+                            writer.WriteStartElement("LocalNameSpeciesNameLanguage");
+                            writer.WriteAttributeString("localNameGuid", item.localNameGuid);
+                            writer.WriteAttributeString("speciesNameGuid", item.speciesNameGuid);
+                            writer.WriteAttributeString("languageGuid", item.languageGuid);
+                            writer.WriteEndElement();
+                        }
+                        writer.WriteEndElement();
+                    }
+                    exportAll = exportLNSNPair && exportAll;
+                }
+                else
+                {
+                    exportAll = false;
+                }
+
+                writer.WriteEndElement();
+                writer.WriteEndDocument();
+                writer.Close();
+                if (exportAll)
+                {
+                    MessageBox.Show($"Exported {languageCount} languages\r\nExported {localNameCount} localnames\r\nExported {lnsnPairCount} local name-scientific name pairs",
+                        "Exported all", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    string msg = "";
+                    if (exportLanguage)
+                    {
+                        msg = $"Exported {languageCount.ToString()} languages";
+                    }
+                    if (exportLocalNames)
+                    {
+                        msg = $"Exported {localNameCount.ToString()} local names";
+                    }
+                    if (exportLNSNPair)
+                    {
+                        msg = $"Exported {lnsnPairCount.ToString()} local name-scientific name pairs";
+                    }
+                    MessageBox.Show(msg, "Export done", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+        }
+
         private bool ExportData(ExportImportDataType dataType, string title)
         {
             var success = false;
@@ -930,124 +1158,23 @@ namespace FAD3.Database.Forms
                 case ".xml":
                     switch (dataType)
                     {
+                        case ExportImportDataType.CatchNameAll:
+                            ExportNames(fileName);
+                            break;
+
                         case ExportImportDataType.LocalNameLanguages:
-
-                            var count = Names.Languages.Count;
-
-                            if (count > 0)
-                            {
-                                var n = 0;
-                                XmlWriter writer = XmlWriter.Create(fileName);
-                                writer.WriteStartDocument();
-                                writer.WriteStartElement("Languages");
-                                foreach (var language in Names.Languages)
-                                {
-                                    writer.WriteStartElement("Language");
-                                    writer.WriteAttributeString("guid", language.Key);
-                                    writer.WriteString(language.Value);
-                                    if (count == 1)
-                                    {
-                                        writer.WriteEndDocument();
-                                    }
-                                    else
-                                    {
-                                        if (n < (count - 1))
-                                        {
-                                            writer.WriteEndElement();
-                                        }
-                                        else
-                                        {
-                                            writer.WriteEndDocument();
-                                        }
-                                    }
-                                    n++;
-                                }
-                                writer.Close();
-                                if (n > 0 && count > 0)
-                                {
-                                    MessageBox.Show($"Succesfully exported {count} languages", "Export successful");
-                                }
-                            }
+                            //ExportLocalNameLanguages(fileName);
+                            ExportNames(fileName, exportLanguage: true, exportLocalNames: false, exportLNSNPair: false);
                             break;
 
                         case ExportImportDataType.CatchLocalNames:
-
-                            count = Names.LocalNameListDict.Count;
-                            if (count > 0)
-                            {
-                                var n = 0;
-                                XmlWriter writer = XmlWriter.Create(fileName);
-                                writer.WriteStartDocument();
-                                writer.WriteStartElement("LocalNames");
-                                foreach (var localName in Names.LocalNameListDict)
-                                {
-                                    writer.WriteStartElement("LocalName");
-                                    writer.WriteAttributeString("guid", localName.Key);
-                                    writer.WriteString(localName.Value);
-                                    if (count == 1)
-                                    {
-                                        writer.WriteEndDocument();
-                                    }
-                                    else
-                                    {
-                                        if (n < (count - 1))
-                                        {
-                                            writer.WriteEndElement();
-                                        }
-                                        else
-                                        {
-                                            writer.WriteEndDocument();
-                                        }
-                                    }
-                                    n++;
-                                }
-                                writer.Close();
-                                if (n > 0 && count > 0)
-                                {
-                                    MessageBox.Show($"Succesfully exported {count} local names", "Export successful");
-                                }
-                            }
-
+                            ExportNames(fileName, exportLanguage: false, exportLocalNames: true, exportLNSNPair: false);
+                            //ExportLocalNames(fileName);
                             break;
 
                         case ExportImportDataType.CatchLocalNameSpeciesNamePair:
-                            var list = Names.GetLocalNameSpeciesNameLanguage();
-                            count = list.Count;
-                            if (count > 0)
-                            {
-                                var n = 0;
-                                XmlWriter writer = XmlWriter.Create(fileName);
-                                writer.WriteStartDocument();
-                                writer.WriteStartElement("LocalNamesSpeciesNamesLanguages");
-                                foreach (var item in list)
-                                {
-                                    writer.WriteStartElement("LocalNameSpeciesNameLanguage");
-                                    writer.WriteAttributeString("localNameGuid", item.localNameGuid);
-                                    writer.WriteAttributeString("speciesNameGuid", item.speciesNameGuid);
-                                    writer.WriteAttributeString("languageGuid", item.languageGuid);
-                                    if (count == 1)
-                                    {
-                                        writer.WriteEndDocument();
-                                    }
-                                    else
-                                    {
-                                        if (n < (count - 1))
-                                        {
-                                            writer.WriteEndElement();
-                                        }
-                                        else
-                                        {
-                                            writer.WriteEndDocument();
-                                        }
-                                    }
-                                    n++;
-                                }
-                                writer.Close();
-                                if (n > 0 && count > 0)
-                                {
-                                    MessageBox.Show($"Succesfully exported {count} local names - species names - languages", "Export successful");
-                                }
-                            }
+                            ExportNames(fileName, exportLanguage: false, exportLocalNames: false, exportLNSNPair: true);
+                            //ExportLocalNameScientificNames(fileName);
                             break;
                     }
                     break;

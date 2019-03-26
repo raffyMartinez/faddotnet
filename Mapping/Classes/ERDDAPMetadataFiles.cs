@@ -428,6 +428,7 @@ namespace FAD3.Mapping.Classes
                     verticalSize = 0;
                     temporalSize = 0;
                     _parameters.Clear();
+                    xmlReader.Close();
                 }
             }
             return files.Length;

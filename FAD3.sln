@@ -13,6 +13,8 @@ Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "FADUpdate12282018", "update
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "FAD3UpdaterMar012019", "updaters\FAD3UpdaterFeb232019\FAD3UpdaterFeb232019.vdproj", "{1D404264-89E9-42FC-80AC-EBAD15542C0E}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "FADUpdaterMarch232019", "updaters\FADUpdaterMarch232019\FADUpdaterMarch232019.vdproj", "{44D3DE66-4ECE-4BD3-93EA-E696D74C11F8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,12 @@ Global
 		{1D404264-89E9-42FC-80AC-EBAD15542C0E}.Release|Any CPU.ActiveCfg = Release
 		{1D404264-89E9-42FC-80AC-EBAD15542C0E}.Release|x64.ActiveCfg = Release
 		{1D404264-89E9-42FC-80AC-EBAD15542C0E}.Release|x86.ActiveCfg = Release
+		{44D3DE66-4ECE-4BD3-93EA-E696D74C11F8}.Debug|Any CPU.ActiveCfg = Debug
+		{44D3DE66-4ECE-4BD3-93EA-E696D74C11F8}.Debug|x64.ActiveCfg = Debug
+		{44D3DE66-4ECE-4BD3-93EA-E696D74C11F8}.Debug|x86.ActiveCfg = Debug
+		{44D3DE66-4ECE-4BD3-93EA-E696D74C11F8}.Release|Any CPU.ActiveCfg = Release
+		{44D3DE66-4ECE-4BD3-93EA-E696D74C11F8}.Release|x64.ActiveCfg = Release
+		{44D3DE66-4ECE-4BD3-93EA-E696D74C11F8}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

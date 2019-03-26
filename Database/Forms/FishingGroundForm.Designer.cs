@@ -30,6 +30,8 @@
         {
             this.tabFG = new System.Windows.Forms.TabControl();
             this.tabGrid25 = new System.Windows.Forms.TabPage();
+            this.lblSubGrid = new System.Windows.Forms.Label();
+            this.textBoxSubGrid = new System.Windows.Forms.TextBox();
             this.lvGrids = new System.Windows.Forms.ListView();
             this.buttonRemoveAll = new System.Windows.Forms.Button();
             this.buttonRemove = new System.Windows.Forms.Button();
@@ -58,11 +60,13 @@
             this.tabFG.Margin = new System.Windows.Forms.Padding(4);
             this.tabFG.Name = "tabFG";
             this.tabFG.SelectedIndex = 0;
-            this.tabFG.Size = new System.Drawing.Size(349, 172);
+            this.tabFG.Size = new System.Drawing.Size(349, 198);
             this.tabFG.TabIndex = 0;
             // 
             // tabGrid25
             // 
+            this.tabGrid25.Controls.Add(this.lblSubGrid);
+            this.tabGrid25.Controls.Add(this.textBoxSubGrid);
             this.tabGrid25.Controls.Add(this.lvGrids);
             this.tabGrid25.Controls.Add(this.buttonRemoveAll);
             this.tabGrid25.Controls.Add(this.buttonRemove);
@@ -79,10 +83,27 @@
             this.tabGrid25.Margin = new System.Windows.Forms.Padding(4);
             this.tabGrid25.Name = "tabGrid25";
             this.tabGrid25.Padding = new System.Windows.Forms.Padding(4);
-            this.tabGrid25.Size = new System.Drawing.Size(341, 144);
+            this.tabGrid25.Size = new System.Drawing.Size(341, 170);
             this.tabGrid25.TabIndex = 0;
             this.tabGrid25.Text = "Grid 25";
             this.tabGrid25.UseVisualStyleBackColor = true;
+            // 
+            // lblSubGrid
+            // 
+            this.lblSubGrid.AutoSize = true;
+            this.lblSubGrid.Location = new System.Drawing.Point(13, 128);
+            this.lblSubGrid.Name = "lblSubGrid";
+            this.lblSubGrid.Size = new System.Drawing.Size(54, 15);
+            this.lblSubGrid.TabIndex = 13;
+            this.lblSubGrid.Text = "Sub-grid";
+            // 
+            // textBoxSubGrid
+            // 
+            this.textBoxSubGrid.Location = new System.Drawing.Point(70, 125);
+            this.textBoxSubGrid.Name = "textBoxSubGrid";
+            this.textBoxSubGrid.Size = new System.Drawing.Size(75, 21);
+            this.textBoxSubGrid.TabIndex = 12;
+            this.textBoxSubGrid.Validating += new System.ComponentModel.CancelEventHandler(this.OntextBoxValidating);
             // 
             // lvGrids
             // 
@@ -135,9 +156,9 @@
             // 
             // textBoxRow
             // 
-            this.textBoxRow.Location = new System.Drawing.Point(64, 98);
+            this.textBoxRow.Location = new System.Drawing.Point(70, 98);
             this.textBoxRow.Name = "textBoxRow";
-            this.textBoxRow.Size = new System.Drawing.Size(81, 21);
+            this.textBoxRow.Size = new System.Drawing.Size(75, 21);
             this.textBoxRow.TabIndex = 6;
             this.textBoxRow.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnTextBox_KeyDown);
             this.textBoxRow.Validating += new System.ComponentModel.CancelEventHandler(this.OntextBoxValidating);
@@ -153,9 +174,9 @@
             // 
             // textBoxColumn
             // 
-            this.textBoxColumn.Location = new System.Drawing.Point(64, 72);
+            this.textBoxColumn.Location = new System.Drawing.Point(70, 72);
             this.textBoxColumn.Name = "textBoxColumn";
-            this.textBoxColumn.Size = new System.Drawing.Size(81, 21);
+            this.textBoxColumn.Size = new System.Drawing.Size(75, 21);
             this.textBoxColumn.TabIndex = 4;
             this.textBoxColumn.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnTextBox_KeyDown);
             this.textBoxColumn.Validating += new System.ComponentModel.CancelEventHandler(this.OntextBoxValidating);
@@ -171,9 +192,9 @@
             // 
             // textBoxGridNo
             // 
-            this.textBoxGridNo.Location = new System.Drawing.Point(64, 46);
+            this.textBoxGridNo.Location = new System.Drawing.Point(70, 46);
             this.textBoxGridNo.Name = "textBoxGridNo";
-            this.textBoxGridNo.Size = new System.Drawing.Size(81, 21);
+            this.textBoxGridNo.Size = new System.Drawing.Size(75, 21);
             this.textBoxGridNo.TabIndex = 2;
             this.textBoxGridNo.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnTextBox_KeyDown);
             this.textBoxGridNo.Validating += new System.ComponentModel.CancelEventHandler(this.OntextBoxValidating);
@@ -189,9 +210,9 @@
             // 
             // textBoxZone
             // 
-            this.textBoxZone.Location = new System.Drawing.Point(64, 21);
+            this.textBoxZone.Location = new System.Drawing.Point(70, 21);
             this.textBoxZone.Name = "textBoxZone";
-            this.textBoxZone.Size = new System.Drawing.Size(81, 21);
+            this.textBoxZone.Size = new System.Drawing.Size(75, 21);
             this.textBoxZone.TabIndex = 0;
             // 
             // tabText
@@ -200,14 +221,14 @@
             this.tabText.Margin = new System.Windows.Forms.Padding(4);
             this.tabText.Name = "tabText";
             this.tabText.Padding = new System.Windows.Forms.Padding(4);
-            this.tabText.Size = new System.Drawing.Size(341, 144);
+            this.tabText.Size = new System.Drawing.Size(341, 170);
             this.tabText.TabIndex = 1;
             this.tabText.Text = "Text";
             this.tabText.UseVisualStyleBackColor = true;
             // 
             // buttonOK
             // 
-            this.buttonOK.Location = new System.Drawing.Point(314, 222);
+            this.buttonOK.Location = new System.Drawing.Point(314, 243);
             this.buttonOK.Name = "buttonOK";
             this.buttonOK.Size = new System.Drawing.Size(39, 23);
             this.buttonOK.TabIndex = 9;
@@ -219,7 +240,7 @@
             // 
             this.buttonCancel.CausesValidation = false;
             this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.buttonCancel.Location = new System.Drawing.Point(253, 222);
+            this.buttonCancel.Location = new System.Drawing.Point(253, 243);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(55, 23);
             this.buttonCancel.TabIndex = 10;
@@ -230,7 +251,7 @@
             // buttonGrids
             // 
             this.buttonGrids.CausesValidation = false;
-            this.buttonGrids.Location = new System.Drawing.Point(195, 222);
+            this.buttonGrids.Location = new System.Drawing.Point(195, 243);
             this.buttonGrids.Name = "buttonGrids";
             this.buttonGrids.Size = new System.Drawing.Size(52, 23);
             this.buttonGrids.TabIndex = 11;
@@ -243,7 +264,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCancel;
-            this.ClientSize = new System.Drawing.Size(368, 257);
+            this.ClientSize = new System.Drawing.Size(368, 279);
             this.Controls.Add(this.buttonGrids);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.buttonOK);
@@ -283,5 +304,7 @@
         private System.Windows.Forms.Button buttonOK;
         private System.Windows.Forms.Button buttonCancel;
         private System.Windows.Forms.Button buttonGrids;
+        private System.Windows.Forms.Label lblSubGrid;
+        private System.Windows.Forms.TextBox textBoxSubGrid;
     }
 }

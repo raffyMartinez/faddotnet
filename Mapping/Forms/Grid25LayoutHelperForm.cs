@@ -16,16 +16,17 @@ namespace FAD3.Mapping.Forms
 {
     public partial class Grid25LayoutHelperForm : Form
     {
-        public static Grid25LayoutHelperForm GetInstance(Grid25MajorGrid majorGrid)
+        public static Grid25LayoutHelperForm GetInstance(Grid25MajorGrid majorGrid, Grid25GenerateForm parentForm)
         {
-            if (_instance == null) _instance = new Grid25LayoutHelperForm(majorGrid);
+            if (_instance == null) _instance = new Grid25LayoutHelperForm(majorGrid, parentForm);
             return _instance;
         }
 
-        public Grid25LayoutHelperForm(Grid25MajorGrid majorGrid)
+        public Grid25LayoutHelperForm(Grid25MajorGrid majorGrid, Grid25GenerateForm parentForm)
         {
             InitializeComponent();
             _majorGrid = majorGrid;
+            _parentForm = parentForm;
             LayoutHelper = _majorGrid.LayoutHelper;
             LayoutHelper.LayerCreated += OnLayoutCreated;
         }
@@ -66,6 +67,7 @@ namespace FAD3.Mapping.Forms
         private string _fishingGround;
         private int _mouseX;
         private int _mouseY;
+        private Grid25GenerateForm _parentForm;
 
         public void SetUpFields()
         {
@@ -205,6 +207,8 @@ namespace FAD3.Mapping.Forms
                         && _majorGrid.LayoutHelper.HasCompletePanelTitles())
 
                         {
+                            _majorGrid.HasSubgrid = _parentForm.HasSubGrid;
+                            _majorGrid.SubGridCount = _parentForm.SubGridCount;
                             if (_majorGrid.GenerateMinorGridFromLayout(textFishingGround.Text, _parentFolder))
                             {
                                 if (_majorGrid.LayoutHelper.LayerHandle > 0)
@@ -401,6 +405,7 @@ namespace FAD3.Mapping.Forms
                 _majorGrid = null;
             }
             _instance = null;
+            _parentForm = null;
             global.SaveFormSettings(this);
             global.MappingForm.SetCursor(tkCursorMode.cmSelection);
         }

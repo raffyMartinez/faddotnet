@@ -78,6 +78,9 @@ namespace FAD3
 
         private static List<string> _filesToDeleteOnClose = new List<string>();
 
+        public bool HasSubgrid { get; set; }
+        public int SubGridCount { get; set; }
+
         public bool InDefindeGridFromLayout
         {
             get { return _inDefineGridFromLayout; }
@@ -125,8 +128,13 @@ namespace FAD3
         /// <param name="mapName"></param>
         public void ApplyGridSymbology(string mapName = "")
         {
-            _grid25MinorGrid.MinorGridLinesShapeFile.DefaultDrawingOptions.LineColor = _gridAndLabelProperties["minorGridLineColor"];
-            _grid25MinorGrid.MinorGridLinesShapeFile.DefaultDrawingOptions.LineWidth = (float)_gridAndLabelProperties["minorGridThickness"] / 100;
+            //_grid25MinorGrid.MinorGridLinesShapeFile.DefaultDrawingOptions.LineColor = _gridAndLabelProperties["minorGridLineColor"];
+            //_grid25MinorGrid.MinorGridLinesShapeFile.DefaultDrawingOptions.LineWidth = (float)_gridAndLabelProperties["minorGridThickness"] / 100;
+
+            if (_grid25MinorGrid.CatergorizeLines())
+            {
+                _grid25MinorGrid.MinorGridLinesShapeFile.Categories.ApplyExpressions();
+            }
 
             _shapefileMajorGridIntersect.DefaultDrawingOptions.FillVisible = false;
             _shapefileMajorGridIntersect.DefaultDrawingOptions.LineColor = _gridAndLabelProperties["majorGridLineColor"];
@@ -1491,6 +1499,7 @@ namespace FAD3
                     if (GenerateMinorGridInsideExtent(selectionBoxExtent))
                     {
                         SetupTopLayers();
+                        //_grid25MinorGrid.MinorGridLinesShapeFile.Categories.ApplyExpressions();
                     }
                 }
                 else

@@ -24,6 +24,7 @@ namespace FAD3.Database.Forms
             rdButton.Visible = false;
             RadioButton rdButton1 = new RadioButton();
             RadioButton rdButton2 = new RadioButton();
+            RadioButton rdButton3 = new RadioButton();
             CheckBox chkBox = new CheckBox();
             var spacing = 4;
             switch (_dataType)
@@ -117,7 +118,6 @@ namespace FAD3.Database.Forms
                     rdButton2.AutoSize = true;
                     Controls.Add(rdButton2);
 
-                    RadioButton rdButton3 = new RadioButton();
                     rdButton3.Text = gearRefCodeCaption;
                     rdButton3.Left = rdButton.Left;
                     rdButton3.Top = rdButton2.Top + rdButton2.Height + spacing;
@@ -131,11 +131,13 @@ namespace FAD3.Database.Forms
                     var languageCaption = "Export languages";
                     var localNamesCaption = "Export local names";
                     var namePairCaption = "Export local name - scientific name pairs";
+                    var allDataCaption = "Export all";
                     if (_action == ExportImportAction.ActionImport)
                     {
                         languageCaption = "Import languages";
                         localNamesCaption = "Import local names";
                         namePairCaption = "Import local name - scientific name pairs";
+                        allDataCaption = "Import all";
                     }
                     //rdButton.Top = 20;
                     rdButton.Left = 10;
@@ -158,6 +160,13 @@ namespace FAD3.Database.Forms
                     rdButton2.Tag = ExportImportDataType.CatchLocalNameSpeciesNamePair;
                     rdButton2.AutoSize = true;
                     Controls.Add(rdButton2);
+
+                    rdButton3.Text = allDataCaption;
+                    rdButton3.Left = rdButton.Left;
+                    rdButton3.Top = rdButton2.Top + rdButton2.Height + spacing;
+                    rdButton3.Tag = ExportImportDataType.CatchNameAll;
+                    rdButton3.AutoSize = true;
+                    Controls.Add(rdButton3);
                     break;
             }
             rdButton.CheckedChanged += OnCheckChanged;
