@@ -61,6 +61,16 @@ namespace FAD3.Mapping.Classes
         public string FishingGround { get; set; }
         public string GridFromLayoutSaveFolder { get; set; }
 
+        public void SelectedMajorGridList(List<int> selectedGridList)
+        {
+            foreach (int item in selectedGridList)
+            {
+                _majorGrid.Grid25Grid.ShapeSelected[item] = true;
+            }
+            _selectedMajorGridShapesExtent = _majorGrid.Grid25Grid.BufferByDistance(0, 0, true, true).Extents;
+            _majorGrid.Grid25Grid.SelectNone();
+        }
+
         public Extents SelectedMajorGridExtents
         {
             get { return _selectedMajorGridShapesExtent; }
@@ -271,7 +281,6 @@ namespace FAD3.Mapping.Classes
                 {
                     Grid25LayoutHelperEventArgs lhe = new Grid25LayoutHelperEventArgs(_layoutExtents);
                     LayerCreated(this, lhe);
-
                     SetupLayout(lhe.Rows, lhe.Columns, lhe.Overlap);
                 }
                 else if (_layoutExtents == null)
@@ -307,6 +316,7 @@ namespace FAD3.Mapping.Classes
                     _axMap.Redraw();
                     success = true;
                     LayoutTemplateFromFile = true;
+                    //_selectedMajorGridShapesExtent = _sfLayout.Extents;
                 }
             }
             return success;

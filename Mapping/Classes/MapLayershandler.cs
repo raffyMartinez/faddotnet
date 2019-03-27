@@ -262,13 +262,17 @@ namespace FAD3
             get { return _mapLayerDictionary.Count; }
         }
 
-        public void set_MapLayer(int layerHandle)
+        public void set_MapLayer(int layerHandle, bool noSelectedShapes = true)
         {
             _currentMapLayer = _mapLayerDictionary[layerHandle];
             if (_currentMapLayer.LayerType == "ShapefileClass")
             {
                 _sfLabelHandler = new ShapefileLabelHandler(_currentMapLayer);
                 _sfSymbologyHandler = new PointLayerSymbologyHandler(_currentMapLayer);
+                if (noSelectedShapes)
+                {
+                    ((Shapefile)_currentMapLayer.LayerObject).SelectNone();
+                }
             }
 
             //if there are listeners to the event

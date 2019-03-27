@@ -931,17 +931,28 @@ namespace FAD3
                     var NoHauls = string.IsNullOrWhiteSpace(EffortData["NumberOfHauls"]) ? "null" : EffortData["NumberOfHauls"];
                     var NoFishers = string.IsNullOrWhiteSpace(EffortData["NumberOfFishers"]) ? "null" : EffortData["NumberOfFishers"];
                     var VesselType = string.IsNullOrWhiteSpace(EffortData["TypeOfVesselUsed"]) ? "null" : EffortData["TypeOfVesselUsed"];
-                    var FishingGround = FishingGrounds.Count > 0 ? FishingGrounds[0] : "";
                     var DateSet = string.IsNullOrWhiteSpace(EffortData["DateSet"]) ? "null" : quote + EffortData["DateSet"] + quote;
                     var TimeSet = string.IsNullOrWhiteSpace(EffortData["TimeSet"]) ? "null" : quote + EffortData["TimeSet"] + quote;
                     var DateHauled = string.IsNullOrWhiteSpace(EffortData["DateHauled"]) ? "null" : quote + EffortData["DateHauled"] + quote;
                     var TimeHauled = string.IsNullOrWhiteSpace(EffortData["TimeHauled"]) ? "null" : quote + EffortData["TimeHauled"] + quote;
                     var SamplingGuid = EffortData["SamplingGUID"];
 
+                    string subGrid = "";
+                    var FishingGround = FishingGrounds.Count > 0 ? FishingGrounds[0] : "";
+                    if (FishingGrid.SubGridStyle != fadSubgridSyle.SubgridStyleNone)
+                    {
+                        var fgParts = FishingGround.Split('-');
+                        FishingGround = $"{fgParts[0]}-{fgParts[1]}";
+                        if (fgParts.Length == 3)
+                        {
+                            subGrid = fgParts[2];
+                        }
+                    }
+
                     if (isNew)
                     {
                         updateQuery = $@"Insert into tblSampling (SamplingGUID, GearVarGUID, AOI, RefNo, SamplingDate, SamplingTime,
-                            FishingGround, TimeSet, DateSet, TimeHauled, DateHauled, NoHauls, NoFishers, Engine, hp,
+                            FishingGround, SubGrid, TimeSet, DateSet, TimeHauled, DateHauled, NoHauls, NoFishers, Engine, hp,
                             WtCatch, WtSample, len, wdt, hgt, LSGUID,  Notes, VesType, SamplingType, HasLiveFish, Enumerator,
                             DateEncoded) values (
                             {{{SamplingGuid}}},
@@ -951,6 +962,7 @@ namespace FAD3
                             '{EffortData["SamplingDate"]}',
                             '{EffortData["SamplingTime"]}',
                             '{FishingGround}',
+                            '{subGrid}',
                             {TimeSet},
                             {DateSet},
                             {TimeHauled},
@@ -979,6 +991,7 @@ namespace FAD3
                             SamplingDate ='{EffortData["SamplingDate"]}',
                             SamplingTime ='{EffortData["SamplingTime"]}',
                             FishingGround = '{FishingGround}',
+                            SubGrid = '{subGrid}',
                             TimeSet ={TimeSet},
                             DateSet = {DateSet},
                             TimeHauled = {TimeHauled},
@@ -1048,11 +1061,19 @@ namespace FAD3
 
                 for (int n = 1; n < FishingGrounds.Count; n++)
                 {
-                    sql = $@"Insert into tblGrid (SamplingGuid, GridName,RowGUID) values
+                    var fgParts = FishingGrounds[n].Split('-');
+                    var fg = $"{fgParts[0]}-{fgParts[1]}";
+                    var subGrid = "";
+                    if (fgParts.Length == 3)
+                    {
+                        subGrid = fgParts[2];
+                    }
+                    sql = $@"Insert into tblGrid (SamplingGuid, GridName,RowGUID,SubGrid) values
                             (
                               {{{SamplingGUID}}},
-                              '{FishingGrounds[n]}',
-                              {{{Guid.NewGuid()}}}
+                              '{fg}',
+                              {{{Guid.NewGuid()}}},
+                              '{subGrid}'
                             )";
                     using (OleDbCommand update = new OleDbCommand(sql, conn))
                     {

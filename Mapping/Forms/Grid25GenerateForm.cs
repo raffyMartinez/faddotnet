@@ -33,6 +33,11 @@ namespace FAD3
         public bool HasSubGrid { get { return _hasSubGrid; } }
         public int SubGridCount { get { return _subGridCount; } }
 
+        public void MapTitle(string mapTitle)
+        {
+            txtMapTitle.Text = mapTitle;
+        }
+
         public Grid25LayoutHelperForm LayoutHelperForm
         {
             get { return _g25lhf; }
@@ -183,6 +188,8 @@ namespace FAD3
                         {
                             _hasSubGrid = true;
                             _subGridCount = sgf.SubGridCount;
+                            _grid25MajorGrid.HasSubgrid = _hasSubGrid;
+                            _grid25MajorGrid.SubGridCount = _subGridCount;
                         }
                     }
 
@@ -202,8 +209,6 @@ namespace FAD3
                     if (txtMinorGridLabelDistance.Text.Length > 0 && txtMinorGridLabelSize.Text.Length > 0)
                     {
                         SetupDictionary();
-                        _grid25MajorGrid.HasSubgrid = _hasSubGrid;
-                        _grid25MajorGrid.SubGridCount = _subGridCount;
                         if (_grid25MajorGrid.DefineMinorGrid((int)((Bitmap)imList.Images["gridCursor"]).GetHicon()))
                         {
                             _grid25MajorGrid.LabelAndGridProperties = _labelAndGridProperties;
@@ -221,6 +226,7 @@ namespace FAD3
                     }
                     break;
 
+                //removes from the map window all features that were created with the use of the Grid25GenerateForm
                 case "buttonClear":
                     if (_grid25MajorGrid.LayoutHelper?.LayoutShapeFile?.NumShapes > 0)
                     {
@@ -285,6 +291,7 @@ namespace FAD3
                         if (_grid25MajorGrid.LayoutHelper.OpenLayoutFile(ofd.FileName))
                         {
                             string line;
+                            List<int> selectedGridHandles = new List<int>();
                             StreamReader file = new StreamReader(ofd.FileName);
 
                             while ((line = file.ReadLine()) != null)
@@ -292,6 +299,18 @@ namespace FAD3
                                 string[] line2 = line.Split(':');
                                 switch (line2[0])
                                 {
+                                    case "SelectedMajorGrids":
+                                        foreach (var item in line2[1].Split(','))
+                                        {
+                                            selectedGridHandles.Add(int.Parse(item));
+                                        }
+                                        //sends a list of major grids that will be selected
+                                        _grid25MajorGrid.SelectedShapeGridNumbers = selectedGridHandles;
+
+                                        //sends a list of major grids that will be used to create an extent of major grid
+                                        _grid25MajorGrid.LayoutHelper.SelectedMajorGridList(selectedGridHandles);
+                                        break;
+
                                     case "Fishing ground":
                                         _grid25MajorGrid.LayoutHelper.FishingGround = line2[1];
                                         break;

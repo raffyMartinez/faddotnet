@@ -226,6 +226,19 @@ namespace FAD3
 
             if (e.Action == "LoadGridMap")
             {
+                //This is where the actual work of constructing the grid map takes place
+                if (LayoutHelper.LayoutTemplateFromFile)
+                {
+                }
+
+                if (GenerateMinorGridInsideExtent(e.SelectedExtent))
+                {
+                    SetupTopLayers();
+                    //_grid25MinorGrid.MinorGridLinesShapeFile.Categories.ApplyExpressions();
+                }
+            }
+            else if (e.Action == "LoadGridMap1")
+            {
                 int h = 0;
 
                 //load the minor grid shapefile
@@ -730,6 +743,16 @@ namespace FAD3
         public List<int> SelectedShapeGridNumbers
         {
             get { return _listSelectedShapeGridNumbers; }
+            set
+            {
+                _listSelectedShapeGridNumbers = value;
+                //foreach (int item in _listSelectedShapeGridNumbers)
+                //{
+                //    _shapefileMajorGrid.ShapeSelected[item] = true;
+                //}
+                //_selectedMajorGridShapesExtent = _shapefileMajorGrid.BufferByDistance(0, 0, true, true).Extents;
+                //_shapefileMajorGrid.SelectNone();
+            }
         }
 
         /// <summary>
@@ -810,6 +833,11 @@ namespace FAD3
             DefineGridLayout(-1);
         }
 
+        /// <summary>
+        /// prepares the map for defining the extent of a layout helper and
+        /// creates a new layout helper object
+        /// </summary>
+        /// <param name="iconHandle"></param>
         public void DefineGridLayout(int iconHandle)
         {
             if (_layoutHelper == null)
@@ -822,6 +850,8 @@ namespace FAD3
                     _axMap.CursorMode = tkCursorMode.cmSelection;
                     _axMap.MapCursor = tkCursor.crsrUserDefined;
                     _axMap.UDCursorHandle = _hCursorDefineLayout;
+
+                    //creates a new layout helper object
                     _layoutHelper = new Grid25LayoutHelper(this, iconHandle);
                 }
                 else
@@ -1511,6 +1541,11 @@ namespace FAD3
             }
         }
 
+        public void SetExtentFromLayout()
+        {
+            _selectedMajorGridShapesExtent = _layoutHelper.SelectedMajorGridExtents;
+        }
+
         /// <summary>
         /// Perform gridding using the layout
         /// </summary>
@@ -1526,20 +1561,21 @@ namespace FAD3
                 _folderToSave = folder;
                 _layoutHelper.GridFromLayoutSaveFolder = _folderToSave;
                 _selectedMajorGridShapesExtent = _layoutHelper.SelectedMajorGridExtents;
-                for (int n = 0; n < _layoutHelper.LayoutShapeFile.NumShapes; n++)
-                {
-                    int fldTitle = _layoutHelper.LayoutShapeFile.FieldIndexByName["Title"];
-                    string mapTitle = _layoutHelper.LayoutShapeFile.CellValue[fldTitle, n].ToString();
-                    if (GenerateMinorGridInsideExtent(_layoutHelper.LayoutShapeFile.Shape[n].Extents, mapTitle))
-                    {
-                        Save($@"{_folderToSave}\{fishingGround}-{mapTitle}");
-                        if (OnGridInPanelCreated != null)
-                        {
-                            LayerEventArg e = new LayerEventArg(mapTitle);
-                            OnGridInPanelCreated(this, e);
-                        }
-                    }
-                }
+
+                //for (int n = 0; n < _layoutHelper.LayoutShapeFile.NumShapes; n++)
+                //{
+                //    int fldTitle = _layoutHelper.LayoutShapeFile.FieldIndexByName["Title"];
+                //    string mapTitle = _layoutHelper.LayoutShapeFile.CellValue[fldTitle, n].ToString();
+                //    if (GenerateMinorGridInsideExtent(_layoutHelper.LayoutShapeFile.Shape[n].Extents, mapTitle))
+                //    {
+                //        Save($@"{_folderToSave}\{fishingGround}-{mapTitle}");
+                //        if (OnGridInPanelCreated != null)
+                //        {
+                //            LayerEventArg e = new LayerEventArg(mapTitle);
+                //            OnGridInPanelCreated(this, e);
+                //        }
+                //    }
+                //}
                 return true;
             }
             else
@@ -1608,6 +1644,8 @@ namespace FAD3
                         _shapefileMajorGrid.SelectionDrawingOptions.LineColor = new Utils().ColorByName(tkMapColor.Red);
                         _shapefileMajorGrid.SelectionDrawingOptions.LineWidth = 2;
                     }
+                    //_selectedMajorGridShapesExtent
+
                     _axMap.Redraw();
                 }
             }

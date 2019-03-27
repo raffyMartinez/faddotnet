@@ -14,6 +14,9 @@ using System.IO;
 
 namespace FAD3.Mapping.Forms
 {
+    /// <summary>
+    /// Creates multiple fishing ground grid maps
+    /// </summary>
     public partial class Grid25LayoutHelperForm : Form
     {
         public static Grid25LayoutHelperForm GetInstance(Grid25MajorGrid majorGrid, Grid25GenerateForm parentForm)
@@ -68,36 +71,38 @@ namespace FAD3.Mapping.Forms
         private int _mouseX;
         private int _mouseY;
         private Grid25GenerateForm _parentForm;
+        private bool _hasSubGrid;
+        private int _subGridCount;
 
+        /// <summary>
+        ///populate the various text fields of the form
+        ///and populate the list of grid maps that are
+        ///defined by the layout template
+        /// </summary>
         public void SetUpFields()
         {
             _fishingGround = LayoutHelper.FishingGround;
             textFishingGround.Text = _fishingGround;
             _savePath = LayoutHelper.GridFromLayoutSaveFolder;
-            textFolderToSave.Text = _savePath;
+            //textFolderToSave.Text = _savePath;
             txtRows.Text = LayoutHelper.Rows.ToString();
             txtColumns.Text = LayoutHelper.Columns.ToString();
             txtOverlap.Text = LayoutHelper.Overlap.ToString();
 
             SetupResultsView();
 
+            //populate the list of grid maps
             int panelCount = LayoutHelper.Columns * LayoutHelper.Rows;
             for (int n = 0; n < panelCount; n++)
             {
                 int fldTitle = LayoutHelper.LayoutShapeFile.FieldIndexByName["Title"];
                 string panelTitle = LayoutHelper.LayoutShapeFile.CellValue[fldTitle, n].ToString();
                 Extents ext = LayoutHelper.LayoutShapeFile.Shape[n].Extents;
-                if (File.Exists($@"{_savePath}\{_fishingGround}-{panelTitle}_gridlines.shp"))
-                {
-                    ListViewItem lvi = lvResults.Items.Add(panelTitle);
-                    lvi.SubItems.Add(ext.Width.ToString());
-                    lvi.SubItems.Add(ext.Height.ToString());
-                    lvi.Tag = $"{_fishingGround}-{panelTitle}";
-                }
-                else
-                {
-                    lvResults.Items.Add("");
-                }
+
+                ListViewItem lvi = lvResults.Items.Add(panelTitle);
+                lvi.SubItems.Add(ext.Width.ToString());
+                lvi.SubItems.Add(ext.Height.ToString());
+                lvi.Tag = $"{_fishingGround}-{panelTitle}";
             }
 
             SizeColumns(lvResults, false);
@@ -161,6 +166,35 @@ namespace FAD3.Mapping.Forms
         {
             switch (((Button)(sender)).Name)
             {
+                case "buttonSubGrid":
+                    _hasSubGrid = _majorGrid.HasSubgrid;
+                    using (Grid25SubGridForm sgf = new Grid25SubGridForm())
+                    {
+                        sgf.SubGridCount = _majorGrid.SubGridCount;
+                        sgf.ShowDialog();
+                        if (sgf.DialogResult == DialogResult.OK)
+                        {
+                            _hasSubGrid = true;
+                            _subGridCount = sgf.SubGridCount;
+                            _majorGrid.HasSubgrid = _hasSubGrid;
+                            _majorGrid.SubGridCount = _subGridCount;
+                        }
+                    }
+                    break;
+
+                case "btnInputTitles":
+                    _majorGrid.MapLayers.set_MapLayer(LayoutHelper.LayerHandle);
+                    EditShapeAttributeForm esaf = EditShapeAttributeForm.GetInstance(global.MappingForm, _majorGrid.MapInterActionHandler);
+                    if (esaf.Visible)
+                    {
+                        esaf.BringToFront();
+                    }
+                    else
+                    {
+                        esaf.Show(this);
+                    }
+                    break;
+
                 case "btnSaveLayout":
                     if (LayoutHelper.ValidLayoutTemplateShapefile())
                     {
@@ -213,9 +247,6 @@ namespace FAD3.Mapping.Forms
                             {
                                 if (_majorGrid.LayoutHelper.LayerHandle > 0)
                                 {
-                                    //_majorGrid.LayoutHelper.FishingGround = textFishingGround.Text;
-                                    //_majorGrid.LayoutHelper.GridFromLayoutSaveFolder = textFolderToSave.Text;
-
                                     FillResultList();
                                     _majorGrid.MapLayers.ClearAllSelections();
                                 }
@@ -290,10 +321,10 @@ namespace FAD3.Mapping.Forms
                 lvi.Checked = false;
                 lvi.Tag = $"{textFishingGround.Text}-{mapTitle}";
             }
-            lvResults.Items[lvResults.Items.Count - 1].Checked = true;
 
             SizeColumns(lvResults, false);
             lvResults.ItemChecked += OnListItemChecked;
+            lvResults.Items[lvResults.Items.Count - 1].Checked = true;
         }
 
         private void OnTextValidating(object sender, CancelEventArgs e)
@@ -357,6 +388,8 @@ namespace FAD3.Mapping.Forms
             txtRows.Text = _majorGrid.LayoutRows.ToString();
             txtColumns.Text = _majorGrid.LayoutCols.ToString();
             txtOverlap.Text = _majorGrid.LayoutOverlap.ToString();
+            _hasSubGrid = _majorGrid.HasSubgrid;
+            _subGridCount = _majorGrid.SubGridCount;
         }
 
         private Extents DefinePageExtent(Extents selectedMajorGridShapesExtent, Extents selectionBoxExtent)
@@ -422,6 +455,7 @@ namespace FAD3.Mapping.Forms
             {
                 lve.FileName = $"{item.Tag.ToString()}";
                 lve.SelectedIndex = item.Index;
+                lve.SelectedExtent = LayoutHelper.LayoutShapeFile.Shape[item.Index].Extents;
                 if (item.Checked)
                 {
                     lve.Action = "LoadGridMap";
@@ -450,8 +484,16 @@ namespace FAD3.Mapping.Forms
                 lvResults.ItemChecked += OnListItemChecked;
             }
 
-            //load/hide the grid inside the checked panel
-            _majorGrid.LoadPanelGrid(chkAutoExpand.Checked, lve);
+            if (lvResults.CheckedItems.Count == 0)
+            {
+                _parentForm.MapTitle("");
+            }
+            else
+            {
+                //load/hide the grid inside the checked panel
+                _majorGrid.LoadPanelGrid(chkAutoExpand.Checked, lve);
+                _parentForm.MapTitle(item.Text);
+            }
         }
 
         private void OnTabsSelectionChanged(object sender, EventArgs e)
@@ -462,6 +504,17 @@ namespace FAD3.Mapping.Forms
             switch (t.SelectedTab.Name)
             {
                 case "tabResults":
+                    if (textFishingGround.Text.Length > 0
+                        && _majorGrid.LayoutHelper.LayoutShapeFile.NumShapes > 0
+                        && _majorGrid.LayoutHelper.HasCompletePanelTitles())
+                    {
+                        _majorGrid.SetExtentFromLayout();
+                        //if (lvResults.Items.Count == 0)
+                        //{
+                        FillResultList();
+                        //}
+                    }
+                    _majorGrid.LayoutHelper.FishingGround = textFishingGround.Text;
                     btnSaveLayout.Visible = true;
                     chkAutoExpand.Visible = true;
                     btnSaveLayout.Enabled = btnSave.Enabled && lvResults.Items.Count > 0 && _majorGrid.LayoutHelper.HasCompletePanelTitles();

@@ -39,29 +39,37 @@
             this.btnApply = new System.Windows.Forms.Button();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.btnCancel = new System.Windows.Forms.Button();
-            this.btnSave = new System.Windows.Forms.Button();
             this.txtPageHeight = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.txtPageWidth = new System.Windows.Forms.TextBox();
             this.tabsLayout = new System.Windows.Forms.TabControl();
             this.tabLayout = new System.Windows.Forms.TabPage();
-            this.tabSave = new System.Windows.Forms.TabPage();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.textFolderToSave = new System.Windows.Forms.TextBox();
-            this.btnSelectFolderSave = new System.Windows.Forms.Button();
+            this.btnInputTitles = new System.Windows.Forms.Button();
+            this.tabFishingGround = new System.Windows.Forms.TabPage();
             this.label7 = new System.Windows.Forms.Label();
             this.textFishingGround = new System.Windows.Forms.TextBox();
             this.tabResults = new System.Windows.Forms.TabPage();
+            this.buttonSubGrid = new System.Windows.Forms.Button();
             this.lvResults = new System.Windows.Forms.ListView();
+            this.menuDropDown = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.tabSave = new System.Windows.Forms.TabPage();
+            this.btnSave = new System.Windows.Forms.Button();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.textFolderToSave = new System.Windows.Forms.TextBox();
+            this.btnSelectFolderSave = new System.Windows.Forms.Button();
             this.chkAutoExpand = new System.Windows.Forms.CheckBox();
             this.btnSaveLayout = new System.Windows.Forms.Button();
-            this.menuDropDown = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.textLayoutTemplateFileName = new System.Windows.Forms.TextBox();
+            this.btnSaveTemplate = new System.Windows.Forms.Button();
             this.tabsLayout.SuspendLayout();
             this.tabLayout.SuspendLayout();
+            this.tabFishingGround.SuspendLayout();
+            this.tabResults.SuspendLayout();
             this.tabSave.SuspendLayout();
             this.groupBox1.SuspendLayout();
-            this.tabResults.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // txtRows
@@ -143,29 +151,19 @@
             this.imageList1.Images.SetKeyName(4, "addLayout");
             this.imageList1.Images.SetKeyName(5, "openLayoutGrid");
             this.imageList1.Images.SetKeyName(6, "saveLayout");
+            this.imageList1.Images.SetKeyName(7, "layoutTitles.bmp");
+            this.imageList1.Images.SetKeyName(8, "subgrid");
             // 
             // btnCancel
             // 
             this.btnCancel.ImageKey = "cancel";
             this.btnCancel.ImageList = this.imageList1;
-            this.btnCancel.Location = new System.Drawing.Point(331, 285);
+            this.btnCancel.Location = new System.Drawing.Point(343, 305);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(28, 28);
             this.btnCancel.TabIndex = 7;
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.OnButtonClick);
-            // 
-            // btnSave
-            // 
-            this.btnSave.Enabled = false;
-            this.btnSave.ImageKey = "save";
-            this.btnSave.ImageList = this.imageList1;
-            this.btnSave.Location = new System.Drawing.Point(329, 184);
-            this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(28, 28);
-            this.btnSave.TabIndex = 8;
-            this.btnSave.UseVisualStyleBackColor = true;
-            this.btnSave.Click += new System.EventHandler(this.OnButtonClick);
             // 
             // txtPageHeight
             // 
@@ -208,17 +206,19 @@
             // tabsLayout
             // 
             this.tabsLayout.Controls.Add(this.tabLayout);
-            this.tabsLayout.Controls.Add(this.tabSave);
+            this.tabsLayout.Controls.Add(this.tabFishingGround);
             this.tabsLayout.Controls.Add(this.tabResults);
+            this.tabsLayout.Controls.Add(this.tabSave);
             this.tabsLayout.Location = new System.Drawing.Point(-2, 23);
             this.tabsLayout.Name = "tabsLayout";
             this.tabsLayout.SelectedIndex = 0;
-            this.tabsLayout.Size = new System.Drawing.Size(380, 251);
+            this.tabsLayout.Size = new System.Drawing.Size(380, 275);
             this.tabsLayout.TabIndex = 13;
             this.tabsLayout.SelectedIndexChanged += new System.EventHandler(this.OnTabsSelectionChanged);
             // 
             // tabLayout
             // 
+            this.tabLayout.Controls.Add(this.btnInputTitles);
             this.tabLayout.Controls.Add(this.txtPageWidth);
             this.tabLayout.Controls.Add(this.label2);
             this.tabLayout.Controls.Add(this.btnApply);
@@ -238,55 +238,33 @@
             this.tabLayout.Text = "Layout";
             this.tabLayout.UseVisualStyleBackColor = true;
             // 
-            // tabSave
+            // btnInputTitles
             // 
-            this.tabSave.Controls.Add(this.groupBox1);
-            this.tabSave.Controls.Add(this.label7);
-            this.tabSave.Controls.Add(this.textFishingGround);
-            this.tabSave.Controls.Add(this.btnSave);
-            this.tabSave.Location = new System.Drawing.Point(4, 22);
-            this.tabSave.Name = "tabSave";
-            this.tabSave.Padding = new System.Windows.Forms.Padding(3);
-            this.tabSave.Size = new System.Drawing.Size(372, 225);
-            this.tabSave.TabIndex = 1;
-            this.tabSave.Text = "Grid and save";
-            this.tabSave.UseVisualStyleBackColor = true;
+            this.btnInputTitles.ImageKey = "layoutTitles.bmp";
+            this.btnInputTitles.ImageList = this.imageList1;
+            this.btnInputTitles.Location = new System.Drawing.Point(295, 184);
+            this.btnInputTitles.Name = "btnInputTitles";
+            this.btnInputTitles.Size = new System.Drawing.Size(28, 28);
+            this.btnInputTitles.TabIndex = 13;
+            this.btnInputTitles.UseVisualStyleBackColor = true;
+            this.btnInputTitles.Click += new System.EventHandler(this.OnButtonClick);
             // 
-            // groupBox1
+            // tabFishingGround
             // 
-            this.groupBox1.Controls.Add(this.textFolderToSave);
-            this.groupBox1.Controls.Add(this.btnSelectFolderSave);
-            this.groupBox1.Location = new System.Drawing.Point(21, 75);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(333, 88);
-            this.groupBox1.TabIndex = 15;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Folder to save";
-            // 
-            // textFolderToSave
-            // 
-            this.textFolderToSave.Enabled = false;
-            this.textFolderToSave.Location = new System.Drawing.Point(6, 54);
-            this.textFolderToSave.Name = "textFolderToSave";
-            this.textFolderToSave.Size = new System.Drawing.Size(321, 20);
-            this.textFolderToSave.TabIndex = 12;
-            this.textFolderToSave.Validating += new System.ComponentModel.CancelEventHandler(this.OnTextValidating);
-            // 
-            // btnSelectFolderSave
-            // 
-            this.btnSelectFolderSave.ImageKey = "addToFolder";
-            this.btnSelectFolderSave.ImageList = this.imageList1;
-            this.btnSelectFolderSave.Location = new System.Drawing.Point(150, 19);
-            this.btnSelectFolderSave.Name = "btnSelectFolderSave";
-            this.btnSelectFolderSave.Size = new System.Drawing.Size(28, 28);
-            this.btnSelectFolderSave.TabIndex = 11;
-            this.btnSelectFolderSave.UseVisualStyleBackColor = true;
-            this.btnSelectFolderSave.Click += new System.EventHandler(this.OnButtonClick);
+            this.tabFishingGround.Controls.Add(this.label7);
+            this.tabFishingGround.Controls.Add(this.textFishingGround);
+            this.tabFishingGround.Location = new System.Drawing.Point(4, 22);
+            this.tabFishingGround.Name = "tabFishingGround";
+            this.tabFishingGround.Padding = new System.Windows.Forms.Padding(3);
+            this.tabFishingGround.Size = new System.Drawing.Size(372, 225);
+            this.tabFishingGround.TabIndex = 1;
+            this.tabFishingGround.Text = "Fishing ground";
+            this.tabFishingGround.UseVisualStyleBackColor = true;
             // 
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(21, 15);
+            this.label7.Location = new System.Drawing.Point(21, 68);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(76, 13);
             this.label7.TabIndex = 14;
@@ -294,7 +272,7 @@
             // 
             // textFishingGround
             // 
-            this.textFishingGround.Location = new System.Drawing.Point(24, 31);
+            this.textFishingGround.Location = new System.Drawing.Point(24, 84);
             this.textFishingGround.Name = "textFishingGround";
             this.textFishingGround.Size = new System.Drawing.Size(330, 20);
             this.textFishingGround.TabIndex = 10;
@@ -302,6 +280,7 @@
             // 
             // tabResults
             // 
+            this.tabResults.Controls.Add(this.buttonSubGrid);
             this.tabResults.Controls.Add(this.lvResults);
             this.tabResults.Location = new System.Drawing.Point(4, 22);
             this.tabResults.Name = "tabResults";
@@ -310,21 +289,91 @@
             this.tabResults.Text = "Results";
             this.tabResults.UseVisualStyleBackColor = true;
             // 
+            // buttonSubGrid
+            // 
+            this.buttonSubGrid.ImageKey = "subgrid";
+            this.buttonSubGrid.ImageList = this.imageList1;
+            this.buttonSubGrid.Location = new System.Drawing.Point(329, 176);
+            this.buttonSubGrid.Name = "buttonSubGrid";
+            this.buttonSubGrid.Size = new System.Drawing.Size(28, 28);
+            this.buttonSubGrid.TabIndex = 12;
+            this.buttonSubGrid.UseVisualStyleBackColor = true;
+            this.buttonSubGrid.Click += new System.EventHandler(this.OnButtonClick);
+            // 
             // lvResults
             // 
             this.lvResults.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.lvResults.ContextMenuStrip = this.menuDropDown;
             this.lvResults.Location = new System.Drawing.Point(3, 3);
             this.lvResults.Name = "lvResults";
-            this.lvResults.Size = new System.Drawing.Size(364, 219);
+            this.lvResults.Size = new System.Drawing.Size(309, 219);
             this.lvResults.TabIndex = 0;
             this.lvResults.UseCompatibleStateImageBehavior = false;
             this.lvResults.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnMouseDown);
             // 
+            // menuDropDown
+            // 
+            this.menuDropDown.Name = "menuDropDown";
+            this.menuDropDown.Size = new System.Drawing.Size(61, 4);
+            this.menuDropDown.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnDropDownItemClicked);
+            // 
+            // tabSave
+            // 
+            this.tabSave.Controls.Add(this.groupBox2);
+            this.tabSave.Controls.Add(this.groupBox1);
+            this.tabSave.Location = new System.Drawing.Point(4, 22);
+            this.tabSave.Name = "tabSave";
+            this.tabSave.Padding = new System.Windows.Forms.Padding(3);
+            this.tabSave.Size = new System.Drawing.Size(372, 249);
+            this.tabSave.TabIndex = 3;
+            this.tabSave.Text = "Save";
+            this.tabSave.UseVisualStyleBackColor = true;
+            // 
+            // btnSave
+            // 
+            this.btnSave.Enabled = false;
+            this.btnSave.ImageKey = "save";
+            this.btnSave.ImageList = this.imageList1;
+            this.btnSave.Location = new System.Drawing.Point(261, 62);
+            this.btnSave.Name = "btnSave";
+            this.btnSave.Size = new System.Drawing.Size(28, 28);
+            this.btnSave.TabIndex = 17;
+            this.btnSave.UseVisualStyleBackColor = true;
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.btnSave);
+            this.groupBox1.Controls.Add(this.textFolderToSave);
+            this.groupBox1.Controls.Add(this.btnSelectFolderSave);
+            this.groupBox1.Location = new System.Drawing.Point(17, 15);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(333, 106);
+            this.groupBox1.TabIndex = 16;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Save all fishing ground grid maps";
+            // 
+            // textFolderToSave
+            // 
+            this.textFolderToSave.Enabled = false;
+            this.textFolderToSave.Location = new System.Drawing.Point(6, 29);
+            this.textFolderToSave.Name = "textFolderToSave";
+            this.textFolderToSave.Size = new System.Drawing.Size(321, 20);
+            this.textFolderToSave.TabIndex = 12;
+            // 
+            // btnSelectFolderSave
+            // 
+            this.btnSelectFolderSave.ImageKey = "addToFolder";
+            this.btnSelectFolderSave.ImageList = this.imageList1;
+            this.btnSelectFolderSave.Location = new System.Drawing.Point(295, 62);
+            this.btnSelectFolderSave.Name = "btnSelectFolderSave";
+            this.btnSelectFolderSave.Size = new System.Drawing.Size(28, 28);
+            this.btnSelectFolderSave.TabIndex = 11;
+            this.btnSelectFolderSave.UseVisualStyleBackColor = true;
+            // 
             // chkAutoExpand
             // 
             this.chkAutoExpand.AutoSize = true;
-            this.chkAutoExpand.Location = new System.Drawing.Point(12, 292);
+            this.chkAutoExpand.Location = new System.Drawing.Point(12, 311);
             this.chkAutoExpand.Name = "chkAutoExpand";
             this.chkAutoExpand.Size = new System.Drawing.Size(129, 17);
             this.chkAutoExpand.TabIndex = 14;
@@ -337,7 +386,7 @@
             this.btnSaveLayout.Enabled = false;
             this.btnSaveLayout.ImageKey = "saveLayout";
             this.btnSaveLayout.ImageList = this.imageList1;
-            this.btnSaveLayout.Location = new System.Drawing.Point(297, 285);
+            this.btnSaveLayout.Location = new System.Drawing.Point(309, 305);
             this.btnSaveLayout.Name = "btnSaveLayout";
             this.btnSaveLayout.Size = new System.Drawing.Size(28, 28);
             this.btnSaveLayout.TabIndex = 15;
@@ -345,17 +394,41 @@
             this.btnSaveLayout.Visible = false;
             this.btnSaveLayout.Click += new System.EventHandler(this.OnButtonClick);
             // 
-            // menuDropDown
+            // groupBox2
             // 
-            this.menuDropDown.Name = "menuDropDown";
-            this.menuDropDown.Size = new System.Drawing.Size(61, 4);
-            this.menuDropDown.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnDropDownItemClicked);
+            this.groupBox2.Controls.Add(this.btnSaveTemplate);
+            this.groupBox2.Controls.Add(this.textLayoutTemplateFileName);
+            this.groupBox2.Location = new System.Drawing.Point(17, 131);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(333, 106);
+            this.groupBox2.TabIndex = 17;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Save fishing ground layout template";
+            // 
+            // textLayoutTemplateFileName
+            // 
+            this.textLayoutTemplateFileName.Enabled = false;
+            this.textLayoutTemplateFileName.Location = new System.Drawing.Point(6, 26);
+            this.textLayoutTemplateFileName.Name = "textLayoutTemplateFileName";
+            this.textLayoutTemplateFileName.Size = new System.Drawing.Size(321, 20);
+            this.textLayoutTemplateFileName.TabIndex = 13;
+            // 
+            // btnSaveTemplate
+            // 
+            this.btnSaveTemplate.Enabled = false;
+            this.btnSaveTemplate.ImageKey = "save";
+            this.btnSaveTemplate.ImageList = this.imageList1;
+            this.btnSaveTemplate.Location = new System.Drawing.Point(295, 61);
+            this.btnSaveTemplate.Name = "btnSaveTemplate";
+            this.btnSaveTemplate.Size = new System.Drawing.Size(28, 28);
+            this.btnSaveTemplate.TabIndex = 18;
+            this.btnSaveTemplate.UseVisualStyleBackColor = true;
             // 
             // Grid25LayoutHelperForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(381, 321);
+            this.ClientSize = new System.Drawing.Size(381, 340);
             this.Controls.Add(this.btnSaveLayout);
             this.Controls.Add(this.chkAutoExpand);
             this.Controls.Add(this.tabsLayout);
@@ -368,11 +441,14 @@
             this.tabsLayout.ResumeLayout(false);
             this.tabLayout.ResumeLayout(false);
             this.tabLayout.PerformLayout();
+            this.tabFishingGround.ResumeLayout(false);
+            this.tabFishingGround.PerformLayout();
+            this.tabResults.ResumeLayout(false);
             this.tabSave.ResumeLayout(false);
-            this.tabSave.PerformLayout();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
-            this.tabResults.ResumeLayout(false);
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -388,17 +464,13 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button btnApply;
         private System.Windows.Forms.Button btnCancel;
-        private System.Windows.Forms.Button btnSave;
         private System.Windows.Forms.TextBox txtPageHeight;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox txtPageWidth;
         private System.Windows.Forms.TabControl tabsLayout;
         private System.Windows.Forms.TabPage tabLayout;
-        private System.Windows.Forms.TabPage tabSave;
-        private System.Windows.Forms.TextBox textFolderToSave;
-        private System.Windows.Forms.Button btnSelectFolderSave;
-        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.TabPage tabFishingGround;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.TextBox textFishingGround;
         private System.Windows.Forms.ImageList imageList1;
@@ -407,5 +479,15 @@
         private System.Windows.Forms.CheckBox chkAutoExpand;
         private System.Windows.Forms.Button btnSaveLayout;
         private System.Windows.Forms.ContextMenuStrip menuDropDown;
+        private System.Windows.Forms.Button btnInputTitles;
+        private System.Windows.Forms.Button buttonSubGrid;
+        private System.Windows.Forms.TabPage tabSave;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.TextBox textFolderToSave;
+        private System.Windows.Forms.Button btnSelectFolderSave;
+        private System.Windows.Forms.Button btnSave;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.Button btnSaveTemplate;
+        private System.Windows.Forms.TextBox textLayoutTemplateFileName;
     }
 }

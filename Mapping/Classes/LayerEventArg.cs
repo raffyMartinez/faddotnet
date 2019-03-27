@@ -1,4 +1,5 @@
 ﻿using System;
+using MapWinGIS;
 
 namespace FAD3
 {
@@ -18,6 +19,7 @@ namespace FAD3
         public int[] SelectedIndexes { get; set; }
         public string VisibilityExpression { get; }
         public VisibilityExpressionTarget ExpressionTarget { get; }
+        public Extents SelectedExtent { get; set; }
 
         public LayerEventArg(int layerHandle, string layerName, bool layerVIsible, bool showInLayerUI, string layerType)
         {
