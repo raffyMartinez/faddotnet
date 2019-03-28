@@ -115,11 +115,69 @@ namespace FAD3.Mapping.Classes
         /// </summary>
         public bool LayoutTemplateFromFile { get; internal set; }
 
+        //public void SaveTemplateToFile()
+        //{
+        //    if (ValidLayoutTemplateShapefile())
+        //    {
+        //        var sf = (Shapefile)_mapLayersHandler.CurrentMapLayer.LayerObject;
+        //        var saveAs = new SaveFileDialog();
+        //        saveAs.Filter = "Shapefile *.shp|*.shp|All files *.*|*.*";
+        //        saveAs.FilterIndex = 1;
+        //        saveAs.ShowDialog();
+        //        if (File.Exists(saveAs.FileName))
+        //        {
+        //            ShapefileDiskStorageHelper.Delete(saveAs.FileName.Replace(".shp", ""));
+        //        }
+        //        if (saveAs.FileName.Length > 0 && sf.SaveAs(saveAs.FileName))
+        //        {
+        //            var prjFile = sf.Filename.Replace(".shp", ".prj");
+        //            sf.GeoProjection.WriteToFile(prjFile);
+
+        //            if (_mapLayersHandler.CurrentMapLayer.IsFishingGridLayoutTemplate)
+        //            {
+        //                var layoutFile = sf.Filename.Replace(".shp", ".lay");
+        //                if (File.Exists(layoutFile))
+        //                {
+        //                    try
+        //                    {
+        //                        File.Delete(layoutFile);
+        //                    }
+        //                    catch (IOException ioex)
+        //                    {
+        //                    }
+        //                    catch (Exception ex)
+        //                    {
+        //                    }
+        //                }
+        //                using (StreamWriter writer = new StreamWriter(layoutFile, true))
+        //                {
+        //                    writer.WriteLine($"Fishing ground:{ global.MappingForm.Grid25MajorGrid.LayoutHelper.FishingGround}");
+        //                    //writer.WriteLine($"Save folder:{global.MappingForm.Grid25MajorGrid.LayoutHelper.GridFromLayoutSaveFolder}");
+        //                    writer.WriteLine($"Rows:{global.MappingForm.Grid25MajorGrid.LayoutHelper.Rows}");
+        //                    writer.WriteLine($"Columns:{global.MappingForm.Grid25MajorGrid.LayoutHelper.Columns}");
+        //                    writer.WriteLine($"Overlap:{global.MappingForm.Grid25MajorGrid.LayoutHelper.Overlap}");
+        //                    string selectedMajorGrids = "SelectedMajorGrids:";
+        //                    foreach (int item in global.MappingForm.Grid25MajorGrid.SelectedShapeGridNumbers)
+        //                    {
+        //                        selectedMajorGrids += $"{item.ToString()},";
+        //                    }
+        //                    selectedMajorGrids = selectedMajorGrids.Trim(',');
+        //                    writer.WriteLine(selectedMajorGrids);
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
         public bool SaveLayoutTemplate(string fileName)
         {
             bool success = true;
             if (ValidLayoutTemplateShapefile())
             {
+                if (File.Exists(fileName))
+                {
+                    ShapefileDiskStorageHelper.Delete(fileName.Replace(".shp", ""));
+                }
+
                 if (_sfLayout.SaveAs(fileName))
                 {
                     var prjFile = _sfLayout.Filename.Replace(".shp", ".prj");
@@ -144,10 +202,17 @@ namespace FAD3.Mapping.Classes
                     using (StreamWriter writer = new StreamWriter(layoutFile, true))
                     {
                         writer.WriteLine($"Fishing ground:{ global.MappingForm.Grid25MajorGrid.LayoutHelper.FishingGround}");
-                        writer.WriteLine($"Save folder:{global.MappingForm.Grid25MajorGrid.LayoutHelper.GridFromLayoutSaveFolder}");
+                        //writer.WriteLine($"Save folder:{global.MappingForm.Grid25MajorGrid.LayoutHelper.GridFromLayoutSaveFolder}");
                         writer.WriteLine($"Rows:{global.MappingForm.Grid25MajorGrid.LayoutHelper.Rows}");
                         writer.WriteLine($"Columns:{global.MappingForm.Grid25MajorGrid.LayoutHelper.Columns}");
                         writer.WriteLine($"Overlap:{global.MappingForm.Grid25MajorGrid.LayoutHelper.Overlap}");
+                        string selectedMajorGrids = "SelectedMajorGrids:";
+                        foreach (int item in global.MappingForm.Grid25MajorGrid.SelectedShapeGridNumbers)
+                        {
+                            selectedMajorGrids += $"{item.ToString()},";
+                        }
+                        selectedMajorGrids = selectedMajorGrids.Trim(',');
+                        writer.WriteLine(selectedMajorGrids);
                     }
                 }
             }

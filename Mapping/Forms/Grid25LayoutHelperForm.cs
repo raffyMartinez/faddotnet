@@ -166,6 +166,21 @@ namespace FAD3.Mapping.Forms
         {
             switch (((Button)(sender)).Name)
             {
+                case "btnSaveTemplate":
+                    var saveAs = new SaveFileDialog();
+                    saveAs.Filter = "Shapefile *.shp|*.shp|All files *.*|*.*";
+                    saveAs.FilterIndex = 1;
+                    saveAs.FileName = $"{textFishingGround.Text}_template.shp";
+                    DialogResult dr = saveAs.ShowDialog();
+                    if (dr == DialogResult.OK)
+                    {
+                        if (!_parentForm.Grid25MajorGrid.LayoutHelper.SaveLayoutTemplate(saveAs.FileName))
+                        {
+                            MessageBox.Show("Template file was not saved");
+                        }
+                    }
+                    break;
+
                 case "buttonSubGrid":
                     _hasSubGrid = _majorGrid.HasSubgrid;
                     using (Grid25SubGridForm sgf = new Grid25SubGridForm())
@@ -178,6 +193,20 @@ namespace FAD3.Mapping.Forms
                             _subGridCount = sgf.SubGridCount;
                             _majorGrid.HasSubgrid = _hasSubGrid;
                             _majorGrid.SubGridCount = _subGridCount;
+
+                            if (_majorGrid.InDefindeGridFromLayout)
+                            {
+                                //reflect changes of subgrid choice
+                                string gridTitle = lvResults.CheckedItems[0].Text;
+                                LayerEventArg lve = new LayerEventArg(gridTitle);
+                                lve.FileName = $"{lvResults.CheckedItems[0].Tag.ToString()}";
+                                lve.SelectedIndex = lvResults.CheckedItems[0].Index;
+                                lve.SelectedExtent = LayoutHelper.LayoutShapeFile.Shape[lvResults.CheckedItems[0].Index].Extents;
+
+                                lve.Action = "LoadGridMap";
+                                _majorGrid.LoadPanelGrid(chkAutoExpand.Checked, lve);
+                                _parentForm.MapTitle(gridTitle);
+                            }
                         }
                     }
                     break;
@@ -198,23 +227,26 @@ namespace FAD3.Mapping.Forms
                 case "btnSaveLayout":
                     if (LayoutHelper.ValidLayoutTemplateShapefile())
                     {
-                        var saveAs = new SaveFileDialog();
+                        saveAs = new SaveFileDialog();
                         saveAs.Filter = "Shapefile *.shp|*.shp|All files *.*|*.*";
                         saveAs.FilterIndex = 1;
-                        saveAs.ShowDialog();
-                        if (saveAs.FileName.Length > 0)
+                        dr = saveAs.ShowDialog();
+                        if (dr == DialogResult.OK)
                         {
-                            if (File.Exists(saveAs.FileName))
+                            if (saveAs.FileName.Length > 0)
                             {
-                                ShapefileDiskStorageHelper.Delete(saveAs.FileName.Replace(".shp", ""));
-                            }
-                            if (LayoutHelper.SaveLayoutTemplate(saveAs.FileName))
-                            {
-                                MessageBox.Show("Layout template successfuly saved!");
-                            }
-                            else
-                            {
-                                MessageBox.Show("Layout template was not saved");
+                                if (File.Exists(saveAs.FileName))
+                                {
+                                    ShapefileDiskStorageHelper.Delete(saveAs.FileName.Replace(".shp", ""));
+                                }
+                                if (LayoutHelper.SaveLayoutTemplate(saveAs.FileName))
+                                {
+                                    MessageBox.Show("Layout template successfuly saved!");
+                                }
+                                else
+                                {
+                                    MessageBox.Show("Layout template was not saved");
+                                }
                             }
                         }
                     }
@@ -388,8 +420,6 @@ namespace FAD3.Mapping.Forms
             txtRows.Text = _majorGrid.LayoutRows.ToString();
             txtColumns.Text = _majorGrid.LayoutCols.ToString();
             txtOverlap.Text = _majorGrid.LayoutOverlap.ToString();
-            _hasSubGrid = _majorGrid.HasSubgrid;
-            _subGridCount = _majorGrid.SubGridCount;
         }
 
         private Extents DefinePageExtent(Extents selectedMajorGridShapesExtent, Extents selectionBoxExtent)
@@ -488,12 +518,12 @@ namespace FAD3.Mapping.Forms
             {
                 _parentForm.MapTitle("");
             }
-            else
-            {
-                //load/hide the grid inside the checked panel
-                _majorGrid.LoadPanelGrid(chkAutoExpand.Checked, lve);
-                _parentForm.MapTitle(item.Text);
-            }
+            //else
+            //{
+            //    //load/hide the grid inside the checked panel
+            _majorGrid.LoadPanelGrid(chkAutoExpand.Checked, lve);
+            _parentForm.MapTitle(item.Text);
+            //}
         }
 
         private void OnTabsSelectionChanged(object sender, EventArgs e)

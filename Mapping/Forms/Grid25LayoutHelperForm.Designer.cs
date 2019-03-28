@@ -54,22 +54,22 @@
             this.lvResults = new System.Windows.Forms.ListView();
             this.menuDropDown = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.tabSave = new System.Windows.Forms.TabPage();
-            this.btnSave = new System.Windows.Forms.Button();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.btnSaveTemplate = new System.Windows.Forms.Button();
+            this.textLayoutTemplateFileName = new System.Windows.Forms.TextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.btnSave = new System.Windows.Forms.Button();
             this.textFolderToSave = new System.Windows.Forms.TextBox();
             this.btnSelectFolderSave = new System.Windows.Forms.Button();
             this.chkAutoExpand = new System.Windows.Forms.CheckBox();
             this.btnSaveLayout = new System.Windows.Forms.Button();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.textLayoutTemplateFileName = new System.Windows.Forms.TextBox();
-            this.btnSaveTemplate = new System.Windows.Forms.Button();
             this.tabsLayout.SuspendLayout();
             this.tabLayout.SuspendLayout();
             this.tabFishingGround.SuspendLayout();
             this.tabResults.SuspendLayout();
             this.tabSave.SuspendLayout();
-            this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // txtRows
@@ -133,7 +133,7 @@
             // 
             this.btnApply.ImageKey = "applyGrid";
             this.btnApply.ImageList = this.imageList1;
-            this.btnApply.Location = new System.Drawing.Point(329, 184);
+            this.btnApply.Location = new System.Drawing.Point(329, 210);
             this.btnApply.Name = "btnApply";
             this.btnApply.Size = new System.Drawing.Size(28, 28);
             this.btnApply.TabIndex = 6;
@@ -233,7 +233,7 @@
             this.tabLayout.Location = new System.Drawing.Point(4, 22);
             this.tabLayout.Name = "tabLayout";
             this.tabLayout.Padding = new System.Windows.Forms.Padding(3);
-            this.tabLayout.Size = new System.Drawing.Size(372, 225);
+            this.tabLayout.Size = new System.Drawing.Size(372, 249);
             this.tabLayout.TabIndex = 0;
             this.tabLayout.Text = "Layout";
             this.tabLayout.UseVisualStyleBackColor = true;
@@ -242,7 +242,7 @@
             // 
             this.btnInputTitles.ImageKey = "layoutTitles.bmp";
             this.btnInputTitles.ImageList = this.imageList1;
-            this.btnInputTitles.Location = new System.Drawing.Point(295, 184);
+            this.btnInputTitles.Location = new System.Drawing.Point(295, 210);
             this.btnInputTitles.Name = "btnInputTitles";
             this.btnInputTitles.Size = new System.Drawing.Size(28, 28);
             this.btnInputTitles.TabIndex = 13;
@@ -256,7 +256,7 @@
             this.tabFishingGround.Location = new System.Drawing.Point(4, 22);
             this.tabFishingGround.Name = "tabFishingGround";
             this.tabFishingGround.Padding = new System.Windows.Forms.Padding(3);
-            this.tabFishingGround.Size = new System.Drawing.Size(372, 225);
+            this.tabFishingGround.Size = new System.Drawing.Size(372, 249);
             this.tabFishingGround.TabIndex = 1;
             this.tabFishingGround.Text = "Fishing ground";
             this.tabFishingGround.UseVisualStyleBackColor = true;
@@ -284,7 +284,7 @@
             this.tabResults.Controls.Add(this.lvResults);
             this.tabResults.Location = new System.Drawing.Point(4, 22);
             this.tabResults.Name = "tabResults";
-            this.tabResults.Size = new System.Drawing.Size(372, 225);
+            this.tabResults.Size = new System.Drawing.Size(372, 249);
             this.tabResults.TabIndex = 2;
             this.tabResults.Text = "Results";
             this.tabResults.UseVisualStyleBackColor = true;
@@ -293,7 +293,7 @@
             // 
             this.buttonSubGrid.ImageKey = "subgrid";
             this.buttonSubGrid.ImageList = this.imageList1;
-            this.buttonSubGrid.Location = new System.Drawing.Point(329, 176);
+            this.buttonSubGrid.Location = new System.Drawing.Point(330, 16);
             this.buttonSubGrid.Name = "buttonSubGrid";
             this.buttonSubGrid.Size = new System.Drawing.Size(28, 28);
             this.buttonSubGrid.TabIndex = 12;
@@ -329,16 +329,36 @@
             this.tabSave.Text = "Save";
             this.tabSave.UseVisualStyleBackColor = true;
             // 
-            // btnSave
+            // groupBox2
             // 
-            this.btnSave.Enabled = false;
-            this.btnSave.ImageKey = "save";
-            this.btnSave.ImageList = this.imageList1;
-            this.btnSave.Location = new System.Drawing.Point(261, 62);
-            this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(28, 28);
-            this.btnSave.TabIndex = 17;
-            this.btnSave.UseVisualStyleBackColor = true;
+            this.groupBox2.Controls.Add(this.btnSaveTemplate);
+            this.groupBox2.Controls.Add(this.textLayoutTemplateFileName);
+            this.groupBox2.Location = new System.Drawing.Point(17, 131);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(333, 106);
+            this.groupBox2.TabIndex = 17;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Save fishing ground layout template";
+            // 
+            // btnSaveTemplate
+            // 
+            this.btnSaveTemplate.Enabled = false;
+            this.btnSaveTemplate.ImageKey = "save";
+            this.btnSaveTemplate.ImageList = this.imageList1;
+            this.btnSaveTemplate.Location = new System.Drawing.Point(295, 61);
+            this.btnSaveTemplate.Name = "btnSaveTemplate";
+            this.btnSaveTemplate.Size = new System.Drawing.Size(28, 28);
+            this.btnSaveTemplate.TabIndex = 18;
+            this.btnSaveTemplate.UseVisualStyleBackColor = true;
+            this.btnSaveTemplate.Click += new System.EventHandler(this.OnButtonClick);
+            // 
+            // textLayoutTemplateFileName
+            // 
+            this.textLayoutTemplateFileName.Enabled = false;
+            this.textLayoutTemplateFileName.Location = new System.Drawing.Point(6, 26);
+            this.textLayoutTemplateFileName.Name = "textLayoutTemplateFileName";
+            this.textLayoutTemplateFileName.Size = new System.Drawing.Size(321, 20);
+            this.textLayoutTemplateFileName.TabIndex = 13;
             // 
             // groupBox1
             // 
@@ -351,6 +371,17 @@
             this.groupBox1.TabIndex = 16;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Save all fishing ground grid maps";
+            // 
+            // btnSave
+            // 
+            this.btnSave.Enabled = false;
+            this.btnSave.ImageKey = "save";
+            this.btnSave.ImageList = this.imageList1;
+            this.btnSave.Location = new System.Drawing.Point(261, 62);
+            this.btnSave.Name = "btnSave";
+            this.btnSave.Size = new System.Drawing.Size(28, 28);
+            this.btnSave.TabIndex = 17;
+            this.btnSave.UseVisualStyleBackColor = true;
             // 
             // textFolderToSave
             // 
@@ -394,36 +425,6 @@
             this.btnSaveLayout.Visible = false;
             this.btnSaveLayout.Click += new System.EventHandler(this.OnButtonClick);
             // 
-            // groupBox2
-            // 
-            this.groupBox2.Controls.Add(this.btnSaveTemplate);
-            this.groupBox2.Controls.Add(this.textLayoutTemplateFileName);
-            this.groupBox2.Location = new System.Drawing.Point(17, 131);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(333, 106);
-            this.groupBox2.TabIndex = 17;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Save fishing ground layout template";
-            // 
-            // textLayoutTemplateFileName
-            // 
-            this.textLayoutTemplateFileName.Enabled = false;
-            this.textLayoutTemplateFileName.Location = new System.Drawing.Point(6, 26);
-            this.textLayoutTemplateFileName.Name = "textLayoutTemplateFileName";
-            this.textLayoutTemplateFileName.Size = new System.Drawing.Size(321, 20);
-            this.textLayoutTemplateFileName.TabIndex = 13;
-            // 
-            // btnSaveTemplate
-            // 
-            this.btnSaveTemplate.Enabled = false;
-            this.btnSaveTemplate.ImageKey = "save";
-            this.btnSaveTemplate.ImageList = this.imageList1;
-            this.btnSaveTemplate.Location = new System.Drawing.Point(295, 61);
-            this.btnSaveTemplate.Name = "btnSaveTemplate";
-            this.btnSaveTemplate.Size = new System.Drawing.Size(28, 28);
-            this.btnSaveTemplate.TabIndex = 18;
-            this.btnSaveTemplate.UseVisualStyleBackColor = true;
-            // 
             // Grid25LayoutHelperForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -445,10 +446,10 @@
             this.tabFishingGround.PerformLayout();
             this.tabResults.ResumeLayout(false);
             this.tabSave.ResumeLayout(false);
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 

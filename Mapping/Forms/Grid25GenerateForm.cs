@@ -179,10 +179,9 @@ namespace FAD3
             switch (((Button)sender).Name)
             {
                 case "buttonSubGrid":
-                    _hasSubGrid = false;
                     using (Grid25SubGridForm sgf = new Grid25SubGridForm())
                     {
-                        sgf.SubGridCount = _subGridCount;
+                        sgf.SubGridCount = _grid25MajorGrid.SubGridCount;
                         sgf.ShowDialog();
                         if (sgf.DialogResult == DialogResult.OK)
                         {
@@ -190,6 +189,11 @@ namespace FAD3
                             _subGridCount = sgf.SubGridCount;
                             _grid25MajorGrid.HasSubgrid = _hasSubGrid;
                             _grid25MajorGrid.SubGridCount = _subGridCount;
+
+                            if (!_grid25MajorGrid.InDefindeGridFromLayout)
+                            {
+                                _grid25MajorGrid.GenerateMinorGridInsidePanelExtent(_grid25MajorGrid.MinorGrids.MinorGridLinesShapeFile.Extents, "");
+                            }
                         }
                     }
 
@@ -249,7 +253,10 @@ namespace FAD3
                         {
                             SetupDictionary();
                             _grid25MajorGrid.LabelAndGridProperties = _labelAndGridProperties;
+
+                            //this will create a layouthelper object for the gri25majorgrid
                             _grid25MajorGrid.DefineGridLayout((int)((Bitmap)imList.Images["gridLayout"]).GetHicon());
+
                             _g25lhf = Grid25LayoutHelperForm.GetInstance(_grid25MajorGrid, this);
 
                             if (_g25lhf.Visible)
@@ -287,7 +294,10 @@ namespace FAD3
                     if (ofd.FileName.Length > 0)
                     {
                         _grid25MajorGrid.LabelAndGridProperties = _labelAndGridProperties;
+
+                        //creates a layouthelper object for grid25majorgrid
                         _grid25MajorGrid.DefineGridLayout();
+
                         if (_grid25MajorGrid.LayoutHelper.OpenLayoutFile(ofd.FileName))
                         {
                             string line;
@@ -423,7 +433,6 @@ namespace FAD3
             txtMajorGridThickness.Text = "2";
             txtMinorGridThickness.Text = "1";
             txtSubGridThickness.Text = "1";
-            _subGridCount = 0;
             chkLeft.Checked = true;
             chkTop.Checked = true;
             chkRight.Checked = true;
