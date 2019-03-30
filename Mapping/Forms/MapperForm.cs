@@ -133,10 +133,12 @@ namespace FAD3
             _grid25MajorGrid.MapInterActionHandler = _mapInterActionHandler;
             axMap.GeoProjection.SetWgs84Projection(_grid25MajorGrid.Grid25Geoprojection);
             axMap.MapUnits = tkUnitsOfMeasure.umMeters;
+
             var h = _mapLayersHandler.AddLayer(Grid25MajorGrid.Grid25Grid, "Grid25", true, true);
+            //_grid25MajorGrid.AddGrid25GridToMap();
             _mapLayersHandler.LoadMapState(false);
             _grid25MajorGrid.MoveToTop();
-            _mapLayersHandler.set_MapLayer(0);
+            _mapLayersHandler.set_MapLayer(h);
         }
 
         public MapperForm(Form parentForm)

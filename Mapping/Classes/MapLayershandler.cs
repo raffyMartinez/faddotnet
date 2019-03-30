@@ -520,7 +520,7 @@ namespace FAD3
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public (bool success, string errMsg) FileOpenHandler(string fileName)
+        public (bool success, string errMsg) FileOpenHandler(string fileName, string layerName = "")
         {
             var success = false;
             var errMsg = "";
@@ -541,7 +541,7 @@ namespace FAD3
                         success = shapefile != null;
                         if (success)
                         {
-                            if (AddLayer(shapefile) < 0)
+                            if (AddLayer(shapefile, layerName) < 0)
                             {
                                 success = false;
                                 errMsg = "Failed to add layer to map";

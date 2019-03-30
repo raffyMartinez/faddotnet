@@ -190,13 +190,10 @@ namespace FAD3
                             _grid25MajorGrid.HasSubgrid = _hasSubGrid;
                             _grid25MajorGrid.SubGridCount = _subGridCount;
 
-                            if (!_grid25MajorGrid.InDefindeGridFromLayout)
-                            {
-                                _grid25MajorGrid.GenerateMinorGridInsidePanelExtent(_grid25MajorGrid.MinorGrids.MinorGridLinesShapeFile.Extents, "");
-                            }
+                            _grid25MajorGrid.MinorGrids.EnsureSize = true;
+                            _grid25MajorGrid.GenerateMinorGridInsidePanelExtent(_grid25MajorGrid.MinorGrids.MinorGridLinesShapeFile.Extents, "");
                         }
                     }
-
                     break;
 
                 //updates the grid labels with changes inputted into the properies dictionary
@@ -238,6 +235,7 @@ namespace FAD3
                     }
                     _grid25MajorGrid.ClearSelectedGrids();
                     _parentForm.SetCursor(MapWinGIS.tkCursorMode.cmSelection);
+                    _grid25MajorGrid.MapLayers.set_MapLayer(_grid25MajorGrid.Grid25ShapefileHandle);
                     _hasSubGrid = false;
                     break;
 
@@ -286,74 +284,82 @@ namespace FAD3
                     break;
 
                 case "btnOpenLayoutGrid":
-                    OpenFileDialog ofd = new OpenFileDialog();
-                    ofd.Title = "Open a layout grid template file";
-                    ofd.Filter = "Layout file|*.lay|All files|*.*";
-                    ofd.FilterIndex = 0;
-                    ofd.ShowDialog();
-                    if (ofd.FileName.Length > 0)
-                    {
-                        _grid25MajorGrid.LabelAndGridProperties = _labelAndGridProperties;
-
-                        //creates a layouthelper object for grid25majorgrid
-                        _grid25MajorGrid.DefineGridLayout();
-
-                        if (_grid25MajorGrid.LayoutHelper.OpenLayoutFile(ofd.FileName))
-                        {
-                            string line;
-                            List<int> selectedGridHandles = new List<int>();
-                            StreamReader file = new StreamReader(ofd.FileName);
-
-                            while ((line = file.ReadLine()) != null)
-                            {
-                                string[] line2 = line.Split(':');
-                                switch (line2[0])
-                                {
-                                    case "SelectedMajorGrids":
-                                        foreach (var item in line2[1].Split(','))
-                                        {
-                                            selectedGridHandles.Add(int.Parse(item));
-                                        }
-                                        //sends a list of major grids that will be selected
-                                        _grid25MajorGrid.SelectedShapeGridNumbers = selectedGridHandles;
-
-                                        //sends a list of major grids that will be used to create an extent of major grid
-                                        _grid25MajorGrid.LayoutHelper.SelectedMajorGridList(selectedGridHandles);
-                                        break;
-
-                                    case "Fishing ground":
-                                        _grid25MajorGrid.LayoutHelper.FishingGround = line2[1];
-                                        break;
-
-                                    case "Save folder":
-                                        string folder = $"{line2[1]}:{line2[2]}";
-                                        _grid25MajorGrid.LayoutHelper.GridFromLayoutSaveFolder = folder;
-                                        _grid25MajorGrid.FolderToSave = folder;
-                                        break;
-
-                                    case "Rows":
-                                        _grid25MajorGrid.LayoutHelper.Rows = int.Parse(line2[1]);
-                                        break;
-
-                                    case "Columns":
-                                        _grid25MajorGrid.LayoutHelper.Columns = int.Parse(line2[1]);
-                                        break;
-
-                                    case "Overlap":
-                                        _grid25MajorGrid.LayoutHelper.Overlap = int.Parse(line2[1]);
-                                        break;
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (ofd.FileName.Length > 0)
-                        {
-                            MessageBox.Show("Selected file is not valid", "Invalid file", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        }
-                    }
+                    OpenTemplate();
                     break;
+            }
+        }
+
+        public void OpenTemplate()
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Title = "Open a layout grid template file";
+            ofd.Filter = "Layout file|*.lay|All files|*.*";
+            ofd.FilterIndex = 0;
+            DialogResult dr = ofd.ShowDialog();
+            if (dr == DialogResult.OK
+                && Path.GetExtension(ofd.FileName) == ".lay")
+            {
+                _grid25MajorGrid.LabelAndGridProperties = _labelAndGridProperties;
+
+                //creates a layouthelper object for grid25majorgrid
+                _grid25MajorGrid.DefineGridLayout();
+
+                if (_grid25MajorGrid.LayoutHelper.OpenLayoutFile(ofd.FileName))
+                {
+                    string line;
+                    List<int> selectedGridHandles = new List<int>();
+                    StreamReader file = new StreamReader(ofd.FileName);
+
+                    while ((line = file.ReadLine()) != null)
+                    {
+                        string[] line2 = line.Split(':');
+                        switch (line2[0])
+                        {
+                            case "SelectedMajorGrids":
+                                foreach (var item in line2[1].Split(','))
+                                {
+                                    selectedGridHandles.Add(int.Parse(item));
+                                }
+                                //sends a list of major grids that will be selected
+                                _grid25MajorGrid.SelectedShapeGridNumbers = selectedGridHandles;
+
+                                //sends a list of major grids that will be used to create an extent of major grid
+                                _grid25MajorGrid.LayoutHelper.SelectedMajorGridList(selectedGridHandles);
+                                break;
+
+                            case "Fishing ground":
+                                _grid25MajorGrid.LayoutHelper.FishingGround = line2[1];
+                                break;
+
+                            case "Save folder":
+                                string folder = $"{line2[1]}:{line2[2]}";
+                                _grid25MajorGrid.LayoutHelper.GridFromLayoutSaveFolder = folder;
+                                _grid25MajorGrid.FolderToSave = folder;
+                                break;
+
+                            case "Rows":
+                                _grid25MajorGrid.LayoutHelper.Rows = int.Parse(line2[1]);
+                                break;
+
+                            case "Columns":
+                                _grid25MajorGrid.LayoutHelper.Columns = int.Parse(line2[1]);
+                                break;
+
+                            case "Overlap":
+                                _grid25MajorGrid.LayoutHelper.Overlap = int.Parse(line2[1]);
+                                break;
+                        }
+                    }
+
+                    _grid25MajorGrid.MapLayers.RefreshLayers();
+                }
+            }
+            else
+            {
+                if (ofd.FileName.Length > 0)
+                {
+                    MessageBox.Show("Selected file is not valid", "Invalid file", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
         }
 
@@ -381,7 +387,7 @@ namespace FAD3
             }
         }
 
-        private void Grid25GenerateForm_FormClosed(object sender, FormClosedEventArgs e)
+        private void OnGrid25GenerateForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             if (!_formCloseDone)
             {

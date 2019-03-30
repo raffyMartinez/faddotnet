@@ -35,6 +35,9 @@ namespace FAD3.Mapping.Classes
 
         public int SelectionTransparency { get; set; }
 
+        public int MaxPanelWidth { get; internal set; }
+        public int MaxPanelHeight { get; internal set; }
+
         public int Rows
         {
             get { return _rows; }
@@ -515,9 +518,13 @@ namespace FAD3.Mapping.Classes
                 {
                     _sfLayout.EditAddShape(_layoutExtents.ToShape());
                     _sfLayout.EditCellValue(fldPanelNo, 0, 1);
+                    MaxPanelWidth = (int)_layoutExtents.Width;
+                    MaxPanelHeight = (int)_layoutExtents.Height;
                 }
                 else
                 {
+                    MaxPanelHeight = 0;
+                    MaxPanelWidth = 0;
                     int x = 0;
                     int y = 0;
                     int iShp = 0;
@@ -552,6 +559,14 @@ namespace FAD3.Mapping.Classes
                             }
 
                             Extents panelExtent = new Extents();
+                            if (panelExtent.Height > MaxPanelHeight)
+                            {
+                                MaxPanelHeight = (int)panelExtent.Height;
+                            }
+                            if (panelExtent.Width > MaxPanelWidth)
+                            {
+                                MaxPanelWidth = (int)panelExtent.Width;
+                            }
 
                             //each cell in the grid is computed based on the polygon's lower left and upper right coordinates
                             //an overlap is added if expand_Side is 1, not added if it is 0

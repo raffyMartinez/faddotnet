@@ -19,6 +19,7 @@ using System.Drawing;
 using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
+using FAD3.Mapping.Forms;
 
 //using dao;
 
@@ -75,6 +76,7 @@ namespace FAD3
         private (string SampledMonth, string GearVariationGuid, string LandingSiteGuid) _effortMonth;
         private bool _readEfforMonth;
         private bool _enableUIEvent;
+        private Grid25GenerateForm _grid25GenerateForm;
 
         public MainForm()
         {
@@ -888,10 +890,10 @@ namespace FAD3
         {
             e.ClickedItem.OwnerItem.Owner.Hide();
 
-            global.MappingMode = fad3MappingMode.grid25Mode;
             var mf = MapperForm.GetInstance(this);
             if (!mf.Visible)
             {
+                global.MappingMode = fad3MappingMode.grid25Mode;
                 mf.Show(this);
                 ToolStripItem tsi = e.ClickedItem;
                 fadUTMZone utmZone = fadUTMZone.utmZone_Undefined;
@@ -906,13 +908,40 @@ namespace FAD3
                         break;
                 }
                 global.MappingForm.CreateGrid25MajorGrid(utmZone);
-                Grid25GenerateForm ggf = new Grid25GenerateForm(global.MappingForm);
-                ggf.set_UTMZone(utmZone);
-                ggf.Show(global.MappingForm);
+                _grid25GenerateForm = new Grid25GenerateForm(global.MappingForm);
+                _grid25GenerateForm.set_UTMZone(utmZone);
+                _grid25GenerateForm.Show(global.MappingForm);
             }
             else
             {
                 mf.BringToFront();
+                if (e.ClickedItem.Name == "menuItemLayoutTemplateOpen")
+                {
+                    if (_grid25GenerateForm != null)
+                    {
+                        _grid25GenerateForm.OpenTemplate();
+                    }
+                    else
+                    {
+                        var ofd = new OpenFileDialog();
+                        ofd.Title = "Open layout template";
+                        ofd.Filter = "Layout file|*.lay|All files|*.*";
+                        ofd.FilterIndex = 1;
+                        DialogResult dr = ofd.ShowDialog();
+                        if (dr == DialogResult.OK && Path.GetExtension(ofd.FileName) == ".lay")
+                        {
+                            Grid25LayoutHelperForm glhf = Grid25LayoutHelperForm.GetInstance(ofd.FileName);
+                            if (glhf.Visible)
+                            {
+                                glhf.BringToFront();
+                            }
+                            else
+                            {
+                                glhf.Show(global.MappingForm);
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -1752,6 +1781,14 @@ namespace FAD3
         {
             spatioTemporalMapMenuItem.Enabled = global.MapIsOpen;
             downloadSpatiotemporalDataToolStripMenuItem.Enabled = global.MapIsOpen;
+            menuItemZone50.Enabled = !global.MapIsOpen;
+            menuItemZone51.Enabled = !global.MapIsOpen;
+            menuItemLayoutTemplateOpen.Enabled = global.MapIsOpen;
+
+            if (!global.MapIsOpen)
+            {
+                _grid25GenerateForm = null;
+            }
         }
 
         private void OnToolbar_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
@@ -3399,6 +3436,16 @@ namespace FAD3
                             break;
                     }
 
+                    break;
+            }
+        }
+
+        private void OnDropDownOpening(object sender, EventArgs e)
+        {
+            switch (((ToolStripMenuItem)sender).Name)
+            {
+                case "generateGridMapToolStripMenuItem":
+                    menuItemLayoutTemplateOpen.Enabled = global.MapIsOpen;
                     break;
             }
         }

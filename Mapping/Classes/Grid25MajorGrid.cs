@@ -55,7 +55,9 @@ namespace FAD3
         private bool _enableMapInteraction;                                     //allows the class to interact with the axMap map control
         private bool _loadGridInPanel;
         private string _folderToSave;
-        private bool _inDefineGridFromLayout;
+        private bool _gridIsDefinedFromLayout;
+
+        public int Grid25ShapefileHandle { get; internal set; }
 
         public delegate void FishingGridLayerSavedHandler(Grid25MajorGrid s, LayerEventArg e);              //event raised when a layer is selected from the list found in the layers form
         public event FishingGridLayerSavedHandler LayerSaved;
@@ -77,13 +79,15 @@ namespace FAD3
         public int LayoutOverlap { get; internal set; }
 
         private static List<string> _filesToDeleteOnClose = new List<string>();
-
+        public const int XBuffer = 1500;
+        public const int YTopBuffer = 4000;
+        public const int YBottomBuffer = 3000;
         public bool HasSubgrid { get; set; }
         public int SubGridCount { get; set; }
 
-        public bool InDefindeGridFromLayout
+        public bool GridIsDefinedFromLayout
         {
-            get { return _inDefineGridFromLayout; }
+            get { return _gridIsDefinedFromLayout; }
         }
 
         public string FolderToSave
@@ -174,7 +178,7 @@ namespace FAD3
             OnFishingGridSelected(null, e);
 
             if (e.Action == "LoadGridMap" && autoExpand)
-                FitGridToMap();
+                FitGridToMap(LayoutHelper.MaxPanelWidth, LayoutHelper.MaxPanelHeight);
         }
 
         public void SetupTopLayers()
@@ -472,7 +476,7 @@ namespace FAD3
             }
 
             {
-                if (_inDefineGridFromLayout)
+                if (_gridIsDefinedFromLayout)
                 {
                     writer.WriteStartElement("Layout");
                     writer.WriteAttributeString("FishingGround", _layoutHelper.FishingGround);
@@ -618,19 +622,29 @@ namespace FAD3
         /// <summary>
         /// fit extents of fishing grid to extent of map control
         /// </summary>
-        public void FitGridToMap()
+        public void FitGridToMap(int WidthToFit = 0, int HeightToFit = 0)
         {
             if (_shapefileBoundingRectangle != null)
             {
                 int labelDistance = (int)_gridAndLabelProperties["minorGridLabelDistance"];
-                const int plusYTop = 4000;
-                const int plusYBottom = 3000;
-                const int plusX = 1500;
 
                 _shapefileBoundingRectangle.Extents.With(e =>
                 {
                     var ext = new Extents();
-                    ext.SetBounds(e.xMin - (labelDistance * 3) - plusX, e.yMin - (labelDistance * 3) - plusYBottom, 0, e.xMax + (labelDistance * 3) + plusX, e.yMax + (labelDistance * 3) + plusYTop, 0);
+                    if (WidthToFit > 0 && HeightToFit > 0)
+                    {
+                        int centroidX = (int)e.Center.x;
+                        int centroidY = (int)e.Center.y;
+                        int xMin = centroidX - (WidthToFit / 2);
+                        int xMax = centroidX + (WidthToFit / 2);
+                        int yMin = centroidY - (HeightToFit / 2);
+                        int yMax = centroidY + (HeightToFit / 2);
+                        ext.SetBounds(xMin - (labelDistance * 3) - XBuffer, yMin - (labelDistance * 3) - YBottomBuffer, 0, xMax + (labelDistance * 3) + XBuffer, yMax + (labelDistance * 3) + YTopBuffer, 0);
+                    }
+                    else
+                    {
+                        ext.SetBounds(e.xMin - (labelDistance * 3) - XBuffer, e.yMin - (labelDistance * 3) - YBottomBuffer, 0, e.xMax + (labelDistance * 3) + XBuffer, e.yMax + (labelDistance * 3) + YTopBuffer, 0);
+                    }
                     _axMap.Extents = ext;
                 });
             }
@@ -691,6 +705,12 @@ namespace FAD3
             }
         }
 
+        public int AddGrid25GridToMap()
+        {
+            Grid25ShapefileHandle = MapLayers.AddLayer(_shapefileMajorGrid, "Grid25", true, true);
+            return Grid25ShapefileHandle;
+        }
+
         public bool EnableMapInteraction
 
         {
@@ -743,12 +763,6 @@ namespace FAD3
             set
             {
                 _listSelectedShapeGridNumbers = value;
-                //foreach (int item in _listSelectedShapeGridNumbers)
-                //{
-                //    _shapefileMajorGrid.ShapeSelected[item] = true;
-                //}
-                //_selectedMajorGridShapesExtent = _shapefileMajorGrid.BufferByDistance(0, 0, true, true).Extents;
-                //_shapefileMajorGrid.SelectNone();
             }
         }
 
@@ -869,7 +883,7 @@ namespace FAD3
         {
             _hCursorDefineGrid = iconHandle;
             _inDefineMinorGrid = _listSelectedShapeGridNumbers.Count > 0;
-            _inDefineGridFromLayout = false;
+            _gridIsDefinedFromLayout = false;
             if (_inDefineMinorGrid)
             {
                 _shapefileMajorGrid.SelectNone();
@@ -1310,7 +1324,6 @@ namespace FAD3
         public bool GenerateMinorGridInsidePanelExtent(Extents panelExtent, string mapTitle)
         {
             _listIntersectedMajorGrids.Clear();
-            _inDefineGridFromLayout = true;
             var minorGridExtent = panelExtent;
             int ifldMGNo = 0;
             int ifldGridHandle = 0;
@@ -1546,7 +1559,7 @@ namespace FAD3
                 && _layoutHelper.LayoutShapeFile.NumShapes > 0
                 && _layoutHelper.HasCompletePanelTitles())
             {
-                _inDefineGridFromLayout = true;
+                _gridIsDefinedFromLayout = true;
                 _layoutHelper.FishingGround = fishingGround;
                 _folderToSave = folder;
                 _layoutHelper.GridFromLayoutSaveFolder = _folderToSave;

@@ -61,6 +61,7 @@ namespace FAD3
             this.menuItemZone50 = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemZone51 = new System.Windows.Forms.ToolStripMenuItem();
             this.spatioTemporalMapMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.downloadSpatiotemporalDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemBrowseLGUs = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -82,6 +83,7 @@ namespace FAD3
             this.buttonCatch = new System.Windows.Forms.Button();
             this.buttonOK = new System.Windows.Forms.Button();
             this.lvMain = new System.Windows.Forms.ListView();
+            this.menuItemLayoutTemplateOpen = new System.Windows.Forms.ToolStripMenuItem();
             this.toolbar = new ToolStripExtensions.ToolStripEx();
             this.tsButtonAbout = new System.Windows.Forms.ToolStripButton();
             this.tsButtonGear = new System.Windows.Forms.ToolStripButton();
@@ -90,7 +92,6 @@ namespace FAD3
             this.tsButtonReport = new System.Windows.Forms.ToolStripButton();
             this.tsButtonMap = new System.Windows.Forms.ToolStripButton();
             this.tsButtonExit = new System.Windows.Forms.ToolStripButton();
-            this.downloadSpatiotemporalDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMenuBar.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.tblLayout.SuspendLayout();
@@ -289,23 +290,25 @@ namespace FAD3
             // 
             this.generateGridMapToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuItemZone50,
-            this.menuItemZone51});
+            this.menuItemZone51,
+            this.menuItemLayoutTemplateOpen});
             this.generateGridMapToolStripMenuItem.Name = "generateGridMapToolStripMenuItem";
             this.generateGridMapToolStripMenuItem.Size = new System.Drawing.Size(242, 22);
             this.generateGridMapToolStripMenuItem.Text = "Generate grid map";
+            this.generateGridMapToolStripMenuItem.DropDownOpening += new System.EventHandler(this.OnDropDownOpening);
             this.generateGridMapToolStripMenuItem.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnGenerateGridMapToolStripMenuItem_DropDownItemClicked);
             // 
             // menuItemZone50
             // 
             this.menuItemZone50.Name = "menuItemZone50";
-            this.menuItemZone50.Size = new System.Drawing.Size(143, 22);
+            this.menuItemZone50.Size = new System.Drawing.Size(189, 22);
             this.menuItemZone50.Tag = "zone50";
             this.menuItemZone50.Text = "UTM zone 50";
             // 
             // menuItemZone51
             // 
             this.menuItemZone51.Name = "menuItemZone51";
-            this.menuItemZone51.Size = new System.Drawing.Size(143, 22);
+            this.menuItemZone51.Size = new System.Drawing.Size(189, 22);
             this.menuItemZone51.Tag = "zone51";
             this.menuItemZone51.Text = "UTM zone 51";
             // 
@@ -316,6 +319,14 @@ namespace FAD3
             this.spatioTemporalMapMenuItem.Size = new System.Drawing.Size(242, 22);
             this.spatioTemporalMapMenuItem.Tag = "spatio-temporal";
             this.spatioTemporalMapMenuItem.Text = "Spatio-temporal mapping";
+            // 
+            // downloadSpatiotemporalDataToolStripMenuItem
+            // 
+            this.downloadSpatiotemporalDataToolStripMenuItem.Enabled = false;
+            this.downloadSpatiotemporalDataToolStripMenuItem.Name = "downloadSpatiotemporalDataToolStripMenuItem";
+            this.downloadSpatiotemporalDataToolStripMenuItem.Size = new System.Drawing.Size(242, 22);
+            this.downloadSpatiotemporalDataToolStripMenuItem.Tag = "downloadSpatioTemporal";
+            this.downloadSpatiotemporalDataToolStripMenuItem.Text = "Download spatio-temporal data";
             // 
             // menuItemBrowseLGUs
             // 
@@ -562,6 +573,13 @@ namespace FAD3
             this.lvMain.MouseClick += new System.Windows.Forms.MouseEventHandler(this.OnListView_MouseClick);
             this.lvMain.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnListView_MouseDown);
             // 
+            // menuItemLayoutTemplateOpen
+            // 
+            this.menuItemLayoutTemplateOpen.Name = "menuItemLayoutTemplateOpen";
+            this.menuItemLayoutTemplateOpen.Size = new System.Drawing.Size(189, 22);
+            this.menuItemLayoutTemplateOpen.Tag = "layoutTemplate";
+            this.menuItemLayoutTemplateOpen.Text = "Open layout template";
+            // 
             // toolbar
             // 
             this.toolbar.ClickThrough = true;
@@ -653,14 +671,6 @@ namespace FAD3
             this.tsButtonExit.Text = "toolStripButton6";
             this.tsButtonExit.ToolTipText = "Exit";
             // 
-            // downloadSpatiotemporalDataToolStripMenuItem
-            // 
-            this.downloadSpatiotemporalDataToolStripMenuItem.Enabled = false;
-            this.downloadSpatiotemporalDataToolStripMenuItem.Name = "downloadSpatiotemporalDataToolStripMenuItem";
-            this.downloadSpatiotemporalDataToolStripMenuItem.Size = new System.Drawing.Size(242, 22);
-            this.downloadSpatiotemporalDataToolStripMenuItem.Tag = "downloadSpatioTemporal";
-            this.downloadSpatiotemporalDataToolStripMenuItem.Text = "Download spatio-temporal data";
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -745,5 +755,6 @@ namespace FAD3
         private System.Windows.Forms.ToolStripMenuItem menuItemBrowseLGUs;
         private System.Windows.Forms.ToolStripMenuItem diagnosticMenuItem;
         private System.Windows.Forms.ToolStripMenuItem downloadSpatiotemporalDataToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem menuItemLayoutTemplateOpen;
     }
 }

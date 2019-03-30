@@ -648,7 +648,7 @@
             this.Name = "Grid25GenerateForm";
             this.ShowInTaskbar = false;
             this.Text = "Grid 25";
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Grid25GenerateForm_FormClosed);
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnGrid25GenerateForm_FormClosed);
             this.Load += new System.EventHandler(this.OnFormLoad);
             this.groupLabels.ResumeLayout(false);
             this.groupLabels.PerformLayout();

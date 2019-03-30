@@ -28,6 +28,8 @@ namespace FAD3
         private int _ifldLineType = -1;
         private Grid25MajorGrid _grid25MajorGrid;
 
+        public bool EnsureSize { get; set; }
+
         public bool SetExtent(Extents ext)
         {
             _minorGridExtents = ext;
@@ -62,44 +64,47 @@ namespace FAD3
         {
             var success = false;
             var mbrExtentIsMaxExtent = false;
-            if (definitionExtent.ToShape().Contains(selectedMajorGridShapesExtent.ToShape()))
+            if (selectedMajorGridShapesExtent != null && definitionExtent != null)
             {
-                //minor grid extent is the extent of the selected major grid shapes
-                _minorGridExtents = selectedMajorGridShapesExtent;
-                mbrExtentIsMaxExtent = true;
-            }
-            else if (selectedMajorGridShapesExtent.ToShape().Contains(definitionExtent.ToShape()))
-            {
-                //minor grid extent is the extent of the selection box
-                _minorGridExtents = definitionExtent;
-            }
-            else if (definitionExtent.ToShape().Intersects(selectedMajorGridShapesExtent.ToShape()))
-            {
-                var results = new object();
-                if (definitionExtent.ToShape().GetIntersection(selectedMajorGridShapesExtent.ToShape(), ref results))
+                if (definitionExtent.ToShape().Contains(selectedMajorGridShapesExtent.ToShape()))
                 {
-                    //convets results object to an array of shapes that is a product of the intersection
-                    object[] shapeArray = results as object[];
-                    if (shapeArray != null)
+                    //minor grid extent is the extent of the selected major grid shapes
+                    _minorGridExtents = selectedMajorGridShapesExtent;
+                    mbrExtentIsMaxExtent = true;
+                }
+                else if (selectedMajorGridShapesExtent.ToShape().Contains(definitionExtent.ToShape()))
+                {
+                    //minor grid extent is the extent of the selection box
+                    _minorGridExtents = definitionExtent;
+                }
+                else if (definitionExtent.ToShape().Intersects(selectedMajorGridShapesExtent.ToShape()))
+                {
+                    var results = new object();
+                    if (definitionExtent.ToShape().GetIntersection(selectedMajorGridShapesExtent.ToShape(), ref results))
                     {
-                        Shape[] shapes = shapeArray.OfType<Shape>().ToArray();
+                        //converts results object to an array of shapes that is a product of the intersection
+                        object[] shapeArray = results as object[];
+                        if (shapeArray != null)
+                        {
+                            Shape[] shapes = shapeArray.OfType<Shape>().ToArray();
 
-                        //minor grid extent is the intersection of the selected major grids and the selection box
-                        _minorGridExtents = shapes[0].Extents;
+                            //minor grid extent is the intersection of the selected major grids and the selection box
+                            _minorGridExtents = shapes[0].Extents;
 
-                        _isIntersect = true;
+                            _isIntersect = true;
+                        }
                     }
                 }
-            }
-            else
-            {
-                //mbrExtent is outside of extent of selected major grid
-                _minorGridExtents = null;
-            }
+                else
+                {
+                    //mbrExtent is outside of extent of selected major grid
+                    _minorGridExtents = null;
+                }
 
-            if (_minorGridExtents != null)
-            {
-                success = ConstructMinorGridLines(extentIsMaxExtent: mbrExtentIsMaxExtent);
+                if (_minorGridExtents != null)
+                {
+                    success = ConstructMinorGridLines(extentIsMaxExtent: mbrExtentIsMaxExtent);
+                }
             }
 
             //success means that a valid extent was created
@@ -157,7 +162,7 @@ namespace FAD3
                     }
                     else
                     {
-                        if (_grid25MajorGrid.InDefindeGridFromLayout)
+                        if (_grid25MajorGrid.GridIsDefinedFromLayout || EnsureSize)
                         {
                             _minorGridMBRHeight = ((ht / CELLSIDE) * CELLSIDE);
                             _minorGridMBRWidth = ((wdt / CELLSIDE) * CELLSIDE);

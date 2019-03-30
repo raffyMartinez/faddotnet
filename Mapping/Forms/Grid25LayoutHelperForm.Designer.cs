@@ -36,7 +36,7 @@
             this.txtColumns = new System.Windows.Forms.TextBox();
             this.txtOverlap = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.btnApply = new System.Windows.Forms.Button();
+            this.btnApplyDimension = new System.Windows.Forms.Button();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.btnCancel = new System.Windows.Forms.Button();
             this.txtPageHeight = new System.Windows.Forms.TextBox();
@@ -50,6 +50,7 @@
             this.label7 = new System.Windows.Forms.Label();
             this.textFishingGround = new System.Windows.Forms.TextBox();
             this.tabResults = new System.Windows.Forms.TabPage();
+            this.lblProvideTitles = new System.Windows.Forms.Label();
             this.buttonSubGrid = new System.Windows.Forms.Button();
             this.lvResults = new System.Windows.Forms.ListView();
             this.menuDropDown = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -129,16 +130,16 @@
             this.label3.Text = "Overlap";
             this.label3.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
             // 
-            // btnApply
+            // btnApplyDimension
             // 
-            this.btnApply.ImageKey = "applyGrid";
-            this.btnApply.ImageList = this.imageList1;
-            this.btnApply.Location = new System.Drawing.Point(329, 210);
-            this.btnApply.Name = "btnApply";
-            this.btnApply.Size = new System.Drawing.Size(28, 28);
-            this.btnApply.TabIndex = 6;
-            this.btnApply.UseVisualStyleBackColor = true;
-            this.btnApply.Click += new System.EventHandler(this.OnButtonClick);
+            this.btnApplyDimension.ImageKey = "applyGrid";
+            this.btnApplyDimension.ImageList = this.imageList1;
+            this.btnApplyDimension.Location = new System.Drawing.Point(329, 210);
+            this.btnApplyDimension.Name = "btnApplyDimension";
+            this.btnApplyDimension.Size = new System.Drawing.Size(28, 28);
+            this.btnApplyDimension.TabIndex = 6;
+            this.btnApplyDimension.UseVisualStyleBackColor = true;
+            this.btnApplyDimension.Click += new System.EventHandler(this.OnButtonClick);
             // 
             // imageList1
             // 
@@ -221,7 +222,7 @@
             this.tabLayout.Controls.Add(this.btnInputTitles);
             this.tabLayout.Controls.Add(this.txtPageWidth);
             this.tabLayout.Controls.Add(this.label2);
-            this.tabLayout.Controls.Add(this.btnApply);
+            this.tabLayout.Controls.Add(this.btnApplyDimension);
             this.tabLayout.Controls.Add(this.txtPageHeight);
             this.tabLayout.Controls.Add(this.txtColumns);
             this.tabLayout.Controls.Add(this.label5);
@@ -280,6 +281,7 @@
             // 
             // tabResults
             // 
+            this.tabResults.Controls.Add(this.lblProvideTitles);
             this.tabResults.Controls.Add(this.buttonSubGrid);
             this.tabResults.Controls.Add(this.lvResults);
             this.tabResults.Location = new System.Drawing.Point(4, 22);
@@ -288,6 +290,16 @@
             this.tabResults.TabIndex = 2;
             this.tabResults.Text = "Results";
             this.tabResults.UseVisualStyleBackColor = true;
+            // 
+            // lblProvideTitles
+            // 
+            this.lblProvideTitles.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblProvideTitles.Location = new System.Drawing.Point(24, 101);
+            this.lblProvideTitles.Name = "lblProvideTitles";
+            this.lblProvideTitles.Size = new System.Drawing.Size(324, 51);
+            this.lblProvideTitles.TabIndex = 13;
+            this.lblProvideTitles.Text = "Provide titles for all panels in the layout and name of fishing ground";
+            this.lblProvideTitles.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // buttonSubGrid
             // 
@@ -306,10 +318,11 @@
             this.lvResults.ContextMenuStrip = this.menuDropDown;
             this.lvResults.Location = new System.Drawing.Point(3, 3);
             this.lvResults.Name = "lvResults";
-            this.lvResults.Size = new System.Drawing.Size(309, 219);
+            this.lvResults.Size = new System.Drawing.Size(309, 243);
             this.lvResults.TabIndex = 0;
             this.lvResults.UseCompatibleStateImageBehavior = false;
-            this.lvResults.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnMouseDown);
+            this.lvResults.SelectedIndexChanged += new System.EventHandler(this.OnListViewSelectedIndexChange);
+            this.lvResults.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnListViewMouseDown);
             // 
             // menuDropDown
             // 
@@ -342,7 +355,6 @@
             // 
             // btnSaveTemplate
             // 
-            this.btnSaveTemplate.Enabled = false;
             this.btnSaveTemplate.ImageKey = "save";
             this.btnSaveTemplate.ImageList = this.imageList1;
             this.btnSaveTemplate.Location = new System.Drawing.Point(295, 61);
@@ -463,7 +475,7 @@
         private System.Windows.Forms.TextBox txtColumns;
         private System.Windows.Forms.TextBox txtOverlap;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Button btnApply;
+        private System.Windows.Forms.Button btnApplyDimension;
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.TextBox txtPageHeight;
         private System.Windows.Forms.Label label4;
@@ -490,5 +502,6 @@
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Button btnSaveTemplate;
         private System.Windows.Forms.TextBox textLayoutTemplateFileName;
+        private System.Windows.Forms.Label lblProvideTitles;
     }
 }

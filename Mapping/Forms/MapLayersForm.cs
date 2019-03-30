@@ -275,15 +275,13 @@ namespace FAD3
             {
                 bool isVisible = (bool)layerGrid[0, e.RowIndex].Value;
                 layerGrid[0, e.RowIndex].Value = !isVisible;
-                //var h = (int)layerGrid[0, e.RowIndex].Tag;
                 var layerName = layerGrid[e.ColumnIndex + 1, e.RowIndex].Value.ToString();
-                //_mapLayersHandler.EditLayer(h, layerName, !isVisible);
                 _mapLayersHandler.EditLayer(_layerHandle, layerName, !isVisible);
             }
+
             if (e.ColumnIndex == 1)
             {
                 MarkCurrentLayerName(e.RowIndex);
-                //_mapLayersHandler.set_MapLayer((int)layerGrid[0, e.RowIndex].Tag);
                 _mapLayersHandler.set_MapLayer(_layerHandle);
                 itemConvertToGrid25.Enabled = false;
                 if (global.MappingMode == fad3MappingMode.grid25Mode)
@@ -383,86 +381,6 @@ namespace FAD3
             }
         }
 
-        //public void SaveTemplateToFile()
-        //{
-        //    if (ValidLayoutTemplateShapefile())
-        //    {
-        //        var sf = (Shapefile)_mapLayersHandler.CurrentMapLayer.LayerObject;
-        //        var saveAs = new SaveFileDialog();
-        //        saveAs.Filter = "Shapefile *.shp|*.shp|All files *.*|*.*";
-        //        saveAs.FilterIndex = 1;
-        //        saveAs.ShowDialog();
-        //        if (File.Exists(saveAs.FileName))
-        //        {
-        //            ShapefileDiskStorageHelper.Delete(saveAs.FileName.Replace(".shp", ""));
-        //        }
-        //        if (saveAs.FileName.Length > 0 && sf.SaveAs(saveAs.FileName))
-        //        {
-        //            var prjFile = sf.Filename.Replace(".shp", ".prj");
-        //            sf.GeoProjection.WriteToFile(prjFile);
-
-        //            if (_mapLayersHandler.CurrentMapLayer.IsFishingGridLayoutTemplate)
-        //            {
-        //                var layoutFile = sf.Filename.Replace(".shp", ".lay");
-        //                if (File.Exists(layoutFile))
-        //                {
-        //                    try
-        //                    {
-        //                        File.Delete(layoutFile);
-        //                    }
-        //                    catch (IOException ioex)
-        //                    {
-        //                    }
-        //                    catch (Exception ex)
-        //                    {
-        //                    }
-        //                }
-        //                using (StreamWriter writer = new StreamWriter(layoutFile, true))
-        //                {
-        //                    writer.WriteLine($"Fishing ground:{ global.MappingForm.Grid25MajorGrid.LayoutHelper.FishingGround}");
-        //                    //writer.WriteLine($"Save folder:{global.MappingForm.Grid25MajorGrid.LayoutHelper.GridFromLayoutSaveFolder}");
-        //                    writer.WriteLine($"Rows:{global.MappingForm.Grid25MajorGrid.LayoutHelper.Rows}");
-        //                    writer.WriteLine($"Columns:{global.MappingForm.Grid25MajorGrid.LayoutHelper.Columns}");
-        //                    writer.WriteLine($"Overlap:{global.MappingForm.Grid25MajorGrid.LayoutHelper.Overlap}");
-        //                    string selectedMajorGrids = "SelectedMajorGrids:";
-        //                    foreach (int item in global.MappingForm.Grid25MajorGrid.SelectedShapeGridNumbers)
-        //                    {
-        //                        selectedMajorGrids += $"{item.ToString()},";
-        //                    }
-        //                    selectedMajorGrids = selectedMajorGrids.Trim(',');
-        //                    writer.WriteLine(selectedMajorGrids);
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
-
-        ///// <summary>
-        ///// returns true if a layout template has all rows in the title field filled up
-        ///// </summary>
-        ///// <returns></returns>
-        //private bool ValidLayoutTemplateShapefile()
-        //{
-        //    bool isValid = true;
-        //    {
-        //        if (_mapLayersHandler.CurrentMapLayer.IsFishingGridLayoutTemplate)
-        //        {
-        //            var sf = (Shapefile)_mapLayersHandler.CurrentMapLayer.LayerObject;
-        //            int fldTitle = sf.FieldIndexByName["Title"];
-        //            for (int n = 0; n < sf.NumShapes; n++)
-        //            {
-        //                if (sf.CellValue[fldTitle, n].ToString().Length == 0)
-        //                {
-        //                    isValid = false;
-        //                    MessageBox.Show("All panels must have titles", "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        //                    break;
-        //                }
-        //            }
-        //        }
-        //        return isValid;
-        //    }
-        //}
-
         private void OnoptionsToolStripMenuItem_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
             e.ClickedItem.OwnerItem.Owner.Hide();
@@ -503,16 +421,6 @@ namespace FAD3
                     break;
 
                 case "buttonAttributes":
-                    //var sfa = ShapefileAttributesForm.GetInstance(global.MappingForm, global.MappingForm.MapInterActionHandler);
-                    //if (!sfa.Visible)
-                    //{
-                    //    sfa.Show(this);
-                    //}
-                    //else
-                    //{
-                    //    sfa.BringToFront();
-                    //}
-
                     EditShapeAttributeForm esaf = EditShapeAttributeForm.GetInstance(global.MappingForm, global.MappingForm.MapInterActionHandler);
                     if (esaf.Visible)
                     {

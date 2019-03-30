@@ -25,6 +25,12 @@ namespace FAD3.Mapping.Forms
             return _instance;
         }
 
+        public static Grid25LayoutHelperForm GetInstance(string layoutFileName)
+        {
+            if (_instance == null) _instance = new Grid25LayoutHelperForm(layoutFileName);
+            return _instance;
+        }
+
         public Grid25LayoutHelperForm(Grid25MajorGrid majorGrid, Grid25GenerateForm parentForm)
         {
             InitializeComponent();
@@ -32,6 +38,42 @@ namespace FAD3.Mapping.Forms
             _parentForm = parentForm;
             LayoutHelper = _majorGrid.LayoutHelper;
             LayoutHelper.LayerCreated += OnLayoutCreated;
+        }
+
+        private void ReadLayoutData()
+        {
+            string line;
+            List<int> selectedGridHandles = new List<int>();
+            StreamReader file = new StreamReader(_layoutFileName);
+
+            while ((line = file.ReadLine()) != null)
+            {
+                string[] line2 = line.Split(':');
+                switch (line2[0])
+                {
+                    case "Fishing ground":
+                        textFishingGround.Text = line2[1];
+                        break;
+
+                    case "Rows":
+                        txtRows.Text = line2[1];
+                        break;
+
+                    case "Columns":
+                        txtColumns.Text = line2[1];
+                        break;
+
+                    case "Overlap":
+                        txtOverlap.Text = line2[1];
+                        break;
+                }
+            }
+        }
+
+        public Grid25LayoutHelperForm(string layoutFleName)
+        {
+            InitializeComponent();
+            _layoutFileName = layoutFleName;
         }
 
         private void OnLayoutCreated(Grid25LayoutHelper s, Grid25LayoutHelperEventArgs e)
@@ -73,6 +115,8 @@ namespace FAD3.Mapping.Forms
         private Grid25GenerateForm _parentForm;
         private bool _hasSubGrid;
         private int _subGridCount;
+        private string _layoutFileName;
+        private Shapefile _layoutShapefile;
 
         /// <summary>
         ///populate the various text fields of the form
@@ -194,19 +238,16 @@ namespace FAD3.Mapping.Forms
                             _majorGrid.HasSubgrid = _hasSubGrid;
                             _majorGrid.SubGridCount = _subGridCount;
 
-                            if (_majorGrid.InDefindeGridFromLayout)
-                            {
-                                //reflect changes of subgrid choice
-                                string gridTitle = lvResults.CheckedItems[0].Text;
-                                LayerEventArg lve = new LayerEventArg(gridTitle);
-                                lve.FileName = $"{lvResults.CheckedItems[0].Tag.ToString()}";
-                                lve.SelectedIndex = lvResults.CheckedItems[0].Index;
-                                lve.SelectedExtent = LayoutHelper.LayoutShapeFile.Shape[lvResults.CheckedItems[0].Index].Extents;
+                            //reflect changes of subgrid choice
+                            string gridTitle = lvResults.CheckedItems[0].Text;
+                            LayerEventArg lve = new LayerEventArg(gridTitle);
+                            lve.FileName = $"{lvResults.CheckedItems[0].Tag.ToString()}";
+                            lve.SelectedIndex = lvResults.CheckedItems[0].Index;
+                            lve.SelectedExtent = LayoutHelper.LayoutShapeFile.Shape[lvResults.CheckedItems[0].Index].Extents;
 
-                                lve.Action = "LoadGridMap";
-                                _majorGrid.LoadPanelGrid(chkAutoExpand.Checked, lve);
-                                _parentForm.MapTitle(gridTitle);
-                            }
+                            lve.Action = "LoadGridMap";
+                            _majorGrid.LoadPanelGrid(chkAutoExpand.Checked, lve);
+                            _parentForm.MapTitle(gridTitle);
                         }
                     }
                     break;
@@ -295,7 +336,7 @@ namespace FAD3.Mapping.Forms
                     Close();
                     break;
 
-                case "btnApply":
+                case "btnApplyDimension":
                     if (AcceptOptions())
                     {
                         _majorGrid.LayoutHelper.SetupLayout(Rows, Columns, Overlap);
@@ -331,8 +372,12 @@ namespace FAD3.Mapping.Forms
             lvResults.FullRowSelect = true;
             lvResults.Columns.Clear();
             lvResults.Columns.Add("Title");
-            lvResults.Columns.Add("Width");
-            lvResults.Columns.Add("Height");
+            lvResults.HideSelection = false;
+            if (global.MappingMode == Database.Classes.fad3MappingMode.grid25Mode)
+            {
+                lvResults.Columns.Add("Width");
+                lvResults.Columns.Add("Height");
+            }
             lvResults.CheckBoxes = true;
             SizeColumns(lvResults);
         }
@@ -340,7 +385,6 @@ namespace FAD3.Mapping.Forms
         private void FillResultList()
         {
             SetupResultsView();
-
             lvResults.Items.Clear();
             int fldTitle = LayoutHelper.LayoutShapeFile.FieldIndexByName["Title"];
             for (int n = 0; n < LayoutHelper.LayoutShapeFile.NumShapes; n++)
@@ -417,9 +461,45 @@ namespace FAD3.Mapping.Forms
             //{
             //}
             global.LoadFormSettings(this, true);
-            txtRows.Text = _majorGrid.LayoutRows.ToString();
-            txtColumns.Text = _majorGrid.LayoutCols.ToString();
-            txtOverlap.Text = _majorGrid.LayoutOverlap.ToString();
+            if (global.MappingMode == Database.Classes.fad3MappingMode.grid25Mode)
+            {
+                txtRows.Text = _majorGrid.LayoutRows.ToString();
+                txtColumns.Text = _majorGrid.LayoutCols.ToString();
+                txtOverlap.Text = _majorGrid.LayoutOverlap.ToString();
+                textLayoutTemplateFileName.Text = _majorGrid.LayoutHelper.LayoutShapeFile.Filename;
+                textLayoutTemplateFileName.Enabled = false;
+            }
+            else
+            {
+                ReadLayoutData();
+                var layoutShapeFileName = _layoutFileName.Replace(".lay", ".shp");
+
+                var result = global.MappingForm.MapLayersHandler.FileOpenHandler(layoutShapeFileName, "Layout frame");
+                if (!result.success)
+                {
+                    MessageBox.Show(result.errMsg, "File open error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    _layoutShapefile = (Shapefile)global.MappingForm.MapLayersHandler.get_MapLayer("Layout frame").LayerObject;
+                    _layoutShapefile.DefaultDrawingOptions.FillVisible = false;
+                    _layoutShapefile.DefaultDrawingOptions.LineWidth = 1.5F;
+                    _layoutShapefile.DefaultDrawingOptions.LineColor = new Utils().ColorByName(tkMapColor.Blue);
+                    int fTitle = _layoutShapefile.FieldIndexByName["Title"];
+                    SetupResultsView();
+                    for (int n = 0; n < _layoutShapefile.NumShapes; n++)
+                    {
+                        ListViewItem lvi = lvResults.Items.Add(_layoutShapefile.CellValue[fTitle, n].ToString());
+                    }
+                    SizeColumns(lvResults, false);
+                    global.MappingForm.MapControl.Extents = _layoutShapefile.Extents;
+                    buttonSubGrid.Visible = false;
+                    btnInputTitles.Visible = false;
+                    btnApplyDimension.Visible = false;
+                    tabsLayout.TabPages.Remove(tabSave);
+                    lvResults.ItemChecked += OnListItemChecked;
+                }
+            }
         }
 
         private Extents DefinePageExtent(Extents selectedMajorGridShapesExtent, Extents selectionBoxExtent)
@@ -469,6 +549,12 @@ namespace FAD3.Mapping.Forms
             }
             _instance = null;
             _parentForm = null;
+            if (_layoutShapefile != null)
+            {
+                _layoutShapefile.Close();
+                _layoutShapefile = null;
+                global.MappingForm.MapLayersHandler.RemoveLayer("Layout frame");
+            }
             global.SaveFormSettings(this);
             global.MappingForm.SetCursor(tkCursorMode.cmSelection);
         }
@@ -483,9 +569,9 @@ namespace FAD3.Mapping.Forms
 
             if (e.Item.Text.Length > 0)
             {
-                lve.FileName = $"{item.Tag.ToString()}";
+                lve.FileName = $"{item.Tag?.ToString()}";
                 lve.SelectedIndex = item.Index;
-                lve.SelectedExtent = LayoutHelper.LayoutShapeFile.Shape[item.Index].Extents;
+                lve.SelectedExtent = LayoutHelper?.LayoutShapeFile.Shape[item.Index].Extents;
                 if (item.Checked)
                 {
                     lve.Action = "LoadGridMap";
@@ -516,47 +602,83 @@ namespace FAD3.Mapping.Forms
 
             if (lvResults.CheckedItems.Count == 0)
             {
-                _parentForm.MapTitle("");
+                _parentForm?.MapTitle("");
             }
-            //else
-            //{
-            //    //load/hide the grid inside the checked panel
-            _majorGrid.LoadPanelGrid(chkAutoExpand.Checked, lve);
-            _parentForm.MapTitle(item.Text);
-            //}
+
+            if (global.MappingMode == Database.Classes.fad3MappingMode.grid25Mode)
+            {
+                _majorGrid.LoadPanelGrid(chkAutoExpand.Checked, lve);
+                _parentForm.MapTitle(item.Text);
+            }
+            else
+            {
+                if (lvResults.CheckedItems.Count > 0)
+                {
+                    _layoutShapefile.ShapeSelected[e.Item.Index] = true;
+                }
+                else
+                {
+                    _layoutShapefile.SelectNone();
+                }
+                global.MappingForm.MapControl.Redraw();
+            }
+
+            global.MappingForm.MapLayersHandler.RefreshLayers();
         }
 
         private void OnTabsSelectionChanged(object sender, EventArgs e)
         {
             chkAutoExpand.Visible = false;
             btnSaveLayout.Visible = false;
+
             var t = sender as TabControl;
             switch (t.SelectedTab.Name)
             {
                 case "tabResults":
-                    if (textFishingGround.Text.Length > 0
-                        && _majorGrid.LayoutHelper.LayoutShapeFile.NumShapes > 0
-                        && _majorGrid.LayoutHelper.HasCompletePanelTitles())
+                    if (global.MappingMode == Database.Classes.fad3MappingMode.grid25Mode)
                     {
-                        _majorGrid.SetExtentFromLayout();
-                        //if (lvResults.Items.Count == 0)
-                        //{
-                        FillResultList();
-                        //}
+                        buttonSubGrid.Enabled = true;
+                        lblProvideTitles.Visible = false;
+                        if (textFishingGround.Text.Length > 0
+                            && _majorGrid.LayoutHelper.LayoutShapeFile.NumShapes > 0
+                            && _majorGrid.LayoutHelper.HasCompletePanelTitles())
+                        {
+                            _majorGrid.SetExtentFromLayout();
+                            lvResults.Visible = true;
+                            FillResultList();
+                        }
+                        else
+                        {
+                            if (lvResults.CheckedItems.Count > 0)
+                            {
+                                lvResults.CheckedItems[0].Checked = false;
+                            }
+                            lvResults.Visible = false;
+                            lblProvideTitles.Visible = true;
+                            buttonSubGrid.Enabled = false;
+                        }
+                        _majorGrid.LayoutHelper.FishingGround = textFishingGround.Text;
+                        btnSaveLayout.Visible = true;
+                        chkAutoExpand.Visible = true;
+                        btnSaveLayout.Enabled = btnSave.Enabled && lvResults.Items.Count > 0 && _majorGrid.LayoutHelper.HasCompletePanelTitles();
                     }
-                    _majorGrid.LayoutHelper.FishingGround = textFishingGround.Text;
-                    btnSaveLayout.Visible = true;
-                    chkAutoExpand.Visible = true;
-                    btnSaveLayout.Enabled = btnSave.Enabled && lvResults.Items.Count > 0 && _majorGrid.LayoutHelper.HasCompletePanelTitles();
+                    else
+                    {
+                        lblProvideTitles.Visible = false;
+                        lvResults.Visible = true;
+                    }
                     break;
 
                 case "tabSave":
 
+                    btnSaveTemplate.Enabled = textFishingGround.Text.Length > 0
+                        && lvResults.Items.Count > 0
+                        && !_majorGrid.LayoutHelper.LayoutTemplateFromFile;
                     break;
             }
         }
 
-        private void OnMouseDown(object sender, MouseEventArgs e)
+        private void OnListViewMouseDown(object sender, MouseEventArgs e)
         {
             ListView lv = (ListView)sender;
             _mouseX = e.Location.X;
@@ -573,20 +695,28 @@ namespace FAD3.Mapping.Forms
             }
 
             ListViewHitTestInfo lvh = lv.HitTest(_mouseX, _mouseY);
-            if (e.Button == MouseButtons.Right)
+            if (lvh.Item != null)
             {
-                menuDropDown.Items.Clear();
+                if (e.Button == MouseButtons.Right)
+                {
+                    menuDropDown.Items.Clear();
 
-                if (rebuildAll)
-                {
-                    var tsi = menuDropDown.Items.Add("Rebuild all Grid25 map");
-                    tsi.Name = "menuRebuildAllGrid25";
+                    if (rebuildAll)
+                    {
+                        var tsi = menuDropDown.Items.Add("Rebuild all Grid25 map");
+                        tsi.Name = "menuRebuildAllGrid25";
+                    }
+                    else
+                    {
+                        var tsi = menuDropDown.Items.Add("Rebuild Grid25 map");
+                        tsi.Name = "menuRebuildGrid25";
+                    }
                 }
-                else
-                {
-                    var tsi = menuDropDown.Items.Add("Rebuild Grid25 map");
-                    tsi.Name = "menuRebuildGrid25";
-                }
+                //else if (global.MappingMode==Database.Classes.fad3MappingMode.defaultMode &&  e.Button == MouseButtons.Left)
+                //{
+                //    global.MappingForm.MapControl.Extents = _layoutShapefile.Shape[lvh.Item.Index].Extents;
+                //    global.MappingForm.MapControl.ExtentPad = 10D;
+                //}
             }
         }
 
@@ -637,6 +767,16 @@ namespace FAD3.Mapping.Forms
                     break;
             }
             SizeColumns(lvResults, false);
+        }
+
+        private void OnListViewSelectedIndexChange(object sender, EventArgs e)
+        {
+            ListView lv = (ListView)sender;
+
+            if (global.MappingMode == Database.Classes.fad3MappingMode.defaultMode && lv.SelectedIndices.Count > 0)
+            {
+                global.MappingForm.MapControl.Extents = _layoutShapefile.Shape[lv.SelectedItems[0].Index].Extents;
+            }
         }
     }
 }
