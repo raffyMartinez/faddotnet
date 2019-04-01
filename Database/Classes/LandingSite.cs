@@ -24,15 +24,16 @@ namespace FAD3
     /// </summary>
     public class Landingsite : EventArgs
     {
-        private string _LandingSiteGUID = "";
-        private long _GearUsedCount = 0;
-        private string _LandingSiteName = "";
+        private string _landingSiteGUID = "";
+        private long _gearUsedCount = 0;
+        private string _landingSiteName = "";
         private double _xCoord = 0;
         private double _yCoord = 0;
         private bool _isInsideTargetArea;
         private Coordinate _coordinate;
-        private bool _IsNew = false;
+        private bool _isNew = false;
         private static string _lastError;
+        private string _targetAreaGuid;
 
         public static string LastError
         {
@@ -95,18 +96,19 @@ namespace FAD3
         public void IsNew()
         {
             _coordinate = new Coordinate();
-            _IsNew = true;
+            _isNew = true;
         }
 
         public string LandingSiteName
         {
-            get { return _LandingSiteName; }
-            set { _LandingSiteName = value; }
+            get { return _landingSiteName; }
+            set { _landingSiteName = value; }
         }
 
-        public Landingsite(string LandingSiteGUID)
+        public Landingsite(string landingSiteGUID, string targetAreaGuid)
         {
-            _LandingSiteGUID = LandingSiteGUID;
+            _landingSiteGUID = landingSiteGUID;
+            _targetAreaGuid = targetAreaGuid;
         }
 
         /// <summary>
@@ -121,7 +123,7 @@ namespace FAD3
                 try
                 {
                     conection.Open();
-                    string query = $"SELECT Count(SamplingGUID) AS n FROM tblSampling WHERE LSGUID= {{{_LandingSiteGUID}}}";
+                    string query = $"SELECT Count(SamplingGUID) AS n FROM tblSampling WHERE LSGUID= {{{_landingSiteGUID}}}";
                     var command = new OleDbCommand(query, conection);
                     myCount = (int)command.ExecuteScalar();
                 }
@@ -259,7 +261,7 @@ namespace FAD3
                     string query = $@"SELECT Year([SamplingDate]) AS SamplingYear, Count(tblLandingSites.LSGUID) AS n
                                             FROM tblLandingSites INNER JOIN tblSampling ON tblLandingSites.LSGUID = tblSampling.LSGUID
                                             GROUP BY Year([SamplingDate]), tblLandingSites.LSGUID
-                                            HAVING tblLandingSites.LSGUID={{{_LandingSiteGUID}}}";
+                                            HAVING tblLandingSites.LSGUID={{{_landingSiteGUID}}}";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
                     for (int i = 0; i < dt.Rows.Count; i++)
@@ -289,7 +291,7 @@ namespace FAD3
                                       FROM tblLandingSites INNER JOIN tblSampling ON tblLandingSites.LSGUID = tblSampling.LSGUID
                                       GROUP BY Year([SamplingDate]), tblSampling.GearVarGUID, tblLandingSites.LSGUID
                                       HAVING tblSampling.GearVarGUID={{{gearVariationGUID}}} AND
-                                      tblLandingSites.LSGUID={{{_LandingSiteGUID}}}";
+                                      tblLandingSites.LSGUID={{{_landingSiteGUID}}}";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
                     for (int i = 0; i < dt.Rows.Count; i++)
@@ -392,10 +394,10 @@ namespace FAD3
 
         public string LandingSiteGUID
         {
-            get { return _LandingSiteGUID; }
+            get { return _landingSiteGUID; }
             set
             {
-                _LandingSiteGUID = value;
+                _landingSiteGUID = value;
                 _coordinate = new Coordinate();
             }
         }
@@ -414,7 +416,7 @@ namespace FAD3
                 {
                     conection.Open();
                     string query = $@"SELECT Format([SamplingDate],'mmm-yyyy') AS sMonth, Count(SamplingGUID) AS n
-                                      FROM tblSampling WHERE LSGUID= {{{_LandingSiteGUID}}} GROUP BY Format([SamplingDate],'mmm-yyyy')
+                                      FROM tblSampling WHERE LSGUID= {{{_landingSiteGUID}}} GROUP BY Format([SamplingDate],'mmm-yyyy')
                                       ORDER BY First(SamplingDate)";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(myDT);
@@ -444,7 +446,7 @@ namespace FAD3
                     conection.Open();
                     string query = $@"SELECT tblSampling.GearVarGUID, tblGearVariations.Variation, tblGearClass.GearClassName, Count(tblSampling.SamplingGUID) AS n
                                       FROM tblGearClass INNER JOIN (tblGearVariations INNER JOIN tblSampling ON tblGearVariations.GearVarGUID = tblSampling.GearVarGUID)
-                                      ON tblGearClass.GearClass = tblGearVariations.GearClass WHERE tblSampling.LSGUID = {{{_LandingSiteGUID}}}
+                                      ON tblGearClass.GearClass = tblGearVariations.GearClass WHERE tblSampling.LSGUID = {{{_landingSiteGUID}}}
                                       GROUP BY tblSampling.GearVarGUID, tblGearVariations.Variation, tblGearClass.GearClassName ORDER BY tblGearVariations.Variation";
 
                     var adapter = new OleDbDataAdapter(query, conection);
@@ -453,7 +455,7 @@ namespace FAD3
                     {
                         DataRow dr = myDT.Rows[i];
                         myGears.Add(dr["GearVarGUID"].ToString(), $"{dr["Variation"].ToString()}: {dr["n"].ToString()}");
-                        _GearUsedCount++;
+                        _gearUsedCount++;
                     }
                 }
                 catch (Exception ex) { Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name); }
@@ -478,7 +480,7 @@ namespace FAD3
                                       tblLandingSites.cx, tblLandingSites.cy, Municipalities.ProvNo
                                       FROM Provinces INNER JOIN (Municipalities INNER JOIN tblLandingSites ON Municipalities.MunNo =
                                       tblLandingSites.MunNo) ON Provinces.ProvNo = Municipalities.ProvNo
-                                      WHERE tblLandingSites.LSGUID= {{{_LandingSiteGUID}}}";
+                                      WHERE tblLandingSites.LSGUID= {{{_landingSiteGUID}}}";
 
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(myDT);
@@ -542,7 +544,7 @@ namespace FAD3
                                       tblLandingSites.cx, tblLandingSites.cy
                                       FROM Provinces INNER JOIN (Municipalities INNER JOIN tblLandingSites ON Municipalities.MunNo =
                                       tblLandingSites.MunNo) ON Provinces.ProvNo = Municipalities.ProvNo
-                                      WHERE tblLandingSites.LSGUID= {{{_LandingSiteGUID}}}";
+                                      WHERE tblLandingSites.LSGUID= {{{_landingSiteGUID}}}";
 
                     double num = 0;
                     var adapter = new OleDbDataAdapter(query, conection);
@@ -550,7 +552,7 @@ namespace FAD3
                     if (dt.Rows.Count > 0)
                     {
                         DataRow dr = dt.Rows[0];
-                        _LandingSiteName = dr["LSName"].ToString();
+                        _landingSiteName = dr["LSName"].ToString();
 
                         if (double.TryParse((dr["cx"].ToString()), out num))
                         {

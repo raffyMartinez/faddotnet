@@ -380,9 +380,9 @@ namespace FAD3
             {
                 Text = TargetAreaName,
                 Name = TargetAreaGuid,
-                ImageKey = "AOI"
+                ImageKey = "target_area"
             };
-            nd.Tag = Tuple.Create(TargetAreaGuid, "", "aoi");
+            nd.Tag = Tuple.Create(TargetAreaGuid, "", "target_area");
             treeMain.Nodes["root"].Nodes.Add(nd);
             treeMain.SelectedNode = nd;
         }
@@ -414,7 +414,7 @@ namespace FAD3
         public void RefreshLV(string TreeLevel)
         {
             SetUPLV(TreeLevel);
-            if (TreeLevel == "landing_site" || TreeLevel == "aoi")
+            if (TreeLevel == "landing_site" || TreeLevel == "target_area")
             {
                 treeMain.SelectedNode.Text = lvMain.Items["name"].SubItems[1].Text;
             }
@@ -504,7 +504,7 @@ namespace FAD3
             {
                 var tsi1 = menuDropDown.Items.Add("Enumerator detail");
                 tsi1.Name = "menuEnumeratorDetail";
-                tsi1.Visible = lvh.Item.Tag != null && _treeLevel == "aoi" && lvh.Item.Tag.ToString() == "enumerator";
+                tsi1.Visible = lvh.Item.Tag != null && _treeLevel == "target_area" && lvh.Item.Tag.ToString() == "enumerator";
 
                 tsi1 = menuDropDown.Items.Add("Landing site detail");
                 tsi1.Name = "menuLandingSiteDetail";
@@ -528,34 +528,38 @@ namespace FAD3
 
                     tsi = menuDropDown.Items.Add("Enumerators");
                     tsi.Name = "menuEnumerators";
-                    tsi.Enabled = _treeLevel == "aoi";
+                    tsi.Enabled = _treeLevel == "target_area";
 
                     tsi = menuDropDown.Items.Add("Fishing gears used");
                     tsi.Name = "menuGearsInTargetArea";
-                    tsi.Enabled = _treeLevel == "aoi";
+                    tsi.Enabled = _treeLevel == "target_area";
+
+                    tsi = menuDropDown.Items.Add("Fishing boats");
+                    tsi.Name = "menuFishingBoats";
+                    tsi.Enabled = _treeLevel == "target_area" || _treeLevel == "landing_site";
 
                     tsi = menuDropDown.Items.Add("Inventory of fishers, gears, and vessels");
                     tsi.Name = "menuGearInventory";
-                    tsi.Enabled = _treeLevel == "aoi";
+                    tsi.Enabled = _treeLevel == "target_area";
 
                     tsi = menuDropDown.Items.Add("Target area properties");
                     tsi.Name = "menuTargetAreaProp";
-                    tsi.Enabled = _treeLevel == "aoi";
+                    tsi.Enabled = _treeLevel == "target_area";
 
                     var sep = menuDropDown.Items.Add("-");
                     sep.Name = "menuSeparator1";
 
                     tsi = menuDropDown.Items.Add("New landing site");
                     tsi.Name = "menuNewLandingSite";
-                    tsi.Enabled = _treeLevel == "aoi";
+                    tsi.Enabled = _treeLevel == "target_area";
 
                     tsi = menuDropDown.Items.Add("Get landing sites from Google Earth KML");
                     tsi.Name = "menuLandingSiteFromKML";
-                    tsi.Enabled = _treeLevel == "aoi" && FishingGrid.IsCompleteGrid25;
+                    tsi.Enabled = _treeLevel == "target_area" && FishingGrid.IsCompleteGrid25;
 
                     tsi = menuDropDown.Items.Add("Show landing sites on map");
                     tsi.Name = "menuShowOnMapLandingSites";
-                    tsi.Enabled = _treeLevel == "aoi" && global.MapIsOpen;
+                    tsi.Enabled = _treeLevel == "target_area" && global.MapIsOpen;
 
                     tsi = menuDropDown.Items.Add("Landing site properties");
                     tsi.Name = "menuLandingSiteProp";
@@ -1035,9 +1039,9 @@ namespace FAD3
 
         public void RefreshFisheriesInventory(string targetAreaGuid)
         {
-            if (_treeLevel == "aoi" && _targetAreaGuid == targetAreaGuid)
+            if (_treeLevel == "target_area" && _targetAreaGuid == targetAreaGuid)
             {
-                SetUPLV("aoi");
+                SetUPLV("target_area");
             }
         }
 
@@ -1061,11 +1065,35 @@ namespace FAD3
             e.ClickedItem.Owner.Hide();
             switch (ItemName)
             {
+
+                case "menuFishingBoats":
+                    FishingBoatForm fbf = FishingBoatForm.GetInstance();
+                    if(fbf.Visible)
+                    {
+                        fbf.BringToFront();
+                    }
+                    else
+                    {
+                        fbf.TreeLevel = _treeLevel;
+                        fbf.TargetArea = _targetArea;
+                        if(_treeLevel=="landing_site")
+                        {
+                             fbf.LandingSite = _ls;
+                        }
+                        else
+                        {
+                            fbf.LandingSite = null;
+                        }
+
+                        fbf.Show(this);
+                    }
+                    
+                    break;
                 case "menuDeleteTreeItem":
                     var myTag = (Tuple<string, string, string>)treeMain.SelectedNode.Tag;
                     switch (_treeLevel)
                     {
-                        case "aoi":
+                        case "target_area":
                             var result = MessageBox.Show("Are you sure you want to delete the selected target area", "Confirmation needed", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
 
                             if (result == DialogResult.Yes)
@@ -1426,10 +1454,10 @@ namespace FAD3
 
                                     break;
 
-                                case "aoi":
+                                case "target_area":
                                     if (item.Tag != null)
                                     {
-                                        if (item.Tag.ToString() == "aoi_data")
+                                        if (item.Tag.ToString() == "target_area_data")
                                         {
                                             var myTag = (Tuple<string, string, string>)treeMain.SelectedNode.Tag;
                                             _targetArea.TargetAreaGuid = myTag.Item1;
@@ -1573,7 +1601,7 @@ namespace FAD3
                     }
                     if (e.Button == MouseButtons.Right)
                     {
-                        if (_treeLevel == "sampling" || _treeLevel == "aoi" || _treeLevel == "landing_site")
+                        if (_treeLevel == "sampling" || _treeLevel == "target_area" || _treeLevel == "landing_site")
                         {
                             ConfigDropDownMenu(lvMain, lvh);
                         }
@@ -1846,7 +1874,7 @@ namespace FAD3
                     break;
 
                 case "tsButtonReport":
-                    if (_treeLevel == "aoi" && _targetAreaName.Length > 0 && _targetAreaGuid.Length > 0)
+                    if (_treeLevel == "target_area" && _targetAreaName.Length > 0 && _targetAreaGuid.Length > 0)
                     {
                         DatabaseReportForm drf = DatabaseReportForm.GetInstance(_treeLevel, _targetArea);
                         if (drf.Visible)
@@ -2019,7 +2047,7 @@ namespace FAD3
 
                         break;
 
-                    case "aoi":
+                    case "target_area":
                         _targetAreaName = treeMain.SelectedNode.Text;
                         this.TargetAreaGuid = treeMain.SelectedNode.Name;
                         _landingSiteName = "";
@@ -2045,7 +2073,8 @@ namespace FAD3
                         _gearVarName = "";
                         _gearVarGUID = "";
                         _LSNode = e.Node;
-
+                        _ls = new Landingsite(_landingSiteGuid, _targetAreaGuid);
+                        _ls.LandingSiteName = _landingSiteName;
                         break;
                 }
 
@@ -2100,8 +2129,8 @@ namespace FAD3
                     TreeNode myNode = new TreeNode(item.AOIName);
                     myNode.Name = item.AOIGuid;
                     root.Nodes.Add(myNode);
-                    myNode.Tag = Tuple.Create(item.AOIGuid, "", "aoi");
-                    myNode.ImageKey = "AOI";
+                    myNode.Tag = Tuple.Create(item.AOIGuid, "", "target_area");
+                    myNode.ImageKey = "target_area";
 
                     if (item.LandingSiteName.Length > 0)
                     {
@@ -2426,7 +2455,7 @@ namespace FAD3
 
         public void RefreshTargetAreaEnumerators(string targetAreaGUID)
         {
-            if (_targetAreaGuid == targetAreaGUID && _treeLevel == "aoi")
+            if (_targetAreaGuid == targetAreaGUID && _treeLevel == "target_area")
             {
                 SetUPLV(_treeLevel);
             }
@@ -2434,7 +2463,7 @@ namespace FAD3
 
         /// <summary>
         /// this will show a list of summaries depending on the level of the node selected
-        /// level could be root, AOI, Landing site, gear used, and sampling month
+        /// level could be root, target area, Landing site, gear used, and sampling month
         /// </summary>
         /// <param name="treeLevel"></param>
         public void SetUPLV(string treeLevel)
@@ -2462,7 +2491,7 @@ namespace FAD3
                     lblTitle.Text = "Database summary";
                     break;
 
-                case "aoi":
+                case "target_area":
                     lblTitle.Text = "Target area";
                     break;
 
@@ -2547,7 +2576,7 @@ namespace FAD3
                         i++;
                     }
 
-                    //add AOI with count for entire database
+                    //add target area with count for entire database
                     lvi = lvMain.Items.Add("");
                     lvi = lvMain.Items.Add("Target areas");
                     i = 0;
@@ -2568,7 +2597,7 @@ namespace FAD3
                     }
                     break;
 
-                case "aoi":
+                case "target_area":
                     //arr = treeMain.SelectedNode.Tag.ToString().Split(',');
                     myData = _targetArea.TargetAreaData();
                     var arr = myData.Split('|');
@@ -2576,15 +2605,15 @@ namespace FAD3
                     //add AOI data for form
                     lvi = lvMain.Items.Add("name", "Name", null);
                     lvi.SubItems.Add(arr[0]);
-                    lvi.Tag = "aoi_data";
+                    lvi.Tag = "target_area_data";
                     lvi = lvMain.Items.Add("Code");
                     lvi.SubItems.Add(arr[1]);
-                    lvi.Tag = "aoi_data";
+                    lvi.Tag = "target_area_data";
                     lvi = lvMain.Items.Add("MBR");
                     lvi.SubItems.Add("");
-                    lvi.Tag = "aoi_data";
+                    lvi.Tag = "target_area_data";
                     lvi = lvMain.Items.Add("Grid system");
-                    lvi.Tag = "aoi_data";
+                    lvi.Tag = "target_area_data";
                     lvi.SubItems.Add(FishingGrid.GridTypeName);
 
                     // add no. of samplings for this AOI
@@ -2690,6 +2719,7 @@ namespace FAD3
 
                     //add landing site form data
                     _ls.LandingSiteGUID = _landingSiteGuid;
+                    _ls.LandingSiteName = _landingSiteName;
                     _ls.LandingSiteDataEx().With(o =>
                     {
                         lvi = lvMain.Items.Add("name", "Name", null);
@@ -2775,7 +2805,7 @@ namespace FAD3
         public void UpdateInventoryList(FishingGearInventory inventory)
         {
             int n = 0;
-            if (_treeLevel == "aoi")
+            if (_treeLevel == "target_area")
             {
                 foreach (ListViewItem item in lvMain.Items)
                 {

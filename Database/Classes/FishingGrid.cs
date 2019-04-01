@@ -343,7 +343,7 @@ namespace FAD3
         }
 
         /// <summary>
-        /// manually refreshes the grid data after changing the guid of the AOI;
+        /// manually refreshes the grid data after changing the guid of the target area;
         /// </summary>
         public static void Refresh()
         {
@@ -352,7 +352,7 @@ namespace FAD3
         }
 
         /// <summary>
-        /// sets and gets the AOI guid of the fishing grid
+        /// sets and gets the target area guid of the fishing grid
         /// </summary>
         public static string TargetAreaGuid
         {

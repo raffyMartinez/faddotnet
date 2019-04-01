@@ -1599,7 +1599,7 @@ namespace FAD3.Database.Forms
                                             //ImportEnumerators(fileName);
                                             if (Enumerators.ImportEnumerators(fileName, _targetArea.TargetAreaGuid))
                                             {
-                                                global.mainForm.SetUPLV("aoi");
+                                                global.mainForm.SetUPLV("target_area");
                                                 MessageBox.Show("Successfully imported enumerators to the database");
                                             }
                                         }

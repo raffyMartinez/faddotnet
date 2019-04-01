@@ -50,12 +50,10 @@ namespace FAD3
         private int _hCursorDefineGrid;                                         //the handle of the cursor used when defining selection extent of major grid
 
         private int _hCursorDefineLayout;
-        private string _mapTitle;                                               //title of the fishing ground grid map
         private MapLayer _currentMapLayer;
         private bool _enableMapInteraction;                                     //allows the class to interact with the axMap map control
         private bool _loadGridInPanel;
         private string _folderToSave;
-        private bool _gridIsDefinedFromLayout;
 
         public int Grid25ShapefileHandle { get; internal set; }
 
@@ -85,10 +83,7 @@ namespace FAD3
         public bool HasSubgrid { get; set; }
         public int SubGridCount { get; set; }
 
-        public bool GridIsDefinedFromLayout
-        {
-            get { return _gridIsDefinedFromLayout; }
-        }
+        public bool GridIsDefinedFromLayout { get; private set; }
 
         public string FolderToSave
         {
@@ -211,7 +206,7 @@ namespace FAD3
             if (_loadGridInPanel)
             {
                 fgFileName = $@"{_folderToSave}\{e.FileName}";
-                _mapTitle = e.LayerName;
+                MapTitle = e.LayerName;
             }
             else
             {
@@ -222,7 +217,7 @@ namespace FAD3
                 fgFileName = sf.CellValue[sf.FieldIndexByName["BaseName"], e.SelectedIndex].ToString();
 
                 //let us get the map title of the selected fishing ground
-                _mapTitle = (string)sf.CellValue[sf.FieldIndexByName["MapName"], e.SelectedIndex];
+                MapTitle = (string)sf.CellValue[sf.FieldIndexByName["MapName"], e.SelectedIndex];
             }
 
             if (e.Action == "LoadGridMap")
@@ -270,7 +265,7 @@ namespace FAD3
 
                         //using Grid25LabelManager, create labels that follow the path defined by  _shapeFileSelectedMajorGridBuffer
                         _grid25LabelManager = new Grid25LabelManager(_axMap.GeoProjection);
-                        if (_grid25LabelManager.LabelGrid(_shapeFileSelectedMajorGridBuffer, _gridAndLabelProperties, _mapTitle))
+                        if (_grid25LabelManager.LabelGrid(_shapeFileSelectedMajorGridBuffer, _gridAndLabelProperties, MapTitle))
                         {
                             //add label shapefile to the map
                             _grid25LabelManager.AddMajorGridLabels(_listIntersectedMajorGrids);
@@ -467,7 +462,7 @@ namespace FAD3
             writer.WriteStartDocument();
 
             writer.WriteStartElement("FishingGroundGridMap");
-            writer.WriteAttributeString("MapTitle", _mapTitle);
+            writer.WriteAttributeString("MapTitle", MapTitle);
             writer.WriteAttributeString("Name", fileName);
             writer.WriteAttributeString("UTMZone", _utmZone.ToString());
             foreach (KeyValuePair<string, uint> kv in _gridAndLabelProperties)
@@ -476,7 +471,7 @@ namespace FAD3
             }
 
             {
-                if (_gridIsDefinedFromLayout)
+                if (GridIsDefinedFromLayout)
                 {
                     writer.WriteStartElement("Layout");
                     writer.WriteAttributeString("FishingGround", _layoutHelper.FishingGround);
@@ -633,6 +628,7 @@ namespace FAD3
                     var ext = new Extents();
                     if (WidthToFit > 0 && HeightToFit > 0)
                     {
+                        //set extents so that it is sized to the widest and tallest grid
                         int centroidX = (int)e.Center.x;
                         int centroidY = (int)e.Center.y;
                         int xMin = centroidX - (WidthToFit / 2);
@@ -661,11 +657,7 @@ namespace FAD3
         /// <summary>
         /// Sets the map title
         /// </summary>
-        public string MapTitle
-        {
-            get { return _mapTitle; }
-            set { _mapTitle = value; }
-        }
+        public string MapTitle { get; set; }
 
         /// <summary>
         /// returns the major grid shapefile
@@ -883,7 +875,7 @@ namespace FAD3
         {
             _hCursorDefineGrid = iconHandle;
             _inDefineMinorGrid = _listSelectedShapeGridNumbers.Count > 0;
-            _gridIsDefinedFromLayout = false;
+            GridIsDefinedFromLayout = false;
             if (_inDefineMinorGrid)
             {
                 _shapefileMajorGrid.SelectNone();
@@ -1008,7 +1000,7 @@ namespace FAD3
                 var ifldTitle = _shapefileBoundingRectangle.EditAddField("MapTitle", FieldType.STRING_FIELD, 1, 255);
                 _shapefileBoundingRectangle.EditAddShape(minorGridExtent.ToShape());
 
-                _shapefileBoundingRectangle.EditCellValue(ifldTitle, 0, _mapTitle);
+                _shapefileBoundingRectangle.EditCellValue(ifldTitle, 0, MapTitle);
 
                 var shp = new Shape();
                 if (shp.Create(ShpfileType.SHP_POLYLINE))
@@ -1272,8 +1264,8 @@ namespace FAD3
         /// <param name="gridAndLabelProperties"></param>
         public void RedoLabels(string mapTitle, Dictionary<string, uint> gridAndLabelProperties)
         {
-            _mapTitle = mapTitle;
-            _grid25LabelManager.LabelGrid(_shapeFileSelectedMajorGridBuffer, gridAndLabelProperties, _mapTitle);
+            MapTitle = mapTitle;
+            _grid25LabelManager.LabelGrid(_shapeFileSelectedMajorGridBuffer, gridAndLabelProperties, MapTitle);
             _grid25LabelManager.AddMajorGridLabels(_listIntersectedMajorGrids);
             _grid25LabelManager.Grid25Labels.Labels.ApplyCategories();
             _axMap.Redraw();
@@ -1329,7 +1321,7 @@ namespace FAD3
             int ifldGridHandle = 0;
             if (mapTitle.Length > 0)
             {
-                _mapTitle = mapTitle;
+                MapTitle = mapTitle;
             }
             _shapefileMajorGridIntersect = new Shapefile();
             if (_shapefileMajorGridIntersect.CreateNewWithShapeID("", ShpfileType.SHP_POLYGON)
@@ -1390,7 +1382,7 @@ namespace FAD3
 
                 _grid25LabelManager = new Grid25LabelManager(_axMap.GeoProjection);
 
-                if (_grid25LabelManager.LabelGrid(_shapeFileSelectedMajorGridBuffer, _gridAndLabelProperties, _mapTitle))
+                if (_grid25LabelManager.LabelGrid(_shapeFileSelectedMajorGridBuffer, _gridAndLabelProperties, MapTitle))
                 {
                     _grid25LabelManager.AddMajorGridLabels(_listIntersectedMajorGrids);
                     _grid25LabelManager.Grid25Labels.Labels.ApplyCategories();
@@ -1437,7 +1429,7 @@ namespace FAD3
             bool minorGridCreated = false;
             if (mapTitle.Length > 0)
             {
-                _mapTitle = mapTitle;
+                MapTitle = mapTitle;
             }
 
             //pass the extents of the selected major grids and the extent defined by the select box
@@ -1458,7 +1450,7 @@ namespace FAD3
                     {
                         _grid25LabelManager = new Grid25LabelManager(_axMap.GeoProjection);
 
-                        if (_grid25LabelManager.LabelGrid(_shapeFileSelectedMajorGridBuffer, _gridAndLabelProperties, _mapTitle))
+                        if (_grid25LabelManager.LabelGrid(_shapeFileSelectedMajorGridBuffer, _gridAndLabelProperties, MapTitle))
                         {
                             _grid25LabelManager.AddMajorGridLabels(_listIntersectedMajorGrids);
                             _grid25LabelManager.Grid25Labels.Labels.ApplyCategories();
@@ -1559,26 +1551,12 @@ namespace FAD3
                 && _layoutHelper.LayoutShapeFile.NumShapes > 0
                 && _layoutHelper.HasCompletePanelTitles())
             {
-                _gridIsDefinedFromLayout = true;
+                GridIsDefinedFromLayout = true;
                 _layoutHelper.FishingGround = fishingGround;
                 _folderToSave = folder;
                 _layoutHelper.GridFromLayoutSaveFolder = _folderToSave;
                 _selectedMajorGridShapesExtent = _layoutHelper.SelectedMajorGridExtents;
 
-                //for (int n = 0; n < _layoutHelper.LayoutShapeFile.NumShapes; n++)
-                //{
-                //    int fldTitle = _layoutHelper.LayoutShapeFile.FieldIndexByName["Title"];
-                //    string mapTitle = _layoutHelper.LayoutShapeFile.CellValue[fldTitle, n].ToString();
-                //    if (GenerateMinorGridInsideExtent(_layoutHelper.LayoutShapeFile.Shape[n].Extents, mapTitle))
-                //    {
-                //        Save($@"{_folderToSave}\{fishingGround}-{mapTitle}");
-                //        if (OnGridInPanelCreated != null)
-                //        {
-                //            LayerEventArg e = new LayerEventArg(mapTitle);
-                //            OnGridInPanelCreated(this, e);
-                //        }
-                //    }
-                //}
                 return true;
             }
             else

@@ -377,6 +377,21 @@ namespace FAD3.Mapping.Classes
                 _hsfLayout = _majorGrid.MapLayers.AddLayer(_sfLayout, "Layout frame", true, true);
                 if (_hsfLayout > 0)
                 {
+                    MaxPanelHeight = 0;
+                    MaxPanelWidth = 0;
+                    for (int n = 0; n < _sfLayout.NumShapes; n++)
+                    {
+                        var ext = _sfLayout.Shape[n].Extents;
+                        if (ext.Width > MaxPanelWidth)
+                        {
+                            MaxPanelWidth = (int)ext.Width;
+                        }
+
+                        if (ext.Height > MaxPanelHeight)
+                        {
+                            MaxPanelHeight = (int)ext.Height;
+                        }
+                    }
                     _sfLayout.DefaultDrawingOptions.FillVisible = false;
                     _sfLayout.DefaultDrawingOptions.LineWidth = 2;
                     _sfLayout.DefaultDrawingOptions.LineColor = new Utils().ColorByName(tkMapColor.DarkBlue);

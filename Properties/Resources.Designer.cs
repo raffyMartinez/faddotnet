@@ -155,7 +155,7 @@ namespace FAD3.Properties {
         /// </summary>
         internal static System.Drawing.Bitmap aoi {
             get {
-                object obj = ResourceManager.GetObject("aoi", resourceCulture);
+                object obj = ResourceManager.GetObject("target_area", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

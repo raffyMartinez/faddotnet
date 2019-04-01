@@ -145,6 +145,8 @@
     <Compile Include="Database\Classes\EffortEventArg.cs" />
     <Compile Include="Database\Classes\FADDiagnostics.cs" />
     <Compile Include="Database\Classes\FileDialogHelper.cs" />
+    <Compile Include="Database\Classes\FishingBoat.cs" />
+    <Compile Include="Database\Classes\FishingBoats.cs" />
     <Compile Include="Database\Classes\FishingGearInventory.cs" />
     <Compile Include="Database\Classes\FisheriesInventoryImportEventArg.cs" />
     <Compile Include="Database\Classes\ImportRowsFromFileEventArgs.cs" />
@@ -210,6 +212,12 @@
     </Compile>
     <Compile Include="Database\Forms\ExportImportDialogForm.Designer.cs">
       <DependentUpon>ExportImportDialogForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Database\Forms\FishingBoatForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Database\Forms\FishingBoatForm.Designer.cs">
+      <DependentUpon>FishingBoatForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Database\Forms\FishingExpenseForm.cs">
       <SubType>Form</SubType>
@@ -768,6 +776,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Database\Forms\ExportImportDialogForm.resx">
       <DependentUpon>ExportImportDialogForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Database\Forms\FishingBoatForm.resx">
+      <DependentUpon>FishingBoatForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Database\Forms\FishingExpenseForm.resx">
       <DependentUpon>FishingExpenseForm.cs</DependentUpon>

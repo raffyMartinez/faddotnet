@@ -110,8 +110,8 @@ namespace FAD3
                     }
                     else
                     {
-                        nodeTargetArea = node.Nodes.Add(item.Value.targetAreaName, item.Value.targetAreaName, "AOI");
-                        nodeTargetArea.Tag = "aoi";
+                        nodeTargetArea = node.Nodes.Add(item.Value.targetAreaName, item.Value.targetAreaName, "target_area");
+                        nodeTargetArea.Tag = "target_area";
                         nodeLandingSite = nodeTargetArea.Nodes.Add(item.Value.landingSite, item.Value.landingSite, "LandingSite");
                         nodeLandingSite.Tag = "landingSite";
                         imageKey = Gear.GearClassImageKeyFromGearClasName(item.Value.gearClassName);
@@ -209,7 +209,7 @@ namespace FAD3
 
                             break;
 
-                        case "aoi":
+                        case "target_area":
                             Proceed = item.Value.targetAreaName == nd.Text;
 
                             break;

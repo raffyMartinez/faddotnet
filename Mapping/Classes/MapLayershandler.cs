@@ -190,9 +190,13 @@ namespace FAD3
                         g = Graphics.FromImage(bmp);
                         g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
                         g.FillRectangle(Brushes.White, (rect.Width / 5) * 1, rect.Height / 4, w, h);
-                        g.DrawImage(new Bitmap(filename), 0, 0, w, h);
-                        pic.Image = bmp;
-                        _mapLayerDictionary[layerHandle].ImageThumbnail = bmp;
+                        try
+                        {
+                            g.DrawImage(new Bitmap(filename), 0, 0, w, h);
+                            pic.Image = bmp;
+                            _mapLayerDictionary[layerHandle].ImageThumbnail = bmp;
+                        }
+                        catch { }
                     }
                     else
                     {
@@ -508,7 +512,8 @@ namespace FAD3
             {
                 case ".tif":
                     return "tifw";
-
+                case ".jpg":
+                    return "jgw";
                 default:
                     var arr = extension.ToCharArray();
                     return $"{arr[1]}{arr[3]}w";
@@ -556,7 +561,7 @@ namespace FAD3
                         var prjFile = $@"{folderPath}\{file}.prj";
                         var worldFile = $@"{folderPath}\{file}.{WorldfileExtension(ext)}";
 
-                        if (File.Exists(prjFile) && File.Exists(worldFile))
+                        if (File.Exists(prjFile) || File.Exists(worldFile))
                         {
                             var image = obj as MapWinGIS.Image;
                             success = image != null;
@@ -581,7 +586,7 @@ namespace FAD3
                         success = grid.Open(fileName, GridDataType.DoubleDataType, false, GridFileType.UseExtension, null);
                         if (success)
                         {
-                            AddLayer(grid, "bathymetry", true, true);
+                            AddLayer(grid, Path.GetFileName(fileName), true, true);
                         }
                     }
                 }

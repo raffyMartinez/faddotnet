@@ -73,7 +73,7 @@ namespace FAD3
                 bool notInclude1 = chkNotInclude1.Checked;
                 switch (_treeLevel)
                 {
-                    case "aoi":
+                    case "target_area":
                         fgmh.MapFishingGrounds(_parentForm.TargetAreaGuid, samplingYears, FishingGrid.UTMZone, aggregated, notInclude1);
                         break;
 
@@ -211,13 +211,13 @@ namespace FAD3
             _treeLevel = treeLevel;
             switch (_treeLevel)
             {
-                case "aoi":
+                case "target_area":
                     if (_parentForm == null)
                     {
                         _parentForm = global.mainForm;
                     }
-                    var aoi = _parentForm.TargetArea;
-                    FillUpSampledYears(aoi.SampledYearsEx());
+                    var targetArea = _parentForm.TargetArea;
+                    FillUpSampledYears(targetArea.SampledYearsEx());
                     labelTitle.Text = $"Mapping of fishing effort in {_parentForm.TargetAreaName}";
                     break;
 

@@ -110,7 +110,7 @@ namespace FAD3
             // 
             this.imageList16.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList16.ImageStream")));
             this.imageList16.TransparentColor = System.Drawing.Color.White;
-            this.imageList16.Images.SetKeyName(0, "AOI");
+            this.imageList16.Images.SetKeyName(0, "target_area");
             this.imageList16.Images.SetKeyName(1, "LandingSite");
             this.imageList16.Images.SetKeyName(2, "MonthGear");
             this.imageList16.Images.SetKeyName(3, "jigs");
