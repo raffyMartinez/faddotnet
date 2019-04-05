@@ -235,8 +235,14 @@ namespace FAD3.Mapping.Forms
                     }
                 }
                 //SizeColumns(init: false);
+
+                gridAttributes.Visible = true;
             }
-            gridAttributes.Visible = true;
+            else
+            {
+                labelShapeFileName.Text = "There is no selected layer";
+                MessageBox.Show("There is no layer selected", "No layer selected", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
 
         private void OnLayerSelection(object sender, EventArgs e)

@@ -478,6 +478,19 @@ namespace FAD3
         {
             string updateQuery = "";
             bool Success = false;
+            fadSubgridSyle subGridStyle = fadSubgridSyle.SubgridStyleNone;
+            switch(AOIData["SubGridStyle"])
+            {
+                case "0":
+                case "-1":
+                    break;
+                case "1":
+                    subGridStyle = fadSubgridSyle.SubgridStyle4;
+                    break;
+                case "2":
+                    subGridStyle = fadSubgridSyle.SubgridStyle9;
+                    break;
+            }
             using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
             {
                 try
@@ -486,16 +499,19 @@ namespace FAD3
                     Enum.TryParse(AOIData["DataStatus"], out DataStatus);
                     if (DataStatus == fad3DataStatus.statusNew)
                     {
-                        updateQuery = $@"Insert into tblAOI (AOIGUID, AOIName, Letter)
+                        updateQuery = $@"Insert into tblAOI (AOIGUID, AOIName, Letter, SubgridStyle)
                             Values (
                                   {{{AOIData["AOIGUID"]}}},
                                   '{AOIData["AOIName"]}',
-                                  '{AOIData["Letter"]}')";
+                                  '{AOIData["Letter"]}',
+                                   {(int)subGridStyle} 
+                                    )";
                     }
                     else if (DataStatus == fad3DataStatus.statusEdited)
                     {
                         updateQuery = $@"Update tblAOI set
-                            AOIName = '{AOIData["AOIName"]}'
+                            AOIName = '{AOIData["AOIName"]}',
+                            SubgridStyle = {(int)subGridStyle}
                             Where AOIGUID = {{{AOIData["AOIGUID"]}}}";
                     }
                     else if (DataStatus == fad3DataStatus.statusForDeletion)
@@ -525,14 +541,15 @@ namespace FAD3
                 try
                 {
                     conection.Open();
-                    string query = $"Select AOIName, Letter from tblAOI where AOIGuid = {{{_targetAreaGuid}}}";
+                    string query = $"Select AOIName, Letter, SubGridStyle from tblAOI where AOIGuid = {{{_targetAreaGuid}}}";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
-                    for (int i = 0; i < dt.Rows.Count; i++)
+                    if (dt.Rows.Count > 0)
                     {
-                        DataRow dr = dt.Rows[i];
+                        DataRow dr = dt.Rows[0];
                         myData.Add("AOIName", dr["AOIName"].ToString());
                         myData.Add("Code", dr["Letter"].ToString());
+                        myData.Add("SubgridStyle", dr["SubgridStyle"].ToString());
                     }
                 }
                 catch (Exception ex)
@@ -553,7 +570,7 @@ namespace FAD3
                 {
                     conection.Open();
 
-                    string query = $"Select AOIName, Letter, MajorGridList from tblAOI where AOIGuid = {{{_targetAreaGuid}}}";
+                    string query = $"Select AOIName, Letter, MajorGridList, SubgridStyle from tblAOI where AOIGuid = {{{_targetAreaGuid}}}";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
                     if (dt.Rows.Count > 0)

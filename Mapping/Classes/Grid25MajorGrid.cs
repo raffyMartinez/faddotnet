@@ -170,6 +170,7 @@ namespace FAD3
         public void LoadPanelGrid(bool autoExpand, LayerEventArg e)
         {
             _loadGridInPanel = true;
+            GridIsDefinedFromLayout = true;
             OnFishingGridSelected(null, e);
 
             if (e.Action == "LoadGridMap" && autoExpand)
@@ -812,6 +813,7 @@ namespace FAD3
                 _mapLayers.RemoveLayer(hLyr);
             }
             _listGridLayers.Clear();
+            _mapInterActionHandler.EnableMapInteraction = true;
             _axMap.Redraw();
         }
 
@@ -843,25 +845,30 @@ namespace FAD3
         /// <param name="iconHandle"></param>
         public void DefineGridLayout(int iconHandle)
         {
+            _inDefineMinorGrid = false;
+            _enableMapInteraction = false;
+            if (iconHandle >= 0)
+            {
+                _hCursorDefineLayout = iconHandle;
+                _axMap.CursorMode = tkCursorMode.cmSelection;
+                _axMap.MapCursor = tkCursor.crsrUserDefined;
+                _axMap.UDCursorHandle = _hCursorDefineLayout;
+            }
+            
             if (_layoutHelper == null)
             {
-                _inDefineMinorGrid = false;
-                _enableMapInteraction = false;
-                if (iconHandle >= 0)
+                if(iconHandle>0)
                 {
-                    _hCursorDefineLayout = iconHandle;
-                    _axMap.CursorMode = tkCursorMode.cmSelection;
-                    _axMap.MapCursor = tkCursor.crsrUserDefined;
-                    _axMap.UDCursorHandle = _hCursorDefineLayout;
-
-                    //creates a new layout helper object, and iconHandle sets the type of cursor when defining layout extent
-                    _layoutHelper = new Grid25LayoutHelper(this, iconHandle);
+                    _layoutHelper = new Grid25LayoutHelper(this, _hCursorDefineLayout);
                 }
                 else
                 {
-                    //no cursor handle because we are opening a layout from file so extent is aldready defined
                     _layoutHelper = new Grid25LayoutHelper(this);
                 }
+            }
+            else
+            {
+                _layoutHelper.SetDefineLayoutCursor(_hCursorDefineLayout);
             }
         }
 
@@ -1524,7 +1531,7 @@ namespace FAD3
                     if (GenerateMinorGridInsideExtent(selectionBoxExtent))
                     {
                         SetupTopLayers();
-                        //_grid25MinorGrid.MinorGridLinesShapeFile.Categories.ApplyExpressions();
+                        _mapInterActionHandler.EnableMapInteraction = false;
                     }
                 }
                 else
@@ -1545,7 +1552,7 @@ namespace FAD3
         /// Perform gridding using the layout
         /// </summary>
         /// <returns></returns>
-        public bool GenerateMinorGridFromLayout(string fishingGround, string folder)
+        public bool SaveMinorGridsInLayout(string fishingGround, string folder)
         {
             if (_layoutHelper != null
                 && _layoutHelper.LayoutShapeFile.NumShapes > 0
@@ -1556,6 +1563,16 @@ namespace FAD3
                 _folderToSave = folder;
                 _layoutHelper.GridFromLayoutSaveFolder = _folderToSave;
                 _selectedMajorGridShapesExtent = _layoutHelper.SelectedMajorGridExtents;
+
+                int ifldTitle = _layoutHelper.LayoutShapeFile.FieldIndexByName["Title"];
+                for (int n= 0; n < _layoutHelper.LayoutShapeFile.NumShapes;n++)
+                {
+                    string mapName = _layoutHelper.LayoutShapeFile.CellValue[ifldTitle, n].ToString();
+                    if (GenerateMinorGridInsideExtent(_layoutHelper.LayoutShapeFile.Shape[n].Extents,mapName ))
+                    {
+                        Save($@"{_folderToSave}\{mapName}");    
+                    }
+                }
 
                 return true;
             }

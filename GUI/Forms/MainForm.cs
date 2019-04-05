@@ -753,6 +753,10 @@ namespace FAD3
                 row.SubItems.Add(item.Value.CatchRows.ToString());                                      //number of catch rows
                 row.SubItems.Add(item.Value.WtCatch != null ? item.Value.WtCatch.ToString() : "");      //wt of catch
                 var fishingGround = item.Value.FishingGround;                                           //fishing ground
+                if(item.Value.SubGrid.Length>0)
+                {
+                    fishingGround += $"-{item.Value.SubGrid}";
+                }
                 row.SubItems.Add(fishingGround);
 
                 if (CompleteGrid25)                                                                     //position
@@ -1247,16 +1251,21 @@ namespace FAD3
                     break;
 
                 case "menuTargetAreaProp":
-                    TargetAreaForm AOIForm = TargetAreaForm.GetInstance(this, IsNew: false);
-                    if (!AOIForm.Visible)
-                    {
-                        AOIForm.Show(this);
-                    }
-                    else
-                    {
-                        AOIForm.BringToFront();
-                    }
-                    AOIForm.TargetArea = _targetArea;
+                    TargetAreaForm f = new TargetAreaForm(this, IsNew: false);
+                    f.TargetArea = _targetArea;
+                    f.ShowDialog(this);
+                    //TargetAreaForm targetAreaForm = TargetAreaForm.GetInstance(this, IsNew: false);
+                    //targetAreaForm.TargetArea = _targetArea;
+                    //if (!targetAreaForm.Visible)
+                    //{
+                    //    targetAreaForm.Show(this);
+                    //}
+                    //else
+                    //{
+                    //    targetAreaForm.BringToFront();
+                    //    targetAreaForm.ShowTargetAreaProperties();
+                    //}
+                    
                     break;
 
                 case "menuLandingSiteProp":
@@ -1460,10 +1469,21 @@ namespace FAD3
                                         if (item.Tag.ToString() == "target_area_data")
                                         {
                                             var myTag = (Tuple<string, string, string>)treeMain.SelectedNode.Tag;
-                                            _targetArea.TargetAreaGuid = myTag.Item1;
+                                            //_targetArea.TargetAreaGuid = myTag.Item1;
+                                            //TargetAreaForm f = TargetAreaForm.GetInstance(this, IsNew: false);
+                                            //if(f.Visible)
+                                            //{
+                                            //    f.BringToFront();
+                                            //}
+                                            //else
+                                            //{
+                                            //    f.Show();
+                                            //}
+                                            //f.TargetArea = _targetArea;
                                             TargetAreaForm f = new TargetAreaForm(this, IsNew: false);
-                                            f.Show();
                                             f.TargetArea = _targetArea;
+                                            f.ShowDialog(this);
+
                                         }
                                         else if (item.Name == "Enumerators")
                                         {
@@ -2616,6 +2636,26 @@ namespace FAD3
                     lvi.Tag = "target_area_data";
                     lvi.SubItems.Add(FishingGrid.GridTypeName);
 
+                    if (FishingGrid.GridTypeName == "Grid25")
+                    {
+                        lvi = lvMain.Items.Add("Sub grid style");
+                        lvi.Tag = "target_area_data";
+                        switch (arr[3])
+                        {
+                            case "-1":
+                            case "0":
+                                lvi.SubItems.Add("None");
+                                break;
+                            case "1":
+                                lvi.SubItems.Add("1");
+                                break;
+                            case "2":
+                                lvi.SubItems.Add("9");
+                                break;
+
+                        }
+                    }
+
                     // add no. of samplings for this AOI
                     lvi = lvMain.Items.Add("");
                     lvi = lvMain.Items.Add("No. of samplings");
@@ -3139,8 +3179,17 @@ namespace FAD3
                         case "Enumerator":
                         case "GearClass":
                         case "FishingGear":
+                        case "SubGrid":
                             break;
 
+                        case "FishingGround":
+                            string fg = effortData[lvi.Name];
+                            if(effortData["SubGrid"].Length>0)
+                            {
+                                fg += $"-{effortData["SubGrid"]}";
+                            }
+                            lvi.SubItems[1].Text = fg;
+                            break;
                         case "GearSpecs":
                             lvi.SubItems[1].Text = ManageGearSpecsClass.GetSampledSpecsEx(_samplingGUID, Truncated: true);
                             break;

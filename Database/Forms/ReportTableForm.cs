@@ -13,6 +13,7 @@ namespace FAD3.Database.Forms
         public TargetArea TargetArea { get; set; }
         public string Topic { get; set; }
         public List<int> Years { get; set; }
+        public string TopicDescription { get; set; }
         private DataSet _dataSet;
 
         public void ShowReport()
@@ -181,6 +182,7 @@ namespace FAD3.Database.Forms
             global.LoadFormSettings(this);
             lvTable.View = View.Details;
             lvTable.FullRowSelect = true;
+            Text = TopicDescription;
             ShowReport();
         }
 

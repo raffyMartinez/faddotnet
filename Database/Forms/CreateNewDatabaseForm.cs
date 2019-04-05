@@ -73,13 +73,13 @@ namespace FAD3
                     {
                         sfd.InitialDirectory = global.MDBPath;
                     }
-                    //ofd.InitialDirectory = Path.GetDirectoryName(Application.ExecutablePath);
-                    sfd.Filter = "Microsoft Access Data File (.mdb)|*.mdb";
-                    sfd.ShowDialog();
-                    _newMDBFile = sfd.FileName;
 
-                    if (_newMDBFile.Length > 0)
+                    sfd.Filter = "Microsoft Access Data File (.mdb)|*.mdb";
+                    DialogResult dr = sfd.ShowDialog();
+                    if (dr == DialogResult.OK && sfd.FileName.Length > 0)
                     {
+                        _newMDBFile = sfd.FileName;
+
                         group2.Visible = true;
                         group1.Visible = false;
                         group2.Location = group1.Location;
@@ -99,6 +99,7 @@ namespace FAD3
                         _requiredTables.Add("Municipalities");
                         _requiredTables.Add("tblGearClass");
                         _requiredTables.Add("tblTaxa");
+                        
                     }
                     break;
             }

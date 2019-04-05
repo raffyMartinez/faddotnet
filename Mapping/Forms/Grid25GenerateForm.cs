@@ -233,9 +233,13 @@ namespace FAD3
                     {
                         _grid25MajorGrid.LayoutHelper.ClearLayout();
                     }
+                   
+                    
                     _grid25MajorGrid.ClearSelectedGrids();
                     _parentForm.SetCursor(MapWinGIS.tkCursorMode.cmSelection);
-                    _grid25MajorGrid.MapLayers.set_MapLayer(_grid25MajorGrid.Grid25ShapefileHandle);
+                    _grid25MajorGrid.MapLayers.set_MapLayer(_grid25MajorGrid.Grid25ShapefileHandle, refreshLayerList: true);
+                    
+
                     _hasSubGrid = false;
                     break;
 
@@ -270,6 +274,7 @@ namespace FAD3
                             {
                                 _g25lhf.SetUpFields();
                             }
+                            SetupGridButtons(enabled: false);
                         }
                         else
                         {
@@ -283,10 +288,19 @@ namespace FAD3
                     }
                     break;
 
-                case "btnOpenLayoutGrid":
+                case "buttonOpenLayoutGrid":
                     OpenTemplate();
                     break;
             }
+        }
+
+        public void SetupGridButtons(bool enabled)
+        {
+            buttonGrid.Enabled = enabled;
+            buttonClear.Enabled = enabled;
+            buttonLocateGrid.Enabled = enabled;
+            buttonOpenLayoutGrid.Enabled = enabled;
+            buttonSubGrid.Enabled = enabled;
         }
 
         public void OpenTemplate()

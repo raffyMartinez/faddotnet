@@ -12,6 +12,7 @@ namespace FAD3.Database.Forms
         private TargetArea _targetArea;
         private Dictionary<string, string> _sampledYears;
         private string _topic;
+        private string _topicDescription;
 
         public TargetArea TargetArea
         {
@@ -134,14 +135,16 @@ namespace FAD3.Database.Forms
                 case "nodeEffort":
                     int row = lvReports.Items.Count + 1;
                     var lvi = lvReports.Items.Add("effort", row.ToString(), null);
-                    lvi.SubItems.Add($"Effort data of {TargetArea.TargetAreaName} target area.");
+                    _topicDescription = $"Effort data of {TargetArea.TargetAreaName} target area.";
+                    lvi.SubItems.Add(_topicDescription);
                     _topic = "effort";
                     break;
 
                 case "nodeCatch":
                     row = lvReports.Items.Count + 1;
                     lvi = lvReports.Items.Add("catch", row.ToString(), null);
-                    lvi.SubItems.Add($"Catch composition data of {TargetArea.TargetAreaName} target area.");
+                    _topicDescription = $"Catch composition data of {TargetArea.TargetAreaName} target area.";
+                    lvi.SubItems.Add(_topicDescription);
                     _topic = "catch";
                     break;
             }
@@ -164,6 +167,7 @@ namespace FAD3.Database.Forms
             if (years.Count > 0)
             {
                 ReportTableForm rtf = ReportTableForm.GetInstance(TargetArea, _topic, years);
+                rtf.TopicDescription = _topicDescription;
                 if (rtf.Visible)
                 {
                     rtf.BringToFront();

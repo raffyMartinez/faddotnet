@@ -100,6 +100,10 @@ namespace FAD3
             textBoxGridNo.Text = arr[0];
             textBoxColumn.Text = arr[1].Substring(0, 1);
             textBoxRow.Text = arr[1].Substring(1, arr[1].Length - 1);
+            if (arr.Length == 3)
+            {
+                textBoxSubGrid.Text = arr[2];
+            }
         }
 
         private void lvGrids_DoubleClick(object sender, EventArgs e)
@@ -165,7 +169,7 @@ namespace FAD3
                         break;
 
                     case "textBoxSubGrid":
-                        if (int.TryParse(textBoxSubGrid.Text, out int sg) && sg > 1 && sg < 10)
+                        if (int.TryParse(textBoxSubGrid.Text, out int sg) && sg >= 1 && sg < 10)
                         {
                             switch (FishingGrid.SubGridStyle)
                             {
@@ -237,6 +241,7 @@ namespace FAD3
                                     msg = "Grid name already exists. Please use another";
                                     proceed = false;
                                 }
+
                             }
                             else
                             {
@@ -291,6 +296,10 @@ namespace FAD3
                         }
                         else if (proceed)
                         {
+                            if(textBoxSubGrid.Text.Length>0)
+                            {
+                                GridName += $"-{textBoxSubGrid.Text}";
+                            }
                             if (global.MapIsOpen)
                             {
                                 global.MappingForm.MapFishingGround(GridName, FishingGrid.UTMZone, GridName);

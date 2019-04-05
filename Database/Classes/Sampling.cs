@@ -29,13 +29,13 @@ namespace FAD3
         private static List<string> _engines = new List<string>();
         private static bool _engineReadDone = false;
 
-        private static Dictionary<string, (string RefNo, DateTime SamplingDate, string FishingGround,
+        private static Dictionary<string, (string RefNo, DateTime SamplingDate, string FishingGround, string SubGrid, 
                                string EnumeratorName, string Notes, double? WtCatch, bool IsGrid25FG,
                                string HasSpecs, int CatchRows)> _effortMonth = new Dictionary<string, (string RefNo, DateTime SamplingDate, string FishingGround,
-                               string EnumeratorName, string Notes, double? WtCatch, bool IsGrid25FG,
+                               string SubGrid, string EnumeratorName, string Notes, double? WtCatch, bool IsGrid25FG,
                                string HasSpecs, int CatchRows)>();
 
-        public static Dictionary<string, (string RefNo, DateTime SamplingDate, string FishingGround,
+        public static Dictionary<string, (string RefNo, DateTime SamplingDate, string FishingGround, string SubGrid,
                                string EnumeratorName, string Notes, double? WtCatch, bool IsGrid25FG,
                                string HasSpecs, int CatchRows)> EffortMonth
         {
@@ -120,7 +120,7 @@ namespace FAD3
         /// <param name="GearGUID"></param>
         /// <param name="SamplingMonth"></param>
         /// <returns></returns>
-        public static Dictionary<string, (string RefNo, DateTime SamplingDate, string FishingGround,
+        public static Dictionary<string, (string RefNo, DateTime SamplingDate, string FishingGround, string SubGrid,
                                 string EnumeratorName, string Notes, double? WtCatch, bool IsGrid25FG,
                                 string HasSpecs, int CatchRows)> SamplingSummaryForMonth(string LSGUID, string GearGUID, string SamplingMonth)
         {
@@ -204,6 +204,7 @@ namespace FAD3
                             query = $@"SELECT tblSampling.RefNo,
                                         tblSampling.SamplingDate,
                                         tblSampling.FishingGround,
+                                        tblSampling.SubGrid,
                                         tblEnumerators.EnumeratorName,
                                         tblSampling.Notes,
                                         tblSampling.WtCatch,
@@ -233,6 +234,7 @@ namespace FAD3
                             query = $@"SELECT tblSampling.RefNo,
                                         tblSampling.SamplingDate,
                                         tblSampling.FishingGround,
+                                        tblSampling.SubGrid,
                                         """" AS EnumeratorName,
                                         tblSampling.Notes,
                                         tblSampling.WtCatch,
@@ -280,7 +282,7 @@ namespace FAD3
                                     rows = int.Parse(dr["rows"].ToString());
                                 }
                                 _effortMonth.Add(dr["SamplingGUID"].ToString(), (dr["RefNo"].ToString(), DateTime.Parse(dr["SamplingDate"].ToString()),
-                                dr["FishingGround"].ToString(), dr["EnumeratorName"].ToString(), dr["Notes"].ToString(), wt,
+                                dr["FishingGround"].ToString(), dr["SubGrid"].ToString(), dr["EnumeratorName"].ToString(), dr["Notes"].ToString(), wt,
                                 bool.Parse(dr["IsGrid25FG"].ToString()), specs, rows));
                             }
                         }
@@ -616,8 +618,12 @@ namespace FAD3
                         PropertyValue.Add("LandingSite", dr["LSName"].ToString() + "|" + dr["LSGuid"].ToString());
                         PropertyValue.Add("GearClass", dr["GearClassName"].ToString() + "|" + dr["GearClass"].ToString());
                         PropertyValue.Add("FishingGear", dr["Variation"].ToString() + "|" + dr["GearVarGUID"].ToString());
+
                         try { PropertyValue.Add("FishingGround", dr["FishingGround"].ToString()); }
                         catch { PropertyValue.Add("FishingGround", ""); }
+
+                        try { PropertyValue.Add("SubGrid", dr["SubGrid"].ToString()); }
+                        catch{ PropertyValue.Add("SubGrid", "");}
 
                         DateTime dt = new DateTime();
 
@@ -947,6 +953,10 @@ namespace FAD3
                         {
                             subGrid = fgParts[2];
                         }
+                        else
+                        {
+                            subGrid = "Null";
+                        }
                     }
 
                     if (isNew)
@@ -962,7 +972,7 @@ namespace FAD3
                             '{EffortData["SamplingDate"]}',
                             '{EffortData["SamplingTime"]}',
                             '{FishingGround}',
-                            '{subGrid}',
+                            {subGrid},
                             {TimeSet},
                             {DateSet},
                             {TimeHauled},
@@ -991,7 +1001,7 @@ namespace FAD3
                             SamplingDate ='{EffortData["SamplingDate"]}',
                             SamplingTime ='{EffortData["SamplingTime"]}',
                             FishingGround = '{FishingGround}',
-                            SubGrid = '{subGrid}',
+                            SubGrid = {subGrid},
                             TimeSet ={TimeSet},
                             DateSet = {DateSet},
                             TimeHauled = {TimeHauled},
@@ -1019,8 +1029,7 @@ namespace FAD3
                         conn.Close();
                     }
                     if (Success)
-                    {
-                        //EffortUpdated?.Invoke(this, new EffortEventArg(DateTime.Parse(EffortData["SamplingDate"]), EffortData["FishingGear"], EffortData["LandingSite"]));
+                    {                        
                         if (OnEffortUpdated != null)
                         {
                             EffortEventArg e = new EffortEventArg(DateTime.Parse(EffortData["SamplingDate"]), EffortData["FishingGear"], EffortData["LandingSite"]);
@@ -1068,12 +1077,16 @@ namespace FAD3
                     {
                         subGrid = fgParts[2];
                     }
+                    else
+                    {
+                        subGrid = "Null";
+                    }
                     sql = $@"Insert into tblGrid (SamplingGuid, GridName,RowGUID,SubGrid) values
                             (
                               {{{SamplingGUID}}},
                               '{fg}',
                               {{{Guid.NewGuid()}}},
-                              '{subGrid}'
+                              {subGrid}
                             )";
                     using (OleDbCommand update = new OleDbCommand(sql, conn))
                     {

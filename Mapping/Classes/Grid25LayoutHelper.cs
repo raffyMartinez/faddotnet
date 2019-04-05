@@ -38,6 +38,11 @@ namespace FAD3.Mapping.Classes
         public int MaxPanelWidth { get; internal set; }
         public int MaxPanelHeight { get; internal set; }
 
+        public void SetDefineLayoutCursor(int cursorHandle)
+        {
+            _hCursorDefineLayout = cursorHandle;
+        }
+
         public int Rows
         {
             get { return _rows; }
@@ -399,6 +404,7 @@ namespace FAD3.Mapping.Classes
                     _axMap.Redraw();
                     success = true;
                     LayoutTemplateFromFile = true;
+                    _layoutExtents = _sfLayout.Extents;
                     //_selectedMajorGridShapesExtent = _sfLayout.Extents;
                 }
             }

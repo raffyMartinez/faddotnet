@@ -223,8 +223,23 @@ namespace FAD3
                 layerGrid[0, 0].Tag = e.LayerHandle;
 
                 //symbolize the current layer by making it bold font
-                MarkCurrentLayerName(0);
+                MarkCurrentLayerName(CurrentLayerRow());
+
             }
+        }
+
+        private int CurrentLayerRow()
+        {
+            int currentLayerHandle = _mapLayersHandler.CurrentMapLayer.Handle;
+            foreach(DataGridViewRow item in layerGrid.Rows)
+            {
+                if((int)item.Cells[0].Tag==currentLayerHandle)
+                {
+                    return item.Index;
+                }
+
+            }
+            return 0;
         }
 
         public static MapLayersForm GetInstance(MapLayersHandler mapLayers, MapperForm parent)
@@ -332,7 +347,10 @@ namespace FAD3
                     break;
 
                 case "itemAddLayer":
-                    _parentForm.OpenFileDialog();
+                     if( _parentForm.OpenFileDialog()==DialogResult.OK)
+                    {
+
+                    }
                     break;
 
                 case "itemRemoveLayer":
@@ -413,7 +431,10 @@ namespace FAD3
             switch (e.ClickedItem.Name)
             {
                 case "buttonAddLayer":
-                    _parentForm.OpenFileDialog();
+                    if(_parentForm.OpenFileDialog()==DialogResult.OK)
+                    {
+                        RefreshLayerList();
+                    }
                     break;
 
                 case "buttonRemoveLayer":
@@ -421,14 +442,21 @@ namespace FAD3
                     break;
 
                 case "buttonAttributes":
-                    EditShapeAttributeForm esaf = EditShapeAttributeForm.GetInstance(global.MappingForm, global.MappingForm.MapInterActionHandler);
-                    if (esaf.Visible)
+                    if (_mapLayersHandler.CurrentMapLayer != null)
                     {
-                        esaf.BringToFront();
+                        EditShapeAttributeForm esaf = EditShapeAttributeForm.GetInstance(global.MappingForm, global.MappingForm.MapInterActionHandler);
+                        if (esaf.Visible)
+                        {
+                            esaf.BringToFront();
+                        }
+                        else
+                        {
+                            esaf.Show(this);
+                        }
                     }
                     else
                     {
-                        esaf.Show(this);
+                        MessageBox.Show("Please select a layer", "No selected layer", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     break;
 
@@ -446,6 +474,7 @@ namespace FAD3
         {
             layerGrid.Rows.Clear();
             _mapLayersHandler.ReadLayers();
+            MarkCurrentLayerName(CurrentLayerRow());
         }
 
         private void OnLayerMoveDropDownClick(object sender, ToolStripItemClickedEventArgs e)

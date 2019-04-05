@@ -243,7 +243,7 @@ namespace FAD3
             global.mainForm.SetMapDependendMenus();
         }
 
-        public void OpenFileDialog()
+        public DialogResult OpenFileDialog()
         {
             string filename = "";
             OpenFileDialog ofd = new OpenFileDialog
@@ -262,16 +262,21 @@ namespace FAD3
                            "Georeferenced raster files (jpg, tiff,bmp)|*.jpg;*.tif;*.tiff;*.bmp|" +
                            "Other files |*.*)";
             ofd.FilterIndex = 1;
-            ofd.ShowDialog();
-            filename = ofd.FileName;
-            if (filename != "")
+
+            DialogResult dr = ofd.ShowDialog();
+            if (dr == DialogResult.OK && ofd.FileName.Length > 0)
             {
+                filename = ofd.FileName;
+
                 var (success, errMsg) = _mapLayersHandler.FileOpenHandler(filename);
                 if (!success)
                 {
                     MessageBox.Show(errMsg, "Error in opening file", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    dr = DialogResult.Cancel;
                 }
+                
             }
+            return dr;
         }
 
         public void SaveMapImageBatch(double dpi, MapTextGraticuleHelper helper, string fileName)
@@ -341,19 +346,25 @@ namespace FAD3
 
                 case "tsButtonLayerAdd":
                     OpenFileDialog();
-
                     break;
 
                 case "tsButtonAttributes":
 
-                    EditShapeAttributeForm esaf = EditShapeAttributeForm.GetInstance(this, _mapInterActionHandler);
-                    if (esaf.Visible)
+                    if (MapLayersHandler.CurrentMapLayer != null)
                     {
-                        esaf.BringToFront();
+                        EditShapeAttributeForm esaf = EditShapeAttributeForm.GetInstance(this, _mapInterActionHandler);
+                        if (esaf.Visible)
+                        {
+                            esaf.BringToFront();
+                        }
+                        else
+                        {
+                            esaf.Show(this);
+                        }
                     }
                     else
                     {
-                        esaf.Show(this);
+                         MessageBox.Show("Please select a layer", "No selected layer", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     break;
 

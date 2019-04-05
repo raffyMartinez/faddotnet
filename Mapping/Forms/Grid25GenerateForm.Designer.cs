@@ -33,6 +33,9 @@
             this.txtMapTitle = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.groupLabels = new System.Windows.Forms.GroupBox();
+            this.label13 = new System.Windows.Forms.Label();
+            this.txtSubGridThickness = new System.Windows.Forms.TextBox();
+            this.label14 = new System.Windows.Forms.Label();
             this.btnLabelsFromKML = new System.Windows.Forms.Button();
             this.imList = new System.Windows.Forms.ImageList(this.components);
             this.buttonLabel = new System.Windows.Forms.Button();
@@ -60,6 +63,7 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.shapeContainer1 = new Microsoft.VisualBasic.PowerPacks.ShapeContainer();
+            this.shapeSubGridLineColor = new Microsoft.VisualBasic.PowerPacks.RectangleShape();
             this.shapeMinorGridLineColor = new Microsoft.VisualBasic.PowerPacks.RectangleShape();
             this.shapeMajorGridLineColor = new Microsoft.VisualBasic.PowerPacks.RectangleShape();
             this.shapeBorderColor = new Microsoft.VisualBasic.PowerPacks.RectangleShape();
@@ -70,7 +74,7 @@
             this.buttonGrid = new System.Windows.Forms.Button();
             this.lblGridStatus = new System.Windows.Forms.Label();
             this.buttonLocateGrid = new System.Windows.Forms.Button();
-            this.btnOpenLayoutGrid = new System.Windows.Forms.Button();
+            this.buttonOpenLayoutGrid = new System.Windows.Forms.Button();
             this.buttonSubGrid = new System.Windows.Forms.Button();
             this.toolbar = new ToolStripExtensions.ToolStripEx();
             this.tsButtonFitMap = new System.Windows.Forms.ToolStripButton();
@@ -80,10 +84,6 @@
             this.tsButtonRetrieve = new System.Windows.Forms.ToolStripButton();
             this.tsButtonXY = new System.Windows.Forms.ToolStripButton();
             this.tsButtonExit = new System.Windows.Forms.ToolStripButton();
-            this.label13 = new System.Windows.Forms.Label();
-            this.txtSubGridThickness = new System.Windows.Forms.TextBox();
-            this.label14 = new System.Windows.Forms.Label();
-            this.shapeSubGridLineColor = new Microsoft.VisualBasic.PowerPacks.RectangleShape();
             this.groupLabels.SuspendLayout();
             this.toolbar.SuspendLayout();
             this.SuspendLayout();
@@ -142,6 +142,30 @@
             this.groupLabels.TabIndex = 4;
             this.groupLabels.TabStop = false;
             this.groupLabels.Text = "Labels";
+            // 
+            // label13
+            // 
+            this.label13.Location = new System.Drawing.Point(144, 324);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(43, 37);
+            this.label13.TabIndex = 30;
+            this.label13.Text = "Line color";
+            // 
+            // txtSubGridThickness
+            // 
+            this.txtSubGridThickness.Location = new System.Drawing.Point(71, 328);
+            this.txtSubGridThickness.Margin = new System.Windows.Forms.Padding(4);
+            this.txtSubGridThickness.Name = "txtSubGridThickness";
+            this.txtSubGridThickness.Size = new System.Drawing.Size(50, 21);
+            this.txtSubGridThickness.TabIndex = 29;
+            // 
+            // label14
+            // 
+            this.label14.Location = new System.Drawing.Point(5, 323);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(72, 30);
+            this.label14.TabIndex = 28;
+            this.label14.Text = "Subgrid thickness";
             // 
             // btnLabelsFromKML
             // 
@@ -389,6 +413,15 @@
             this.shapeContainer1.TabIndex = 25;
             this.shapeContainer1.TabStop = false;
             // 
+            // shapeSubGridLineColor
+            // 
+            this.shapeSubGridLineColor.FillColor = System.Drawing.SystemColors.AppWorkspace;
+            this.shapeSubGridLineColor.FillStyle = Microsoft.VisualBasic.PowerPacks.FillStyle.Solid;
+            this.shapeSubGridLineColor.Location = new System.Drawing.Point(197, 314);
+            this.shapeSubGridLineColor.Name = "shapeSubGridLineColor";
+            this.shapeSubGridLineColor.Size = new System.Drawing.Size(23, 18);
+            this.shapeSubGridLineColor.DoubleClick += new System.EventHandler(this.OnShapeColor_DoubleClick);
+            // 
             // shapeMinorGridLineColor
             // 
             this.shapeMinorGridLineColor.FillStyle = Microsoft.VisualBasic.PowerPacks.FillStyle.Solid;
@@ -483,16 +516,16 @@
             this.buttonLocateGrid.UseVisualStyleBackColor = true;
             this.buttonLocateGrid.Click += new System.EventHandler(this.OnButtons_Click);
             // 
-            // btnOpenLayoutGrid
+            // buttonOpenLayoutGrid
             // 
-            this.btnOpenLayoutGrid.ImageIndex = 6;
-            this.btnOpenLayoutGrid.ImageList = this.imList;
-            this.btnOpenLayoutGrid.Location = new System.Drawing.Point(255, 205);
-            this.btnOpenLayoutGrid.Name = "btnOpenLayoutGrid";
-            this.btnOpenLayoutGrid.Size = new System.Drawing.Size(28, 28);
-            this.btnOpenLayoutGrid.TabIndex = 10;
-            this.btnOpenLayoutGrid.UseVisualStyleBackColor = true;
-            this.btnOpenLayoutGrid.Click += new System.EventHandler(this.OnButtons_Click);
+            this.buttonOpenLayoutGrid.ImageIndex = 6;
+            this.buttonOpenLayoutGrid.ImageList = this.imList;
+            this.buttonOpenLayoutGrid.Location = new System.Drawing.Point(255, 205);
+            this.buttonOpenLayoutGrid.Name = "buttonOpenLayoutGrid";
+            this.buttonOpenLayoutGrid.Size = new System.Drawing.Size(28, 28);
+            this.buttonOpenLayoutGrid.TabIndex = 10;
+            this.buttonOpenLayoutGrid.UseVisualStyleBackColor = true;
+            this.buttonOpenLayoutGrid.Click += new System.EventHandler(this.OnButtons_Click);
             // 
             // buttonSubGrid
             // 
@@ -593,46 +626,13 @@
             this.tsButtonExit.Text = "toolStripButton1";
             this.tsButtonExit.ToolTipText = "Close";
             // 
-            // label13
-            // 
-            this.label13.Location = new System.Drawing.Point(144, 324);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(43, 37);
-            this.label13.TabIndex = 30;
-            this.label13.Text = "Line color";
-            // 
-            // txtSubGridThickness
-            // 
-            this.txtSubGridThickness.Location = new System.Drawing.Point(71, 328);
-            this.txtSubGridThickness.Margin = new System.Windows.Forms.Padding(4);
-            this.txtSubGridThickness.Name = "txtSubGridThickness";
-            this.txtSubGridThickness.Size = new System.Drawing.Size(50, 21);
-            this.txtSubGridThickness.TabIndex = 29;
-            // 
-            // label14
-            // 
-            this.label14.Location = new System.Drawing.Point(5, 323);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(72, 30);
-            this.label14.TabIndex = 28;
-            this.label14.Text = "Subgrid thickness";
-            // 
-            // shapeSubGridLineColor
-            // 
-            this.shapeSubGridLineColor.FillColor = System.Drawing.SystemColors.AppWorkspace;
-            this.shapeSubGridLineColor.FillStyle = Microsoft.VisualBasic.PowerPacks.FillStyle.Solid;
-            this.shapeSubGridLineColor.Location = new System.Drawing.Point(197, 314);
-            this.shapeSubGridLineColor.Name = "shapeSubGridLineColor";
-            this.shapeSubGridLineColor.Size = new System.Drawing.Size(23, 18);
-            this.shapeSubGridLineColor.DoubleClick += new System.EventHandler(this.OnShapeColor_DoubleClick);
-            // 
             // Grid25GenerateForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(292, 564);
             this.Controls.Add(this.buttonSubGrid);
-            this.Controls.Add(this.btnOpenLayoutGrid);
+            this.Controls.Add(this.buttonOpenLayoutGrid);
             this.Controls.Add(this.buttonLocateGrid);
             this.Controls.Add(this.lblGridStatus);
             this.Controls.Add(this.toolbar);
@@ -708,7 +708,7 @@
         private System.Windows.Forms.Button btnLabelsFromKML;
         private System.Windows.Forms.Label lblGridStatus;
         private System.Windows.Forms.Button buttonLocateGrid;
-        private System.Windows.Forms.Button btnOpenLayoutGrid;
+        private System.Windows.Forms.Button buttonOpenLayoutGrid;
         private System.Windows.Forms.ToolStripButton tsButtonXY;
         private System.Windows.Forms.Button buttonSubGrid;
         private System.Windows.Forms.Label label13;

@@ -236,7 +236,7 @@ namespace FAD3
                 _axMap.PixelToProj(e.left, e.top, ref extL, ref extT);
                 _axMap.PixelToProj(e.right, e.bottom, ref extR, ref extB);
                 selectionBoxExtent.SetBounds(extL, extB, 0, extR, extT, 0);
-                Select(selectionBoxExtent, SelectionFromSelectBox: true);
+                Select(selectionBoxExtent, selectionFromSelectBox: true);
             }
         }
 
@@ -245,13 +245,13 @@ namespace FAD3
         /// Afterwards, a Selection event is raised
         /// </summary>
         /// <param name="selectExtents"></param>
-        /// <param name="SelectionFromSelectBox"></param>
-        private void Select(Extents selectExtents, bool SelectionFromSelectBox = false)
+        /// <param name="selectionFromSelectBox"></param>
+        private void Select(Extents selectExtents, bool selectionFromSelectBox = false)
         {
             if (_currentMapLayer != null)
             {
                 _selectedShapeIndexes = null;
-                _selectionFromSelectBox = SelectionFromSelectBox;
+                _selectionFromSelectBox = selectionFromSelectBox;
                 if (_currentMapLayer.LayerType == "ShapefileClass")
                 {
                     var sf = _axMap.get_Shapefile(_currentMapLayer.Handle);
@@ -346,7 +346,7 @@ namespace FAD3
                 _axMap.PixelToProj(e.x - CURSORWIDTH, e.y - CURSORWIDTH, ref extL, ref extT);
                 _axMap.PixelToProj(e.x + CURSORWIDTH, e.y + CURSORWIDTH, ref extR, ref extB);
                 ext.SetBounds(extL, extB, 0, extR, extT, 0);
-                Select(ext, SelectionFromSelectBox: false);
+                Select(ext, selectionFromSelectBox: false);
             }
         }
 

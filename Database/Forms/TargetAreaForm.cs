@@ -25,7 +25,6 @@ namespace FAD3
         private MainForm _parent_form;
         private int _MouseX;
         private int _MouseY;
-        private string _TargetAreaName;
 
         public void SetFishingGround(string Name, string ULCorner, string LRCorner)
         {
@@ -62,7 +61,6 @@ namespace FAD3
             set
             {
                 _targetArea = value;
-                ShowAOIProps();
             }
         }
 
@@ -78,7 +76,7 @@ namespace FAD3
             _parent_form = Parent;
         }
 
-        private void ShowAOIProps()
+        public void ShowTargetAreaProperties()
         {
             textBoxOtherGrid.Text = "";
 
@@ -102,7 +100,25 @@ namespace FAD3
                         global.SizeListViewColumns(lvMaps, false);
                         comboUTMZone.Text = "";
                         comboUTMZone.Text = FishingGrid.UTMZoneName;
-                        comboSubGrid.SelectedIndex = (int)FishingGrid.SubGridStyle;
+                        if(comboSubGrid.Items.Count==0)
+                        {
+                            foreach (var item in FishingGrid.SubGridStyles)
+                            {
+                                comboSubGrid.Items.Add(item);
+                            }
+                        }
+                        switch(FishingGrid.SubGridStyle)
+                        {
+                            case fadSubgridSyle.SubgridStyleNone:
+                                comboSubGrid.SelectedIndex = 0;
+                                break;
+                            case fadSubgridSyle.SubgridStyle4:
+                                comboSubGrid.SelectedIndex = 1;
+                                break;
+                            case fadSubgridSyle.SubgridStyle9:
+                                comboSubGrid.SelectedIndex = 2;
+                                break;
+                        }
 
                         break;
                 }
@@ -117,21 +133,26 @@ namespace FAD3
 
         private void OnFormLoad(object sender, EventArgs e)
         {
+            global.LoadFormSettings(this);
             if (_isNew)
             {
                 lblTitle.Text = "Add new target area";
             }
 
-            txtName.Focus();
+
             var lv = (ListView)tabAOI.TabPages["tabGrid25"].Controls["lvMaps"];
 
             foreach (var item in FishingGrid.UTMZones)
             {
                 comboUTMZone.Items.Add(item);
             }
-            foreach (var item in FishingGrid.SubGridStyles)
+
+            if (comboSubGrid.Items.Count == 0)
             {
-                comboSubGrid.Items.Add(item);
+                foreach (var item in FishingGrid.SubGridStyles)
+                {
+                    comboSubGrid.Items.Add(item);
+                }
             }
 
             lv.With(o =>
@@ -147,12 +168,19 @@ namespace FAD3
             global.SizeListViewColumns(lv);
 
             comboUTMZone.SelectedIndex = -1;
-            comboSubGrid.SelectedIndex = -1;
+
+
             if (_isNew)
             {
                 comboUTMZone.SelectedIndex = 0;
                 comboSubGrid.SelectedIndex = 0;
             }
+
+            if(_targetArea!=null)
+            {
+                ShowTargetAreaProperties();
+            }
+            txtName.Focus();
         }
 
         private void LoadGrid25Items(ListView lv)
@@ -247,6 +275,7 @@ namespace FAD3
             TargetAreaData.Add("DataStatus", _isNew ?
                                               fad3DataStatus.statusNew.ToString() :
                                               fad3DataStatus.statusEdited.ToString());
+            TargetAreaData.Add("SubGridStyle", comboSubGrid.SelectedIndex.ToString());
 
             if (TargetArea.UpdateData(TargetAreaData))
             {
@@ -310,9 +339,6 @@ namespace FAD3
             }
         }
 
-        private void tabAOI_TabIndexChanged(object sender, EventArgs e)
-        {
-        }
 
         private void OnFormClosed(object sender, FormClosedEventArgs e)
         {
@@ -320,17 +346,10 @@ namespace FAD3
                 FishingGrid.SubGridStyle = (fadSubgridSyle)comboSubGrid.SelectedIndex;
 
             _instance = null;
+            global.SaveFormSettings(this);
         }
 
-        private void panelAOI_Paint(object sender, PaintEventArgs e)
-        {
-        }
 
-        private void tabAOI_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            //TabPage tp = ((TabControl)sender).SelectedTab;
-            //ShowTabPanels(tp.Name);
-        }
 
         private void lvMaps_MouseDown(object sender, MouseEventArgs e)
         {
@@ -365,7 +384,7 @@ namespace FAD3
                 var UTMZone = FishingGrid.ZoneFromZoneName(comboUTMZone.Text);
                 fge = new FishingGroundDefinitionForm(this, UTMZone, lvi.Text, lvi.SubItems[1].Text, lvi.SubItems[2].Text);
             }
-            fge.ShowDialog(this);
+            fge.ShowDialog(Parent_form);
         }
 
         private void OnbuttonGrid25_Click(object sender, EventArgs e)

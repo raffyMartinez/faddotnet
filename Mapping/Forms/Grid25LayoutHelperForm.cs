@@ -160,17 +160,21 @@ namespace FAD3.Mapping.Forms
             txtPageWidth.Enabled = enable;
         }
 
-        private bool AcceptOptions()
+        private bool AcceptOptions(bool forLayout=true)
         {
-            bool accept = true;
-            foreach (Control c in Controls)
+            bool accept = txtColumns.Text.Length > 0
+                && txtRows.Text.Length > 0
+                && txtOverlap.Text.Length > 0
+                && txtPageHeight.Text.Length > 0
+                && txtPageWidth.Text.Length > 0;
+
+            if(!forLayout && accept)
             {
-                if (c.GetType().Name == "TextBox" && ((TextBox)c).Text.Length == 0)
-                {
-                    accept = false;
-                    break;
-                }
+                accept = textFolderToSave.Text.Length > 0;
+
             }
+
+            
 
             if (accept)
             {
@@ -265,33 +269,6 @@ namespace FAD3.Mapping.Forms
                     }
                     break;
 
-                case "btnSaveLayout":
-                    if (LayoutHelper.ValidLayoutTemplateShapefile())
-                    {
-                        saveAs = new SaveFileDialog();
-                        saveAs.Filter = "Shapefile *.shp|*.shp|All files *.*|*.*";
-                        saveAs.FilterIndex = 1;
-                        dr = saveAs.ShowDialog();
-                        if (dr == DialogResult.OK)
-                        {
-                            if (saveAs.FileName.Length > 0)
-                            {
-                                if (File.Exists(saveAs.FileName))
-                                {
-                                    ShapefileDiskStorageHelper.Delete(saveAs.FileName.Replace(".shp", ""));
-                                }
-                                if (LayoutHelper.SaveLayoutTemplate(saveAs.FileName))
-                                {
-                                    MessageBox.Show("Layout template successfuly saved!");
-                                }
-                                else
-                                {
-                                    MessageBox.Show("Layout template was not saved");
-                                }
-                            }
-                        }
-                    }
-                    break;
 
                 case "btnSelectFolderSave":
                     FolderBrowserDialog fbd = new FolderBrowserDialog();
@@ -308,21 +285,22 @@ namespace FAD3.Mapping.Forms
                     break;
 
                 case "btnSave":
-                    if (AcceptOptions())
+                    if (AcceptOptions(forLayout:false))
                     {
                         if (_majorGrid.LayoutHelper.LayoutShapeFile.NumShapes > 0
                         && _majorGrid.LayoutHelper.HasCompletePanelTitles())
 
                         {
-                            _majorGrid.HasSubgrid = _parentForm.HasSubGrid;
-                            _majorGrid.SubGridCount = _parentForm.SubGridCount;
-                            if (_majorGrid.GenerateMinorGridFromLayout(textFishingGround.Text, _parentFolder))
+                            //_majorGrid.HasSubgrid = _parentForm.HasSubGrid;
+                            //_majorGrid.SubGridCount = _parentForm.SubGridCount;
+                            if (_majorGrid.SaveMinorGridsInLayout(textFishingGround.Text, _parentFolder))
                             {
-                                if (_majorGrid.LayoutHelper.LayerHandle > 0)
-                                {
-                                    FillResultList();
-                                    _majorGrid.MapLayers.ClearAllSelections();
-                                }
+                                //if (_majorGrid.LayoutHelper.LayerHandle > 0)
+                                //{
+                                //    FillResultList();
+                                //    _majorGrid.MapLayers.ClearAllSelections();
+                                //}
+                                MessageBox.Show("Grid maps saved", "Save successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             }
                         }
                         else
@@ -466,7 +444,7 @@ namespace FAD3.Mapping.Forms
                 txtRows.Text = _majorGrid.LayoutRows.ToString();
                 txtColumns.Text = _majorGrid.LayoutCols.ToString();
                 txtOverlap.Text = _majorGrid.LayoutOverlap.ToString();
-                textLayoutTemplateFileName.Text = _majorGrid.LayoutHelper.LayoutShapeFile.Filename;
+                textLayoutTemplateFileName.Text = _majorGrid.LayoutHelper.LayoutShapeFile?.Filename;
                 textLayoutTemplateFileName.Enabled = false;
             }
             else
@@ -548,7 +526,7 @@ namespace FAD3.Mapping.Forms
                 _majorGrid = null;
             }
             _instance = null;
-            _parentForm = null;
+
             if (_layoutShapefile != null)
             {
                 _layoutShapefile.Close();
@@ -557,6 +535,8 @@ namespace FAD3.Mapping.Forms
             }
             global.SaveFormSettings(this);
             global.MappingForm.SetCursor(tkCursorMode.cmSelection);
+            _parentForm.SetupGridButtons(enabled: true);
+            _parentForm = null;
         }
 
         private void OnListItemChecked(object sender, ItemCheckedEventArgs e)
@@ -629,7 +609,6 @@ namespace FAD3.Mapping.Forms
         private void OnTabsSelectionChanged(object sender, EventArgs e)
         {
             chkAutoExpand.Visible = false;
-            btnSaveLayout.Visible = false;
 
             var t = sender as TabControl;
             switch (t.SelectedTab.Name)
@@ -658,9 +637,8 @@ namespace FAD3.Mapping.Forms
                             buttonSubGrid.Enabled = false;
                         }
                         _majorGrid.LayoutHelper.FishingGround = textFishingGround.Text;
-                        btnSaveLayout.Visible = true;
                         chkAutoExpand.Visible = true;
-                        btnSaveLayout.Enabled = btnSave.Enabled && lvResults.Items.Count > 0 && _majorGrid.LayoutHelper.HasCompletePanelTitles();
+                        
                     }
                     else
                     {
@@ -776,6 +754,14 @@ namespace FAD3.Mapping.Forms
             if (global.MappingMode == Database.Classes.fad3MappingMode.defaultMode && lv.SelectedIndices.Count > 0)
             {
                 global.MappingForm.MapControl.Extents = _layoutShapefile.Shape[lv.SelectedItems[0].Index].Extents;
+            }
+        }
+
+        private void OnFormActivated(object sender, EventArgs e)
+        {
+            if (_majorGrid.MinorGrids.MinorGridLinesShapeFile == null)
+            {
+                _majorGrid.DefineGridLayout((int)((Bitmap)imageList1.Images["grid_layout"]).GetHicon());
             }
         }
     }

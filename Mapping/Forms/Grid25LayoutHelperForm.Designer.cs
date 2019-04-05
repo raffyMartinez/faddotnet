@@ -63,7 +63,6 @@
             this.textFolderToSave = new System.Windows.Forms.TextBox();
             this.btnSelectFolderSave = new System.Windows.Forms.Button();
             this.chkAutoExpand = new System.Windows.Forms.CheckBox();
-            this.btnSaveLayout = new System.Windows.Forms.Button();
             this.tabsLayout.SuspendLayout();
             this.tabLayout.SuspendLayout();
             this.tabFishingGround.SuspendLayout();
@@ -154,6 +153,7 @@
             this.imageList1.Images.SetKeyName(6, "saveLayout");
             this.imageList1.Images.SetKeyName(7, "layoutTitles.bmp");
             this.imageList1.Images.SetKeyName(8, "subgrid");
+            this.imageList1.Images.SetKeyName(9, "grid_layout");
             // 
             // btnCancel
             // 
@@ -394,6 +394,7 @@
             this.btnSave.Size = new System.Drawing.Size(28, 28);
             this.btnSave.TabIndex = 17;
             this.btnSave.UseVisualStyleBackColor = true;
+            this.btnSave.Click += new System.EventHandler(this.OnButtonClick);
             // 
             // textFolderToSave
             // 
@@ -412,6 +413,7 @@
             this.btnSelectFolderSave.Size = new System.Drawing.Size(28, 28);
             this.btnSelectFolderSave.TabIndex = 11;
             this.btnSelectFolderSave.UseVisualStyleBackColor = true;
+            this.btnSelectFolderSave.Click += new System.EventHandler(this.OnButtonClick);
             // 
             // chkAutoExpand
             // 
@@ -424,31 +426,18 @@
             this.chkAutoExpand.UseVisualStyleBackColor = true;
             this.chkAutoExpand.Visible = false;
             // 
-            // btnSaveLayout
-            // 
-            this.btnSaveLayout.Enabled = false;
-            this.btnSaveLayout.ImageKey = "saveLayout";
-            this.btnSaveLayout.ImageList = this.imageList1;
-            this.btnSaveLayout.Location = new System.Drawing.Point(309, 305);
-            this.btnSaveLayout.Name = "btnSaveLayout";
-            this.btnSaveLayout.Size = new System.Drawing.Size(28, 28);
-            this.btnSaveLayout.TabIndex = 15;
-            this.btnSaveLayout.UseVisualStyleBackColor = true;
-            this.btnSaveLayout.Visible = false;
-            this.btnSaveLayout.Click += new System.EventHandler(this.OnButtonClick);
-            // 
             // Grid25LayoutHelperForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(381, 340);
-            this.Controls.Add(this.btnSaveLayout);
             this.Controls.Add(this.chkAutoExpand);
             this.Controls.Add(this.tabsLayout);
             this.Controls.Add(this.btnCancel);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "Grid25LayoutHelperForm";
             this.Text = "Layout grids";
+            this.Activated += new System.EventHandler(this.OnFormActivated);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.OnFormClosing);
             this.Load += new System.EventHandler(this.OnFormLoad);
             this.tabsLayout.ResumeLayout(false);
@@ -490,7 +479,6 @@
         private System.Windows.Forms.TabPage tabResults;
         private System.Windows.Forms.ListView lvResults;
         private System.Windows.Forms.CheckBox chkAutoExpand;
-        private System.Windows.Forms.Button btnSaveLayout;
         private System.Windows.Forms.ContextMenuStrip menuDropDown;
         private System.Windows.Forms.Button btnInputTitles;
         private System.Windows.Forms.Button buttonSubGrid;

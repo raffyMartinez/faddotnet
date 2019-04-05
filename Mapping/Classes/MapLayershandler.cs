@@ -266,7 +266,7 @@ namespace FAD3
             get { return _mapLayerDictionary.Count; }
         }
 
-        public void set_MapLayer(int layerHandle, bool noSelectedShapes = true)
+        public void set_MapLayer(int layerHandle, bool noSelectedShapes = true, bool refreshLayerList=false)
         {
             _currentMapLayer = _mapLayerDictionary[layerHandle];
             if (_currentMapLayer.LayerType == "ShapefileClass")
@@ -286,6 +286,12 @@ namespace FAD3
                 LayerEventArg lp = new LayerEventArg(_currentMapLayer.Handle, _currentMapLayer.Name, _currentMapLayer.Visible, _currentMapLayer.VisibleInLayersUI, _currentMapLayer.LayerType);
                 CurrentLayer(this, lp);
             }
+
+            if (refreshLayerList)
+            {
+                RefreshLayers();
+            }
+            
         }
 
         public MapLayer get_MapLayer(string Name)
@@ -447,13 +453,21 @@ namespace FAD3
             {
                 _mapLayerDictionary[layerHandle].Dispose();
                 _mapLayerDictionary.Remove(layerHandle);
+
                 _axmap.RemoveLayer(layerHandle);
                 _axmap.Redraw();
+
                 //fire the layer deleted event
                 if (LayerRemoved != null)
                 {
                     LayerEventArg lp = new LayerEventArg(layerHandle, layerRemoved: true);
                     LayerRemoved(this, lp);
+                }
+
+                //if the layer removed is the current layer, then make the current layer null
+                if (layerHandle == _currentMapLayer.Handle)
+                {
+                    _currentMapLayer = null;
                 }
             }
             catch (KeyNotFoundException knfex)

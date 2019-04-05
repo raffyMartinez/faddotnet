@@ -133,8 +133,6 @@ namespace FAD3
             this.tabAOI.SelectedIndex = 0;
             this.tabAOI.Size = new System.Drawing.Size(370, 357);
             this.tabAOI.TabIndex = 8;
-            this.tabAOI.SelectedIndexChanged += new System.EventHandler(this.tabAOI_SelectedIndexChanged);
-            this.tabAOI.TabIndexChanged += new System.EventHandler(this.tabAOI_TabIndexChanged);
             // 
             // tabGrid25
             // 

@@ -16,13 +16,13 @@ namespace FAD3
         private static string _targetAreaGuid;
         public static Grid25Struct _grid25 = new Grid25Struct();
         private static fadUTMZone _utmZone = fadUTMZone.utmZone_Undefined;
-        private static int ZoneNumber = 50;
-        private static string ZoneLetter = "N";
+        private static int _zoneNumber = 50;
+        private static string _zoneLetter = "N";
         private static fadGridType _gt = fadGridType.gridTypeNone;
         private static List<string> _UTMZones = new List<string>();
         private static string _appPath;
-        private static fadSubgridSyle _SubGridStyle = fadSubgridSyle.SubgridStyleNone;
-        private static List<string> _SubGridStyleList = new List<string>();
+        private static fadSubgridSyle _subGridStyle = fadSubgridSyle.SubgridStyleNone;
+        private static List<string> _subGri2dStyleList = new List<string>();
 
         /// <summary>
         /// Constructor
@@ -33,9 +33,9 @@ namespace FAD3
             _UTMZones.Add("51N");
             _appPath = global.ApplicationPath;
 
-            _SubGridStyleList.Add("None");
-            _SubGridStyleList.Add("4");
-            _SubGridStyleList.Add("9");
+            _subGri2dStyleList.Add("None");
+            _subGri2dStyleList.Add("4");
+            _subGri2dStyleList.Add("9");
         }
 
         /// <summary>
@@ -121,10 +121,10 @@ namespace FAD3
         /// </summary>
         public static fadSubgridSyle SubGridStyle
         {
-            get { return _SubGridStyle; }
+            get { return _subGridStyle; }
             set
             {
-                _SubGridStyle = value;
+                _subGridStyle = value;
                 SaveSubGridType();
             }
         }
@@ -134,7 +134,7 @@ namespace FAD3
         /// </summary>
         public static List<string> SubGridStyles
         {
-            get { return _SubGridStyleList; }
+            get { return _subGri2dStyleList; }
         }
 
         /// <summary>
@@ -663,14 +663,14 @@ namespace FAD3
                                         {
                                             case "51N":
                                                 _utmZone = fadUTMZone.utmZone51N;
-                                                ZoneNumber = 51;
-                                                ZoneLetter = "N";
+                                                _zoneNumber = 51;
+                                                _zoneLetter = "N";
                                                 break;
 
                                             case "50N":
                                                 _utmZone = fadUTMZone.utmZone50N;
-                                                ZoneNumber = 50;
-                                                ZoneLetter = "N";
+                                                _zoneNumber = 50;
+                                                _zoneLetter = "N";
                                                 break;
 
                                             default:
@@ -787,7 +787,7 @@ namespace FAD3
                 }
                 LatLngUTMConverter llc = new LatLngUTMConverter("WGS 84");
                 var LatLong = new LatLngUTMConverter.LatLng();
-                LatLong = llc.convertUtmToLatLng(x_mtr, y_mtr, ZoneNumber, ZoneLetter);
+                LatLong = llc.convertUtmToLatLng(x_mtr, y_mtr, _zoneNumber, _zoneLetter);
                 X = LatLong.Lng;
                 Y = LatLong.Lat;
             }
@@ -852,7 +852,7 @@ namespace FAD3
                     try
                     {
                         conection.Open();
-                        var query = $"Select GridName from tblGrid where SamplingGUID ={{{SamplingGuid}}}";
+                        var query = $"Select GridName,SubGrid from tblGrid where SamplingGUID ={{{SamplingGuid}}}";
 
                         using (var adapter = new OleDbDataAdapter(query, conection))
                         {
@@ -860,7 +860,13 @@ namespace FAD3
                             for (int i = 0; i < dt.Rows.Count; i++)
                             {
                                 var dr = dt.Rows[i];
-                                myList.Add(dr["GridName"].ToString());
+                                string fg = dr["GridName"].ToString();
+                                string subGrid = dr["subGrid"].ToString();
+                                if(subGrid.Length>0)
+                                {
+                                    fg += $"-{subGrid}";
+                                }
+                                myList.Add(fg);
                             }
                         }
                     }
@@ -885,7 +891,7 @@ namespace FAD3
             {
                 try
                 {
-                    var sql = $"Update tblAOI set SubgridStyle = {(int)_SubGridStyle} where AOIGuid ={{{TargetAreaGuid}}}";
+                    var sql = $"Update tblAOI set SubgridStyle = {(int)_subGridStyle} where AOIGuid ={{{TargetAreaGuid}}}";
                     OleDbCommand update = new OleDbCommand(sql, conn);
                     conn.Open();
                     Success = (update.ExecuteNonQuery() > 0);
@@ -915,7 +921,21 @@ namespace FAD3
                             if (dt.Rows.Count > 0)
                             {
                                 DataRow dr = dt.Rows[0];
-                                _SubGridStyle = (fadSubgridSyle)int.Parse(dr["SubgridStyle"].ToString());
+                                switch(dr["SubgridStyle"].ToString())
+                                    {
+                                    case "-1":
+                                    case "0":
+                                        _subGridStyle = fadSubgridSyle.SubgridStyleNone;
+                                        break;
+                                    case "1":
+                                        _subGridStyle = fadSubgridSyle.SubgridStyle4;
+                                        break;
+                                    case "2":
+                                        _subGridStyle = fadSubgridSyle.SubgridStyle9;
+                                        break;
+                                }
+
+                                
                             }
                         }
                     }
