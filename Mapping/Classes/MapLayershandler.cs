@@ -329,8 +329,16 @@ namespace FAD3
             var layerMoved = false;
             if (_axmap.MoveLayerBottom(layerHandle))
             {
-                _mapLayerDictionary[layerHandle].LayerPosition = _axmap.get_LayerPosition(layerHandle);
-                layerMoved = true;
+                try
+                {
+                    _mapLayerDictionary[layerHandle].LayerPosition = _axmap.get_LayerPosition(layerHandle);
+                    layerMoved = true;
+                }
+                catch
+                {
+                    //ignore error
+                }
+                
             }
             return layerMoved;
         }
@@ -700,6 +708,35 @@ namespace FAD3
                     LayerRead(this, lp);
                 }
                 LineWidthFix.FixLineWidth(sf);
+            }
+            else
+            {
+                int reprojectedCount = 0;
+
+                //if(sf.ReprojectInPlace(_axmap.GeoProjection,ref reprojectedCount))
+                var sfr = sf.Reproject(_axmap.GeoProjection, reprojectedCount);
+                if(reprojectedCount>0)
+                {
+                    h = _axmap.AddLayer(sfr, isVisible);
+                    if(h>0)
+                    {
+                        if (layerName.Length == 0)
+                        {
+                            layerName = Path.GetFileName(sf.Filename);
+                        }
+                        _axmap.set_LayerName(h, layerName);
+                        _currentMapLayer = SetMapLayer(h, layerName, isVisible, true, sf.GeoProjection, "ShapefileClass", sf.Filename);
+                        _currentMapLayer.MappingMode = mappingMode;
+
+                        if (LayerRead != null)
+                        {
+                            LayerEventArg lp = new LayerEventArg(h, layerName, true, true, _currentMapLayer.LayerType);
+                            LayerRead(this, lp);
+                        }
+                        LineWidthFix.FixLineWidth(sf);
+                    }
+                }
+
             }
             return h;
         }

@@ -36,6 +36,8 @@ namespace FAD3
 		/// </summary>
 		private void InitializeComponent()
 		{
+            this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TargetAreaForm));
             this.txtName = new System.Windows.Forms.TextBox();
             this.txtCode = new System.Windows.Forms.TextBox();
             this.buttonOK = new System.Windows.Forms.Button();
@@ -47,6 +49,7 @@ namespace FAD3
             this.comboSubGrid = new System.Windows.Forms.ComboBox();
             this.label5 = new System.Windows.Forms.Label();
             this.buttonRemoveMap = new System.Windows.Forms.Button();
+            this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.buttonAddMap = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.lvMaps = new System.Windows.Forms.ListView();
@@ -173,22 +176,31 @@ namespace FAD3
             // buttonRemoveMap
             // 
             this.buttonRemoveMap.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonRemoveMap.Location = new System.Drawing.Point(250, 285);
+            this.buttonRemoveMap.ImageKey = "removel_large";
+            this.buttonRemoveMap.ImageList = this.imageList1;
+            this.buttonRemoveMap.Location = new System.Drawing.Point(274, 285);
             this.buttonRemoveMap.Name = "buttonRemoveMap";
-            this.buttonRemoveMap.Size = new System.Drawing.Size(45, 31);
+            this.buttonRemoveMap.Size = new System.Drawing.Size(33, 31);
             this.buttonRemoveMap.TabIndex = 9;
-            this.buttonRemoveMap.Text = "-";
             this.buttonRemoveMap.UseVisualStyleBackColor = true;
             this.buttonRemoveMap.Click += new System.EventHandler(this.OnbuttonGrid25_Click);
+            // 
+            // imageList1
+            // 
+            this.imageList1.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList1.ImageStream")));
+            this.imageList1.TransparentColor = System.Drawing.Color.White;
+            this.imageList1.Images.SetKeyName(0, "removel_large");
+            this.imageList1.Images.SetKeyName(1, "add_large");
             // 
             // buttonAddMap
             // 
             this.buttonAddMap.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonAddMap.Location = new System.Drawing.Point(302, 285);
+            this.buttonAddMap.ImageKey = "add_large";
+            this.buttonAddMap.ImageList = this.imageList1;
+            this.buttonAddMap.Location = new System.Drawing.Point(315, 285);
             this.buttonAddMap.Name = "buttonAddMap";
-            this.buttonAddMap.Size = new System.Drawing.Size(45, 31);
+            this.buttonAddMap.Size = new System.Drawing.Size(33, 31);
             this.buttonAddMap.TabIndex = 8;
-            this.buttonAddMap.Text = "+";
             this.buttonAddMap.UseVisualStyleBackColor = true;
             this.buttonAddMap.Click += new System.EventHandler(this.OnbuttonGrid25_Click);
             // 
@@ -255,10 +267,10 @@ namespace FAD3
             // 
             this.textBoxOtherGrid.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBoxOtherGrid.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxOtherGrid.Location = new System.Drawing.Point(3, 3);
+            this.textBoxOtherGrid.Location = new System.Drawing.Point(3, 37);
             this.textBoxOtherGrid.Multiline = true;
             this.textBoxOtherGrid.Name = "textBoxOtherGrid";
-            this.textBoxOtherGrid.Size = new System.Drawing.Size(353, 246);
+            this.textBoxOtherGrid.Size = new System.Drawing.Size(353, 212);
             this.textBoxOtherGrid.TabIndex = 7;
             // 
             // tabMBR
@@ -332,5 +344,6 @@ namespace FAD3
         private System.Windows.Forms.ComboBox comboSubGrid;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label lblTitle;
+        private System.Windows.Forms.ImageList imageList1;
     }
 }

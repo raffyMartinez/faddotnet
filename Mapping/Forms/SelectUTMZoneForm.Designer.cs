@@ -33,14 +33,13 @@
             this.label1 = new System.Windows.Forms.Label();
             this.btnOk = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
-            this.chkCreateFile = new System.Windows.Forms.CheckBox();
             this.btnIgnore = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // rbtnZone50N
             // 
             this.rbtnZone50N.AutoSize = true;
-            this.rbtnZone50N.Location = new System.Drawing.Point(11, 33);
+            this.rbtnZone50N.Location = new System.Drawing.Point(16, 66);
             this.rbtnZone50N.Name = "rbtnZone50N";
             this.rbtnZone50N.Size = new System.Drawing.Size(211, 17);
             this.rbtnZone50N.TabIndex = 0;
@@ -51,7 +50,7 @@
             // 
             this.rbtnZone51N.AutoSize = true;
             this.rbtnZone51N.Checked = true;
-            this.rbtnZone51N.Location = new System.Drawing.Point(11, 56);
+            this.rbtnZone51N.Location = new System.Drawing.Point(16, 89);
             this.rbtnZone51N.Name = "rbtnZone51N";
             this.rbtnZone51N.Size = new System.Drawing.Size(283, 17);
             this.rbtnZone51N.TabIndex = 1;
@@ -61,16 +60,16 @@
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(8, 11);
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(9, 13);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(63, 13);
+            this.label1.Size = new System.Drawing.Size(328, 35);
             this.label1.TabIndex = 2;
-            this.label1.Text = "Select zone";
+            this.label1.Text = "Select a zone. The selected zone will be used in blanking out inland points. ";
             // 
             // btnOk
             // 
-            this.btnOk.Location = new System.Drawing.Point(257, 131);
+            this.btnOk.Location = new System.Drawing.Point(295, 136);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(42, 25);
             this.btnOk.TabIndex = 4;
@@ -80,7 +79,7 @@
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(88, 131);
+            this.btnCancel.Location = new System.Drawing.Point(126, 136);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(49, 25);
             this.btnCancel.TabIndex = 5;
@@ -88,19 +87,9 @@
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.OnButtonClick);
             // 
-            // chkCreateFile
-            // 
-            this.chkCreateFile.AutoSize = true;
-            this.chkCreateFile.Location = new System.Drawing.Point(11, 95);
-            this.chkCreateFile.Name = "chkCreateFile";
-            this.chkCreateFile.Size = new System.Drawing.Size(172, 17);
-            this.chkCreateFile.TabIndex = 6;
-            this.chkCreateFile.Text = "Create file without inland points";
-            this.chkCreateFile.UseVisualStyleBackColor = true;
-            // 
             // btnIgnore
             // 
-            this.btnIgnore.Location = new System.Drawing.Point(143, 131);
+            this.btnIgnore.Location = new System.Drawing.Point(181, 136);
             this.btnIgnore.Name = "btnIgnore";
             this.btnIgnore.Size = new System.Drawing.Size(102, 25);
             this.btnIgnore.TabIndex = 7;
@@ -112,9 +101,8 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(305, 165);
+            this.ClientSize = new System.Drawing.Size(349, 172);
             this.Controls.Add(this.btnIgnore);
-            this.Controls.Add(this.chkCreateFile);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnOk);
             this.Controls.Add(this.label1);
@@ -123,6 +111,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "SelectUTMZoneForm";
             this.Text = "Select UTM zone";
+            this.Load += new System.EventHandler(this.OnFormLoad);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -135,7 +124,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button btnOk;
         private System.Windows.Forms.Button btnCancel;
-        private System.Windows.Forms.CheckBox chkCreateFile;
         private System.Windows.Forms.Button btnIgnore;
     }
 }

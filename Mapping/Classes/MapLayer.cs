@@ -2,6 +2,7 @@
 using MapWinGIS;
 using System;
 using System.Drawing;
+using System.IO;
 
 namespace FAD3
 {/// <summary>
@@ -84,14 +85,18 @@ namespace FAD3
         public bool Save(string fileName)
         {
             var success = false;
+            if (!fileName.EndsWith(".shp"))
+            {
+                fileName += ".shp";
+            }
             if (LayerType == "ShapefileClass")
             {
                 ((Shapefile)LayerObject).With(sf =>
                 {
-                    success = sf.SaveAs(fileName + ".shp");                     //saves the shapefile
+                    success = sf.SaveAs(fileName);                     //saves the shapefile
                     if (success)
                     {
-                        sf.GeoProjection.WriteToFile(fileName + ".prj");        //save the shapefile's projection data
+                        sf.GeoProjection.WriteToFile(Path.GetFileName(fileName)+".prj");        //save the shapefile's projection data
                     }
                 });
             }

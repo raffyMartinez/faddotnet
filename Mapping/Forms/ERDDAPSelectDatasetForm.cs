@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using FAD3.Mapping.Classes;
 using MapWinGIS;
+using FAD3.GUI.Classes;
 
 namespace FAD3.Mapping.Forms
 {
@@ -30,7 +31,34 @@ namespace FAD3.Mapping.Forms
             InitializeComponent();
         }
 
-        private void OnExtentDefined(object sender, ExtentDraggedBoxEventArgs e)
+        private void SetupTooltips()
+        {
+            // Create the ToolTip and associate with the Form container.
+            ToolTip tt = new ToolTip();
+
+            // Set up the delays for the ToolTip.
+            tt.AutoPopDelay = TooltipGlobal.AutoPopDelay;
+            tt.InitialDelay = TooltipGlobal.InitialDelay;
+            tt.ReshowDelay = TooltipGlobal.ReshowDelay;
+
+            // Force the ToolTip text to be displayed whether or not the form is active.
+            tt.ShowAlways = TooltipGlobal.ShowAlways;
+
+            // Set up the ToolTip text
+            tt.SetToolTip(txtMinLat, "Minimum latitude of the dataset extent");
+            tt.SetToolTip(txtMinLon, "Minimum longitude of the dataset extent");
+            tt.SetToolTip(txtMaxLat, "Maximum latitude of the dataset extent");
+            tt.SetToolTip(txtMaxLon, "Maximum longitude of the dataset extent");
+            tt.SetToolTip(rbtnManual, "Click to define dataset extent by manually entering coordinates of extent");
+            tt.SetToolTip(rbtnUseSelectedLayer, "Click to define dataset extent by using an existing layer");
+            tt.SetToolTip(rbtnUseSelectionBox, "Click to define dataset extent by selecting an area using a map");
+            tt.SetToolTip(txtMetadataFolderPath, "Path of folder that contains IS0995 metadata xml files");
+            tt.SetToolTip(btnGetMetadataFolder, "Click to locate folder that contains ISO995 metadata xml files");
+            tt.SetToolTip(lvERDDAP, "List of datasets that you can download from NOAA's ERDDAP>griddap server. This list is based on ISO995 metadata xml files that you can download at the NOAA ERDDAP server");
+            tt.SetToolTip(btnDownload, "Click to download selected dataset");
+            tt.SetToolTip(btnOk, "Click of close the form");
+        }
+            private void OnExtentDefined(object sender, ExtentDraggedBoxEventArgs e)
         {
             txtMaxLat.Text = e.Top.ToString();
             txtMinLat.Text = e.Bottom.ToString();
@@ -141,6 +169,7 @@ namespace FAD3.Mapping.Forms
             MakeGridFromPoints.OnExtentDefined += OnExtentDefined;
             Text = "Download gridded, oceanographic, spatio-temporal data using ERDDAP";
             UpdateDataSetCount();
+            SetupTooltips();
         }
 
         private void OnCurrentLayer(MapLayersHandler s, LayerEventArg e)

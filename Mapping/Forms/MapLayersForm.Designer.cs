@@ -284,7 +284,7 @@
             this.Name = "MapLayersForm";
             this.ShowInTaskbar = false;
             this.Text = "Layers";
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MapLayersForm_FormClosed);
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnFormClosed);
             this.Load += new System.EventHandler(this.OnMapLayersForm_Load);
             this.Resize += new System.EventHandler(this.MapLayersForm_Resize);
             ((System.ComponentModel.ISupportInitialize)(this.layerGrid)).EndInit();

@@ -431,11 +431,6 @@
             // udSize
             // 
             this.udSize.Location = new System.Drawing.Point(90, 130);
-            this.udSize.Minimum = new decimal(new int[] {
-            4,
-            0,
-            0,
-            0});
             this.udSize.Name = "udSize";
             this.udSize.Size = new System.Drawing.Size(49, 20);
             this.udSize.TabIndex = 16;

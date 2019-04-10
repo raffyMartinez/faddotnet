@@ -50,25 +50,39 @@
             this.label7 = new System.Windows.Forms.Label();
             this.textFishingGround = new System.Windows.Forms.TextBox();
             this.tabResults = new System.Windows.Forms.TabPage();
+            this.btnGridSettings = new System.Windows.Forms.Button();
+            this.btnLocateSourceFolder = new System.Windows.Forms.Button();
             this.lblProvideTitles = new System.Windows.Forms.Label();
             this.buttonSubGrid = new System.Windows.Forms.Button();
             this.lvResults = new System.Windows.Forms.ListView();
             this.menuDropDown = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.tabSave = new System.Windows.Forms.TabPage();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.groupSaveTemplate = new System.Windows.Forms.GroupBox();
             this.btnSaveTemplate = new System.Windows.Forms.Button();
             this.textLayoutTemplateFileName = new System.Windows.Forms.TextBox();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.groupSaveGrids = new System.Windows.Forms.GroupBox();
             this.btnSave = new System.Windows.Forms.Button();
             this.textFolderToSave = new System.Windows.Forms.TextBox();
             this.btnSelectFolderSave = new System.Windows.Forms.Button();
             this.chkAutoExpand = new System.Windows.Forms.CheckBox();
+            this.tabExport = new System.Windows.Forms.TabPage();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.btnExport = new System.Windows.Forms.Button();
+            this.txtFolderExportPath = new System.Windows.Forms.TextBox();
+            this.btnFolderExportImage = new System.Windows.Forms.Button();
+            this.label6 = new System.Windows.Forms.Label();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.txtDPI = new System.Windows.Forms.TextBox();
+            this.label8 = new System.Windows.Forms.Label();
+            this.listLayers = new System.Windows.Forms.CheckedListBox();
             this.tabsLayout.SuspendLayout();
             this.tabLayout.SuspendLayout();
             this.tabFishingGround.SuspendLayout();
             this.tabResults.SuspendLayout();
             this.tabSave.SuspendLayout();
-            this.groupBox2.SuspendLayout();
+            this.groupSaveTemplate.SuspendLayout();
+            this.groupSaveGrids.SuspendLayout();
+            this.tabExport.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -154,6 +168,9 @@
             this.imageList1.Images.SetKeyName(7, "layoutTitles.bmp");
             this.imageList1.Images.SetKeyName(8, "subgrid");
             this.imageList1.Images.SetKeyName(9, "grid_layout");
+            this.imageList1.Images.SetKeyName(10, "Folder_16x");
+            this.imageList1.Images.SetKeyName(11, "settings");
+            this.imageList1.Images.SetKeyName(12, "image");
             // 
             // btnCancel
             // 
@@ -210,6 +227,7 @@
             this.tabsLayout.Controls.Add(this.tabFishingGround);
             this.tabsLayout.Controls.Add(this.tabResults);
             this.tabsLayout.Controls.Add(this.tabSave);
+            this.tabsLayout.Controls.Add(this.tabExport);
             this.tabsLayout.Location = new System.Drawing.Point(-2, 23);
             this.tabsLayout.Name = "tabsLayout";
             this.tabsLayout.SelectedIndex = 0;
@@ -281,6 +299,8 @@
             // 
             // tabResults
             // 
+            this.tabResults.Controls.Add(this.btnGridSettings);
+            this.tabResults.Controls.Add(this.btnLocateSourceFolder);
             this.tabResults.Controls.Add(this.lblProvideTitles);
             this.tabResults.Controls.Add(this.buttonSubGrid);
             this.tabResults.Controls.Add(this.lvResults);
@@ -290,6 +310,30 @@
             this.tabResults.TabIndex = 2;
             this.tabResults.Text = "Results";
             this.tabResults.UseVisualStyleBackColor = true;
+            // 
+            // btnGridSettings
+            // 
+            this.btnGridSettings.ImageKey = "settings";
+            this.btnGridSettings.ImageList = this.imageList1;
+            this.btnGridSettings.Location = new System.Drawing.Point(330, 84);
+            this.btnGridSettings.Name = "btnGridSettings";
+            this.btnGridSettings.Size = new System.Drawing.Size(28, 28);
+            this.btnGridSettings.TabIndex = 15;
+            this.btnGridSettings.UseVisualStyleBackColor = true;
+            this.btnGridSettings.Visible = false;
+            this.btnGridSettings.Click += new System.EventHandler(this.OnButtonClick);
+            // 
+            // btnLocateSourceFolder
+            // 
+            this.btnLocateSourceFolder.ImageKey = "Folder_16x";
+            this.btnLocateSourceFolder.ImageList = this.imageList1;
+            this.btnLocateSourceFolder.Location = new System.Drawing.Point(330, 50);
+            this.btnLocateSourceFolder.Name = "btnLocateSourceFolder";
+            this.btnLocateSourceFolder.Size = new System.Drawing.Size(28, 28);
+            this.btnLocateSourceFolder.TabIndex = 14;
+            this.btnLocateSourceFolder.UseVisualStyleBackColor = true;
+            this.btnLocateSourceFolder.Visible = false;
+            this.btnLocateSourceFolder.Click += new System.EventHandler(this.OnButtonClick);
             // 
             // lblProvideTitles
             // 
@@ -332,8 +376,8 @@
             // 
             // tabSave
             // 
-            this.tabSave.Controls.Add(this.groupBox2);
-            this.tabSave.Controls.Add(this.groupBox1);
+            this.tabSave.Controls.Add(this.groupSaveTemplate);
+            this.tabSave.Controls.Add(this.groupSaveGrids);
             this.tabSave.Location = new System.Drawing.Point(4, 22);
             this.tabSave.Name = "tabSave";
             this.tabSave.Padding = new System.Windows.Forms.Padding(3);
@@ -342,16 +386,16 @@
             this.tabSave.Text = "Save";
             this.tabSave.UseVisualStyleBackColor = true;
             // 
-            // groupBox2
+            // groupSaveTemplate
             // 
-            this.groupBox2.Controls.Add(this.btnSaveTemplate);
-            this.groupBox2.Controls.Add(this.textLayoutTemplateFileName);
-            this.groupBox2.Location = new System.Drawing.Point(17, 131);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(333, 106);
-            this.groupBox2.TabIndex = 17;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Save fishing ground layout template";
+            this.groupSaveTemplate.Controls.Add(this.btnSaveTemplate);
+            this.groupSaveTemplate.Controls.Add(this.textLayoutTemplateFileName);
+            this.groupSaveTemplate.Location = new System.Drawing.Point(17, 131);
+            this.groupSaveTemplate.Name = "groupSaveTemplate";
+            this.groupSaveTemplate.Size = new System.Drawing.Size(333, 106);
+            this.groupSaveTemplate.TabIndex = 17;
+            this.groupSaveTemplate.TabStop = false;
+            this.groupSaveTemplate.Text = "Save fishing ground layout template";
             // 
             // btnSaveTemplate
             // 
@@ -372,17 +416,17 @@
             this.textLayoutTemplateFileName.Size = new System.Drawing.Size(321, 20);
             this.textLayoutTemplateFileName.TabIndex = 13;
             // 
-            // groupBox1
+            // groupSaveGrids
             // 
-            this.groupBox1.Controls.Add(this.btnSave);
-            this.groupBox1.Controls.Add(this.textFolderToSave);
-            this.groupBox1.Controls.Add(this.btnSelectFolderSave);
-            this.groupBox1.Location = new System.Drawing.Point(17, 15);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(333, 106);
-            this.groupBox1.TabIndex = 16;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Save all fishing ground grid maps";
+            this.groupSaveGrids.Controls.Add(this.btnSave);
+            this.groupSaveGrids.Controls.Add(this.textFolderToSave);
+            this.groupSaveGrids.Controls.Add(this.btnSelectFolderSave);
+            this.groupSaveGrids.Location = new System.Drawing.Point(17, 15);
+            this.groupSaveGrids.Name = "groupSaveGrids";
+            this.groupSaveGrids.Size = new System.Drawing.Size(333, 106);
+            this.groupSaveGrids.TabIndex = 16;
+            this.groupSaveGrids.TabStop = false;
+            this.groupSaveGrids.Text = "Save all fishing ground grid maps";
             // 
             // btnSave
             // 
@@ -424,7 +468,112 @@
             this.chkAutoExpand.TabIndex = 14;
             this.chkAutoExpand.Text = "Auto-expand selected";
             this.chkAutoExpand.UseVisualStyleBackColor = true;
-            this.chkAutoExpand.Visible = false;
+            // 
+            // tabExport
+            // 
+            this.tabExport.Controls.Add(this.groupBox1);
+            this.tabExport.Location = new System.Drawing.Point(4, 22);
+            this.tabExport.Name = "tabExport";
+            this.tabExport.Padding = new System.Windows.Forms.Padding(3);
+            this.tabExport.Size = new System.Drawing.Size(372, 249);
+            this.tabExport.TabIndex = 4;
+            this.tabExport.Text = "Export grid maps";
+            this.tabExport.UseVisualStyleBackColor = true;
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.listLayers);
+            this.groupBox1.Controls.Add(this.label8);
+            this.groupBox1.Controls.Add(this.txtDPI);
+            this.groupBox1.Controls.Add(this.checkBox1);
+            this.groupBox1.Controls.Add(this.label6);
+            this.groupBox1.Controls.Add(this.btnExport);
+            this.groupBox1.Controls.Add(this.txtFolderExportPath);
+            this.groupBox1.Controls.Add(this.btnFolderExportImage);
+            this.groupBox1.Location = new System.Drawing.Point(3, 13);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(363, 232);
+            this.groupBox1.TabIndex = 17;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Export all grid maps to TIFF image files";
+            // 
+            // btnExport
+            // 
+            this.btnExport.Enabled = false;
+            this.btnExport.ImageKey = "image";
+            this.btnExport.ImageList = this.imageList1;
+            this.btnExport.Location = new System.Drawing.Point(294, 24);
+            this.btnExport.Name = "btnExport";
+            this.btnExport.Size = new System.Drawing.Size(28, 28);
+            this.btnExport.TabIndex = 17;
+            this.btnExport.UseVisualStyleBackColor = true;
+            this.btnExport.Click += new System.EventHandler(this.OnButtonClick);
+            // 
+            // txtFolderExportPath
+            // 
+            this.txtFolderExportPath.Enabled = false;
+            this.txtFolderExportPath.Location = new System.Drawing.Point(6, 29);
+            this.txtFolderExportPath.Name = "txtFolderExportPath";
+            this.txtFolderExportPath.Size = new System.Drawing.Size(280, 20);
+            this.txtFolderExportPath.TabIndex = 12;
+            // 
+            // btnFolderExportImage
+            // 
+            this.btnFolderExportImage.ImageKey = "addToFolder";
+            this.btnFolderExportImage.ImageList = this.imageList1;
+            this.btnFolderExportImage.Location = new System.Drawing.Point(326, 24);
+            this.btnFolderExportImage.Name = "btnFolderExportImage";
+            this.btnFolderExportImage.Size = new System.Drawing.Size(28, 28);
+            this.btnFolderExportImage.TabIndex = 11;
+            this.btnFolderExportImage.UseVisualStyleBackColor = true;
+            this.btnFolderExportImage.Click += new System.EventHandler(this.OnButtonClick);
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(6, 95);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(154, 13);
+            this.label6.TabIndex = 19;
+            this.label6.Text = "Hide these layers in front image";
+            // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Checked = true;
+            this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBox1.Location = new System.Drawing.Point(8, 65);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(187, 17);
+            this.checkBox1.TabIndex = 20;
+            this.checkBox1.Text = "Export front and back map images";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            // 
+            // txtDPI
+            // 
+            this.txtDPI.Location = new System.Drawing.Point(237, 63);
+            this.txtDPI.Name = "txtDPI";
+            this.txtDPI.Size = new System.Drawing.Size(48, 20);
+            this.txtDPI.TabIndex = 21;
+            this.txtDPI.Text = "150";
+            this.txtDPI.Validating += new System.ComponentModel.CancelEventHandler(this.OnTextValidating);
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(206, 67);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(25, 13);
+            this.label8.TabIndex = 22;
+            this.label8.Text = "DPI";
+            // 
+            // listLayers
+            // 
+            this.listLayers.FormattingEnabled = true;
+            this.listLayers.Location = new System.Drawing.Point(8, 111);
+            this.listLayers.Name = "listLayers";
+            this.listLayers.Size = new System.Drawing.Size(278, 109);
+            this.listLayers.TabIndex = 23;
             // 
             // Grid25LayoutHelperForm
             // 
@@ -447,8 +596,11 @@
             this.tabFishingGround.PerformLayout();
             this.tabResults.ResumeLayout(false);
             this.tabSave.ResumeLayout(false);
-            this.groupBox2.ResumeLayout(false);
-            this.groupBox2.PerformLayout();
+            this.groupSaveTemplate.ResumeLayout(false);
+            this.groupSaveTemplate.PerformLayout();
+            this.groupSaveGrids.ResumeLayout(false);
+            this.groupSaveGrids.PerformLayout();
+            this.tabExport.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
@@ -483,13 +635,25 @@
         private System.Windows.Forms.Button btnInputTitles;
         private System.Windows.Forms.Button buttonSubGrid;
         private System.Windows.Forms.TabPage tabSave;
-        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.GroupBox groupSaveGrids;
         private System.Windows.Forms.TextBox textFolderToSave;
         private System.Windows.Forms.Button btnSelectFolderSave;
         private System.Windows.Forms.Button btnSave;
-        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.GroupBox groupSaveTemplate;
         private System.Windows.Forms.Button btnSaveTemplate;
         private System.Windows.Forms.TextBox textLayoutTemplateFileName;
         private System.Windows.Forms.Label lblProvideTitles;
+        private System.Windows.Forms.Button btnLocateSourceFolder;
+        private System.Windows.Forms.Button btnGridSettings;
+        private System.Windows.Forms.TabPage tabExport;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.Button btnExport;
+        private System.Windows.Forms.TextBox txtFolderExportPath;
+        private System.Windows.Forms.Button btnFolderExportImage;
+        private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.TextBox txtDPI;
+        private System.Windows.Forms.CheckedListBox listLayers;
     }
 }

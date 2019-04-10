@@ -31,5 +31,22 @@ namespace FAD3.Database.Classes
             BoatLength = length;
             BoatHeight = height;
         }
+
+        public double? GrossTonnage
+        {
+            get
+            {
+                if (BoatWidth != null
+                    && BoatLength != null
+                    && BoatHeight != null)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
     }
 }

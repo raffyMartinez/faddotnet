@@ -19,6 +19,39 @@ namespace FAD3.Mapping.Forms
     /// </summary>
     public partial class Grid25LayoutHelperForm : Form
     {
+
+        public int PageWidth { get; internal set; }
+        public int PageHeight { get; internal set; }
+        public int Overlap { get; internal set; }
+        public int Rows { get; internal set; }
+        public int Columns { get; internal set; }
+        public Extents SelectionBoxExtent { get; set; }
+        public Extents MajorGridSelectionExtent { get; set; }
+        public double ExtentTop { get; set; }
+        public double ExtentBottom { get; set; }
+        public double ExtentLeft { get; set; }
+        public double ExtentRight { get; set; }
+        public Grid25LayoutHelper LayoutHelper { get; set; }
+        private static Grid25LayoutHelperForm _instance;
+        private Grid25MajorGrid _majorGrid;
+        private string _parentFolder = string.Empty;
+        private string _savePath;
+        private string _fishingGround;
+        private int _mouseX;
+        private int _mouseY;
+        private Grid25GenerateForm _parentForm;
+        private bool _hasSubGrid;
+        private int _subGridCount;
+        private string _layoutFileName;
+        private Shapefile _layoutShapefile;
+        private string _gridMapSourceFolderPath;
+        private string _exportImageFolderSavePath;
+        private Grid25GeographicDisplayHelper _grid25GeographicDisplayHelper;
+        public const int XBuffer = 1500;
+        public const int YTopBuffer = 4000;
+        public const int YBottomBuffer = 3000;
+        private int _maxDimensionIndex=-1;
+
         public static Grid25LayoutHelperForm GetInstance(Grid25MajorGrid majorGrid, Grid25GenerateForm parentForm)
         {
             if (_instance == null) _instance = new Grid25LayoutHelperForm(majorGrid, parentForm);
@@ -93,30 +126,7 @@ namespace FAD3.Mapping.Forms
             get { return chkAutoExpand.Checked; }
         }
 
-        public int PageWidth { get; internal set; }
-        public int PageHeight { get; internal set; }
-        public int Overlap { get; internal set; }
-        public int Rows { get; internal set; }
-        public int Columns { get; internal set; }
-        public Extents SelectionBoxExtent { get; set; }
-        public Extents MajorGridSelectionExtent { get; set; }
-        public double ExtentTop { get; set; }
-        public double ExtentBottom { get; set; }
-        public double ExtentLeft { get; set; }
-        public double ExtentRight { get; set; }
-        public Grid25LayoutHelper LayoutHelper { get; set; }
-        private static Grid25LayoutHelperForm _instance;
-        private Grid25MajorGrid _majorGrid;
-        private string _parentFolder = string.Empty;
-        private string _savePath;
-        private string _fishingGround;
-        private int _mouseX;
-        private int _mouseY;
-        private Grid25GenerateForm _parentForm;
-        private bool _hasSubGrid;
-        private int _subGridCount;
-        private string _layoutFileName;
-        private Shapefile _layoutShapefile;
+
 
         /// <summary>
         ///populate the various text fields of the form
@@ -214,6 +224,78 @@ namespace FAD3.Mapping.Forms
         {
             switch (((Button)(sender)).Name)
             {
+                case "btnExport":
+                    var exportCount = 0;
+                    for(int n=0;n<lvResults.Items.Count;n++)
+                    {
+                        lvResults.Items[n].Checked = true;
+                        //OnListItemChecked(null, new ItemCheckedEventArgs(lvResults.Items[n]));
+                        SaveMapImage smi = new SaveMapImage($@"{txtFolderExportPath.Text}\{lvResults.Items[n].Text}_grid.tif", int.Parse(txtDPI.Text),global.MappingForm.MapControl);
+                        smi.MapLayersHandler = global.MappingForm.MapLayersHandler;
+                        smi.PreviewImage = false;
+                        if(smi.Save(true))
+                        {
+                            exportCount++;
+                        }
+                    }
+                    var msg = "";
+                    if((exportCount)== lvResults.Items.Count)
+                    {
+                        msg = $"Successfully exported all {exportCount} grid maps";
+                    }
+                    else
+                    {
+                        msg = $"Not all grids were exported.\r\nOnly {exportCount} grids were exported";
+                    }
+                    MessageBox.Show(msg, "Export grid map to image", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    break;
+
+                case "btnFolderExportImage":
+                    var folderBrowser = new FolderBrowserDialog();
+                    folderBrowser.ShowNewFolderButton = true;
+                    folderBrowser.SelectedPath = SaveMapForm.GetSavedMapsFolder();
+                    folderBrowser.Description = "Locate folder to save exported map images";
+                    DialogResult result = FolderBrowserLauncher.ShowFolderBrowser(folderBrowser);
+                    if (result == DialogResult.OK && folderBrowser.SelectedPath.Length>0)
+                    {
+                        _exportImageFolderSavePath = folderBrowser.SelectedPath;
+                        txtFolderExportPath.Text = _exportImageFolderSavePath;
+                        btnExport.Enabled = true;
+                    }
+                    break;
+                case "btnGridSettings":
+                    using (Grid25GeographicDisplayOptionsForm ggdf = new Grid25GeographicDisplayOptionsForm(
+                        _grid25GeographicDisplayHelper.MinorGridFontSize,
+                        _grid25GeographicDisplayHelper.MinorGridOffsetDistance,
+                        _grid25GeographicDisplayHelper.MajorGridFontSize,
+                        _grid25GeographicDisplayHelper.SubgridsVisible))
+                    {
+                        ggdf.ShowDialog();
+                        if (ggdf.DialogResult == DialogResult.OK)
+                        {
+                            _grid25GeographicDisplayHelper.MinorGridOffsetDistance = ggdf.MinorGridDistance;
+                            _grid25GeographicDisplayHelper.MinorGridFontSize = ggdf.MinorGridFontSize;
+                            _grid25GeographicDisplayHelper.MajorGridFontSize = ggdf.MajorGridFontSize;
+                            _grid25GeographicDisplayHelper.SubgridsVisible = ggdf.ShowSubgrid;
+                            _grid25GeographicDisplayHelper.RemoveGrid25Layers();
+                            _grid25GeographicDisplayHelper.SelectedLayoutCell = lvResults.CheckedItems[0].Text;
+                            _grid25GeographicDisplayHelper.SymbolizeGrid();
+                        }
+                    }
+                        break;
+
+                case "btnLocateSourceFolder":
+                    folderBrowser = new FolderBrowserDialog();
+                    folderBrowser.ShowNewFolderButton = true;
+                    folderBrowser.SelectedPath = SaveMapForm.GetSavedMapsFolder();
+                    folderBrowser.Description = "Locate folder containing saved fishing ground grid maps";
+                    result = FolderBrowserLauncher.ShowFolderBrowser(folderBrowser);
+                    if (result == DialogResult.OK && folderBrowser.SelectedPath.Length>0)
+                    {
+                        _gridMapSourceFolderPath = folderBrowser.SelectedPath;
+                        _grid25GeographicDisplayHelper.SetMaxDimensionGridName(_gridMapSourceFolderPath, lvResults.Items[_maxDimensionIndex].Text);
+                    }
+                    break;
                 case "btnSaveTemplate":
                     var saveAs = new SaveFileDialog();
                     saveAs.Filter = "Shapefile *.shp|*.shp|All files *.*|*.*";
@@ -274,8 +356,8 @@ namespace FAD3.Mapping.Forms
                     FolderBrowserDialog fbd = new FolderBrowserDialog();
                     fbd.Description = "Select folder to save fishing ground grid map";
                     fbd.SelectedPath = GetSavedMapsFolder();
-                    DialogResult result = FolderBrowserLauncher.ShowFolderBrowser(fbd);
-                    if (result == DialogResult.OK && fbd.SelectedPath.Length > 0)
+                    dr = FolderBrowserLauncher.ShowFolderBrowser(fbd);
+                    if (dr == DialogResult.OK && fbd.SelectedPath.Length > 0)
                     {
                         _parentFolder = fbd.SelectedPath;
                         SetSavedMapsFolder(_parentFolder);
@@ -394,6 +476,7 @@ namespace FAD3.Mapping.Forms
                     case "txtPageHeight":
                     case "txtRows":
                     case "txtColumns":
+                    case "txtDP!":
                         if (int.TryParse(s, out v))
                         {
                             e.Cancel = v <= 0;
@@ -434,10 +517,7 @@ namespace FAD3.Mapping.Forms
 
         private void OnFormLoad(object sender, EventArgs e)
         {
-            //var ext = DefinePageExtent(MajorGridSelectionExtent, SelectionBoxExtent);
-            //if (ext != null)
-            //{
-            //}
+            _gridMapSourceFolderPath = "";
             global.LoadFormSettings(this, true);
             if (global.MappingMode == Database.Classes.fad3MappingMode.grid25Mode)
             {
@@ -446,9 +526,11 @@ namespace FAD3.Mapping.Forms
                 txtOverlap.Text = _majorGrid.LayoutOverlap.ToString();
                 textLayoutTemplateFileName.Text = _majorGrid.LayoutHelper.LayoutShapeFile?.Filename;
                 textLayoutTemplateFileName.Enabled = false;
+                tabsLayout.TabPages.Remove(tabExport);
             }
             else
             {
+                _grid25GeographicDisplayHelper = new Grid25GeographicDisplayHelper(global.MappingForm.MapLayersHandler, global.MappingForm.MapControl);
                 ReadLayoutData();
                 var layoutShapeFileName = _layoutFileName.Replace(".lay", ".shp");
 
@@ -465,17 +547,36 @@ namespace FAD3.Mapping.Forms
                     _layoutShapefile.DefaultDrawingOptions.LineColor = new Utils().ColorByName(tkMapColor.Blue);
                     int fTitle = _layoutShapefile.FieldIndexByName["Title"];
                     SetupResultsView();
+
+                    double maxDimension = 0;
+                    lvResults.Items.Clear();
                     for (int n = 0; n < _layoutShapefile.NumShapes; n++)
                     {
                         ListViewItem lvi = lvResults.Items.Add(_layoutShapefile.CellValue[fTitle, n].ToString());
+                        var ext = _layoutShapefile.Shape[n].Extents;
+
+                        if(ext.Width+ext.Height >maxDimension)
+                        {
+                            maxDimension = ext.Width + ext.Height;
+                            _maxDimensionIndex = n;
+                        }
+
+                        Console.WriteLine($"w: {ext.Width}, h: {ext.Height}, n: {n}");
                     }
+
                     SizeColumns(lvResults, false);
                     global.MappingForm.MapControl.Extents = _layoutShapefile.Extents;
                     buttonSubGrid.Visible = false;
                     btnInputTitles.Visible = false;
                     btnApplyDimension.Visible = false;
+                    btnGridSettings.Visible = true;
+                    btnGridSettings.Location = btnLocateSourceFolder.Location;
+                    btnLocateSourceFolder.Visible = true;
+                    btnLocateSourceFolder.Location = buttonSubGrid.Location;
                     tabsLayout.TabPages.Remove(tabSave);
                     lvResults.ItemChecked += OnListItemChecked;
+                    btnFolderExportImage.Enabled = false;
+                    btnExport.Enabled = false;
                 }
             }
         }
@@ -533,9 +634,13 @@ namespace FAD3.Mapping.Forms
                 _layoutShapefile = null;
                 global.MappingForm.MapLayersHandler.RemoveLayer("Layout frame");
             }
+            if(_grid25GeographicDisplayHelper!=null)
+            {
+                _grid25GeographicDisplayHelper.RemoveGrid25Layers();
+            }
             global.SaveFormSettings(this);
             global.MappingForm.SetCursor(tkCursorMode.cmSelection);
-            _parentForm.SetupGridButtons(enabled: true);
+            _parentForm?.SetupGridButtons(enabled: true);
             _parentForm = null;
         }
 
@@ -569,15 +674,7 @@ namespace FAD3.Mapping.Forms
             //only allow one checked item in the listbox
             if (lvResults.CheckedItems.Count > 1)
             {
-                lvResults.ItemChecked -= OnListItemChecked;
-                foreach (ListViewItem lvi in lvResults.Items)
-                {
-                    if (lvi.Index != e.Item.Index)
-                    {
-                        lvi.Checked = false;
-                    }
-                }
-                lvResults.ItemChecked += OnListItemChecked;
+                UncheckAllItems(e.Item.Index);
             }
 
             if (lvResults.CheckedItems.Count == 0)
@@ -592,23 +689,82 @@ namespace FAD3.Mapping.Forms
             }
             else
             {
+                _layoutShapefile.SelectNone();
+                _grid25GeographicDisplayHelper.RemoveGrid25Layers();
                 if (lvResults.CheckedItems.Count > 0)
                 {
                     _layoutShapefile.ShapeSelected[e.Item.Index] = true;
+                    if(_gridMapSourceFolderPath.Length>0)
+                    {
+                        _grid25GeographicDisplayHelper.SourceFolder = _gridMapSourceFolderPath;
+                        _grid25GeographicDisplayHelper.SelectedLayoutCell = lvResults.CheckedItems[0].Text;
+                        if(chkAutoExpand.Checked)
+                        {
+                            var adjustValue = 60 * 1852;
+                            var ext = new Extents();
+
+                            var extMBRMax = _grid25GeographicDisplayHelper.MaxDimensionMBR.Extents;
+                            var maxWidth = extMBRMax.xMax - extMBRMax.xMin;
+                            var maxHeight = extMBRMax.yMax - extMBRMax.yMin;
+
+                            var extMBRGrid = _grid25GeographicDisplayHelper.MBR.Extents;
+                            var labelDistance = _grid25GeographicDisplayHelper.MinorGridLabelDistance;
+                            //ext.SetBounds(extMBR.xMin - (labelDistance * 3) - XBuffer / adjustValue,
+                            //    extMBR.yMin - (labelDistance * 3) - YBottomBuffer / adjustValue,
+                            //    0, 
+                            //    extMBR.xMax + (labelDistance * 3) + XBuffer / adjustValue, 
+                            //    extMBR.yMax + (labelDistance * 3) + YTopBuffer / adjustValue, 
+                            //    0);
+                            //ext.SetBounds(extMBR.xMin - (labelDistance * 5) - XBuffer / adjustValue,
+                            //    extMBR.yMin - (labelDistance * 5) - YBottomBuffer / adjustValue,
+                            //    0,
+                            //    (extMBR.xMin + _maxPanelWidth) + (labelDistance * 5) + XBuffer / adjustValue,
+                            //    (extMBR.yMin + _maxPanelHeight) + (labelDistance * 5) + YTopBuffer / adjustValue,
+                            ext.SetBounds(extMBRGrid.xMin - (labelDistance * 3) - XBuffer / adjustValue,
+                                extMBRGrid.yMin - (labelDistance * 3) - YBottomBuffer / adjustValue,
+                                0,
+                                (extMBRGrid.xMin + maxWidth) + (labelDistance * 3) + XBuffer / adjustValue,
+                                (extMBRGrid.yMin + maxHeight) + (labelDistance * 3) + YTopBuffer / adjustValue,
+                                0);
+                            global.MappingForm.MapControl.Extents = ext;
+                        }
+                    }
+                    else
+                    {
+                        if(chkAutoExpand.Checked)
+                        {
+                            global.MappingForm.MapControl.Extents = _layoutShapefile.Shape[lv.CheckedItems[0].Index].Extents;
+                        }
+                    }
                 }
-                else
-                {
-                    _layoutShapefile.SelectNone();
-                }
+                
                 global.MappingForm.MapControl.Redraw();
             }
 
-            global.MappingForm.MapLayersHandler.RefreshLayers();
+            if (lvResults.CheckedItems.Count > 0)
+            {
+                global.MappingForm.MapLayersHandler.RefreshLayers();
+            }
         }
+
+
+        private void UncheckAllItems(int index)
+        {
+            lvResults.ItemChecked -= OnListItemChecked;
+            foreach (ListViewItem lvi in lvResults.Items)
+            {
+                if (lvi.Index != index)
+                {
+                    lvi.Checked = false;
+                }
+            }
+            lvResults.ItemChecked += OnListItemChecked;
+        }
+
 
         private void OnTabsSelectionChanged(object sender, EventArgs e)
         {
-            chkAutoExpand.Visible = false;
+            //chkAutoExpand.Visible = false;
 
             var t = sender as TabControl;
             switch (t.SelectedTab.Name)
@@ -637,7 +793,7 @@ namespace FAD3.Mapping.Forms
                             buttonSubGrid.Enabled = false;
                         }
                         _majorGrid.LayoutHelper.FishingGround = textFishingGround.Text;
-                        chkAutoExpand.Visible = true;
+                        //chkAutoExpand.Visible = true;
                         
                     }
                     else
@@ -649,9 +805,31 @@ namespace FAD3.Mapping.Forms
 
                 case "tabSave":
 
-                    btnSaveTemplate.Enabled = textFishingGround.Text.Length > 0
-                        && lvResults.Items.Count > 0
-                        && !_majorGrid.LayoutHelper.LayoutTemplateFromFile;
+                    switch (global.MappingMode)
+                    {
+                        case Database.Classes.fad3MappingMode.defaultMode:
+                            break;
+                        case Database.Classes.fad3MappingMode.grid25Mode:
+                            btnSaveTemplate.Enabled = textFishingGround.Text.Length > 0
+                                && lvResults.Items.Count > 0
+                                && !_majorGrid.LayoutHelper.LayoutTemplateFromFile;
+                            break;
+                    }
+                    break;
+
+                case "tabExport":
+                    if (_grid25GeographicDisplayHelper.HasGrid)
+                    {
+                        btnFolderExportImage.Enabled = true;
+                        btnExport.Enabled = txtFolderExportPath.Text.Length > 0;
+
+                        listLayers.Items.Clear();
+                        foreach(MapLayer ml in global.MappingForm.MapLayersHandler)
+                        {
+                            listLayers.Items.Insert(0,ml.Name);
+                        }
+                        
+                    }
                     break;
             }
         }
@@ -749,17 +927,30 @@ namespace FAD3.Mapping.Forms
 
         private void OnListViewSelectedIndexChange(object sender, EventArgs e)
         {
-            ListView lv = (ListView)sender;
+            //ListView lv = (ListView)sender;
 
-            if (global.MappingMode == Database.Classes.fad3MappingMode.defaultMode && lv.SelectedIndices.Count > 0)
-            {
-                global.MappingForm.MapControl.Extents = _layoutShapefile.Shape[lv.SelectedItems[0].Index].Extents;
-            }
+            //if (global.MappingMode == Database.Classes.fad3MappingMode.defaultMode && lv.SelectedIndices.Count > 0)
+            //{
+            //    if (_grid25GeographicDisplayHelper.HasGrid)
+            //    {
+            //        var adjustValue = 60 * 1852;
+            //        var ext = new Extents();
+            //        var extMBR = _grid25GeographicDisplayHelper.MBR.Extents;
+            //        var labelDistance = _grid25GeographicDisplayHelper.MinorGridLabelDistance;
+            //        ext.SetBounds(extMBR.xMin - (labelDistance * 3) - XBuffer/adjustValue , extMBR.yMin - (labelDistance * 3) - YBottomBuffer/adjustValue, 0, extMBR.xMax + (labelDistance * 3) + XBuffer/adjustValue, extMBR.yMax + (labelDistance * 3) + YTopBuffer/adjustValue, 0);
+            //        global.MappingForm.MapControl.Extents = ext;
+            //    }
+            //    else
+            //    {
+            //        global.MappingForm.MapControl.Extents = _layoutShapefile.Shape[lv.SelectedItems[0].Index].Extents;
+            //    }
+            //}
         }
 
         private void OnFormActivated(object sender, EventArgs e)
         {
-            if (_majorGrid.MinorGrids.MinorGridLinesShapeFile == null)
+            if (_majorGrid != null 
+                &&_majorGrid.MinorGrids.MinorGridLinesShapeFile == null)
             {
                 _majorGrid.DefineGridLayout((int)((Bitmap)imageList1.Images["grid_layout"]).GetHicon());
             }

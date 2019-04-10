@@ -13,6 +13,7 @@ using System.IO;
 using System.Xml;
 using Microsoft.VisualBasic.FileIO;
 using FAD3.Mapping.Classes;
+using FAD3.GUI.Classes;
 
 namespace FAD3.Mapping.Forms
 {
@@ -79,11 +80,12 @@ namespace FAD3.Mapping.Forms
             ToolTip tt = new ToolTip();
 
             // Set up the delays for the ToolTip.
-            tt.AutoPopDelay = 5000;
-            tt.InitialDelay = 1000;
-            tt.ReshowDelay = 500;
+            tt.AutoPopDelay = TooltipGlobal.AutoPopDelay;
+            tt.InitialDelay = TooltipGlobal.InitialDelay;
+            tt.ReshowDelay = TooltipGlobal.ReshowDelay;
+
             // Force the ToolTip text to be displayed whether or not the form is active.
-            tt.ShowAlways = true;
+            tt.ShowAlways = TooltipGlobal.ShowAlways;
 
             // Set up the ToolTip text for the Button and Checkbox.
             tt.SetToolTip(btnCancel, "Closes this window");

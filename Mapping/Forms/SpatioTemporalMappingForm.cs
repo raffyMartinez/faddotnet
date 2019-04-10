@@ -13,6 +13,7 @@ using System.Windows.Forms.DataVisualization.Charting;
 using System.Threading.Tasks;
 using Microsoft.Win32;
 using MapWinGIS;
+using FAD3.GUI.Classes;
 
 namespace FAD3.Mapping.Forms
 {
@@ -32,7 +33,6 @@ namespace FAD3.Mapping.Forms
         private int _dataPoints;
         private int _selectionIndex = 0;
         private fadUTMZone _utmZone;
-        private bool _createFileWithoutInland;
         private bool _hasReadCoordinates;
         private string _ERDDAPMetadataFolder;
         private Extents _selectionExtent;
@@ -289,10 +289,8 @@ namespace FAD3.Mapping.Forms
                         if (szf.DialogResult == DialogResult.OK)
                         {
                             _utmZone = szf.UTMZone;
-                            _createFileWithoutInland = szf.CreateFileWithoutInland;
                             MakeGridFromPoints.IgnoreInlandPoints = false;
                             MakeGridFromPoints.UTMZone = _utmZone;
-                            MakeGridFromPoints.CreateFileWithoutInlandPoints = _createFileWithoutInland;
                         }
                         else if (szf.DialogResult == DialogResult.Ignore)
                         {
@@ -1279,28 +1277,63 @@ namespace FAD3.Mapping.Forms
             ToolTip tt = new ToolTip();
 
             // Set up the delays for the ToolTip.
-            tt.AutoPopDelay = 5000;
-            tt.InitialDelay = 1000;
-            tt.ReshowDelay = 500;
-            // Force the ToolTip text to be displayed whether or not the form is active.
-            tt.ShowAlways = true;
+            tt.AutoPopDelay = TooltipGlobal.AutoPopDelay;
+            tt.InitialDelay = TooltipGlobal.InitialDelay;
+            tt.ReshowDelay = TooltipGlobal.ReshowDelay;
 
+            // Force the ToolTip text to be displayed whether or not the form is active.
+            tt.ShowAlways = TooltipGlobal.ShowAlways;
+
+            tt.SetToolTip(btnOpen, "Loads and then opens a data file");
+            tt.SetToolTip(txtFile, "Filename of the currenty loaded dataset");
             tt.SetToolTip(cboLongitude, "Column in the data representing longitude");
             tt.SetToolTip(cboLatitude, "Column in the data representing latitude");
             tt.SetToolTip(cboTemporal, "Column in the data representing time");
             tt.SetToolTip(cboValue, "Column in the data representing the value to map");
+            tt.SetToolTip(btnReadFile, "Reads the loaded data file");
+
             tt.SetToolTip(cboFirstData, "First time slice to include in the map");
             tt.SetToolTip(cboLastData, "Last time slice to include in the map");
+            tt.SetToolTip(btnExclude, "");
+
+            tt.SetToolTip(txtMetadata, "Contents of metadata of dataset, but only for NCCSV dataset type");
+
+            tt.SetToolTip(txtDatasetNumberOfTimePeriods, "Number of time periods (time slices) in the dataset");
             tt.SetToolTip(txtRows, "Number of point coordinates in the map");
-            tt.SetToolTip(txtInlandPoints, "Number of point coordinates that are inland");
-            tt.SetToolTip(btnOpen, "Loads and then opens a data file");
-            tt.SetToolTip(btnReadFile, "Reads the loaded data file");
-            tt.SetToolTip(btnOk, "Closes this window");
-            tt.SetToolTip(txtMetadata, "Metadata of the dataset, if available");
-            tt.SetToolTip(txtFile, "Filename of the currenty loaded dataset");
+            tt.SetToolTip(txtInlandPoints, "Number of point coordinates that are inland.Inland points could be made null based on user input");
+            tt.SetToolTip(txtDatasetNumberValues, "Number of non-null values in the dataset");
+            tt.SetToolTip(txtDatasetUniqueCount, "Number of unique values in the dataset");
+            tt.SetToolTip(txtDatasetMax, "Maximum value in the dataset");
+            tt.SetToolTip(txtDatasetMin,"Minimum value in the dataset");
+
             tt.SetToolTip(icbColorScheme, "Select color scheme to symbolize categories");
             tt.SetToolTip(cboClassificationScheme, "Select classification scheme for creating categories");
             tt.SetToolTip(txtCategoryCount, "Number of categories to create");
+            tt.SetToolTip(btnCategorize, "Click to categorize the data");
+            tt.SetToolTip(dgCategories, "Lists the categories/intervals");
+
+            tt.SetToolTip(txtSelectedMaximum, "Maximum value in the selected time periods in the dataset");
+            tt.SetToolTip(txtSelectedMinimum, "Miniumum value in the selected time periods in the dataset");
+            tt.SetToolTip(txtSelectedUnique, "Number of unique values in the selected time periods in the dataset");
+            tt.SetToolTip(txtSelectedValuesCount, "Number pf values in the selected time periods in the dataset");
+            tt.SetToolTip(txtSelectedNumberOfPeriods, "Number of time periods selected in the dataset");
+
+            tt.SetToolTip(btnShowGridPoints, "Click to show the data points in the dataset. If the dataset is  rectangular, the data grid will be automatically created");
+            tt.SetToolTip(btnShowGridPolygons, "Click to construct the data grid from the data points");
+
+            tt.SetToolTip(listSelectedTimePeriods, "Shows a list of time periods that were selected. Click on a time period to see spatial distribution of the data");
+            tt.SetToolTip(btnUp, "Click to map the next item in the time periods list");
+            tt.SetToolTip(btnDown,"Click to map the previous item in the time periods list");
+            tt.SetToolTip(dgSheetSummary, "Distribution of values within the categories/intervals");
+            tt.SetToolTip(graphSheet, "Columnar chart of how values are distributed within the categories/intervals");
+            tt.SetToolTip(btnExport, "Export a time series of distribution of values within categories/intervals for all time periods in the list");
+            tt.SetToolTip(chkViewTimeSeriesChart, "View a 100 percent area chart of the time series");
+
+            tt.SetToolTip(btnOk, "Closes this window");
+
+
+
+
             tt.SetToolTip(btnCategorize, "Click to create categories using selected classificaton scheme");
         }
 

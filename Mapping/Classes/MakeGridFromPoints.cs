@@ -42,7 +42,6 @@ namespace FAD3.Mapping.Classes
         private static Dictionary<string, int> _sheetMapSummary = new Dictionary<string, int>();
         public static int InlandPointCount { get; internal set; }
         public static fadUTMZone UTMZone { get; set; }
-        public static bool CreateFileWithoutInlandPoints { get; set; }
         public static bool IgnoreInlandPoints { get; set; }
 
         public static int LatitudeColumn { get; set; }
@@ -122,7 +121,6 @@ namespace FAD3.Mapping.Classes
                     sfExtent.DefaultDrawingOptions.FillVisible = false;
                     sfExtent.DefaultDrawingOptions.LineWidth = 1.5f;
                     sfExtent.DefaultDrawingOptions.LineColor = new Utils().ColorByName(tkMapColor.DarkBlue);
-                    // MapControl.Redraw();
                     MapLayersHandler.MapControl.Redraw();
                 }
             }
@@ -131,7 +129,6 @@ namespace FAD3.Mapping.Classes
         public static void Cleanup()
         {
             _extents = null;
-            //Reset(gridPointLayerHandle, gridMeshPointLayerHandle);
             Reset();
             if (_mapControl != null)
             {
@@ -1043,7 +1040,8 @@ namespace FAD3.Mapping.Classes
                         {
                             //if cell is inland (CellValue[_ifldInlandColumn, n].ToString() == "T")
                             //then make the parameter column value  null
-                            if (_meshShapeFile.CellValue[_ifldInlandColumn, n].ToString() == "T")
+                            if (_ifldInlandColumn>=0 
+                                && _meshShapeFile.CellValue[_ifldInlandColumn, n].ToString() == "T")
                             {
                                 _meshShapeFile.EditCellValue(_ifldDateColumn, n, null);
                                 _meshShapeFile.ShapeCategory2[n] = "nullCategory";

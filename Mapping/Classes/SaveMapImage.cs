@@ -248,7 +248,7 @@ namespace FAD3
         ///Creates a mask that will hide features that fall outside the extent of the fishing grid
         /// </summary>
         /// <returns></returns>
-        private void set_Mask()
+        private void SetMask()
         {
             _shapeFileMask = new Shapefile();
             var sf = new Shapefile();
@@ -301,47 +301,63 @@ namespace FAD3
             //we now compute the width (w) that corresponds to a map whose width fits the required dpi
             var ext = _axMap.Extents;
             var w = ((double)_axMap.Width) * ((double)_dpi / 96);
-
-            //create an image whose width (w) will result in a map whose width in pixels fits the the required dpi
-            var img = _axMap.SnapShot3(ext.xMin, ext.xMax, ext.yMax, ext.yMin, (int)w);
-
-            //restore the map to its previous state by removing the mask and setting Reset to true
-            if (handleMask != null) MapLayersHandler.RemoveLayer((int)handleMask);
-            Reset = true;
-            AdjustFeatureSize();
-
-            if (_saveToTempFile)
+            bool proceed = true;
+            Image img = new Image();
+            try
             {
-                _fileName = $@"{global.AppPath}\tempMap.jpg";
-                global.ListTemporaryFile(_fileName);
-                if (img.Save(_fileName))
+                //create an image whose width (w) will result in a map whose width in pixels fits the the required dpi
+                img = _axMap.SnapShot3(ext.xMin, ext.xMax, ext.yMax, ext.yMin, (int)w);
+            }
+            catch(System.Runtime.InteropServices.COMException comex)
+            {
+                Logger.Log(comex.Message, "SaveMapImage.cs", "SaveMapHelper");
+                proceed = false;
+            }
+
+            if (proceed)
+            {
+                //restore the map to its previous state by removing the mask and setting Reset to true
+                if (handleMask != null) MapLayersHandler.RemoveLayer((int)handleMask);
+                Reset = true;
+                AdjustFeatureSize();
+
+                if (_saveToTempFile)
                 {
-                    return true;
+                    _fileName = $@"{global.AppPath}\tempMap.jpg";
+                    global.ListTemporaryFile(_fileName);
+                    if (img.Save(_fileName))
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        _fileName = $@"{global.AppPath}\tempMap1.jpg";
+                        return img.Save(_fileName);
+                    }
                 }
                 else
                 {
-                    _fileName = $@"{global.AppPath}\tempMap1.jpg";
-                    return img.Save(_fileName);
+                    //specify filename of projection file for the image
+                    var prjFileName = _fileName.Replace(Path.GetExtension(_fileName), ".prj");
+
+                    //save the image to disk and create a worldfile. Image format is specified by USE_FILE_EXTENSION.
+                    //also save the projection file
+                    if (img.Save(_fileName, WriteWorldFile: true, FileType: ImageType.USE_FILE_EXTENSION) && _axMap.GeoProjection.WriteToFile(prjFileName))
+                    {
+                        //show the image file using the default image viewer
+                        if (PreviewImage) Process.Start(_fileName);
+                        img = null;
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
             }
             else
             {
-                //specify filename of projection file for the image
-                var prjFileName = _fileName.Replace(Path.GetExtension(_fileName), ".prj");
-
-                //save the image to disk and create a worldfile. Image format is specified by USE_FILE_EXTENSION.
-                //also save the projection file
-                if (img.Save(_fileName, WriteWorldFile: true, FileType: ImageType.USE_FILE_EXTENSION) && _axMap.GeoProjection.WriteToFile(prjFileName))
-                {
-                    //show the image file using the default image viewer
-                    if (PreviewImage) Process.Start(_fileName);
-                    img = null;
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                return false;
             }
         }
 
@@ -404,7 +420,7 @@ namespace FAD3
             }
 
             //add a mask to the map control
-            set_Mask();
+            SetMask();
             var handleMask = MapLayersHandler.AddLayer(_shapeFileMask, "Grid mask", true, false);
 
             //move the mask layer to the top

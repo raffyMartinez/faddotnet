@@ -436,6 +436,7 @@ namespace FAD3
                             break;
                     }
 
+
                     if (ShapefileDiskStorageHelper.Delete(fileName))
                     {
                         var result = ml.Save(fileName);

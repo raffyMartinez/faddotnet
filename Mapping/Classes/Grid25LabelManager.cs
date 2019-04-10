@@ -429,7 +429,7 @@ namespace FAD3
 
                         //Major grid labels
                         case "MG":
-                            c.Expression = $@"[Location] =  ""MG""";
+                            c.Expression = @"[Location] =  ""MG""";
                             c.FontSize = (int)_labelPropertiesDictionary["majorGridLabelSize"];
                             c.FontBold = true;
                             c.FontColor = (uint)_labelPropertiesDictionary["majorGridLabelColor"];

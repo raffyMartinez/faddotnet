@@ -11,6 +11,7 @@ using FAD3.Database.Classes;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using FAD3.GUI.Classes;
 
 namespace FAD3
 {
@@ -180,10 +181,44 @@ namespace FAD3
             {
                 ShowTargetAreaProperties();
             }
+            SetupTooltips();
             txtName.Focus();
         }
 
-        private void LoadGrid25Items(ListView lv)
+        private void SetupTooltips()
+        {
+            // Create the ToolTip and associate with the Form container.
+            ToolTip tt = new ToolTip();
+
+            // Set up the delays for the ToolTip.
+            tt.AutoPopDelay = TooltipGlobal.AutoPopDelay;
+            tt.InitialDelay = TooltipGlobal.InitialDelay;
+            tt.ReshowDelay = TooltipGlobal.ReshowDelay;
+
+            // Force the ToolTip text to be displayed whether or not the form is active.
+            tt.ShowAlways = TooltipGlobal.ShowAlways;
+
+            // Set up the ToolTip text for the Button and Checkbox.
+            tt.SetToolTip(txtName, "Name of the target area");
+            tt.SetToolTip(txtCode, "Target area code of 1 to 5 characters long");
+            tt.SetToolTip(comboUTMZone, "UTM zone where the target area is found.\r\nSelect 50N if target area is located in Palawan\r\nSelect 51N if target areas is located in the rest of the Philippines");
+            tt.SetToolTip(comboSubGrid, "Select subgrid style\r\n-None\r\n-4 subgrids (1000x1000 meters)\r\n-9 subgrids (666 x 666 meters)");
+            tt.SetToolTip(lvMaps, "List of fishing ground maps that will be used in the target area\r\n"+
+                                    "To add a map, click on the + button\r\n"+
+                                    "To remove a map, click on the - button\r\n"+
+                                    "To edit a map, couble click on the map name");
+            tt.SetToolTip(buttonAddMap,"Click to add a fishing ground map to the target area");
+            tt.SetToolTip(buttonRemoveMap, "Click to remove a fishing ground map from the target area");
+            tt.SetToolTip(buttonOK, "Closes the form and saves the target area");
+            tt.SetToolTip(buttonCancel, "Closes the form without saving the target area");
+            tt.SetToolTip(tabAOI, "Page for setting up a target area to use the Grid25 system");
+            tt.SetToolTip(tabOtherGrid, "Page for setting up target areas using the older grid system.\r\n" +
+                                        "This is not used creating new target areas in FAD3");
+            tt.SetToolTip(tabMBR, "Page for setting up the MBR (minimum bounding rectangle of a target area");
+            tt.SetToolTip(buttonDefine, "Click to setup a grid system not using Grid25\r\nThis is not used for new target areas in FAD3");
+        }
+
+            private void LoadGrid25Items(ListView lv)
         {
             lv.Items.Clear();
             if (FishingGrid.GridType == fadGridType.gridTypeGrid25)
@@ -408,10 +443,17 @@ namespace FAD3
                     break;
 
                 case "buttonRemoveMap":
-                    var itemText = lvMaps.SelectedItems[0].Text;
-                    if (FishingGrid.DeleteFishingGroundMap(itemText, _targetArea.TargetAreaGuid))
+                    if (lvMaps.SelectedItems.Count == 0)
                     {
-                        lvMaps.Items.RemoveByKey(itemText);
+                        MessageBox.Show("Select a fishing ground map in the list", "No map was selected", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        var itemText = lvMaps.SelectedItems[0].Text;
+                        if (FishingGrid.DeleteFishingGroundMap(itemText, _targetArea.TargetAreaGuid))
+                        {
+                            lvMaps.Items.RemoveByKey(itemText);
+                        }
                     }
                     break;
             }

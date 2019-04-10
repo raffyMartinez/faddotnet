@@ -981,9 +981,9 @@
             this.label15.AutoSize = true;
             this.label15.Location = new System.Drawing.Point(2, 9);
             this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(40, 13);
+            this.label15.Size = new System.Drawing.Size(67, 13);
             this.label15.TabIndex = 25;
-            this.label15.Text = "Sheets";
+            this.label15.Text = "Time periods";
             // 
             // btnOk
             // 

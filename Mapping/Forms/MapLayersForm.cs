@@ -258,7 +258,7 @@ namespace FAD3
             itemAlwaysKeepOnTop.Visible = global.MappingMode == fad3MappingMode.grid25Mode;
         }
 
-        private void MapLayersForm_FormClosed(object sender, FormClosedEventArgs e)
+        private void OnFormClosed(object sender, FormClosedEventArgs e)
         {
             _instance = null;
             _mapLayersHandler.LayerRead -= OnLayerRead;
@@ -317,11 +317,14 @@ namespace FAD3
         /// <param name="currentRow"></param>
         private void MarkCurrentLayerName(int currentRow)
         {
-            foreach (DataGridViewRow row in layerGrid.Rows)
+            if (layerGrid.Rows.Count > 0)
             {
-                row.Cells[1].Style.Font = new Font(Font.FontFamily.Name, Font.Size, FontStyle.Regular);
+                foreach (DataGridViewRow row in layerGrid.Rows)
+                {
+                    row.Cells[1].Style.Font = new Font(Font.FontFamily.Name, Font.Size, FontStyle.Regular);
+                }
+                layerGrid[1, currentRow].Style.Font = new Font(Font.FontFamily.Name, Font.Size, FontStyle.Bold);
             }
-            layerGrid[1, currentRow].Style.Font = new Font(Font.FontFamily.Name, Font.Size, FontStyle.Bold);
         }
 
         /// <summary>
@@ -373,10 +376,9 @@ namespace FAD3
                     switch (_mapLayersHandler.CurrentMapLayer.LayerType)
                     {
                         case "ShapefileClass":
-                            if (!_mapLayersHandler.CurrentMapLayer.IsFishingGridLayoutTemplate)
-                            {
-                                SaveTemplateToFile();
-                            }
+
+                            ExportShapefile();
+                            
                             break;
 
                         case "ImageClass":
@@ -386,6 +388,26 @@ namespace FAD3
             }
         }
 
+        private void ExportShapefile()
+        {
+            var saveAs = new SaveFileDialog();
+            saveAs.Filter = "Shapefile *.shp|*.shp|All files *.*|*.*";
+            saveAs.FilterIndex = 1;
+            if(_mapLayersHandler.CurrentMapLayer.FileName.Length==0)
+            {
+                saveAs.FileName = $"{_mapLayersHandler.CurrentMapLayer.Name}";
+            }
+            else
+            {
+                saveAs.FileName = $"{Path.GetFileName( _mapLayersHandler.CurrentMapLayer.FileName)}";
+            }
+            
+            DialogResult dr = saveAs.ShowDialog();
+            if (dr == DialogResult.OK && saveAs.FileName.Length>0)
+            {
+                _parentForm.MapLayersHandler.CurrentMapLayer.Save(saveAs.FileName);
+            }
+        }
         public void SaveTemplateToFile()
         {
             var saveAs = new SaveFileDialog();

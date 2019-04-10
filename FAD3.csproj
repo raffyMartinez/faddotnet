@@ -298,6 +298,7 @@
     <Compile Include="Database\Forms\ReportTableForm.Designer.cs">
       <DependentUpon>ReportTableForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="GUI\Classes\TooltipGlobal.cs" />
     <Compile Include="GUI\Forms\AboutFADForm2.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -315,6 +316,7 @@
     <Compile Include="Mapping\Classes\ERDDAPMetadataFiles.cs" />
     <Compile Include="Mapping\Classes\ERDDAPMetadataFile.cs" />
     <Compile Include="Mapping\Classes\ExtentDraggedBoxEventArgs.cs" />
+    <Compile Include="Mapping\Classes\Grid25GeographicDisplayHelper.cs" />
     <Compile Include="Mapping\Classes\Grid25LayoutHelper.cs" />
     <Compile Include="Mapping\Classes\Grid25LayoutHelperEventArgs.cs" />
     <Compile Include="Mapping\Classes\Grid25MinorGrid.cs" />
@@ -351,6 +353,12 @@
     </Compile>
     <Compile Include="Mapping\Forms\FileDownloadForm.Designer.cs">
       <DependentUpon>FileDownloadForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Mapping\Forms\Grid25GeographicDisplayOptionsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Mapping\Forms\Grid25GeographicDisplayOptionsForm.Designer.cs">
+      <DependentUpon>Grid25GeographicDisplayOptionsForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Mapping\Forms\Grid25SubGridForm.cs">
       <SubType>Form</SubType>
@@ -837,6 +845,9 @@
     <EmbeddedResource Include="Mapping\Forms\FileDownloadForm.resx">
       <DependentUpon>FileDownloadForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Mapping\Forms\Grid25GeographicDisplayOptionsForm.resx">
+      <DependentUpon>Grid25GeographicDisplayOptionsForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Mapping\Forms\Grid25SubGridForm.resx">
       <DependentUpon>Grid25SubGridForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -1077,6 +1088,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="FAD3.ico" />
+    <None Include="Resources\Settings_12x_16x.png" />
+    <None Include="Resources\removel_l.bmp" />
     <None Include="Resources\label+.bmp" />
     <None Include="Resources\label-.bmp" />
     <None Include="Resources\right arrow.bmp" />
@@ -1145,6 +1158,7 @@
     <None Include="Resources\BigProp.png" />
     <None Include="Resources\2Rows2Columns_16x.png" />
     <None Include="Resources\apply grid.bmp" />
+    <None Include="Resources\add_l.bmp" />
     <Content Include="Resources\BigProp.bmp" />
     <None Include="Resources\Cancel_16x.bmp" />
     <Content Include="Resources\clear_selection.bmp" />
