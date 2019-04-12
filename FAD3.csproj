@@ -336,6 +336,12 @@
     <Compile Include="GUI\Forms\DisplayCopyableTextForm.Designer.cs">
       <DependentUpon>DisplayCopyableTextForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Mapping\Forms\BatchExportMapSettingsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Mapping\Forms\BatchExportMapSettingsForm.Designer.cs">
+      <DependentUpon>BatchExportMapSettingsForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Mapping\Forms\ERDDAPSelectDatasetForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -835,6 +841,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Forms\GraphForm.resx">
       <DependentUpon>GraphForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Mapping\Forms\BatchExportMapSettingsForm.resx">
+      <DependentUpon>BatchExportMapSettingsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Mapping\Forms\ERDDAPSelectDatasetForm.resx">
       <DependentUpon>ERDDAPSelectDatasetForm.cs</DependentUpon>

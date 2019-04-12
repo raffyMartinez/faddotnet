@@ -69,6 +69,15 @@ namespace FAD3
             }
         }
 
+        public void Refresh()
+        {
+            _mapLayerDictionary.Clear();
+            for(int n=0; n<_axmap.NumLayers;n++)
+            {
+                //MapLayer ml = new MapLayer()
+            }
+        }
+
         public void MoveToTop()
         {
             _axmap.MoveLayerTop(_axmap.get_LayerPosition(_currentMapLayer.Handle));
@@ -406,7 +415,7 @@ namespace FAD3
             for (int n = 0; n < _axmap.NumLayers; n++)
             {
                 var h = _axmap.get_LayerHandle(n);
-                if (_mapLayerDictionary[h].VisibleInLayersUI)
+                if (_mapLayerDictionary.ContainsKey(h) && _mapLayerDictionary[h].VisibleInLayersUI)
                 {
                     //if there is a listener to the event
                     if (LayerRead != null)
@@ -464,6 +473,7 @@ namespace FAD3
 
                 _axmap.RemoveLayer(layerHandle);
                 _axmap.Redraw();
+                
 
                 //fire the layer deleted event
                 if (LayerRemoved != null)
@@ -547,7 +557,7 @@ namespace FAD3
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public (bool success, string errMsg) FileOpenHandler(string fileName, string layerName = "")
+        public (bool success, string errMsg) FileOpenHandler(string fileName, string layerName = "", bool reproject =false)
         {
             var success = false;
             var errMsg = "";
@@ -568,6 +578,15 @@ namespace FAD3
                         success = shapefile != null;
                         if (success)
                         {
+                            if(reproject)
+                            {
+                                int reprojectCount = 0;
+                                var sf= shapefile.Reproject(MapControl.GeoProjection, reprojectCount);
+                                if(reprojectCount>0 || sf.NumShapes>0)
+                                {
+                                    shapefile = sf;
+                                }
+                            }
                             if (AddLayer(shapefile, layerName) < 0)
                             {
                                 success = false;

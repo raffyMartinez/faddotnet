@@ -410,6 +410,7 @@ namespace FAD3
                     if (kv.Value.KeepOnTop)
                     {
                         layersOnTop.Add(_axMap.get_LayerPosition(kv.Value.Handle));
+                        //kv.Value.Labels.VerticalPosition = tkVerticalPosition.vpAboveAllLayers;
                     }
                 }
             }

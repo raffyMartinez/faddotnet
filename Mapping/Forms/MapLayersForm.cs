@@ -230,14 +230,17 @@ namespace FAD3
 
         private int CurrentLayerRow()
         {
-            int currentLayerHandle = _mapLayersHandler.CurrentMapLayer.Handle;
-            foreach(DataGridViewRow item in layerGrid.Rows)
+            if (_mapLayersHandler.CurrentMapLayer != null)
             {
-                if((int)item.Cells[0].Tag==currentLayerHandle)
+                int currentLayerHandle = _mapLayersHandler.CurrentMapLayer.Handle;
+                foreach (DataGridViewRow item in layerGrid.Rows)
                 {
-                    return item.Index;
-                }
+                    if ((int)item.Cells[0].Tag == currentLayerHandle)
+                    {
+                        return item.Index;
+                    }
 
+                }
             }
             return 0;
         }
@@ -255,7 +258,7 @@ namespace FAD3
 
             layerGrid.DefaultCellStyle.SelectionBackColor = SystemColors.Window;
             layerGrid.DefaultCellStyle.SelectionForeColor = SystemColors.WindowText;
-            itemAlwaysKeepOnTop.Visible = global.MappingMode == fad3MappingMode.grid25Mode;
+            //itemAlwaysKeepOnTop.Visible = global.MappingMode == fad3MappingMode.grid25Mode;
         }
 
         private void OnFormClosed(object sender, FormClosedEventArgs e)
@@ -299,9 +302,9 @@ namespace FAD3
                 MarkCurrentLayerName(e.RowIndex);
                 _mapLayersHandler.set_MapLayer(_layerHandle);
                 itemConvertToGrid25.Enabled = false;
+                itemAlwaysKeepOnTop.Checked = _mapLayersHandler.CurrentMapLayer.KeepOnTop;
                 if (global.MappingMode == fad3MappingMode.grid25Mode)
                 {
-                    itemAlwaysKeepOnTop.Checked = _mapLayersHandler.CurrentMapLayer.KeepOnTop;
                     if (_mapLayersHandler.CurrentMapLayer.LayerType == "ShapefileClass")
                     {
                         var sf = _mapLayersHandler.CurrentMapLayer.LayerObject as Shapefile;

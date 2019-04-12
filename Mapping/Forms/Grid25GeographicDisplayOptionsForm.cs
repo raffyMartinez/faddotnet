@@ -15,15 +15,26 @@ namespace FAD3.Mapping.Forms
         public int MinorGridFontSize { get; set; }
         public double MinorGridDistance { get; set; }
         public int MajorGridFontSize { get; set; }
+        public bool MinorGridBoldLabels { get; set; }
         public bool ShowSubgrid { get; set; }
+        public bool MajorGridBoldLabels { get; set; }
 
 
-        public Grid25GeographicDisplayOptionsForm(int minorGridFontSize, double minorGridDistance, int majorGridFontSize, bool showSubgrid)
+        public Grid25GeographicDisplayOptionsForm(
+            int minorGridFontSize, 
+            double minorGridDistance, 
+            int majorGridFontSize, 
+            bool showSubgrid,
+            bool minorGridLabelBold,
+            bool majorGridLabelBold)
         {
             MinorGridFontSize = minorGridFontSize;
             MinorGridDistance = minorGridDistance;
             MajorGridFontSize = majorGridFontSize;
             ShowSubgrid = showSubgrid;
+            MinorGridBoldLabels= minorGridLabelBold;
+            MajorGridBoldLabels = majorGridLabelBold;
+
             InitializeComponent();
         }
 
@@ -39,6 +50,8 @@ namespace FAD3.Mapping.Forms
                         MinorGridFontSize = int.Parse(txtMinorGridLabelSize.Text);
                         MajorGridFontSize = int.Parse(txtMajorGridLabelSize.Text);
                         ShowSubgrid = chkShowSubgrids.Checked;
+                        MinorGridBoldLabels = chkMinorGridBoldLabels.Checked;
+                        MajorGridBoldLabels = chkMajorGridBoldLabels.Checked;
                         DialogResult = DialogResult.OK;
                     }
                     else
@@ -68,6 +81,8 @@ namespace FAD3.Mapping.Forms
             txtMajorGridLabelSize.Text = MajorGridFontSize.ToString();
             txtMinorGridLabelSize.Text = MinorGridFontSize.ToString();
             chkShowSubgrids.Checked = ShowSubgrid;
+            chkMinorGridBoldLabels.Checked = MinorGridBoldLabels;
+            chkMajorGridBoldLabels.Checked = MajorGridBoldLabels;
         }
 
         private void OnFieldValidating(object sender, CancelEventArgs e)

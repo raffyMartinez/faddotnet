@@ -34,6 +34,7 @@ namespace FAD3.Mapping.Classes
         private float _minorGridThickness;
         private uint _minorGridLabelColor;
         private bool _minorGridLabelFontBold;
+        private bool _majorGridLabelFontBold;
         private float _minorGridLabelDistance;
         private uint _minorGridLineColor;
         //private int _minorGridLabelWrapped;
@@ -45,6 +46,16 @@ namespace FAD3.Mapping.Classes
         private double _minorGridOffsetDistance;
         private bool _gridStateFinishedReading;
         public bool SubgridsVisible { get; set; }
+        public bool MinorGridLableFontBold
+        {
+            get { return _minorGridLabelFontBold; }
+            set { _minorGridLabelFontBold = value; }
+        }
+        public bool MajorGridLableFontBold
+        {
+            get { return _majorGridLabelFontBold; }
+            set { _majorGridLabelFontBold = value; }
+        }
         public double MinorGridOffsetDistance
         {
             get { return _minorGridOffsetDistance; }
@@ -62,6 +73,10 @@ namespace FAD3.Mapping.Classes
             get { return _minorGridLabelSize; }
             set { _minorGridLabelSize = value; }
         }
+        public void SetMapExtents(Extents extents)
+        {
+            _mapcontrol.Extents = extents;
+        }
 
         public int MajorGridFontSize
         {
@@ -72,7 +87,22 @@ namespace FAD3.Mapping.Classes
         public Shapefile MBR { get; internal set; }
         private AxMap _mapcontrol;
 
+        public void LockMap()
+        {
+            //_mapcontrol.Visible = false;
+            _mapcontrol.LockWindow(tkLockMode.lmLock);
+        }
 
+        public void UnlockMap()
+        {
+            _mapcontrol.LockWindow(tkLockMode.lmUnlock);
+            //_mapcontrol.Visible = true;
+        }
+
+        public void RedrawNap()
+        {
+            _mapcontrol.Redraw();
+        }
 
         private void ResetGrid()
         {
@@ -88,7 +118,7 @@ namespace FAD3.Mapping.Classes
             set
             {
                 _selectedLayoutCell = value;
-                RemoveGrid25Layers();
+                //RemoveGrid25Layers();
                 AddSelectedLayoutGrid(_selectedLayoutCell);
             }
         }
@@ -105,8 +135,8 @@ namespace FAD3.Mapping.Classes
         private bool AddSelectedLayoutGrid(string layoutCellName)
         {
             _grid25Layers.Clear();
-            _grid25Layers.Add("Minor grids", $"{layoutCellName}_gridlines.shp");
-            _grid25Layers.Add("Major grids", $"{layoutCellName}_majorgrid.shp");
+            _grid25Layers.Add("Minor grid", $"{layoutCellName}_gridlines.shp");
+            _grid25Layers.Add("Major grid", $"{layoutCellName}_majorgrid.shp");
             _grid25Layers.Add("Labels", $"{layoutCellName}_gridlabels.shp");
             _grid25Layers.Add("MBR", $"{layoutCellName}_gridboundary.shp");
 
@@ -134,6 +164,7 @@ namespace FAD3.Mapping.Classes
                                 _majorGridLabelSize = int.Parse(xmlReader.GetAttribute("majorGridLabelSize"));
                                 _majorGridLabelColor = uint.Parse(xmlReader.GetAttribute("majorGridLabelColor"));
                                 _minorGridLabelSize = int.Parse(xmlReader.GetAttribute("minorGridLabelSize"));
+                                _majorGridLabelFontBold = false;
                                 break;
 
                         }
@@ -143,25 +174,25 @@ namespace FAD3.Mapping.Classes
             }
 
             var sf = new Shapefile();
-            string file = $@"{SourceFolder}\{_grid25Layers["Minor grids"]}";
+            string file = $@"{SourceFolder}\{_grid25Layers["Minor grid"]}";
             if (File.Exists(file) && sf.Open(file))
             {
-                _hMinorGrid = MapLayersHandler.AddLayer(sf, "Minor grids");
+                _hMinorGrid = MapLayersHandler.AddLayer(sf, "Minor grid",true,true);
 
 
 
                 sf = new Shapefile();
-                file = $@"{SourceFolder}\{_grid25Layers["Major grids"]}";
+                file = $@"{SourceFolder}\{_grid25Layers["Major grid"]}";
                 if (File.Exists(file) && sf.Open(file))
                 {
-                    _hMajorGrid = MapLayersHandler.AddLayer(sf, "Major grids");
+                    _hMajorGrid = MapLayersHandler.AddLayer(sf, "Major grid",true,true);
                 }
 
                 sf = new Shapefile();
                 file = $@"{SourceFolder}\{_grid25Layers["Labels"]}";
                 if (File.Exists(file) && sf.Open(file))
                 {
-                    _hGridLabels = MapLayersHandler.AddLayer(sf, "Labels");
+                    _hGridLabels = MapLayersHandler.AddLayer(sf, "Labels",true,true);
                     int reprojectedCount = 0;
                     MBR = sf.Reproject(_mapcontrol.GeoProjection, ref reprojectedCount);
                 }
@@ -170,7 +201,7 @@ namespace FAD3.Mapping.Classes
                 file = $@"{SourceFolder}\{_grid25Layers["MBR"]}";
                 if (File.Exists(file) && sf.Open(file))
                 {
-                    _hMBR = MapLayersHandler.AddLayer(sf, "MBR");
+                    _hMBR = MapLayersHandler.AddLayer(sf, "MBR",true,true);
                 }
 
 
@@ -211,12 +242,12 @@ namespace FAD3.Mapping.Classes
             sf.DefaultDrawingOptions.PointSize = 0;
             sf.DefaultDrawingOptions.LineVisible = false;
             sf.DefaultDrawingOptions.FillColor = new Utils().ColorByName(tkMapColor.White);
-
             sf.Labels.Alignment = tkLabelAlignment.laCenter;
             sf.Labels.FrameVisible = false;
             sf.Labels.AutoOffset = false;
             sf.Labels.AvoidCollisions = false;
             sf.Labels.Visible = true;
+            sf.Labels.FontBold = _minorGridLabelFontBold;
             //sf.Labels.Expression = "[Label]";
             sf.Labels.Generate("[Label]",tkLabelPositioning.lpCentroid,false);
 
@@ -224,7 +255,7 @@ namespace FAD3.Mapping.Classes
             var lc= sf.Labels.AddCategory("majorGrid");
             lc.Expression = @"[Location]=""MG""";
             lc.FontSize = _majorGridLabelSize;
-            lc.FontBold = true;
+            lc.FontBold = _majorGridLabelFontBold;
             lc.FontColor = _majorGridLabelColor;
 
             lc = sf.Labels.AddCategory("title");
