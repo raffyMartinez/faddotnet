@@ -536,17 +536,6 @@ namespace FAD3.Database.Forms
         {
             Debug.WriteLine($"{GetType().Name} {MethodBase.GetCurrentMethod().Name} {DateTime.Now.ToString()}");
             FillHeaderRows();
-            //listResults.Columns.Add("Local names");
-            SizeColumns(listResults);
-            //foreach (ListViewItem lvi in listResults.Items)
-            //{
-            //    var localNames = "";
-            //    foreach (var name in _inventory.GetGearLocalNamesInventory(lvi.Name))
-            //    {
-            //        localNames += name + ", ";
-            //    }
-            //    lvi.SubItems.Add(localNames.Trim(new char[] { ',', ' ' }));
-            //}
             SizeColumns(listResults, false);
         }
 
@@ -848,8 +837,6 @@ namespace FAD3.Database.Forms
 
                     if (fileName.Length > 0)
                     {
-                        //Logger.Log($"Gear inventory tabular form Exporting inventory to file: {fileName}");
-                        Debug.WriteLine($"Gear inventory tabular form Exporting inventory to file: {fileName}");
                         switch (Path.GetExtension(fileName))
                         {
                             case ".txt":

@@ -86,7 +86,6 @@ namespace FAD3.Database.Forms
         private void SetMunicipalitiesCombo(long ProvNo)
         {
             global.MunicipalitiesFromProvinceNo(ProvNo);
-            //comboBox2.Items.Clear();
             comboMunicipality.DataSource = new BindingSource(global.MunicipalitiesDictionary, null);
             comboMunicipality.DisplayMember = "Value";
             comboMunicipality.ValueMember = "Key";
@@ -183,11 +182,9 @@ namespace FAD3.Database.Forms
             {
                 //setup listview of history of cpue
 
-                //int fiveyearCount = 0;
                 int year = DateTime.Now.Year;
                 year = 2021;
                 int decadeNow = (year / 10) * 10;
-                //for (int y = 0; y < 10; y++)
                 ListViewItem lvi;
                 while (decadeNow > 1930)
                 {
@@ -195,38 +192,6 @@ namespace FAD3.Database.Forms
                     lvi = listViewHistoryCpue.Items.Add(decadeNow.ToString(), decadeNow.ToString() + "s", null);
                     lvi.Tag = decadeNow;
                 }
-                //int halfDecadeNow = (year / 5) * 5;
-                //var lustrumText = halfDecadeNow.ToString();
-                //bool adjusted = false;
-                //for (int y = 0; y < 16; y++)
-                //while (halfDecadeNow > 1920)
-                //{
-                //    if (fiveyearCount >= 4)
-                //    {
-                //        if (((double)halfDecadeNow / 10) == halfDecadeNow / 10)
-                //        {
-                //            if (!adjusted)
-                //            {
-                //                halfDecadeNow -= 10;
-                //                lustrumText = halfDecadeNow.ToString();
-                //                adjusted = true;
-                //            }
-                //            listViewHistoryCpue.Items.Add(lustrumText, lustrumText + "s", null);
-                //        }
-
-                //        if (((double)halfDecadeNow / 10) != halfDecadeNow / 10 && fiveyearCount < 5)
-                //        {
-                //            listViewHistoryCpue.Items.Add(lustrumText, $"{lustrumText} - {(halfDecadeNow - 5).ToString()}", null);
-                //        }
-                //    }
-                //    else
-                //    {
-                //        listViewHistoryCpue.Items.Add(lustrumText, $"{lustrumText} - {(halfDecadeNow - 5).ToString()}", null);
-                //    }
-                //    halfDecadeNow -= 5;
-                //    lustrumText = halfDecadeNow.ToString();
-                //    fiveyearCount++;
-                //}
             }
             else
             {
@@ -366,7 +331,6 @@ namespace FAD3.Database.Forms
                 && chkListBoxMonthsSeason.CheckedItems.Count > 0
                 && chkListBoxMonthsUsed.CheckedItems.Count > 0
                 && listBoxDominantCatch.Items.Count > 0;
-            //&& txtDominantPercentage.Text.Length > 0;
 
             if (proceed)
             {
@@ -637,13 +601,6 @@ namespace FAD3.Database.Forms
                     {
                         foreach (ListViewItem lvi in listViewHistoryCpue.Items)
                         {
-                            //if (lvi.Text == item.decade.ToString() + "s")
-                            //{
-                            //    lvi.SubItems.Add(item.cpue.ToString());
-                            //    lvi.SubItems.Add(item.unit);
-                            //    break;
-                            //}
-
                             if (lvi.Name == item.decade.ToString())
                             {
                                 lvi.SubItems.Add(item.cpue.ToString());
@@ -1368,7 +1325,6 @@ namespace FAD3.Database.Forms
                     gearKey = ((KeyValuePair<string, string>)cboGearClass.SelectedItem).Key;
                     SetGearVariationsCombo(gearKey);
                     cboGearVariation.SelectedIndex = 0;
-                    //_gearVariationKey = ((KeyValuePair<string, string>)cboGearVariation.SelectedItem).Key;
                     break;
 
                 case "cboGearVariation":
@@ -1568,7 +1524,6 @@ namespace FAD3.Database.Forms
             pnlGear.Location = pnlInventory.Location;
             pnlBarangay.Location = pnlInventory.Location;
             pnlBarangay.Size = pnlGear.Size;
-            //tabsBarangayData.Location = tabsGear.Location;
             tabsBarangayData.Top = cboGearClass.Top;
             lblCurrentSitio.Location = lblLocation.Location;
 

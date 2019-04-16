@@ -312,8 +312,6 @@ namespace FAD3.Mapping.Forms
                 blend.Colors[1] = clr; blend.Positions[1] = 1.0f;
                 _schemes.Add(blend);
             }
-
-            //int index = (_colorSchemes.Type == ColorSchemeType.Layer) ? 1 : 0;
             int index = 0;
             for (int i = index; i < listBox1.Items.Count; i++)
             {

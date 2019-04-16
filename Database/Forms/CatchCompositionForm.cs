@@ -415,14 +415,6 @@ namespace FAD3
             _row++;
         }
 
-        private void OnTextBoxKeyUp(object sender, KeyEventArgs e)
-        {
-            //if (e.KeyCode == Keys.Return)
-            //{
-            //    e.Handled = e.SuppressKeyPress = true;
-            //}
-        }
-
         private void OncboEditoe_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
         {
             if (e.KeyData == Keys.Tab)
@@ -437,7 +429,6 @@ namespace FAD3
             if (e.KeyCode == Keys.Return)
             {
                 GetTextBox(_cboEditor, GetNext: true).Focus();
-                //e.Handled = e.SuppressKeyPress = true;
             }
             else if (e.KeyCode == Keys.Escape)
             {
@@ -646,9 +637,6 @@ namespace FAD3
                 if (_newGenus.Length > 0)
                 {
                     _comboGenus.Items.Add(_newGenus);
-                    //var item = new KeyValuePair<string, string>(acceptedNewGuid, acceptedSpecies);
-                    //_comboSpecies.Items.Add(item);
-                    //_cboEditor.Items.Add(item);
                 }
             }
             _newGenus = "";
@@ -751,9 +739,6 @@ namespace FAD3
                     _cboEditor.SelectionStart = 0;
                     _cboEditor.SelectionLength = _cboEditor.Text.Length;
                 }
-
-                //_cboEditor.SelectionLength = _cboEditor.Text.Length;
-
                 SetEditorEvents();
             }
         }
@@ -1498,7 +1483,6 @@ namespace FAD3
             t.GotFocus += OnTextBoxGotFocus;
             t.Validating += OnTextBoxValidating;
             t.TextChanged += OnTextBoxChanged;
-            t.KeyUp += OnTextBoxKeyUp;
             t.KeyPress += OnTextBoxKeyPress;
             t.DoubleClick += OnTextBoxDoubleClick;
         }

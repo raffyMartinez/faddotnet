@@ -58,7 +58,8 @@ namespace FAD3.Mapping.Forms
             tt.SetToolTip(btnDownload, "Click to download selected dataset");
             tt.SetToolTip(btnOk, "Click of close the form");
         }
-            private void OnExtentDefined(object sender, ExtentDraggedBoxEventArgs e)
+
+        private void OnExtentDefined(object sender, ExtentDraggedBoxEventArgs e)
         {
             txtMaxLat.Text = e.Top.ToString();
             txtMinLat.Text = e.Bottom.ToString();
@@ -68,7 +69,6 @@ namespace FAD3.Mapping.Forms
             _selectionExtent.SetBounds(e.Left, e.Bottom, 0, e.Right, e.Top, 0);
             if (!e.InDrag)
             {
-                //MakeGridFromPoints.MapLayersHandler = global.MappingForm.MapLayersHandler;
                 MakeGridFromPoints.MakeExtentShapeFile();
             }
         }
@@ -117,7 +117,6 @@ namespace FAD3.Mapping.Forms
                                 double.Parse(txtMaxLon.Text),
                                 double.Parse(txtMaxLat.Text),
                                 0);
-                            //MakeGridFromPoints.MapLayersHandler = global.MappingForm.MapLayersHandler;
                             MakeGridFromPoints.SetDataSetExtent(_selectionExtent);
                             MakeGridFromPoints.MakeExtentShapeFile();
                         }
@@ -276,7 +275,6 @@ namespace FAD3.Mapping.Forms
             {
                 case "btnCreateExtent":
 
-                    //MakeGridFromPoints.MapLayersHandler = global.MappingForm.MapLayersHandler;
                     MakeGridFromPoints.MakeExtentShapeFile();
 
                     break;

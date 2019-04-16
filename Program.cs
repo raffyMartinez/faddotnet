@@ -27,17 +27,23 @@ namespace FAD3
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            global.TestRequiredFilesExists();
-            try
+            if (global.TestRequiredFilesExists())
             {
-                Application.Run(new MainForm());
-                global.Cleanup();
-            }
-            catch (ObjectDisposedException) { }
-            //TODO: error when closing the file when file close on the menu bar is used
+                try
+                {
+                    Application.Run(new MainForm());
+                    global.Cleanup();
+                }
+                catch (ObjectDisposedException) { }
+                //TODO: error when closing the file when file close on the menu bar is used
 
-            //System.ObjectDisposedException: 'Cannot access a disposed object.
-            //Object name: 'ToolStripDropDownMenu'.'
+                //System.ObjectDisposedException: 'Cannot access a disposed object.
+                //Object name: 'ToolStripDropDownMenu'.'
+            }
+            else
+            {
+                Logger.Log("Not all required files were found. Application will not run");
+            }
         }
     }
 }

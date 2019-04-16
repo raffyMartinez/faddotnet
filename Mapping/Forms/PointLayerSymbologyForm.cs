@@ -97,7 +97,6 @@ namespace FAD3
 
             //appearance
             comboLineWidth.SelectedIndex = (int)_options.LineWidth - 1;
-            //udTransparency.SetValue(_options.FillTransparency);
             transpFillColor.Value = (byte)_options.FillTransparency;
             chkFillVisible.Checked = _options.FillVisible;
             chkOutlineVisible.Checked = _options.LineVisible;
@@ -201,7 +200,6 @@ namespace FAD3
 
             _options.PointSize = (float)udSize.Value;
             _options.PointRotation = (double)udRotation.Value;
-            //_options.FillTransparency = (float)udTransparency.Value;
             _options.FillTransparency = (float)transpFillColor.Value;
             _options.PointSidesCount = (int)udNumberOfSides.Value;
             _options.PointSidesRatio = (float)udSideRatio.Value / 10;

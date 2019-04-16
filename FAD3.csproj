@@ -316,6 +316,7 @@
     <Compile Include="Mapping\Classes\ERDDAPMetadataFiles.cs" />
     <Compile Include="Mapping\Classes\ERDDAPMetadataFile.cs" />
     <Compile Include="Mapping\Classes\ExtentDraggedBoxEventArgs.cs" />
+    <Compile Include="Mapping\Classes\FrontAndReverseMapSpecs.cs" />
     <Compile Include="Mapping\Classes\Grid25GeographicDisplayHelper.cs" />
     <Compile Include="Mapping\Classes\Grid25LayoutHelper.cs" />
     <Compile Include="Mapping\Classes\Grid25LayoutHelperEventArgs.cs" />

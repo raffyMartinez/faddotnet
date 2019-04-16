@@ -38,6 +38,7 @@ namespace FAD3.Mapping.Classes
         public int MaxPanelWidth { get; internal set; }
         public int MaxPanelHeight { get; internal set; }
         public int LayoutMaxDimensionIndex { get; internal set; }
+
         public void SetDefineLayoutCursor(int cursorHandle)
         {
             _hCursorDefineLayout = cursorHandle;
@@ -123,7 +124,6 @@ namespace FAD3.Mapping.Classes
         /// </summary>
         public bool LayoutTemplateFromFile { get; internal set; }
 
-
         public bool SaveLayoutTemplate(string fileName)
         {
             bool success = true;
@@ -158,7 +158,6 @@ namespace FAD3.Mapping.Classes
                     using (StreamWriter writer = new StreamWriter(layoutFile, true))
                     {
                         writer.WriteLine($"Fishing ground:{ global.MappingForm.Grid25MajorGrid.LayoutHelper.FishingGround}");
-                        //writer.WriteLine($"Save folder:{global.MappingForm.Grid25MajorGrid.LayoutHelper.GridFromLayoutSaveFolder}");
                         writer.WriteLine($"Rows:{global.MappingForm.Grid25MajorGrid.LayoutHelper.Rows}");
                         writer.WriteLine($"Columns:{global.MappingForm.Grid25MajorGrid.LayoutHelper.Columns}");
                         writer.WriteLine($"Overlap:{global.MappingForm.Grid25MajorGrid.LayoutHelper.Overlap}");
@@ -316,8 +315,6 @@ namespace FAD3.Mapping.Classes
             }
         }
 
-
-
         /// <summary>
         /// opens an existing template shapefile by looking for the .lay extension
         /// </summary>
@@ -329,7 +326,6 @@ namespace FAD3.Mapping.Classes
             _sfLayout = new Shapefile();
             if (_sfLayout.Open(fileName.Replace("lay", "shp")))
             {
-                
                 _hsfLayout = _majorGrid.MapLayers.AddLayer(_sfLayout, "Layout frame", true, true);
                 if (_hsfLayout > 0)
                 {
@@ -358,7 +354,6 @@ namespace FAD3.Mapping.Classes
                     success = true;
                     LayoutTemplateFromFile = true;
                     _layoutExtents = _sfLayout.Extents;
-                    //_selectedMajorGridShapesExtent = _sfLayout.Extents;
                 }
             }
             return success;

@@ -104,7 +104,6 @@ namespace FAD3
             textLandingSiteName.Focus();
             if (_definedFromKML)
             {
-                //DefineCoordinateFormat();
                 _coordinateformat = global.CoordinateFormatCode;
                 textLandingSiteName.Text = _landingSiteName;
                 var coordinate = new Coordinate((float)_yCoordinate, (float)_xCoordinate);
@@ -261,7 +260,6 @@ namespace FAD3
         private void SetMunicipalitiesCombo(long ProvNo)
         {
             global.MunicipalitiesFromProvinceNo(ProvNo);
-            //comboBox2.Items.Clear();
             comboMunicipality.DataSource = new BindingSource(global.MunicipalitiesDictionary, null);
             comboMunicipality.DisplayMember = "Value";
             comboMunicipality.ValueMember = "Key";

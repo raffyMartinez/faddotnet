@@ -88,7 +88,6 @@ namespace FAD3
                     case ShpfileType.SHP_POINT:
                         if (sf.Categories.Count > 0)
                         {
-                            //sf.SelectionAppearance = tkSelectionAppearance.saSelectionColor;
                         }
                         else
                         {

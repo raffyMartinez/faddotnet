@@ -129,7 +129,6 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "About FAD";
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.AboutFadForm_FormClosed);
             this.Load += new System.EventHandler(this.frmAbout_Load);
             ((System.ComponentModel.ISupportInitialize)(this.axMap)).EndInit();
             this.panelUI.ResumeLayout(false);

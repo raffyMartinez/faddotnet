@@ -216,14 +216,12 @@ namespace FAD3
         {
             global.SaveFormSettings(this);
             ManageGearSpecsClass.SampledGearSpecs.Clear();
-            if (IsNew) _parentForm.NewSamplingDataEntryCancelled();
             _sampling.OnUIRowRead -= new Sampling.ReadUIElement(OnUIRowRead);
             _sampling = null;
         }
 
         private void OnUIRowRead(object sender, UIRowFromXML e)
         {
-            //Logger.Log(e.Key + " " + e.Control.ToString());
             int ht = 16;
             int x = 0;
 
@@ -616,7 +614,6 @@ namespace FAD3
         {
             this.Size = new Size(Width, _lv.Height);
             global.LoadFormSettings(this, true);
-            //_sampling = new Sampling();
             _sampling = _parentForm.Sampling;
             _sampling.OnUIRowRead += new Sampling.ReadUIElement(OnUIRowRead);
             panelUI.SuspendLayout();
@@ -725,7 +722,6 @@ namespace FAD3
                             break;
 
                         case "MaskedTextBox":
-                            // var s = "";
                             var s = ((MaskedTextBox)c).MaskCompleted ? c.Text : "";
                             EffortData.Add(c.Tag.ToString(), s);
                             break;
@@ -950,7 +946,6 @@ namespace FAD3
                     break;
 
                 case "buttonCancel":
-                    if (IsNew) _parentForm.NewSamplingDataEntryCancelled();
                     this.Close();
                     break;
             }
@@ -1100,16 +1095,6 @@ namespace FAD3
                 }
             }
 
-            ////Step 4. There should be catch weight if datetime of gear set and haul is given
-            //if (isValidated && !GearDateTimeIsEmpty)
-            //{
-            //    isValidated = (panelUI.Controls["textWeightOfCatch"].Text.Length > 0);
-            //    if (!isValidated)
-            //    {
-            //        msg = "Weight of catch could not be blank";
-            //    }
-            //}
-
             //Step 4. Weight of sample cannot be more than weight of catch
             if (isValidated && panelUI.Controls["textWeightOfCatch"].Text.Length > 0 &&
                 panelUI.Controls["textWeightOfSample"].Text.Length > 0)
@@ -1125,15 +1110,6 @@ namespace FAD3
 
             TextBox catchWt = (TextBox)panelUI.Controls["textWeightOfCatch"];
             TextBox fishingGround = (TextBox)panelUI.Controls["textFishingGround"];
-
-            ////Step 6. if catch weight is blank then confirm it
-            //if (isValidated && GearDateTimeIsEmpty && catchWt.Text.Length == 0)
-            //{
-            //    DialogResult dr = MessageBox.Show("Confirm that weight of catch is blank", "Please validate",
-            //                                       MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
-            //    isValidated = (dr == DialogResult.Yes);
-            //    if (!isValidated) catchWt.Focus();
-            //}
 
             //Step 5. If catch is not blank then confirm if fishing ground is blank
             if (isValidated && catchWt.Text.Length > 0)
@@ -1167,13 +1143,6 @@ namespace FAD3
         private void OnFieldChange(object sender, EventArgs e)
         {
             HideErrorLabels();
-            if (sender.GetType().Name == "ComboBox")
-            {
-                if (((Control)sender).Name == "comboEnumerator")
-                {
-                    //System.Diagnostics.Debugger.Break();
-                }
-            }
         }
 
         private void OnFieldValidated(object sender, EventArgs e)
@@ -1225,11 +1194,6 @@ namespace FAD3
                                     break;
 
                                 case "comboGearClass":
-                                    //_gearClassName = ((ComboBox)panelUI.Controls["comboGearClass"]).Text;
-                                    //string myAOIGUID = ((KeyValuePair<string, string>)((ComboBox)panelUI.Controls["comboTargetArea"]).SelectedItem).Key;
-                                    //targetCombo = (ComboBox)panelUI.Controls["comboFishingGear"];
-                                    //comboItems = gear.GearVariationsUsage(key, myAOIGUID);
-                                    //ChangeComboDataSource(targetCombo, comboItems);
                                     GearVariationUseRefresh();
                                     break;
 
@@ -1250,7 +1214,6 @@ namespace FAD3
             cbo.With
             (o =>
             {
-                //o.Text = "";
                 if (comboItems.Count > 0)
                 {
                     o.DataSource = new BindingSource(comboItems, null);

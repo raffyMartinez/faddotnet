@@ -1,5 +1,4 @@
-﻿//using ADOX;
-using dao;
+﻿using dao;
 using FAD3.Database.Classes;
 using HtmlAgilityPack;
 using MetaphoneCOM;
@@ -900,7 +899,6 @@ namespace FAD3
                     }
                     catch
                     {
-                        // ignore success = false;
                     }
                 }
             }
@@ -1022,11 +1020,6 @@ namespace FAD3
             return list;
         }
 
-        //public static Task<int> ImportSpeciesNamesFromHTMLAsync(string fileName, int speciesColumn)
-        //{
-        //    return Task.Run(() => ImportSpeciesNamesFromHTML(fileName, speciesColumn));
-        //}
-
         private static int ImportSpeciesNamesFromHTML(string filename, int speciesColumn)
 
         {
@@ -1034,7 +1027,6 @@ namespace FAD3
             GetAllSpecies();
             var genus = "";
             var species = "";
-            //ListFishSpecies();
             HtmlDocument doc = new HtmlDocument();
             int col = 0;
             doc.Load(filename);
@@ -1105,7 +1097,6 @@ namespace FAD3
                     using (var streamReader = new StreamReader(fileStream, Encoding.UTF8, true, BufferSize))
                     {
                         String line;
-                        //var spList = ListFishSpecies();
                         GetAllSpecies();
                         while ((line = streamReader.ReadLine()) != null)
                         {
@@ -1176,24 +1167,6 @@ namespace FAD3
             return n;
         }
 
-        //private static List<string> ListFishSpecies()
-        //{
-        //    var sql = $"SELECT Genus, species from tblAllSpecies where TaxaNo = {(int)Taxa.Fish}";
-        //    using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
-        //    {
-        //        conn.Open();
-        //        var adapter = new OleDbDataAdapter(sql, conn);
-        //        DataTable dt = new DataTable();
-        //        adapter.Fill(dt);
-        //        for (int n = 0; n < dt.Rows.Count; n++)
-        //        {
-        //            DataRow dr = dt.Rows[n];
-        //            _listSpeciesNames.Add(dr["Genus"].ToString() + " " + dr["species"].ToString());
-        //        }
-        //    }
-        //    return _listSpeciesNames;
-        //}
-
         public static Dictionary<string, string> GetSimilarSoundingLocalNames(NewFisheryObjectName newName)
         {
             Dictionary<string, string> similarNames = new Dictionary<string, string>();
@@ -1247,7 +1220,6 @@ namespace FAD3
                         success = update.ExecuteNonQuery() > 0;
                         if (success)
                         {
-                            //_listSpeciesNames.Add(genus + " " + species);
                             _allSpeciesDictionary.Add(guid, genus + " " + species);
                             _allSpeciesDictionaryReverse.Add(genus + " " + species, guid);
                         }
@@ -1285,7 +1257,6 @@ namespace FAD3
                             Success = update.ExecuteNonQuery() > 0;
                             if (Success)
                             {
-                                //_listSpeciesNames.Add(genus + " " + species);
                                 _allSpeciesDictionaryReverse.Add(genus + " " + species, nameGuid);
                                 _allSpeciesDictionary.Add(nameGuid, genus + " " + species);
                             }
@@ -1348,7 +1319,6 @@ namespace FAD3
 
         public static Dictionary<string, CatchName> RetrieveScientificNames(Dictionary<string, string> filters = null, bool selectOnlyWithRecords = false)
         {
-            //System.Windows.Forms.MessageBox.Show(MethodBase.GetCurrentMethod().DeclaringType.Name + MethodBase.GetCurrentMethod().Name);
             var catchNames = new Dictionary<string, CatchName>();
             var filter = "";
             if (filters != null)
@@ -1409,7 +1379,6 @@ namespace FAD3
                     }
                     catch (Exception ex)
                     {
-                        //Logger.Log(ex.Message);
                         Logger.Log(ex.Message, "Names.cs", "RetrieveScienticiNames");
                     }
                 }

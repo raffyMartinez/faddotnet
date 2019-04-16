@@ -446,11 +446,6 @@ namespace FAD3
                 try
                 {
                     conection.Open();
-                    //string query = $@"SELECT tblGearClass.GearClassName, tblGearVariations.Variation, tblRefGearCodes.RefGearCode
-                    //                FROM (tblGearClass INNER JOIN (tblGearVariations INNER JOIN (tblRefGearCodes INNER JOIN tblRefGearCodes_Usage
-                    //                ON tblRefGearCodes.RefGearCode = tblRefGearCodes_Usage.RefGearCode) ON tblGearVariations.GearVarGUID = tblRefGearCodes.GearVar)
-                    //                ON tblGearClass.GearClass = tblGearVariations.GearClass) INNER JOIN tblAOI ON tblRefGearCodes_Usage.TargetAreaGUID = tblAOI.AOIGuid
-                    //                WHERE tblAOI.AOIGuid={{{aoiGuid}}} ORDER BY tblGearClass.GearClassName, tblGearVariations.Variation, tblRefGearCodes.RefGearCode";
 
                     string query = $@"SELECT tblGearClass.GearClassName, tblGearVariations.Variation, tblGearVariations.GearVarGUID, Count(tblSampling.SamplingGUID) AS n
                                      FROM (tblGearClass INNER JOIN tblGearVariations ON tblGearClass.GearClass = tblGearVariations.GearClass) INNER JOIN tblSampling ON
@@ -479,14 +474,16 @@ namespace FAD3
             string updateQuery = "";
             bool Success = false;
             fadSubgridSyle subGridStyle = fadSubgridSyle.SubgridStyleNone;
-            switch(AOIData["SubGridStyle"])
+            switch (AOIData["SubGridStyle"])
             {
                 case "0":
                 case "-1":
                     break;
+
                 case "1":
                     subGridStyle = fadSubgridSyle.SubgridStyle4;
                     break;
+
                 case "2":
                     subGridStyle = fadSubgridSyle.SubgridStyle9;
                     break;
@@ -504,7 +501,7 @@ namespace FAD3
                                   {{{AOIData["AOIGUID"]}}},
                                   '{AOIData["AOIName"]}',
                                   '{AOIData["Letter"]}',
-                                   {(int)subGridStyle} 
+                                   {(int)subGridStyle}
                                     )";
                     }
                     else if (DataStatus == fad3DataStatus.statusEdited)

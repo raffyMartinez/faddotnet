@@ -89,8 +89,6 @@ namespace FAD3.Mapping.UserControls
             path.AddString(text, smallFont.FontFamily, (int)smallFont.Style, (float)smallFont.Size, rect, format);
             graphics.FillPath(new SolidBrush(ForeColor), path);
             graphics.DrawPath(Pens.Black, path);
-
-            //graphics.DrawString(text, smallFont, brush, rect, format);
         }
 
         #endregion Drawing

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using FAD3.Mapping.Classes;
 
 namespace FAD3
 {
@@ -29,6 +30,7 @@ namespace FAD3
         private Dictionary<int, int> _frameWidthDict = new Dictionary<int, int>();
         public bool PreviewImage { get; set; }
         public string TempMapFileName { get { return _fileName; } }
+        public bool MaintainOnePointLineWidth { get; set; }
 
         public void Dispose()
         {
@@ -82,26 +84,48 @@ namespace FAD3
         /// <returns></returns>
         private double AdjustLabelProperty(double value)
         {
-            if (Reset)
+            try
             {
-                value /= (_dpi / 96);
+                if (Reset)
+                {
+                    value /= (_dpi / 96);
+                }
+                else
+                {
+                    value *= (_dpi / 96);
+                }
             }
-            else
+            catch (OverflowException oex)
             {
-                value *= (_dpi / 96);
+                value = 8;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message, "SaveMapImage.cs", $"AdjustLabelProperty: Reset={Reset} double value");
             }
             return value;
         }
 
         private int AdjustLabelProperty(int value)
         {
-            if (Reset)
+            try
             {
-                value /= ((int)_dpi / 96);
+                if (Reset)
+                {
+                    value /= ((int)_dpi / 96);
+                }
+                else
+                {
+                    value *= ((int)_dpi / 96);
+                }
             }
-            else
+            catch (OverflowException oex)
             {
-                value *= ((int)_dpi / 96);
+                value = 8;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message, "SaveMapImage.cs", $"AdjustLabelProperty: Reset={Reset} int value");
             }
             return value;
         }
@@ -114,43 +138,46 @@ namespace FAD3
         {
             _axMap.get_Shapefile(layerHandle).Labels.With(lbl =>
            {
-               lbl.VerticalPosition = tkVerticalPosition.vpAboveParentLayer;
-               lbl.FontSize = AdjustLabelProperty(lbl.FontSize);
-               lbl.OffsetX = AdjustLabelProperty(lbl.OffsetX);
-               lbl.OffsetY = AdjustLabelProperty(lbl.OffsetY);
-               lbl.FontOutlineWidth = AdjustLabelProperty(lbl.FontOutlineWidth);
-               lbl.FramePaddingX = AdjustLabelProperty(lbl.FramePaddingX);
-               lbl.FramePaddingY = AdjustLabelProperty(lbl.FramePaddingY);
-               lbl.ShadowOffsetX = AdjustLabelProperty(lbl.ShadowOffsetX);
-               lbl.ShadowOffsetY = AdjustLabelProperty(lbl.ShadowOffsetY);
+               if (lbl.Visible && lbl.Count > 0)
+               {
+                   lbl.VerticalPosition = tkVerticalPosition.vpAboveParentLayer;
+                   lbl.FontSize = AdjustLabelProperty(lbl.FontSize);
+                   lbl.OffsetX = AdjustLabelProperty(lbl.OffsetX);
+                   lbl.OffsetY = AdjustLabelProperty(lbl.OffsetY);
+                   lbl.FontOutlineWidth = AdjustLabelProperty(lbl.FontOutlineWidth);
+                   lbl.FramePaddingX = AdjustLabelProperty(lbl.FramePaddingX);
+                   lbl.FramePaddingY = AdjustLabelProperty(lbl.FramePaddingY);
+                   lbl.ShadowOffsetX = AdjustLabelProperty(lbl.ShadowOffsetX);
+                   lbl.ShadowOffsetY = AdjustLabelProperty(lbl.ShadowOffsetY);
 
-               if (Reset)
-               {
-                   lbl.FrameOutlineWidth = _frameWidthDict[layerHandle];
-                   _frameWidthDict[layerHandle] = lbl.FrameOutlineWidth;
-               }
-               else
-               {
-                   if (!_frameWidthDict.ContainsKey(layerHandle))
+                   if (Reset)
                    {
-                       _frameWidthDict.Add(layerHandle, lbl.FrameOutlineWidth);
+                       lbl.FrameOutlineWidth = _frameWidthDict[layerHandle];
+                       _frameWidthDict[layerHandle] = lbl.FrameOutlineWidth;
                    }
-                   lbl.FrameOutlineWidth = (int)AdjustLabelProperty(lbl.FrameOutlineWidth);
-               }
-
-               if (lbl.NumCategories > 0)
-               {
-                   for (int n = 0; n < lbl.NumCategories; n++)
+                   else
                    {
-                       lbl.Category[n].FontSize = AdjustLabelProperty(lbl.Category[n].FontSize);
-                       lbl.Category[n].OffsetX = AdjustLabelProperty(lbl.Category[n].OffsetX);
-                       lbl.Category[n].OffsetY = AdjustLabelProperty(lbl.Category[n].OffsetY);
-                       lbl.Category[n].FontOutlineWidth = AdjustLabelProperty(lbl.Category[n].FontOutlineWidth);
-                       lbl.Category[n].FramePaddingX = AdjustLabelProperty(lbl.Category[n].FramePaddingX);
-                       lbl.Category[n].FramePaddingY = AdjustLabelProperty(lbl.Category[n].FramePaddingY);
-                       lbl.Category[n].ShadowOffsetX = AdjustLabelProperty(lbl.Category[n].ShadowOffsetX);
-                       lbl.Category[n].ShadowOffsetY = AdjustLabelProperty(lbl.Category[n].ShadowOffsetY);
-                       lbl.Category[n].FrameOutlineWidth = AdjustLabelProperty(lbl.Category[n].FrameOutlineWidth);
+                       if (!_frameWidthDict.ContainsKey(layerHandle))
+                       {
+                           _frameWidthDict.Add(layerHandle, lbl.FrameOutlineWidth);
+                       }
+                       lbl.FrameOutlineWidth = (int)AdjustLabelProperty(lbl.FrameOutlineWidth);
+                   }
+
+                   if (lbl.NumCategories > 0)
+                   {
+                       for (int n = 0; n < lbl.NumCategories; n++)
+                       {
+                           lbl.Category[n].FontSize = AdjustLabelProperty(lbl.Category[n].FontSize);
+                           lbl.Category[n].OffsetX = AdjustLabelProperty(lbl.Category[n].OffsetX);
+                           lbl.Category[n].OffsetY = AdjustLabelProperty(lbl.Category[n].OffsetY);
+                           lbl.Category[n].FontOutlineWidth = AdjustLabelProperty(lbl.Category[n].FontOutlineWidth);
+                           lbl.Category[n].FramePaddingX = AdjustLabelProperty(lbl.Category[n].FramePaddingX);
+                           lbl.Category[n].FramePaddingY = AdjustLabelProperty(lbl.Category[n].FramePaddingY);
+                           lbl.Category[n].ShadowOffsetX = AdjustLabelProperty(lbl.Category[n].ShadowOffsetX);
+                           lbl.Category[n].ShadowOffsetY = AdjustLabelProperty(lbl.Category[n].ShadowOffsetY);
+                           lbl.Category[n].FrameOutlineWidth = AdjustLabelProperty(lbl.Category[n].FrameOutlineWidth);
+                       }
                    }
                }
            });
@@ -165,7 +192,6 @@ namespace FAD3
             {
                 var h = _axMap.get_LayerHandle(n);
                 if (this.MapLayersHandler.get_MapLayer(h).LayerType == "ShapefileClass")
-                //if (_axMap.get_GetObject(h).GetType().Name == "ShapefileClass")
                 {
                     var categoryCount = _axMap.get_Shapefile(h).Categories.Count;
 
@@ -181,16 +207,29 @@ namespace FAD3
                                 {
                                     for (int y = 0; y < categoryCount; y++)
                                     {
-                                        _axMap.get_Shapefile(h).Categories.Item[y].DrawingOptions.LineWidth /= (float)(_dpi / 96);
+                                        if (!MaintainOnePointLineWidth
+                                        || _axMap.get_Shapefile(h).Categories.Item[y].DrawingOptions.LineWidth > 1.2)
+                                        {
+                                            _axMap.get_Shapefile(h).Categories.Item[y].DrawingOptions.LineWidth /= (float)(_dpi / 96);
+                                        }
                                         _axMap.get_Shapefile(h).Categories.Item[y].DrawingOptions.PointSize /= (float)(_dpi / 96);
-                                        _axMap.get_Shapefile(h).Categories.Item[y].DrawingOptions.VerticesSize /= (int)(_dpi / 96);
+                                        if (_axMap.get_Shapefile(h).Categories.Item[y].DrawingOptions.VerticesVisible)
+                                        {
+                                            _axMap.get_Shapefile(h).Categories.Item[y].DrawingOptions.VerticesSize /= (int)(_dpi / 96);
+                                        }
                                     }
                                 }
                                 else
                                 {
+                                    if (!MaintainOnePointLineWidth || ddo.LineWidth > 1.2)
+                                    {
+                                        ddo.LineWidth /= (float)(_dpi / 96);
+                                    }
                                     ddo.PointSize /= (float)(_dpi / 96);
-                                    ddo.LineWidth /= (float)(_dpi / 96);
-                                    ddo.VerticesSize /= (int)(_dpi / 96);
+                                    if (ddo.VerticesVisible)
+                                    {
+                                        ddo.VerticesSize /= (int)(_dpi / 96);
+                                    }
                                 }
                             }
                             else
@@ -199,16 +238,29 @@ namespace FAD3
                                 {
                                     for (int y = 0; y < categoryCount; y++)
                                     {
-                                        _axMap.get_Shapefile(h).Categories.Item[y].DrawingOptions.LineWidth *= (float)(_dpi / 96);
+                                        if (!MaintainOnePointLineWidth
+                                        || _axMap.get_Shapefile(h).Categories.Item[y].DrawingOptions.LineWidth > 1.2)
+                                        {
+                                            _axMap.get_Shapefile(h).Categories.Item[y].DrawingOptions.LineWidth *= (float)(_dpi / 96);
+                                        }
                                         _axMap.get_Shapefile(h).Categories.Item[y].DrawingOptions.PointSize *= (float)(_dpi / 96);
-                                        _axMap.get_Shapefile(h).Categories.Item[y].DrawingOptions.VerticesSize *= (int)(_dpi / 96);
+                                        if (_axMap.get_Shapefile(h).Categories.Item[y].DrawingOptions.VerticesVisible)
+                                        {
+                                            _axMap.get_Shapefile(h).Categories.Item[y].DrawingOptions.VerticesSize *= (int)(_dpi / 96);
+                                        }
                                     }
                                 }
                                 else
                                 {
+                                    if (!MaintainOnePointLineWidth || ddo.LineWidth > 1.2)
+                                    {
+                                        ddo.LineWidth *= (float)(_dpi / 96);
+                                    }
                                     ddo.PointSize *= (float)(_dpi / 96);
-                                    ddo.LineWidth *= (float)(_dpi / 96);
-                                    ddo.VerticesSize *= (int)(_dpi / 96);
+                                    if (ddo.VerticesVisible)
+                                    {
+                                        ddo.VerticesSize *= (int)(_dpi / 96);
+                                    }
                                 }
                             }
                         });
@@ -231,7 +283,6 @@ namespace FAD3
         /// <returns></returns>
         public bool Save(bool SaveGrid25 = true)
         {
-            //MapLayersHandler.SaveLayerSettingsToXML();
             _saveToTempFile = false;
             AdjustFeatureSize();
             if (SaveGrid25)
@@ -261,7 +312,6 @@ namespace FAD3
 
                 ext.SetBounds(ext.xMin - ef, ext.yMin - ef, 0, ext.xMax + ef, ext.yMax + ef, 0);
 
-                //var shp = _axMap.Extents.ToShape().Clip(_axMap.get_Shapefile(_handleGridBoundary).Extents.ToShape(), tkClipOperation.clDifference);
                 var shp = ext.ToShape().Clip(_axMap.get_Shapefile(_handleGridBoundary).Extents.ToShape(), tkClipOperation.clDifference);
                 sf.EditAddShape(shp);
                 sf.DefaultDrawingOptions.LineVisible = false;
@@ -308,7 +358,7 @@ namespace FAD3
                 //create an image whose width (w) will result in a map whose width in pixels fits the the required dpi
                 img = _axMap.SnapShot3(ext.xMin, ext.xMax, ext.yMax, ext.yMin, (int)w);
             }
-            catch(System.Runtime.InteropServices.COMException comex)
+            catch (System.Runtime.InteropServices.COMException comex)
             {
                 Logger.Log(comex.Message, "SaveMapImage.cs", "SaveMapHelper");
                 proceed = false;
@@ -384,33 +434,36 @@ namespace FAD3
                     else
                     {
                         //layers whose weights are null will be placed below layers with weight values
-                        //_axMap.get_Shapefile(kv.Key).Labels.VerticalPosition = tkVerticalPosition.vpAboveAllLayers;
                         _axMap.get_Shapefile(kv.Key).Labels.VerticalPosition = tkVerticalPosition.vpAboveParentLayer;
                     }
-                    switch (kv.Value.Name)
+
+                    if (kv.Value.IsGrid25Layer)
                     {
-                        case "MBR":
-                            _handleGridBoundary = kv.Value.Handle;
-                            break;
+                        switch (kv.Value.Name)
+                        {
+                            case "MBR":
+                                _handleGridBoundary = kv.Value.Handle;
+                                break;
 
-                        case "Labels":
-                            _handleLabels = kv.Value.Handle;
+                            case "Labels":
+                                _handleLabels = kv.Value.Handle;
 
-                            break;
+                                break;
 
-                        case "Major grid":
-                            _handleMajorGrid = kv.Value.Handle;
-                            break;
+                            case "Major grid":
+                                _handleMajorGrid = kv.Value.Handle;
+                                break;
 
-                        case "Minor grid":
-                            _handleMinorGrid = kv.Value.Handle;
-                            break;
+                            case "Minor grid":
+                                _handleMinorGrid = kv.Value.Handle;
+                                break;
+                        }
                     }
 
                     if (kv.Value.KeepOnTop)
                     {
+                        Console.WriteLine($"keep on top {kv.Value.Name}");
                         layersOnTop.Add(_axMap.get_LayerPosition(kv.Value.Handle));
-                        //kv.Value.Labels.VerticalPosition = tkVerticalPosition.vpAboveAllLayers;
                     }
                 }
             }
@@ -418,11 +471,12 @@ namespace FAD3
             foreach (int lyr in layersOnTop)
             {
                 _axMap.MoveLayerTop(lyr);
+                Console.WriteLine($"on top {_axMap.get_LayerName(lyr)}");
             }
 
             //add a mask to the map control
             SetMask();
-            var handleMask = MapLayersHandler.AddLayer(_shapeFileMask, "Grid mask", true, false);
+            var handleMask = MapLayersHandler.AddLayer(_shapeFileMask, "Grid mask", true);
 
             //move the mask layer to the top
             _axMap.MoveLayerTop(_axMap.get_LayerPosition(handleMask));

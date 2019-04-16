@@ -62,7 +62,6 @@ namespace FAD3
         {
             _mapLayer = mapLayer;
             _shapeFile = (Shapefile)_mapLayer.LayerObject;
-            //SetupLabelClass(_shapeFile);
         }
 
         /// <summary>
@@ -76,7 +75,6 @@ namespace FAD3
 
             //applies label properties to the current shapefile's labels
             _shapeFile.Labels.Deserialize(labelXML);
-            //SetupLabelClass(_shapeFile);
 
             //we convert string labelXML to an xml object
             var doc = new XmlDocument();

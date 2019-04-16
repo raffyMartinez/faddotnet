@@ -208,12 +208,10 @@ namespace FAD3.Database.Forms
             if (_provinceNode == null)
             {
                 nd = treeInventory.Nodes["root"].Nodes[_inventoryGuid];
-                //TreeViewEventArgs e = new TreeViewEventArgs(treeInventory.Nodes["root"].Nodes[_inventoryGuid]);
             }
             else
             {
                 nd = _provinceNode.Parent;
-                //TreeViewEventArgs e = new TreeViewEventArgs(_provinceNode.Parent);
             }
             TreeViewEventArgs e = new TreeViewEventArgs(nd);
             _refreshSitioNumbers = true;
@@ -1579,7 +1577,6 @@ namespace FAD3.Database.Forms
                                 switch (actionType)
                                 {
                                     case ExportImportAction.ActionExport:
-                                        //ExportEnumerators();
                                         var exportCount = Enumerators.ExportEnumerators(_targetArea.TargetAreaGuid);
                                         if (exportCount > 0)
                                         {
@@ -1596,7 +1593,6 @@ namespace FAD3.Database.Forms
                                         var fileName = FileDialogHelper.FileName;
                                         if (fileName.Length > 0)
                                         {
-                                            //ImportEnumerators(fileName);
                                             if (Enumerators.ImportEnumerators(fileName, _targetArea.TargetAreaGuid))
                                             {
                                                 global.mainForm.SetUPLV("target_area");
@@ -1621,11 +1617,6 @@ namespace FAD3.Database.Forms
                             }
                         }
                     }
-                    //Export();
-                    //break;
-
-                    //case "tsButtonImport":
-                    //Import();
                     break;
             }
         }
@@ -1642,7 +1633,6 @@ namespace FAD3.Database.Forms
             writer.WriteAttributeString("TargetAreaGuid", _targetArea.TargetAreaGuid);
             writer.WriteAttributeString("DateStart", _inventory.Inventories[_inventoryGuid].DateConducted.ToShortDateString());
             writer.WriteAttributeString("ProjectName", _inventory.Inventories[_inventoryGuid].InventoryName);
-            //writer.WriteEndElement();
 
             //list inventory enumerators
             {

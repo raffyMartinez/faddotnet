@@ -1,20 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using AxMapWinGIS;
+using FAD3.Database.Classes;
 using MapWinGIS;
-using AxMapWinGIS;
-using FAD3.Mapping.Classes;
+using System.Collections.Generic;
 using System.IO;
 using System.Xml;
+using System;
 
 namespace FAD3.Mapping.Classes
 {
     /// <summary>
-    /// Displays grid25 grid map in geographic coordinate system (not UTM) 
+    /// Displays grid25 grid map in geographic coordinate system (not UTM)
     /// </summary>
-    public class Grid25GeographicDisplayHelper
+    public class Grid25GeographicDisplayHelper : IDisposable
     {
         public string SourceFolder { get; set; }                //folder where grid maps are saved
         public MapLayersHandler MapLayersHandler { get; internal set; }
@@ -24,8 +21,10 @@ namespace FAD3.Mapping.Classes
         private int _hMajorGrid;
         private int _hGridLabels;
         private int _hMBR;
+        private bool _disposed;
 
-
+        public GridMapSideToPrint GridMapSideToPrint { get; set; }
+        public bool PrintFrontAndReverseSides { get; set; }
         public bool HasGrid { get; internal set; }
         private float _majorGridThickness;
         private int _majorGridLabelSize;
@@ -37,25 +36,56 @@ namespace FAD3.Mapping.Classes
         private bool _majorGridLabelFontBold;
         private float _minorGridLabelDistance;
         private uint _minorGridLineColor;
-        //private int _minorGridLabelWrapped;
         private int _minorGridLabelSize;
-        private int _subGridLineThickness;
+        private float? _subGridLineThickness;
         private uint _subGridLineColor;
         private uint _borderColor;
         private float _borderThickness;
         private double _minorGridOffsetDistance;
         private bool _gridStateFinishedReading;
         public bool SubgridsVisible { get; set; }
+        public Shapefile MaxDimensionMBR { get; internal set; }
+        public Shapefile MBR { get; internal set; }
+        private AxMap _mapcontrol;
+
+        public Dictionary<int, FrontAndReverseMapSpecs> ExportSettingsDict { get; set; }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                }
+                MaxDimensionMBR.EditClear();
+                MaxDimensionMBR = null;
+                MBR.EditClear();
+                MBR = null;
+                _mapcontrol = null;
+                _grid25Layers.Clear();
+                _grid25Layers = null;
+                _disposed = true;
+            }
+        }
+
         public bool MinorGridLableFontBold
         {
             get { return _minorGridLabelFontBold; }
             set { _minorGridLabelFontBold = value; }
         }
+
         public bool MajorGridLableFontBold
         {
             get { return _majorGridLabelFontBold; }
             set { _majorGridLabelFontBold = value; }
         }
+
         public double MinorGridOffsetDistance
         {
             get { return _minorGridOffsetDistance; }
@@ -63,7 +93,7 @@ namespace FAD3.Mapping.Classes
         }
 
         public float MinorGridLabelDistance
-        { 
+        {
             get { return _minorGridLabelDistance; }
             set { _minorGridLabelDistance = value; }
         }
@@ -73,6 +103,7 @@ namespace FAD3.Mapping.Classes
             get { return _minorGridLabelSize; }
             set { _minorGridLabelSize = value; }
         }
+
         public void SetMapExtents(Extents extents)
         {
             _mapcontrol.Extents = extents;
@@ -83,20 +114,15 @@ namespace FAD3.Mapping.Classes
             get { return _majorGridLabelSize; }
             set { _majorGridLabelSize = value; }
         }
-        public Shapefile MaxDimensionMBR { get; internal set;}
-        public Shapefile MBR { get; internal set; }
-        private AxMap _mapcontrol;
 
         public void LockMap()
         {
-            //_mapcontrol.Visible = false;
             _mapcontrol.LockWindow(tkLockMode.lmLock);
         }
 
         public void UnlockMap()
         {
             _mapcontrol.LockWindow(tkLockMode.lmUnlock);
-            //_mapcontrol.Visible = true;
         }
 
         public void RedrawNap()
@@ -118,20 +144,93 @@ namespace FAD3.Mapping.Classes
             set
             {
                 _selectedLayoutCell = value;
-                //RemoveGrid25Layers();
                 AddSelectedLayoutGrid(_selectedLayoutCell);
+                SetUpNonGridLayers();
             }
         }
+
         public void SetMaxDimensionGridName(string folderPath, string gridName)
         {
             var sf = new Shapefile();
             string file = $@"{folderPath}\{gridName}_gridlabels.shp";
-            if(File.Exists(file) && sf.Open(file))
+            if (File.Exists(file) && sf.Open(file))
             {
                 int reprojectedCount = 0;
                 MaxDimensionMBR = sf.Reproject(_mapcontrol.GeoProjection, ref reprojectedCount);
             }
         }
+
+        private void SetupShapefileLayerForPrinting(MapLayer ml)
+        {
+            if (ExportSettingsDict?.Count > 0)
+            {
+                foreach (var item in ExportSettingsDict.Values)
+                {
+                    if (item.IsGrid25Layer && item.LayerName == ml.Name)
+                    {
+                        var sf = ml.LayerObject as Shapefile;
+                        switch (GridMapSideToPrint)
+                        {
+                            case GridMapSideToPrint.SideToPrintIgnore:
+                                break;
+
+                            case GridMapSideToPrint.SideToPrintFront:
+
+                                MapLayersHandler.MapControl.set_LayerVisible(ml.Handle, item.ShowInFront);
+
+                                if (!item.ShowLabelsFront)
+                                {
+                                    sf.Labels.Visible = false;
+                                }
+                                break;
+
+                            case GridMapSideToPrint.SideToPrintReverse:
+
+                                MapLayersHandler.MapControl.set_LayerVisible(ml.Handle, item.ShowInReverse);
+
+                                if (!item.ShowLabelsReverse)
+                                {
+                                    sf.Labels.Visible = false;
+                                }
+                                break;
+                        }
+                        break;
+                    }
+                    else if (item.LayerHandle == ml.Handle)
+                    {
+                        var sf = ml.LayerObject as Shapefile;
+                        switch (GridMapSideToPrint)
+                        {
+                            case GridMapSideToPrint.SideToPrintFront:
+
+                                MapLayersHandler.MapControl.set_LayerVisible(ml.Handle, item.ShowInFront);
+                                sf.Labels.Visible = item.ShowLabelsFront;
+                                break;
+
+                            case GridMapSideToPrint.SideToPrintReverse:
+
+                                MapLayersHandler.MapControl.set_LayerVisible(ml.Handle, item.ShowInReverse);
+                                sf.Labels.Visible = item.ShowLabelsReverse;
+
+                                break;
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
+        private void SetUpNonGridLayers()
+        {
+            foreach (MapLayer ml in MapLayersHandler)
+            {
+                if (!ml.IsGrid25Layer)
+                {
+                    SetupShapefileLayerForPrinting(ml);
+                }
+            }
+        }
+
         private bool AddSelectedLayoutGrid(string layoutCellName)
         {
             _grid25Layers.Clear();
@@ -140,9 +239,8 @@ namespace FAD3.Mapping.Classes
             _grid25Layers.Add("Labels", $"{layoutCellName}_gridlabels.shp");
             _grid25Layers.Add("MBR", $"{layoutCellName}_gridboundary.shp");
 
-            
             string gridStateFile = $@"{SourceFolder}\{layoutCellName}_gridstate.xml";
-            if ( File.Exists(gridStateFile) &&  !_gridStateFinishedReading)
+            if (File.Exists(gridStateFile) && !_gridStateFinishedReading)
             {
                 XmlTextReader xmlReader = new XmlTextReader(gridStateFile);
                 while (xmlReader.Read())
@@ -165,8 +263,9 @@ namespace FAD3.Mapping.Classes
                                 _majorGridLabelColor = uint.Parse(xmlReader.GetAttribute("majorGridLabelColor"));
                                 _minorGridLabelSize = int.Parse(xmlReader.GetAttribute("minorGridLabelSize"));
                                 _majorGridLabelFontBold = false;
+                                _subGridLineColor = uint.Parse(xmlReader.GetAttribute("subGridLineColor"));
+                                _subGridLineThickness = float.Parse(xmlReader.GetAttribute("subGridLineThickness")) / 100;
                                 break;
-
                         }
                     }
                 }
@@ -177,22 +276,26 @@ namespace FAD3.Mapping.Classes
             string file = $@"{SourceFolder}\{_grid25Layers["Minor grid"]}";
             if (File.Exists(file) && sf.Open(file))
             {
-                _hMinorGrid = MapLayersHandler.AddLayer(sf, "Minor grid",true,true);
-
-
+                _hMinorGrid = MapLayersHandler.AddLayer(sf, "Minor grid", true, true);
+                MapLayersHandler[_hMinorGrid].IsGrid25Layer = true;
+                SetupShapefileLayerForPrinting(MapLayersHandler[_hMinorGrid]);
 
                 sf = new Shapefile();
                 file = $@"{SourceFolder}\{_grid25Layers["Major grid"]}";
                 if (File.Exists(file) && sf.Open(file))
                 {
-                    _hMajorGrid = MapLayersHandler.AddLayer(sf, "Major grid",true,true);
+                    _hMajorGrid = MapLayersHandler.AddLayer(sf, "Major grid", true, true);
+                    MapLayersHandler[_hMajorGrid].IsGrid25Layer = true;
+                    SetupShapefileLayerForPrinting(MapLayersHandler[_hMajorGrid]);
                 }
 
                 sf = new Shapefile();
                 file = $@"{SourceFolder}\{_grid25Layers["Labels"]}";
                 if (File.Exists(file) && sf.Open(file))
                 {
-                    _hGridLabels = MapLayersHandler.AddLayer(sf, "Labels",true,true);
+                    _hGridLabels = MapLayersHandler.AddLayer(sf, "Labels", true, true);
+                    MapLayersHandler[_hGridLabels].IsGrid25Layer = true;
+                    SetupShapefileLayerForPrinting(MapLayersHandler[_hGridLabels]);
                     int reprojectedCount = 0;
                     MBR = sf.Reproject(_mapcontrol.GeoProjection, ref reprojectedCount);
                 }
@@ -201,9 +304,10 @@ namespace FAD3.Mapping.Classes
                 file = $@"{SourceFolder}\{_grid25Layers["MBR"]}";
                 if (File.Exists(file) && sf.Open(file))
                 {
-                    _hMBR = MapLayersHandler.AddLayer(sf, "MBR",true,true);
+                    _hMBR = MapLayersHandler.AddLayer(sf, "MBR", true, true);
+                    MapLayersHandler[_hMBR].IsGrid25Layer = true;
+                    SetupShapefileLayerForPrinting(MapLayersHandler[_hMBR]);
                 }
-
 
                 SymbolizeGrid();
                 return true;
@@ -212,7 +316,6 @@ namespace FAD3.Mapping.Classes
             {
                 return false;
             }
-
         }
 
         public void SymbolizeGrid()
@@ -227,6 +330,18 @@ namespace FAD3.Mapping.Classes
                 sf.VisibilityExpression = "";
             }
             sf.DefaultDrawingOptions.LineWidth = _minorGridThickness;
+
+            var cat = sf.Categories.Add("minorGrid");
+            cat.DrawingOptions.LineColor = _minorGridLineColor;
+            cat.DrawingOptions.LineWidth = _minorGridThickness;
+            cat.Expression = @"[LineType]=""MG""";
+
+            cat = sf.Categories.Add("subGrid");
+            cat.DrawingOptions.LineColor = _subGridLineColor;
+            cat.DrawingOptions.LineWidth = _minorGridThickness;
+            cat.Expression = @"[LineType]=""SG""";
+
+            sf.Categories.ApplyExpressions();
 
             sf = MapLayersHandler[_hMajorGrid].LayerObject as Shapefile;
             sf.DefaultDrawingOptions.FillVisible = false;
@@ -248,11 +363,9 @@ namespace FAD3.Mapping.Classes
             sf.Labels.AvoidCollisions = false;
             sf.Labels.Visible = true;
             sf.Labels.FontBold = _minorGridLabelFontBold;
-            //sf.Labels.Expression = "[Label]";
-            sf.Labels.Generate("[Label]",tkLabelPositioning.lpCentroid,false);
+            sf.Labels.Generate("[Label]", tkLabelPositioning.lpCentroid, false);
 
-
-            var lc= sf.Labels.AddCategory("majorGrid");
+            var lc = sf.Labels.AddCategory("majorGrid");
             lc.Expression = @"[Location]=""MG""";
             lc.FontSize = _majorGridLabelSize;
             lc.FontBold = _majorGridLabelFontBold;
@@ -274,7 +387,7 @@ namespace FAD3.Mapping.Classes
             lc = sf.Labels.AddCategory("left");
             lc.Expression = @"[Location]=""L""";
             lc.FontSize = _minorGridLabelSize;
-            lc.OffsetX = _minorGridOffsetDistance *-1;
+            lc.OffsetX = _minorGridOffsetDistance * -1;
             lc.FontColor = new Utils().ColorByName(tkMapColor.Black);
 
             lc = sf.Labels.AddCategory("right");
@@ -286,7 +399,7 @@ namespace FAD3.Mapping.Classes
             lc = sf.Labels.AddCategory("top");
             lc.Expression = @"[Location]=""T""";
             lc.FontSize = _minorGridLabelSize;
-            lc.OffsetY = _minorGridOffsetDistance *-1;
+            lc.OffsetY = _minorGridOffsetDistance * -1;
             lc.FontColor = new Utils().ColorByName(tkMapColor.Black);
 
             lc = sf.Labels.AddCategory("bottom");
@@ -299,11 +412,10 @@ namespace FAD3.Mapping.Classes
             HasGrid = true;
         }
 
-
         public bool RemoveGrid25Layers()
         {
-            MapLayersHandler.RemoveLayer("Minor grids");
-            MapLayersHandler.RemoveLayer("Major grids");
+            MapLayersHandler.RemoveLayer("Minor grid");
+            MapLayersHandler.RemoveLayer("Major grid");
             MapLayersHandler.RemoveLayer("Labels");
             MapLayersHandler.RemoveLayer("MBR");
             ResetGrid();
@@ -311,8 +423,7 @@ namespace FAD3.Mapping.Classes
             return true;
         }
 
-
-        public Grid25GeographicDisplayHelper( MapLayersHandler mapLayersHandler, AxMap mapControl)
+        public Grid25GeographicDisplayHelper(MapLayersHandler mapLayersHandler, AxMap mapControl)
         {
             _mapcontrol = mapControl;
             MapLayersHandler = mapLayersHandler;
@@ -320,7 +431,7 @@ namespace FAD3.Mapping.Classes
             _subGridLineThickness = 1;
             _majorGridLabelColor = new Utils().ColorByName(tkMapColor.Red);
             _majorGridLineColor = new Utils().ColorByName(tkMapColor.Red);
-            _minorGridLabelColor  = new Utils().ColorByName(tkMapColor.Black);
+            _minorGridLabelColor = new Utils().ColorByName(tkMapColor.Black);
             _subGridLineColor = new Utils().ColorByName(tkMapColor.Gray);
             _borderColor = new Utils().ColorByName(tkMapColor.Black);
             HasGrid = false;

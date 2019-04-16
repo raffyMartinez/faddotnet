@@ -87,14 +87,11 @@ namespace FAD3
             global.LoadFormSettings(this, false);
             dropDownMenu.ItemClicked += OnDropDownMenuItemClicked;
             Text = "Database of species names of catch in the Philippines";
-            //lvTaxa.Columns.Add("");
             lvTaxa.View = View.List;
-            //SizeColumns(lvTaxa);
             foreach (var item in CatchName.RetrieveTaxaDictionary())
             {
                 lvTaxa.Items.Add(item.Key.ToString(), item.Value, null);
             }
-            //SizeColumns(lvTaxa, false);
 
             lvNames.With(o =>
                 {
@@ -110,9 +107,7 @@ namespace FAD3
                     o.HideSelection = false;
                 });
             SizeColumns(lvNames);
-            //FillListNames();
             GetSpeciesNames();
-            //SizeColumns(lvNames, false);
         }
 
         private void OnDropDownMenuItemClicked(object sender, ToolStripItemClickedEventArgs e)
@@ -221,7 +216,6 @@ namespace FAD3
 
         private int FillListNames(Dictionary<string, string> filters = null, bool OnlyWithRecords = false)
         {
-            //lvNames.Items.Clear();
             int n = 1;
             foreach (var item in Names.RetrieveScientificNames(filters, OnlyWithRecords))
             {
@@ -229,7 +223,6 @@ namespace FAD3
                 var recordCount = item.Value.catchCompositionRecordCount == 0 ? "" : item.Value.catchCompositionRecordCount.ToString();
                 var lvi = new ListViewItem(new string[] { n.ToString(), item.Value.genus, item.Value.species, item.Value.taxaName, inFishBase, recordCount, item.Value.Notes });
                 lvi.Name = item.Value.catchNameGuid;
-                //lvNames.Items.Add(lvi);
                 AddItem(lvi);
                 n++;
             }
@@ -296,8 +289,6 @@ namespace FAD3
                     {
                         _filters.Remove("search");
                     }
-
-                    //FillListNames(_filters, chkShowWithRecords.Checked);
                     GetSpeciesNames(_filters, chkShowWithRecords.Checked);
 
                     break;
@@ -487,7 +478,6 @@ namespace FAD3
                                                     writer.WriteAttributeString("taxa", spName.Value.taxa.ToString());
                                                     writer.WriteAttributeString("inFishbase", spName.Value.inFishbase.ToString());
                                                     writer.WriteAttributeString("fishBaseSpNo", spName.Value.fishBaseSpeciesNo != null ? spName.Value.fishBaseSpeciesNo.ToString() : "");
-                                                    //writer.WriteString(spName.Value.genus + " " + spName.Value.species);
                                                     if (count == 1)
                                                     {
                                                         writer.WriteEndDocument();
@@ -555,10 +545,6 @@ namespace FAD3
                                     }
                                     else
                                     {
-                                        //var importCount = Names.ImportSpeciesNames(fileName, null);
-                                        //FillListNames();
-                                        //SizeColumns(lvNames, false);
-                                        //MessageBox.Show($"Finished importing {importCount} species names to the database", "Finished importing", MessageBoxButtons.OK, MessageBoxIcon.Information);
                                         GetImportedRows(fileName, null);
                                     }
                                 }
@@ -572,9 +558,7 @@ namespace FAD3
         private async void GetImportedRows(string fileName, int? speciesColumn)
         {
             int result = await Names.ImportSpeciesNamesAsync(fileName, speciesColumn);
-            //FillListNames();
             GetSpeciesNames();
-            //SizeColumns(lvNames, false);
             lblListViewLabel.Text = "List of species names";
             MessageBox.Show($"{_rowsImported} species names were saved to the database", "Import successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }

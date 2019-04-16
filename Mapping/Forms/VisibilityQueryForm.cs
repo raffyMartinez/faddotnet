@@ -270,14 +270,6 @@ namespace FAD3
                             options.Add("3 - Exclude from selection");
                             options.Add("4 - Invert in selection");
                             string s = string.Format("Number of shapes = {0}. Choose the way to update selection", arr.Length);
-                            //int option = MapWindow.Controls.Dialogs.ChooseOptions(options, 0, s, "Update selection");
-
-                            // updating selection
-                            //if (option != -1)
-                            //{
-                            //_mapWin.View.UpdateSelection(_layerHandle, ref arr, (SelectionOperation)option);
-                            //_mapWin.View.Redraw();
-                            //}
                         }
                     }
                     success = (arr != null && arr.Length > 0);

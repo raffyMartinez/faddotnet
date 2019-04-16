@@ -273,7 +273,6 @@ namespace FAD3
                 _samplings = Enumerators.GetEnumeratorSamplings();
                 ConfigureTree();
                 PopulateList(tree.Nodes["root"]);
-                //SizeColumns(lvEnumerators, false);
                 Text = "Enumerator data and sampling list";
             }
         }

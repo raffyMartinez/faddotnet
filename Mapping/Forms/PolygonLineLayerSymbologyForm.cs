@@ -144,10 +144,6 @@ namespace FAD3.Mapping.Forms
             cboGradientBounds.SelectedIndex = (int)_options.FillGradientBounds;
             chkOutline.Checked = _options.LineVisible;
 
-            // texture
-            //udScaleX.SetValue(_options.PictureScaleX);
-            //udScaleY.SetValue(_options.PictureScaleY);
-
             // vertices
             chkVertices.Checked = _options.VerticesVisible;
             chkVerticesFillVisible.Checked = _options.VerticesFillVisible;
@@ -156,8 +152,6 @@ namespace FAD3.Mapping.Forms
             cboVerticesType.SelectedIndex = (int)_options.VerticesType;
 
             // transparency
-            //cboFillTransparency.Text = ((int)((double)(_options.FillTransparency) / 2.55 + 0.5)).ToString();
-            //cboLineTransparency.Text = ((int)((double)(_options.LineTransparency) / 2.55 + 0.5)).ToString();
             transpFill.Value = (byte)_options.FillTransparency;
             transpOutline.Value = (byte)_options.LineTransparency;
 
@@ -186,10 +180,6 @@ namespace FAD3.Mapping.Forms
             _options.FillColor2 = Colors.ColorToUInteger(clpGradient2.Color);
             _options.FillRotation = (double)udGradientRotation.Value;
             _options.FillGradientBounds = (tkGradientBounds)cboGradientBounds.SelectedIndex;
-
-            //// texture
-            //_options.PictureScaleX = (double)udScaleX.Value;
-            //_options.PictureScaleY = (double)udScaleY.Value;
 
             // outline
             _options.LineStipple = (tkDashStyle)icbLineStyle.SelectedIndex;

@@ -70,7 +70,6 @@ namespace FAD3.Mapping.Forms
                 _updowns[i].Width = 50;
                 _updowns[i].Enabled = false;
                 _updowns[i].Visible = false;
-                //_updowns[i].ValueChanged += new EventHandler(this.DoUpdate);
             }
 
             Blend2GUI(blend);
@@ -114,9 +113,6 @@ namespace FAD3.Mapping.Forms
                         _checkboxes[i].Enabled = false;
                 }
             }
-
-            // comparing new blend with initial for chnages
-            //bool changesMade = !BlendsAreEqual(_initBlend, _blend);
         }
 
         /// <summary>
@@ -131,18 +127,15 @@ namespace FAD3.Mapping.Forms
             for (int i = 0; i < _colopickers.Length; i++)
             {
                 _colopickers[i].Enabled = false;
-                //_updowns[i].Enabled = false;
                 _checkboxes[i].Enabled = false;
             }
 
             for (int i = 0; i < blend.Colors.Length; i++)
             {
                 _colopickers[i].Color = blend.Colors[i];
-                //_updowns[i].Value = (decimal)blend.Positions[i] * 100;
                 _checkboxes[i].Checked = true;
 
                 _colopickers[i].Enabled = true;
-                //_updowns[i].Enabled = true;
                 _checkboxes[i].Enabled = true;
             }
             if (blend.Colors.Length < _checkboxes.Length)
@@ -180,29 +173,6 @@ namespace FAD3.Mapping.Forms
             }
             return blend;
         }
-
-        /// <summary>
-        /// Checks if the 2 color blends are equal
-        /// </summary>
-        /// <returns>True if the 2 blends are equal and false otherwise</returns>
-        //bool BlendsAreEqual(ColorBlend blend1, ColorBlend blend2)
-        //{
-        //    if (blend1 == null || blend2 == null) return false;
-
-        //    if (blend1.Colors.Length != blend2.Colors.Length ||
-        //        blend1.Positions.Length != blend2.Positions.Length)
-        //    {
-        //        return false;
-        //    }
-
-        //    for (int i = 0; i < blend1.Colors.Length; i++)
-        //        if (blend1.Colors[i] != blend2.Colors[i]) return false;
-
-        //    for (int i = 0; i < blend1.Positions.Length; i++)
-        //        if (blend1.Positions[i] != blend2.Positions[i]) return false;
-
-        //    return true;
-        //}
 
         /// <summary>
         /// Draws current color blend

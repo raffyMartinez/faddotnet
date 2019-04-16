@@ -61,7 +61,6 @@ namespace FAD3.Database.Forms
                 case "btnOk":
                     if (FormValidated())
                     {
-                        //_parentForm.HistoricalCPUE(_catchWt, cboUnit.Text, txtNotes.Text);
                         if (!ByDecade)
                         {
                             DecadeYear = int.Parse(txtHistoryYear.Text);
@@ -70,7 +69,6 @@ namespace FAD3.Database.Forms
                         CPUEUnit = cboUnit.Text;
                         Notes = txtNotes.Text;
                         DialogResult = DialogResult.OK;
-                        //Close();
                     }
                     else
                     {

@@ -70,7 +70,7 @@
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.btnExportSettings = new System.Windows.Forms.Button();
             this.btnExport = new System.Windows.Forms.Button();
-            this.chkExportFrontBack = new System.Windows.Forms.CheckBox();
+            this.chkExportFrontAndReverse = new System.Windows.Forms.CheckBox();
             this.label8 = new System.Windows.Forms.Label();
             this.txtDPI = new System.Windows.Forms.TextBox();
             this.txtFolderExportPath = new System.Windows.Forms.TextBox();
@@ -316,6 +316,7 @@
             // 
             // btnGridSettings
             // 
+            this.btnGridSettings.Enabled = false;
             this.btnGridSettings.ImageKey = "settings";
             this.btnGridSettings.ImageList = this.imageList1;
             this.btnGridSettings.Location = new System.Drawing.Point(330, 84);
@@ -368,7 +369,6 @@
             this.lvResults.Size = new System.Drawing.Size(309, 293);
             this.lvResults.TabIndex = 0;
             this.lvResults.UseCompatibleStateImageBehavior = false;
-            this.lvResults.SelectedIndexChanged += new System.EventHandler(this.OnListViewSelectedIndexChange);
             this.lvResults.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnListViewMouseDown);
             // 
             // menuDropDown
@@ -498,7 +498,7 @@
             // 
             this.groupBox2.Controls.Add(this.btnExportSettings);
             this.groupBox2.Controls.Add(this.btnExport);
-            this.groupBox2.Controls.Add(this.chkExportFrontBack);
+            this.groupBox2.Controls.Add(this.chkExportFrontAndReverse);
             this.groupBox2.Controls.Add(this.label8);
             this.groupBox2.Controls.Add(this.txtDPI);
             this.groupBox2.Location = new System.Drawing.Point(10, 92);
@@ -532,18 +532,18 @@
             this.btnExport.UseVisualStyleBackColor = true;
             this.btnExport.Click += new System.EventHandler(this.OnButtonClick);
             // 
-            // chkExportFrontBack
+            // chkExportFrontAndReverse
             // 
-            this.chkExportFrontBack.AutoSize = true;
-            this.chkExportFrontBack.Checked = true;
-            this.chkExportFrontBack.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkExportFrontBack.Location = new System.Drawing.Point(15, 30);
-            this.chkExportFrontBack.Name = "chkExportFrontBack";
-            this.chkExportFrontBack.Size = new System.Drawing.Size(187, 17);
-            this.chkExportFrontBack.TabIndex = 20;
-            this.chkExportFrontBack.Text = "Export front and back map images";
-            this.chkExportFrontBack.UseVisualStyleBackColor = true;
-            this.chkExportFrontBack.CheckedChanged += new System.EventHandler(this.OnCheckChanged);
+            this.chkExportFrontAndReverse.AutoSize = true;
+            this.chkExportFrontAndReverse.Checked = true;
+            this.chkExportFrontAndReverse.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkExportFrontAndReverse.Location = new System.Drawing.Point(15, 30);
+            this.chkExportFrontAndReverse.Name = "chkExportFrontAndReverse";
+            this.chkExportFrontAndReverse.Size = new System.Drawing.Size(187, 17);
+            this.chkExportFrontAndReverse.TabIndex = 20;
+            this.chkExportFrontAndReverse.Text = "Export front and back map images";
+            this.chkExportFrontAndReverse.UseVisualStyleBackColor = true;
+            this.chkExportFrontAndReverse.CheckedChanged += new System.EventHandler(this.OnCheckChanged);
             // 
             // label8
             // 
@@ -669,7 +669,7 @@
         private System.Windows.Forms.Button btnExport;
         private System.Windows.Forms.TextBox txtFolderExportPath;
         private System.Windows.Forms.Button btnFolderExportImage;
-        private System.Windows.Forms.CheckBox chkExportFrontBack;
+        private System.Windows.Forms.CheckBox chkExportFrontAndReverse;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.TextBox txtDPI;
         private System.Windows.Forms.Label label6;

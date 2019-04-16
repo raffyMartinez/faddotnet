@@ -257,9 +257,6 @@ namespace FAD3
         {
             get
             {
-                //return _gt == fadGridType.gridTypeGrid25 && _grid25.UTMZone != fadUTMZone.utmZone_Undefined
-                //        && _grid25.Bounds.Count > 0 && _grid25.GridSet.Count > 0;
-
                 return _gt == fadGridType.gridTypeGrid25 && _grid25.UTMZone != fadUTMZone.utmZone_Undefined
                         && _grid25.BoundsEx.Count > 0 && _grid25.GridSet.Count > 0;
             }
@@ -343,7 +340,7 @@ namespace FAD3
         }
 
         /// <summary>
-        /// manually refreshes the grid data after changing the guid of the target area;
+        /// manually refreshes the grid data after changing the guid of the target area
         /// </summary>
         public static void Refresh()
         {
@@ -677,8 +674,6 @@ namespace FAD3
                                                 UTMZoneSet = false;
                                                 break;
                                         }
-
-                                        //_grid25.Bounds.Clear();
                                         _grid25.BoundsEx.Clear();
 
                                         if (UTMZoneSet)
@@ -706,8 +701,6 @@ namespace FAD3
                                                 myBound.lrGridName = lr;
                                                 myBound.ulGridName = ul;
                                                 myBound.primaryMap = true;
-
-                                                //_grid25.Bounds.Add(myBound);
                                                 _grid25.BoundsEx.Add(myBound.gridDescription, myBound);
                                             }
 
@@ -740,7 +733,6 @@ namespace FAD3
                                                             myBound.lrGridName = lr;
                                                             myBound.ulGridName = ul;
 
-                                                            //_grid25.Bounds.Add(myBound);
                                                             _grid25.BoundsEx.Add(myBound.gridDescription, myBound);
                                                         }
                                                     }
@@ -862,7 +854,7 @@ namespace FAD3
                                 var dr = dt.Rows[i];
                                 string fg = dr["GridName"].ToString();
                                 string subGrid = dr["subGrid"].ToString();
-                                if(subGrid.Length>0)
+                                if (subGrid.Length > 0)
                                 {
                                     fg += $"-{subGrid}";
                                 }
@@ -921,21 +913,21 @@ namespace FAD3
                             if (dt.Rows.Count > 0)
                             {
                                 DataRow dr = dt.Rows[0];
-                                switch(dr["SubgridStyle"].ToString())
-                                    {
+                                switch (dr["SubgridStyle"].ToString())
+                                {
                                     case "-1":
                                     case "0":
                                         _subGridStyle = fadSubgridSyle.SubgridStyleNone;
                                         break;
+
                                     case "1":
                                         _subGridStyle = fadSubgridSyle.SubgridStyle4;
                                         break;
+
                                     case "2":
                                         _subGridStyle = fadSubgridSyle.SubgridStyle9;
                                         break;
                                 }
-
-                                
                             }
                         }
                     }
@@ -982,28 +974,6 @@ namespace FAD3
             return MajorGridRowPosition(GridNo) * _grid25.MajorGridSizeMeters + (_grid25.MajorGridYOrigin - _grid25.MajorGridSizeMeters);
         }
 
-        /// <summary>
-        /// returns the row position of a major grid inside the grid25 gridsystem
-        /// </summary>
-        /// <param name="GridNo"></param>
-        /// <returns></returns>
-        //private static int MajorGridRowPosition(int GridNo)
-        //{
-        //    double d = (GridNo / _grid25.MajorGridColumns);
-        //    if (d != Math.Floor(d))
-        //    {
-        //        return (int)Math.Floor(d) + 1;
-        //    }
-        //    return (int)Math.Floor(d);
-        //}
-
-        //original
-        //private static int MajorGridRowPosition(int GridNo)
-        //{
-        //    double d = (GridNo / _grid25.MajorGridColumns);
-        //    return (int)Math.Floor(d) + 1;
-        //}
-
         private static int MajorGridRowPosition(int GridNo)
         {
             double d = ((double)GridNo / _grid25.MajorGridColumns);
@@ -1044,8 +1014,6 @@ namespace FAD3
                     var MinorGrid = arr[1].Trim();
                     var MajorX = GridXOrigin(MajorGrid);
                     var MajorY = GridYOrigin(MajorGrid);
-                    //var arr1 = MinorGrid.Substring(0, 1).ToLower().ToCharArray();
-                    //var MinorCol1 = (int)arr1[0] - 96;
                     var MinorCol = MinorGrid.ToLower()[0] - 96;
                     var MinorRow = 25 - int.Parse(MinorGrid.Substring(1, MinorGrid.Length - 1));
                     x = MajorX + (MinorCol * 2000) - 1000;
@@ -1271,8 +1239,6 @@ namespace FAD3
             public int MajorGridSizeMeters { get; set; }
             public int MajorGridXOrigin { get; set; }
             public int MajorGridYOrigin { get; set; }
-
-            //private static List<LLBounds> _bounds;
             private static Dictionary<string, LLBounds> _boundsEx;
 
             public Dictionary<string, LLBounds> BoundsEx
@@ -1280,21 +1246,13 @@ namespace FAD3
                 get { return _boundsEx; }
             }
 
-            //public List<LLBounds> Bounds
-            //{
-            //    get { return _bounds; }
-            //    //set { _bounds = value;  }
-            //}
-
             public List<string> GridSet
             {
                 get { return _GridSet; }
-                //set { _GridSet = value; }
             }
 
             static Grid25Struct()
             {
-                //_bounds = new List<LLBounds>();
                 _boundsEx = new Dictionary<string, LLBounds>();
                 _GridSet = new List<string>();
             }

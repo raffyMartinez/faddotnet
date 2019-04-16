@@ -8,8 +8,6 @@ using System.IO;
 using System.Windows.Forms;
 using FAD3.Mapping.Forms;
 
-//using MapWinGIS;
-
 namespace FAD3
 {
     public partial class Grid25GenerateForm : Form
@@ -68,7 +66,6 @@ namespace FAD3
             _grid25MajorGrid.GridRetrieved += OnGrid25GridRetrieved;
             _grid25MajorGrid.ExtentCreatedInLayer += OnExtentCreated;
             _grid25MajorGrid.OnGridInPanelCreated += OnGridInPanelCreated;
-            //_grid25MajorGrid.LayoutDefined += OnGridLayoutDefined;
         }
 
         private void OnGridInPanelCreated(Grid25MajorGrid s, LayerEventArg e)
@@ -233,12 +230,10 @@ namespace FAD3
                     {
                         _grid25MajorGrid.LayoutHelper.ClearLayout();
                     }
-                   
-                    
+
                     _grid25MajorGrid.ClearSelectedGrids();
                     _parentForm.SetCursor(MapWinGIS.tkCursorMode.cmSelection);
                     _grid25MajorGrid.MapLayers.set_MapLayer(_grid25MajorGrid.Grid25ShapefileHandle, refreshLayerList: true);
-                    
 
                     _hasSubGrid = false;
                     break;

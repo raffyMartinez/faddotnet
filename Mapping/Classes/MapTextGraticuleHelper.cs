@@ -124,7 +124,6 @@ namespace FAD3.Mapping.Classes
                         var shape = new Shape();
                         if (shape.Create(ShpfileType.SHP_POINT))
                         {
-                            //shape.AddPoint();
                             _iShpTitle = _textShapefile.EditAddShape(shape);
                             _textShapefile.EditCellValue(_ifldText, _ishpNote, NoteText);
                         }

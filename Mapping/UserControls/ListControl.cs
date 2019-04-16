@@ -229,7 +229,6 @@ namespace FAD3.Mapping.UserControls
                 _redrawNeeded = false;
             }
 
-            //base.OnPaint(e);
             if (_backbuffer != null)
             {
                 if (vScrollBar1.Visible)

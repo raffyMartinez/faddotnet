@@ -242,7 +242,6 @@ namespace FAD3.Mapping.Forms
                     cboLastData.Text = "";
                     txtRows.Text = "";
                     txtMetadata.Text = "";
-                    //MakeGridFromPoints.Reset(true);
                     if (OpenFile())
                     {
                         ClearSummary();
@@ -263,7 +262,6 @@ namespace FAD3.Mapping.Forms
                         btnExport.Enabled = false;
                         lblStatus.Text = "";
                         _hasMesh = false;
-                        //RemoveMappingResults();
                         ResetCategoryAndMappingResults();
                         _datafileRead = false;
                     }
@@ -331,12 +329,10 @@ namespace FAD3.Mapping.Forms
                         switch (_classificationScheme)
                         {
                             case "Jenk's-Fisher's":
-                                //btnShowGridPolygons.Enabled = DoJenksFisherCategorization();
                                 categorizationSuccess = DoJenksFisherCategorization();
                                 break;
 
                             case "Unique values":
-                                //btnShowGridPolygons.Enabled = DoUniqueValuesCategorization();
                                 categorizationSuccess = DoUniqueValuesCategorization();
                                 txtCategoryCount.Text = _hashSelectedValues.Count.ToString();
                                 break;
@@ -423,7 +419,6 @@ namespace FAD3.Mapping.Forms
                         _hasMesh = MakeGridFromPoints.MeshShapefileHandle > 0;
                         if (_hasMesh)
                         {
-                            //MakeGridFromPoints.SetMeshCategories();
                             btnCategorize.Enabled = cboFirstData.SelectedIndex >= 0 && cboLastData.SelectedIndex >= 0;
                         }
                     }
@@ -718,10 +713,6 @@ namespace FAD3.Mapping.Forms
                     }
                     n++;
                 }
-                ////add the last category to the datagridview
-                //color = MakeGridFromPoints.AddCategory(upper, _dataValues.Max() + 1);
-                //row = dgCategories.Rows.Add(new object[] { $"> {ListOfIntervals.Max().ToString("N5")}", GetClassSize(ListOfIntervals.Max(), 0, true).ToString(), "" });
-                //dgCategories[2, row].Style.BackColor = color;
 
                 //add an empty null category
                 MakeGridFromPoints.AddNullCategory();
@@ -1035,11 +1026,8 @@ namespace FAD3.Mapping.Forms
                 dgSheetSummary.Rows.Clear();
                 foreach (KeyValuePair<string, int> kv in summary)
                 {
-                    // string category = dgCategories[0, row].Value.ToString();
-                    //var col2Text = "";
                     if (kv.Key == "Null")
                     {
-                        //col2Text = "Null";
                         percent = ((double)(kv.Value - MakeGridFromPoints.InlandPointCount) / (double)(_dataPoints - MakeGridFromPoints.InlandPointCount)) * 100;
                         row = dgSheetSummary.Rows.Add(new object[] { true, "Null", "", (kv.Value - MakeGridFromPoints.InlandPointCount).ToString(), percent.ToString("N1") });
                     }
@@ -1066,7 +1054,6 @@ namespace FAD3.Mapping.Forms
                 dgSheetSummary.ClearSelection();
                 dgSheetSummary.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCellsExceptHeader;
                 dgSheetSummary.Columns[1].MinimumWidth = 100;
-                //SizeColumns(dgSheetSummary, false);
             }
             else
             {
@@ -1243,8 +1230,6 @@ namespace FAD3.Mapping.Forms
             btnShowGridPolygons.Enabled = false;
             btnExport.Enabled = false;
             lblMappedSheet.Visible = false;
-            //SizeColumns(dgCategories);
-            //SizeColumns(dgSheetSummary);
             dgCategories.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCellsExceptHeader;
             dgCategories.Columns[0].MinimumWidth = 100;
             dgSheetSummary.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCellsExceptHeader;
@@ -1304,7 +1289,7 @@ namespace FAD3.Mapping.Forms
             tt.SetToolTip(txtDatasetNumberValues, "Number of non-null values in the dataset");
             tt.SetToolTip(txtDatasetUniqueCount, "Number of unique values in the dataset");
             tt.SetToolTip(txtDatasetMax, "Maximum value in the dataset");
-            tt.SetToolTip(txtDatasetMin,"Minimum value in the dataset");
+            tt.SetToolTip(txtDatasetMin, "Minimum value in the dataset");
 
             tt.SetToolTip(icbColorScheme, "Select color scheme to symbolize categories");
             tt.SetToolTip(cboClassificationScheme, "Select classification scheme for creating categories");
@@ -1323,16 +1308,13 @@ namespace FAD3.Mapping.Forms
 
             tt.SetToolTip(listSelectedTimePeriods, "Shows a list of time periods that were selected. Click on a time period to see spatial distribution of the data");
             tt.SetToolTip(btnUp, "Click to map the next item in the time periods list");
-            tt.SetToolTip(btnDown,"Click to map the previous item in the time periods list");
+            tt.SetToolTip(btnDown, "Click to map the previous item in the time periods list");
             tt.SetToolTip(dgSheetSummary, "Distribution of values within the categories/intervals");
             tt.SetToolTip(graphSheet, "Columnar chart of how values are distributed within the categories/intervals");
             tt.SetToolTip(btnExport, "Export a time series of distribution of values within categories/intervals for all time periods in the list");
             tt.SetToolTip(chkViewTimeSeriesChart, "View a 100 percent area chart of the time series");
 
             tt.SetToolTip(btnOk, "Closes this window");
-
-
-
 
             tt.SetToolTip(btnCategorize, "Click to create categories using selected classificaton scheme");
         }

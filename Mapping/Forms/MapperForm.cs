@@ -135,7 +135,6 @@ namespace FAD3
             axMap.MapUnits = tkUnitsOfMeasure.umMeters;
 
             var h = _mapLayersHandler.AddLayer(Grid25MajorGrid.Grid25Grid, "Grid25", true, true);
-            //_grid25MajorGrid.AddGrid25GridToMap();
             _mapLayersHandler.LoadMapState(false);
             _grid25MajorGrid.MoveToTop();
             _mapLayersHandler.set_MapLayer(h);
@@ -210,24 +209,6 @@ namespace FAD3
             axMap.UDCursorHandle = (int)ptr;
         }
 
-        //public void SetCursorToPan()
-        //{
-        //    axMap.MapCursor = tkCursor.crsrUserDefined;
-        //    Bitmap b = new Bitmap(Properties.Resources.pan);
-        //    b.MakeTransparent(b.GetPixel(0, 0));
-        //    Graphics g = Graphics.FromImage(b);
-        //    IntPtr ptr = b.GetHicon();
-        //    axMap.UDCursorHandle = (int)ptr;
-        //    axMap.CursorMode = tkCursorMode.cmPan;
-        //}
-
-        //public void SetCursorToSelect()
-        //{
-        //    axMap.MapCursor = tkCursor.crsrUserDefined;
-        //    axMap.UDCursorHandle = (int)((Bitmap)ilCursors.Images["arrow32"]).GetHicon();
-        //    axMap.CursorMode = tkCursorMode.cmSelection;
-        //}
-
         private void OnMapperForm_Closed(object sender, FormClosedEventArgs e)
         {
             global.MappingForm = null;
@@ -274,7 +255,6 @@ namespace FAD3
                     MessageBox.Show(errMsg, "Error in opening file", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     dr = DialogResult.Cancel;
                 }
-                
             }
             return dr;
         }
@@ -302,12 +282,13 @@ namespace FAD3
             return fileName;
         }
 
-        public bool SaveMapImage(double DPI, string fileName, bool Preview = true)
+        public bool SaveMapImage(double DPI, string fileName, bool Preview = true, bool maintainOnePointLineWidth = false)
         {
             var success = false;
             _saveMapImage = new SaveMapImage(fileName, DPI, axMap);
             _saveMapImage.PreviewImage = Preview;
             _saveMapImage.MapLayersHandler = _mapLayersHandler;
+            _saveMapImage.MaintainOnePointLineWidth = maintainOnePointLineWidth;
             success = _saveMapImage.Save(_grid25MajorGrid != null);
             try
             {
@@ -364,7 +345,7 @@ namespace FAD3
                     }
                     else
                     {
-                         MessageBox.Show("Please select a layer", "No selected layer", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBox.Show("Please select a layer", "No selected layer", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     break;
 
@@ -392,12 +373,10 @@ namespace FAD3
                     break;
 
                 case "tsButtonPan":
-                    //SetCursorToPan();
                     SetCursor(tkCursorMode.cmPan);
                     break;
 
                 case "tsButtonBlackArrow":
-                    //SetCursorToSelect();
                     SetCursor(tkCursorMode.cmSelection);
                     break;
 

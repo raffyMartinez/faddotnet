@@ -16,7 +16,6 @@ namespace FAD3
 
         private void frmAbout_Load(object sender, EventArgs e)
         {
-            //global.LoadFormSettings(this, FormBorderStyle == FormBorderStyle.FixedToolWindow);
             labelApp.Text = "Fisheries Assessment Database 3";
             FontFamily ff = new FontFamily("Microsoft Sans Serif");
             labelApp.Font = new Font(ff, 13F, FontStyle.Bold);
@@ -47,11 +46,6 @@ namespace FAD3
             labelCredits.Text = $"This software make use of the following {(componentList.Count == 1 ? "component:" : "components:")}\r\n{labelCredits.Text}\r\n\r\n";
             labelCredits.Font = new Font(ff, 8F, FontStyle.Regular);
             labelCredits.BorderStyle = BorderStyle.None;
-        }
-
-        private void AboutFadForm_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            //global.SaveFormSettings(this);
         }
 
         private void OnButtonClick(object sender, EventArgs e)

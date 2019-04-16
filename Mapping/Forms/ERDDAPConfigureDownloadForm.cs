@@ -234,7 +234,6 @@ namespace FAD3.Mapping.Forms
             _selectionExtent.SetBounds(e.Left, e.Bottom, 0, e.Right, e.Top, 0);
             if (!e.InDrag)
             {
-                //MakeGridFromPoints.MapLayersHandler = global.MappingForm.MapLayersHandler;
                 MakeGridFromPoints.MakeExtentShapeFile();
             }
             ValidateExtents();

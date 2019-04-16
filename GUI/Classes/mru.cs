@@ -18,7 +18,6 @@ namespace FAD3
         private ToolStripMenuItem _MyMenu;
 
         // The menu items we use to display files.
-        //private ToolStripSeparator Separator;
         private ToolStripMenuItem[] MenuItems;
 
         // Raised when the user selects a file from the MRU list.
@@ -41,11 +40,6 @@ namespace FAD3
             _MyMenu = menu;
             _NumFiles = num_files;
             FileInfos = new List<FileInfo>();
-
-            // Make a separator.
-            //Separator = new ToolStripSeparator();
-            //Separator.Visible = false;
-            //MyMenu.DropDownItems.Add(Separator);
 
             // Make the menu items we may later need.
             MenuItems = new ToolStripMenuItem[_NumFiles + 1];
@@ -163,7 +157,6 @@ namespace FAD3
         // Display the files in the menu items.
         private void ShowFiles()
         {
-            //Separator.Visible = (FileInfos.Count > 0);
             for (int i = 0; i < FileInfos.Count; i++)
             {
                 MenuItems[i].Text = string.Format("&{0} {1}", i + 1, FileInfos[i].Name);

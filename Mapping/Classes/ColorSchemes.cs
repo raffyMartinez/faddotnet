@@ -105,7 +105,6 @@ namespace FAD3.Mapping
                 }
                 catch (Exception ex)
                 {
-                    //Globals.MessageBoxError("Failed to create directory: " + path + Environment.NewLine + ex.Message);
                     Logger.Log("Failed to create directory: " + path + Environment.NewLine + ex.Message);
                     return;
                 }

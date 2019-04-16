@@ -31,7 +31,6 @@ namespace FAD3.Mapping.Forms
             _mapControl.MouseMoveEvent += OnMapMouseMove;
             Text = "Capture coordinates";
             _utmZone = _majorGrid.UTMZone.ToString().Replace("utmZone", "");
-            // _mapControl.MouseDownEvent += OnMapMouseDown;
         }
 
         private void OnMapMouseDown(object sender, _DMapEvents_MouseDownEvent e)
@@ -50,7 +49,6 @@ namespace FAD3.Mapping.Forms
         private void OnFormClosing(object sender, FormClosingEventArgs e)
         {
             _instance = null;
-            //_mapControl.MouseDownEvent -= OnMapMouseDown;
             _mapControl.MouseMoveEvent -= OnMapMouseMove;
             _mapControl = null;
             global.SaveFormSettings(this);

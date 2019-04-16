@@ -15,8 +15,6 @@ using System.Data;
 using System.Data.OleDb;
 using System.Reflection;
 
-//using System.Diagnostics;
-
 namespace FAD3
 {
     /// <summary>

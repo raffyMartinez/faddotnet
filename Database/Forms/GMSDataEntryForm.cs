@@ -63,7 +63,6 @@ namespace FAD3
             t.GotFocus += OnTextFocus;
             t.Validating += OnTextValidating;
             t.DoubleClick += OnTextBoxDoubleClick;
-            //t.KeyDown += OnTextKeyDown;
         }
 
         private void OnTextKeyDown(object sender, KeyEventArgs e)
@@ -99,8 +98,6 @@ namespace FAD3
                         o.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
                         o.Font = Font;
                         _ctlHeight = o.Height;
-                        //o.Validated += OnComboValidated;
-                        //o.KeyDown += OnCombo_Keydown;
                     });
 
                 _cboGMS.With(o =>
@@ -308,9 +305,6 @@ namespace FAD3
                 {
                     _cboEditor.Text = s;
                 }
-
-                //_cboEditor.SelectionStart = 0;
-                //_cboEditor.SelectionLength = _cboEditor.Text.Length;
 
                 SetEditorEvents();
             }

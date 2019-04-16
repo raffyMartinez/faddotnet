@@ -160,15 +160,6 @@ namespace FAD3
                 picPreview.ImageLocation = tempFileName;
 
                 picPreview.Load();
-                //Rectangle rect = picPreview.ClientRectangle;
-                //Bitmap bmp = new Bitmap(rect.Width, rect.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                //Graphics g = Graphics.FromImage(bmp);
-                //IntPtr ptr = g.GetHdc();
-
-                //global.MappingForm.MapControl.SnapShotToDC(ptr, global.MappingForm.MapControl.Extents, picPreview.Width);
-                //g.ReleaseHdc();
-
-                //picPreview.Image = bmp;
                 picPreview.SizeMode = PictureBoxSizeMode.Zoom;
             }
         }

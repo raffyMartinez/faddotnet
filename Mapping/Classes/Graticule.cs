@@ -270,11 +270,6 @@ namespace FAD3
         {
             _sfGraticule?.EditClear();
             _sfGraticule?.Labels.Clear();
-            //if (GraticuleTextHelper.TitleVisible)
-            //{
-            //    _mapLayersHandler.AddLayer(GraticuleTextHelper.TextShapefile, "Text", true, true);
-            //    GraticuleTextHelper.TextShapefile.Labels.Expression = "[Text]";
-            //}
             ShowGraticule();
         }
 
@@ -310,19 +305,6 @@ namespace FAD3
             _mapExtents.SetBounds(xMin, yMin, 0, xMax, yMax, 0);
 
             _graticuleExtents = new Extents();
-
-            //if (GraticuleTextHelper.TitleVisible)
-            //{
-            //    if (GraticuleTextHelper.NoteVisible)
-            //    {
-            //    }
-            //}
-            //else
-            //{
-            //    //0.93 means that the graticule is 93% of the map extent
-            //    tempW = (xMax - xMin) * 0.93;
-            //    tempH = (yMax - yMin) * 0.93;
-            //}
 
             //0.93 means that the graticule is 93% of the map extent
             tempW = (xMax - xMin) * 0.93;

@@ -1,5 +1,4 @@
-﻿//using ADOX;
-using FAD3.Database.Classes;
+﻿using FAD3.Database.Classes;
 using MetaphoneCOM;
 using System;
 using System.Collections.Generic;
@@ -218,7 +217,6 @@ namespace FAD3
         {
             get
             {
-                //GetGearLocalNames();
                 return _gearLocalNameListDict;
             }
         }
@@ -1062,7 +1060,6 @@ namespace FAD3
                                       HAVING tblSampling.[LSGUID]={{{LandingSiteGUID}}} AND tblSampling.[GearVarGUID]={{{_GearVarGUID}}}
                                       ORDER BY Year([SamplingDate]), Month([SamplingDate])";
 
-                    //Debug.WriteLine (query);
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(myDT);
                     for (int i = 0; i < myDT.Rows.Count; i++)

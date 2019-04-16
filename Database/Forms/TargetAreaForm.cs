@@ -101,21 +101,23 @@ namespace FAD3
                         global.SizeListViewColumns(lvMaps, false);
                         comboUTMZone.Text = "";
                         comboUTMZone.Text = FishingGrid.UTMZoneName;
-                        if(comboSubGrid.Items.Count==0)
+                        if (comboSubGrid.Items.Count == 0)
                         {
                             foreach (var item in FishingGrid.SubGridStyles)
                             {
                                 comboSubGrid.Items.Add(item);
                             }
                         }
-                        switch(FishingGrid.SubGridStyle)
+                        switch (FishingGrid.SubGridStyle)
                         {
                             case fadSubgridSyle.SubgridStyleNone:
                                 comboSubGrid.SelectedIndex = 0;
                                 break;
+
                             case fadSubgridSyle.SubgridStyle4:
                                 comboSubGrid.SelectedIndex = 1;
                                 break;
+
                             case fadSubgridSyle.SubgridStyle9:
                                 comboSubGrid.SelectedIndex = 2;
                                 break;
@@ -139,7 +141,6 @@ namespace FAD3
             {
                 lblTitle.Text = "Add new target area";
             }
-
 
             var lv = (ListView)tabAOI.TabPages["tabGrid25"].Controls["lvMaps"];
 
@@ -170,14 +171,13 @@ namespace FAD3
 
             comboUTMZone.SelectedIndex = -1;
 
-
             if (_isNew)
             {
                 comboUTMZone.SelectedIndex = 0;
                 comboSubGrid.SelectedIndex = 0;
             }
 
-            if(_targetArea!=null)
+            if (_targetArea != null)
             {
                 ShowTargetAreaProperties();
             }
@@ -203,11 +203,11 @@ namespace FAD3
             tt.SetToolTip(txtCode, "Target area code of 1 to 5 characters long");
             tt.SetToolTip(comboUTMZone, "UTM zone where the target area is found.\r\nSelect 50N if target area is located in Palawan\r\nSelect 51N if target areas is located in the rest of the Philippines");
             tt.SetToolTip(comboSubGrid, "Select subgrid style\r\n-None\r\n-4 subgrids (1000x1000 meters)\r\n-9 subgrids (666 x 666 meters)");
-            tt.SetToolTip(lvMaps, "List of fishing ground maps that will be used in the target area\r\n"+
-                                    "To add a map, click on the + button\r\n"+
-                                    "To remove a map, click on the - button\r\n"+
+            tt.SetToolTip(lvMaps, "List of fishing ground maps that will be used in the target area\r\n" +
+                                    "To add a map, click on the + button\r\n" +
+                                    "To remove a map, click on the - button\r\n" +
                                     "To edit a map, couble click on the map name");
-            tt.SetToolTip(buttonAddMap,"Click to add a fishing ground map to the target area");
+            tt.SetToolTip(buttonAddMap, "Click to add a fishing ground map to the target area");
             tt.SetToolTip(buttonRemoveMap, "Click to remove a fishing ground map from the target area");
             tt.SetToolTip(buttonOK, "Closes the form and saves the target area");
             tt.SetToolTip(buttonCancel, "Closes the form without saving the target area");
@@ -218,7 +218,7 @@ namespace FAD3
             tt.SetToolTip(buttonDefine, "Click to setup a grid system not using Grid25\r\nThis is not used for new target areas in FAD3");
         }
 
-            private void LoadGrid25Items(ListView lv)
+        private void LoadGrid25Items(ListView lv)
         {
             lv.Items.Clear();
             if (FishingGrid.GridType == fadGridType.gridTypeGrid25)
@@ -326,7 +326,6 @@ namespace FAD3
                     {
                         var Map = (lvi.Text, lvi.SubItems[1].Text, lvi.SubItems[2].Text);
 
-                        //var Map = (MapName: lvi.Text, ULGrid: lvi.SubItems[1].Text, LRGrid: lvi.SubItems[2].Text);
                         Maps.Add(lvi.Text, Map);
                     }
                     FirstMap = lvMaps.Items[0].Text;
@@ -374,7 +373,6 @@ namespace FAD3
             }
         }
 
-
         private void OnFormClosed(object sender, FormClosedEventArgs e)
         {
             if (FishingGrid.GridType == fadGridType.gridTypeGrid25)
@@ -383,8 +381,6 @@ namespace FAD3
             _instance = null;
             global.SaveFormSettings(this);
         }
-
-
 
         private void lvMaps_MouseDown(object sender, MouseEventArgs e)
         {

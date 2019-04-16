@@ -64,8 +64,6 @@ namespace FAD3.Database.Forms
                                         mehf.CombineYearsInOneMap = chkCombinedMap.Checked;
                                         mehf.SetUpMapping(f.TargetArea.TargetAreaGuid, item.Tag.ToString(), item.SubItems[1].Text, f.TargetArea.TargetAreaName);
                                         mehf.MapTargetAreaGearFishingGroundBatch(this);
-                                        //var file = $@"{FishingGearMapping.SaveMapFolder}\{item.Text}-{item.SubItems[1].Text}.tif";
-                                        //global.MappingForm.SaveMapImage(int.Parse(txtDPI.Text), file, false);
                                         n++;
                                     }
                                 }

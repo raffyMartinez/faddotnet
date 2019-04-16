@@ -161,7 +161,6 @@ namespace FAD3.Mapping.Forms
                                 row.CreateCells(gridAttributes);
                                 row.Cells[0].Value = valueText;
                                 row.HeaderCell.Value = headerText;
-                                //row.SetValues(new object[] { headerText, valueText });
                                 gridAttributes.Rows.Add(row);
                             }
                         }
@@ -234,7 +233,6 @@ namespace FAD3.Mapping.Forms
                         }
                     }
                 }
-                //SizeColumns(init: false);
 
                 gridAttributes.Visible = true;
             }
@@ -247,26 +245,6 @@ namespace FAD3.Mapping.Forms
 
         private void OnLayerSelection(object sender, EventArgs e)
         {
-            bool proceed = false;
-
-            //lvAttributes.SelectedItems.Clear();
-            //ItemBackColorReset();
-            //if (chkRemember.Checked && lvAttributes.Items.Count > 0 && MapInterActionHandler.SelectedShapeIndexes != null)
-            //{
-            //    Shapefile sf = _currentMapLayer.LayerObject as Shapefile;
-            //    for (int n = 0; n < MapInterActionHandler.SelectedShapeIndexes.Length; n++)
-            //    {
-            //        var itemName = MapInterActionHandler.SelectedShapeIndexes[n].ToString();
-            //        if (lvAttributes.Items.ContainsKey(itemName))
-            //        {
-            //            lvAttributes.Items[itemName].Selected = true;
-            //            lvAttributes.Items[itemName].BackColor = SystemColors.Highlight;
-            //            proceed = true;
-            //        }
-            //    }
-            //    if (proceed) lvAttributes.SelectedItems[0].EnsureVisible();
-            //}
-            //else
             {
                 DisplayAttributes();
             }

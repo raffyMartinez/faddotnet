@@ -99,7 +99,6 @@ namespace FAD3
                         _requiredTables.Add("Municipalities");
                         _requiredTables.Add("tblGearClass");
                         _requiredTables.Add("tblTaxa");
-                        
                     }
                     break;
             }
@@ -129,14 +128,9 @@ namespace FAD3
             var qd = new dao.QueryDef();
             foreach (var item in _requiredTables)
             {
-                //sql = $"Insert Into {item} In '{_newMDBFile}' Select * from {item}";
                 sql = $"Insert Into {item} In '{_newMDBFile}' Select {TableFieldList(item)} from {item}";
-                // MessageBox.Show(sql);
                 qd = dbData.CreateQueryDef("", sql);
                 qd.Execute();
-
-                //qd.Close();
-                //qd = null;
             }
 
             if (checkAOI.Checked)

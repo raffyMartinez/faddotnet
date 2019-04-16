@@ -90,7 +90,6 @@ namespace FAD3
             var result = ShapefileLabelHandler.TestExpression(expression, (Shapefile)_mapLayer.LayerObject);
             if (result.isValid)
             {
-                //txtLabelSourceField.Text = _mapLayer.Expression;
                 lblResult.Text = "Valid expression";
                 lblResult.ForeColor = Color.Green;
             }
@@ -444,28 +443,6 @@ namespace FAD3
             {
                 _shapeFile.Labels.Clear();
                 txtLabelSourceField.Text = string.Empty;
-                //Labels lb = _shapeFile.Labels;
-                //for (int i = 0; i < lb.Count; i++)
-                //{
-                //    for (int j = 0; j < lb.get_NumParts(i); j++)
-                //    {
-                //        lb.get_Label(i, j).Text = "";
-                //    }
-                //}
-
-                //listBox1.Enabled = true;
-                //btnPlus.Enabled = true;
-                //btnQuotes.Enabled = true;
-                //btnNewLine.Enabled = true;
-                //richTextBox1.Enabled = true;
-                //richTextBox1.Text = "";
-
-                //lb.SavingMode = tkSavingMode.modeXMLOverwrite;
-                //lb.Synchronized = true;
-                //if (!lb.Synchronized)
-                //{
-                //    lb.Clear();
-                //}
             }
         }
 

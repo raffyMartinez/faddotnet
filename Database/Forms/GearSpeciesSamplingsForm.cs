@@ -184,11 +184,6 @@ namespace FAD3
                 o.Columns.Add("Weight of catch");
                 o.Columns.Add("Type of vessel used");
                 o.Columns.Add("Name of enumerator");
-
-                //foreach (ColumnHeader c in lvSamplings.Columns)
-                //{
-                //    c.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
-                //}
             });
             SizeColumns(lvSamplings);
         }

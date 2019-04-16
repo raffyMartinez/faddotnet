@@ -105,7 +105,6 @@ namespace FAD3
                     {
                         if (_saveAsShapefile)
                         {
-                            //_parentForm.Grid25MajorGrid.Save(txtSave.Text);
                             FolderBrowserDialog fbd = new FolderBrowserDialog();
                             fbd.Description = "Select folder to save fishing ground grid map";
                             fbd.SelectedPath = GetSavedMapsFolder();
@@ -135,7 +134,7 @@ namespace FAD3
                             if (result == DialogResult.OK && sfd.FileName.Length > 0)
                             {
                                 //if (_parentForm.Grid25MajorGrid.Save(int.Parse(txtSave.Text), sfd.FileName))
-                                if (global.MappingForm.SaveMapImage(int.Parse(txtSave.Text), sfd.FileName))
+                                if (global.MappingForm.SaveMapImage(int.Parse(txtSave.Text), sfd.FileName, maintainOnePointLineWidth: true))
                                 {
                                     Close();
                                 }

@@ -280,15 +280,6 @@ namespace FAD3
                     }
 
                     success = true;
-                    //var cat = _shapefileMinorGridLines.Categories.Add("minorGrid");
-                    //cat.Expression = @"[LineType] = ""MG""";
-                    //cat.DrawingOptions.LineColor = _grid25MajorGrid.LabelAndGridProperties["minorGridLineColor"];
-                    //cat.DrawingOptions.LineWidth = _grid25MajorGrid.LabelAndGridProperties["minorGridThickness"];
-
-                    //var cat1 = _shapefileMinorGridLines.Categories.Add("subGrid");
-                    //cat1.Expression = @"[LineType] = ""SG""";
-                    //cat1.DrawingOptions.LineColor = _grid25MajorGrid.LabelAndGridProperties["subGridLineColor"];
-                    //cat1.DrawingOptions.LineWidth = _grid25MajorGrid.LabelAndGridProperties["subGridLineThickness"];
                 });
             }
 
@@ -360,7 +351,6 @@ namespace FAD3
                         _shapefileMinorGridLines.EditCellValue(iFldDirection, shpIndex, lineType);
                         _shapefileMinorGridLines.EditCellValue(ifldBoundary, shpIndex, "F");
                         _shapefileMinorGridLines.EditCellValue(ifldLineType, shpIndex, "SG");
-                        Console.WriteLine($"added subgrid {r + 1.ToString()} with xy of {_shapefileMinorGridLines.Shape[shpIndex].Point[0].x.ToString()},{_shapefileMinorGridLines.Shape[shpIndex].Point[0].y.ToString()}");
                     }
                 }
             }
@@ -387,7 +377,6 @@ namespace FAD3
                     _minorGridExtents = null;
                     _axMap = null;
                 }
-                //_grid25MajorGrid = null;
                 _disposed = true;
             }
         }

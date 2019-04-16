@@ -123,7 +123,6 @@ namespace FAD3
 
             _lastLen = textLen;
             _lastFreq = textFreq;
-            //_lastLen.Focus();
 
             textLen.Validating += OnTextValidating;
             textFreq.Validating += OnTextValidating;
@@ -246,9 +245,6 @@ namespace FAD3
                     }
                     else
                     {
-                        //_deletedLF.Add(_lf[_currentRow].rowGuid);
-                        //_lf.Remove(_currentRow);
-
                         PopulateFieldControls(false, true);
                     }
                     break;

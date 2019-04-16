@@ -19,7 +19,6 @@ namespace Owf.Controls
             set
             {
                 this._colorPlate.ColorPlate.SelectedColor = value;
-                //this.Refresh();
             }
         }
 

@@ -89,7 +89,6 @@ namespace FAD3.Database.Forms
                         if (cboInventories.Items.Count > 0)
                         {
                             cboInventories.SelectedIndex = 0;
-                            //ImportIntoExistingProjectGuid = ((KeyValuePair<string, string>)cboInventories.SelectedItem).Key;
                         }
                     }
                     else

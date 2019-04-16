@@ -14,8 +14,6 @@ namespace FAD3.Database.Classes
 
         public static void ShowDialog()
         {
-            //FileName = "";
-
             if (DialogType == FileDialogType.FileOpen)
             {
                 _dlg = new OpenFileDialog();

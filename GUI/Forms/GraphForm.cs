@@ -61,7 +61,6 @@ namespace FAD3.GUI.Forms
 
         public void MapSpatioTemporalData(SeriesChartType chartType)
         {
-            //chartType = SeriesChartType.StackedColumn100;
             if (DataFile.Length > 0)
             {
                 _hasLongName = false;
@@ -88,7 +87,6 @@ namespace FAD3.GUI.Forms
                             chart.ChartAreas[0].AxisX.Title = _xVariableName;
                             chart.ChartAreas[0].AxisX.IsLabelAutoFit = false;
                             chart.ChartAreas[0].AxisX.LabelStyle.Angle = -90;
-                            //chart.Series["Null"].Color = Color.AntiqueWhite;
                         }
                         else if (line.Contains("Inland points:"))
                         {
@@ -195,7 +193,6 @@ namespace FAD3.GUI.Forms
                     }
                     tabsChart.SelectedTab = tabsChart.TabPages["tabGraph"];
                     _newFont = null;
-                    //tabGraph.Select();
                     break;
 
                 case "btnXaxisLabelFont":

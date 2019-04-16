@@ -113,7 +113,6 @@ namespace FAD3.Database.Forms
             TreeNode targetNode = treeLGUs.GetNodeAt(targetPoint);
 
             // Retrieve the node that was dragged.
-            //TreeNode draggedNode = e.Data.GetData(typeof(TreeNode));
             TreeNode draggedNode = (TreeNode)e.Data.GetData(typeof(TreeNode));
 
             if (targetNode.Tag.ToString() == "province" && draggedNode.Parent.Text != targetNode.Text)
@@ -163,7 +162,6 @@ namespace FAD3.Database.Forms
                             {
                                 targetNode.Nodes.Add(draggedNode);
                                 draggedNode.Nodes.Clear();
-                                //RefreshLandingSiteNodeNodes(targetNode);
                                 targetNode.Expand();
                             }
                             targetNode.BackColor = Color.White;
@@ -173,7 +171,6 @@ namespace FAD3.Database.Forms
 
                 // Optional: Select the dropped node and navigate (however you do it)
                 treeLGUs.SelectedNode = draggedNode;
-                // NavigateToContent(draggedNode.Tag);
             }
             else
             {

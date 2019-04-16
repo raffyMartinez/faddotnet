@@ -57,6 +57,8 @@ namespace FAD3
 
         public int Grid25ShapefileHandle { get; internal set; }
 
+        public bool PrintFrontAndReverseSides { get; set; }
+
         public delegate void FishingGridLayerSavedHandler(Grid25MajorGrid s, LayerEventArg e);              //event raised when a layer is selected from the list found in the layers form
         public event FishingGridLayerSavedHandler LayerSaved;
 
@@ -66,15 +68,14 @@ namespace FAD3
         public delegate void MapExtentCreated(Grid25MajorGrid s, ExtentDraggedBoxEventArgs e);                          //event raised when an extent is created
         public event MapExtentCreated ExtentCreatedInLayer;
 
-        //public delegate void GridLayoutOriginDefined(Grid25MajorGrid s, ExtentDraggedBoxEventArgs e);
-        //public event GridLayoutOriginDefined LayoutDefined;
-
         public delegate void GridInPanelCreated(Grid25MajorGrid s, LayerEventArg e);
         public event GridInPanelCreated OnGridInPanelCreated;
 
+        public GridMapSideToPrint GridMapSideToPrint { get; set; }
         public int LayoutRows { get; internal set; }
         public int LayoutCols { get; internal set; }
         public int LayoutOverlap { get; internal set; }
+        public bool UpdateOnGridCreate { get; set; }
 
         private static List<string> _filesToDeleteOnClose = new List<string>();
         public const int XBuffer = 1500;
@@ -84,6 +85,20 @@ namespace FAD3
         public int SubGridCount { get; set; }
 
         public bool GridIsDefinedFromLayout { get; private set; }
+
+        public Dictionary<int, FrontAndReverseMapSpecs> ExportSettingsDict { get; set; }
+
+        public string SourceFolder { get; set; }
+
+        public void LockMap()
+        {
+            MapLayers.MapControl.LockWindow(tkLockMode.lmLock);
+        }
+
+        public void UnlockMap()
+        {
+            MapLayers.MapControl.LockWindow(tkLockMode.lmUnlock);
+        }
 
         public string FolderToSave
         {
@@ -230,88 +245,8 @@ namespace FAD3
 
                 if (GenerateMinorGridInsideExtent(e.SelectedExtent))
                 {
+                    SetUpNonGridLayers();
                     SetupTopLayers();
-                    //_grid25MinorGrid.MinorGridLinesShapeFile.Categories.ApplyExpressions();
-                }
-            }
-            else if (e.Action == "LoadGridMap1")
-            {
-                int h = 0;
-
-                //load the minor grid shapefile
-                if (_grid25MinorGrid.LoadMinorGridShapefile($"{fgFileName}_gridlines.shp"))
-                {
-                    //load the major grids of the fishing ground
-                    _shapefileMajorGridIntersect = new Shapefile();
-                    if (_shapefileMajorGridIntersect.Open($"{fgFileName}_majorgrid.shp"))
-                    {
-                        //populate the list with the shape indexes of the major grids
-                        _listSelectedShapeGridNumbers.Clear();
-                        for (int n = 0; n < _shapefileMajorGridIntersect.NumShapes; n++)
-                        {
-                            string shpIndex = (string)_shapefileMajorGridIntersect.CellValue[_shapefileMajorGridIntersect.FieldIndexByName["hGrid"], n];
-                            if (shpIndex.Length > 0)
-                            {
-                                _listSelectedShapeGridNumbers.Add(int.Parse(shpIndex));
-                                //_listSelectedShapeGridNumbers.Add(shpIndex);
-                            }
-                        }
-
-                        //get the intersection of the minorGridExtent and the selected major grids
-                        if (MajorGridsIntersectMinorGridExtent(_grid25MinorGrid.MinorGridLinesShapeFile.Extents))
-                        {
-                            _shapeFileSelectedMajorGridBuffer = _shapefileMajorGridIntersect.BufferByDistance(0, 1, false, true);
-                            _shapeFileSelectedMajorGridBuffer.GeoProjection = _axMap.GeoProjection;
-                        }
-
-                        //using Grid25LabelManager, create labels that follow the path defined by  _shapeFileSelectedMajorGridBuffer
-                        _grid25LabelManager = new Grid25LabelManager(_axMap.GeoProjection);
-                        if (_grid25LabelManager.LabelGrid(_shapeFileSelectedMajorGridBuffer, _gridAndLabelProperties, MapTitle))
-                        {
-                            //add label shapefile to the map
-                            _grid25LabelManager.AddMajorGridLabels(_listIntersectedMajorGrids);
-                            _grid25LabelManager.Grid25Labels.Labels.ApplyCategories();
-                            h = _mapLayers.AddLayer(_grid25LabelManager.Grid25Labels, "Labels", true, true);
-                            _mapLayers.LayerDictionary[h].IsFishingGrid = true;
-                            AssignLayerWeight(_mapLayers.LayerDictionary[h]);
-                            _listGridLayers.Add(h);
-
-                            //add minor grid shapefile to the map
-                            h = _mapLayers.AddLayer(_grid25MinorGrid.MinorGridLinesShapeFile, "Minor grid", true, true);
-                            _mapLayers.LayerDictionary[h].IsGraticule = true;
-                            _mapLayers.LayerDictionary[h].IsFishingGrid = true;
-                            AssignLayerWeight(_mapLayers.LayerDictionary[h]);
-                            _listGridLayers.Add(h);
-
-                            //add major grids
-                            h = _mapLayers.AddLayer(_shapefileMajorGridIntersect, "Major grid", true, true);
-                            _mapLayers.LayerDictionary[h].IsGraticule = true;
-                            _mapLayers.LayerDictionary[h].IsFishingGrid = true;
-                            AssignLayerWeight(_mapLayers.LayerDictionary[h]);
-                            _listGridLayers.Add(h);
-
-                            //add boundary
-                            _shapefileBoundingRectangle = new Shapefile();
-                            _shapefileBoundingRectangle.Open($"{fgFileName}_gridboundary.shp");
-                            h = _mapLayers.AddLayer(_shapefileBoundingRectangle, "MBR", true, true);
-                            _mapLayers.LayerDictionary[h].IsGraticule = true;
-                            _mapLayers.LayerDictionary[h].IsFishingGrid = true;
-                            AssignLayerWeight(_mapLayers.LayerDictionary[h]);
-                            _listGridLayers.Add(h);
-
-                            ApplyGridSymbology();
-
-                            //raise event declaring that a fishing grid was retrieved from file
-                            if (GridRetrieved != null)
-                            {
-                                var mapName = _shapefileBoundingRectangle.CellValue[_shapefileBoundingRectangle.FieldIndexByName["MapTitle"], 0];
-                                LayerEventArg lp = new LayerEventArg(h, (string)mapName);
-                                GridRetrieved(this, lp);
-                            }
-
-                            SetupTopLayers();
-                        }
-                    }
                 }
             }
             else if (e.Action == "DeleteGridMap")
@@ -368,6 +303,7 @@ namespace FAD3
             LayoutRows = 1;
             LayoutCols = 1;
             LayoutOverlap = 0;
+            UpdateOnGridCreate = true;
         }
 
         private void OnSelectBoxDrag(object sender, _DMapEvents_SelectBoxDragEvent e)
@@ -435,7 +371,6 @@ namespace FAD3
                             sf.EditCellValue(sf.FieldIndexByName["Name"], 0, Path.GetFileName(baseFileName));
                             break;
                     }
-
 
                     if (ShapefileDiskStorageHelper.Delete(fileName))
                     {
@@ -780,7 +715,6 @@ namespace FAD3
                         break;
                 }
                 FishingGrid.UTMZone = _utmZone;
-                //GenerateMajorGrids();
             }
         }
 
@@ -855,10 +789,10 @@ namespace FAD3
                 _axMap.MapCursor = tkCursor.crsrUserDefined;
                 _axMap.UDCursorHandle = _hCursorDefineLayout;
             }
-            
+
             if (_layoutHelper == null)
             {
-                if(iconHandle>0)
+                if (iconHandle > 0)
                 {
                     _layoutHelper = new Grid25LayoutHelper(this, _hCursorDefineLayout);
                 }
@@ -1372,8 +1306,6 @@ namespace FAD3
                                             _shapefileMajorGridIntersect.EditCellValue(ifldMGNo, iShp2, _shapefileMajorGrid.CellValue[1, indexes[n]]);
                                             _shapefileMajorGridIntersect.EditCellValue(ifldGridHandle, iShp2, indexes[n]);
                                             _listIntersectedMajorGrids.Add((int.Parse(_shapefileMajorGrid.CellValue[1, indexes[n]].ToString()), intersectedExtent.Center.x, intersectedExtent.Center.y));
-                                            Console.WriteLine($"grid number:{_shapefileMajorGrid.CellValue[1, indexes[n]]}");
-                                            Console.WriteLine($"width:{intersectedExtent.Width} height:{intersectedExtent.Height}");
                                         }
                                     }
                                 }
@@ -1467,29 +1399,44 @@ namespace FAD3
                             var h = _mapLayers.AddLayer(_grid25MinorGrid.MinorGridLinesShapeFile, "Minor grid", true, true);
                             _mapLayers.LayerDictionary[h].IsGraticule = true;
                             _mapLayers.LayerDictionary[h].IsFishingGrid = true;
+                            _mapLayers.LayerDictionary[h].IsGrid25Layer = true;
                             AssignLayerWeight(_mapLayers.LayerDictionary[h]);
                             _listGridLayers.Add(h);
 
                             h = _mapLayers.AddLayer(_grid25LabelManager.Grid25Labels, "Labels", true, true);
                             _mapLayers.LayerDictionary[h].IsFishingGrid = true;
+                            _mapLayers.LayerDictionary[h].IsGrid25Layer = true;
                             AssignLayerWeight(_mapLayers.LayerDictionary[h]);
                             _listGridLayers.Add(h);
 
                             h = _mapLayers.AddLayer(_shapefileMajorGridIntersect, "Major grid", true, true);
                             _mapLayers.LayerDictionary[h].IsGraticule = true;
                             _mapLayers.LayerDictionary[h].IsFishingGrid = true;
+                            _mapLayers.LayerDictionary[h].IsGrid25Layer = true;
                             AssignLayerWeight(_mapLayers.LayerDictionary[h]);
                             _listGridLayers.Add(h);
 
                             h = _mapLayers.AddLayer(_shapefileBoundingRectangle, "MBR", true, true);
                             _mapLayers.LayerDictionary[h].IsGraticule = true;
                             _mapLayers.LayerDictionary[h].IsFishingGrid = true;
+                            _mapLayers.LayerDictionary[h].IsGrid25Layer = true;
                             AssignLayerWeight(_mapLayers.LayerDictionary[h]);
                             _listGridLayers.Add(h);
 
+                            if (PrintFrontAndReverseSides)
+                            {
+                                foreach (var item in ExportSettingsDict.Values)
+                                {
+                                    if (item.IsGrid25Layer)
+                                    {
+                                        SetupShapefileLayerForPrinting(_mapLayers.get_MapLayer(item.LayerName));
+                                    }
+                                }
+                            }
+
                             ApplyGridSymbology();
 
-                            if (ExtentCreatedInLayer != null)
+                            if (UpdateOnGridCreate && ExtentCreatedInLayer != null)
                             {
                                 ExtentDraggedBoxEventArgs arg = new ExtentDraggedBoxEventArgs(_shapefileBoundingRectangle.Extents.yMax, _shapefileBoundingRectangle.Extents.yMin, _shapefileBoundingRectangle.Extents.xMin, _shapefileBoundingRectangle.Extents.xMax, false);
                                 ExtentCreatedInLayer(this, arg);
@@ -1502,6 +1449,79 @@ namespace FAD3
             }
 
             return minorGridCreated;
+        }
+
+        private void SetUpNonGridLayers()
+        {
+            Console.WriteLine("in SetUpNonGridLayers");
+            foreach (MapLayer ml in MapLayers)
+            {
+                if (!ml.IsGrid25Layer)
+                {
+                    SetupShapefileLayerForPrinting(ml);
+                }
+            }
+        }
+
+        private void SetupShapefileLayerForPrinting(MapLayer ml)
+        {
+            Console.Write("in SetupShapefileLayerForPrinting");
+            if (ExportSettingsDict?.Count > 0)
+            {
+                foreach (var item in ExportSettingsDict.Values)
+                {
+                    if (item.IsGrid25Layer && item.LayerName == ml.Name)
+                    {
+                        var sf = ml.LayerObject as Shapefile;
+                        switch (GridMapSideToPrint)
+                        {
+                            case GridMapSideToPrint.SideToPrintIgnore:
+                                break;
+
+                            case GridMapSideToPrint.SideToPrintFront:
+
+                                MapLayers.MapControl.set_LayerVisible(ml.Handle, item.ShowInFront);
+
+                                if (!item.ShowLabelsFront)
+                                {
+                                    sf.Labels.Visible = false;
+                                }
+                                break;
+
+                            case GridMapSideToPrint.SideToPrintReverse:
+
+                                MapLayers.MapControl.set_LayerVisible(ml.Handle, item.ShowInReverse);
+
+                                if (!item.ShowLabelsReverse)
+                                {
+                                    sf.Labels.Visible = false;
+                                }
+                                break;
+                        }
+                        break;
+                    }
+                    else if (item.LayerHandle == ml.Handle)
+                    {
+                        var sf = ml.LayerObject as Shapefile;
+                        switch (GridMapSideToPrint)
+                        {
+                            case GridMapSideToPrint.SideToPrintFront:
+
+                                MapLayers.MapControl.set_LayerVisible(ml.Handle, item.ShowInFront);
+                                sf.Labels.Visible = item.ShowLabelsFront;
+                                break;
+
+                            case GridMapSideToPrint.SideToPrintReverse:
+
+                                MapLayers.MapControl.set_LayerVisible(ml.Handle, item.ShowInReverse);
+                                sf.Labels.Visible = item.ShowLabelsReverse;
+
+                                break;
+                        }
+                        break;
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -1566,12 +1586,12 @@ namespace FAD3
                 _selectedMajorGridShapesExtent = _layoutHelper.SelectedMajorGridExtents;
 
                 int ifldTitle = _layoutHelper.LayoutShapeFile.FieldIndexByName["Title"];
-                for (int n= 0; n < _layoutHelper.LayoutShapeFile.NumShapes;n++)
+                for (int n = 0; n < _layoutHelper.LayoutShapeFile.NumShapes; n++)
                 {
                     string mapName = _layoutHelper.LayoutShapeFile.CellValue[ifldTitle, n].ToString();
-                    if (GenerateMinorGridInsideExtent(_layoutHelper.LayoutShapeFile.Shape[n].Extents,mapName ))
+                    if (GenerateMinorGridInsideExtent(_layoutHelper.LayoutShapeFile.Shape[n].Extents, mapName))
                     {
-                        Save($@"{_folderToSave}\{mapName}");    
+                        Save($@"{_folderToSave}\{mapName}");
                     }
                 }
 

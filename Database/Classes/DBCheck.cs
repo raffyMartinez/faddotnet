@@ -12,7 +12,6 @@ namespace FAD3
     {
         public static bool CheckDB(string mdbPath)
         {
-            //bool Cancel = false;
             List<string> tableList = new List<string>();
             List<string> colList = new List<string>();
 
@@ -196,7 +195,6 @@ namespace FAD3
         {
             var dbe = new DBEngine();
             var dbData = dbe.OpenDatabase(mdbPath);
-            //var sql = "ALTER TABLE tblGearInventoryBarangayData DROP INDEX AltKey";
             var sql = "DROP INDEX AltKey ON tblGearInventoryBarangayData";
 
             try

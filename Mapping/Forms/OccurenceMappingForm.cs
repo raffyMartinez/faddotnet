@@ -16,7 +16,6 @@ namespace FAD3.Mapping.Forms
         private Form _parentForm;
         private OccurenceDataType _occurenceType;
 
-        //private string _targetAreaGUid;
         private List<int> _sampledYears;
         private string _speciesName;
         private string _speciesGuid;

@@ -29,7 +29,7 @@ namespace FAD3
         private static List<string> _engines = new List<string>();
         private static bool _engineReadDone = false;
 
-        private static Dictionary<string, (string RefNo, DateTime SamplingDate, string FishingGround, string SubGrid, 
+        private static Dictionary<string, (string RefNo, DateTime SamplingDate, string FishingGround, string SubGrid,
                                string EnumeratorName, string Notes, double? WtCatch, bool IsGrid25FG,
                                string HasSpecs, int CatchRows)> _effortMonth = new Dictionary<string, (string RefNo, DateTime SamplingDate, string FishingGround,
                                string SubGrid, string EnumeratorName, string Notes, double? WtCatch, bool IsGrid25FG,
@@ -49,7 +49,6 @@ namespace FAD3
 
         static Sampling()
         {
-            //SetUpUIElement();
         }
 
         public Sampling(string SamplingGUID)
@@ -263,10 +262,6 @@ namespace FAD3
                             foreach (DataRow dr in myDT.Rows)
                             {
                                 double? wt = null;
-                                //if (dr["WtCatch"].ToString().Length > 0)
-                                //{
-                                //    wt = double.Parse(dr["WtCatch"].ToString());
-                                //}
                                 if (double.TryParse(dr["wtCatch"].ToString(), out double w))
                                 {
                                     wt = w;
@@ -499,7 +494,6 @@ namespace FAD3
             XmlNodeList nodeList = root.SelectNodes("//UIRow");
             foreach (XmlNode n in nodeList)
             {
-                //UIRowFromXML row = new UIRowFromXML();
                 UserInterfaceStructure uistruct = new UserInterfaceStructure();
                 foreach (XmlNode c in n)
                 {
@@ -576,11 +570,6 @@ namespace FAD3
             }
         }
 
-        //public override string ToString()
-        //{
-        //    return $"Target area {}";
-        //}
-
         /// <summary>
         /// reads the catch and effort data of a sampled fish landing and returs a
         /// Dictionary object of keys and values
@@ -623,7 +612,7 @@ namespace FAD3
                         catch { PropertyValue.Add("FishingGround", ""); }
 
                         try { PropertyValue.Add("SubGrid", dr["SubGrid"].ToString()); }
-                        catch{ PropertyValue.Add("SubGrid", "");}
+                        catch { PropertyValue.Add("SubGrid", ""); }
 
                         DateTime dt = new DateTime();
 
@@ -1029,7 +1018,7 @@ namespace FAD3
                         conn.Close();
                     }
                     if (Success)
-                    {                        
+                    {
                         if (OnEffortUpdated != null)
                         {
                             EffortEventArg e = new EffortEventArg(DateTime.Parse(EffortData["SamplingDate"]), EffortData["FishingGear"], EffortData["LandingSite"]);

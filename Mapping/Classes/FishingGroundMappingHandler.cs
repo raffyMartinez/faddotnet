@@ -258,7 +258,6 @@ namespace FAD3
                                 INNER JOIN tblSampling ON tblLandingSites.LSGUID = tblSampling.LSGUID) ON tblGearVariations.GearVarGUID = tblSampling.GearVarGUID
                                 WHERE tblLandingSites.LSGUID={{{landingSiteGuid}}} AND tblSampling.GearVarGUID={{{gearVariationGuid}}}
                                 GROUP BY tblAOI.AOIName, tblLandingSites.LSName, tblGearVariations.Variation, tblSampling.FishingGround, Year([SamplingDate]) ";
-                        //HAVING Year([SamplingDate]) In ({samplingYears})";
 
                         if (notInclude1)
                         {
@@ -276,7 +275,6 @@ namespace FAD3
                             Avg(tblSampling.WtCatch) AS AvgCatch FROM (tblAOI INNER JOIN tblLandingSites ON tblAOI.AOIGuid = tblLandingSites.AOIGuid)
                             INNER JOIN tblSampling ON tblLandingSites.LSGUID = tblSampling.LSGUID WHERE tblLandingSites.LSGUID={{{landingSiteGuid}}}
                             GROUP BY tblAOI.AOIName, tblLandingSites.LSName, tblSampling.FishingGround, Year([SamplingDate]) ";
-                        //HAVING Year([SamplingDate]) In ({samplingYears})";
 
                         if (notInclude1)
                         {
@@ -294,7 +292,6 @@ namespace FAD3
                             Min(tblSampling.WtCatch) AS MinCatch, Avg(tblSampling.WtCatch) AS AvgCatch
                             FROM tblAOI INNER JOIN tblSampling ON tblAOI.AOIGuid = tblSampling.AOI
                             GROUP BY tblAOI.AOIName, tblSampling.FishingGround, tblSampling.AOI, Year([SamplingDate]) ";
-                        //HAVING tblSampling.AOI= {{{aoiGUID}}} AND Year([SamplingDate]) In ({samplingYears})";
 
                         if (notInclude1)
                         {
@@ -352,16 +349,6 @@ namespace FAD3
 
                     ifldCatchWt = sf.EditAddField("CatchWt", FieldType.DOUBLE_FIELD, 2, 8);
                     sf.Field[ifldCatchWt].Alias = "Catch weight";
-
-                    //query = @"SELECT tblAOI.AOIName, tblEnumerators.EnumeratorName, tblLandingSites.LSName,
-                    //            tblGearClass.GearClassName, tblGearVariations.Variation, Year([SamplingDate]) AS samplingYear,
-                    //            tblSampling.FishingGround, tblSampling.NoHauls, tblSampling.NoFishers, tblSampling.DateSet,
-                    //            tblSampling.TimeSet, tblSampling.DateHauled, tblSampling.TimeHauled, tblSampling.VesType, tblSampling.hp,
-                    //            tblSampling.WtCatch FROM tblGearClass INNER JOIN(tblEnumerators INNER JOIN (tblGearVariations
-                    //            INNER JOIN ((tblAOI INNER JOIN tblLandingSites ON tblAOI.AOIGuid = tblLandingSites.AOIGuid)
-                    //            INNER JOIN tblSampling ON tblLandingSites.LSGUID = tblSampling.LSGUID) ON
-                    //            tblGearVariations.GearVarGUID = tblSampling.GearVarGUID) ON tblEnumerators.EnumeratorID = tblSampling.Enumerator)
-                    //            ON tblGearClass.GearClass = tblGearVariations.GearClass ";
 
                     query = @"SELECT tblAOI.AOIName, tblEnumerators.EnumeratorName, tblLandingSites.LSName, tblGearClass.GearClassName,
                             tblGearVariations.Variation, Year([SamplingDate]) AS samplingYear, tblSampling.FishingGround, tblSampling.NoHauls,

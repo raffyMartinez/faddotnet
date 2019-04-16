@@ -118,9 +118,6 @@ namespace FAD3
 
             //fill this listview with gear variations belonging to a class
             var lv = listViewVariations;
-            //lv.Columns.Add("Variation");
-            //lv.Columns.Add("Specs");
-            //SizeColumns(lv);
             FillVariationsList();
             if (_gearVarGuid.Length > 0)
                 lv.Items[_gearVarGuid].Selected = true;
@@ -297,51 +294,11 @@ namespace FAD3
             }
             comboClass.With(o =>
             {
-                //o.DataSource = new BindingSource(Gear.GearClass, null);
                 o.DisplayMember = "Value";
                 o.ValueMember = "Key";
                 o.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
                 o.AutoCompleteSource = AutoCompleteSource.ListItems;
             });
-        }
-
-        private void OnComboClass_Validated(object sender, EventArgs e)
-        {
-            //var cbo = (ComboBox)sender;
-
-            //switch (cbo.Name)
-            //{
-            //    case "comboClass":
-
-            //        listViewCodes.Items.Clear();
-            //        listViewWhereUsed.Items.Clear();
-            //        listViewLocalNames.Items.Clear();
-            //        listViewVariations.Items.Clear();
-
-            //        FillVariationsList();
-            //        var ch = listViewVariations.Columns[0];
-            //        var cw = ch.Width;
-            //        ch.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
-            //        if (ch.Width < cw) ch.Width = cw;
-            //        FillGearVarSpecsColumn(listViewVariations);
-
-            //        if (listViewVariations.Items.Count > 0)
-            //        {
-            //            if (listViewVariations.Items.ContainsKey(_gearVarGuid))
-            //            {
-            //                listViewVariations.Items[_gearVarGuid].Selected = true;
-            //            }
-            //            else
-            //            {
-            //                listViewVariations.Items[0].Selected = true;
-            //                _gearVarGuid = listViewVariations.Items[0].Name;
-            //            }
-
-            //            EventArgs ea = new EventArgs();
-            //            OnlistView_Click(listViewVariations, ea);
-            //        }
-            //        break;
-            //}
         }
 
         private void OnButtonClick(object sender, EventArgs e)
@@ -450,7 +407,6 @@ namespace FAD3
             else if (e.Button == MouseButtons.Right)
             {
                 dropDownMenu.Items.Clear();
-                //ListViewHitTestInfo info = lv.HitTest(e.X, e.Y);
 
                 switch (_currentList)
                 {
@@ -1217,7 +1173,6 @@ namespace FAD3
                         eidf.ShowDialog(this);
                         if (eidf.DialogResult == DialogResult.OK)
                         {
-                            //var result = eidf.Selection;
                             if ((eidf.Selection & ExportImportDataType.GearsVariation) == ExportImportDataType.GearsVariation)
                             {
                                 Export(ExportImportDataType.GearsVariation);
@@ -1243,7 +1198,6 @@ namespace FAD3
                         eidf.ShowDialog(this);
                         if (eidf.DialogResult == DialogResult.OK)
                         {
-                            //var result = eidf.Selection;
                             if ((eidf.Selection & ExportImportDataType.GearsVariation) == ExportImportDataType.GearsVariation)
                             {
                                 Import(ExportImportDataType.GearsVariation);

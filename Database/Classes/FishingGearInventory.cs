@@ -1468,11 +1468,6 @@ namespace FAD3.Database.Classes
                 }
             }
 
-            //if (importedGearCount > 0)
-            //{
-            //    FisheriesInventoryImportEventArg e = new FisheriesInventoryImportEventArg(true, projectName, projectGuid);
-            //    InventoryLevel?.Invoke(this, e);
-            //}
             return importedGearCount;
         }
 
@@ -1722,29 +1717,6 @@ namespace FAD3.Database.Classes
             {
                 gearLocalNames += $@"""{item.Value}"",";
             }
-            //string gearLocalNames = $@"""{localNames.Values[0]}"",";
-            //for (int n = 1; n < localNames.Count; n++)
-            //{
-            //    gearLocalNames += $@"""{localNames[n]}""" + ",";
-            //}
-            //string sql = $@"SELECT tblGearInventoryBarangayData.DataGuid,
-            //                    tblGearInventoryBarangay.Municipality,
-            //                    tblGearInventoryBarangayData.GearVariation,
-            //                    tblGearInventoryBarangay.Barangay,
-            //                    tblGearInventoryBarangay.Sitio,
-            //                    tblGearLocalNames.LocalName
-            //                FROM tblGearLocalNames INNER JOIN
-            //                    ((tblGearInventoryBarangay INNER JOIN
-            //                    tblGearInventoryBarangayData ON
-            //                    tblGearInventoryBarangay.BarangayInventoryGuid = tblGearInventoryBarangayData.BarangayInventoryGUID) INNER JOIN
-            //                    tblGearInventoryGearLocalNames ON
-            //                    tblGearInventoryBarangayData.DataGuid = tblGearInventoryGearLocalNames.InventoryDataGuid) ON
-            //                    tblGearLocalNames.LocalNameGUID = tblGearInventoryGearLocalNames.LocalNameGuid
-            //                WHERE tblGearInventoryBarangay.Municipality = {municipalityNumber} AND
-            //                    tblGearInventoryBarangayData.GearVariation ={{{gearVariationGuid}}} AND
-            //                    tblGearInventoryBarangay.Barangay = ""{barangay}"" AND
-            //                    tblGearInventoryBarangay.Sitio = ""{sitio}"" AND
-            //                    tblGearLocalNames.LocalName In ({gearLocalNames.Trim(new char[] { ',', ' ' })});
             string sql = $@"SELECT tblGearInventoryBarangayData.DataGuid, Count(tblGearInventoryBarangayData.DataGuid) AS n
                             FROM tblGearLocalNames INNER JOIN
                                 ((tblGearInventoryBarangay INNER JOIN
@@ -2245,10 +2217,7 @@ namespace FAD3.Database.Classes
                     nonMotorizedCount = (int)dr["CountMunicipalNonMotorized"];
                     noBoatCount = (int)dr["CountNoBoat"];
                     numberDaysGearUsedPerMonth = (int)dr["NumberDaysPerMonth"];
-                    //cpueRangeMax = (int)dr["MaxCPUE"];
-                    //cpueRangeMin = (int)dr["MinCPUE"];
-                    //cpueModeUpper = (int)dr["ModeUpper"];
-                    //cpueModeLower = (int)dr["ModeLower"];
+
                     if (int.TryParse(dr["MaxCPUE"].ToString(), out int max))
                     {
                         cpueRangeMax = max;
@@ -2270,7 +2239,7 @@ namespace FAD3.Database.Classes
                     {
                         percentageOfDominance = percent;
                     }
-                    //percentageOfDominance = (int)dr["DominantCatchPercent"];
+
                     notes = dr["Notes"].ToString();
                     if (int.TryParse(dr["AverageCPUE"].ToString(), out int avgCPUE))
                     {
@@ -2588,7 +2557,6 @@ namespace FAD3.Database.Classes
         /// <returns></returns>
         public (string inventoryName, DateTime? dateImplemented) GetInventory(string inventoryGUID)
         {
-            //_inventories.Clear();
             var dt = new DataTable();
             using (var conection = new OleDbConnection(global.ConnectionString))
             {

@@ -239,9 +239,6 @@ namespace FAD3
 
         private void OnListViewDoubleClick(object sender, EventArgs e)
         {
-            //MessageBox.Show("To be implemented!");
-            //EditShapeAttributeForm eaf = EditShapeAttributeForm.
-
             using (EditShapeAttributeForm esaf = new EditShapeAttributeForm(global.MappingForm, MapInterActionHandler))
             {
                 esaf.ShowDialog(this);

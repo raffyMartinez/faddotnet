@@ -72,7 +72,7 @@ namespace FAD3
         public void Refresh()
         {
             _mapLayerDictionary.Clear();
-            for(int n=0; n<_axmap.NumLayers;n++)
+            for (int n = 0; n < _axmap.NumLayers; n++)
             {
                 //MapLayer ml = new MapLayer()
             }
@@ -275,7 +275,7 @@ namespace FAD3
             get { return _mapLayerDictionary.Count; }
         }
 
-        public void set_MapLayer(int layerHandle, bool noSelectedShapes = true, bool refreshLayerList=false)
+        public void set_MapLayer(int layerHandle, bool noSelectedShapes = true, bool refreshLayerList = false)
         {
             _currentMapLayer = _mapLayerDictionary[layerHandle];
             if (_currentMapLayer.LayerType == "ShapefileClass")
@@ -300,7 +300,6 @@ namespace FAD3
             {
                 RefreshLayers();
             }
-            
         }
 
         public MapLayer get_MapLayer(string Name)
@@ -347,7 +346,6 @@ namespace FAD3
                 {
                     //ignore error
                 }
-                
             }
             return layerMoved;
         }
@@ -380,8 +378,6 @@ namespace FAD3
         private void OnProjectionMismatch(object sender, _DMapEvents_ProjectionMismatchEvent e)
         {
             e.reproject = tkMwBoolean.blnTrue;
-            //var rcount = 0;
-            //_axmap.get_Shapefile(e.layerHandle).Reproject(_axmap.GeoProjection, ref rcount);
         }
 
         public void Dispose()
@@ -473,7 +469,6 @@ namespace FAD3
 
                 _axmap.RemoveLayer(layerHandle);
                 _axmap.Redraw();
-                
 
                 //fire the layer deleted event
                 if (LayerRemoved != null)
@@ -483,7 +478,7 @@ namespace FAD3
                 }
 
                 //if the layer removed is the current layer, then make the current layer null
-                if (layerHandle == _currentMapLayer.Handle)
+                if (CurrentMapLayer != null && layerHandle == _currentMapLayer.Handle)
                 {
                     _currentMapLayer = null;
                 }
@@ -544,8 +539,10 @@ namespace FAD3
             {
                 case ".tif":
                     return "tifw";
+
                 case ".jpg":
                     return "jgw";
+
                 default:
                     var arr = extension.ToCharArray();
                     return $"{arr[1]}{arr[3]}w";
@@ -557,7 +554,7 @@ namespace FAD3
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public (bool success, string errMsg) FileOpenHandler(string fileName, string layerName = "", bool reproject =false)
+        public (bool success, string errMsg) FileOpenHandler(string fileName, string layerName = "", bool reproject = false)
         {
             var success = false;
             var errMsg = "";
@@ -578,11 +575,11 @@ namespace FAD3
                         success = shapefile != null;
                         if (success)
                         {
-                            if(reproject)
+                            if (reproject)
                             {
                                 int reprojectCount = 0;
-                                var sf= shapefile.Reproject(MapControl.GeoProjection, reprojectCount);
-                                if(reprojectCount>0 || sf.NumShapes>0)
+                                var sf = shapefile.Reproject(MapControl.GeoProjection, reprojectCount);
+                                if (reprojectCount > 0 || sf.NumShapes > 0)
                                 {
                                     shapefile = sf;
                                 }
@@ -734,10 +731,10 @@ namespace FAD3
 
                 //if(sf.ReprojectInPlace(_axmap.GeoProjection,ref reprojectedCount))
                 var sfr = sf.Reproject(_axmap.GeoProjection, reprojectedCount);
-                if(reprojectedCount>0)
+                if (reprojectedCount > 0)
                 {
                     h = _axmap.AddLayer(sfr, isVisible);
-                    if(h>0)
+                    if (h > 0)
                     {
                         if (layerName.Length == 0)
                         {
@@ -755,7 +752,6 @@ namespace FAD3
                         LineWidthFix.FixLineWidth(sf);
                     }
                 }
-
             }
             return h;
         }

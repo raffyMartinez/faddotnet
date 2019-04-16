@@ -6,6 +6,13 @@
         ActionImport
     }
 
+    public enum GridMapSideToPrint
+    {
+        SideToPrintIgnore,
+        SideToPrintFront,
+        SideToPrintReverse
+    }
+
     public enum ImportInventoryAction
     {
         ImportDoNothing,

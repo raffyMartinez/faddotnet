@@ -11,6 +11,7 @@ using MapWinGIS;
 using FAD3.Mapping.Classes;
 using Microsoft.Win32;
 using System.IO;
+using FAD3.Database.Classes;
 
 namespace FAD3.Mapping.Forms
 {
@@ -19,7 +20,6 @@ namespace FAD3.Mapping.Forms
     /// </summary>
     public partial class Grid25LayoutHelperForm : Form
     {
-
         public int PageWidth { get; internal set; }
         public int PageHeight { get; internal set; }
         public int Overlap { get; internal set; }
@@ -50,11 +50,12 @@ namespace FAD3.Mapping.Forms
         public const int XBuffer = 1500;
         public const int YTopBuffer = 4000;
         public const int YBottomBuffer = 3000;
-        private int _maxDimensionIndex=-1;
+        private int _maxDimensionIndex = -1;
         private int _exportedImageCount;
         private int _exportDPI;
         private string _layoutPanelTitle;
-        private Dictionary<int, (string layerName, bool showFront, bool showFrontLabel, bool showReverse, bool showReverseLabel)> _exportSettingsDict = new Dictionary<int, (string layerName, bool showFront, bool showFrontLabel, bool showReverse, bool showReverseLabel)>();
+        private int _layoutGridIndex;
+        private Dictionary<int, FrontAndReverseMapSpecs> _exportSettingsDict = new Dictionary<int, FrontAndReverseMapSpecs>();
 
         public static Grid25LayoutHelperForm GetInstance(Grid25MajorGrid majorGrid, Grid25GenerateForm parentForm)
         {
@@ -130,8 +131,6 @@ namespace FAD3.Mapping.Forms
             get { return chkAutoExpand.Checked; }
         }
 
-
-
         /// <summary>
         ///populate the various text fields of the form
         ///and populate the list of grid maps that are
@@ -142,7 +141,6 @@ namespace FAD3.Mapping.Forms
             _fishingGround = LayoutHelper.FishingGround;
             textFishingGround.Text = _fishingGround;
             _savePath = LayoutHelper.GridFromLayoutSaveFolder;
-            //textFolderToSave.Text = _savePath;
             txtRows.Text = LayoutHelper.Rows.ToString();
             txtColumns.Text = LayoutHelper.Columns.ToString();
             txtOverlap.Text = LayoutHelper.Overlap.ToString();
@@ -174,7 +172,7 @@ namespace FAD3.Mapping.Forms
             txtPageWidth.Enabled = enable;
         }
 
-        private bool AcceptOptions(bool forLayout=true)
+        private bool AcceptOptions(bool forLayout = true)
         {
             bool accept = txtColumns.Text.Length > 0
                 && txtRows.Text.Length > 0
@@ -182,13 +180,10 @@ namespace FAD3.Mapping.Forms
                 && txtPageHeight.Text.Length > 0
                 && txtPageWidth.Text.Length > 0;
 
-            if(!forLayout && accept)
+            if (!forLayout && accept)
             {
                 accept = textFolderToSave.Text.Length > 0;
-
             }
-
-            
 
             if (accept)
             {
@@ -224,14 +219,12 @@ namespace FAD3.Mapping.Forms
             reg_key.SetValue("FolderSavedGrids", folderPath);
         }
 
-
-
         private async void BatchExportAsync()
         {
-            bool layerFormIsOpen=false;
-            foreach(Form f in Application.OpenForms)
+            bool layerFormIsOpen = false;
+            foreach (Form f in Application.OpenForms)
             {
-                if(f.Name=="MapLayersForm")
+                if (f.Name == "MapLayersForm")
                 {
                     layerFormIsOpen = true;
                     break;
@@ -240,23 +233,85 @@ namespace FAD3.Mapping.Forms
 
             if (!layerFormIsOpen)
             {
-                _grid25GeographicDisplayHelper.LockMap();
                 _exportedImageCount = 0;
-                _fishingGround = textFishingGround.Text;
                 _exportDPI = int.Parse(txtDPI.Text);
-                for (int n = 0; n < lvResults.Items.Count; n++)
+                _fishingGround = textFishingGround.Text;
+                switch (global.MappingMode)
                 {
-                    _layoutPanelTitle = lvResults.Items[n].Text;
-                    if(await BatchExportTask())
-                    {
-                        _exportedImageCount++;
-                    }
-                }
+                    case fad3MappingMode.grid25Mode:
+                        _majorGrid.LockMap();
+                        _majorGrid.PrintFrontAndReverseSides = chkExportFrontAndReverse.Checked;
+                        _majorGrid.ExportSettingsDict = _exportSettingsDict;
+                        _majorGrid.SourceFolder = _gridMapSourceFolderPath;
+                        _majorGrid.UpdateOnGridCreate = false;
+                        for (int n = 0; n < lvResults.Items.Count; n++)
+                        {
+                            _layoutGridIndex = n;
+                            _layoutPanelTitle = lvResults.Items[n].Text;
+                            if (_majorGrid.PrintFrontAndReverseSides)
+                            {
+                                if (await BatchExportTask(GridMapSideToPrint.SideToPrintFront))
+                                {
+                                    _exportedImageCount++;
+                                }
+                                if (await BatchExportTask(GridMapSideToPrint.SideToPrintReverse))
+                                {
+                                    _exportedImageCount++;
+                                }
+                            }
+                            else
+                            {
+                                if (await BatchExportTask(GridMapSideToPrint.SideToPrintIgnore))
+                                {
+                                    _exportedImageCount++;
+                                }
+                            }
+                        }
+                        _majorGrid.UnlockMap();
+                        _majorGrid.MapControl.Redraw();
+                        break;
 
+                    case fad3MappingMode.defaultMode:
+                        _grid25GeographicDisplayHelper.LockMap();
+                        _grid25GeographicDisplayHelper.PrintFrontAndReverseSides = chkExportFrontAndReverse.Checked;
+                        _grid25GeographicDisplayHelper.ExportSettingsDict = _exportSettingsDict;
+
+                        for (int n = 0; n < lvResults.Items.Count; n++)
+                        {
+                            _layoutPanelTitle = lvResults.Items[n].Text;
+                            if (_grid25GeographicDisplayHelper.PrintFrontAndReverseSides)
+                            {
+                                if (await BatchExportTask(GridMapSideToPrint.SideToPrintFront))
+                                {
+                                    _exportedImageCount++;
+                                }
+                                if (await BatchExportTask(GridMapSideToPrint.SideToPrintReverse))
+                                {
+                                    _exportedImageCount++;
+                                }
+                            }
+                            else
+                            {
+                                if (await BatchExportTask(GridMapSideToPrint.SideToPrintIgnore))
+                                {
+                                    _exportedImageCount++;
+                                }
+                            }
+                        }
+
+                        _grid25GeographicDisplayHelper.UnlockMap();
+                        _grid25GeographicDisplayHelper.RedrawNap();
+
+                        break;
+                }
                 var msg = "";
-                if ((_exportedImageCount) == lvResults.Items.Count)
+                if (!chkExportFrontAndReverse.Checked && _exportedImageCount == lvResults.Items.Count)
                 {
                     msg = $"Successfully exported all {_exportedImageCount} grid maps";
+                }
+                else if (chkExportFrontAndReverse.Checked && _exportedImageCount == lvResults.Items.Count * 2)
+                {
+                    msg = $"Successfully exported all {_exportedImageCount} grid maps, front and reverse sides";
                 }
                 else
                 {
@@ -268,19 +323,68 @@ namespace FAD3.Mapping.Forms
             {
                 MessageBox.Show("Please close layers form to proceed", "Cannot proceed", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            _grid25GeographicDisplayHelper.UnlockMap();
-            _grid25GeographicDisplayHelper.RedrawNap();
         }
 
-        private Task<bool> BatchExportTask()
+        private Task<bool> BatchExportTask(GridMapSideToPrint sideToPrint)
         {
-            return Task.Run(() => BatchExportMain());
+            if (global.MappingMode == fad3MappingMode.defaultMode)
+            {
+                return Task.Run(() => BatchExportMain(sideToPrint));
+            }
+            else
+            {
+                return Task.Run(() => BatchExportMain2(sideToPrint));
+            }
         }
 
-         private bool BatchExportMain()
+        private bool BatchExportMain2(GridMapSideToPrint sideToPrint)
         {
+            Console.WriteLine($"in {System.Reflection.MethodBase.GetCurrentMethod().Name}");
+            _majorGrid.GridMapSideToPrint = sideToPrint;
+
+            LayerEventArg lve = new LayerEventArg(_layoutPanelTitle);
+            string fileName = "";
+            switch (sideToPrint)
+            {
+                case GridMapSideToPrint.SideToPrintIgnore:
+                    fileName = $@"{_exportImageFolderSavePath}\{_layoutPanelTitle}_grid.tif";
+                    break;
+
+                case GridMapSideToPrint.SideToPrintFront:
+                    fileName = $@"{_exportImageFolderSavePath}\{_layoutPanelTitle}_front_grid.tif";
+                    break;
+
+                case GridMapSideToPrint.SideToPrintReverse:
+                    fileName = $@"{_exportImageFolderSavePath}\{_layoutPanelTitle}_reverse_grid.tif";
+                    break;
+            }
+            //lve.FileName = fileName;
+            lve.SelectedIndex = _layoutGridIndex;
+            lve.SelectedExtent = LayoutHelper?.LayoutShapeFile.Shape[_layoutGridIndex].Extents;
+            lve.Action = "LoadGridMap";
+            _majorGrid.LoadPanelGrid(chkAutoExpand.Checked, lve);
+
+            SaveMapImage smi = new SaveMapImage(fileName, _exportDPI, global.MappingForm.MapControl);
+
+            smi.MaintainOnePointLineWidth = true;
+            smi.MapLayersHandler = global.MappingForm.MapLayersHandler;
+            smi.PreviewImage = false;
+
+            bool rv = smi.Save(true);
+            if (rv)
+            {
+                smi.Dispose();
+                smi = null;
+            }
+            return rv;
+        }
+
+        private bool BatchExportMain(GridMapSideToPrint sideToPrint)
+        {
+            //_grid25GeographicDisplayHelper.RemoveGrid25Layers();
             _grid25GeographicDisplayHelper.SourceFolder = _gridMapSourceFolderPath;
-            _grid25GeographicDisplayHelper.SelectedLayoutCell = _layoutPanelTitle; ;
+            _grid25GeographicDisplayHelper.GridMapSideToPrint = sideToPrint;
+            _grid25GeographicDisplayHelper.SelectedLayoutCell = _layoutPanelTitle;
             var adjustValue = 60 * 1852;
             var ext = new Extents();
 
@@ -294,25 +398,42 @@ namespace FAD3.Mapping.Forms
             ext.SetBounds(extMBRGrid.xMin - (labelDistance * 3) - XBuffer / adjustValue,
                 extMBRGrid.yMin - (labelDistance * 3) - YBottomBuffer / adjustValue,
                 0,
-                (extMBRGrid.xMin + maxWidth) + (labelDistance * 3) + XBuffer / adjustValue,
-                (extMBRGrid.yMin + maxHeight) + (labelDistance * 3) + YTopBuffer / adjustValue,
+                extMBRGrid.xMin + maxWidth + (labelDistance * 3) + (XBuffer / adjustValue),
+                extMBRGrid.yMin + maxHeight + (labelDistance * 3) + (YTopBuffer / adjustValue),
                 0);
 
-
             _grid25GeographicDisplayHelper.SetMapExtents(ext);
-            SaveMapImage smi = new SaveMapImage($@"{_exportImageFolderSavePath}\{_layoutPanelTitle}_grid.tif", _exportDPI, global.MappingForm.MapControl);
+
+            string fileName = "";
+            switch (sideToPrint)
+            {
+                case GridMapSideToPrint.SideToPrintIgnore:
+                    fileName = $@"{_exportImageFolderSavePath}\{_layoutPanelTitle}_grid.tif";
+                    break;
+
+                case GridMapSideToPrint.SideToPrintFront:
+                    fileName = $@"{_exportImageFolderSavePath}\{_layoutPanelTitle}_front_grid.tif";
+                    break;
+
+                case GridMapSideToPrint.SideToPrintReverse:
+                    fileName = $@"{_exportImageFolderSavePath}\{_layoutPanelTitle}_reverse_grid.tif";
+                    break;
+            }
+
+            SaveMapImage smi = new SaveMapImage(fileName, _exportDPI, global.MappingForm.MapControl);
+
+            smi.MaintainOnePointLineWidth = true;
             smi.MapLayersHandler = global.MappingForm.MapLayersHandler;
             smi.PreviewImage = false;
 
             bool rv = smi.Save(true);
-            if(rv)
+            if (rv)
             {
                 smi.Dispose();
                 smi = null;
             }
             return rv;
         }
-
 
         private void OnButtonClick(object sender, EventArgs e)
         {
@@ -327,16 +448,39 @@ namespace FAD3.Mapping.Forms
                             {
                                 if (ml.Visible)
                                 {
-                                    _exportSettingsDict.Add(ml.Handle, (ml.Name, true, false, true, true));
+                                    if (ml.IsGrid25Layer)
+                                    {
+                                        ml.PrintOnFront = true;
+                                        ml.PrintLabelsFront = false;
+                                        ml.PrintOnReverse = false;
+                                        switch (ml.Name)
+                                        {
+                                            case "Labels":
+                                                ml.PrintLabelsFront = true;
+                                                break;
+
+                                            case "MBR":
+                                                ml.PrintOnReverse = true;
+                                                break;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        ml.PrintOnFront = true;
+                                        ml.PrintLabelsFront = false;
+                                        ml.PrintOnReverse = true;
+                                        ml.PrintLabelsReverse = true;
+                                    }
+                                    _exportSettingsDict.Add(ml.Handle, new FrontAndReverseMapSpecs(ml.Handle, ml.IsGrid25Layer, ml.Name, ml.PrintOnFront, ml.PrintLabelsFront, ml.PrintOnReverse, ml.PrintLabelsReverse));
                                 }
                             }
                         }
-                        
+
                         bef.ExportSettingsDict = _exportSettingsDict;
                         bef.ShowDialog();
-                        if(bef.DialogResult==DialogResult.OK)
+                        if (bef.DialogResult == DialogResult.OK)
                         {
-                            _exportSettingsDict = new Dictionary<int, (string layerName, bool showFront, bool showFrontLabel, bool showReverse, bool showReverseLabel)>(bef.ExportSettingsDict);    
+                            _exportSettingsDict = new Dictionary<int, FrontAndReverseMapSpecs>(bef.ExportSettingsDict);
                         }
                     }
                     break;
@@ -351,14 +495,15 @@ namespace FAD3.Mapping.Forms
                     folderBrowser.SelectedPath = SaveMapForm.GetSavedMapsFolder();
                     folderBrowser.Description = "Locate folder to save exported map images";
                     DialogResult result = FolderBrowserLauncher.ShowFolderBrowser(folderBrowser);
-                    if (result == DialogResult.OK && folderBrowser.SelectedPath.Length>0)
+                    if (result == DialogResult.OK && folderBrowser.SelectedPath.Length > 0)
                     {
                         _exportImageFolderSavePath = folderBrowser.SelectedPath;
                         txtFolderExportPath.Text = _exportImageFolderSavePath;
                         btnExport.Enabled = true;
-                        btnExportSettings.Enabled = btnExport.Enabled && chkExportFrontBack.Checked;
+                        btnExportSettings.Enabled = btnExport.Enabled && chkExportFrontAndReverse.Checked;
                     }
                     break;
+
                 case "btnGridSettings":
                     using (Grid25GeographicDisplayOptionsForm ggdf = new Grid25GeographicDisplayOptionsForm(
                         _grid25GeographicDisplayHelper.MinorGridFontSize,
@@ -377,25 +522,27 @@ namespace FAD3.Mapping.Forms
                             _grid25GeographicDisplayHelper.SubgridsVisible = ggdf.ShowSubgrid;
                             _grid25GeographicDisplayHelper.MinorGridLableFontBold = ggdf.MinorGridBoldLabels;
                             _grid25GeographicDisplayHelper.MajorGridLableFontBold = ggdf.MajorGridBoldLabels;
-                            //_grid25GeographicDisplayHelper.RemoveGrid25Layers();
                             _grid25GeographicDisplayHelper.SelectedLayoutCell = lvResults.CheckedItems[0].Text;
                             _grid25GeographicDisplayHelper.SymbolizeGrid();
                         }
                     }
-                        break;
+                    break;
 
                 case "btnLocateSourceFolder":
+                    btnGridSettings.Enabled = false;
                     folderBrowser = new FolderBrowserDialog();
                     folderBrowser.ShowNewFolderButton = true;
                     folderBrowser.SelectedPath = SaveMapForm.GetSavedMapsFolder();
                     folderBrowser.Description = "Locate folder containing saved fishing ground grid maps";
                     result = FolderBrowserLauncher.ShowFolderBrowser(folderBrowser);
-                    if (result == DialogResult.OK && folderBrowser.SelectedPath.Length>0)
+                    if (result == DialogResult.OK && folderBrowser.SelectedPath.Length > 0)
                     {
+                        btnGridSettings.Enabled = true;
                         _gridMapSourceFolderPath = folderBrowser.SelectedPath;
                         _grid25GeographicDisplayHelper.SetMaxDimensionGridName(_gridMapSourceFolderPath, lvResults.Items[_maxDimensionIndex].Text);
                     }
                     break;
+
                 case "btnSaveTemplate":
                     var saveAs = new SaveFileDialog();
                     saveAs.Filter = "Shapefile *.shp|*.shp|All files *.*|*.*";
@@ -451,7 +598,6 @@ namespace FAD3.Mapping.Forms
                     }
                     break;
 
-
                 case "btnSelectFolderSave":
                     FolderBrowserDialog fbd = new FolderBrowserDialog();
                     fbd.Description = "Select folder to save fishing ground grid map";
@@ -467,21 +613,14 @@ namespace FAD3.Mapping.Forms
                     break;
 
                 case "btnSave":
-                    if (AcceptOptions(forLayout:false))
+                    if (AcceptOptions(forLayout: false))
                     {
                         if (_majorGrid.LayoutHelper.LayoutShapeFile.NumShapes > 0
                         && _majorGrid.LayoutHelper.HasCompletePanelTitles())
 
                         {
-                            //_majorGrid.HasSubgrid = _parentForm.HasSubGrid;
-                            //_majorGrid.SubGridCount = _parentForm.SubGridCount;
                             if (_majorGrid.SaveMinorGridsInLayout(textFishingGround.Text, _parentFolder))
                             {
-                                //if (_majorGrid.LayoutHelper.LayerHandle > 0)
-                                //{
-                                //    FillResultList();
-                                //    _majorGrid.MapLayers.ClearAllSelections();
-                                //}
                                 MessageBox.Show("Grid maps saved", "Save successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             }
                         }
@@ -627,7 +766,6 @@ namespace FAD3.Mapping.Forms
                 txtOverlap.Text = _majorGrid.LayoutOverlap.ToString();
                 textLayoutTemplateFileName.Text = _majorGrid.LayoutHelper.LayoutShapeFile?.Filename;
                 textLayoutTemplateFileName.Enabled = false;
-                //tabsLayout.TabPages.Remove(tabExport);
             }
             else
             {
@@ -635,7 +773,7 @@ namespace FAD3.Mapping.Forms
                 ReadLayoutData();
                 var layoutShapeFileName = _layoutFileName.Replace(".lay", ".shp");
 
-                var result = global.MappingForm.MapLayersHandler.FileOpenHandler(layoutShapeFileName, "Layout frame",reproject:true);
+                var result = global.MappingForm.MapLayersHandler.FileOpenHandler(layoutShapeFileName, "Layout frame", reproject: true);
                 if (!result.success)
                 {
                     MessageBox.Show(result.errMsg, "File open error", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -656,13 +794,11 @@ namespace FAD3.Mapping.Forms
                         ListViewItem lvi = lvResults.Items.Add(_layoutShapefile.CellValue[fTitle, n].ToString());
                         var ext = _layoutShapefile.Shape[n].Extents;
 
-                        if(ext.Width+ext.Height >maxDimension)
+                        if (ext.Width + ext.Height > maxDimension)
                         {
                             maxDimension = ext.Width + ext.Height;
                             _maxDimensionIndex = n;
                         }
-
-                        Console.WriteLine($"w: {ext.Width}, h: {ext.Height}, n: {n}");
                     }
 
                     SizeColumns(lvResults, false);
@@ -735,19 +871,16 @@ namespace FAD3.Mapping.Forms
                 _layoutShapefile = null;
                 global.MappingForm.MapLayersHandler.RemoveLayer("Layout frame");
             }
-            if(_grid25GeographicDisplayHelper!=null)
+            if (_grid25GeographicDisplayHelper != null)
             {
                 _grid25GeographicDisplayHelper.RemoveGrid25Layers();
+                _grid25GeographicDisplayHelper.Dispose();
             }
             global.SaveFormSettings(this);
             global.MappingForm.SetCursor(tkCursorMode.cmSelection);
             _parentForm?.SetupGridButtons(enabled: true);
             _parentForm = null;
         }
-
-
- 
-
 
         private void OnListItemChecked(object sender, ItemCheckedEventArgs e)
         {
@@ -789,6 +922,7 @@ namespace FAD3.Mapping.Forms
 
             if (global.MappingMode == Database.Classes.fad3MappingMode.grid25Mode)
             {
+                _majorGrid.UpdateOnGridCreate = true;
                 _majorGrid.LoadPanelGrid(chkAutoExpand.Checked, lve);
                 _parentForm.MapTitle(item.Text);
             }
@@ -799,11 +933,11 @@ namespace FAD3.Mapping.Forms
                 if (lvResults.CheckedItems.Count > 0)
                 {
                     _layoutShapefile.ShapeSelected[e.Item.Index] = true;
-                    if(_gridMapSourceFolderPath.Length>0)
+                    if (_gridMapSourceFolderPath.Length > 0)
                     {
                         _grid25GeographicDisplayHelper.SourceFolder = _gridMapSourceFolderPath;
                         _grid25GeographicDisplayHelper.SelectedLayoutCell = lvResults.CheckedItems[0].Text;
-                        if(chkAutoExpand.Checked)
+                        if (chkAutoExpand.Checked)
                         {
                             var adjustValue = 60 * 1852;
                             var ext = new Extents();
@@ -814,17 +948,7 @@ namespace FAD3.Mapping.Forms
 
                             var extMBRGrid = _grid25GeographicDisplayHelper.MBR.Extents;
                             var labelDistance = _grid25GeographicDisplayHelper.MinorGridLabelDistance;
-                            //ext.SetBounds(extMBR.xMin - (labelDistance * 3) - XBuffer / adjustValue,
-                            //    extMBR.yMin - (labelDistance * 3) - YBottomBuffer / adjustValue,
-                            //    0, 
-                            //    extMBR.xMax + (labelDistance * 3) + XBuffer / adjustValue, 
-                            //    extMBR.yMax + (labelDistance * 3) + YTopBuffer / adjustValue, 
-                            //    0);
-                            //ext.SetBounds(extMBR.xMin - (labelDistance * 5) - XBuffer / adjustValue,
-                            //    extMBR.yMin - (labelDistance * 5) - YBottomBuffer / adjustValue,
-                            //    0,
-                            //    (extMBR.xMin + _maxPanelWidth) + (labelDistance * 5) + XBuffer / adjustValue,
-                            //    (extMBR.yMin + _maxPanelHeight) + (labelDistance * 5) + YTopBuffer / adjustValue,
+
                             ext.SetBounds(extMBRGrid.xMin - (labelDistance * 3) - XBuffer / adjustValue,
                                 extMBRGrid.yMin - (labelDistance * 3) - YBottomBuffer / adjustValue,
                                 0,
@@ -836,13 +960,13 @@ namespace FAD3.Mapping.Forms
                     }
                     else
                     {
-                        if(chkAutoExpand.Checked)
+                        if (chkAutoExpand.Checked)
                         {
                             global.MappingForm.MapControl.Extents = _layoutShapefile.Shape[lv.CheckedItems[0].Index].Extents;
                         }
                     }
                 }
-                
+
                 global.MappingForm.MapControl.Redraw();
             }
 
@@ -851,7 +975,6 @@ namespace FAD3.Mapping.Forms
                 global.MappingForm.MapLayersHandler.RefreshLayers();
             }
         }
-
 
         private void UncheckAllItems(int index)
         {
@@ -866,11 +989,8 @@ namespace FAD3.Mapping.Forms
             lvResults.ItemChecked += OnListItemChecked;
         }
 
-
         private void OnTabsSelectionChanged(object sender, EventArgs e)
         {
-            //chkAutoExpand.Visible = false;
-
             var t = sender as TabControl;
             switch (t.SelectedTab.Name)
             {
@@ -899,8 +1019,6 @@ namespace FAD3.Mapping.Forms
                             buttonSubGrid.Enabled = false;
                         }
                         _majorGrid.LayoutHelper.FishingGround = textFishingGround.Text;
-                        
-                        
                     }
                     else
                     {
@@ -915,6 +1033,7 @@ namespace FAD3.Mapping.Forms
                     {
                         case Database.Classes.fad3MappingMode.defaultMode:
                             break;
+
                         case Database.Classes.fad3MappingMode.grid25Mode:
                             btnSaveTemplate.Enabled = textFishingGround.Text.Length > 0
                                 && lvResults.Items.Count > 0
@@ -927,22 +1046,19 @@ namespace FAD3.Mapping.Forms
                     chkAutoExpand.Visible = false;
                     if (global.MappingMode == Database.Classes.fad3MappingMode.defaultMode)
                     {
-
-
                         if (_grid25GeographicDisplayHelper.HasGrid)
                         {
                             btnFolderExportImage.Enabled = true;
                             btnExport.Enabled = txtFolderExportPath.Text.Length > 0;
-
-
                         }
                     }
-                    else if(global.MappingMode==Database.Classes.fad3MappingMode.grid25Mode)
+                    else if (global.MappingMode == Database.Classes.fad3MappingMode.grid25Mode)
                     {
                         btnFolderExportImage.Enabled = textFishingGround.Text.Length > 0
                             && lvResults.Items.Count > 0;
                     }
                     break;
+
                 default:
                     chkAutoExpand.Visible = false;
                     break;
@@ -983,11 +1099,6 @@ namespace FAD3.Mapping.Forms
                         tsi.Name = "menuRebuildGrid25";
                     }
                 }
-                //else if (global.MappingMode==Database.Classes.fad3MappingMode.defaultMode &&  e.Button == MouseButtons.Left)
-                //{
-                //    global.MappingForm.MapControl.Extents = _layoutShapefile.Shape[lvh.Item.Index].Extents;
-                //    global.MappingForm.MapControl.ExtentPad = 10D;
-                //}
             }
         }
 
@@ -1040,32 +1151,10 @@ namespace FAD3.Mapping.Forms
             SizeColumns(lvResults, false);
         }
 
-        private void OnListViewSelectedIndexChange(object sender, EventArgs e)
-        {
-            //ListView lv = (ListView)sender;
-
-            //if (global.MappingMode == Database.Classes.fad3MappingMode.defaultMode && lv.SelectedIndices.Count > 0)
-            //{
-            //    if (_grid25GeographicDisplayHelper.HasGrid)
-            //    {
-            //        var adjustValue = 60 * 1852;
-            //        var ext = new Extents();
-            //        var extMBR = _grid25GeographicDisplayHelper.MBR.Extents;
-            //        var labelDistance = _grid25GeographicDisplayHelper.MinorGridLabelDistance;
-            //        ext.SetBounds(extMBR.xMin - (labelDistance * 3) - XBuffer/adjustValue , extMBR.yMin - (labelDistance * 3) - YBottomBuffer/adjustValue, 0, extMBR.xMax + (labelDistance * 3) + XBuffer/adjustValue, extMBR.yMax + (labelDistance * 3) + YTopBuffer/adjustValue, 0);
-            //        global.MappingForm.MapControl.Extents = ext;
-            //    }
-            //    else
-            //    {
-            //        global.MappingForm.MapControl.Extents = _layoutShapefile.Shape[lv.SelectedItems[0].Index].Extents;
-            //    }
-            //}
-        }
-
         private void OnFormActivated(object sender, EventArgs e)
         {
-            if (_majorGrid != null 
-                &&_majorGrid.MinorGrids.MinorGridLinesShapeFile == null)
+            if (_majorGrid != null
+                && _majorGrid.MinorGrids.MinorGridLinesShapeFile == null)
             {
                 _majorGrid.DefineGridLayout((int)((Bitmap)imageList1.Images["grid_layout"]).GetHicon());
             }
@@ -1073,9 +1162,9 @@ namespace FAD3.Mapping.Forms
 
         private void OnCheckChanged(object sender, EventArgs e)
         {
-            if(btnExport.Enabled)
+            if (btnExport.Enabled)
             {
-                btnExportSettings.Enabled = chkExportFrontBack.Checked;
+                btnExportSettings.Enabled = chkExportFrontAndReverse.Checked;
             }
         }
     }

@@ -317,12 +317,6 @@ namespace FAD3.Mapping.Classes
                 _metadataRows++;
             }
 
-            //if (addToDict)
-            //{
-            //    _dictValueParameters.Add(currentValue, (dataType, fillValue, longName, missingValue, units));
-            //    addToDict = false;
-            //}
-
             //read fields
             line = sr.ReadLine();
             tfp = new TextFieldParser(new StringReader(line));
@@ -451,7 +445,6 @@ namespace FAD3.Mapping.Classes
 
                     tfp.Close();
                     tfp = null;
-                    //break;
                 }
                 sr.Close();
                 sr = null;
@@ -1040,7 +1033,7 @@ namespace FAD3.Mapping.Classes
                         {
                             //if cell is inland (CellValue[_ifldInlandColumn, n].ToString() == "T")
                             //then make the parameter column value  null
-                            if (_ifldInlandColumn>=0 
+                            if (_ifldInlandColumn >= 0
                                 && _meshShapeFile.CellValue[_ifldInlandColumn, n].ToString() == "T")
                             {
                                 _meshShapeFile.EditCellValue(_ifldDateColumn, n, null);
@@ -1192,8 +1185,6 @@ namespace FAD3.Mapping.Classes
                 }
 
                 int iMeshShp = -1;
-                //_latList.Sort();
-                //_lonList.Sort();
                 foreach (double lat in _latList)
                 {
                     foreach (double lon in _lonList)
@@ -1258,14 +1249,12 @@ namespace FAD3.Mapping.Classes
             int iShp = -1;
             int ifldInland = -1;
             var sf = new Shapefile();
-            //double distance = 0;
             if (sf.CreateNewWithShapeID("", ShpfileType.SHP_POINT))
             {
                 _iFldRow = sf.EditAddField("row", MapWinGIS.FieldType.INTEGER_FIELD, 4, 1);
 
                 if (ShowInland)
                 {
-                    //inlandPoints = FishingGrid.InlandPoints;
                     ifldInland = sf.EditAddField("inland", MapWinGIS.FieldType.STRING_FIELD, 1, 1);
                 }
 
@@ -1283,7 +1272,6 @@ namespace FAD3.Mapping.Classes
 
                         if (ShowInland)
                         {
-                            //var grid25Point = FishingGrid.LongLatToGrid25(pnt.x, pnt.y, UTMZone);
                             bool isInland = _inlandCoordinates.Contains((pnt.x, pnt.y));
                             if (isInland)
                             {

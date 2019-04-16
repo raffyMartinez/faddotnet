@@ -89,7 +89,6 @@ namespace FAD3.Database.Forms
                 case "btnOk":
                     if (ValidateForm())
                     {
-                        //_parentForm.RefreshFishingExpense(_expenseItem, cboExpenseItem.Text, double.Parse(txtCost.Text), cboSource.Text, txtNotes.Text);
                         DialogResult = DialogResult.OK;
                     }
                     else

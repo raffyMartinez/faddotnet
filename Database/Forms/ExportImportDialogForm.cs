@@ -40,7 +40,6 @@ namespace FAD3.Database.Forms
                     rdButton.Tag = ExportImportDataType.SpeciesNames;
                     if (TaxaCSV?.Length > 0)
                     {
-                        //checkBox2 = new CheckBox();
                         chkBox.Name = "chkExportSelected";
                         chkBox.Text = "Export selected taxa only";
                         chkBox.Left = rdButton.Left;
@@ -73,7 +72,6 @@ namespace FAD3.Database.Forms
                         inventoryCaption = "Import fishery inventory";
                     }
 
-                    //rdButton.Top = 20;
                     rdButton.Text = enumeratorCaption;
                     rdButton.Tag = ExportImportDataType.Enumerators;
                     rdButton.Visible = true;
@@ -98,12 +96,10 @@ namespace FAD3.Database.Forms
                         gearClassCaption = "Import gear classes";
                         gearRefCodeCaption = "Import gear codes";
                     }
-                    //rdButton.Top = 20;
                     rdButton.Text = gearVarCaption;
                     rdButton.Tag = ExportImportDataType.GearsVariation;
                     rdButton.Visible = true;
 
-                    //checkBox2 = new CheckBox();
                     rdButton1.Text = gearLocalNameCaption;
                     rdButton1.Left = rdButton.Left;
                     rdButton1.Top = rdButton.Top + rdButton.Height + spacing;
@@ -139,13 +135,11 @@ namespace FAD3.Database.Forms
                         namePairCaption = "Import local name - scientific name pairs";
                         allDataCaption = "Import all";
                     }
-                    //rdButton.Top = 20;
                     rdButton.Left = 10;
                     rdButton.Text = languageCaption;
                     rdButton.Tag = ExportImportDataType.LocalNameLanguages;
                     rdButton.Visible = true;
 
-                    //checkBox2 = new CheckBox();
                     rdButton1.Text = localNamesCaption;
                     rdButton1.Left = rdButton.Left;
                     rdButton1.Top = rdButton.Top + rdButton.Height + spacing;
@@ -153,7 +147,6 @@ namespace FAD3.Database.Forms
                     rdButton1.AutoSize = true;
                     Controls.Add(rdButton1);
 
-                    //checkBox3 = new CheckBox();
                     rdButton2.Text = namePairCaption;
                     rdButton2.Left = rdButton.Left;
                     rdButton2.Top = rdButton1.Top + rdButton1.Height + spacing;
@@ -243,12 +236,10 @@ namespace FAD3.Database.Forms
                         }
                     }
                     DialogResult = DialogResult.OK;
-                    //Close();
                     break;
 
                 case "btnCancel":
                     DialogResult = DialogResult.Cancel;
-                    //Close();
                     break;
             }
         }

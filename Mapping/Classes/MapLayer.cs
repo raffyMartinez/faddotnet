@@ -38,6 +38,11 @@ namespace FAD3
         public fad3MappingMode MappingMode { get; set; }
         public bool IsFishingGridLayoutTemplate { get; set; }
         public bool KeepOnTop { get; set; }
+        public bool PrintOnFront { get; set; }
+        public bool PrintLabelsFront { get; set; }
+        public bool PrintOnReverse { get; set; }
+        public bool PrintLabelsReverse { get; set; }
+        public bool IsGrid25Layer { get; set; }
 
         public void RestoreSettingsFromXML()
         {
@@ -96,7 +101,7 @@ namespace FAD3
                     success = sf.SaveAs(fileName);                     //saves the shapefile
                     if (success)
                     {
-                        sf.GeoProjection.WriteToFile(Path.GetFileName(fileName)+".prj");        //save the shapefile's projection data
+                        sf.GeoProjection.WriteToFile(Path.GetFileName(fileName) + ".prj");        //save the shapefile's projection data
                     }
                 });
             }

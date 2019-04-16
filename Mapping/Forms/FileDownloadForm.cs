@@ -64,8 +64,6 @@ namespace FAD3.Mapping.Forms
                         }
                         return;
                     }
-
-                    //MessageBox.Show(wex.Message, "Web error", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 catch (InvalidOperationException ioex)
                 {

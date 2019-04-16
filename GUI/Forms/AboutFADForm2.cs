@@ -21,7 +21,6 @@ namespace FAD3.GUI.Forms
 
         private void OnFormLoad(object sender, EventArgs e)
         {
-            //global.LoadFormSettings(this, FormBorderStyle == FormBorderStyle.FixedToolWindow);
             labelApp.Text = "Fisheries Assessment Database 3";
             FontFamily ff = new FontFamily("Microsoft Sans Serif");
             labelApp.Font = new Font(ff, 13F, FontStyle.Bold);
@@ -61,7 +60,6 @@ namespace FAD3.GUI.Forms
 
         private void OnFormClosed(object sender, FormClosedEventArgs e)
         {
-            //global.SaveFormSettings(this);
         }
     }
 }

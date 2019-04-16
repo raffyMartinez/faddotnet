@@ -224,7 +224,6 @@ namespace FAD3
 
                 //symbolize the current layer by making it bold font
                 MarkCurrentLayerName(CurrentLayerRow());
-
             }
         }
 
@@ -239,7 +238,6 @@ namespace FAD3
                     {
                         return item.Index;
                     }
-
                 }
             }
             return 0;
@@ -258,7 +256,6 @@ namespace FAD3
 
             layerGrid.DefaultCellStyle.SelectionBackColor = SystemColors.Window;
             layerGrid.DefaultCellStyle.SelectionForeColor = SystemColors.WindowText;
-            //itemAlwaysKeepOnTop.Visible = global.MappingMode == fad3MappingMode.grid25Mode;
         }
 
         private void OnFormClosed(object sender, FormClosedEventArgs e)
@@ -353,9 +350,8 @@ namespace FAD3
                     break;
 
                 case "itemAddLayer":
-                     if( _parentForm.OpenFileDialog()==DialogResult.OK)
+                    if (_parentForm.OpenFileDialog() == DialogResult.OK)
                     {
-
                     }
                     break;
 
@@ -381,7 +377,7 @@ namespace FAD3
                         case "ShapefileClass":
 
                             ExportShapefile();
-                            
+
                             break;
 
                         case "ImageClass":
@@ -396,21 +392,22 @@ namespace FAD3
             var saveAs = new SaveFileDialog();
             saveAs.Filter = "Shapefile *.shp|*.shp|All files *.*|*.*";
             saveAs.FilterIndex = 1;
-            if(_mapLayersHandler.CurrentMapLayer.FileName.Length==0)
+            if (_mapLayersHandler.CurrentMapLayer.FileName.Length == 0)
             {
                 saveAs.FileName = $"{_mapLayersHandler.CurrentMapLayer.Name}";
             }
             else
             {
-                saveAs.FileName = $"{Path.GetFileName( _mapLayersHandler.CurrentMapLayer.FileName)}";
+                saveAs.FileName = $"{Path.GetFileName(_mapLayersHandler.CurrentMapLayer.FileName)}";
             }
-            
+
             DialogResult dr = saveAs.ShowDialog();
-            if (dr == DialogResult.OK && saveAs.FileName.Length>0)
+            if (dr == DialogResult.OK && saveAs.FileName.Length > 0)
             {
                 _parentForm.MapLayersHandler.CurrentMapLayer.Save(saveAs.FileName);
             }
         }
+
         public void SaveTemplateToFile()
         {
             var saveAs = new SaveFileDialog();
@@ -456,7 +453,7 @@ namespace FAD3
             switch (e.ClickedItem.Name)
             {
                 case "buttonAddLayer":
-                    if(_parentForm.OpenFileDialog()==DialogResult.OK)
+                    if (_parentForm.OpenFileDialog() == DialogResult.OK)
                     {
                         RefreshLayerList();
                     }

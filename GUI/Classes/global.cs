@@ -43,7 +43,7 @@ namespace FAD3
         private static bool _TemplateFileExists = true;
         private static bool _UITemplateFileExists = true;
         private static bool _InlandGridDBFileExists = true;
-        private static bool _AllRequiredFilesExists = true;
+        private static bool _allRequiredFilesExists = true;
         private static CoordinateDisplayFormat _CoordDisplayFormat = CoordinateDisplayFormat.DegreeDecimal;
         private static Color _MissingFieldBackColor = global.MissingFieldBackColor;
         private static List<string> _tempFiles = new List<string>();
@@ -367,7 +367,7 @@ namespace FAD3
         /// </summary>
         public static bool AllRequiredFilesExists
         {
-            get { return _AllRequiredFilesExists; }
+            get { return _allRequiredFilesExists; }
         }
 
         /// <summary>
@@ -421,13 +421,13 @@ namespace FAD3
         /// <summary>
         /// Test if the files required by the application to run are present
         /// </summary>
-        public static void TestRequiredFilesExists()
+        public static bool TestRequiredFilesExists()
         {
             _UITemplateFileExists = File.Exists(ApplicationPath + "\\UITable.xml");
             _TemplateFileExists = File.Exists(_templateMDBFile);
             _InlandGridDBFileExists = File.Exists(ApplicationPath + "\\grid25inland.mdb");
-            _AllRequiredFilesExists = _UITemplateFileExists && _TemplateFileExists && _InlandGridDBFileExists;
-            if (_AllRequiredFilesExists)
+            _allRequiredFilesExists = _UITemplateFileExists && _TemplateFileExists && _InlandGridDBFileExists;
+            if (_allRequiredFilesExists)
             {
                 RegistryKey reg_key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\FAD3", true);
                 reg_key.SetValue("ApplicationPath", ApplicationPath);
@@ -437,6 +437,7 @@ namespace FAD3
                 RegistryKey reg_key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\FAD3", true);
                 reg_key.SetValue("ApplicationPath", "");
             }
+            return _allRequiredFilesExists;
         }
 
         /// <summary>
@@ -845,7 +846,6 @@ namespace FAD3
                         sw.Write("\t" + lv.Columns[col].Text.ToString());
                     }
                 }
-                //sw.WriteLine("\n");
                 int rowIndex = 1;
                 int row = 0;
                 string st1 = "\n";

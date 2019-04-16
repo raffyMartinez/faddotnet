@@ -219,7 +219,6 @@ namespace FAD3.Mapping.UserControls
                     case ImageComboStyle.LinearGradient:
                         {
                             // TODO: temporary
-                            //str = ((tkLinearGradientMode)i).ToString();
                             str = "  Style " + (i + 1).ToString();
                             break;
                         }
@@ -251,15 +250,6 @@ namespace FAD3.Mapping.UserControls
                         }
                     case ImageComboStyle.HatchStyleWithNone:
                         {
-                            // TODO: temporary
-                            //if (i == 0)
-                            //{
-                            //    str = "None";
-                            //}
-                            //else
-                            //{
-                            //    str = ((tkGDIPlusHatchStyle)i - 1).ToString();
-                            //}
                             str = "  Style " + (i + 1).ToString();
                             break;
                         }

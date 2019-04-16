@@ -35,7 +35,6 @@ namespace FAD3.Database.Forms
                     _localNameGuid = value;
                     _speciesGuid = "";
                     _idType = Identification.LocalName;
-                    //FillListSpeciesNames();
                     FillListsNames();
                 }
             }
@@ -51,7 +50,6 @@ namespace FAD3.Database.Forms
                     _speciesGuid = value;
                     _localNameGuid = "";
                     _idType = Identification.Scientific;
-                    //FillListLocalNames();
                     FillListsNames();
                 }
             }
@@ -337,7 +335,6 @@ namespace FAD3.Database.Forms
                 tbCombo.Visible = false;
                 tbComboLabel.Visible = false;
                 FillListsNames();
-                //listView.Height += (Height - listView.Height-toolBar.Height-lblList.Height-50);
                 listView.Height += ClientSize.Height - listView.Height - toolBar.Height - lblList.Height - 15;
                 listView.Width += ClientSize.Width - listView.Width - 5;
             }
@@ -379,7 +376,6 @@ namespace FAD3.Database.Forms
                     contextMenu.Items.Add(menuItem);
 
                     ToolStripSeparator menuSep = new ToolStripSeparator();
-                    //menuItem.Text = "-";
                     contextMenu.Items.Add(menuSep);
 
                     CatchNameURLGenerator.CatchName = treeView.SelectedNode.Text;
@@ -1163,18 +1159,15 @@ namespace FAD3.Database.Forms
                             break;
 
                         case ExportImportDataType.LocalNameLanguages:
-                            //ExportLocalNameLanguages(fileName);
                             ExportNames(fileName, exportLanguage: true, exportLocalNames: false, exportLNSNPair: false);
                             break;
 
                         case ExportImportDataType.CatchLocalNames:
                             ExportNames(fileName, exportLanguage: false, exportLocalNames: true, exportLNSNPair: false);
-                            //ExportLocalNames(fileName);
                             break;
 
                         case ExportImportDataType.CatchLocalNameSpeciesNamePair:
                             ExportNames(fileName, exportLanguage: false, exportLocalNames: false, exportLNSNPair: true);
-                            //ExportLocalNameScientificNames(fileName);
                             break;
                     }
                     break;
