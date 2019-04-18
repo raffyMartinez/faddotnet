@@ -160,7 +160,15 @@ namespace FAD3.Mapping.Classes
             }
         }
 
-        private void SetupShapefileLayerForPrinting(MapLayer ml)
+        public void ResetLayerAndLabelVisibility()
+        {
+            foreach (MapLayer ml in MapLayersHandler)
+            {
+                SetupShapefileLayerForPrinting(ml, true);
+            }
+        }
+
+        private void SetupShapefileLayerForPrinting(MapLayer ml, bool reset = false)
         {
             if (ExportSettingsDict?.Count > 0)
             {
@@ -180,7 +188,7 @@ namespace FAD3.Mapping.Classes
 
                                 if (!item.ShowLabelsFront)
                                 {
-                                    sf.Labels.Visible = false;
+                                    sf.Labels.Visible = reset;
                                 }
                                 break;
 
@@ -190,7 +198,7 @@ namespace FAD3.Mapping.Classes
 
                                 if (!item.ShowLabelsReverse)
                                 {
-                                    sf.Labels.Visible = false;
+                                    sf.Labels.Visible = reset;
                                 }
                                 break;
                         }

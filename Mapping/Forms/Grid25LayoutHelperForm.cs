@@ -258,6 +258,7 @@ namespace FAD3.Mapping.Forms
                                 {
                                     _exportedImageCount++;
                                 }
+                                _majorGrid.ResetLayerAndLabelVisibility();
                             }
                             else
                             {
@@ -267,6 +268,7 @@ namespace FAD3.Mapping.Forms
                                 }
                             }
                         }
+                        _majorGrid.PrintFrontAndReverseSides = false;
                         _majorGrid.UnlockMap();
                         _majorGrid.MapControl.Redraw();
                         break;
@@ -289,6 +291,7 @@ namespace FAD3.Mapping.Forms
                                 {
                                     _exportedImageCount++;
                                 }
+                                _grid25GeographicDisplayHelper.ResetLayerAndLabelVisibility();
                             }
                             else
                             {
@@ -298,7 +301,7 @@ namespace FAD3.Mapping.Forms
                                 }
                             }
                         }
-
+                        _grid25GeographicDisplayHelper.PrintFrontAndReverseSides = false;
                         _grid25GeographicDisplayHelper.UnlockMap();
                         _grid25GeographicDisplayHelper.RedrawNap();
 
@@ -376,6 +379,7 @@ namespace FAD3.Mapping.Forms
                 smi.Dispose();
                 smi = null;
             }
+
             return rv;
         }
 
@@ -440,42 +444,14 @@ namespace FAD3.Mapping.Forms
             switch (((Button)(sender)).Name)
             {
                 case "btnExportSettings":
+
+                    if (_exportSettingsDict.Count == 0)
+                    {
+                        PopulateExportSettings();
+                    }
+
                     using (BatchExportMapSettingsForm bef = new BatchExportMapSettingsForm())
                     {
-                        if (_exportSettingsDict.Count == 0)
-                        {
-                            foreach (MapLayer ml in global.MappingForm.MapLayersHandler)
-                            {
-                                if (ml.Visible)
-                                {
-                                    if (ml.IsGrid25Layer)
-                                    {
-                                        ml.PrintOnFront = true;
-                                        ml.PrintLabelsFront = false;
-                                        ml.PrintOnReverse = false;
-                                        switch (ml.Name)
-                                        {
-                                            case "Labels":
-                                                ml.PrintLabelsFront = true;
-                                                break;
-
-                                            case "MBR":
-                                                ml.PrintOnReverse = true;
-                                                break;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        ml.PrintOnFront = true;
-                                        ml.PrintLabelsFront = false;
-                                        ml.PrintOnReverse = true;
-                                        ml.PrintLabelsReverse = true;
-                                    }
-                                    _exportSettingsDict.Add(ml.Handle, new FrontAndReverseMapSpecs(ml.Handle, ml.IsGrid25Layer, ml.Name, ml.PrintOnFront, ml.PrintLabelsFront, ml.PrintOnReverse, ml.PrintLabelsReverse));
-                                }
-                            }
-                        }
-
                         bef.ExportSettingsDict = _exportSettingsDict;
                         bef.ShowDialog();
                         if (bef.DialogResult == DialogResult.OK)
@@ -554,6 +530,10 @@ namespace FAD3.Mapping.Forms
                         if (!_parentForm.Grid25MajorGrid.LayoutHelper.SaveLayoutTemplate(saveAs.FileName))
                         {
                             MessageBox.Show("Template file was not saved");
+                        }
+                        else
+                        {
+                            textLayoutTemplateFileName.Text = saveAs.FileName;
                         }
                     }
                     break;
@@ -757,6 +737,7 @@ namespace FAD3.Mapping.Forms
         private void OnFormLoad(object sender, EventArgs e)
         {
             chkAutoExpand.Visible = false;
+            chkExportFrontAndReverse.Checked = false;
             _gridMapSourceFolderPath = "";
             global.LoadFormSettings(this, true);
             if (global.MappingMode == Database.Classes.fad3MappingMode.grid25Mode)
@@ -1044,6 +1025,9 @@ namespace FAD3.Mapping.Forms
 
                 case "tabExport":
                     chkAutoExpand.Visible = false;
+
+                    PopulateExportSettings();
+
                     if (global.MappingMode == Database.Classes.fad3MappingMode.defaultMode)
                     {
                         if (_grid25GeographicDisplayHelper.HasGrid)
@@ -1062,6 +1046,43 @@ namespace FAD3.Mapping.Forms
                 default:
                     chkAutoExpand.Visible = false;
                     break;
+            }
+        }
+
+        private void PopulateExportSettings()
+        {
+            //populate export settings dictionary
+            _exportSettingsDict.Clear();
+
+            foreach (MapLayer ml in global.MappingForm.MapLayersHandler)
+            {
+                if (ml.Visible)
+                {
+                    if (ml.IsGrid25Layer)
+                    {
+                        ml.PrintOnFront = true;
+                        ml.PrintLabelsFront = false;
+                        ml.PrintOnReverse = false;
+                        switch (ml.Name)
+                        {
+                            case "Labels":
+                                ml.PrintLabelsFront = true;
+                                break;
+
+                            case "MBR":
+                                ml.PrintOnReverse = true;
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        ml.PrintOnFront = true;
+                        ml.PrintLabelsFront = false;
+                        ml.PrintOnReverse = true;
+                        ml.PrintLabelsReverse = true;
+                    }
+                    _exportSettingsDict.Add(ml.Handle, new FrontAndReverseMapSpecs(ml.Handle, ml.IsGrid25Layer, ml.Name, ml.PrintOnFront, ml.PrintLabelsFront, ml.PrintOnReverse, ml.PrintLabelsReverse));
+                }
             }
         }
 

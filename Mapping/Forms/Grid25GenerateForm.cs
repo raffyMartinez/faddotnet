@@ -239,7 +239,11 @@ namespace FAD3
                     break;
 
                 case "buttonClose":
-                    Close();
+                    DialogResult dr = MessageBox.Show("Close the Grid25 form?", "Confirm closing of form", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                    if (dr == DialogResult.Yes)
+                    {
+                        Close();
+                    }
                     break;
 
                 case "buttonLocateGrid":

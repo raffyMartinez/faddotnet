@@ -277,6 +277,7 @@ namespace FAD3.Mapping.Forms
             switch (((Button)sender).Name)
             {
                 case "btnOk":
+                    Close();
                     break;
 
                 case "btnCancel":

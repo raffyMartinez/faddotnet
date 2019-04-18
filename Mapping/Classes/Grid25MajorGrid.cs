@@ -1463,7 +1463,15 @@ namespace FAD3
             }
         }
 
-        private void SetupShapefileLayerForPrinting(MapLayer ml)
+        public void ResetLayerAndLabelVisibility()
+        {
+            foreach (MapLayer ml in MapLayers)
+            {
+                SetupShapefileLayerForPrinting(ml, true);
+            }
+        }
+
+        private void SetupShapefileLayerForPrinting(MapLayer ml, bool reset = false)
         {
             Console.Write("in SetupShapefileLayerForPrinting");
             if (ExportSettingsDict?.Count > 0)
@@ -1479,22 +1487,35 @@ namespace FAD3
                                 break;
 
                             case GridMapSideToPrint.SideToPrintFront:
-
-                                MapLayers.MapControl.set_LayerVisible(ml.Handle, item.ShowInFront);
+                                if (reset)
+                                {
+                                    MapLayers.MapControl.set_LayerVisible(ml.Handle, reset);
+                                }
+                                else
+                                {
+                                    MapLayers.MapControl.set_LayerVisible(ml.Handle, item.ShowInFront);
+                                }
 
                                 if (!item.ShowLabelsFront)
                                 {
-                                    sf.Labels.Visible = false;
+                                    sf.Labels.Visible = reset;
                                 }
                                 break;
 
                             case GridMapSideToPrint.SideToPrintReverse:
+                                if (reset)
+                                {
+                                    MapLayers.MapControl.set_LayerVisible(ml.Handle, reset);
 
-                                MapLayers.MapControl.set_LayerVisible(ml.Handle, item.ShowInReverse);
+                                }
+                                else
+                                {
+                                    MapLayers.MapControl.set_LayerVisible(ml.Handle, item.ShowInReverse);
+                                }
 
                                 if (!item.ShowLabelsReverse)
                                 {
-                                    sf.Labels.Visible = false;
+                                    sf.Labels.Visible = reset;
                                 }
                                 break;
                         }
