@@ -12,8 +12,8 @@ namespace FAD3
 {
     public partial class Grid25GenerateForm : Form
     {
+        public bool _closeCommandDone;
         private static Grid25GenerateForm _instance;
-        private bool _formCloseDone = false;
         private MapperForm _parentForm;
         private Grid25MajorGrid _grid25MajorGrid;
         private Dictionary<string, uint> _labelAndGridProperties = new Dictionary<string, uint>();
@@ -239,11 +239,9 @@ namespace FAD3
                     break;
 
                 case "buttonClose":
-                    DialogResult dr = MessageBox.Show("Close the Grid25 form?", "Confirm closing of form", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
-                    if (dr == DialogResult.Yes)
-                    {
-                        Close();
-                    }
+                    _closeCommandDone = false;
+                    Close();
+
                     break;
 
                 case "buttonLocateGrid":
@@ -402,18 +400,6 @@ namespace FAD3
 
         private void OnGrid25GenerateForm_FormClosed(object sender, FormClosedEventArgs e)
         {
-            if (!_formCloseDone)
-            {
-                _formCloseDone = true;
-                if (global.MappingForm != null) global.MappingForm.Close();
-            }
-
-            CleanUp();
-
-            global.SaveFormSettings(this);
-            global.MappingMode = fad3MappingMode.defaultMode;
-            ReviewSavedGridFiles();
-            global.Grid25GenerateForm = null;
         }
 
         private void CleanUp()
@@ -536,6 +522,30 @@ namespace FAD3
                 case "tsButtonExit":
                     Close();
                     break;
+            }
+        }
+
+        private void OnFormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (!_closeCommandDone)
+            {
+                DialogResult dr = MessageBox.Show("Close the Grid25 form?", "Confirm closing of form", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                if (dr == DialogResult.Yes)
+                {
+                    _closeCommandDone = true;
+
+                    CleanUp();
+
+                    global.SaveFormSettings(this);
+                    global.MappingMode = fad3MappingMode.defaultMode;
+                    ReviewSavedGridFiles();
+                    global.Grid25GenerateForm = null;
+                    if (global.MappingForm != null) global.MappingForm.Close();
+                }
+                else
+                {
+                    e.Cancel = true;
+                }
             }
         }
     }

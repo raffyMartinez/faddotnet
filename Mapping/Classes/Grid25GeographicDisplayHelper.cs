@@ -63,9 +63,15 @@ namespace FAD3.Mapping.Classes
                 if (disposing)
                 {
                 }
-                MaxDimensionMBR.EditClear();
+                if (MaxDimensionMBR != null)
+                {
+                    MaxDimensionMBR.EditClear();
+                }
                 MaxDimensionMBR = null;
-                MBR.EditClear();
+                if (MBR != null)
+                {
+                    MBR.EditClear();
+                }
                 MBR = null;
                 _mapcontrol = null;
                 _grid25Layers.Clear();
@@ -170,7 +176,7 @@ namespace FAD3.Mapping.Classes
 
         private void SetupShapefileLayerForPrinting(MapLayer ml, bool reset = false)
         {
-            if (ExportSettingsDict?.Count > 0)
+            if (PrintFrontAndReverseSides && ExportSettingsDict?.Count > 0)
             {
                 foreach (var item in ExportSettingsDict.Values)
                 {

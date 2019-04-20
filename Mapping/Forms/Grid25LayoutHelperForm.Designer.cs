@@ -50,11 +50,16 @@
             this.label7 = new System.Windows.Forms.Label();
             this.textFishingGround = new System.Windows.Forms.TextBox();
             this.tabResults = new System.Windows.Forms.TabPage();
+            this.dgResults = new System.Windows.Forms.DataGridView();
+            this.colVisible = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.colTitle = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colExport = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.colWidth = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colHeight = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.btnGridSettings = new System.Windows.Forms.Button();
             this.btnLocateSourceFolder = new System.Windows.Forms.Button();
             this.lblProvideTitles = new System.Windows.Forms.Label();
             this.buttonSubGrid = new System.Windows.Forms.Button();
-            this.lvResults = new System.Windows.Forms.ListView();
             this.menuDropDown = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.tabSave = new System.Windows.Forms.TabPage();
             this.groupSaveTemplate = new System.Windows.Forms.GroupBox();
@@ -80,6 +85,7 @@
             this.tabLayout.SuspendLayout();
             this.tabFishingGround.SuspendLayout();
             this.tabResults.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgResults)).BeginInit();
             this.tabSave.SuspendLayout();
             this.groupSaveTemplate.SuspendLayout();
             this.groupSaveGrids.SuspendLayout();
@@ -174,6 +180,7 @@
             this.imageList1.Images.SetKeyName(11, "settings");
             this.imageList1.Images.SetKeyName(12, "image");
             this.imageList1.Images.SetKeyName(13, "toolbox");
+            this.imageList1.Images.SetKeyName(14, "list_16xMD.png");
             // 
             // btnCancel
             // 
@@ -302,17 +309,75 @@
             // 
             // tabResults
             // 
+            this.tabResults.Controls.Add(this.dgResults);
             this.tabResults.Controls.Add(this.btnGridSettings);
             this.tabResults.Controls.Add(this.btnLocateSourceFolder);
             this.tabResults.Controls.Add(this.lblProvideTitles);
             this.tabResults.Controls.Add(this.buttonSubGrid);
-            this.tabResults.Controls.Add(this.lvResults);
             this.tabResults.Location = new System.Drawing.Point(4, 22);
             this.tabResults.Name = "tabResults";
             this.tabResults.Size = new System.Drawing.Size(372, 299);
             this.tabResults.TabIndex = 2;
             this.tabResults.Text = "Results";
             this.tabResults.UseVisualStyleBackColor = true;
+            // 
+            // dgResults
+            // 
+            this.dgResults.AllowUserToAddRows = false;
+            this.dgResults.AllowUserToDeleteRows = false;
+            this.dgResults.BackgroundColor = System.Drawing.SystemColors.Window;
+            this.dgResults.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.dgResults.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgResults.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.colVisible,
+            this.colTitle,
+            this.colExport,
+            this.colWidth,
+            this.colHeight});
+            this.dgResults.Location = new System.Drawing.Point(0, 3);
+            this.dgResults.MultiSelect = false;
+            this.dgResults.Name = "dgResults";
+            this.dgResults.RowHeadersVisible = false;
+            this.dgResults.Size = new System.Drawing.Size(309, 293);
+            this.dgResults.TabIndex = 16;
+            this.dgResults.Visible = false;
+            this.dgResults.CellMouseUp += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.OndgResultsCellMouseUp);
+            // 
+            // colVisible
+            // 
+            this.colVisible.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.ColumnHeader;
+            this.colVisible.HeaderText = "Select";
+            this.colVisible.MinimumWidth = 50;
+            this.colVisible.Name = "colVisible";
+            this.colVisible.Width = 50;
+            // 
+            // colTitle
+            // 
+            this.colTitle.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.ColumnHeader;
+            this.colTitle.HeaderText = "Map title";
+            this.colTitle.Name = "colTitle";
+            this.colTitle.Width = 72;
+            // 
+            // colExport
+            // 
+            this.colExport.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.ColumnHeader;
+            this.colExport.HeaderText = "Export";
+            this.colExport.Name = "colExport";
+            this.colExport.Width = 43;
+            // 
+            // colWidth
+            // 
+            this.colWidth.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.ColumnHeader;
+            this.colWidth.HeaderText = "Width";
+            this.colWidth.Name = "colWidth";
+            this.colWidth.Width = 60;
+            // 
+            // colHeight
+            // 
+            this.colHeight.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.ColumnHeader;
+            this.colHeight.HeaderText = "Height";
+            this.colHeight.Name = "colHeight";
+            this.colHeight.Width = 63;
             // 
             // btnGridSettings
             // 
@@ -359,17 +424,6 @@
             this.buttonSubGrid.TabIndex = 12;
             this.buttonSubGrid.UseVisualStyleBackColor = true;
             this.buttonSubGrid.Click += new System.EventHandler(this.OnButtonClick);
-            // 
-            // lvResults
-            // 
-            this.lvResults.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.lvResults.ContextMenuStrip = this.menuDropDown;
-            this.lvResults.Location = new System.Drawing.Point(3, 3);
-            this.lvResults.Name = "lvResults";
-            this.lvResults.Size = new System.Drawing.Size(309, 293);
-            this.lvResults.TabIndex = 0;
-            this.lvResults.UseCompatibleStateImageBehavior = false;
-            this.lvResults.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnListViewMouseDown);
             // 
             // menuDropDown
             // 
@@ -612,6 +666,7 @@
             this.tabFishingGround.ResumeLayout(false);
             this.tabFishingGround.PerformLayout();
             this.tabResults.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dgResults)).EndInit();
             this.tabSave.ResumeLayout(false);
             this.groupSaveTemplate.ResumeLayout(false);
             this.groupSaveTemplate.PerformLayout();
@@ -648,7 +703,6 @@
         private System.Windows.Forms.TextBox textFishingGround;
         private System.Windows.Forms.ImageList imageList1;
         private System.Windows.Forms.TabPage tabResults;
-        private System.Windows.Forms.ListView lvResults;
         private System.Windows.Forms.CheckBox chkAutoExpand;
         private System.Windows.Forms.ContextMenuStrip menuDropDown;
         private System.Windows.Forms.Button btnInputTitles;
@@ -675,5 +729,11 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Button btnExportSettings;
+        private System.Windows.Forms.DataGridView dgResults;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn colVisible;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colTitle;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn colExport;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colWidth;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colHeight;
     }
 }

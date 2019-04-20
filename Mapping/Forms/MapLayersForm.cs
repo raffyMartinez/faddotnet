@@ -441,9 +441,12 @@ namespace FAD3
                     break;
 
                 case "itemAlwaysKeepOnTop":
-                    ToolStripMenuItem tsmi = (ToolStripMenuItem)e.ClickedItem;
-                    tsmi.Checked = !tsmi.Checked;
-                    _mapLayersHandler.CurrentMapLayer.KeepOnTop = tsmi.Checked;
+                    if (_mapLayersHandler.CurrentMapLayer != null)
+                    {
+                        ToolStripMenuItem tsmi = (ToolStripMenuItem)e.ClickedItem;
+                        tsmi.Checked = !tsmi.Checked;
+                        _mapLayersHandler.CurrentMapLayer.KeepOnTop = tsmi.Checked;
+                    }
                     break;
             }
         }

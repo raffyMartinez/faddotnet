@@ -1453,7 +1453,6 @@ namespace FAD3
 
         private void SetUpNonGridLayers()
         {
-            Console.WriteLine("in SetUpNonGridLayers");
             foreach (MapLayer ml in MapLayers)
             {
                 if (!ml.IsGrid25Layer)
@@ -1473,7 +1472,6 @@ namespace FAD3
 
         private void SetupShapefileLayerForPrinting(MapLayer ml, bool reset = false)
         {
-            Console.Write("in SetupShapefileLayerForPrinting");
             if (ExportSettingsDict?.Count > 0)
             {
                 foreach (var item in ExportSettingsDict.Values)
@@ -1506,7 +1504,6 @@ namespace FAD3
                                 if (reset)
                                 {
                                     MapLayers.MapControl.set_LayerVisible(ml.Handle, reset);
-
                                 }
                                 else
                                 {

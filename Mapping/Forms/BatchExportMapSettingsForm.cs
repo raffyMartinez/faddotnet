@@ -37,6 +37,7 @@ namespace FAD3.Mapping.Forms
                 dgSettings.Rows[row].Cells[0].Tag = item.Value.IsGrid25Layer;
             }
             dgSettings.CellValueChanged += OnCellValueChanged;
+            Text = "Visibility of layers and labels";
         }
 
         private void OnButtonClick(object sender, EventArgs e)

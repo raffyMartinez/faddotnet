@@ -462,16 +462,14 @@ namespace FAD3
 
                     if (kv.Value.KeepOnTop)
                     {
-                        Console.WriteLine($"keep on top {kv.Value.Name}");
-                        layersOnTop.Add(_axMap.get_LayerPosition(kv.Value.Handle));
+                        layersOnTop.Add(kv.Value.Handle);
                     }
                 }
             }
 
             foreach (int lyr in layersOnTop)
             {
-                _axMap.MoveLayerTop(lyr);
-                Console.WriteLine($"on top {_axMap.get_LayerName(lyr)}");
+                _axMap.MoveLayerTop(_axMap.get_LayerPosition(lyr));
             }
 
             //add a mask to the map control
