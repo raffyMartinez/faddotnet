@@ -13,8 +13,10 @@ namespace FAD3.Database.Classes
         public bool Cancel { get; set; }
         public string CancelReason { get; set; }
         public bool ImportCompleted { get; internal set; }
+        public string GearVariationImported { get; internal set; }
+        public string BarangayName { get; internal set; }
 
-        public FisheriesInventoryImportEventArg(string levelName, string levelGuid, FisheriesInventoryLevel inventoryLevel)
+        public FisheriesInventoryImportEventArg(string levelName, string levelGuid, FisheriesInventoryLevel inventoryLevel, string barangay = "")
         {
             InventoryLevel = inventoryLevel;
             switch (inventoryLevel)
@@ -27,6 +29,11 @@ namespace FAD3.Database.Classes
                 case FisheriesInventoryLevel.TargetArea:
                     TargetAreaGuid = levelGuid;
                     TargetAreaName = levelName;
+                    break;
+
+                case FisheriesInventoryLevel.Gear:
+                    GearVariationImported = levelName;
+                    BarangayName = barangay;
                     break;
             }
         }

@@ -22,6 +22,7 @@ namespace FAD3.Database.Classes
         public static List<string> ExpenseItems { get; internal set; }
         public static List<string> PaymentSources { get; internal set; }
         private Dictionary<string, int> _monthToInt = new Dictionary<string, int>();
+        private int _sitioGearCount;
 
         public static void GetLists()
         {
@@ -85,24 +86,7 @@ namespace FAD3.Database.Classes
                             tblGearInventoryCatchComposition ON
                             tblBaseLocalNames.NameNo = tblGearInventoryCatchComposition.NameOfCatch
                         WHERE tblGearInventoryCatchComposition.InventoryDataGuid ={{{dataGuid}}}";
-            var dt = new DataTable();
-            using (var conection = new OleDbConnection(global.ConnectionString))
-            {
-                try
-                {
-                    conection.Open();
-                    var adapter = new OleDbDataAdapter(sql, conection);
-                    adapter.Fill(dt);
-                    for (int i = 0; i < dt.Rows.Count; i++)
-                    {
-                        DataRow dr = dt.Rows[i];
-                        catchComposition.Add((dr["Name"].ToString(), (bool)dr["IsDominant"]));
-                    }
-                }
-                catch
-                {
-                }
-            }
+
             return catchComposition;
         }
 
@@ -817,6 +801,33 @@ namespace FAD3.Database.Classes
             get { return _barangayInventories; }
         }
 
+        public int GetSitioGearCount(string inventoryGuid)
+        {
+            _sitioGearCount = 0;
+
+            using (var conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                string sql = $@"SELECT Count(tblGearInventoryBarangayData.BarangayInventoryGUID) AS n
+                          FROM tblGearInventories INNER JOIN(tblGearInventoryBarangay INNER JOIN tblGearInventoryBarangayData ON tblGearInventoryBarangay.BarangayInventoryGuid = tblGearInventoryBarangayData.BarangayInventoryGUID) ON tblGearInventories.InventoryGuid = tblGearInventoryBarangay.InventoryGuid
+                          WHERE tblGearInventories.InventoryGuid = {{{inventoryGuid}}}";
+
+                using (OleDbCommand getGuid = new OleDbCommand(sql, conn))
+                {
+                    try
+                    {
+                        _sitioGearCount = (int)getGuid.ExecuteScalar();
+                    }
+                    catch
+                    {
+                        _sitioGearCount = 0;
+                    }
+                }
+            }
+
+            return _sitioGearCount;
+        }
+
         public Dictionary<string, (string InventoryName, DateTime DateConducted, string TargetArea)> Inventories
         {
             get { return _inventories; }
@@ -1143,6 +1154,8 @@ namespace FAD3.Database.Classes
             string barangaySurveyGuid = "";
             string gearInventoryGuid = "";
             string gearVariationGuid = "";
+            string gearClassName = "";
+            string gearVariationName = "";
             List<string> respondents = new List<string>();
             Dictionary<string, string> localNames = new Dictionary<string, string>();
             int usageCommercial = 0;
@@ -1267,6 +1280,8 @@ namespace FAD3.Database.Classes
                                 SaveSitioRespondents(respondents, barangaySurveyGuid);
                                 respondents.Clear();
                             }
+                            gearClassName = xmlReader.GetAttribute("GearClass");
+                            gearVariationName = xmlReader.GetAttribute("GearVariation");
                             gearInventoryGuid = xmlReader.GetAttribute("GearInventoryGuid");
                             gearVariationGuid = xmlReader.GetAttribute("GearVariationGuid");
                             break;
@@ -1440,6 +1455,9 @@ namespace FAD3.Database.Classes
 
                             case "Notes":
                                 notes = xmlReader.GetAttribute("Notes");
+
+                                SaveGearVariation(gearClassName, gearVariationName, gearVariationGuid);
+
                                 if (SaveSitioGearInventoryMain(barangaySurveyGuid, gearVariationGuid, usageCommercial, usageMunicipalMotorized, usageMunicipalNonMotorized, usageNoBoat,
                                       numberDaysFishingPerMonth, unit, percentDominance, gearInventoryGuid, fad3DataStatus.statusNew, cpueMax, cpueMin, cpueModalUpper, cpueModalLower,
                                       notes, cpueAvg, cpueMode, kiloPerUnit))
@@ -1451,6 +1469,9 @@ namespace FAD3.Database.Classes
                                     SaveSitioGearInventoryHistoricalCPUE(gearInventoryGuid, cpueHistories);
                                     SaveSitioGearInventoryExpenses(gearInventoryGuid, expenseItems);
                                     importedGearCount++;
+
+                                    FisheriesInventoryImportEventArg e = new FisheriesInventoryImportEventArg(gearVariationName, "", FisheriesInventoryLevel.Gear, barangay);
+                                    InventoryLevel?.Invoke(this, e);
                                 }
                                 notes = "";
                                 validGearVariation = false;
@@ -1469,6 +1490,16 @@ namespace FAD3.Database.Classes
             }
 
             return importedGearCount;
+        }
+
+        private void SaveGearVariation(string gearClassName, string gearVariationName, string gearVariationGuid)
+        {
+            if (!Gear.GearVariationGUIDExists(gearVariationGuid))
+            {
+                string classGuid = Gear.GearClassGuidFromClassName(gearClassName);
+                NewFisheryObjectName newGear = new NewFisheryObjectName(gearVariationName, FisheryObjectNameType.GearVariationName);
+                Gear.SaveNewVariationName(newGear, classGuid, gearVariationGuid);
+            }
         }
 
         public bool DeleteInventory(Dictionary<string, string> deleteInventoryArgs)
@@ -3486,8 +3517,114 @@ namespace FAD3.Database.Classes
             return n > 0 && m > 0;
         }
 
-        public bool SaveSitioGearInventoryGearLocalNames(string sitioGearInventoryGuid, Dictionary<string, string> localNamesDict)
+        private List<string> GetInventoryGuidsUsingGearVariationName(string variationName)
+        {
+            List<string> inventoryGuidsList = new List<string>();
+            var dt = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
 
+            {
+                try
+                {
+                    conection.Open();
+                    string query = $@"SELECT tblGearInventoryBarangayData.DataGuid
+                                    FROM tblGearVariations INNER JOIN tblGearInventoryBarangayData ON
+                                    tblGearVariations.GearVarGUID = tblGearInventoryBarangayData.GearVariation
+                                    WHERE tblGearVariations.Variation='{variationName}'";
+
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(dt);
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        DataRow dr = dt.Rows[i];
+                        inventoryGuidsList.Add(dr["DataGuid"].ToString());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
+                }
+            }
+            return inventoryGuidsList;
+        }
+
+        public bool EditInventoriedGearVariationName(string oldName, string targetGearVariationGuid, string localName)
+        {
+            string inventoryGuids = "";
+            var succeeded = false;
+            var listGuids = GetInventoryGuidsUsingGearVariationName(oldName);
+            if (listGuids.Count > 0)
+            {
+                foreach (var item in listGuids)
+                {
+                    inventoryGuids += $"{{{item}}},";
+                }
+                inventoryGuids = inventoryGuids.Trim(new char[] { ',', ' ' });
+                using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+                {
+                    conn.Open();
+                    string sql = $@"UPDATE tblGearInventoryBarangayData SET tblGearInventoryBarangayData.GearVariation = {{{targetGearVariationGuid}}}
+                WHERE tblGearInventoryBarangayData.DataGuid in({inventoryGuids})";
+
+                    using (OleDbCommand update = new OleDbCommand(sql, conn))
+                    {
+                        succeeded = update.ExecuteNonQuery() > 0;
+                    }
+                }
+
+                if (succeeded)
+                {
+                    if (localName.Length > 0)
+                    {
+                        NewFisheryObjectName gearLocalName = new NewFisheryObjectName(localName, FisheryObjectNameType.GearLocalName);
+                        var result = Gear.SaveNewLocalName(gearLocalName);
+                        if (result.success)
+                        {
+                            foreach (var item in listGuids)
+                            {
+                                if (!LocalNameIsUsed(item, localName))
+                                {
+                                    SaveSitioGearInventoryGearLocalNames(item, result.newGuid, false);
+                                }
+                            }
+                        }
+                    }
+
+                    var deleteResult = Gear.DeleteGearVariation(Gear.GetVariationGuidFromVariationName(oldName));
+                    succeeded = deleteResult.success;
+                }
+            }
+            return succeeded;
+        }
+
+        public bool LocalNameIsUsed(string inventoryGuid, string localName)
+        {
+            bool inUse = false;
+            string sql = $@"SELECT tblGearLocalNames.LocalName
+                            FROM tblGearLocalNames INNER JOIN
+                                tblGearInventoryGearLocalNames ON
+                                tblGearLocalNames.LocalNameGUID = tblGearInventoryGearLocalNames.LocalNameGuid
+                            WHERE tblGearInventoryGearLocalNames.InventoryDataGuid= {{{inventoryGuid}}}
+                            AND tblGearLocalNames.LocalName='{localName}'";
+            var dt = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    var adapter = new OleDbDataAdapter(sql, conection);
+                    adapter.Fill(dt);
+                    inUse = dt.Rows.Count > 0;
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex.Message, "FishingGearInventory.cs", "LocalNameIsUsed");
+                }
+            }
+            return inUse;
+        }
+
+        public bool SaveSitioGearInventoryGearLocalNames(string sitioGearInventoryGuid, Dictionary<string, string> localNamesDict)
         {
             int n = 0;
             using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
@@ -3525,26 +3662,37 @@ namespace FAD3.Database.Classes
             return n > 0;
         }
 
+        public bool SaveSitioGearInventoryGearLocalNames(string sitioGearInventoryGuid, string localNamesGuid, bool DeleteOtherLocalNames = true)
+        {
+            List<string> localNamesGUID = new List<string>();
+            localNamesGUID.Add(localNamesGuid);
+            return SaveSitioGearInventoryGearLocalNames(sitioGearInventoryGuid, localNamesGUID, DeleteOtherLocalNames);
+        }
+
         /// <summary>
         /// saves local names of a fishing gear included in a fishery inventory
         /// </summary>
         /// <param name="sitioGearInventoryGuid"></param>
         /// <param name="localNamesGuid"></param>
         /// <returns></returns>
-        public bool SaveSitioGearInventoryGearLocalNames(string sitioGearInventoryGuid, List<string> localNamesGuid)
+        public bool SaveSitioGearInventoryGearLocalNames(string sitioGearInventoryGuid, List<string> localNamesGuid, bool DeleteOtherLocalNames = true)
 
         {
             int n = 0;
+            string sql = "";
             using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
             {
                 try
                 {
                     conn.Open();
-                    string sql = $"Delete * from tblGearInventoryGearLocalNames where InventoryDataGuid = {{{sitioGearInventoryGuid}}}";
-
-                    using (OleDbCommand update = new OleDbCommand(sql, conn))
+                    if (DeleteOtherLocalNames)
                     {
-                        update.ExecuteNonQuery();
+                        sql = $"Delete * from tblGearInventoryGearLocalNames where InventoryDataGuid = {{{sitioGearInventoryGuid}}}";
+
+                        using (OleDbCommand update = new OleDbCommand(sql, conn))
+                        {
+                            update.ExecuteNonQuery();
+                        }
                     }
 
                     foreach (var item in localNamesGuid)

@@ -9,7 +9,7 @@ Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup", "setup\Setup\Setup.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Owf.Controls.Office2007ColorPicker", "Owf.Controls.Office2007ColorPicker\Owf.Controls.Office2007ColorPicker.csproj", "{F017C4CB-751D-4F5D-8A72-96A279135473}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "FAD3UpdaterApr052019", "updaters\FAD3UpdaterApr052019\FAD3UpdaterApr052019.vdproj", "{F10A593C-EBC8-4483-ACE8-69CC5D8A3031}"
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "FADUpdaterApr212019", "updaters\FADUpdaterApr212019\FADUpdaterApr212019.vdproj", "{1D5AEE59-F81C-49D1-8E91-4D5D87CAB38D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -55,12 +55,12 @@ Global
 		{F017C4CB-751D-4F5D-8A72-96A279135473}.Release|x64.Build.0 = Release|Any CPU
 		{F017C4CB-751D-4F5D-8A72-96A279135473}.Release|x86.ActiveCfg = Release|Any CPU
 		{F017C4CB-751D-4F5D-8A72-96A279135473}.Release|x86.Build.0 = Release|Any CPU
-		{F10A593C-EBC8-4483-ACE8-69CC5D8A3031}.Debug|Any CPU.ActiveCfg = Debug
-		{F10A593C-EBC8-4483-ACE8-69CC5D8A3031}.Debug|x64.ActiveCfg = Debug
-		{F10A593C-EBC8-4483-ACE8-69CC5D8A3031}.Debug|x86.ActiveCfg = Debug
-		{F10A593C-EBC8-4483-ACE8-69CC5D8A3031}.Release|Any CPU.ActiveCfg = Release
-		{F10A593C-EBC8-4483-ACE8-69CC5D8A3031}.Release|x64.ActiveCfg = Release
-		{F10A593C-EBC8-4483-ACE8-69CC5D8A3031}.Release|x86.ActiveCfg = Release
+		{1D5AEE59-F81C-49D1-8E91-4D5D87CAB38D}.Debug|Any CPU.ActiveCfg = Debug
+		{1D5AEE59-F81C-49D1-8E91-4D5D87CAB38D}.Debug|x64.ActiveCfg = Debug
+		{1D5AEE59-F81C-49D1-8E91-4D5D87CAB38D}.Debug|x86.ActiveCfg = Debug
+		{1D5AEE59-F81C-49D1-8E91-4D5D87CAB38D}.Release|Any CPU.ActiveCfg = Release
+		{1D5AEE59-F81C-49D1-8E91-4D5D87CAB38D}.Release|x64.ActiveCfg = Release
+		{1D5AEE59-F81C-49D1-8E91-4D5D87CAB38D}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

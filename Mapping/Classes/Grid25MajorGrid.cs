@@ -84,6 +84,9 @@ namespace FAD3
         public bool HasSubgrid { get; set; }
         public int SubGridCount { get; set; }
 
+        public bool ShowMapTitleOnReverse { get; set; }
+        public bool ShowMapZoneOnReverse { get; set; }
+
         public bool GridIsDefinedFromLayout { get; private set; }
 
         public Dictionary<int, FrontAndReverseMapSpecs> ExportSettingsDict { get; set; }
@@ -1322,7 +1325,13 @@ namespace FAD3
 
                 _grid25LabelManager = new Grid25LabelManager(_axMap.GeoProjection);
 
-                if (_grid25LabelManager.LabelGrid(_shapeFileSelectedMajorGridBuffer, _gridAndLabelProperties, MapTitle))
+                if (_grid25LabelManager.LabelGrid(_shapeFileSelectedMajorGridBuffer,
+                    _gridAndLabelProperties,
+                    MapTitle,
+                    PrintFrontAndReverseSides,
+                    GridMapSideToPrint == GridMapSideToPrint.SideToPrintReverse,
+                    ShowMapTitleOnReverse,
+                    ShowMapZoneOnReverse))
                 {
                     _grid25LabelManager.AddMajorGridLabels(_listIntersectedMajorGrids);
                     _grid25LabelManager.Grid25Labels.Labels.ApplyCategories();
@@ -1514,6 +1523,7 @@ namespace FAD3
                                 {
                                     sf.Labels.Visible = reset;
                                 }
+
                                 break;
                         }
                         break;

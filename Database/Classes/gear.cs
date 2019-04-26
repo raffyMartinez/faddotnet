@@ -249,42 +249,79 @@ namespace FAD3
             set { _GearVarGUID = value; }
         }
 
-        public static (bool success, string newGuid) SaveNewLocalName(NewFisheryObjectName newName, string guid = "")
+        public static string GetVariationGuidFromVariationName(string variationName)
         {
-            bool success = false;
-            var newLocalName = newName.NewName;
-            var key1 = newName.Key1;
-            var key2 = newName.Key2;
-            if (guid.Length == 0)
-            {
-                guid = newName.ObjectGUID;
-            }
+            string variationGUID = "";
+            var sql = $@"SELECT GearVarGUID
+                         FROM tblGearVariations
+                         WHERE Variation='{variationName}'";
             using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
             {
                 conn.Open();
-                var sql = $@"Insert into tblGearLocalNames (LocalName, LocalNameGUID, MPH1,MPH2) values
-                        ('{newLocalName}', {{{guid}}},{key1},{key2})";
-                using (OleDbCommand update = new OleDbCommand(sql, conn))
+                using (OleDbCommand getVariationGUID = new OleDbCommand(sql, conn))
                 {
                     try
                     {
-                        success = update.ExecuteNonQuery() > 0;
-                        if (success)
-                        {
-                            _gearLocalNameListDict.Add(guid, newLocalName);
-                            _gearLocalNameListReverseDict.Add(newLocalName, guid);
-                        }
+                        variationGUID = getVariationGUID.ExecuteScalar().ToString();
                     }
-                    catch (OleDbException dbex)
+                    catch
                     {
-                        if (dbex.ErrorCode == -2147467259)
-                        {
-                            guid = _gearLocalNameListReverseDict[newLocalName];
-                        }
+                        variationGUID = "";
                     }
-                    catch (Exception ex)
+                }
+            }
+            return variationGUID;
+        }
+
+        public static (bool success, string newGuid) SaveNewLocalName(NewFisheryObjectName newName, string guid = "")
+        {
+            bool success = false;
+            if (newName.NewName.Length > 0)
+            {
+                var newLocalName = newName.NewName;
+                var key1 = newName.Key1;
+                var key2 = newName.Key2;
+                if (guid.Length == 0)
+                {
+                    guid = newName.ObjectGUID;
+                }
+                using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+                {
+                    conn.Open();
+                    var sql = $@"Insert into tblGearLocalNames (LocalName, LocalNameGUID, MPH1,MPH2) values
+                        ('{newLocalName}', {{{guid}}},{key1},{key2})";
+                    using (OleDbCommand update = new OleDbCommand(sql, conn))
                     {
-                        Logger.Log(ex.Message, "Gear", "SaveNewLocalName");
+                        try
+                        {
+                            success = update.ExecuteNonQuery() > 0;
+                            if (success)
+                            {
+                                _gearLocalNameListDict.Add(guid, newLocalName);
+                                _gearLocalNameListReverseDict.Add(newLocalName, guid);
+                            }
+                        }
+                        catch (OleDbException dbex)
+                        {
+                            if (dbex.ErrorCode == -2147467259)
+                            {
+                                //guid = _gearLocalNameListReverseDict[newLocalName];
+                                var comparer = StringComparison.CurrentCultureIgnoreCase;
+                                foreach (var element in _gearLocalNameListReverseDict)
+                                {
+                                    if (String.Equals(element.Key, newLocalName, comparer))
+                                    {
+                                        guid = element.Value;
+                                        success = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Log(ex.Message, "Gear", "SaveNewLocalName");
+                        }
                     }
                 }
             }
@@ -572,7 +609,6 @@ namespace FAD3
         public static string GearClassFromGearVarGUID(string GearVarGUID)
         {
             string gearClass = "";
-            var dt = new DataTable();
             using (var conection = new OleDbConnection(global.ConnectionString))
             {
                 try
@@ -580,12 +616,10 @@ namespace FAD3
                     conection.Open();
                     string query = $@"SELECT GearClassName FROM tblGearClass INNER JOIN tblGearVariations ON
                                    tblGearClass.GearClass = tblGearVariations.GearClass WHERE GearVarGUID={{{GearVarGUID}}}";
-                    var adapter = new OleDbDataAdapter(query, conection);
-                    adapter.Fill(dt);
-                    if (dt.Rows.Count > 0)
+
+                    using (OleDbCommand getGearClass = new OleDbCommand(query, conection))
                     {
-                        DataRow dr = dt.Rows[0];
-                        gearClass = dr["GearClassName"].ToString();
+                        gearClass = getGearClass.ExecuteScalar().ToString();
                     }
                 }
                 catch (Exception ex)
@@ -1134,6 +1168,28 @@ namespace FAD3
             return success;
         }
 
+        public static bool GearVariationGUIDExists(string variationGUID)
+        {
+            bool exists = false;
+            string sql = $"Select Variation from tblGearVariations where GearVarGUID = '{variationGUID}'";
+            using (var conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                using (OleDbCommand getExists = new OleDbCommand(sql, conn))
+                {
+                    try
+                    {
+                        exists = getExists.ExecuteScalar().ToString().Length > 0;
+                    }
+                    catch
+                    {
+                        exists = false;
+                    }
+                }
+            }
+            return exists;
+        }
+
         public static int SamplingCountGearVariation(string gearVarGuid)
         {
             int samplingCount = 0;
@@ -1177,6 +1233,29 @@ namespace FAD3
                 catch (Exception ex) { Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name); }
             }
             return GearNameMatches;
+        }
+
+        public static string GearClassGuidFromClassName(string className)
+        {
+            string classGuid = "";
+            string sql = $"Select GearClass from tblGearClass where GearClassName = '{className}'";
+            using (var conn = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    var myDT = new DataTable();
+                    var adapter = new OleDbDataAdapter(sql, conn);
+                    adapter.Fill(myDT);
+                    DataRow dr = myDT.Rows[0];
+                    classGuid = dr["GearClass"].ToString();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
+                }
+            }
+            return classGuid;
         }
 
         /// <summary>

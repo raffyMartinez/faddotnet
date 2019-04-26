@@ -13,7 +13,10 @@ namespace FAD3.Mapping.Forms
 {
     public partial class BatchExportMapSettingsForm : Form
     {
+        private int _labelsRow;
         public bool ExportReverseSide;
+        public bool ShowTitleOnReverseSide;
+        public bool ShowZoneOnReverseSide;
         public Dictionary<int, FrontAndReverseMapSpecs> ExportSettingsDict { get; set; } //= new Dictionary<int, (string layerName, bool showFront, bool showFrontLabel, bool showReverse, bool showReverseLabel)>();
 
         public BatchExportMapSettingsForm()
@@ -23,16 +26,21 @@ namespace FAD3.Mapping.Forms
 
         private void OnFormLoad(object sender, EventArgs e)
         {
+            int row = 0;
             dgSettings.CellValueChanged -= OnCellValueChanged;
             foreach (var item in ExportSettingsDict)
             {
-                int row = dgSettings.Rows.Add(new object[] {
+                row = dgSettings.Rows.Add(new object[] {
                     item.Value.LayerName,
                     item.Value.ShowInFront,
                     item.Value.ShowLabelsFront,
                     item.Value.ShowInReverse,
                     item.Value.ShowLabelsReverse
                 });
+                if (item.Value.LayerName == "Labels")
+                {
+                    _labelsRow = row;
+                }
                 dgSettings.Rows[row].Tag = item.Key;
                 dgSettings.Rows[row].Cells[0].Tag = item.Value.IsGrid25Layer;
             }
@@ -101,6 +109,48 @@ namespace FAD3.Mapping.Forms
                     {
                         dgSettings.EndEdit();
                     }
+                    break;
+            }
+        }
+
+        private void OnCellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right
+                && e.ColumnIndex == 0
+                && e.RowIndex == _labelsRow
+                && (bool)dgSettings.Rows[e.RowIndex].Cells[4].Value)
+            {
+                dropdownSettings.Show(Cursor.Position.X, Cursor.Position.Y);
+            }
+        }
+
+        private void OnCellEnter(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.ColumnIndex == 0)
+            {
+                dgSettings.EditMode = DataGridViewEditMode.EditProgrammatically;
+            }
+            else
+            {
+                dgSettings.EditMode = DataGridViewEditMode.EditOnEnter;
+            }
+        }
+
+        private void OnDropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+            switch (e.ClickedItem.Name)
+            {
+                case "menuItemSetupLabels":
+                    using (ReverseGridLabelsSetupForm rslf = new ReverseGridLabelsSetupForm())
+                    {
+                        rslf.ShowDialog(this);
+                        if (rslf.DialogResult == DialogResult.OK)
+                        {
+                            ShowTitleOnReverseSide = rslf.ShowTitleOnReverse;
+                            ShowZoneOnReverseSide = rslf.ShowZoneOnReverse;
+                        }
+                    }
+
                     break;
             }
         }

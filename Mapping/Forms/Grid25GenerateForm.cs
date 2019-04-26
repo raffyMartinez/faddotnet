@@ -12,7 +12,7 @@ namespace FAD3
 {
     public partial class Grid25GenerateForm : Form
     {
-        public bool _closeCommandDone;
+        private bool _closeCommandDone;
         private static Grid25GenerateForm _instance;
         private MapperForm _parentForm;
         private Grid25MajorGrid _grid25MajorGrid;
@@ -239,7 +239,6 @@ namespace FAD3
                     break;
 
                 case "buttonClose":
-                    _closeCommandDone = false;
                     Close();
 
                     break;
@@ -529,23 +528,14 @@ namespace FAD3
         {
             if (!_closeCommandDone)
             {
-                DialogResult dr = MessageBox.Show("Close the Grid25 form?", "Confirm closing of form", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
-                if (dr == DialogResult.Yes)
-                {
-                    _closeCommandDone = true;
+                _closeCommandDone = true;
+                CleanUp();
 
-                    CleanUp();
-
-                    global.SaveFormSettings(this);
-                    global.MappingMode = fad3MappingMode.defaultMode;
-                    ReviewSavedGridFiles();
-                    global.Grid25GenerateForm = null;
-                    if (global.MappingForm != null) global.MappingForm.Close();
-                }
-                else
-                {
-                    e.Cancel = true;
-                }
+                global.SaveFormSettings(this);
+                global.MappingMode = fad3MappingMode.defaultMode;
+                ReviewSavedGridFiles();
+                global.Grid25GenerateForm = null;
+                if (global.MappingForm != null) global.MappingForm.Close();
             }
         }
     }

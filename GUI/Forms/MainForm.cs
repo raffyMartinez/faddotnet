@@ -2786,7 +2786,14 @@ namespace FAD3
                     }
                     lvi.Name = item.Key;
                     lvi.Tag = "inventory";
-                    lvi.SubItems[1].Text = item.Value.InventoryName;
+                    try
+                    {
+                        lvi.SubItems[1].Text = item.Value.InventoryName;
+                    }
+                    catch
+                    {
+                        //ignore
+                    }
                     n++;
                 }
             }

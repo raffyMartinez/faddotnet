@@ -101,7 +101,9 @@ namespace FAD3
                     success = sf.SaveAs(fileName);                     //saves the shapefile
                     if (success)
                     {
-                        sf.GeoProjection.WriteToFile(Path.GetFileName(fileName) + ".prj");        //save the shapefile's projection data
+                        string prjFile = fileName.Replace(".shp", ".prj");
+                        //sf.GeoProjection.WriteToFile(Path.GetFileName(fileName) + ".prj");        //save the shapefile's projection data
+                        sf.GeoProjection.WriteToFile(prjFile);
                     }
                 });
             }

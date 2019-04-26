@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
 using System.Xml;
+using System.Threading.Tasks;
 
 namespace FAD3.Database.Forms
 {
@@ -35,6 +36,9 @@ namespace FAD3.Database.Forms
         private bool _importInventorySuccess;
         private string _importInventoryProjectName;
         private string _importInventoryProjectGuid;
+        private string _inventoryProjectName;
+        private int _sitioGearCount;
+        private ExportImportProgressForm _exportImportProgressForm;
 
         //function to ensure that only one instance of the form is open
         public static GearInventoryForm GetInstance(TargetArea aoi, MainForm parentForm, string inventoryGuid = "")
@@ -168,6 +172,7 @@ namespace FAD3.Database.Forms
 
         private void OnFormLoad(object sender, EventArgs e)
         {
+            _sitioGearCount = 0;
             Text = "Inventory of fishers, fishing vessels and gears";
             SetupListview();
             var ndRoot = treeInventory.Nodes.Add("root", "Fishery inventory");
@@ -179,6 +184,7 @@ namespace FAD3.Database.Forms
             foreach (var item in _inventory.Inventories)
             {
                 var subInventoryProjectNode = ndRoot.Nodes.Add(item.Key, item.Value.InventoryName);
+                _inventoryProjectName = item.Value.InventoryName;
                 subInventoryProjectNode.Tag = "targetAreaInventory";
                 subInventoryProjectNode.Nodes.Add("***dummy***");
                 subInventoryProjectNode.ImageKey = "LayoutTransform";
@@ -236,7 +242,7 @@ namespace FAD3.Database.Forms
         private void OnTreeAfterExpand(object sender, TreeViewEventArgs e)
         {
             _treeLevel = e.Node.Tag.ToString();
-            if (_refreshSitioNumbers || e.Node.FirstNode.Text == "***dummy***")
+            if (_refreshSitioNumbers || e.Node.FirstNode?.Text == "***dummy***")
             {
                 e.Node.Nodes.Clear();
                 switch (_treeLevel)
@@ -319,6 +325,7 @@ namespace FAD3.Database.Forms
         /// </summary>
         private void ConfigureContextMenu()
         {
+            bool enableEditGearVariationName = false;
             contextMenu.Items.Clear();
 
             if (!_clickFromTree && lvInventory.SelectedItems.Count > 0 && lvInventory.SelectedItems[0].Tag != null)
@@ -331,6 +338,10 @@ namespace FAD3.Database.Forms
                         break;
 
                     case "gearVariation":
+                        break;
+
+                    case "gearVariationSummary":
+                        enableEditGearVariationName = true;
                         break;
 
                     default:
@@ -357,6 +368,15 @@ namespace FAD3.Database.Forms
             menuItem = contextMenu.Items.Add("Add fishing gear inventory");
             menuItem.Name = "itemAddFishingGear";
             menuItem.Enabled = _treeLevel == "sitio";
+
+            if (enableEditGearVariationName)
+            {
+                menuItem = contextMenu.Items.Add("Edit gear name");
+                menuItem.Name = "itemEditGearName";
+
+                menuItem = contextMenu.Items.Add("Details of gear name usage");
+                menuItem.Name = "itemDetailGearNameUsage";
+            }
 
             if (_clickFromTree)
             {
@@ -490,13 +510,20 @@ namespace FAD3.Database.Forms
                 _barangayInventoryGuid = string.Empty;
 
                 ConfigToolbar();
-                if (_treeLevel == "gearVariation")
+                switch (_treeLevel)
                 {
-                    ConfigListViewGear(e.Node.Name);
-                }
-                else
-                {
-                    ConfigListView(e.Node);
+                    case "gearVariation":
+                        ConfigListViewGear(e.Node.Name);
+                        break;
+
+                    case "targetAreaInventory":
+                        _sitioGearCount = _inventory.GetSitioGearCount(e.Node.Name);
+                        ConfigListView(e.Node);
+                        break;
+
+                    default:
+                        ConfigListView(e.Node);
+                        break;
                 }
                 e.Node.SelectedImageKey = e.Node.ImageKey;
             }
@@ -969,6 +996,7 @@ namespace FAD3.Database.Forms
         /// <param name="node"></param>
         private void ConfigListView(TreeNode node)
         {
+            lvInventory.Visible = false;
             lvInventory.Items.Clear();
             lvInventory.Columns.Clear();
             lvInventory.Columns.Add("Property");
@@ -1088,6 +1116,7 @@ namespace FAD3.Database.Forms
                     break;
             }
             SizeColumns(lvInventory, false);
+            lvInventory.Visible = true;
         }
 
         public void RefreshMainInventory(string inventoryName)
@@ -1174,18 +1203,21 @@ namespace FAD3.Database.Forms
 
         private void ShowSitioGearInventory(TreeNode node)
         {
-            _barangayInventoryGuid = _inventory.GetBarangayInventoryGuid(node.Parent.Parent.Parent.Parent.Name, node.Parent.Parent.Parent.Name, node.Parent.Parent.Name, node.Parent.Name, node.Name);
-            foreach (var item in _inventory.ReadSitioGearInventory(_barangayInventoryGuid))
+            if (node != null)
             {
-                if (!node.Nodes.ContainsKey(item.variationInventoryGuid))
+                _barangayInventoryGuid = _inventory.GetBarangayInventoryGuid(node.Parent.Parent.Parent.Parent.Name, node.Parent.Parent.Parent.Name, node.Parent.Parent.Name, node.Parent.Name, node.Name);
+                foreach (var item in _inventory.ReadSitioGearInventory(_barangayInventoryGuid))
                 {
-                    if (node.Nodes.Count > 0 && node.FirstNode.Text == "***dummy***")
+                    if (!node.Nodes.ContainsKey(item.variationInventoryGuid))
                     {
-                        node.Nodes.Clear();
+                        if (node.Nodes.Count > 0 && node.FirstNode.Text == "***dummy***")
+                        {
+                            node.Nodes.Clear();
+                        }
+                        var nd = node.Nodes.Add(item.variationInventoryGuid, $"{item.gearVariation} ({item.localNames})");
+                        nd.Tag = "gearVariation";
+                        nd.ImageKey = Gear.GearClassImageKeyFromGearClasName(item.gearClass);
                     }
-                    var nd = node.Nodes.Add(item.variationInventoryGuid, $"{item.gearVariation} ({item.localNames})");
-                    nd.Tag = "gearVariation";
-                    nd.ImageKey = Gear.GearClassImageKeyFromGearClasName(item.gearClass);
                 }
             }
         }
@@ -1207,7 +1239,13 @@ namespace FAD3.Database.Forms
             switch (_treeLevel)
             {
                 case "targetAreaInventory":
-                    node.Expand();
+                    if (!node.IsExpanded)
+                    {
+                        treeInventory.Visible = false;
+                        node.Expand();
+                        node.Collapse();
+                        treeInventory.Visible = true;
+                    }
 
                     //list the detail of the inventory project
                     lvi = lvInventory.Items.Add("Name of inventory");
@@ -1347,6 +1385,7 @@ namespace FAD3.Database.Forms
                         lvi = lvInventory.Items.Add($"{item.Value.gearClass} - {item.Value.variation}");
                     }
                     lvi.SubItems.Add(item.Value.total.ToString());
+                    lvi.Tag = "gearVariationSummary";
                     lvi.ImageKey = Gear.GearClassImageKeyFromGearClasName(item.Value.gearClass);
                 }
             }
@@ -1378,7 +1417,7 @@ namespace FAD3.Database.Forms
         private void OnContextMenu_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
             e.ClickedItem.Owner.Visible = false;
-
+            bool proceed = true;
             var inventoryEditForm = new GearInventoryEditForm(_treeLevel, _targetArea, _inventory, this);
             switch (e.ClickedItem.Name)
             {
@@ -1418,6 +1457,26 @@ namespace FAD3.Database.Forms
                     OnNodeClicked(null, ee);
                     return;
 
+                case "itemDetailGearNameUsage":
+                    proceed = false;
+                    break;
+
+                case "itemEditGearName":
+                    proceed = false;
+                    using (EditGearVariationNameForm egvnf = new EditGearVariationNameForm(_listTargetHit.Text))
+                    {
+                        egvnf.ShowDialog(this);
+                        if (egvnf.DialogResult == DialogResult.OK)
+                        {
+                            var editedGearName = _listTargetHit.Text.Substring(_listTargetHit.Text.IndexOf('-') + 1).Trim();
+                            if (_inventory.EditInventoriedGearVariationName(editedGearName, egvnf.TargetGearVariationGuid, egvnf.LocalName))
+                            {
+                                ConfigListView(treeInventory.SelectedNode);
+                            }
+                        }
+                    }
+                    break;
+
                 case "itemAddBarangay":
                     TreeNode nd = treeInventory.SelectedNode;
                     switch (_treeLevel)
@@ -1455,7 +1514,11 @@ namespace FAD3.Database.Forms
                     inventoryEditForm.AddNewGearInventory(_barangayInventoryGuid, _sitioCountCommercial, _sitioCountMunicipalMotorized, _sitioCountMunicipalNonMotorized, _sitioCountFishers);
                     break;
             }
-            inventoryEditForm.ShowDialog(this);
+
+            if (proceed)
+            {
+                inventoryEditForm.ShowDialog(this);
+            }
         }
 
         private void OnListViewDoubleClick(object sender, EventArgs e)
@@ -1621,8 +1684,9 @@ namespace FAD3.Database.Forms
             }
         }
 
-        private void ExportInventoryXML(string fileName)
+        private int ExportInventoryXML(string fileName)
         {
+            int gearsExportedCount = 0;
             XmlWriter writer = XmlWriter.Create(fileName);
             writer.WriteStartDocument();
 
@@ -1678,171 +1742,181 @@ namespace FAD3.Database.Forms
                 writer.WriteEndElement();
 
                 //gear inventory in sitio
-                foreach (var sitioGear in _inventory.ReadSitioGearInventory(item.Key))
+                if (_sitioGearCount == 0)
                 {
-                    //gear used in sitio
-                    writer.WriteStartElement("GearInventory");
-                    writer.WriteAttributeString("GearClass", sitioGear.gearClass);
-                    writer.WriteAttributeString("GearVariation", sitioGear.gearVariation);
-                    writer.WriteAttributeString("GearVariationGuid", sitioGear.gearVariationGuid);
-                    writer.WriteAttributeString("GearInventoryGuid", sitioGear.variationInventoryGuid);
-
+                    _exportImportProgressForm.UpdateProgress(forcedComplete: true);
+                }
+                else
+                {
+                    foreach (var sitioGear in _inventory.ReadSitioGearInventory(item.Key))
                     {
-                        var gearDetail = _inventory.GetGearVariationInventoryDataEx(sitioGear.variationInventoryGuid);
+                        //gear used in sitio
+                        writer.WriteStartElement("GearInventory");
+                        writer.WriteAttributeString("GearClass", sitioGear.gearClass);
+                        writer.WriteAttributeString("GearVariation", sitioGear.gearVariation);
+                        writer.WriteAttributeString("GearVariationGuid", sitioGear.gearVariationGuid);
+                        writer.WriteAttributeString("GearInventoryGuid", sitioGear.variationInventoryGuid);
 
-                        //local names of gear used
                         {
-                            writer.WriteStartElement("GearLocalNames");
-                            foreach (var localName in gearDetail.gearLocalNames)
+                            var gearDetail = _inventory.GetGearVariationInventoryDataEx(sitioGear.variationInventoryGuid);
+
+                            //local names of gear used
                             {
-                                writer.WriteStartElement("GearLocalName");
-                                writer.WriteAttributeString("Value", localName.Value);
-                                writer.WriteAttributeString("key", localName.Key);
-                                writer.WriteEndElement();
-                            }
-                            writer.WriteEndElement();
-                        }
-
-                        //distribution of gear within vessel types
-                        {
-                            writer.WriteStartElement("UsageCount");
-                            writer.WriteAttributeString("CountCommercialUse", gearDetail.commercialCount.ToString());
-                            writer.WriteAttributeString("CountMotorizedUse", gearDetail.motorizedCount.ToString());
-                            writer.WriteAttributeString("CountNonCommercialUse", gearDetail.nonMotorizedCount.ToString());
-                            writer.WriteAttributeString("CountNoBoatUse", gearDetail.noBoatCount.ToString());
-                            writer.WriteEndElement();
-                        }
-
-                        //seasonality of gear
-                        {
-                            writer.WriteStartElement("Seaonality");
-                            writer.WriteAttributeString("NumberDaysPerMonth", gearDetail.numberDaysGearUsedPerMonth.ToString());
-                            {
-                                writer.WriteStartElement("MonthsInUse");
-                                foreach (var monthOperation in gearDetail.monthsInUse)
+                                writer.WriteStartElement("GearLocalNames");
+                                foreach (var localName in gearDetail.gearLocalNames)
                                 {
-                                    writer.WriteStartElement("Month");
-                                    writer.WriteString(MonthFromNumber(monthOperation));
-                                    writer.WriteEndElement();
-                                }
-                                writer.WriteEndElement();
-
-                                writer.WriteStartElement("MonthsPeak");
-                                foreach (var monthPeak in gearDetail.peakMonths)
-                                {
-                                    writer.WriteStartElement("Month");
-                                    writer.WriteString(MonthFromNumber(monthPeak));
+                                    writer.WriteStartElement("GearLocalName");
+                                    writer.WriteAttributeString("Value", localName.Value);
+                                    writer.WriteAttributeString("key", localName.Key);
                                     writer.WriteEndElement();
                                 }
                                 writer.WriteEndElement();
                             }
-                            writer.WriteEndElement();
-                        }
 
-                        //cpue of the gear
-                        {
-                            writer.WriteStartElement("CPUE");
-                            writer.WriteAttributeString("CatchRangeMaximum", gearDetail.cpueRangeMax.ToString());
-                            writer.WriteAttributeString("CatchRangeMinimum", gearDetail.cpueRangeMin.ToString());
-                            writer.WriteAttributeString("CatchAverageCPUE", gearDetail.cpueAverage.ToString());
-                            writer.WriteAttributeString("CatchModeUpper", gearDetail.cpueModeUpper.ToString());
-                            writer.WriteAttributeString("CatchModeLower", gearDetail.cpueModeLower.ToString());
-                            writer.WriteAttributeString("CatchMode", gearDetail.cpueMode.ToString());
-                            writer.WriteAttributeString("Unit", gearDetail.cpueUnit);
-                            writer.WriteAttributeString("KiloEquivalent", gearDetail.equivalentKg.ToString());
-
-                            //historical cpue
+                            //distribution of gear within vessel types
                             {
-                                writer.WriteStartElement("CPUEHistoricalTrend");
-                                foreach (var trend in gearDetail.historicalCPUE)
+                                writer.WriteStartElement("UsageCount");
+                                writer.WriteAttributeString("CountCommercialUse", gearDetail.commercialCount.ToString());
+                                writer.WriteAttributeString("CountMotorizedUse", gearDetail.motorizedCount.ToString());
+                                writer.WriteAttributeString("CountNonCommercialUse", gearDetail.nonMotorizedCount.ToString());
+                                writer.WriteAttributeString("CountNoBoatUse", gearDetail.noBoatCount.ToString());
+                                writer.WriteEndElement();
+                            }
+
+                            //seasonality of gear
+                            {
+                                writer.WriteStartElement("Seaonality");
+                                writer.WriteAttributeString("NumberDaysPerMonth", gearDetail.numberDaysGearUsedPerMonth.ToString());
                                 {
-                                    writer.WriteStartElement("CPUEHistory");
-                                    if (trend.decade != null)
+                                    writer.WriteStartElement("MonthsInUse");
+                                    foreach (var monthOperation in gearDetail.monthsInUse)
                                     {
-                                        writer.WriteAttributeString("DecadeStart", trend.decade.ToString() + "s");
+                                        writer.WriteStartElement("Month");
+                                        writer.WriteString(MonthFromNumber(monthOperation));
+                                        writer.WriteEndElement();
                                     }
-                                    else
+                                    writer.WriteEndElement();
+
+                                    writer.WriteStartElement("MonthsPeak");
+                                    foreach (var monthPeak in gearDetail.peakMonths)
                                     {
-                                        writer.WriteAttributeString("SpecificYear", trend.historyYear.ToString());
+                                        writer.WriteStartElement("Month");
+                                        writer.WriteString(MonthFromNumber(monthPeak));
+                                        writer.WriteEndElement();
                                     }
-                                    writer.WriteAttributeString("AverageCPUE", trend.cpue.ToString());
-                                    writer.WriteAttributeString("Unit", trend.unit);
-                                    writer.WriteAttributeString("Notes", trend.notes);
                                     writer.WriteEndElement();
                                 }
                                 writer.WriteEndElement();
                             }
 
-                            writer.WriteEndElement();
-                        }
-
-                        //catch composition
-                        {
-                            writer.WriteStartElement("CatchComposition");
-                            writer.WriteAttributeString("PercentageOfDominance", gearDetail.percentageOfDominance.ToString());
+                            //cpue of the gear
                             {
-                                //Dominant catch
-                                writer.WriteStartElement("DominantCatch");
-                                foreach (var dCatch in gearDetail.dominantCatch)
+                                writer.WriteStartElement("CPUE");
+                                writer.WriteAttributeString("CatchRangeMaximum", gearDetail.cpueRangeMax.ToString());
+                                writer.WriteAttributeString("CatchRangeMinimum", gearDetail.cpueRangeMin.ToString());
+                                writer.WriteAttributeString("CatchAverageCPUE", gearDetail.cpueAverage.ToString());
+                                writer.WriteAttributeString("CatchModeUpper", gearDetail.cpueModeUpper.ToString());
+                                writer.WriteAttributeString("CatchModeLower", gearDetail.cpueModeLower.ToString());
+                                writer.WriteAttributeString("CatchMode", gearDetail.cpueMode.ToString());
+                                writer.WriteAttributeString("Unit", gearDetail.cpueUnit);
+                                writer.WriteAttributeString("KiloEquivalent", gearDetail.equivalentKg.ToString());
+
+                                //historical cpue
                                 {
-                                    writer.WriteStartElement("Name");
-                                    writer.WriteAttributeString("Value", dCatch.Value);
-                                    writer.WriteAttributeString("guid", dCatch.Key);
+                                    writer.WriteStartElement("CPUEHistoricalTrend");
+                                    foreach (var trend in gearDetail.historicalCPUE)
+                                    {
+                                        writer.WriteStartElement("CPUEHistory");
+                                        if (trend.decade != null)
+                                        {
+                                            writer.WriteAttributeString("DecadeStart", trend.decade.ToString() + "s");
+                                        }
+                                        else
+                                        {
+                                            writer.WriteAttributeString("SpecificYear", trend.historyYear.ToString());
+                                        }
+                                        writer.WriteAttributeString("AverageCPUE", trend.cpue.ToString());
+                                        writer.WriteAttributeString("Unit", trend.unit);
+                                        writer.WriteAttributeString("Notes", trend.notes);
+                                        writer.WriteEndElement();
+                                    }
                                     writer.WriteEndElement();
                                 }
-                                writer.WriteEndElement();
 
-                                //Non-dominant catch
-                                writer.WriteStartElement("NonDominantCatch");
-                                foreach (var ndCatch in gearDetail.nonDominantCatch)
+                                writer.WriteEndElement();
+                            }
+
+                            //catch composition
+                            {
+                                writer.WriteStartElement("CatchComposition");
+                                writer.WriteAttributeString("PercentageOfDominance", gearDetail.percentageOfDominance.ToString());
                                 {
-                                    writer.WriteStartElement("Name");
-                                    writer.WriteAttributeString("Value", ndCatch.Value);
-                                    writer.WriteAttributeString("guid", ndCatch.Key);
+                                    //Dominant catch
+                                    writer.WriteStartElement("DominantCatch");
+                                    foreach (var dCatch in gearDetail.dominantCatch)
+                                    {
+                                        writer.WriteStartElement("Name");
+                                        writer.WriteAttributeString("Value", dCatch.Value);
+                                        writer.WriteAttributeString("guid", dCatch.Key);
+                                        writer.WriteEndElement();
+                                    }
+                                    writer.WriteEndElement();
+
+                                    //Non-dominant catch
+                                    writer.WriteStartElement("NonDominantCatch");
+                                    foreach (var ndCatch in gearDetail.nonDominantCatch)
+                                    {
+                                        writer.WriteStartElement("Name");
+                                        writer.WriteAttributeString("Value", ndCatch.Value);
+                                        writer.WriteAttributeString("guid", ndCatch.Key);
+                                        writer.WriteEndElement();
+                                    }
+                                    writer.WriteEndElement();
+                                }
+
+                                writer.WriteEndElement();
+                            }
+
+                            //accessories
+                            {
+                                writer.WriteStartElement("Accessories");
+                                foreach (string accessory in gearDetail.accessories)
+                                {
+                                    writer.WriteStartElement("Accessory");
+                                    writer.WriteAttributeString("Name", accessory);
                                     writer.WriteEndElement();
                                 }
                                 writer.WriteEndElement();
                             }
 
-                            writer.WriteEndElement();
-                        }
-
-                        //accessories
-                        {
-                            writer.WriteStartElement("Accessories");
-                            foreach (string accessory in gearDetail.accessories)
+                            //expenses
                             {
-                                writer.WriteStartElement("Accessory");
-                                writer.WriteAttributeString("Name", accessory);
+                                writer.WriteStartElement("Expenses");
+                                foreach (var expense in gearDetail.expenses)
+                                {
+                                    writer.WriteStartElement("Expense");
+                                    writer.WriteAttributeString("Name", expense.expense);
+                                    writer.WriteAttributeString("Cost", expense.cost.ToString());
+                                    writer.WriteAttributeString("SourceOfFunds", expense.source);
+                                    writer.WriteAttributeString("Notes", expense.notes);
+                                    writer.WriteEndElement();
+                                }
                                 writer.WriteEndElement();
                             }
-                            writer.WriteEndElement();
-                        }
 
-                        //expenses
-                        {
-                            writer.WriteStartElement("Expenses");
-                            foreach (var expense in gearDetail.expenses)
+                            //final notes
                             {
-                                writer.WriteStartElement("Expense");
-                                writer.WriteAttributeString("Name", expense.expense);
-                                writer.WriteAttributeString("Cost", expense.cost.ToString());
-                                writer.WriteAttributeString("SourceOfFunds", expense.source);
-                                writer.WriteAttributeString("Notes", expense.notes);
+                                writer.WriteStartElement("Notes");
+                                writer.WriteAttributeString("Value", gearDetail.notes);
                                 writer.WriteEndElement();
                             }
-                            writer.WriteEndElement();
                         }
 
-                        //final notes
-                        {
-                            writer.WriteStartElement("Notes");
-                            writer.WriteAttributeString("Value", gearDetail.notes);
-                            writer.WriteEndElement();
-                        }
+                        writer.WriteEndElement();
+                        gearsExportedCount++;
+                        _exportImportProgressForm.ExportImportCount++;
+                        _exportImportProgressForm.UpdateProgress();
                     }
-
-                    writer.WriteEndElement();
                 }
                 writer.WriteEndElement();
             }
@@ -1850,39 +1924,69 @@ namespace FAD3.Database.Forms
             writer.WriteEndElement();
             writer.WriteEndDocument();
             writer.Close();
-            MessageBox.Show("Fishing gear inventory was exported to XML", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            return gearsExportedCount;
+        }
+
+        private async void ExportInventoryToXMLAsync(string fileName)
+        {
+            //treeInventory.SelectedNode.Expand();
+            OnTreeAfterExpand(null, new TreeViewEventArgs(treeInventory.SelectedNode));
+            int gearsitioCount = await ExportInventoryToXMLTask(fileName);
+            if (gearsitioCount > 0 && gearsitioCount != _sitioGearCount)
+            {
+                MessageBox.Show("Fishing gear inventory exported to XML was not completed", "Export was not completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
+        private Task<int> ExportInventoryToXMLTask(string fileName)
+        {
+            return Task.Run(() => ExportInventoryXML(fileName));
         }
 
         private void ExportInventory()
         {
-            bool notImplemented = true;
-            FileDialogHelper.Title = "Provide filename for exporting fisher, vessel and fishing gear inventory";
-            FileDialogHelper.DialogType = FileDialogType.FileSave;
-            FileDialogHelper.DataFileType = DataFileType.Text | DataFileType.XML | DataFileType.CSV | DataFileType.Excel;
-            FileDialogHelper.ShowDialog();
-            var fileName = FileDialogHelper.FileName;
-            if (fileName.Length > 0)
+            if (_treeLevel == "targetAreaInventory")
             {
-                switch (Path.GetExtension(fileName))
+                bool notImplemented = true;
+                FileDialogHelper.Title = "Provide filename for exporting fisher, vessel and fishing gear inventory";
+                FileDialogHelper.DialogType = FileDialogType.FileSave;
+                FileDialogHelper.DataFileType = DataFileType.Text | DataFileType.XML | DataFileType.CSV | DataFileType.Excel;
+                FileDialogHelper.FilterIndex = 2;
+                FileDialogHelper.FileName = $"{_inventoryProjectName}_export_inventory.xml";
+                DialogResult dr = FileDialogHelper.ShowDialog();
+                if (dr == DialogResult.OK)
                 {
-                    case ".txt":
+                    var fileName = FileDialogHelper.FileName;
+                    if (fileName.Length > 0)
+                    {
+                        switch (Path.GetExtension(fileName))
+                        {
+                            case ".txt":
+                                break;
 
-                        break;
+                            case ".XML":
+                            case ".xml":
+                                notImplemented = false;
+                                _exportImportProgressForm = new ExportImportProgressForm(fileName, _sitioGearCount);
+                                _exportImportProgressForm.Show(this);
+                                ExportInventoryToXMLAsync(fileName);
+                                break;
 
-                    case ".XML":
-                    case ".xml":
-                        ExportInventoryXML(fileName);
-                        notImplemented = false;
-                        break;
+                            case ".xlsx":
+                                break;
+                        }
+                    }
+                }
 
-                    case ".xlsx":
-                        break;
+                if (dr == DialogResult.OK && notImplemented)
+                {
+                    MessageBox.Show("This is not yet implemented");
                 }
             }
-
-            if (notImplemented)
+            else
             {
-                MessageBox.Show("This is not yet implemented");
+                MessageBox.Show("Please select an inventory project in the tree", "Inventory project required", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
@@ -1895,7 +1999,11 @@ namespace FAD3.Database.Forms
                 {
                     _importInventoryProjectName = iifx.ImportedInventoryProjectName;
                     _importInventoryProjectGuid = iifx.ImportedInventoryProjectGuid;
+                    _exportImportProgressForm = new ExportImportProgressForm(_inventory, iifx.ImportedInventoryFileName);
+                    _exportImportProgressForm.ActionExportImport = ExportImportAction.ActionImport;
+                    _exportImportProgressForm.Show(this);
                     int result = await _inventory.ImportInventoryAsync(iifx.ImportedInventoryFileName, iifx.ImportInventoryAction, _importInventoryProjectGuid);
+                    _exportImportProgressForm.UpdateProgress(true);
                     string msg = "";
                     if (result > 0)
                     {
@@ -1938,10 +2046,6 @@ namespace FAD3.Database.Forms
             _clickFromTree = false;
             _listTargetHit = lvInventory.HitTest(e.X, e.Y).Item;
             ConfigureContextMenu();
-        }
-
-        private void OnPanelSizeChanged(object sender, EventArgs e)
-        {
         }
     }
 }

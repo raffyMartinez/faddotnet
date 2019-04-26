@@ -201,6 +201,12 @@
     <Compile Include="Database\Forms\DatabaseReportForm.Designer.cs">
       <DependentUpon>DatabaseReportForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Database\Forms\EditGearVariationNameForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Database\Forms\EditGearVariationNameForm.Designer.cs">
+      <DependentUpon>EditGearVariationNameForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Database\Forms\EditSelectedLocalNameForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -212,6 +218,12 @@
     </Compile>
     <Compile Include="Database\Forms\ExportImportDialogForm.Designer.cs">
       <DependentUpon>ExportImportDialogForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Database\Forms\ExportImportProgressForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Database\Forms\ExportImportProgressForm.Designer.cs">
+      <DependentUpon>ExportImportProgressForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Database\Forms\FishingBoatForm.cs">
       <SubType>Form</SubType>
@@ -372,6 +384,12 @@
     </Compile>
     <Compile Include="Mapping\Forms\Grid25SubGridForm.Designer.cs">
       <DependentUpon>Grid25SubGridForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Mapping\Forms\ReverseGridLabelsSetupForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Mapping\Forms\ReverseGridLabelsSetupForm.Designer.cs">
+      <DependentUpon>ReverseGridLabelsSetupForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Mapping\Forms\SelectUTMZoneForm.cs">
       <SubType>Form</SubType>
@@ -786,11 +804,17 @@
     <EmbeddedResource Include="Database\Forms\DatabaseReportForm.resx">
       <DependentUpon>DatabaseReportForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Database\Forms\EditGearVariationNameForm.resx">
+      <DependentUpon>EditGearVariationNameForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Database\Forms\EditSelectedLocalNameForm.resx">
       <DependentUpon>EditSelectedLocalNameForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Database\Forms\ExportImportDialogForm.resx">
       <DependentUpon>ExportImportDialogForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Database\Forms\ExportImportProgressForm.resx">
+      <DependentUpon>ExportImportProgressForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Database\Forms\FishingBoatForm.resx">
       <DependentUpon>FishingBoatForm.cs</DependentUpon>
@@ -860,6 +884,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Mapping\Forms\Grid25SubGridForm.resx">
       <DependentUpon>Grid25SubGridForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Mapping\Forms\ReverseGridLabelsSetupForm.resx">
+      <DependentUpon>ReverseGridLabelsSetupForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Mapping\Forms\SelectUTMZoneForm.resx">
       <DependentUpon>SelectUTMZoneForm.cs</DependentUpon>

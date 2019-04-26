@@ -1292,6 +1292,10 @@ namespace FAD3.Database.Forms
             }
         }
 
+        public void EditInventoriedGearVariationName(string variationName, string targetVariationGuid, List<string> localNames)
+        {
+        }
+
         private void SetGearVariationsCombo(string gearKey)
         {
             cboGearVariation.Items.Clear();

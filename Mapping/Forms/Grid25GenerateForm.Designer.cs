@@ -69,7 +69,6 @@
             this.shapeBorderColor = new Microsoft.VisualBasic.PowerPacks.RectangleShape();
             this.shapeMajorGridLabelColor = new Microsoft.VisualBasic.PowerPacks.RectangleShape();
             this.shapeMinorGridLabelColor = new Microsoft.VisualBasic.PowerPacks.RectangleShape();
-            this.buttonClose = new System.Windows.Forms.Button();
             this.buttonClear = new System.Windows.Forms.Button();
             this.buttonGrid = new System.Windows.Forms.Button();
             this.lblGridStatus = new System.Windows.Forms.Label();
@@ -465,16 +464,6 @@
             this.shapeMinorGridLabelColor.Size = new System.Drawing.Size(23, 18);
             this.shapeMinorGridLabelColor.DoubleClick += new System.EventHandler(this.OnShapeColor_DoubleClick);
             // 
-            // buttonClose
-            // 
-            this.buttonClose.Location = new System.Drawing.Point(229, 514);
-            this.buttonClose.Name = "buttonClose";
-            this.buttonClose.Size = new System.Drawing.Size(48, 28);
-            this.buttonClose.TabIndex = 5;
-            this.buttonClose.Text = "Close";
-            this.buttonClose.UseVisualStyleBackColor = true;
-            this.buttonClose.Click += new System.EventHandler(this.OnButtons_Click);
-            // 
             // buttonClear
             // 
             this.buttonClear.ImageIndex = 1;
@@ -501,7 +490,7 @@
             // 
             this.lblGridStatus.Location = new System.Drawing.Point(4, 491);
             this.lblGridStatus.Name = "lblGridStatus";
-            this.lblGridStatus.Size = new System.Drawing.Size(215, 68);
+            this.lblGridStatus.Size = new System.Drawing.Size(276, 68);
             this.lblGridStatus.TabIndex = 8;
             this.lblGridStatus.Text = "Grid status:";
             // 
@@ -636,7 +625,6 @@
             this.Controls.Add(this.buttonLocateGrid);
             this.Controls.Add(this.lblGridStatus);
             this.Controls.Add(this.toolbar);
-            this.Controls.Add(this.buttonClose);
             this.Controls.Add(this.groupLabels);
             this.Controls.Add(this.buttonClear);
             this.Controls.Add(this.buttonGrid);
@@ -696,7 +684,6 @@
         private Microsoft.VisualBasic.PowerPacks.RectangleShape shapeMajorGridLineColor;
         private Microsoft.VisualBasic.PowerPacks.RectangleShape shapeBorderColor;
         private Microsoft.VisualBasic.PowerPacks.RectangleShape shapeMajorGridLabelColor;
-        private System.Windows.Forms.Button buttonClose;
         private System.Windows.Forms.ImageList imList;
         private System.Windows.Forms.Button buttonLabel;
         private ToolStripExtensions.ToolStripEx toolbar;

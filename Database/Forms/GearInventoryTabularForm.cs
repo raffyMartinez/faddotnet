@@ -417,7 +417,10 @@ namespace FAD3.Database.Forms
                 else
                 {
                     c.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
-                    c.Width = c.Width > (int)c.Tag ? c.Width : (int)c.Tag;
+                    if (c.Tag != null)
+                    {
+                        c.Width = c.Width > (int)c.Tag ? c.Width : (int)c.Tag;
+                    }
                 }
             }
             lv.Visible = !init;

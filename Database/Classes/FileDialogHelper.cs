@@ -6,13 +6,19 @@ namespace FAD3.Database.Classes
     {
         public static FileDialogType DialogType { get; set; }
         public static string Title { get; set; }
-        public static string FileName { get; internal set; }
+        public static string FileName { get; set; }
         public static string Filter { get; internal set; }
         public static int FilterIndex { get; set; }
         public static DataFileType DataFileType { get; set; }
         private static FileDialog _dlg;
+        public static DialogResult DialogResult { get; internal set; }
 
-        public static void ShowDialog()
+        static FileDialogHelper()
+        {
+            FilterIndex = 1;
+        }
+
+        public static DialogResult ShowDialog()
         {
             if (DialogType == FileDialogType.FileOpen)
             {
@@ -25,7 +31,7 @@ namespace FAD3.Database.Classes
                 _dlg.Title = "Save a file";
             }
             _dlg.Filter = "Text file|*.txt|All files|*.*";
-            _dlg.FilterIndex = 1;
+            _dlg.FilterIndex = FilterIndex;
 
             if (DataFileType != DataFileType.None)
             {
@@ -64,8 +70,12 @@ namespace FAD3.Database.Classes
             }
             _dlg.FileName = FileName;
             FilterIndex = _dlg.FilterIndex;
-            _dlg.ShowDialog();
-            FileName = _dlg.FileName;
+            DialogResult DialogResult = _dlg.ShowDialog();
+            if (DialogResult == DialogResult.OK)
+            {
+                FileName = _dlg.FileName;
+            }
+            return DialogResult;
         }
     }
 }

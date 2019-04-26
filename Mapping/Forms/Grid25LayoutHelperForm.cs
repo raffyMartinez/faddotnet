@@ -59,6 +59,8 @@ namespace FAD3.Mapping.Forms
         public Dictionary<string, bool> MapsForExport { get; set; }
         private Dictionary<int, FrontAndReverseMapSpecs> _exportSettingsDict = new Dictionary<int, FrontAndReverseMapSpecs>();
         private int _checkedGridRow;
+        private bool _showMapTitleOnReverse;
+        private bool _showMapZoneOnReverse;
 
         public static Grid25LayoutHelperForm GetInstance(Grid25MajorGrid majorGrid, Grid25GenerateForm parentForm)
         {
@@ -367,6 +369,8 @@ namespace FAD3.Mapping.Forms
 
                 case GridMapSideToPrint.SideToPrintReverse:
                     fileName = $@"{_exportImageFolderSavePath}\{_layoutPanelTitle}_reverse_grid.tif";
+                    _majorGrid.ShowMapTitleOnReverse = _showMapTitleOnReverse;
+                    _majorGrid.ShowMapZoneOnReverse = _showMapZoneOnReverse;
                     break;
             }
             //lve.FileName = fileName;
@@ -417,6 +421,8 @@ namespace FAD3.Mapping.Forms
             _grid25GeographicDisplayHelper.SetMapExtents(ext);
 
             string fileName = "";
+            SaveMapImage smi = new SaveMapImage(fileName, _exportDPI, global.MappingForm.MapControl);
+
             switch (sideToPrint)
             {
                 case GridMapSideToPrint.SideToPrintIgnore:
@@ -431,8 +437,6 @@ namespace FAD3.Mapping.Forms
                     fileName = $@"{_exportImageFolderSavePath}\{_layoutPanelTitle}_reverse_grid.tif";
                     break;
             }
-
-            SaveMapImage smi = new SaveMapImage(fileName, _exportDPI, global.MappingForm.MapControl);
 
             smi.MaintainOnePointLineWidth = true;
             smi.MapLayersHandler = global.MappingForm.MapLayersHandler;
@@ -465,6 +469,8 @@ namespace FAD3.Mapping.Forms
                         if (bef.DialogResult == DialogResult.OK)
                         {
                             _exportSettingsDict = new Dictionary<int, FrontAndReverseMapSpecs>(bef.ExportSettingsDict);
+                            _showMapTitleOnReverse = bef.ShowTitleOnReverseSide;
+                            _showMapZoneOnReverse = bef.ShowZoneOnReverseSide;
                         }
                     }
                     break;

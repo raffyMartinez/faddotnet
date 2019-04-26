@@ -50,7 +50,13 @@ namespace FAD3
             _shapeFileGrid25Labels.EditClear();
         }
 
-        public bool LabelGrid(Shapefile sfLabelPath, Dictionary<string, uint> labelProperties, string mapTitle)
+        public bool LabelGrid(Shapefile sfLabelPath,
+            Dictionary<string, uint> labelProperties,
+            string mapTitle,
+            bool printFrontAndReverse = false,
+            bool reverseSide = false,
+            bool showTitle = false,
+            bool showZone = false)
         {
             bool success = false;
             if (_shapeFileGrid25Labels != null)
@@ -60,18 +66,21 @@ namespace FAD3
 
                 ClearLabels();
 
-                _wrappedLabels = _labelPropertiesDictionary["minorGridLabelWrapped"] == 1;
-                _labelDistance = (int)_labelPropertiesDictionary["minorGridLabelDistance"];
-                if (_wrappedLabels)
+                if (!printFrontAndReverse || (printFrontAndReverse && !reverseSide))
                 {
-                    for (int shp = 0; shp < sfLabelPath.NumShapes; shp++)
+                    _wrappedLabels = _labelPropertiesDictionary["minorGridLabelWrapped"] == 1;
+                    _labelDistance = (int)_labelPropertiesDictionary["minorGridLabelDistance"];
+                    if (_wrappedLabels)
                     {
-                        GetLines(sfLabelPath.Shape[shp]);
+                        for (int shp = 0; shp < sfLabelPath.NumShapes; shp++)
+                        {
+                            GetLines(sfLabelPath.Shape[shp]);
+                        }
                     }
-                }
-                else
-                {
-                    GetLines(sfLabelPath.Extents.ToShape());
+                    else
+                    {
+                        GetLines(sfLabelPath.Extents.ToShape());
+                    }
                 }
 
                 SetMapTitle(sfLabelPath.Extents);
@@ -305,7 +314,7 @@ namespace FAD3
         /// Places map title and footer
         /// </summary>
         /// <param name="minorGridExtent"></param>
-        private void SetMapTitle(Extents minorGridExtent)
+        private void SetMapTitle(Extents minorGridExtent, bool showZone = true)
         {
             //set up map title
             var shp = new Shape();
@@ -328,19 +337,22 @@ namespace FAD3
             }
 
             //setup UTM zone footer
-            shp = new Shape();
-            if (shp.Create(ShpfileType.SHP_POINT))
+            if (showZone)
             {
-                if (shp.AddPoint(minorGridExtent.xMin, minorGridExtent.yMin - 3000 - _labelDistance) >= 0)
+                shp = new Shape();
+                if (shp.Create(ShpfileType.SHP_POINT))
                 {
-                    var iShp = _shapeFileGrid25Labels.EditAddShape(shp);
-                    if (iShp >= 0)
+                    if (shp.AddPoint(minorGridExtent.xMin, minorGridExtent.yMin - 3000 - _labelDistance) >= 0)
                     {
-                        _shapeFileGrid25Labels.EditCellValue(_iFldLocation, iShp, "MZ");
-                        var arr = _shapeFileGrid25Labels.GeoProjection.ProjectionName.Split(' ');
-                        var zone = $"Zone: {arr[5]}";
-                        _shapeFileGrid25Labels.EditCellValue(_iFLdLabel, iShp, zone);
-                        _shapeFileGrid25Labels.Labels.AddLabel(zone, shp.Point[0].x, shp.Point[0].y, 0, 6);
+                        var iShp = _shapeFileGrid25Labels.EditAddShape(shp);
+                        if (iShp >= 0)
+                        {
+                            _shapeFileGrid25Labels.EditCellValue(_iFldLocation, iShp, "MZ");
+                            var arr = _shapeFileGrid25Labels.GeoProjection.ProjectionName.Split(' ');
+                            var zone = $"Zone: {arr[5]}";
+                            _shapeFileGrid25Labels.EditCellValue(_iFLdLabel, iShp, zone);
+                            _shapeFileGrid25Labels.Labels.AddLabel(zone, shp.Point[0].x, shp.Point[0].y, 0, 6);
+                        }
                     }
                 }
             }

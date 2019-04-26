@@ -56,7 +56,7 @@
             // contextMenu
             // 
             this.contextMenu.Name = "contextMenu";
-            this.contextMenu.Size = new System.Drawing.Size(181, 26);
+            this.contextMenu.Size = new System.Drawing.Size(61, 4);
             this.contextMenu.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnContextMenu_ItemClicked);
             // 
             // split
@@ -107,7 +107,6 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.Size = new System.Drawing.Size(612, 326);
             this.tableLayoutPanel1.TabIndex = 4;
-            this.tableLayoutPanel1.ClientSizeChanged += new System.EventHandler(this.OnPanelSizeChanged);
             // 
             // lblGuide
             // 
