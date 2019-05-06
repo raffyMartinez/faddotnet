@@ -6,6 +6,14 @@
         ActionImport
     }
 
+    public enum PointFeatureType
+    {
+        MunicipalityLocation,
+        BarangayLocation,
+        LandmarkLocation,
+        IslandLocation
+    }
+
     public enum GridMapSideToPrint
     {
         SideToPrintIgnore,

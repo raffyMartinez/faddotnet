@@ -89,7 +89,11 @@
             this.treeInventory.Size = new System.Drawing.Size(307, 326);
             this.treeInventory.TabIndex = 1;
             this.treeInventory.AfterExpand += new System.Windows.Forms.TreeViewEventHandler(this.OnTreeAfterExpand);
+            this.treeInventory.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.OnTreeItemDrag);
             this.treeInventory.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.OnNodeClicked);
+            this.treeInventory.DragDrop += new System.Windows.Forms.DragEventHandler(this.OnTreeDragDrop);
+            this.treeInventory.DragEnter += new System.Windows.Forms.DragEventHandler(this.OnTreeDragEnter);
+            this.treeInventory.DragOver += new System.Windows.Forms.DragEventHandler(this.OnTreeDragOver);
             // 
             // tableLayoutPanel1
             // 
@@ -128,8 +132,9 @@
             this.lvInventory.Size = new System.Drawing.Size(606, 300);
             this.lvInventory.TabIndex = 4;
             this.lvInventory.UseCompatibleStateImageBehavior = false;
+            this.lvInventory.SelectedIndexChanged += new System.EventHandler(this.OnListSelectionChanged);
             this.lvInventory.DoubleClick += new System.EventHandler(this.OnListViewDoubleClick);
-            this.lvInventory.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnMouseDown);
+            this.lvInventory.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnListViewMouseDown);
             // 
             // toolStrip
             // 

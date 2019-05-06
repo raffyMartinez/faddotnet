@@ -40,69 +40,76 @@ namespace FAD3.Database.Forms
             FileDialogHelper.Title = "Get filename for importing fisher, vessel and fishing gear inventory";
             FileDialogHelper.DialogType = FileDialogType.FileOpen;
             FileDialogHelper.DataFileType = DataFileType.XML;
-            FileDialogHelper.ShowDialog();
+            DialogResult dr = FileDialogHelper.ShowDialog();
             _fileName = FileDialogHelper.FileName;
-            if (_fileName.Length > 0 && string.Equals(Path.GetExtension(_fileName), ".xml", StringComparison.OrdinalIgnoreCase))
+            if (dr == DialogResult.OK && _fileName.Length > 0)
             {
-                var elementCounter = 0;
-                XmlTextReader xmlReader = new XmlTextReader(_fileName);
-                while ((elementCounter == 0 || (elementCounter > 0)) && xmlReader.Read())
+                if (_fileName.Length > 0 && string.Equals(Path.GetExtension(_fileName), ".xml", StringComparison.OrdinalIgnoreCase))
                 {
-                    if (xmlReader.Name == "FisherVesselGearInventoryProject")
+                    var elementCounter = 0;
+                    XmlTextReader xmlReader = new XmlTextReader(_fileName);
+                    while ((elementCounter == 0 || (elementCounter > 0)) && xmlReader.Read())
                     {
-                        _importedProjectGUID = xmlReader.GetAttribute("ProjectGuid");
-                        _importedProjectName = xmlReader.GetAttribute("ProjectName");
-                        _importedProjectDateImplemented = DateTime.Parse(xmlReader.GetAttribute("DateStart"));
-                        _isInventoryXML = true;
-                        break;
-                    }
-                    else if (elementCounter > 1 && !_isInventoryXML)
-                    {
-                        break;
-                    }
-                    elementCounter++;
-                }
-
-                if (_isInventoryXML)
-                {
-                    foreach (var inventory in _inventory.Inventories)
-                    {
-                        KeyValuePair<string, string> kv = new KeyValuePair<string, string>(inventory.Key, inventory.Value.InventoryName);
-                        cboInventories.Items.Add(kv);
-
-                        if (!_importedProjectFound
-                            && inventory.Value.InventoryName == _importedProjectName
-                            && inventory.Value.DateConducted == _importedProjectDateImplemented)
+                        if (xmlReader.Name == "FisherVesselGearInventoryProject")
                         {
-                            _importedProjectFound = true;
+                            _importedProjectGUID = xmlReader.GetAttribute("ProjectGuid");
+                            _importedProjectName = xmlReader.GetAttribute("ProjectName");
+                            _importedProjectDateImplemented = DateTime.Parse(xmlReader.GetAttribute("DateStart"));
+                            _isInventoryXML = true;
+                            break;
                         }
+                        else if (elementCounter > 1 && !_isInventoryXML)
+                        {
+                            break;
+                        }
+                        elementCounter++;
                     }
 
-                    cboInventories.DisplayMember = "Value";
-                    cboInventories.ValueMember = "Key";
-
-                    if (!_importedProjectFound)
+                    if (_isInventoryXML)
                     {
-                        txtImportedProject.Text = _importedProjectName;
-                        rdbImportExisting.Enabled = cboInventories.Items.Count > 0;
-                        cboInventories.Enabled = cboInventories.Items.Count > 0;
-                        if (cboInventories.Items.Count > 0)
+                        foreach (var inventory in _inventory.Inventories)
+                        {
+                            KeyValuePair<string, string> kv = new KeyValuePair<string, string>(inventory.Key, inventory.Value.InventoryName);
+                            cboInventories.Items.Add(kv);
+
+                            if (!_importedProjectFound
+                                && inventory.Value.InventoryName == _importedProjectName
+                                && inventory.Value.DateConducted == _importedProjectDateImplemented)
+                            {
+                                _importedProjectFound = true;
+                            }
+                        }
+
+                        cboInventories.DisplayMember = "Value";
+                        cboInventories.ValueMember = "Key";
+
+                        if (!_importedProjectFound)
+                        {
+                            txtImportedProject.Text = _importedProjectName;
+                            rdbImportExisting.Enabled = cboInventories.Items.Count > 0;
+                            cboInventories.Enabled = cboInventories.Items.Count > 0;
+                            if (cboInventories.Items.Count > 0)
+                            {
+                                cboInventories.SelectedIndex = 0;
+                            }
+                        }
+                        else
                         {
                             cboInventories.SelectedIndex = 0;
+                            rdbImportNew.Enabled = false;
+                            txtImportedProject.Enabled = false;
                         }
                     }
                     else
                     {
-                        cboInventories.SelectedIndex = 0;
-                        rdbImportNew.Enabled = false;
-                        txtImportedProject.Enabled = false;
+                        MessageBox.Show("File does not contain inventory data", "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        btnOk.Enabled = false;
                     }
                 }
-                else
-                {
-                    MessageBox.Show("File does not contain inventory data", "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    btnOk.Enabled = false;
-                }
+            }
+            else
+            {
+                Close();
             }
         }
 

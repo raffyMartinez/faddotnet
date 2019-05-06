@@ -114,7 +114,7 @@
             this.Name = "CoordinateEntryForm";
             this.ShowInTaskbar = false;
             this.Text = "Coordinates";
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnCoordinateEntryForm_FormClosed);
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnFormClosed);
             this.Load += new System.EventHandler(this.OnCoordinateEntryForm_Load);
             this.Shown += new System.EventHandler(this.CoordinateEntryForm_Shown);
             this.ResumeLayout(false);

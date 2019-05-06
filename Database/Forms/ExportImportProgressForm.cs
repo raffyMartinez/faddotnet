@@ -20,31 +20,50 @@ namespace FAD3.Database.Forms
         public ExportImportAction ActionExportImport { get; set; }
         public FishingGearInventory FishingGearInventory { get; set; }
         public int BatchSize { get; set; }
+        private GearInventoryForm _parentForm;
+        public string NameOfSavedGear { get; set; }
 
-        public ExportImportProgressForm(FishingGearInventory fishingGearInventory, string fileName)
+        public ExportImportProgressForm(FishingGearInventory fishingGearInventory, string fileName, GearInventoryForm parentForm)
         {
             InitializeComponent();
             FileName = fileName;
             FishingGearInventory = fishingGearInventory;
             FishingGearInventory.InventoryLevel += OnInventoryLevel;
             BatchSize = 25;
+            _parentForm = parentForm;
         }
 
         private void OnInventoryLevel(object sender, FisheriesInventoryImportEventArg e)
         {
-            ExportImportCount++;
-            if (ExportImportTargetCount < ExportImportCount)
+            NameOfSavedGear = e.NameOfSavedGear;
+            if (e.StartImporting)
             {
-                ExportImportTargetCount += BatchSize;
+                lblStatus.Invoke(new MethodInvoker(delegate
+                {
+                    lblStatus.Visible = true;
+                }));
             }
-            UpdateProgress();
+            else if (NameOfSavedGear?.Length > 0)
+            {
+                ExportImportCount++;
+                if (ExportImportTargetCount < ExportImportCount)
+                {
+                    ExportImportTargetCount += BatchSize;
+                }
+                UpdateProgress();
+                lblStatus.Invoke(new MethodInvoker(delegate
+                {
+                    lblStatus.Text = $"processed {NameOfSavedGear}";
+                }));
+            }
         }
 
-        public ExportImportProgressForm(string fileName, int exportImportTargetCount)
+        public ExportImportProgressForm(string fileName, int exportImportTargetCount, GearInventoryForm parentForm)
         {
             InitializeComponent();
             FileName = fileName;
             ExportImportTargetCount = exportImportTargetCount;
+            _parentForm = parentForm;
         }
 
         public void UpdateProgress(bool forcedComplete = false)
@@ -58,6 +77,13 @@ namespace FAD3.Database.Forms
                 else
                 {
                     progressBar.Value = (int)(((double)ExportImportCount / (double)ExportImportTargetCount) * 100);
+                    if (ActionExportImport == ExportImportAction.ActionExport)
+                    {
+                        lblStatus.Invoke(new MethodInvoker(delegate
+                        {
+                            lblStatus.Text = $"processed {NameOfSavedGear}";
+                        }));
+                    }
                 }
             }));
 
@@ -67,6 +93,11 @@ namespace FAD3.Database.Forms
                 {
                     lblTitle.Text = "Finished processing file!";
                 });
+
+                lblStatus.Invoke(new MethodInvoker(delegate
+                {
+                    lblStatus.Text = "Done";
+                }));
             }
         }
 
@@ -89,6 +120,16 @@ namespace FAD3.Database.Forms
                     break;
             }
             lblExportImport.Text = $"Processing {FileName.EllipsisString()}";
+            lblStatus.Visible = true;
+        }
+
+        private void OnFormClosed(object sender, FormClosedEventArgs e)
+        {
+            if (ActionExportImport == ExportImportAction.ActionImport)
+            {
+                FishingGearInventory.InventoryLevel -= OnInventoryLevel;
+            }
+            _parentForm.ResetProgressForm();
         }
     }
 }

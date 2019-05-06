@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using FAD3.Mapping.Classes;
+using System.Reflection;
 
 namespace FAD3
 {
@@ -31,6 +32,9 @@ namespace FAD3
         public bool PreviewImage { get; set; }
         public string TempMapFileName { get { return _fileName; } }
         public bool MaintainOnePointLineWidth { get; set; }
+        public float SuggestedDPI;
+
+        public event EventHandler PointSizeExceed100Error;
 
         public void Dispose()
         {
@@ -188,10 +192,11 @@ namespace FAD3
         /// </summary>
         private void AdjustFeatureSize()
         {
+            float ptSize = 0;
             for (int n = 0; n < _axMap.NumLayers; n++)
             {
                 var h = _axMap.get_LayerHandle(n);
-                if (this.MapLayersHandler.get_MapLayer(h).LayerType == "ShapefileClass")
+                if (this.MapLayersHandler.get_MapLayer(h)?.LayerType == "ShapefileClass")
                 {
                     var categoryCount = _axMap.get_Shapefile(h).Categories.Count;
 
@@ -243,7 +248,15 @@ namespace FAD3
                                         {
                                             _axMap.get_Shapefile(h).Categories.Item[y].DrawingOptions.LineWidth *= (float)(_dpi / 96);
                                         }
-                                        _axMap.get_Shapefile(h).Categories.Item[y].DrawingOptions.PointSize *= (float)(_dpi / 96);
+
+                                        ptSize = _axMap.get_Shapefile(h).Categories.Item[y].DrawingOptions.PointSize *= (float)(_dpi / 96);
+                                        //_axMap.get_Shapefile(h).Categories.Item[y].DrawingOptions.PointSize *= (float)(_dpi / 96);
+                                        _axMap.get_Shapefile(h).Categories.Item[y].DrawingOptions.PointSize = ptSize;
+                                        if (ptSize > 100)
+                                        {
+                                            throw new Exception("Point size exceeded 100");
+                                        }
+
                                         if (_axMap.get_Shapefile(h).Categories.Item[y].DrawingOptions.VerticesVisible)
                                         {
                                             _axMap.get_Shapefile(h).Categories.Item[y].DrawingOptions.VerticesSize *= (int)(_dpi / 96);
@@ -256,7 +269,15 @@ namespace FAD3
                                     {
                                         ddo.LineWidth *= (float)(_dpi / 96);
                                     }
-                                    ddo.PointSize *= (float)(_dpi / 96);
+
+                                    ptSize = ddo.PointSize *= (float)(_dpi / 96);
+                                    //ddo.PointSize *= (float)(_dpi / 96);
+                                    ddo.PointSize = ptSize;
+                                    if (ptSize > 100)
+                                    {
+                                        throw new Exception("Point size exceeded 100");
+                                    }
+
                                     if (ddo.VerticesVisible)
                                     {
                                         ddo.VerticesSize *= (int)(_dpi / 96);
@@ -277,6 +298,54 @@ namespace FAD3
             return SaveMaptoImage();
         }
 
+        public bool AcceptablePointSize()
+        {
+            bool exceeded = false;
+            float maxPtSize = 0;
+            float ptSize = 0;
+            for (int n = 0; n < _axMap.NumLayers; n++)
+            {
+                var h = _axMap.get_LayerHandle(n);
+                if (MapLayersHandler[h]?.LayerType == "ShapefileClass"
+                    && ((Shapefile)MapLayersHandler[h].LayerObject).ShapefileType == ShpfileType.SHP_POINT)
+                {
+                    var categoryCount = _axMap.get_Shapefile(h).Categories.Count;
+
+                    if (_axMap.get_LayerVisible(h))
+                    {
+                        if (categoryCount > 0)
+                        {
+                            for (int y = 0; y < categoryCount; y++)
+                            {
+                                ptSize = _axMap.get_Shapefile(h).Categories.Item[y].DrawingOptions.PointSize;
+                                maxPtSize = ptSize;
+                                ptSize *= (float)(_dpi / 96);
+                                if (ptSize > 100)
+                                {
+                                    exceeded = true;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            ptSize = _axMap.get_Shapefile(h).DefaultDrawingOptions.PointSize;
+                            maxPtSize = ptSize;
+                            ptSize *= (float)(_dpi / 96);
+                            if (ptSize > 100)
+                            {
+                                exceeded = true;
+                            }
+                        }
+                    }
+                }
+            }
+            if (exceeded)
+            {
+                SuggestedDPI = 100 / (float)(maxPtSize / 96);
+            }
+            return !exceeded;
+        }
+
         /// <summary>
         /// Initiates saving of a map to an image
         /// </summary>
@@ -284,14 +353,32 @@ namespace FAD3
         public bool Save(bool SaveGrid25 = true)
         {
             _saveToTempFile = false;
-            AdjustFeatureSize();
-            if (SaveGrid25)
+            bool proceed = true;
+
+            if (AcceptablePointSize())
             {
-                return SaveGrid25MapToImage();
+                AdjustFeatureSize();
             }
             else
             {
-                return SaveMaptoImage();
+                PointSizeExceed100Error?.Invoke(this, EventArgs.Empty);
+                proceed = false;
+            }
+
+            if (proceed)
+            {
+                if (SaveGrid25)
+                {
+                    return SaveGrid25MapToImage();
+                }
+                else
+                {
+                    return SaveMaptoImage();
+                }
+            }
+            else
+            {
+                return false;
             }
         }
 

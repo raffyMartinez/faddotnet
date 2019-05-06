@@ -20,6 +20,8 @@ using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
 using FAD3.Mapping.Forms;
+using System.Text;
+using FAD3.Mapping.Classes;
 
 namespace FAD3
 {
@@ -388,6 +390,10 @@ namespace FAD3
                 SetupCatchListView(Show: false);
             }
 
+            if (File.Exists(filename))
+            {
+                UpdateLocationTables();
+            }
             _treeLevel = "root";
             if (!SetupTree(filename, FromMRU: true))
             {
@@ -475,6 +481,9 @@ namespace FAD3
                 tsi1.Name = "menuDeleteSampling";
                 tsi1.Visible = lvMain.Tag.ToString() == "sampling";
             }
+
+            tsi = menuDropDown.Items.Add("Copy text");
+            tsi.Name = "menuCopyText";
         }
 
         private void ConfigDropDownMenu(Control Source)
@@ -547,6 +556,10 @@ namespace FAD3
                     break;
 
                 case "lvMain":
+
+                    tsi = menuDropDown.Items.Add("Copy text");
+                    tsi.Name = "menuCopyText";
+
                     tsi = menuDropDown.Items.Add("New sampling");
                     tsi.Name = "menuNewSampling";
                     tsi.Visible = _treeLevel == "sampling" || _treeLevel == "landing_site" || _treeLevel == "gear";
@@ -752,6 +765,13 @@ namespace FAD3
             CancelButton = buttonOK.Visible ? buttonOK : null;
         }
 
+        private void UpdateLocationTables()
+        {
+            UpdateLocationDatabase.UpdateRegions();
+            UpdateLocationDatabase.UpdateProvinces();
+            UpdateLocationDatabase.UpdateMunicipalities();
+        }
+
         private void OnMainForm_Load(object sender, EventArgs e)
         {
             if (global.AllRequiredFilesExists)
@@ -776,6 +796,7 @@ namespace FAD3
                         Names.GetGenus_LocalNames();
                         Names.GetLocalNames();
                         Gear.GetGearLocalNames();
+                        UpdateLocationTables();
                         statusPanelDBPath.Text = SavedMDBPath;
                         lblErrorFormOpen.Visible = false;
                         PopulateTree();
@@ -1043,6 +1064,26 @@ namespace FAD3
                         fbf.Show(this);
                     }
 
+                    break;
+
+                case "menuCopyText":
+                    StringBuilder copyText = new StringBuilder();
+                    string col = "";
+                    foreach (ColumnHeader c in lvMain.Columns)
+                    {
+                        col += $"{c.Text}\t";
+                    }
+                    copyText.Append($"{col.TrimEnd()}\r\n");
+                    foreach (ListViewItem item in lvMain.Items)
+                    {
+                        copyText.Append(item.Text);
+                        for (int n = 1; n < item.SubItems.Count; n++)
+                        {
+                            copyText.Append($"\t{item.SubItems[n]?.Text}");
+                        }
+                        copyText.Append("\r\n");
+                    }
+                    Clipboard.SetText(copyText.ToString());
                     break;
 
                 case "menuDeleteTreeItem":
@@ -2098,10 +2139,11 @@ namespace FAD3
                 ofd.InitialDirectory = global.MDBPath;
             }
             ofd.Filter = "Microsoft Access Data File (.mdb)|*.mdb";
-            ofd.ShowDialog();
-            filename = ofd.FileName;
-            if (filename.Length > 0)
+            DialogResult dr = ofd.ShowDialog();
+            if (dr == DialogResult.OK && ofd.FileName.Length > 0)
             {
+                filename = ofd.FileName;
+                UpdateLocationTables();
                 SetupTree(filename);
 
                 //add the recently opened file to the MRU

@@ -44,5 +44,6 @@ namespace FAD3
         public int ShadowOffsetX { get; set; }
         public int ShadowOffsetY { get; set; }
         public bool ShadowVisible { get; set; }
+        public string Expression { get; set; }
     }
 }

@@ -150,8 +150,11 @@
     <Compile Include="Database\Classes\FishingGearInventory.cs" />
     <Compile Include="Database\Classes\FisheriesInventoryImportEventArg.cs" />
     <Compile Include="Database\Classes\ImportRowsFromFileEventArgs.cs" />
+    <Compile Include="Database\Classes\InventoryItem.cs" />
     <Compile Include="Database\Classes\LengthFreq.cs" />
+    <Compile Include="Database\Classes\LGU.cs" />
     <Compile Include="Database\Classes\LGUs.cs" />
+    <Compile Include="Database\Classes\Province.cs" />
     <Compile Include="Database\Classes\ReportGeneratorClass.cs" />
     <Compile Include="Database\Classes\SimMetrics\AbstractStringMetric.cs" />
     <Compile Include="Database\Classes\SimMetrics\AbstractSubstitutionCost.cs" />
@@ -200,6 +203,12 @@
     </Compile>
     <Compile Include="Database\Forms\DatabaseReportForm.Designer.cs">
       <DependentUpon>DatabaseReportForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Database\Forms\DeleteMultipleGearVariationsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Database\Forms\DeleteMultipleGearVariationsForm.Designer.cs">
+      <DependentUpon>DeleteMultipleGearVariationsForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Database\Forms\EditGearVariationNameForm.cs">
       <SubType>Form</SubType>
@@ -255,6 +264,12 @@
     <Compile Include="Database\Forms\GearInventoryTabularForm.Designer.cs">
       <DependentUpon>GearInventoryTabularForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Database\Forms\GearVarNameUsageInventoryForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Database\Forms\GearVarNameUsageInventoryForm.Designer.cs">
+      <DependentUpon>GearVarNameUsageInventoryForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Database\Forms\HTMLTableSelectColumnsForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -284,6 +299,12 @@
     </Compile>
     <Compile Include="Database\Forms\LGUSForm.Designer.cs">
       <DependentUpon>LGUSForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Database\Forms\ListGearLocalNamesForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Database\Forms\ListGearLocalNamesForm.Designer.cs">
+      <DependentUpon>ListGearLocalNamesForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Database\Forms\LocalNameSciNameEditForm.cs">
       <SubType>Form</SubType>
@@ -323,16 +344,21 @@
     <Compile Include="GUI\Forms\GraphForm.Designer.cs">
       <DependentUpon>GraphForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Mapping\Classes\BarangayMunicipalityCoordinateHelper.cs" />
     <Compile Include="Mapping\Classes\Colors.cs" />
     <Compile Include="Mapping\Classes\ColorSchemes.cs" />
     <Compile Include="Mapping\Classes\ERDDAPMetadataFiles.cs" />
     <Compile Include="Mapping\Classes\ERDDAPMetadataFile.cs" />
     <Compile Include="Mapping\Classes\ExtentDraggedBoxEventArgs.cs" />
+    <Compile Include="Mapping\Classes\FisherVesselInventoryItem.cs" />
     <Compile Include="Mapping\Classes\FrontAndReverseMapSpecs.cs" />
     <Compile Include="Mapping\Classes\Grid25GeographicDisplayHelper.cs" />
     <Compile Include="Mapping\Classes\Grid25LayoutHelper.cs" />
     <Compile Include="Mapping\Classes\Grid25LayoutHelperEventArgs.cs" />
     <Compile Include="Mapping\Classes\Grid25MinorGrid.cs" />
+    <Compile Include="Mapping\Classes\InventoryMapping.cs" />
+    <Compile Include="Mapping\Classes\GearInventoryMappingItem.cs" />
+    <Compile Include="Mapping\Classes\LocationCoordinate.cs" />
     <Compile Include="Mapping\Classes\MapEditor.cs" />
     <Compile Include="Mapping\Classes\OccurenceMapping.cs" />
     <Compile Include="Mapping\Classes\MapTextGraticuleHelper.cs" />
@@ -349,6 +375,7 @@
     <Compile Include="GUI\Forms\DisplayCopyableTextForm.Designer.cs">
       <DependentUpon>DisplayCopyableTextForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Mapping\Classes\UpdateLocationDatabase.cs" />
     <Compile Include="Mapping\Forms\BatchExportMapSettingsForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -384,6 +411,12 @@
     </Compile>
     <Compile Include="Mapping\Forms\Grid25SubGridForm.Designer.cs">
       <DependentUpon>Grid25SubGridForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Mapping\Forms\LocationsCoordinateForms.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Mapping\Forms\LocationsCoordinateForms.Designer.cs">
+      <DependentUpon>LocationsCoordinateForms.cs</DependentUpon>
     </Compile>
     <Compile Include="Mapping\Forms\ReverseGridLabelsSetupForm.cs">
       <SubType>Form</SubType>
@@ -804,6 +837,9 @@
     <EmbeddedResource Include="Database\Forms\DatabaseReportForm.resx">
       <DependentUpon>DatabaseReportForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Database\Forms\DeleteMultipleGearVariationsForm.resx">
+      <DependentUpon>DeleteMultipleGearVariationsForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Database\Forms\EditGearVariationNameForm.resx">
       <DependentUpon>EditGearVariationNameForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -831,6 +867,9 @@
     <EmbeddedResource Include="Database\Forms\GearInventoryTabularForm.resx">
       <DependentUpon>GearInventoryTabularForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Database\Forms\GearVarNameUsageInventoryForm.resx">
+      <DependentUpon>GearVarNameUsageInventoryForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Database\Forms\HTMLTableSelectColumnsForm.resx">
       <DependentUpon>HTMLTableSelectColumnsForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -845,6 +884,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Database\Forms\LGUSForm.resx">
       <DependentUpon>LGUSForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Database\Forms\ListGearLocalNamesForm.resx">
+      <DependentUpon>ListGearLocalNamesForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Database\Forms\LocalNameSciNameEditForm.resx">
       <DependentUpon>LocalNameSciNameEditForm.cs</DependentUpon>
@@ -884,6 +926,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Mapping\Forms\Grid25SubGridForm.resx">
       <DependentUpon>Grid25SubGridForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Mapping\Forms\LocationsCoordinateForms.resx">
+      <DependentUpon>LocationsCoordinateForms.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Mapping\Forms\ReverseGridLabelsSetupForm.resx">
       <DependentUpon>ReverseGridLabelsSetupForm.cs</DependentUpon>

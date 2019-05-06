@@ -6,22 +6,59 @@ namespace FAD3
 {
     public static class ShapefileLayerHelper
     {
+        public static int PointSizeOfMaxCategory { get; set; }
+        public static int NumberOfCategories { get; set; }
+
         public static void CategorizeNumericPointLayer(Shapefile sf, int classificationField = 1,
-                                                       tkClassificationType Method = tkClassificationType.ctNaturalBreaks,
-                                                       int numberOfClasses = 5,
-                                                       int maximumPointSize = 28)
+                                                       tkClassificationType Method = tkClassificationType.ctNaturalBreaks)
         {
             float ptSize = 0;
-            if (sf.Categories.Generate(classificationField, Method, numberOfClasses))
+            if (sf.Categories.Generate(classificationField, Method, NumberOfCategories))
             {
                 for (int n = 0; n < sf.Categories.Count; n++)
                 {
                     var category = sf.Categories.Item[n];
-                    ptSize = maximumPointSize * ((float)(n + 1) / sf.Categories.Count);
+                    ptSize = PointSizeOfMaxCategory * ((float)(n + 1) / sf.Categories.Count);
                     category.DrawingOptions.PointSize = ptSize;
                     category.DrawingOptions.LineColor = new Utils().ColorByName(tkMapColor.White);
                 }
             }
+        }
+
+        public static void CategorizeNumericPointLayer(Shapefile sf, List<double> breaks, int classificationField = 1)
+        {
+            for (int b = 0; b < breaks.Count; b++)
+            {
+                var cat = sf.Categories.Add(b.ToString());
+                cat.DrawingOptions.LineColor = new Utils().ColorByName(tkMapColor.White);
+                cat.DrawingOptions.PointSize = PointSizeOfMaxCategory * ((float)(b + 1) / breaks.Count);
+            }
+
+            for (int n = 0; n < sf.NumShapes; n++)
+            {
+                double v = (int)sf.CellValue[classificationField, n];
+                for (int c = 0; c < breaks.Count; c++)
+                {
+                    if (c + 1 < breaks.Count)
+                    {
+                        if (v >= breaks[c] && v < breaks[c + 1])
+                        {
+                            sf.ShapeCategory[n] = c;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        sf.ShapeCategory[n] = breaks.Count - 1;
+                    }
+                }
+            }
+        }
+
+        static ShapefileLayerHelper()
+        {
+            PointSizeOfMaxCategory = 40;
+            NumberOfCategories = 5;
         }
 
         /// <summary>

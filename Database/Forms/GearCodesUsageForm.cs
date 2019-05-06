@@ -444,6 +444,10 @@ namespace FAD3
                         tsi.Name = "itemDeleteGearVariation";
                         tsi.Enabled = info.Item != null;
 
+                        tsi = dropDownMenu.Items.Add("Delete gear variation (mulitple)");
+                        tsi.Name = "itemDeleteGearVariationMultiple";
+                        tsi.Enabled = info.Item != null;
+
                         dropDownMenu.Items.Add("-");
 
                         tsi = dropDownMenu.Items.Add("Gear specs");
@@ -578,6 +582,17 @@ namespace FAD3
                             listViewLocalNames.SelectedItems[0].Text = gef.GearLocalName;
                         }
                     }
+                    break;
+
+                case "itemDeleteGearVariationMultiple":
+                    using (DeleteMultipleGearVariationsForm dmgf = new DeleteMultipleGearVariationsForm())
+                    {
+                        dmgf.ShowDialog();
+                        if (dmgf.DialogResult == DialogResult.OK)
+                        {
+                        }
+                    }
+
                     break;
 
                 case "itemEditGearVariation":

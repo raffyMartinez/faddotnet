@@ -15,6 +15,7 @@ namespace FAD3
         {
             sf.Labels.With(l =>
             {
+                LabelProperty.Expression = l.Expression;
                 LabelProperty.Alignment = l.Alignment;
                 LabelProperty.FontName = l.FontName;
                 LabelProperty.FontSize = l.FontSize;
@@ -105,7 +106,11 @@ namespace FAD3
                 //AvoidCollision is not included in labelXML so we put it here
                 if (d.Attributes["AvoidCollision"]?.Value == "1")
                 {
-                    _shapeFile.Labels.AvoidCollisions = d.Attributes["AvoidCollision"].Value == "1";
+                    _shapeFile.Labels.AvoidCollisions = true;
+                }
+                else if (d.Attributes["AvoidCollision"]?.Value == "0")
+                {
+                    _shapeFile.Labels.AvoidCollisions = false;
                 }
             });
 

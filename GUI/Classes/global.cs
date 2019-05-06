@@ -19,6 +19,7 @@ using System.Reflection;
 using System.Windows.Forms;
 using System.Net;
 using System.Linq;
+using System.Security.Cryptography;
 
 namespace FAD3
 {
@@ -29,27 +30,28 @@ namespace FAD3
     public static class global
     {
         private static List<string> _listBarangays = new List<string>();
-        private static Dictionary<string, string> _VesselTypeDict = new Dictionary<string, string>();
+        private static Dictionary<string, string> _vesselTypeDict = new Dictionary<string, string>();
         private static Dictionary<long, string> _provinceDict = new Dictionary<long, string>();
         private static Dictionary<long, string> _munDict = new Dictionary<long, string>();
         private static string _mdbPath = "";
-        private static string _ConnectionString = "";
-        private static string _AppPath = "";
-        private static bool _ShowErrorMessage = false;
+        private static string _connectionString = "";
+        private static string _appPath = "";
+        private static bool _showErrorMessage = false;
         private static bool _hasMPH = false;
         private static bool _mapIsOpen;
         private static MapperForm _mapForm;
         private static string _templateMDBFile = "";
-        private static readonly string _ConnectionStringTemplate = "";
-        private static bool _TemplateFileExists = true;
-        private static bool _UITemplateFileExists = true;
-        private static bool _InlandGridDBFileExists = true;
+        private static readonly string _connectionStringTemplate = "";
+        private static bool _templateFileExists = true;
+        private static bool _uiTemplateFileExists = true;
+        private static bool _inlandGridDBFileExists = true;
         private static bool _allRequiredFilesExists = true;
-        private static CoordinateDisplayFormat _CoordDisplayFormat = CoordinateDisplayFormat.DegreeDecimal;
-        private static Color _MissingFieldBackColor = global.MissingFieldBackColor;
+        private static CoordinateDisplayFormat _coordDisplayFormat = CoordinateDisplayFormat.DegreeDecimal;
+        private static Color _missingFieldBackColor = global.MissingFieldBackColor;
         private static List<string> _tempFiles = new List<string>();
         private static bool _isMapComponentRegistered;
         public static event EventHandler MapperOpen;
+        public static event EventHandler MapperClosed;
 
         public static bool IsMapComponentRegistered
         {
@@ -57,6 +59,17 @@ namespace FAD3
         }
 
         public static Grid25GenerateForm Grid25GenerateForm { get; set; }
+
+        public static string checkMD5(string fileName)
+        {
+            using (var md5 = MD5.Create())
+            {
+                using (var stream = File.OpenRead(fileName))
+                {
+                    return System.Text.Encoding.Default.GetString(md5.ComputeHash(stream));
+                }
+            }
+        }
 
         public static void ShowCopyableText(string title, string text, Form parentForm)
         {
@@ -139,9 +152,9 @@ namespace FAD3
         {
             get
             {
-                var s = _TemplateFileExists ? "" : "\r\n- template.mdb";
-                s += _UITemplateFileExists ? "" : "\r\n- UITable.xml";
-                s += _InlandGridDBFileExists ? "" : "\r\n- grid25inland.mdb";
+                var s = _templateFileExists ? "" : "\r\n- template.mdb";
+                s += _uiTemplateFileExists ? "" : "\r\n- UITable.xml";
+                s += _inlandGridDBFileExists ? "" : "\r\n- grid25inland.mdb";
 
                 return s;
             }
@@ -190,6 +203,10 @@ namespace FAD3
                 {
                     MapperOpen?.Invoke(null, EventArgs.Empty);
                 }
+                else
+                {
+                    MapperClosed?.Invoke(null, EventArgs.Empty);
+                }
             }
         }
 
@@ -237,13 +254,13 @@ namespace FAD3
 
         public static Color MissingFieldBackColor
         {
-            get { return _MissingFieldBackColor; }
+            get { return _missingFieldBackColor; }
         }
 
         private static void GetAppPreferences()
         {
             //the values here should be from an external source to prevent hardcoding
-            _MissingFieldBackColor = Color.Orange;
+            _missingFieldBackColor = Color.Orange;
         }
 
         public static
@@ -388,10 +405,10 @@ namespace FAD3
 
         public static CoordinateDisplayFormat CoordinateDisplay
         {
-            get { return _CoordDisplayFormat; }
+            get { return _coordDisplayFormat; }
             set
             {
-                _CoordDisplayFormat = value;
+                _coordDisplayFormat = value;
                 SaveCoordinateDisplayFormat();
             }
         }
@@ -409,7 +426,7 @@ namespace FAD3
         /// </summary>
         public static bool UITemplateFileExists
         {
-            get { return _UITemplateFileExists; }
+            get { return _uiTemplateFileExists; }
         }
 
         /// <summary>
@@ -417,7 +434,7 @@ namespace FAD3
         /// </summary>
         public static bool InlandGridDBFileExists
         {
-            get { return _InlandGridDBFileExists; }
+            get { return _inlandGridDBFileExists; }
         }
 
         /// <summary>
@@ -425,7 +442,7 @@ namespace FAD3
         /// </summary>
         public static bool TemplateFileExists
         {
-            get { return _TemplateFileExists; }
+            get { return _templateFileExists; }
         }
 
         public static void ListTemporaryFile(string fileName)
@@ -442,11 +459,11 @@ namespace FAD3
         static global()
         {
             IsMapWinGISRegistered();
-            _AppPath = Application.StartupPath.ToString();
+            _appPath = Application.StartupPath;
             MappingMode = fad3MappingMode.defaultMode;
             GetAppPreferences();
             _templateMDBFile = ApplicationPath + "\\template.mdb";
-            _ConnectionStringTemplate = "Provider=Microsoft.JET.OLEDB.4.0;data source=" + _AppPath + "\\template.mdb";
+            _connectionStringTemplate = "Provider=Microsoft.JET.OLEDB.4.0;data source=" + _appPath + "\\template.mdb";
             ReferenceNumberManager.ReadRefNoRange();
             GetCoordinateDisplayFormat();
             TestMPH();
@@ -457,10 +474,10 @@ namespace FAD3
         /// </summary>
         public static bool TestRequiredFilesExists()
         {
-            _UITemplateFileExists = File.Exists(ApplicationPath + "\\UITable.xml");
-            _TemplateFileExists = File.Exists(_templateMDBFile);
-            _InlandGridDBFileExists = File.Exists(ApplicationPath + "\\grid25inland.mdb");
-            _allRequiredFilesExists = _UITemplateFileExists && _TemplateFileExists && _InlandGridDBFileExists;
+            _uiTemplateFileExists = File.Exists(ApplicationPath + "\\UITable.xml");
+            _templateFileExists = File.Exists(_templateMDBFile);
+            _inlandGridDBFileExists = File.Exists(ApplicationPath + "\\grid25inland.mdb");
+            _allRequiredFilesExists = _uiTemplateFileExists && _templateFileExists && _inlandGridDBFileExists;
             if (_allRequiredFilesExists)
             {
                 RegistryKey reg_key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\FAD3", true);
@@ -479,7 +496,7 @@ namespace FAD3
         /// </summary>
         public static string ApplicationPath
         {
-            get { return _AppPath; }
+            get { return _appPath; }
         }
 
         /// <summary>
@@ -487,7 +504,7 @@ namespace FAD3
         /// </summary>
         public static Dictionary<string, string> VesselTypeDict
         {
-            get { return _VesselTypeDict; }
+            get { return _vesselTypeDict; }
         }
 
         /// <summary>
@@ -572,6 +589,27 @@ namespace FAD3
             return IsAlphaNumeric;
         }
 
+        public static void SaveMD5(string fileName, string md5)
+        {
+            RegistryKey reg_key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\FAD3", true);
+            RegistryKey sub_key = reg_key.CreateSubKey("MD5");
+            sub_key.SetValue(fileName, md5);
+        }
+
+        public static string GetMD5(string fileName)
+        {
+            RegistryKey reg_key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\FAD3", true);
+            RegistryKey sub_key = reg_key.CreateSubKey("MD5");
+            try
+            {
+                return sub_key.GetValue(fileName).ToString();
+            }
+            catch
+            {
+                return "";
+            }
+        }
+
         /// <summary>
         /// save window position to registry
         /// </summary>
@@ -598,13 +636,13 @@ namespace FAD3
             {
                 rv = CoordinateDisplayFormat.DegreeDecimal.ToString();
             }
-            _CoordDisplayFormat = (CoordinateDisplayFormat)Enum.Parse(typeof(CoordinateDisplayFormat), rv);
+            _coordDisplayFormat = (CoordinateDisplayFormat)Enum.Parse(typeof(CoordinateDisplayFormat), rv);
         }
 
         private static void SaveCoordinateDisplayFormat()
         {
             RegistryKey reg_key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\FAD3", true);
-            reg_key.SetValue("CoordinateFormat", _CoordDisplayFormat.ToString());
+            reg_key.SetValue("CoordinateFormat", _coordDisplayFormat.ToString());
         }
 
         public static bool HasMPH
@@ -633,19 +671,19 @@ namespace FAD3
 
         public static bool ShowErrorMessage
         {
-            get { return _ShowErrorMessage; }
-            set { _ShowErrorMessage = value; }
+            get { return _showErrorMessage; }
+            set { _showErrorMessage = value; }
         }
 
         public static string AppPath
         {
-            get { return _AppPath; }
+            get { return _appPath; }
         }
 
         public static void BarangaysFromMunicipalityNo(long MunicipalityNumber)
         {
             var myDT = new DataTable();
-            using (var conection = new OleDbConnection(_ConnectionString))
+            using (var conection = new OleDbConnection(_connectionString))
             {
                 try
                 {
@@ -674,7 +712,7 @@ namespace FAD3
 		public static void MunicipalitiesFromProvinceNo(long ProvinceNo)
         {
             var myDT = new DataTable();
-            using (var conection = new OleDbConnection(_ConnectionString))
+            using (var conection = new OleDbConnection(_connectionString))
             {
                 try
                 {
@@ -727,7 +765,7 @@ namespace FAD3
                 if (DBCheck.CheckDB(value))
                 {
                     _mdbPath = value;
-                    _ConnectionString = "Provider=Microsoft.JET.OLEDB.4.0;data source=" + _mdbPath;
+                    _connectionString = "Provider=Microsoft.JET.OLEDB.4.0;data source=" + _mdbPath;
                     Names.MakeAllNames();
                     FishingVessel.MakeVesselTypeTable();
                     GetProvinces();
@@ -743,7 +781,7 @@ namespace FAD3
             string municipality = "";
 
             var dt = new DataTable();
-            using (var conection = new OleDbConnection(_ConnectionString))
+            using (var conection = new OleDbConnection(_connectionString))
             {
                 try
                 {
@@ -797,9 +835,9 @@ namespace FAD3
 
         private static void GetVesselTypes()
         {
-            _VesselTypeDict.Clear();
+            _vesselTypeDict.Clear();
             var myDT = new DataTable();
-            using (var conection = new OleDbConnection(_ConnectionString))
+            using (var conection = new OleDbConnection(_connectionString))
             {
                 try
                 {
@@ -811,7 +849,7 @@ namespace FAD3
                         for (int i = 0; i < myDT.Rows.Count; i++)
                         {
                             DataRow dr = myDT.Rows[i];
-                            _VesselTypeDict.Add(dr[0].ToString(), dr[1].ToString());
+                            _vesselTypeDict.Add(dr[0].ToString(), dr[1].ToString());
                         }
                     }
                 }
@@ -826,7 +864,7 @@ namespace FAD3
         {
             get
             {
-                return _ConnectionString;
+                return _connectionString;
             }
         }
 
@@ -837,7 +875,7 @@ namespace FAD3
         {
             _provinceDict.Clear();
             var myDT = new DataTable();
-            using (var conection = new OleDbConnection(_ConnectionString))
+            using (var conection = new OleDbConnection(_connectionString))
             {
                 try
                 {

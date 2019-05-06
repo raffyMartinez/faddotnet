@@ -6,16 +6,19 @@ using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Xml;
+using System.Diagnostics;
 
 namespace FAD3.Database.Classes
 {
     /// <summary>
     /// Database helper class for fishery inventory data
     /// </summary>
-    public class FishingGearInventory
+    public class FishingGearInventory : IDisposable
     {
         private Dictionary<string, (string Province, string Municipality, string MunicipalityNumber, string barangay, string sitio, string enumerator, string EnumeratorGuid, DateTime dateSurvey)> _barangayInventories = new Dictionary<string, (string Province, string Municipality, string MunicipalityNumber, string barangay, string sitio, string enumerator, string EnumeratorGuid, DateTime dateSurvey)>();
-        private Dictionary<string, (string InventoryName, DateTime DateConducted, string TargetArea)> _inventories = new Dictionary<string, (string InventoryName, DateTime DateConducted, string TargetArea)>();
+
+        //private Dictionary<string, (string InventoryName, DateTime DateConducted, string TargetArea)> _inventories = new Dictionary<string, (string InventoryName, DateTime DateConducted, string TargetArea)>();
+        private Dictionary<string, InventoryItem> _inventories = new Dictionary<string, InventoryItem>();
         public event EventHandler<FisheriesInventoryImportEventArg> InventoryLevel;
 
         public static List<string> Accessories { get; internal set; }
@@ -23,12 +26,67 @@ namespace FAD3.Database.Classes
         public static List<string> PaymentSources { get; internal set; }
         private Dictionary<string, int> _monthToInt = new Dictionary<string, int>();
         private int _sitioGearCount;
+        public DateTime InventoryProcessStart { get; internal set; }
+        public DateTime InventoryProcessEnd { get; internal set; }
+        private bool _disposed;
 
         public static void GetLists()
         {
             GetPaymentSources();
             GetExpenses();
             GetAccessories();
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                }
+                _barangayInventories.Clear();
+                _barangayInventories = null;
+                _inventories.Clear();
+                _inventories = null;
+                _monthToInt.Clear();
+                _monthToInt = null; ;
+            }
+        }
+
+        public bool MoveInventoriesToOtherInventory(string provinceName, string originInventory, string targetInventory)
+        {
+            bool success = false;
+            string sql = $@"UPDATE (Provinces
+                            INNER JOIN Municipalities
+                                ON Provinces.ProvNo = Municipalities.ProvNo)
+                            INNER JOIN tblGearInventoryBarangay
+                                ON (Municipalities.MunNo = tblGearInventoryBarangay.Municipality)
+                                AND (Municipalities.MunNo = tblGearInventoryBarangay.Municipality)
+                            SET tblGearInventoryBarangay.InventoryGuid = {{{targetInventory}}}
+                            WHERE tblGearInventoryBarangay.InventoryGuid = {{{originInventory}}}
+                                AND Provinces.ProvinceName = '{provinceName}'";
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    using (OleDbCommand update = new OleDbCommand(sql, conn))
+                    {
+                        success = update.ExecuteNonQuery() > 0;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex.Message, "FishingGearInventory.cs", "MoveInventoriesToOtherInventory");
+                }
+            }
+            return success;
         }
 
         public static bool AddPaymentSource(string source)
@@ -86,8 +144,61 @@ namespace FAD3.Database.Classes
                             tblGearInventoryCatchComposition ON
                             tblBaseLocalNames.NameNo = tblGearInventoryCatchComposition.NameOfCatch
                         WHERE tblGearInventoryCatchComposition.InventoryDataGuid ={{{dataGuid}}}";
-
+            var dt = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    var adapter = new OleDbDataAdapter(sql, conection);
+                    adapter.Fill(dt);
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        DataRow dr = dt.Rows[i];
+                        catchComposition.Add((dr["Name"].ToString(), (bool)dr["IsDominant"]));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
+                }
+            }
             return catchComposition;
+        }
+
+        public List<string> LocalNamesOfGear(string gearVariationName)
+        {
+            List<string> names = new List<string>();
+            string sql = $@"SELECT DISTINCT tblGearLocalNames.LocalName
+                        FROM tblGearLocalNames
+                            INNER JOIN (tblGearVariations
+                            INNER JOIN (tblGearInventoryBarangayData
+                            INNER JOIN tblGearInventoryGearLocalNames
+                            ON tblGearInventoryBarangayData.DataGuid = tblGearInventoryGearLocalNames.InventoryDataGuid)
+                            ON tblGearVariations.GearVarGUID = tblGearInventoryBarangayData.GearVariation)
+                            ON tblGearLocalNames.LocalNameGUID = tblGearInventoryGearLocalNames.LocalNameGuid
+                            WHERE tblGearVariations.Variation='{gearVariationName}'
+                            ORDER BY tblGearLocalNames.LocalName";
+            var dt = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    var adapter = new OleDbDataAdapter(sql, conection);
+                    adapter.Fill(dt);
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        DataRow dr = dt.Rows[i];
+                        names.Add(dr["LocalName"].ToString().ToLower());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
+                }
+            }
+            return names;
         }
 
         public List<string> GetGearLocalNamesInventory(string dataGuid)
@@ -828,7 +939,7 @@ namespace FAD3.Database.Classes
             return _sitioGearCount;
         }
 
-        public Dictionary<string, (string InventoryName, DateTime DateConducted, string TargetArea)> Inventories
+        public Dictionary<string, InventoryItem> Inventories
         {
             get { return _inventories; }
         }
@@ -1138,6 +1249,7 @@ namespace FAD3.Database.Classes
         /// <returns></returns>
         private int ImportInventory(string fileName, ImportInventoryAction importAction, string existingInventoryGuid = "")
         {
+            InventoryProcessStart = DateTime.Now;
             bool proceed = false;
             int elementCounter = 0;
             XmlTextReader xmlReader = new XmlTextReader(fileName);
@@ -1193,51 +1305,62 @@ namespace FAD3.Database.Classes
                         case "FisherVesselGearInventoryProject":
                             projectGuid = xmlReader.GetAttribute("ProjectGuid");
                             projectName = xmlReader.GetAttribute("ProjectName");
-                            FisheriesInventoryImportEventArg e = new FisheriesInventoryImportEventArg(projectName, projectGuid, FisheriesInventoryLevel.Project);
+                            //FisheriesInventoryImportEventArg e = new FisheriesInventoryImportEventArg(projectName, projectGuid, FisheriesInventoryLevel.Project);
+                            //e.ImportInventoryAction = importAction;
+                            //InventoryLevel?.Invoke(this, e);
+                            //if (e.Cancel)
+                            //{
+                            //   return -1;
+                            //}
+                            //else
+                            //{
+                            projectDate = DateTime.Parse(xmlReader.GetAttribute("DateStart"));
+                            projectTargetArea = xmlReader.GetAttribute("TargetArea");
+                            projectTargetAreaGuid = xmlReader.GetAttribute("TargetAreaGuid");
+
+                            FisheriesInventoryImportEventArg e = new FisheriesInventoryImportEventArg(projectTargetArea, projectTargetAreaGuid, FisheriesInventoryLevel.TargetArea);
                             e.ImportInventoryAction = importAction;
                             InventoryLevel?.Invoke(this, e);
+
                             if (e.Cancel)
                             {
                                 return -1;
                             }
                             else
                             {
-                                projectDate = DateTime.Parse(xmlReader.GetAttribute("DateStart"));
-                                projectTargetArea = xmlReader.GetAttribute("TargetArea");
-                                projectTargetAreaGuid = xmlReader.GetAttribute("TargetAreaGuid");
-
-                                e = new FisheriesInventoryImportEventArg(projectTargetArea, projectTargetAreaGuid, FisheriesInventoryLevel.TargetArea);
-                                e.ImportInventoryAction = importAction;
-                                InventoryLevel?.Invoke(this, e);
-
-                                if (e.Cancel)
+                                switch (importAction)
                                 {
-                                    return -1;
-                                }
-                                else
-                                {
-                                    switch (importAction)
-                                    {
-                                        case ImportInventoryAction.ImportDoNothing:
-                                            break;
+                                    case ImportInventoryAction.ImportDoNothing:
+                                        break;
 
-                                        case ImportInventoryAction.ImportIntoExisting:
-                                            projectGuid = existingInventoryGuid;
-                                            break;
+                                    case ImportInventoryAction.ImportIntoExisting:
+                                        projectGuid = existingInventoryGuid;
+                                        break;
 
-                                        case ImportInventoryAction.ImportIntoNew:
-                                            if (!SaveFisheryInventoryProject(fad3DataStatus.statusNew, projectName, projectDate, projectGuid))
+                                    case ImportInventoryAction.ImportIntoNew:
+                                        var result = SaveFisheryInventoryProject(fad3DataStatus.statusNew, projectName, projectDate, projectGuid);
+                                        if (!result.success)
+                                        {
+                                            switch (result.status)
                                             {
-                                                return -1;
+                                                case "Inventory guid exists":
+                                                    e = new FisheriesInventoryImportEventArg(importCompleted: false, projectName: projectName, projectGuid: projectGuid);
+                                                    e.Cancel = true;
+                                                    e.CancelReason = "Inventory identifier already in database. Save your inventory into existing project";
+                                                    InventoryLevel?.Invoke(this, e);
+                                                    break;
                                             }
-                                            break;
-                                    }
+                                            return -1;
+                                        }
+                                        break;
                                 }
                             }
+                            //}
                             break;
 
                         case "Enumerators":
-
+                            e = new FisheriesInventoryImportEventArg(startImporting: true);
+                            InventoryLevel?.Invoke(this, e);
                             break;
 
                         case "Enumerator":
@@ -1284,6 +1407,11 @@ namespace FAD3.Database.Classes
                             gearVariationName = xmlReader.GetAttribute("GearVariation");
                             gearInventoryGuid = xmlReader.GetAttribute("GearInventoryGuid");
                             gearVariationGuid = xmlReader.GetAttribute("GearVariationGuid");
+                            //if (gearVariationName == "Trawl")
+                            //{
+                            //    Debugger.Break();
+                            //}
+
                             break;
 
                         case "GearLocalNames":
@@ -1294,8 +1422,10 @@ namespace FAD3.Database.Classes
                             localNames.Add(xmlReader.GetAttribute("key"), xmlReader.GetAttribute("Value"));
                             break;
                     }
+                    //if (validGearVariation || (gearVariationGuid?.Length > 0
+                    //    && localNames.Count > 0
+                    //    && !GearInventoryExists(gearVariationGuid, municipalityNumber, barangay, sitio, localNames)))
                     if (validGearVariation || (gearVariationGuid?.Length > 0
-                        && localNames.Count > 0
                         && !GearInventoryExists(gearVariationGuid, municipalityNumber, barangay, sitio, localNames)))
                     {
                         validGearVariation = true;
@@ -1387,7 +1517,10 @@ namespace FAD3.Database.Classes
                                 try
                                 {
                                     decade = xmlReader.GetAttribute("DecadeStart");
-                                    specificYear = int.Parse(xmlReader.GetAttribute("SpecificYear"));
+                                    if (int.TryParse(xmlReader.GetAttribute("SpecificYear"), out int year))
+                                    {
+                                        specificYear = year;
+                                    }
                                 }
                                 catch (ArgumentNullException nullEx)
                                 {
@@ -1456,7 +1589,7 @@ namespace FAD3.Database.Classes
                             case "Notes":
                                 notes = xmlReader.GetAttribute("Notes");
 
-                                SaveGearVariation(gearClassName, gearVariationName, gearVariationGuid);
+                                gearVariationGuid = SaveGearVariation(gearClassName, gearVariationName, gearVariationGuid).variationGuid;
 
                                 if (SaveSitioGearInventoryMain(barangaySurveyGuid, gearVariationGuid, usageCommercial, usageMunicipalMotorized, usageMunicipalNonMotorized, usageNoBoat,
                                       numberDaysFishingPerMonth, unit, percentDominance, gearInventoryGuid, fad3DataStatus.statusNew, cpueMax, cpueMin, cpueModalUpper, cpueModalLower,
@@ -1471,6 +1604,8 @@ namespace FAD3.Database.Classes
                                     importedGearCount++;
 
                                     FisheriesInventoryImportEventArg e = new FisheriesInventoryImportEventArg(gearVariationName, "", FisheriesInventoryLevel.Gear, barangay);
+                                    e.GearInventorySaved = true;
+                                    e.NameOfSavedGear = gearVariationName;
                                     InventoryLevel?.Invoke(this, e);
                                 }
                                 notes = "";
@@ -1488,18 +1623,26 @@ namespace FAD3.Database.Classes
                     }
                 }
             }
-
+            InventoryProcessEnd = DateTime.Now;
             return importedGearCount;
         }
 
-        private void SaveGearVariation(string gearClassName, string gearVariationName, string gearVariationGuid)
+        private (bool success, string variationGuid) SaveGearVariation(string gearClassName, string gearVariationName, string gearVariationGuid)
         {
-            if (!Gear.GearVariationGUIDExists(gearVariationGuid))
+            bool saveSuccess = false;
+            string variationGuid = Gear.GetVariationGuidFromVariationName(gearVariationName);
+            if (variationGuid.Length == 0)
             {
-                string classGuid = Gear.GearClassGuidFromClassName(gearClassName);
-                NewFisheryObjectName newGear = new NewFisheryObjectName(gearVariationName, FisheryObjectNameType.GearVariationName);
-                Gear.SaveNewVariationName(newGear, classGuid, gearVariationGuid);
+                if (!Gear.GearVariationGUIDExists(gearVariationGuid))
+                {
+                    string classGuid = Gear.GearClassGuidFromClassName(gearClassName);
+                    NewFisheryObjectName newGear = new NewFisheryObjectName(gearVariationName, FisheryObjectNameType.GearVariationName);
+                    var result = Gear.SaveNewVariationName(newGear, classGuid, gearVariationGuid);
+                    saveSuccess = result.success;
+                    variationGuid = result.newGuid;
+                }
             }
+            return (saveSuccess, variationGuid);
         }
 
         public bool DeleteInventory(Dictionary<string, string> deleteInventoryArgs)
@@ -1744,11 +1887,14 @@ namespace FAD3.Database.Classes
         {
             Dictionary<string, int> dataGuids = new Dictionary<string, int>();
             string gearLocalNames = "";
-            foreach (var item in localNames)
+            string sql = "";
+            if (localNames.Count > 0)
             {
-                gearLocalNames += $@"""{item.Value}"",";
-            }
-            string sql = $@"SELECT tblGearInventoryBarangayData.DataGuid, Count(tblGearInventoryBarangayData.DataGuid) AS n
+                foreach (var item in localNames)
+                {
+                    gearLocalNames += $@"""{item.Value}"",";
+                }
+                sql = $@"SELECT tblGearInventoryBarangayData.DataGuid, Count(tblGearInventoryBarangayData.DataGuid) AS n
                             FROM tblGearLocalNames INNER JOIN
                                 ((tblGearInventoryBarangay INNER JOIN
                                 tblGearInventoryBarangayData ON
@@ -1758,10 +1904,27 @@ namespace FAD3.Database.Classes
                                 tblGearLocalNames.LocalNameGUID = tblGearInventoryGearLocalNames.LocalNameGuid
                             WHERE tblGearInventoryBarangay.Municipality = {municipalityNumber} AND
                                 tblGearInventoryBarangayData.GearVariation ={{{gearVariationGuid}}} AND
-                                tblGearInventoryBarangay.Barangay = ""{barangay}"" AND
-                                tblGearInventoryBarangay.Sitio = ""{sitio}"" AND
+                                tblGearInventoryBarangay.Barangay = '{barangay}' AND
+                                tblGearInventoryBarangay.Sitio = '{sitio}' AND
                                 tblGearLocalNames.LocalName In ({gearLocalNames.Trim(new char[] { ',', ' ' })})
                             GROUP BY tblGearInventoryBarangayData.DataGuid";
+            }
+            else
+            {
+                sql = $@"SELECT tblGearInventoryBarangayData.DataGuid, Count(tblGearInventoryBarangayData.DataGuid) AS n
+                            FROM tblGearLocalNames INNER JOIN
+                                ((tblGearInventoryBarangay INNER JOIN
+                                tblGearInventoryBarangayData ON
+                                tblGearInventoryBarangay.BarangayInventoryGuid = tblGearInventoryBarangayData.BarangayInventoryGUID) INNER JOIN
+                                tblGearInventoryGearLocalNames ON
+                                tblGearInventoryBarangayData.DataGuid = tblGearInventoryGearLocalNames.InventoryDataGuid) ON
+                                tblGearLocalNames.LocalNameGUID = tblGearInventoryGearLocalNames.LocalNameGuid
+                            WHERE tblGearInventoryBarangay.Municipality = {municipalityNumber} AND
+                                tblGearInventoryBarangayData.GearVariation ={{{gearVariationGuid}}} AND
+                                tblGearInventoryBarangay.Barangay = '{barangay}' AND
+                                tblGearInventoryBarangay.Sitio = '{sitio}'
+                            GROUP BY tblGearInventoryBarangayData.DataGuid";
+            }
 
             var dt = new DataTable();
             using (var conection = new OleDbConnection(global.ConnectionString))
@@ -1779,7 +1942,7 @@ namespace FAD3.Database.Classes
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex.Message, "FishingInventory", "GetInventoryEnumerators");
+                    Logger.Log(ex.Message, "FishingInventory", "GearInventoryExists");
                 }
             }
             foreach (var item in dataGuids)
@@ -2619,9 +2782,9 @@ namespace FAD3.Database.Classes
         /// <param name="barangayName"></param>
         /// <param name="sitioName"></param>
         /// <returns></returns>
-        public Dictionary<string, (string gearClass, string gearVariation, string localNames, int total, int sumCommercial, int sumMotorized, int sumNonMotorized, int sumNoBoat)> GetLevelGearsInventory(string inventoryGuid, string provinceName = "", string municipalityName = "", string barangayName = "", string sitioName = "")
+        public Dictionary<string, (string gearClass, string gearVarGuid, string gearVariation, string localNames, int total, int sumCommercial, int sumMotorized, int sumNonMotorized, int sumNoBoat)> GetLevelGearsInventory(string inventoryGuid, string provinceName = "", string municipalityName = "", string barangayName = "", string sitioName = "")
         {
-            Dictionary<string, (string gearClass, string gearVariation, string localNames, int total, int sumCommercial, int sumMotorized, int sumNonMotorized, int sumNoBoat)> dict = new Dictionary<string, (string gearClass, string gearVariation, string localNames, int total, int sumCommercial, int sumMotorized, int sumNonMotorized, int sumNoBoat)>();
+            Dictionary<string, (string gearClass, string gearVarGuid, string gearVariation, string localNames, int total, int sumCommercial, int sumMotorized, int sumNonMotorized, int sumNoBoat)> dict = new Dictionary<string, (string gearClass, string gearVarGuid, string gearVariation, string localNames, int total, int sumCommercial, int sumMotorized, int sumNonMotorized, int sumNoBoat)>();
 
             var dt = new DataTable();
             string query = "";
@@ -2637,7 +2800,7 @@ namespace FAD3.Database.Classes
                         {
                             sitio = sitioName;
                         }
-                        query = $@"SELECT t2.DataGuid, tblGearClass.GearClassName, tblGearVariations.Variation,
+                        query = $@"SELECT t2.DataGuid, tblGearClass.GearClassName, tblGearVariations.GearVarGUID, tblGearVariations.Variation,
                                 Sum([t2].[CountCommercial]+[t2].[CountMunicipalMotorized]+[t2].[CountMunicipalNonMotorized]+[t2].[CountNoBoat]) AS Total,
                                 Sum(t2.CountCommercial) AS TotalCommercial,
                                 Sum(t2.CountMunicipalMotorized) AS TotalMotorized,
@@ -2652,12 +2815,12 @@ namespace FAD3.Database.Classes
                                 WHERE tblGearInventoryBarangay.InventoryGuid={{{inventoryGuid}}} AND Provinces.ProvinceName='{provinceName}'
                                     AND Municipalities.Municipality= '{municipalityName}' AND tblGearInventoryBarangay.Barangay='{barangayName}'
                                     AND tblGearInventoryBarangay.Sitio='{sitio}'
-                                GROUP BY  t2.DataGuid, tblGearClass.GearClassName, tblGearVariations.Variation
+                                GROUP BY  t2.DataGuid, tblGearClass.GearClassName, tblGearVariations.GearVarGUID, tblGearVariations.Variation
                                 ORDER BY tblGearClass.GearClassName, tblGearVariations.Variation;";
                     }
                     else if (barangayName.Length > 0)
                     {
-                        query = $@"SELECT t2.DataGuid, tblGearClass.GearClassName, tblGearVariations.Variation,
+                        query = $@"SELECT t2.DataGuid, tblGearClass.GearClassName, tblGearVariations.GearVarGUID, tblGearVariations.Variation,
                                 Sum([t2].[CountCommercial]+[t2].[CountMunicipalMotorized]+[t2].[CountMunicipalNonMotorized]+[t2].[CountNoBoat]) AS Total,
                                 Sum(t2.CountCommercial) AS TotalCommercial,
                                 Sum(t2.CountMunicipalMotorized) AS TotalMotorized,
@@ -2671,12 +2834,12 @@ namespace FAD3.Database.Classes
                                     tblGearClass.GearClass = tblGearVariations.GearClass
                                 WHERE tblGearInventoryBarangay.InventoryGuid={{{inventoryGuid}}} AND Provinces.ProvinceName='{provinceName}'
                                     AND Municipalities.Municipality= '{municipalityName}' AND tblGearInventoryBarangay.Barangay='{barangayName}'
-                                GROUP BY t2.DataGuid, tblGearClass.GearClassName, tblGearVariations.Variation
+                                GROUP BY t2.DataGuid, tblGearClass.GearClassName, tblGearVariations.GearVarGUID, tblGearVariations.Variation
                                 ORDER BY tblGearClass.GearClassName, tblGearVariations.Variation;";
                     }
                     else if (municipalityName.Length > 0)
                     {
-                        query = $@"SELECT tblGearClass.GearClassName, tblGearVariations.Variation,
+                        query = $@"SELECT tblGearClass.GearClassName, tblGearVariations.GearVarGUID, tblGearVariations.Variation,
                                 Sum([t2].[CountCommercial]+[t2].[CountMunicipalMotorized]+[t2].[CountMunicipalNonMotorized]+[t2].[CountNoBoat]) AS Total,
                                 Sum(t2.CountCommercial) AS TotalCommercial,
                                 Sum(t2.CountMunicipalMotorized) AS TotalMotorized,
@@ -2689,12 +2852,12 @@ namespace FAD3.Database.Classes
                                     tblGearVariations.GearVarGUID = t2.GearVariation) ON
                                     tblGearClass.GearClass = tblGearVariations.GearClass
                                 WHERE tblGearInventoryBarangay.InventoryGuid={{{inventoryGuid}}} AND Provinces.ProvinceName='{provinceName}'  AND Municipalities.Municipality= '{municipalityName}'
-                                GROUP BY tblGearClass.GearClassName, tblGearVariations.Variation
+                                GROUP BY tblGearClass.GearClassName,  tblGearVariations.GearVarGUID, tblGearVariations.Variation
                                 ORDER BY tblGearClass.GearClassName, tblGearVariations.Variation;";
                     }
                     else if (provinceName.Length > 0)
                     {
-                        query = $@"SELECT  tblGearClass.GearClassName, tblGearVariations.Variation,
+                        query = $@"SELECT  tblGearClass.GearClassName, tblGearVariations.GearVarGUID, tblGearVariations.Variation,
                                 Sum([t2].[CountCommercial]+[t2].[CountMunicipalMotorized]+[t2].[CountMunicipalNonMotorized]+[t2].[CountNoBoat]) AS Total,
                                 Sum(t2.CountCommercial) AS TotalCommercial,
                                 Sum(t2.CountMunicipalMotorized) AS TotalMotorized,
@@ -2707,12 +2870,12 @@ namespace FAD3.Database.Classes
                                     tblGearVariations.GearVarGUID = t2.GearVariation) ON
                                     tblGearClass.GearClass = tblGearVariations.GearClass
                                 WHERE tblGearInventoryBarangay.InventoryGuid={{{inventoryGuid}}} AND Provinces.ProvinceName='{provinceName}'
-                                GROUP BY tblGearClass.GearClassName, tblGearVariations.Variation
+                                GROUP BY tblGearClass.GearClassName,  tblGearVariations.GearVarGUID, tblGearVariations.Variation
                                 ORDER BY tblGearClass.GearClassName, tblGearVariations.Variation;";
                     }
                     else
                     {
-                        query = $@"SELECT tblGearClass.GearClassName, tblGearVariations.Variation,
+                        query = $@"SELECT tblGearClass.GearClassName, tblGearVariations.GearVarGUID, tblGearVariations.Variation,
                                 Sum([t2].[CountCommercial]+[t2].[CountMunicipalMotorized]+[t2].[CountMunicipalNonMotorized]+[t2].[CountNoBoat]) AS Total,
                                 Sum(t2.CountCommercial) AS TotalCommercial,
                                 Sum(t2.CountMunicipalMotorized) AS TotalMotorized,
@@ -2725,7 +2888,7 @@ namespace FAD3.Database.Classes
                                     tblGearVariations.GearVarGUID = t2.GearVariation) ON
                                     tblGearClass.GearClass = tblGearVariations.GearClass
                                 WHERE tblGearInventoryBarangay.InventoryGuid={{{inventoryGuid}}}
-                                GROUP BY tblGearClass.GearClassName, tblGearVariations.Variation
+                                GROUP BY tblGearClass.GearClassName, tblGearVariations.GearVarGUID, tblGearVariations.Variation
                                 ORDER BY tblGearClass.GearClassName, tblGearVariations.Variation;";
                     }
                     var adapter = new OleDbDataAdapter(query, conection);
@@ -2743,11 +2906,11 @@ namespace FAD3.Database.Classes
                                 localNames += name + ", ";
                             }
 
-                            dict.Add(dr["DataGuid"].ToString(), (dr["GearClassName"].ToString(), dr["Variation"].ToString(), localNames.Trim(',', ' '), int.Parse(dr["Total"].ToString()), int.Parse(dr["TotalCommercial"].ToString()), int.Parse(dr["TotalMotorized"].ToString()), int.Parse(dr["TotalNonMotorized"].ToString()), int.Parse(dr["TotalNoBoat"].ToString())));
+                            dict.Add(dr["DataGuid"].ToString(), (dr["GearClassName"].ToString(), dr["GearVarGUID"].ToString(), dr["Variation"].ToString(), localNames.Trim(',', ' '), int.Parse(dr["Total"].ToString()), int.Parse(dr["TotalCommercial"].ToString()), int.Parse(dr["TotalMotorized"].ToString()), int.Parse(dr["TotalNonMotorized"].ToString()), int.Parse(dr["TotalNoBoat"].ToString())));
                         }
                         else
                         {
-                            dict.Add(dr["Variation"].ToString(), (dr["GearClassName"].ToString(), dr["Variation"].ToString(), localNames, int.Parse(dr["Total"].ToString()), int.Parse(dr["TotalCommercial"].ToString()), int.Parse(dr["TotalMotorized"].ToString()), int.Parse(dr["TotalNonMotorized"].ToString()), int.Parse(dr["TotalNoBoat"].ToString())));
+                            dict.Add(dr["Variation"].ToString(), (dr["GearClassName"].ToString(), dr["GearVarGUID"].ToString(), dr["Variation"].ToString(), localNames, int.Parse(dr["Total"].ToString()), int.Parse(dr["TotalCommercial"].ToString()), int.Parse(dr["TotalMotorized"].ToString()), int.Parse(dr["TotalNonMotorized"].ToString()), int.Parse(dr["TotalNoBoat"].ToString())));
                         }
                     }
                 }
@@ -3323,9 +3486,10 @@ namespace FAD3.Database.Classes
         /// <param name="dateConducted"></param>
         /// <param name="inventoryGuid"></param>
         /// <returns></returns>
-        public bool SaveFisheryInventoryProject(fad3DataStatus dataStatus, string name, DateTime dateConducted, string inventoryGuid)
+        public (bool success, string status) SaveFisheryInventoryProject(fad3DataStatus dataStatus, string name, DateTime dateConducted, string inventoryGuid)
         {
-            bool Success = false;
+            bool success = false;
+            string status = "";
             string updateQuery = "";
             using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
             {
@@ -3346,17 +3510,26 @@ namespace FAD3.Database.Classes
                     conn.Open();
                     using (OleDbCommand update = new OleDbCommand(updateQuery, conn))
                     {
-                        Success = (update.ExecuteNonQuery() > 0);
+                        success = (update.ExecuteNonQuery() > 0);
+                        status = "Inventory saved";
                     }
                     conn.Close();
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log($"{ex.Message}\r\n{ex.Source}");
+                    status = "Error in saving inventory";
+                    if (ex.HResult == -2147467259)
+                    {
+                        status = "Inventory guid exists";
+                    }
+                    else
+                    {
+                        Logger.Log($"{ex.Message}\r\n{ex.Source}");
+                    }
                 }
             }
 
-            return Success;
+            return (success, status);
         }
 
         public bool SaveSitioGearInventoryCatchComposition(string sitioGearInventoryGuid, Dictionary<string, string> dominantCatchDict, Dictionary<string, string> nonDominantCatchDict)
@@ -3627,35 +3800,38 @@ namespace FAD3.Database.Classes
         public bool SaveSitioGearInventoryGearLocalNames(string sitioGearInventoryGuid, Dictionary<string, string> localNamesDict)
         {
             int n = 0;
-            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            if (localNamesDict.Count > 0)
             {
-                try
+                using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
                 {
-                    conn.Open();
-                    string sql = $"Delete * from tblGearInventoryGearLocalNames where InventoryDataGuid = {{{sitioGearInventoryGuid}}}";
-
-                    using (OleDbCommand update = new OleDbCommand(sql, conn))
+                    try
                     {
-                        update.ExecuteNonQuery();
-                    }
+                        conn.Open();
+                        string sql = $"Delete * from tblGearInventoryGearLocalNames where InventoryDataGuid = {{{sitioGearInventoryGuid}}}";
 
-                    foreach (var item in localNamesDict)
-                    {
-                        NewFisheryObjectName nfo = new NewFisheryObjectName(item.Value, FisheryObjectNameType.GearLocalName);
-                        var result = Gear.SaveNewLocalName(nfo, item.Key);
-
-                        sql = $"Insert into tblGearInventoryGearLocalNames (InventoryDataGuid, LocalNameGuid, RowGuid) values ({{{sitioGearInventoryGuid}}}, {{{result.newGuid}}},{{{Guid.NewGuid().ToString()}}})";
                         using (OleDbCommand update = new OleDbCommand(sql, conn))
                         {
-                            if (update.ExecuteNonQuery() > 0) n++;
+                            update.ExecuteNonQuery();
                         }
-                    }
 
-                    conn.Close();
-                }
-                catch (Exception ex)
-                {
-                    Logger.Log($"{ex.Message}\r\n{ex.Source}");
+                        foreach (var item in localNamesDict)
+                        {
+                            NewFisheryObjectName nfo = new NewFisheryObjectName(item.Value, FisheryObjectNameType.GearLocalName);
+                            var result = Gear.SaveNewLocalName(nfo, item.Key);
+
+                            sql = $"Insert into tblGearInventoryGearLocalNames (InventoryDataGuid, LocalNameGuid, RowGuid) values ({{{sitioGearInventoryGuid}}}, {{{result.newGuid}}},{{{Guid.NewGuid().ToString()}}})";
+                            using (OleDbCommand update = new OleDbCommand(sql, conn))
+                            {
+                                if (update.ExecuteNonQuery() > 0) n++;
+                            }
+                        }
+
+                        conn.Close();
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log($"{ex.Message}\r\n{ex.Source}");
+                    }
                 }
             }
 
@@ -3909,7 +4085,7 @@ namespace FAD3.Database.Classes
                                           {countMunicipalNonMotorizedUsage}, {countNoBoatGears},
                                           {countDaysPerMonthUse},{rangeCPUEMaxValue}, {rangeCPUEMinValue},
                                           {modeCPUEUpperValue},{modeCPUELowerValue},'{cpueUnit}',{{{guid}}},
-                                          {dominantPercentage},""{notes}"",
+                                          {dominantPercentage},'{notes}',
                                           {cpueAvgValue}, {cpueModeValue}, {equivalentKiloValue})";
                     }
                     else
@@ -3925,9 +4101,9 @@ namespace FAD3.Database.Classes
                                        MinCPUE = {rangeCPUEMinValue},
                                        ModeUpper = {modeCPUEUpperValue},
                                        ModeLower = {modeCPUELowerValue},
-                                       CPUEUnit = ""{cpueUnit}"",
+                                       CPUEUnit = '{cpueUnit}',
                                        DominantCatchPercent = {dominantPercentage},
-                                       Notes = ""{notes}"",
+                                       Notes = '{notes}',
                                        AverageCPUE = {cpueAvgValue},
                                        Mode = {cpueModeValue},
                                        EquivalentKg = {equivalentKiloValue}
@@ -4011,7 +4187,8 @@ namespace FAD3.Database.Classes
                     for (int i = 0; i < dt.Rows.Count; i++)
                     {
                         DataRow dr = dt.Rows[i];
-                        _inventories.Add(dr["InventoryGuid"].ToString(), (dr["InventoryName"].ToString(), (DateTime)dr["DateConducted"], dr["AOIName"].ToString()));
+                        //_inventories.Add(dr["InventoryGuid"].ToString(), (dr["InventoryName"].ToString(), (DateTime)dr["DateConducted"], dr["AOIName"].ToString()));
+                        _inventories.Add(dr["InventoryGuid"].ToString(), new InventoryItem(dr["InventoryName"].ToString(), (DateTime)dr["DateConducted"], dr["AOIName"].ToString()));
                     }
                 }
                 catch (Exception ex)

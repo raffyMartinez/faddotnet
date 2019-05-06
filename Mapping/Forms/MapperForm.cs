@@ -22,7 +22,7 @@ namespace FAD3
         private MapLayer _currentMapLayer;
         public event EventHandler MapperClosed;
         public event EventHandler MapperOpen;
-
+        public float SuggestedDPI = 0;
         public fadUTMZone UTMZone { get; private set; }
 
         public Graticule Graticule
@@ -158,7 +158,9 @@ namespace FAD3
             Text = "Map";
             global.LoadFormSettings(this);
             _mapLayersHandler = new MapLayersHandler(axMap);
+            _mapLayersHandler.OnLayerVisibilityChanged += OnMapLayerVisibilityChanged;
             _mapLayersHandler.CurrentLayer += OnCurrentMapLayer;
+            _mapLayersHandler.LayerRead += OnMapLayerRead;
             _mapInterActionHandler = new MapInterActionHandler(axMap, _mapLayersHandler)
             {
                 MapContextMenuStrip = menuDropDown
@@ -180,6 +182,61 @@ namespace FAD3
                 handler(this, EventArgs.Empty);
             }
             global.MappingForm = this;
+        }
+
+        public void SetGraticuleTitle(string title)
+        {
+            bool formFound = false;
+            if (Graticule != null)
+            {
+                foreach (Form f in Application.OpenForms)
+                {
+                    if (f.Name == "GraticuleForm")
+                    {
+                        GraticuleForm frm = (GraticuleForm)f;
+                        frm.SetGraticuleTitle(title);
+                        formFound = true;
+                        break;
+                    }
+                }
+                if (!formFound)
+                {
+                    Graticule.MapTitle = title;
+                    Graticule.Refresh();
+                }
+            }
+        }
+
+        private void OnMapLayerRead(MapLayersHandler s, LayerEventArg e)
+        {
+        }
+
+        private void OnMapLayerVisibilityChanged(MapLayersHandler s, LayerEventArg e)
+        {
+            int n = 0;
+            int position = 0;
+            string title = "";
+            if (Graticule != null)
+            {
+                foreach (MapLayer ml in MapLayersHandler)
+                {
+                    if (ml.IsPointDatabaseLayer && ml.Visible)
+                    {
+                        n++;
+
+                        if (n == 0)
+                        {
+                            position = ml.LayerPosition;
+                            title = ml.Name;
+                        }
+                        if (n > 0 && ml.LayerPosition < position)
+                        {
+                            title = ml.Name;
+                        }
+                    }
+                }
+            }
+            SetGraticuleTitle(title);
         }
 
         private void OnCurrentMapLayer(MapLayersHandler s, LayerEventArg e)
@@ -211,6 +268,10 @@ namespace FAD3
 
         private void OnMapperForm_Closed(object sender, FormClosedEventArgs e)
         {
+            if (_saveMapImage != null)
+            {
+                _saveMapImage.PointSizeExceed100Error -= OnPointSizeRenderError;
+            }
             global.MappingForm = null;
             CleanUp();
 
@@ -289,6 +350,7 @@ namespace FAD3
             _saveMapImage.PreviewImage = Preview;
             _saveMapImage.MapLayersHandler = _mapLayersHandler;
             _saveMapImage.MaintainOnePointLineWidth = maintainOnePointLineWidth;
+            _saveMapImage.PointSizeExceed100Error += OnPointSizeRenderError;
             success = _saveMapImage.Save(_grid25MajorGrid != null);
             try
             {
@@ -299,6 +361,14 @@ namespace FAD3
                 //ignore
             }
             return success;
+        }
+
+        private void OnPointSizeRenderError(object sender, EventArgs e)
+        {
+            MessageBox.Show("Error in rendering map being saved. A point size exceeded 100\r\n"
+                + "Use lower resolution when saving map",
+                "Map rendering error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            SuggestedDPI = _saveMapImage.SuggestedDPI;
         }
 
         private void OnToolbarClicked(object sender, ToolStripItemClickedEventArgs e)

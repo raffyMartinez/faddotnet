@@ -56,7 +56,14 @@ namespace FAD3
             }
             else
             {
-                txtSave.Text = "150";
+                if (global.MappingForm.SuggestedDPI > 0)
+                {
+                    txtSave.Text = ((int)global.MappingForm.SuggestedDPI).ToString();
+                }
+                else
+                {
+                    txtSave.Text = "150";
+                }
             }
         }
 
@@ -140,7 +147,15 @@ namespace FAD3
                                 }
                                 else
                                 {
-                                    Logger.Log("Was not able to save map to image.", "Grid25SaveForm", "OnButton_Click SaveMapToImage");
+                                    if (global.MappingForm.SuggestedDPI > 0)
+                                    {
+                                        txtSave.Text = ((int)global.MappingForm.SuggestedDPI).ToString();
+                                    }
+                                    else
+
+                                    {
+                                        Logger.Log("Was not able to save map to image.", "Grid25SaveForm", "OnButton_Click SaveMapToImage");
+                                    }
                                 }
                             }
                         }

@@ -3,51 +3,150 @@ using ISO_Classes;
 using System;
 using System.ComponentModel;
 using System.Windows.Forms;
+using AxMapWinGIS;
+using MapWinGIS;
+using FAD3.Mapping.Classes;
 
 namespace FAD3
 {
     public partial class CoordinateEntryForm : Form
     {
-        private LandingSiteForm _ParentForm;
-        private string _XCoordinatePrompt;
-        private string _YCoordinatePrompt;
-        private Coordinate _Coordinate;
-        private CoordinateDisplayFormat _CoordinateFormat;
+        private LandingSiteForm _parentForm;
+        private string _xCoordinatePrompt;
+        private string _yCoordinatePrompt;
+        private Coordinate _coordinate;
+        private CoordinateDisplayFormat _coordinateFormat;
+        private MapLayersHandler _mapLayersHandler;
+        private string _treeLevel;
+        private int _lguNumber;
 
-        private float _LonDeg;
-        private float _LatDeg;
-        private float _LonMin;
-        private float _LatMin;
-        private float _LonSec;
-        private float _LatSec;
-        private bool _IsNorth;
-        private bool _IsEast;
+        private string _locationName;
+
+        private float _lonDeg;
+        private float _latDeg;
+        private float _lonMin;
+        private float _latMin;
+        private float _lonSec;
+        private float _latSec;
+        private bool _isNorth;
+        private bool _isEast;
+
+        private string _format;
+
+        private AxMap _mapControl;
+
+        public AxMap MapControl
+        {
+            get { return _mapControl; }
+            set
+            {
+                _mapControl = value;
+                _mapControl.SendMouseUp = true;
+                _mapControl.MouseUpEvent += OnMapMouseUp;
+            }
+        }
+
+        public event EventHandler CoordinateAvailable;
+        public event EventHandler CoordinateFormClosed;
+
+        public string TreeLevel
+        {
+            get { return _treeLevel; }
+            set
+            {
+                _treeLevel = value;
+                mtextLongitude.Enabled = _treeLevel == "barangay" || _treeLevel == "municipality";
+                mtextLatitude.Enabled = mtextLongitude.Enabled;
+                if (!mtextLatitude.Enabled)
+                {
+                    mtextLatitude.Clear();
+                    mtextLongitude.Clear();
+                }
+            }
+        }
+
+        public void SetLocation(string lguName, int lguNumber, string barangayName = "")
+        {
+            mtextLatitude.Clear();
+            mtextLongitude.Clear();
+            switch (_treeLevel)
+            {
+                case "barangay":
+                    _locationName = $"{barangayName}, {lguName}";
+                    Text = $"Set coordinate for {barangayName}, {lguName}";
+                    break;
+
+                case "municipality":
+                    _locationName = $"{lguName}";
+                    _lguNumber = lguNumber;
+                    break;
+            }
+            Text = $"Set coordinate for {_locationName}";
+            var result = BarangayMunicipalityCoordinateHelper.GetCoordinate(_treeLevel, lguNumber, barangayName);
+            if (result.success)
+            {
+                Coordinate = result.c;
+                var CoordString = result.c.ToString(_format).Split(' ');
+                mtextLongitude.Text = CoordString[1];
+                mtextLatitude.Text = CoordString[0];
+            }
+        }
+
+        private void OnMapMouseUp(object sender, _DMapEvents_MouseUpEvent e)
+        {
+            mtextLatitude.Clear();
+            mtextLongitude.Clear();
+            _coordinate = null;
+
+            if (_treeLevel == "municipality" || TreeLevel == "barangay")
+            {
+                double projX = 0;
+                double projY = 0;
+                MapControl.PixelToProj(e.x, e.y, ref projX, ref projY);
+                switch (_treeLevel)
+                {
+                    case "barangay":
+                        _coordinate = new Coordinate((float)projY, (float)projX);
+                        break;
+
+                    case "municipality":
+                        if (_mapLayersHandler.CurrentMapLayer.LayerType == "ShapefileClass"
+                            && ((Shapefile)_mapLayersHandler.CurrentMapLayer.LayerObject).ShapefileType == ShpfileType.SHP_POINT
+                            && ((Shapefile)_mapLayersHandler.CurrentMapLayer.LayerObject).NumSelected == 1)
+                        {
+                            var sf = _mapLayersHandler.CurrentMapLayer.LayerObject as Shapefile;
+                            var pt = sf.Shape[_mapLayersHandler.CurrentMapLayer.SelectedIndexes[0]].Point[0];
+                            _coordinate = new Coordinate((float)pt.y, (float)pt.x);
+                        }
+                        break;
+                }
+
+                if (_coordinate != null)
+                {
+                    var CoordString = _coordinate.ToString(_format).Split(' ');
+                    mtextLongitude.Text = CoordString[1];
+                    mtextLatitude.Text = CoordString[0];
+                }
+            }
+        }
 
         private char _SecondSign = '"';
-        private bool _IsNew;
+        private bool _isNew;
 
         public Coordinate Coordinate
         {
-            get { return _Coordinate; }
-            set { _Coordinate = value; }
+            get { return _coordinate; }
+            set { _coordinate = value; }
         }
 
-        public CoordinateEntryForm(bool isNew, LandingSiteForm parent, Coordinate coordinate)
+        private void SetUpCoordinateFields()
         {
-            InitializeComponent();
-            _ParentForm = parent;
-            _IsNew = isNew;
-            _Coordinate = coordinate;
-
-            var format = "D";
-            _CoordinateFormat = global.CoordinateDisplay;
-
-            if (!_IsNew)
+            if (!_isNew)
             {
-                _Coordinate.GetD(out _LatDeg, out _LonDeg);
+                _coordinate.GetD(out _latDeg, out _lonDeg);
             }
 
-            switch (_CoordinateFormat)
+            switch (_coordinateFormat)
             {
                 case CoordinateDisplayFormat.DegreeDecimal:
                     mtextLongitude.Mask = $"000.0000° L";
@@ -58,15 +157,15 @@ namespace FAD3
                 case CoordinateDisplayFormat.DegreeMinute:
                     mtextLongitude.Mask = $"000°00.00' L";
                     mtextLatitude.Mask = $"00°00.00' L";
-                    if (!_IsNew) _Coordinate.GetDM(out _LatDeg, out _LatMin, out _IsNorth, out _LonDeg, out _LonMin, out _IsEast);
-                    format = "DM";
+                    if (!_isNew) _coordinate.GetDM(out _latDeg, out _latMin, out _isNorth, out _lonDeg, out _lonMin, out _isEast);
+                    _format = "DM";
                     break;
 
                 case CoordinateDisplayFormat.DegreeMinuteSecond:
                     mtextLongitude.Mask = $"000°00'00.0{_SecondSign} L";
                     mtextLatitude.Mask = $"00°00'00.0{_SecondSign} L";
-                    if (!_IsNew) _Coordinate.GetDMS(out _LatDeg, out _LatMin, out _LatSec, out _IsNorth, out _LonDeg, out _LonMin, out _LonSec, out _IsEast);
-                    format = "DMS";
+                    if (!_isNew) _coordinate.GetDMS(out _latDeg, out _latMin, out _latSec, out _isNorth, out _lonDeg, out _lonMin, out _lonSec, out _isEast);
+                    _format = "DMS";
                     break;
 
                 case CoordinateDisplayFormat.UTM:
@@ -74,15 +173,40 @@ namespace FAD3
                     mtextLatitude.Mask = "";
                     break;
             }
-            _XCoordinatePrompt = mtextLongitude.Text;
-            _YCoordinatePrompt = mtextLatitude.Text;
+            _xCoordinatePrompt = mtextLongitude.Text;
+            _yCoordinatePrompt = mtextLatitude.Text;
 
-            if (!_IsNew)
+            if (!_isNew)
             {
-                var CoordString = _Coordinate.ToString(format).Split(' ');
+                var CoordString = _coordinate.ToString(_format).Split(' ');
                 mtextLongitude.Text = CoordString[1];
                 mtextLatitude.Text = CoordString[0];
             }
+        }
+
+        public CoordinateEntryForm(AxMap mapControl, MapLayersHandler mapLayersHandler)
+        {
+            InitializeComponent();
+            MapControl = mapControl;
+            _mapLayersHandler = mapLayersHandler;
+            _isNew = true;
+            _format = "D";
+            _coordinateFormat = global.CoordinateDisplay;
+            SetUpCoordinateFields();
+        }
+
+        public CoordinateEntryForm(bool isNew, LandingSiteForm parent, Coordinate coordinate)
+        {
+            InitializeComponent();
+            _parentForm = parent;
+            _isNew = isNew;
+            _coordinate = coordinate;
+            _format = "D";
+            _coordinateFormat = global.CoordinateDisplay;
+            TreeLevel = "";
+            mtextLongitude.Enabled = true;
+            mtextLatitude.Enabled = true;
+            SetUpCoordinateFields();
         }
 
         private void OnButton_Click(object sender, EventArgs e)
@@ -90,10 +214,19 @@ namespace FAD3
             switch (((Button)sender).Name)
             {
                 case "buttonOK":
-                    if (mtextLatitude.Text != _YCoordinatePrompt && mtextLongitude.Text != _XCoordinatePrompt)
+                    if (mtextLatitude.Text != _yCoordinatePrompt && mtextLongitude.Text != _xCoordinatePrompt)
                     {
-                        _Coordinate.SetDMS(_LatDeg, _LatMin, _LatSec, _IsNorth, _LonDeg, _LonMin, _LonSec, _IsEast);
-                        Close();
+                        if (TreeLevel.Length == 0)
+                        {
+                            _coordinate.SetDMS(_latDeg, _latMin, _latSec, _isNorth, _lonDeg, _lonMin, _lonSec, _isEast);
+                            Close();
+                        }
+                        else
+                        {
+                            CoordinateAvailable?.Invoke(this, EventArgs.Empty);
+                            mtextLongitude.Clear();
+                            mtextLatitude.Clear();
+                        }
                     }
                     else
                     {
@@ -116,7 +249,7 @@ namespace FAD3
             var isLimit = false;
             ((MaskedTextBox)sender).With(o =>
             {
-                if (o.Text != _XCoordinatePrompt && o.Text != _YCoordinatePrompt)
+                if (o.Text != _xCoordinatePrompt && o.Text != _yCoordinatePrompt)
                 {
                     if (o.MaskCompleted)
                     {
@@ -125,7 +258,7 @@ namespace FAD3
 
                         //indicates what part of the parts[] array is the NEWS direction indicator located
                         var directionPart = 3;
-                        switch (_CoordinateFormat)
+                        switch (_coordinateFormat)
                         {
                             case CoordinateDisplayFormat.DegreeDecimal:
                                 directionPart = 2;
@@ -157,7 +290,7 @@ namespace FAD3
                                     e.Cancel = Math.Abs(float.Parse(parts[0])) > 180;
                                     isLimit = float.Parse(parts[0]) == 180;
                                     msg = "Degree part cannot be more than 180";
-                                    _IsEast = cardinalDirection == 'E';
+                                    _isEast = cardinalDirection == 'E';
                                 }
                             }
                             else
@@ -170,22 +303,22 @@ namespace FAD3
                                     e.Cancel = Math.Abs(float.Parse(parts[0])) > 90;
                                     isLimit = float.Parse(parts[0]) == 90;
                                     msg = "Degree part cannot be more than 90";
-                                    _IsNorth = cardinalDirection == 'N';
+                                    _isNorth = cardinalDirection == 'N';
                                 }
                             }
 
                             if (!e.Cancel)
                             {
-                                switch (_CoordinateFormat)
+                                switch (_coordinateFormat)
                                 {
                                     case CoordinateDisplayFormat.DegreeDecimal:
                                         if (!e.Cancel && o.Name == "mtextLongitude")
                                         {
-                                            _LonDeg = float.Parse(parts[0]);
+                                            _lonDeg = float.Parse(parts[0]);
                                         }
                                         else if (!e.Cancel)
                                         {
-                                            _LatDeg = float.Parse(parts[0]);
+                                            _latDeg = float.Parse(parts[0]);
                                         }
                                         break;
 
@@ -194,13 +327,13 @@ namespace FAD3
                                         msg = isLimit ? "Minute part shoud be zero" : "Minute part should be less than 60";
                                         if (!e.Cancel && o.Name == "mtextLongitude")
                                         {
-                                            _LonDeg = float.Parse(parts[0]);
-                                            _LonMin = float.Parse(parts[1]);
+                                            _lonDeg = float.Parse(parts[0]);
+                                            _lonMin = float.Parse(parts[1]);
                                         }
                                         else if (!e.Cancel)
                                         {
-                                            _LatDeg = float.Parse(parts[0]);
-                                            _LatMin = float.Parse(parts[1]);
+                                            _latDeg = float.Parse(parts[0]);
+                                            _latMin = float.Parse(parts[1]);
                                         }
                                         break;
 
@@ -209,15 +342,15 @@ namespace FAD3
                                         msg = isLimit ? "Second part should be zero" : "Second part should be less than 60";
                                         if (!e.Cancel && o.Name == "mtextLongitude")
                                         {
-                                            _LonDeg = float.Parse(parts[0]);
-                                            _LonMin = float.Parse(parts[1]);
-                                            _LonSec = float.Parse(parts[2]);
+                                            _lonDeg = float.Parse(parts[0]);
+                                            _lonMin = float.Parse(parts[1]);
+                                            _lonSec = float.Parse(parts[2]);
                                         }
                                         else if (!e.Cancel)
                                         {
-                                            _LatDeg = float.Parse(parts[0]);
-                                            _LatMin = float.Parse(parts[1]);
-                                            _LatSec = float.Parse(parts[2]);
+                                            _latDeg = float.Parse(parts[0]);
+                                            _latMin = float.Parse(parts[1]);
+                                            _latSec = float.Parse(parts[2]);
                                         }
                                         break;
 
@@ -282,9 +415,15 @@ namespace FAD3
             global.LoadFormSettings(this, true);
         }
 
-        private void OnCoordinateEntryForm_FormClosed(object sender, FormClosedEventArgs e)
+        private void OnFormClosed(object sender, FormClosedEventArgs e)
         {
             global.SaveFormSettings(this);
+            if (_mapControl != null)
+            {
+                _mapControl.MouseUpEvent -= OnMapMouseUp;
+            }
+            _mapControl = null;
+            CoordinateFormClosed?.Invoke(this, EventArgs.Empty);
         }
     }
 }

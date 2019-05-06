@@ -10,9 +10,11 @@ namespace FAD3
     /// </summary>
     public static class DBCheck
     {
+        public static List<string> TableList;
+
         public static bool CheckDB(string mdbPath)
         {
-            List<string> tableList = new List<string>();
+            TableList = new List<string>();
             List<string> colList = new List<string>();
 
             var dbe = new DBEngine();
@@ -23,7 +25,7 @@ namespace FAD3
             foreach (TableDef td in dbData.TableDefs)
             {
                 if (td.Name.Substring(0, 4) != "MSys" && td.Name.Substring(0, 5) != "temp_")
-                    tableList.Add(td.Name);
+                    TableList.Add(td.Name);
             }
 
             foreach (TableDef tdTemplate in dbTemplate.TableDefs)
@@ -31,7 +33,7 @@ namespace FAD3
                 if (tdTemplate.Name.Substring(0, 4) != "MSys" && tdTemplate.Name.Substring(0, 5) != "temp_")
                 {
                     tdName = tdTemplate.Name;
-                    if (!tableList.Contains(tdTemplate.Name))
+                    if (!TableList.Contains(tdTemplate.Name))
                     {
                         var sql = $@"SELECT [{tdTemplate.Name}].* INTO
                                            [{tdTemplate.Name}] IN '{dbData.Name}'

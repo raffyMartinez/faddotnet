@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
+using System.Text;
 
 namespace FAD3.Database.Forms
 {
@@ -860,6 +861,46 @@ namespace FAD3.Database.Forms
 
                 case "tsbClose":
                     Close();
+                    break;
+            }
+        }
+
+        private void OnListMouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                contextMenu.Items.Clear();
+                var tsi = contextMenu.Items.Add("Copy text");
+                tsi.Name = "menuCopyText";
+
+                contextMenu.Show(Cursor.Position);
+            }
+        }
+
+        private void OnMenuItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+            switch (e.ClickedItem.Name)
+            {
+                case "menuCopyText":
+
+                    StringBuilder copyText = new StringBuilder();
+                    string col = "";
+                    foreach (ColumnHeader c in listResults.Columns)
+                    {
+                        col += $"{c.Text}\t";
+                    }
+                    copyText.Append($"{col.TrimEnd()}\r\n");
+                    foreach (ListViewItem item in listResults.Items)
+                    {
+                        copyText.Append(item.Text);
+                        for (int n = 1; n < item.SubItems.Count; n++)
+                        {
+                            copyText.Append($"\t{item.SubItems[n]?.Text}");
+                        }
+                        copyText.Append("\r\n");
+                    }
+                    Clipboard.SetText(copyText.ToString());
+
                     break;
             }
         }

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using FAD3.Database.Forms;
 
 namespace FAD3
 {
@@ -14,11 +15,38 @@ namespace FAD3
         private static LabelsForm _instance;
         private MapLayersHandler _layersHandler;
         private MapLayer _mapLayer;
+        public string FormText { get; set; }
+        private GearInventoryForm _gearInventoryForm;
+
+        public Labels Labels
+        {
+            get { return _shapeFile.Labels; }
+        }
 
         public static LabelsForm GetInstance(MapLayersHandler layersHandler)
         {
             if (_instance == null) _instance = new LabelsForm(layersHandler);
             return _instance;
+        }
+
+        public LabelsForm(MapLayersHandler layersHandler, int layerHandle, GearInventoryForm gearInventoryForm)
+        {
+            InitializeComponent();
+            _layersHandler = layersHandler;
+            _layersHandler.OnVisibilityExpressionSet += OnVisibilityExpression;
+            _mapLayer = _layersHandler[layerHandle];
+            _shapeFile = _mapLayer.LayerObject as Shapefile;
+            _gearInventoryForm = gearInventoryForm;
+        }
+
+        public LabelsForm(MapLayersHandler layersHandler, GearInventoryForm gearInventoryForm)
+        {
+            InitializeComponent();
+            _layersHandler = layersHandler;
+            _layersHandler.OnVisibilityExpressionSet += OnVisibilityExpression;
+            _mapLayer = _layersHandler.CurrentMapLayer;
+            _shapeFile = _mapLayer.LayerObject as Shapefile;
+            _gearInventoryForm = gearInventoryForm;
         }
 
         public LabelsForm(MapLayersHandler layersHandler)
@@ -120,6 +148,7 @@ namespace FAD3
                     lblResult.ForeColor = Color.Black;
                 }
             }
+            chkLayerIsLabeled.Checked = true;
             chkLabelsVisible.Checked = _shapeFile.Labels.Visible;
             chkAvoidCollision.Checked = _shapeFile.Labels.AvoidCollisions;
             txtCollisionBuffer.Text = _shapeFile.Labels.CollisionBuffer.ToString();
@@ -130,6 +159,7 @@ namespace FAD3
             FillComboVerticalPosition(comboVerticalPosition);
             comboVerticalPosition.SelectedIndex = (int)_shapeFile.Labels.VerticalPosition;
             comboVerticalPosition.DisplayMember = "value";
+            txtLabelSourceField.Text = _shapeFile.Labels.Expression;
 
             //font tab
             _fontComboBox.Text = _shapeFile.Labels.FontName;
@@ -290,7 +320,7 @@ namespace FAD3
                 else
                 {
                     _shapeFile.Labels.Visible = true;
-                    _shapeFile.Labels.Expression = $"[{listboxFields.Text}]";
+                    _shapeFile.Labels.Expression = txtLabelSourceField.Text;
                     _shapeFile.Labels.RemoveDuplicates = chkRemoveDuplicates.Checked;
                     _shapeFile.Labels.AvoidCollisions = chkAvoidCollision.Checked;
                     _shapeFile.Labels.CollisionBuffer = int.Parse(txtCollisionBuffer.Text);
@@ -391,7 +421,12 @@ namespace FAD3
             switch (((Button)sender).Name)
             {
                 case "btnOk":
+                    DialogResult = DialogResult.OK;
                     ApplyLabelProperties();
+                    if (_gearInventoryForm != null)
+                    {
+                        _gearInventoryForm.Labels = _shapeFile.Labels;
+                    }
                     Close();
                     break;
 
@@ -400,6 +435,7 @@ namespace FAD3
                     break;
 
                 case "btnCancel":
+                    DialogResult = DialogResult.Cancel;
                     Close();
                     break;
 
@@ -448,7 +484,7 @@ namespace FAD3
 
         private void OnListFieldsDblCLick(object sender, EventArgs e)
         {
-            txtLabelSourceField.Text = $"[{listboxFields.Text}]";
+            txtLabelSourceField.Text += $" [{listboxFields.Text}]";
         }
 
         private void txtLabelSourceField_TextChanged(object sender, EventArgs e)

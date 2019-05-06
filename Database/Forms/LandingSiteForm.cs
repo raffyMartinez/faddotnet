@@ -127,18 +127,27 @@ namespace FAD3
 
         private bool ValidateForm()
         {
+            bool proceed = false;
             if (textLandingSiteName.Text.Length > 0 && comboMunicipality.Text.Length > 0 && comboProvince.Text.Length > 0)
             {
                 if (TargetArea.LandingSiteFromName(textLandingSiteName.Text, _targetArea.TargetAreaGuid) == null)
                 {
-                    return true;
+                    proceed = true;
                 }
                 else
                 {
-                    MessageBox.Show("A landing site with the same name already exists", "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    if (_isNew)
+                    {
+                        proceed = false;
+                        MessageBox.Show("A landing site with the same name already exists", "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        proceed = true;
+                    }
                 }
             }
-            return false;
+            return proceed;
         }
 
         private void OnButtonClick(object sender, EventArgs e)

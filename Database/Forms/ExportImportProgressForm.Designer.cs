@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.progressBar = new System.Windows.Forms.ProgressBar();
-            this.lblError = new System.Windows.Forms.Label();
+            this.lblStatus = new System.Windows.Forms.Label();
             this.btnOk = new System.Windows.Forms.Button();
             this.lblTitle = new System.Windows.Forms.Label();
             this.lblExportImport = new System.Windows.Forms.Label();
@@ -42,14 +42,13 @@
             this.progressBar.Size = new System.Drawing.Size(362, 20);
             this.progressBar.TabIndex = 1;
             // 
-            // lblError
+            // lblStatus
             // 
-            this.lblError.Location = new System.Drawing.Point(12, 127);
-            this.lblError.Name = "lblError";
-            this.lblError.Size = new System.Drawing.Size(362, 49);
-            this.lblError.TabIndex = 8;
-            this.lblError.Text = "This is a download error";
-            this.lblError.Visible = false;
+            this.lblStatus.Location = new System.Drawing.Point(12, 127);
+            this.lblStatus.Name = "lblStatus";
+            this.lblStatus.Size = new System.Drawing.Size(362, 49);
+            this.lblStatus.TabIndex = 8;
+            this.lblStatus.Visible = false;
             // 
             // btnOk
             // 
@@ -86,7 +85,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(386, 223);
-            this.Controls.Add(this.lblError);
+            this.Controls.Add(this.lblStatus);
             this.Controls.Add(this.btnOk);
             this.Controls.Add(this.lblTitle);
             this.Controls.Add(this.lblExportImport);
@@ -94,6 +93,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "ExportImportProgressForm";
             this.Text = "ExportImportProgressForm";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnFormClosed);
             this.Load += new System.EventHandler(this.OnFormLoad);
             this.ResumeLayout(false);
 
@@ -102,7 +102,7 @@
         #endregion
 
         private System.Windows.Forms.ProgressBar progressBar;
-        private System.Windows.Forms.Label lblError;
+        private System.Windows.Forms.Label lblStatus;
         private System.Windows.Forms.Button btnOk;
         private System.Windows.Forms.Label lblTitle;
         private System.Windows.Forms.Label lblExportImport;

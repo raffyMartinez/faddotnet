@@ -324,7 +324,14 @@ namespace FAD3
 
         public MapLayer get_MapLayer(int layerHandle)
         {
-            return _mapLayerDictionary[layerHandle];
+            try
+            {
+                return _mapLayerDictionary[layerHandle];
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public int get_LayerPosition(int layerHandle)
@@ -694,6 +701,28 @@ namespace FAD3
                 _axmap.set_LayerName(h, layerName);
             }
             return h;
+        }
+
+        public void SetAsPointLayerFromDatabase(MapLayer ly)
+        {
+            ly.IsPointDatabaseLayer = true;
+            List<int> forRemove = new List<int>();
+            foreach (MapLayer ml in _mapLayerDictionary.Values)
+            {
+                if (ml.IsPointDatabaseLayer && ml.Handle != ly.Handle)
+                {
+                    forRemove.Add(ml.Handle);
+                }
+            }
+            if (forRemove.Count > 0)
+            {
+                foreach (var item in forRemove)
+                {
+                    _mapLayerDictionary.Remove(item);
+                    _axmap.RemoveLayer(item);
+                }
+                RefreshLayers();
+            }
         }
 
         /// <summary>

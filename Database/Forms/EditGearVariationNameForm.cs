@@ -1,19 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using FAD3.Database.Classes;
 
 namespace FAD3.Database.Forms
 {
     public partial class EditGearVariationNameForm : Form
     {
         private string _variationName;
+        private string _parsedVariationName;
         private Dictionary<string, string> _gearVarDict = new Dictionary<string, string>();
         public string TargetGearVariationName { get; internal set; }
         public string TargetGearVariationGuid { get; internal set; }
@@ -68,19 +62,41 @@ namespace FAD3.Database.Forms
                 KeyValuePair<string, string> gearClass = new KeyValuePair<string, string>(item.Key, item.Value.gearClassName);
                 cboGearClasses.Items.Add(gearClass);
             }
+
+            _parsedVariationName = _variationName.Substring(_variationName.IndexOf('-') + 1).Trim().ToLower();
+            cboGearClasses.Text = _variationName.Split('-')[0].Trim();
         }
 
         private void OnGearClassChanged(object sender, EventArgs e)
         {
+            int n = 0;
+            string selectVariation = "";
             cboGearVariation.Items.Clear();
             foreach (var item in Gear.GearVariationsUsage(((KeyValuePair<string, string>)cboGearClasses.SelectedItem).Key))
             {
                 cboGearVariation.Items.Add(item);
+                if (_parsedVariationName != item.Value.ToLower() && _parsedVariationName.Contains(item.Value.ToLower()))
+                {
+                    if (n == 0)
+                    {
+                        selectVariation = item.Value;
+                    }
+                    else if (item.Value.Length > selectVariation.Length)
+                    {
+                        selectVariation = item.Value;
+                    }
+                    n++;
+                }
             }
+
             cboGearVariation.DisplayMember = "value";
             cboGearVariation.ValueMember = "key";
-            //cboGearVariation.AutoCompleteMode = AutoCompleteMode.Suggest;
-            //cboGearVariation.AutoCompleteSource = AutoCompleteSource.ListItems;
+            cboGearVariation.Text = selectVariation;
+
+            if (cboGearVariation.Text == "")
+            {
+                cboGearVariation.Text = _variationName.Substring(_variationName.IndexOf('-') + 1).Trim();
+            }
         }
     }
 }

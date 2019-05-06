@@ -15,6 +15,14 @@ namespace FAD3.Database.Classes
         public bool ImportCompleted { get; internal set; }
         public string GearVariationImported { get; internal set; }
         public string BarangayName { get; internal set; }
+        public bool StartImporting { get; internal set; }
+        public bool GearInventorySaved { get; set; }
+        public string NameOfSavedGear { get; set; }
+
+        public FisheriesInventoryImportEventArg(bool startImporting)
+        {
+            StartImporting = startImporting;
+        }
 
         public FisheriesInventoryImportEventArg(string levelName, string levelGuid, FisheriesInventoryLevel inventoryLevel, string barangay = "")
         {

@@ -38,6 +38,7 @@ namespace FAD3
         private double _intervalSize;
         public MapTextGraticuleHelper GraticuleTextHelper { get; internal set; }
 
+        public string MapTitle { get; set; }
         public bool BottomHasLabel { get; set; }
         public bool TopHasLabel { get; set; }
         public bool RightHasLabel { get; set; }
@@ -169,7 +170,7 @@ namespace FAD3
                     //ef is expansion factor
                     var ef = (_mapExtents.xMax - _mapExtents.xMin) * 0.01;
 
-                    _mapExtents.SetBounds(_mapExtents.xMin - ef, _mapExtents.yMin - ef, 0, _mapExtents.xMax + ef, _mapExtents.yMax + ef, 0);
+                    _mapExtents.SetBounds(_mapExtents.xMin - ef, _mapExtents.yMin - ef, 0, _mapExtents.xMax + ef, _mapExtents.yMax + (ef), 0);
 
                     shp = _mapExtents.ToShape().Clip(_boundaryExtents.ToShape(), tkClipOperation.clDifference);
                     var iShp = sf.EditAddShape(shp);
@@ -297,10 +298,13 @@ namespace FAD3
         /// <param name="yMin"></param>
         private void ComputeGraticule(double xMax, double yMax, double xMin, double yMin)
         {
+            double titleX = 0;
+            double titleY = 0;
             var coordinateString = "";
             var coord = new ISO_Classes.Coordinate();
             var tempW = 0D;
             var tempH = 0D;
+
             _mapExtents = new Extents();
             _mapExtents.SetBounds(xMin, yMin, 0, xMax, yMax, 0);
 
@@ -313,6 +317,8 @@ namespace FAD3
             //compute the origin of the graticule
             _xOrigin = (xMin + ((xMax - xMin) / 2)) - (tempW / 2);
             _yOrigin = (yMin + ((yMax - yMin) / 2)) - (tempH / 2);
+
+            tempH = (yMax - yMin) * 0.87;
 
             var ticLength = Math.Abs(xMin - _xOrigin) / 4;
 
@@ -342,6 +348,12 @@ namespace FAD3
                     shp.AddPoint(pt2.x, pt2.y);
                     var iShp = _sfGraticule.EditAddShape(shp);
                     _sfGraticule.EditCellValue(_ifldPart, iShp, "Border");
+                    if (n == 1)
+                    {
+                        //_sfGraticule.EditCellValue(_ifldLabel, iShp, MapTitle);
+                        titleX = pt1.x;
+                        titleY = pt1.y;
+                    }
                 }
             }
 
@@ -373,9 +385,10 @@ namespace FAD3
             _sfGraticule.Labels.AddCategory("Bottom");
             _sfGraticule.Labels.AddCategory("Right");
             _sfGraticule.Labels.AddCategory("Left");
+            _sfGraticule.Labels.AddCategory("Title");
 
             //setup display options of labels
-            for (int n = 0; n < 4; n++)
+            for (int n = 0; n < _sfGraticule.Labels.NumCategories; n++)
             {
                 _sfGraticule.Labels.Category[n].FontBold = BoldLabels;
                 _sfGraticule.Labels.Category[n].FontSize = LabelFontSize;
@@ -395,6 +408,13 @@ namespace FAD3
                     case "Left":
                     case "Right":
                         _sfGraticule.Labels.Category[n].Alignment = tkLabelAlignment.laCenter;
+                        break;
+
+                    case "Title":
+                        _sfGraticule.Labels.AddLabel(MapTitle, titleX, titleY + ((_axMap.Extents.yMax - titleY) / 2), Category: n);
+                        _sfGraticule.Labels.Category[n].Alignment = tkLabelAlignment.laTopRight;
+                        _sfGraticule.Labels.Category[n].FontSize = 16;
+                        _sfGraticule.Labels.Category[n].FontBold = true;
                         break;
                 }
             }

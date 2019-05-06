@@ -796,7 +796,7 @@ namespace FAD3.Database.Forms
                                 {
                                     guid = _inventoryGuid;
                                 }
-                                success = _inventory.SaveFisheryInventoryProject(_dataStatus, txtInventoryName.Text, DateTime.Parse(txtDateImplemented.Text), guid);
+                                success = _inventory.SaveFisheryInventoryProject(_dataStatus, txtInventoryName.Text, DateTime.Parse(txtDateImplemented.Text), guid).success;
                                 if (success)
                                 {
                                     if (_dataStatus == fad3DataStatus.statusNew)
@@ -955,7 +955,8 @@ namespace FAD3.Database.Forms
 
                         if (success)
                         {
-                            Close();
+                            //Close();
+                            DialogResult = DialogResult.OK;
                         }
                     }
                     else
@@ -977,7 +978,7 @@ namespace FAD3.Database.Forms
                     break;
 
                 case "btnCancel":
-                    Close();
+                    DialogResult = DialogResult.Cancel;
                     break;
 
                 case "btnAddLocalName":

@@ -57,6 +57,8 @@
             this.chkTitle = new System.Windows.Forms.CheckBox();
             this.chkNote = new System.Windows.Forms.CheckBox();
             this.picPreview = new System.Windows.Forms.PictureBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.txtMapTitle = new System.Windows.Forms.TextBox();
             this.tabsGraticule.SuspendLayout();
             this.tabConfigureGrid.SuspendLayout();
             this.tabConfigureText.SuspendLayout();
@@ -107,6 +109,8 @@
             // 
             // tabConfigureGrid
             // 
+            this.tabConfigureGrid.Controls.Add(this.label6);
+            this.tabConfigureGrid.Controls.Add(this.txtMapTitle);
             this.tabConfigureGrid.Controls.Add(this.btnRemove);
             this.tabConfigureGrid.Controls.Add(this.label5);
             this.tabConfigureGrid.Controls.Add(this.txtName);
@@ -134,7 +138,7 @@
             // 
             // btnRemove
             // 
-            this.btnRemove.Location = new System.Drawing.Point(88, 301);
+            this.btnRemove.Location = new System.Drawing.Point(86, 355);
             this.btnRemove.Name = "btnRemove";
             this.btnRemove.Size = new System.Drawing.Size(166, 35);
             this.btnRemove.TabIndex = 33;
@@ -161,7 +165,7 @@
             // chkBold
             // 
             this.chkBold.AutoSize = true;
-            this.chkBold.Location = new System.Drawing.Point(226, 224);
+            this.chkBold.Location = new System.Drawing.Point(238, 278);
             this.chkBold.Name = "chkBold";
             this.chkBold.Size = new System.Drawing.Size(87, 19);
             this.chkBold.TabIndex = 30;
@@ -171,7 +175,7 @@
             // chkBottom
             // 
             this.chkBottom.AutoSize = true;
-            this.chkBottom.Location = new System.Drawing.Point(226, 251);
+            this.chkBottom.Location = new System.Drawing.Point(238, 305);
             this.chkBottom.Name = "chkBottom";
             this.chkBottom.Size = new System.Drawing.Size(65, 19);
             this.chkBottom.TabIndex = 29;
@@ -181,7 +185,7 @@
             // chkRight
             // 
             this.chkRight.AutoSize = true;
-            this.chkRight.Location = new System.Drawing.Point(155, 251);
+            this.chkRight.Location = new System.Drawing.Point(167, 305);
             this.chkRight.Name = "chkRight";
             this.chkRight.Size = new System.Drawing.Size(55, 19);
             this.chkRight.TabIndex = 28;
@@ -191,7 +195,7 @@
             // chkTop
             // 
             this.chkTop.AutoSize = true;
-            this.chkTop.Location = new System.Drawing.Point(88, 251);
+            this.chkTop.Location = new System.Drawing.Point(100, 305);
             this.chkTop.Name = "chkTop";
             this.chkTop.Size = new System.Drawing.Size(47, 19);
             this.chkTop.TabIndex = 27;
@@ -201,7 +205,7 @@
             // chkLeft
             // 
             this.chkLeft.AutoSize = true;
-            this.chkLeft.Location = new System.Drawing.Point(21, 251);
+            this.chkLeft.Location = new System.Drawing.Point(33, 305);
             this.chkLeft.Name = "chkLeft";
             this.chkLeft.Size = new System.Drawing.Size(46, 19);
             this.chkLeft.TabIndex = 26;
@@ -211,7 +215,7 @@
             // chkShowGrid
             // 
             this.chkShowGrid.AutoSize = true;
-            this.chkShowGrid.Location = new System.Drawing.Point(21, 224);
+            this.chkShowGrid.Location = new System.Drawing.Point(33, 278);
             this.chkShowGrid.Name = "chkShowGrid";
             this.chkShowGrid.Size = new System.Drawing.Size(81, 19);
             this.chkShowGrid.TabIndex = 25;
@@ -220,28 +224,28 @@
             // 
             // txtGridlineWidth
             // 
-            this.txtGridlineWidth.Location = new System.Drawing.Point(166, 171);
+            this.txtGridlineWidth.Location = new System.Drawing.Point(178, 225);
             this.txtGridlineWidth.Name = "txtGridlineWidth";
             this.txtGridlineWidth.Size = new System.Drawing.Size(59, 21);
             this.txtGridlineWidth.TabIndex = 24;
             // 
             // txtBordeWidth
             // 
-            this.txtBordeWidth.Location = new System.Drawing.Point(166, 137);
+            this.txtBordeWidth.Location = new System.Drawing.Point(178, 191);
             this.txtBordeWidth.Name = "txtBordeWidth";
             this.txtBordeWidth.Size = new System.Drawing.Size(59, 21);
             this.txtBordeWidth.TabIndex = 23;
             // 
             // txtNumberOfGridlines
             // 
-            this.txtNumberOfGridlines.Location = new System.Drawing.Point(166, 104);
+            this.txtNumberOfGridlines.Location = new System.Drawing.Point(178, 158);
             this.txtNumberOfGridlines.Name = "txtNumberOfGridlines";
             this.txtNumberOfGridlines.Size = new System.Drawing.Size(59, 21);
             this.txtNumberOfGridlines.TabIndex = 22;
             // 
             // txtLabelSize
             // 
-            this.txtLabelSize.Location = new System.Drawing.Point(166, 71);
+            this.txtLabelSize.Location = new System.Drawing.Point(178, 125);
             this.txtLabelSize.Name = "txtLabelSize";
             this.txtLabelSize.Size = new System.Drawing.Size(59, 21);
             this.txtLabelSize.TabIndex = 21;
@@ -249,7 +253,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(17, 141);
+            this.label4.Location = new System.Drawing.Point(29, 195);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(76, 15);
             this.label4.TabIndex = 20;
@@ -258,7 +262,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(17, 174);
+            this.label3.Location = new System.Drawing.Point(29, 228);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(82, 15);
             this.label3.TabIndex = 19;
@@ -267,7 +271,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(17, 107);
+            this.label2.Location = new System.Drawing.Point(29, 161);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(115, 15);
             this.label2.TabIndex = 18;
@@ -276,7 +280,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(17, 74);
+            this.label1.Location = new System.Drawing.Point(29, 128);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(141, 15);
             this.label1.TabIndex = 17;
@@ -369,6 +373,22 @@
             this.picPreview.TabIndex = 5;
             this.picPreview.TabStop = false;
             // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(20, 61);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(54, 15);
+            this.label6.TabIndex = 35;
+            this.label6.Text = "Map title";
+            // 
+            // txtMapTitle
+            // 
+            this.txtMapTitle.Location = new System.Drawing.Point(20, 79);
+            this.txtMapTitle.Name = "txtMapTitle";
+            this.txtMapTitle.Size = new System.Drawing.Size(292, 21);
+            this.txtMapTitle.TabIndex = 34;
+            // 
             // GraticuleForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -427,5 +447,7 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.LinkLabel lnkNote;
         private System.Windows.Forms.LinkLabel lnkTitle;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.TextBox txtMapTitle;
     }
 }

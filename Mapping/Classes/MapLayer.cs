@@ -43,6 +43,22 @@ namespace FAD3
         public bool PrintOnReverse { get; set; }
         public bool PrintLabelsReverse { get; set; }
         public bool IsGrid25Layer { get; set; }
+        private bool _isPointDatabaseLayer;
+
+        public bool IsPointDatabaseLayer
+        {
+            get
+            {
+                return _isPointDatabaseLayer;
+            }
+            set
+            {
+                _isPointDatabaseLayer = value;
+                if (_isPointDatabaseLayer)
+                {
+                }
+            }
+        }
 
         public void RestoreSettingsFromXML()
         {

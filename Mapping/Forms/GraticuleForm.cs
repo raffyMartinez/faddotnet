@@ -7,6 +7,18 @@ namespace FAD3
 {
     public partial class GraticuleForm : Form
     {
+        private string _maptitle;
+
+        public string MapTitle
+        {
+            get { return _maptitle; }
+            set
+            {
+                _maptitle = value;
+                txtMapTitle.Text = _maptitle;
+            }
+        }
+
         private static GraticuleForm _instance;
         private MapperForm _parentForm;
         public Graticule Graticule { get; internal set; }
@@ -31,6 +43,7 @@ namespace FAD3
             Graticule.Configure(txtName.Text, int.Parse(txtLabelSize.Text), int.Parse(txtNumberOfGridlines.Text),
                                 int.Parse(txtBordeWidth.Text), int.Parse(txtGridlineWidth.Text), chkShowGrid.Checked,
                                 chkBold.Checked, chkLeft.Checked, chkRight.Checked, chkTop.Checked, chkBottom.Checked);
+            Graticule.MapTitle = txtMapTitle.Text;
             Graticule.ShowGraticule();
         }
 
@@ -69,8 +82,16 @@ namespace FAD3
             }
         }
 
+        public void SetGraticuleTitle(string title)
+        {
+            txtMapTitle.Text = title;
+            ShowGraticule();
+        }
+
         private void GraticuleForm_FormClosed(object sender, FormClosedEventArgs e)
         {
+            Graticule.GraticuleExtentChanged -= OnGraticuleExtentChanged;
+            Graticule.MapRedrawNeeded -= OnRedrawNeeded;
             _instance = null;
             _parentForm = null;
             CleanUp();
@@ -78,6 +99,8 @@ namespace FAD3
 
         private void OnGraticuleForm_Load(object sender, EventArgs e)
         {
+            _maptitle = "New untitled map";
+            txtMapTitle.Text = _maptitle;
             txtName.Text = "Graticule";
             txtLabelSize.Text = "8";
             txtBordeWidth.Text = "2";
@@ -89,6 +112,7 @@ namespace FAD3
             chkRight.Checked = true;
             chkShowGrid.Checked = true;
             Graticule = _parentForm.Graticule;
+            Graticule.MapTitle = _maptitle;
             Graticule.GraticuleExtentChanged += OnGraticuleExtentChanged;
             Graticule.MapRedrawNeeded += OnRedrawNeeded;
         }
@@ -155,7 +179,7 @@ namespace FAD3
             }
 
             var tempFileName = global.MappingForm.SaveTempMapImage();
-            if (tempFileName.Length > 0)
+            if (tempFileName?.Length > 0)
             {
                 picPreview.ImageLocation = tempFileName;
 
