@@ -455,6 +455,21 @@ namespace FAD3
         {
             switch (e.ClickedItem.Name)
             {
+                case "buttonLegend":
+                    MapLegendForm mlf = MapLegendForm.GetInstance();
+                    if (mlf.Visible)
+                    {
+                        mlf.BringToFront();
+                    }
+                    else
+                    {
+                        mlf.Show(global.MappingForm);
+                    }
+
+                    mlf.MapLayersHandler = global.MappingForm.MapLayersHandler;
+                    mlf.DrawLayers();
+                    break;
+
                 case "buttonAddLayer":
                     if (_parentForm.OpenFileDialog() == DialogResult.OK)
                     {

@@ -15,12 +15,15 @@ namespace FAD3.Mapping.Classes
         private AxMap _mapControl;
         private MapLayersHandler _layersHandler;
         public string InventoryGuid { get; set; }
-        public int NumberOfBreaks { get; set; }
-        public List<double> FisherJenksBreaks;
+        public static int NumberOfBreaks { get; set; }
+        public bool ComparisonAmongLGUs { get; set; }
+        public static List<double> GearDataFisherJenksBreaks;
+        public static List<double> FisherVesselDataFisherJenksBreaks;
         public double BreakSourceMaximum { get; set; }
         private List<FisherVesselInventoryItem> _fisherVesselDistributionList;
         private static string _labelXML;
         private static Labels _labels;
+        public int InventoryLayerHandle { get; internal set; }
 
         public static Labels Labels
         {
@@ -42,10 +45,72 @@ namespace FAD3.Mapping.Classes
             _layersHandler = layersHandler;
         }
 
-        public List<double> GetFisherJenksBreaks()
+        public List<double> GetFisherVesselJenksBreaks()
         {
-            FisherJenksBreaks = GetBreaksFromInventoryData(InventoryGuid, NumberOfBreaks);
-            return FisherJenksBreaks;
+            if (FisherVesselDataFisherJenksBreaks == null)
+            {
+                FisherVesselDataFisherJenksBreaks = GetBreaksFromFisherVesselInventoryData(InventoryGuid, NumberOfBreaks);
+            }
+            return FisherVesselDataFisherJenksBreaks;
+        }
+
+        public List<double> GetGearFisherJenksBreaks()
+        {
+            if (GearDataFisherJenksBreaks == null)
+            {
+                GearDataFisherJenksBreaks = GetBreaksFromInventoryData(InventoryGuid, NumberOfBreaks);
+            }
+            return GearDataFisherJenksBreaks;
+        }
+
+        private List<double> GetBreaksFromFisherVesselInventoryData(string inventoryGuid, int numBreaks = 5)
+        {
+            List<double> source = new List<double>();
+            var dt = new DataTable();
+            string sql = $@"SELECT Sum(CountMunicipalMotorized) AS Motorized,
+                            Sum(CountMunicipalNonMotorized) AS NonMotorized,
+                            Sum(CountCommercial) AS Commercial
+                            FROM tblGearInventoryBarangay
+                            WHERE InventoryGuid={{{inventoryGuid}}}
+                            GROUP BY Municipality";
+
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    var adapter = new OleDbDataAdapter(sql, conection);
+                    adapter.Fill(dt);
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        DataRow dr = dt.Rows[i];
+
+                        double v = (double)dr["Motorized"];
+                        if (v > 0)
+                        {
+                            source.Add(v);
+                        }
+
+                        v = (double)dr["NonMotorized"];
+                        if (v > 0)
+                        {
+                            source.Add(v);
+                        }
+
+                        v = (double)dr["Commercial"];
+                        if (v > 0)
+                        {
+                            source.Add(v);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex.Message, "InventoryMapping.cs", "GetBreaksFromInventoryData");
+                }
+            }
+            BreakSourceMaximum = source.Max();
+            return JenksFisher.CreateJenksFisherBreaksArray(source, numBreaks);
         }
 
         private List<double> GetBreaksFromInventoryData(string inventoryGuid, int numBreaks = 5)
@@ -99,13 +164,13 @@ namespace FAD3.Mapping.Classes
                 int ifldProjectName = sf.EditAddField("Inventory project", FieldType.STRING_FIELD, 1, 50);
                 int ifldProvince = sf.EditAddField("Province", FieldType.STRING_FIELD, 1, 30);
                 int ifldMunicipalityName = sf.EditAddField("Municipality", FieldType.STRING_FIELD, 1, 30);
+                int ifldMuni = sf.EditAddField("Muni", FieldType.STRING_FIELD, 1, 4);
                 int ifldX = sf.EditAddField("x", FieldType.DOUBLE_FIELD, 9, 12);
                 int ifldY = sf.EditAddField("y", FieldType.DOUBLE_FIELD, 9, 12);
                 int ifldFishers = sf.EditAddField("Fishers", FieldType.INTEGER_FIELD, 1, 7);
                 int ifldCommercial = sf.EditAddField("Commercial", FieldType.INTEGER_FIELD, 1, 7);
                 int ifldMunicipalMot = sf.EditAddField("Municipal Motorized", FieldType.INTEGER_FIELD, 1, 7);
                 int ifldMunicipalNonMot = sf.EditAddField("Municipal Non-motorized", FieldType.INTEGER_FIELD, 1, 7);
-                int ifldNoBoat = sf.EditAddField("No boat", FieldType.INTEGER_FIELD, 1, 7);
                 foreach (var item in distributionList)
                 {
                     Shape sh = new Shape();
@@ -117,6 +182,7 @@ namespace FAD3.Mapping.Classes
                             sf.EditCellValue(ifldProjectName, iShp, item.InventoryProjectName);
                             sf.EditCellValue(ifldProvince, iShp, item.ProvinceName);
                             sf.EditCellValue(ifldMunicipalityName, iShp, item.Municipality);
+                            sf.EditCellValue(ifldMuni, iShp, Database.Classes.LGUs.ShortenPlaceName(item.Municipality));
                             sf.EditCellValue(ifldX, iShp, item.X);
                             sf.EditCellValue(ifldY, iShp, item.Y);
                             sf.EditCellValue(ifldFishers, iShp, item.CountFisher);
@@ -156,13 +222,32 @@ namespace FAD3.Mapping.Classes
                         itemName = "Total number of municipal non-motorized vessels";
                         break;
                 }
-                ShapefileLayerHelper.CategorizeNumericPointLayer(sf, fld);
+                //ShapefileLayerHelper.CategorizeNumericPointLayer(sf, fld);
+
+                Database.Classes.ClassificationType classificationType = Database.Classes.ClassificationType.NaturalBreaks;
+                if (itemToMap == "fishers")
+                {
+                    ShapefileLayerHelper.CategorizeNumericPointLayer(sf, fld);
+                }
+                else if (ComparisonAmongLGUs)
+                {
+                    ShapefileLayerHelper.CategorizeNumericPointLayer(sf, fld);
+                }
+                else
+                {
+                    ShapefileLayerHelper.CategorizeNumericPointLayer(sf, FisherVesselDataFisherJenksBreaks, fld);
+                    classificationType = Database.Classes.ClassificationType.JenksFisher;
+                }
+
+                InventoryLayerHandle = _layersHandler.AddLayer(sf, itemName);
+                _layersHandler[InventoryLayerHandle].ClassificationType = classificationType;
+
                 if (Labels != null)
                 {
-                    sf.Labels = Labels;
+                    sf.Labels.Clear();
+                    _layersHandler.ShapeFileLableHandler.LabelShapefile(_labelXML);
                 }
-                var h = _layersHandler.AddLayer(sf, itemName);
-                _layersHandler.SetAsPointLayerFromDatabase(_layersHandler[h]);
+                _layersHandler.SetAsPointLayerFromDatabase(_layersHandler[InventoryLayerHandle]);
             }
             return sf.NumShapes > 0;
         }
@@ -176,7 +261,7 @@ namespace FAD3.Mapping.Classes
                 int ifldProjectName = sf.EditAddField("Inventory project", FieldType.STRING_FIELD, 1, 50);
                 int ifldProvince = sf.EditAddField("Province", FieldType.STRING_FIELD, 1, 30);
                 int ifldMunicipalityName = sf.EditAddField("Municipality", FieldType.STRING_FIELD, 1, 30);
-                int ifldMunNameAbbrev = sf.EditAddField("Mun", FieldType.STRING_FIELD, 1, 4);
+                int ifldMuni = sf.EditAddField("Muni", FieldType.STRING_FIELD, 1, 8);
                 int ifldGear = sf.EditAddField("Gear", FieldType.STRING_FIELD, 1, 50);
                 int ifldX = sf.EditAddField("x", FieldType.DOUBLE_FIELD, 9, 12);
                 int ifldY = sf.EditAddField("y", FieldType.DOUBLE_FIELD, 9, 12);
@@ -196,7 +281,8 @@ namespace FAD3.Mapping.Classes
                             sf.EditCellValue(ifldProjectName, iShp, item.InventoryProjectName);
                             sf.EditCellValue(ifldProvince, iShp, item.ProvinceName);
                             sf.EditCellValue(ifldMunicipalityName, iShp, item.Municipality);
-                            sf.EditCellValue(ifldMunNameAbbrev, iShp, item.Municipality.Substring(0, 4));
+                            //sf.EditCellValue(ifldMunNameAbbrev, iShp, item.Municipality.Substring(0, 4));
+                            sf.EditCellValue(ifldMuni, iShp, Database.Classes.LGUs.ShortenPlaceName(item.Municipality));
                             sf.EditCellValue(ifldGear, iShp, item.GearVariationName);
                             sf.EditCellValue(ifldX, iShp, item.X);
                             sf.EditCellValue(ifldY, iShp, item.Y);
@@ -213,9 +299,19 @@ namespace FAD3.Mapping.Classes
                 sf.DefaultDrawingOptions.LineColor = new Utils().ColorByName(tkMapColor.White);
                 sf.DefaultDrawingOptions.LineVisible = true;
                 sf.CollisionMode = tkCollisionMode.AllowCollisions;
-                ShapefileLayerHelper.CategorizeNumericPointLayer(sf, FisherJenksBreaks, ifldCount);
-                var h = _layersHandler.AddLayer(sf, gearName);
-                _layersHandler.set_MapLayer(h);
+                Database.Classes.ClassificationType classificationType = Database.Classes.ClassificationType.NaturalBreaks;
+                if (ComparisonAmongLGUs)
+                {
+                    ShapefileLayerHelper.CategorizeNumericPointLayer(sf, ifldCount);
+                }
+                else
+                {
+                    ShapefileLayerHelper.CategorizeNumericPointLayer(sf, GearDataFisherJenksBreaks, ifldCount);
+                    classificationType = Database.Classes.ClassificationType.JenksFisher;
+                }
+                InventoryLayerHandle = _layersHandler.AddLayer(sf, gearName);
+                _layersHandler[InventoryLayerHandle].ClassificationType = classificationType;
+                //_layersHandler.set_MapLayer(h);
 
                 if (Labels != null)
                 {
@@ -223,13 +319,14 @@ namespace FAD3.Mapping.Classes
                     _layersHandler.ShapeFileLableHandler.LabelShapefile(_labelXML);
                 }
 
-                _layersHandler.SetAsPointLayerFromDatabase(_layersHandler[h]);
+                _layersHandler.SetAsPointLayerFromDatabase(_layersHandler[InventoryLayerHandle]);
             }
             return sf.NumShapes > 0;
         }
 
         public List<FisherVesselInventoryItem> GetFisherVesselDistribution(string itemToMap, bool refresh = false)
         {
+            int count = 0;
             if (_fisherVesselDistributionList == null || refresh)
             {
                 _fisherVesselDistributionList = new List<FisherVesselInventoryItem>();
@@ -264,10 +361,30 @@ namespace FAD3.Mapping.Classes
                             DataRow dr = dt.Rows[i];
                             FisherVesselInventoryItem item = new FisherVesselInventoryItem((double)dr["xCoord"], (double)dr["yCoord"], dr["InventoryName"].ToString(), dr["ProvinceName"].ToString());
                             item.Municipality = dr["Municipality"].ToString();
-                            item.CountFisher = (int)(double)dr["Fishers"];
-                            item.CountCommercial = (int)(double)dr["Commercial"];
-                            item.CountMunicipalMotorized = (int)(double)dr["Municipal motorized"];
-                            item.CountMunicipalNonMotorized = (int)(double)dr["Non-motorized"];
+
+                            count = (int)(double)dr["Fishers"];
+                            if (count > 0)
+                            {
+                                item.CountFisher = count;
+                            }
+
+                            count = (int)(double)dr["Commercial"];
+                            if (count > 0)
+                            {
+                                item.CountCommercial = count;
+                            }
+
+                            count = (int)(double)dr["Municipal motorized"];
+                            if (count > 0)
+                            {
+                                item.CountMunicipalMotorized = count;
+                            }
+
+                            count = (int)(double)dr["Non-motorized"];
+                            if (count > 0)
+                            {
+                                item.CountMunicipalNonMotorized = count;
+                            }
                             _fisherVesselDistributionList.Add(item);
                         }
                     }

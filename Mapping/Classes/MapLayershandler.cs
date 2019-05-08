@@ -154,8 +154,9 @@ namespace FAD3
         /// <param name="layerHandle"></param>
         /// <param name="pic"></param>
         /// <param name="layerType"></param>
-        public void LayerSymbol(int layerHandle, System.Windows.Forms.PictureBox pic, string layerType)
+        public void LayerSymbol(int layerHandle, System.Windows.Forms.PictureBox pic, string layerType, ShapeDrawingOptions drawingOptions = null)
         {
+            bool isCategory = drawingOptions != null;
             if (pic.Image != null) pic.Image.Dispose();
             Rectangle rect = pic.ClientRectangle;
             int w = rect.Width / 2;
@@ -171,20 +172,35 @@ namespace FAD3
                 case "ShapefileClass":
                     ((Shapefile)ly).With(shp =>
                     {
+                        ShapeDrawingOptions sdo = shp.DefaultDrawingOptions;
+                        if (drawingOptions != null)
+                        {
+                            sdo = drawingOptions;
+                        }
                         switch (shp.ShapefileType)
                         {
                             case ShpfileType.SHP_POINT:
-                                shp.DefaultDrawingOptions.DrawPoint(ptr, (rect.Width / 5) * 2, rect.Height / 2, 0, 0);
+
+                                if (isCategory)
+                                {
+                                    sdo.DrawPoint(ptr, (rect.Width / 5) * 2, rect.Height / 4, 0, 0);
+                                }
+                                else
+                                {
+                                    sdo.DrawPoint(ptr, (rect.Width / 5) * 2, rect.Height / 2, 0, 0);
+                                }
+
                                 break;
 
                             case ShpfileType.SHP_POLYGON:
-                                shp.DefaultDrawingOptions.DrawRectangle(ptr, rect.Width / 3, rect.Height / 4, w, h, shp.DefaultDrawingOptions.LineVisible, rect.Width, rect.Height);
+                                sdo.DrawRectangle(ptr, rect.Width / 3, rect.Height / 4, w, h, shp.DefaultDrawingOptions.LineVisible, rect.Width, rect.Height);
                                 break;
 
                             case ShpfileType.SHP_POLYLINE:
-                                shp.DefaultDrawingOptions.DrawLine(ptr, rect.Width / 3, rect.Height / 4, w, h, true, rect.Width, rect.Height);
+                                sdo.DrawLine(ptr, rect.Width / 3, rect.Height / 4, w, h, true, rect.Width, rect.Height);
                                 break;
                         }
+
                         g.ReleaseHdc(ptr);
                         pic.Image = bmp;
                     });

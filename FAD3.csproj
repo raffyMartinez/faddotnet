@@ -345,6 +345,7 @@
       <DependentUpon>GraphForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Mapping\Classes\BarangayMunicipalityCoordinateHelper.cs" />
+    <Compile Include="Mapping\Classes\ClassifiedItem.cs" />
     <Compile Include="Mapping\Classes\Colors.cs" />
     <Compile Include="Mapping\Classes\ColorSchemes.cs" />
     <Compile Include="Mapping\Classes\ERDDAPMetadataFiles.cs" />
@@ -360,6 +361,7 @@
     <Compile Include="Mapping\Classes\GearInventoryMappingItem.cs" />
     <Compile Include="Mapping\Classes\LocationCoordinate.cs" />
     <Compile Include="Mapping\Classes\MapEditor.cs" />
+    <Compile Include="Mapping\Classes\MapLegend.cs" />
     <Compile Include="Mapping\Classes\OccurenceMapping.cs" />
     <Compile Include="Mapping\Classes\MapTextGraticuleHelper.cs" />
     <Compile Include="Mapping\Classes\Discretizer.cs" />
@@ -417,6 +419,12 @@
     </Compile>
     <Compile Include="Mapping\Forms\LocationsCoordinateForms.Designer.cs">
       <DependentUpon>LocationsCoordinateForms.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Mapping\Forms\MapLegendForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Mapping\Forms\MapLegendForm.Designer.cs">
+      <DependentUpon>MapLegendForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Mapping\Forms\ReverseGridLabelsSetupForm.cs">
       <SubType>Form</SubType>
@@ -930,6 +938,9 @@
     <EmbeddedResource Include="Mapping\Forms\LocationsCoordinateForms.resx">
       <DependentUpon>LocationsCoordinateForms.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Mapping\Forms\MapLegendForm.resx">
+      <DependentUpon>MapLegendForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Mapping\Forms\ReverseGridLabelsSetupForm.resx">
       <DependentUpon>ReverseGridLabelsSetupForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -1170,6 +1181,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="FAD3.ico" />
+    <None Include="Resources\legend.bmp" />
     <None Include="Resources\Settings_12x_16x.png" />
     <None Include="Resources\removel_l.bmp" />
     <None Include="Resources\label+.bmp" />

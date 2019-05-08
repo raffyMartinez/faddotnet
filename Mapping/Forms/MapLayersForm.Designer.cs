@@ -41,6 +41,7 @@
             this.itemLayerExport = new System.Windows.Forms.ToolStripMenuItem();
             this.itemOptions = new System.Windows.Forms.ToolStripMenuItem();
             this.itemConvertToGrid25 = new System.Windows.Forms.ToolStripMenuItem();
+            this.itemAlwaysKeepOnTop = new System.Windows.Forms.ToolStripMenuItem();
             this.itemMoveLayer = new System.Windows.Forms.ToolStripMenuItem();
             this.itemMoveTop = new System.Windows.Forms.ToolStripMenuItem();
             this.itemMoveUp = new System.Windows.Forms.ToolStripMenuItem();
@@ -49,10 +50,10 @@
             this.toolBar = new System.Windows.Forms.ToolStrip();
             this.buttonAddLayer = new System.Windows.Forms.ToolStripButton();
             this.buttonRemoveLayer = new System.Windows.Forms.ToolStripButton();
+            this.buttonLegend = new System.Windows.Forms.ToolStripButton();
             this.buttonAttributes = new System.Windows.Forms.ToolStripButton();
             this.buttonZoomToLayer = new System.Windows.Forms.ToolStripButton();
             this.buttonClose = new System.Windows.Forms.ToolStripButton();
-            this.itemAlwaysKeepOnTop = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.layerGrid)).BeginInit();
             this.menuLayers.SuspendLayout();
             this.toolBar.SuspendLayout();
@@ -118,7 +119,7 @@
             this.itemOptions,
             this.itemMoveLayer});
             this.menuLayers.Name = "menuLayers";
-            this.menuLayers.Size = new System.Drawing.Size(181, 180);
+            this.menuLayers.Size = new System.Drawing.Size(146, 158);
             this.menuLayers.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnMenuLayers_ItemClicked);
             // 
             // itemAddLayer
@@ -157,15 +158,22 @@
             this.itemConvertToGrid25,
             this.itemAlwaysKeepOnTop});
             this.itemOptions.Name = "itemOptions";
-            this.itemOptions.Size = new System.Drawing.Size(180, 22);
+            this.itemOptions.Size = new System.Drawing.Size(145, 22);
             this.itemOptions.Text = "Options";
             this.itemOptions.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnoptionsToolStripMenuItem_DropDownItemClicked);
             // 
             // itemConvertToGrid25
             // 
             this.itemConvertToGrid25.Name = "itemConvertToGrid25";
-            this.itemConvertToGrid25.Size = new System.Drawing.Size(180, 22);
+            this.itemConvertToGrid25.Size = new System.Drawing.Size(177, 22);
             this.itemConvertToGrid25.Text = "Convert to Grid25";
+            // 
+            // itemAlwaysKeepOnTop
+            // 
+            this.itemAlwaysKeepOnTop.Name = "itemAlwaysKeepOnTop";
+            this.itemAlwaysKeepOnTop.Size = new System.Drawing.Size(177, 22);
+            this.itemAlwaysKeepOnTop.Text = "Always keep on top";
+            this.itemAlwaysKeepOnTop.CheckStateChanged += new System.EventHandler(this.onCheckStateChange);
             // 
             // itemMoveLayer
             // 
@@ -208,6 +216,7 @@
             this.toolBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.buttonAddLayer,
             this.buttonRemoveLayer,
+            this.buttonLegend,
             this.buttonAttributes,
             this.buttonZoomToLayer,
             this.buttonClose});
@@ -235,6 +244,16 @@
             this.buttonRemoveLayer.Name = "buttonRemoveLayer";
             this.buttonRemoveLayer.Size = new System.Drawing.Size(23, 22);
             this.buttonRemoveLayer.Text = "Remove layer";
+            // 
+            // buttonLegend
+            // 
+            this.buttonLegend.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.buttonLegend.Image = global::FAD3.Properties.Resources.legend;
+            this.buttonLegend.ImageTransparentColor = System.Drawing.Color.White;
+            this.buttonLegend.Name = "buttonLegend";
+            this.buttonLegend.Size = new System.Drawing.Size(23, 22);
+            this.buttonLegend.Text = "toolStripButton1";
+            this.buttonLegend.ToolTipText = "Legend";
             // 
             // buttonAttributes
             // 
@@ -265,13 +284,6 @@
             this.buttonClose.Size = new System.Drawing.Size(23, 22);
             this.buttonClose.Text = "toolStripButton1";
             this.buttonClose.ToolTipText = "Close layers";
-            // 
-            // itemAlwaysKeepOnTop
-            // 
-            this.itemAlwaysKeepOnTop.Name = "itemAlwaysKeepOnTop";
-            this.itemAlwaysKeepOnTop.Size = new System.Drawing.Size(180, 22);
-            this.itemAlwaysKeepOnTop.Text = "Always keep on top";
-            this.itemAlwaysKeepOnTop.CheckStateChanged += new System.EventHandler(this.onCheckStateChange);
             // 
             // MapLayersForm
             // 
@@ -322,5 +334,6 @@
         private System.Windows.Forms.ToolStripMenuItem itemMoveBottom;
         private System.Windows.Forms.ToolStripMenuItem itemAttributes;
         private System.Windows.Forms.ToolStripMenuItem itemAlwaysKeepOnTop;
+        private System.Windows.Forms.ToolStripButton buttonLegend;
     }
 }

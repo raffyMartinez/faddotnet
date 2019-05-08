@@ -1,5 +1,17 @@
 ﻿namespace FAD3.Database.Classes
 {
+    public enum ClassificationType
+    {
+        None,
+        NaturalBreaks,
+        JenksFisher,
+        UniqueValues,
+        EqualIntervals,
+        EqualCount,
+        StandardDeviation,
+        EqualSumOfValues
+    }
+
     public enum ExportImportAction
     {
         ActionExport,

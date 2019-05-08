@@ -47,7 +47,7 @@ namespace FAD3.Database.Forms
         private ExportImportProgressForm _exportImportProgressForm;
         private bool wasImportErrorHandled = false;
         public MapWinGIS.Labels Labels { get; set; }
-
+        private int _inventoryLayerHandle;
         private CoordinateEntryForm _coordinateEntryForm;
 
         private bool _allowNodeDrag;
@@ -360,7 +360,7 @@ namespace FAD3.Database.Forms
         /// <summary>
         /// set up right click menu to facilitate adding of inventory project, fisher-boat inventory (barangay), or gear inventory (sitio)
         /// </summary>
-        private void ConfigureContextMenu()
+        private void ConfigureContextMenu(bool showAlternative = false)
         {
             contextMenu.Items.Clear();
 
@@ -427,6 +427,17 @@ namespace FAD3.Database.Forms
                 menuItem.Name = "itemMapGearDistribution";
                 menuItem.Enabled = global.MapIsOpen;
 
+                if (showAlternative)
+                {
+                    menuItem = contextMenu.Items.Add("Map gear distribution 2");
+                    menuItem.Name = "itemMapGearDistribution2";
+                    menuItem.Enabled = global.MapIsOpen;
+                }
+
+                menuItem = contextMenu.Items.Add("Show attributes");
+                menuItem.Name = "itemShowAttributes";
+                menuItem.Enabled = global.MapIsOpen;
+
                 menuItem = contextMenu.Items.Add("Setup up map labels");
                 menuItem.Name = "itemSetLayerLabels";
                 menuItem.Enabled = global.MapIsOpen;
@@ -435,41 +446,55 @@ namespace FAD3.Database.Forms
             {
                 if (lvInventory.SelectedItems.Count > 0)
                 {
-                    string item = lvInventory.SelectedItems[0].Text;
-                    string menuItemText = "";
-                    string menuItemTag = "";
-                    switch (item)
+                    string item = lvInventory.SelectedItems[0].SubItems[1].Tag?.ToString();
+                    if (item != null)
                     {
-                        case "Total number of municipal motorized vessels":
-                            menuItemText = "Map distribution of municipal motorized vessels";
-                            menuItemTag = "municipalMotorized";
-                            break;
+                        string menuItemText = "";
+                        string menuItemTag = "";
+                        switch (item)
+                        {
+                            case "municipalMotorized":
+                                menuItemText = "Map distribution of municipal motorized vessels";
+                                menuItemTag = "municipalMotorized";
+                                break;
 
-                        case "Total number of municipal non-motorized vessels":
-                            menuItemText = "Map distribution of municipal non-motorized vessels";
-                            menuItemTag = "municipalNonMotorized";
-                            break;
+                            case "municipalNonMotorized":
+                                menuItemText = "Map distribution of municipal non-motorized vessels";
+                                menuItemTag = "municipalNonMotorized";
+                                break;
 
-                        case "Total number of commercial vessels":
-                            menuItemText = "Map distribution of commercial vessels";
-                            menuItemTag = "commercial";
-                            break;
+                            case "commercial":
+                                menuItemText = "Map distribution of commercial vessels";
+                                menuItemTag = "commercial";
+                                break;
 
-                        case "Total number of fishers":
-                            menuItemText = "Map distribution of fishers";
-                            menuItemTag = "fishers";
-                            break;
-                    }
+                            case "fishers":
+                                menuItemText = "Map distribution of fishers";
+                                menuItemTag = "fishers";
+                                break;
+                        }
 
-                    if (menuItemText.Length > 0)
-                    {
-                        menuItem = contextMenu.Items.Add(menuItemText);
-                        menuItem.Name = "itemMapFisherVessel";
-                        menuItem.Tag = menuItemTag;
+                        if (menuItemText.Length > 0)
+                        {
+                            menuItem = contextMenu.Items.Add(menuItemText);
+                            menuItem.Name = "itemMapFisherVessel";
+                            menuItem.Tag = menuItemTag;
 
-                        menuItem = contextMenu.Items.Add("Setup up map labels");
-                        menuItem.Name = "itemSetLayerLabels";
-                        menuItem.Enabled = global.MapIsOpen && InventoryMapLayerExists(lvInventory.SelectedItems[0].Text);
+                            if (showAlternative && menuItemTag != "fishers")
+                            {
+                                menuItem = contextMenu.Items.Add($"{menuItemText} 2");
+                                menuItem.Name = "itemMapFisherVessel2";
+                                menuItem.Tag = menuItemTag;
+                            }
+
+                            menuItem = contextMenu.Items.Add("Show attributes");
+                            menuItem.Name = "itemShowAttributes";
+                            menuItem.Enabled = global.MapIsOpen;
+
+                            menuItem = contextMenu.Items.Add("Setup up map labels");
+                            menuItem.Name = "itemSetLayerLabels";
+                            menuItem.Enabled = global.MapIsOpen && InventoryMapLayerExists(lvInventory.SelectedItems[0].Text);
+                        }
                     }
                 }
             }
@@ -1438,23 +1463,27 @@ namespace FAD3.Database.Forms
 
             //add summary of fisher and boat inventory at the selected govenrment unit level
             lvi = lvInventory.Items.Add("Total number of fishers");
-            lvi.SubItems.Add(fisherCount.ToString());
+            ListViewItem.ListViewSubItem lsi = lvi.SubItems.Add(fisherCount.ToString());
             lvi.Tag = treeInventory.SelectedNode.Tag;
+            lsi.Tag = "fishers";
             lvi.ImageKey = "Actor_16xMD";
 
             lvi = lvInventory.Items.Add("Total number of municipal motorized vessels");
-            lvi.SubItems.Add(motorizedCount.ToString());
+            lsi = lvi.SubItems.Add(motorizedCount.ToString());
             lvi.Tag = treeInventory.SelectedNode.Tag;
+            lsi.Tag = "municipalMotorized";
             lvi.ImageKey = "propSmall";
 
             lvi = lvInventory.Items.Add("Total number of municipal non-motorized vessels");
-            lvi.SubItems.Add(nonMotorizedCount.ToString());
+            lsi = lvi.SubItems.Add(nonMotorizedCount.ToString());
             lvi.Tag = treeInventory.SelectedNode.Tag;
+            lsi.Tag = "municipalNonMotorized";
             lvi.ImageKey = "paddle";
 
             lvi = lvInventory.Items.Add("Total number of commercial vessels");
-            lvi.SubItems.Add(commercialCount.ToString());
+            lsi = lvi.SubItems.Add(commercialCount.ToString());
             lvi.Tag = treeInventory.SelectedNode.Tag;
+            lsi.Tag = "commercial";
             lvi.ImageKey = "propMed";
 
             //add summary of inventoried gear at selected gorvenrment unit level
@@ -1600,6 +1629,30 @@ namespace FAD3.Database.Forms
         {
         }
 
+        private void MapFisherVesselDistribution(string itemToMap, bool comparisonAmongLGUs = false)
+        {
+            InventoryMapping fisherVesselMapping = new InventoryMapping(global.MappingForm.MapControl, global.MappingForm.MapLayersHandler);
+            fisherVesselMapping.InventoryGuid = _inventoryGuid;
+            InventoryMapping.NumberOfBreaks = 5;
+            fisherVesselMapping.ComparisonAmongLGUs = comparisonAmongLGUs;
+            fisherVesselMapping.GetFisherVesselJenksBreaks();
+            fisherVesselMapping.GetFisherVesselDistribution(itemToMap);
+            global.MappingForm.SetGraticuleTitle(lvInventory.SelectedItems[0].Text);
+            _inventoryLayerHandle = fisherVesselMapping.InventoryLayerHandle;
+        }
+
+        private void MapGearDistribution(bool comparisonAmongLGUs = false)
+        {
+            InventoryMapping im = new InventoryMapping(global.MappingForm.MapControl, global.MappingForm.MapLayersHandler);
+            im.InventoryGuid = _inventoryGuid;
+            im.ComparisonAmongLGUs = comparisonAmongLGUs;
+            InventoryMapping.NumberOfBreaks = 5;
+            im.GetGearFisherJenksBreaks();
+            im.GetGearVariationDistribution(lvInventory.SelectedItems[0].Text, lvInventory.SelectedItems[0].Name);
+            global.MappingForm.SetGraticuleTitle(lvInventory.SelectedItems[0].Text);
+            _inventoryLayerHandle = im.InventoryLayerHandle;
+        }
+
         /// <summary>
         /// implements what was selected in right click menu
         /// </summary>
@@ -1613,38 +1666,62 @@ namespace FAD3.Database.Forms
             switch (e.ClickedItem.Name)
             {
                 case "itemMapFisherVessel":
-                    InventoryMapping fisherVesselMapping = new InventoryMapping(global.MappingForm.MapControl, global.MappingForm.MapLayersHandler);
-                    fisherVesselMapping.InventoryGuid = _inventoryGuid;
-                    fisherVesselMapping.NumberOfBreaks = 5;
-                    //fisherVesselMapping.Labels = Labels;
-                    fisherVesselMapping.GetFisherVesselDistribution(e.ClickedItem.Tag.ToString());
-                    global.MappingForm.SetGraticuleTitle(lvInventory.SelectedItems[0].Text);
+                    MapFisherVesselDistribution(lvInventory.SelectedItems[0].SubItems[1].Tag.ToString());
                     proceed = false;
                     break;
 
                 case "itemSetLayerLabels":
-                    int handle = global.MappingForm.MapLayersHandler.get_MapLayer(lvInventory.SelectedItems[0].Text).Handle;
-                    using (LabelsForm lf = new LabelsForm(global.MappingForm.MapLayersHandler, handle, this))
+                    try
                     {
-                        lf.Text = lvInventory.SelectedItems[0].Text;
-                        lf.ShowDialog();
-                        if (lf.DialogResult == DialogResult.OK)
+                        int handle = global.MappingForm.MapLayersHandler.get_MapLayer(lvInventory.SelectedItems[0].Text).Handle;
+                        using (LabelsForm lf = new LabelsForm(global.MappingForm.MapLayersHandler, handle, this))
                         {
-                            InventoryMapping.Labels = ((MapWinGIS.Shapefile)global.MappingForm.MapLayersHandler[handle].LayerObject).Labels;
+                            lf.Text = lvInventory.SelectedItems[0].Text;
+                            lf.ShowDialog();
+                            if (lf.DialogResult == DialogResult.OK)
+                            {
+                                InventoryMapping.Labels = ((MapWinGIS.Shapefile)global.MappingForm.MapLayersHandler[handle].LayerObject).Labels;
+                            }
                         }
+                    }
+                    catch (NullReferenceException nre)
+                    {
+                        MessageBox.Show("Current item is not mapped", "Item not mapped", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log(ex.Message, "GearInventoryForm", "OnContextMenu_ItemClicked");
                     }
 
                     proceed = false;
                     break;
 
                 case "itemMapGearDistribution":
-                    InventoryMapping im = new InventoryMapping(global.MappingForm.MapControl, global.MappingForm.MapLayersHandler);
-                    //im.Labels = Labels;
-                    im.InventoryGuid = _inventoryGuid;
-                    im.NumberOfBreaks = 5;
-                    im.GetFisherJenksBreaks();
-                    im.GetGearVariationDistribution(lvInventory.SelectedItems[0].Text, lvInventory.SelectedItems[0].Name);
-                    global.MappingForm.SetGraticuleTitle(lvInventory.SelectedItems[0].Text);
+                    MapGearDistribution();
+                    proceed = false;
+                    break;
+
+                case "itemShowAttributes":
+                    EditShapeAttributeForm esaf = EditShapeAttributeForm.GetInstance(global.MappingForm, global.MappingForm.MapInterActionHandler);
+                    esaf.CurrentLayer = global.MappingForm.MapLayersHandler[_inventoryLayerHandle];
+                    if (esaf.Visible)
+                    {
+                        esaf.BringToFront();
+                    }
+                    else
+                    {
+                        esaf.Show(this);
+                    }
+                    proceed = false;
+                    break;
+
+                case "itemMapGearDistribution2":
+                    MapGearDistribution(comparisonAmongLGUs: true);
+                    proceed = false;
+                    break;
+
+                case "itemMapFisherVessel2":
+                    MapFisherVesselDistribution(lvInventory.SelectedItems[0].SubItems[1].Tag.ToString(), comparisonAmongLGUs: true);
                     proceed = false;
                     break;
 
@@ -1806,12 +1883,36 @@ namespace FAD3.Database.Forms
 
         private void OnListViewDoubleClick(object sender, EventArgs e)
         {
+            bool proceed = true;
             using (GearInventoryEditForm inventoryEditForm = new GearInventoryEditForm(_treeLevel, _targetArea, _inventory, this))
             {
                 switch (_treeLevel)
                 {
+                    case "gearVariationSummary":
+                        if (global.MapIsOpen)
+                        {
+                            MapGearDistribution();
+                        }
+                        proceed = false;
+                        break;
+
                     case "targetAreaInventory":
-                        inventoryEditForm.EditInventoryLevel(_inventoryGuid, lvInventory.Items[0].SubItems[1].Text, DateTime.Parse(lvInventory.Items[1].SubItems[1].Text));
+                        var itemTag = lvInventory.SelectedItems[0].SubItems[1].Tag?.ToString();
+
+                        if (global.MapIsOpen
+                            && itemTag != null
+                            && (itemTag == "fishers"
+                            || itemTag == "commercial"
+                            || itemTag == "municipalMotorized"
+                            || itemTag == "municipalNonMotorized"))
+                        {
+                            MapFisherVesselDistribution(itemTag);
+                            proceed = false;
+                        }
+                        else
+                        {
+                            inventoryEditForm.EditInventoryLevel(_inventoryGuid, lvInventory.Items[0].SubItems[1].Text, DateTime.Parse(lvInventory.Items[1].SubItems[1].Text));
+                        }
                         break;
 
                     case "sitio":
@@ -1863,9 +1964,12 @@ namespace FAD3.Database.Forms
                         //inventoryEditForm = null;
                         return;
                 }
-                inventoryEditForm.ShowDialog(this);
-                if (inventoryEditForm.DialogResult == DialogResult.OK)
+                if (proceed)
                 {
+                    inventoryEditForm.ShowDialog(this);
+                    if (inventoryEditForm.DialogResult == DialogResult.OK)
+                    {
+                    }
                 }
             }
         }
@@ -2360,9 +2464,15 @@ namespace FAD3.Database.Forms
 
         private void OnListViewMouseDown(object sender, MouseEventArgs e)
         {
-            //_clickFromTree = false;
-            //_listTargetHit = lvInventory.HitTest(e.X, e.Y).Item;
-            //ConfigureContextMenu();
+            if (e.Button == MouseButtons.Right)
+            {
+                if (ListView.ModifierKeys == Keys.Shift)
+                {
+                    _clickFromTree = false;
+                    _listTargetHit = lvInventory.HitTest(e.X, e.Y).Item;
+                    ConfigureContextMenu(showAlternative: true);
+                }
+            }
         }
 
         private void OnTreeDragDrop(object sender, DragEventArgs e)

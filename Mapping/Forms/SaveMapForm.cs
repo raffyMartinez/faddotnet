@@ -11,6 +11,7 @@ namespace FAD3
         private static SaveMapForm _instance;
         private Grid25GenerateForm _parentForm;
         public string MapTitle { get; set; }
+        private string _fileName;
 
         public void SaveType(bool SaveAsShapefile)
         {
@@ -65,6 +66,7 @@ namespace FAD3
                     txtSave.Text = "150";
                 }
             }
+            _fileName = "";
         }
 
         private void OnGrid25SaveForm_FormClosed(object sender, FormClosedEventArgs e)
@@ -131,30 +133,42 @@ namespace FAD3
                         }
                         else
                         {
-                            SaveFileDialog sfd = new SaveFileDialog();
-                            sfd.Title = "Provide file name of image file";
-                            sfd.Filter = "jpeg|*.jpg|tiff|*.tif";
-                            sfd.FilterIndex = 2;
-                            sfd.AddExtension = true;
-                            sfd.InitialDirectory = GetSavedMapsFolder();
-                            DialogResult result = sfd.ShowDialog();
-                            if (result == DialogResult.OK && sfd.FileName.Length > 0)
+                            if (_fileName.Length > 0
+                                && txtSave.Text.Length > 0
+                                && int.Parse(txtSave.Text) <= (int)global.MappingForm.SuggestedDPI)
                             {
-                                //if (_parentForm.Grid25MajorGrid.Save(int.Parse(txtSave.Text), sfd.FileName))
-                                if (global.MappingForm.SaveMapImage(int.Parse(txtSave.Text), sfd.FileName, maintainOnePointLineWidth: true))
+                                if (global.MappingForm.SaveMapImage(int.Parse(txtSave.Text), _fileName, maintainOnePointLineWidth: true))
                                 {
                                     Close();
                                 }
-                                else
+                            }
+                            else
+                            {
+                                SaveFileDialog sfd = new SaveFileDialog();
+                                sfd.Title = "Provide file name of image file";
+                                sfd.Filter = "jpeg|*.jpg|tiff|*.tif";
+                                sfd.FilterIndex = 2;
+                                sfd.AddExtension = true;
+                                sfd.InitialDirectory = GetSavedMapsFolder();
+                                DialogResult result = sfd.ShowDialog();
+                                if (result == DialogResult.OK && sfd.FileName.Length > 0)
                                 {
-                                    if (global.MappingForm.SuggestedDPI > 0)
+                                    _fileName = sfd.FileName;
+                                    if (global.MappingForm.SaveMapImage(int.Parse(txtSave.Text), _fileName, maintainOnePointLineWidth: true))
                                     {
-                                        txtSave.Text = ((int)global.MappingForm.SuggestedDPI).ToString();
+                                        Close();
                                     }
                                     else
-
                                     {
-                                        Logger.Log("Was not able to save map to image.", "Grid25SaveForm", "OnButton_Click SaveMapToImage");
+                                        if (global.MappingForm.SuggestedDPI > 0)
+                                        {
+                                            txtSave.Text = ((int)global.MappingForm.SuggestedDPI).ToString();
+                                        }
+                                        else
+
+                                        {
+                                            Logger.Log("Was not able to save map to image.", "Grid25SaveForm", "OnButton_Click SaveMapToImage");
+                                        }
                                     }
                                 }
                             }

@@ -23,6 +23,13 @@ namespace FAD3
                     category.DrawingOptions.LineColor = new Utils().ColorByName(tkMapColor.White);
                 }
             }
+            var cat0 = sf.Categories.Add("zero");
+            Field f = sf.Field[classificationField];
+            cat0.Expression = $"[{f.Name}]=0";
+            cat0.DrawingOptions.PointSize = 0;
+            cat0.DrawingOptions.FillVisible = false;
+            cat0.DrawingOptions.LineVisible = false;
+            sf.Categories.ApplyExpression(sf.Categories.CategoryIndex[cat0]);
         }
 
         public static void CategorizeNumericPointLayer(Shapefile sf, List<double> breaks, int classificationField = 1)
@@ -33,24 +40,36 @@ namespace FAD3
                 cat.DrawingOptions.LineColor = new Utils().ColorByName(tkMapColor.White);
                 cat.DrawingOptions.PointSize = PointSizeOfMaxCategory * ((float)(b + 1) / breaks.Count);
             }
+            var cat0 = sf.Categories.Add("zero");
+            cat0.DrawingOptions.LineColor = new Utils().ColorByName(tkMapColor.White);
+            cat0.DrawingOptions.PointSize = 0;
+            cat0.DrawingOptions.FillVisible = false;
+            cat0.DrawingOptions.LineVisible = false;
 
             for (int n = 0; n < sf.NumShapes; n++)
             {
                 double v = (int)sf.CellValue[classificationField, n];
-                for (int c = 0; c < breaks.Count; c++)
+                if (v > 0)
                 {
-                    if (c + 1 < breaks.Count)
+                    for (int c = 0; c < breaks.Count; c++)
                     {
-                        if (v >= breaks[c] && v < breaks[c + 1])
+                        if (c + 1 < breaks.Count)
                         {
-                            sf.ShapeCategory[n] = c;
-                            break;
+                            if (v >= breaks[c] && v < breaks[c + 1])
+                            {
+                                sf.ShapeCategory[n] = c;
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            sf.ShapeCategory[n] = breaks.Count - 1;
                         }
                     }
-                    else
-                    {
-                        sf.ShapeCategory[n] = breaks.Count - 1;
-                    }
+                }
+                else
+                {
+                    sf.ShapeCategory3[n] = cat0;
                 }
             }
         }

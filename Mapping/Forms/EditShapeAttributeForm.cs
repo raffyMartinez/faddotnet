@@ -21,6 +21,15 @@ namespace FAD3.Mapping.Forms
         private static EditShapeAttributeForm _instance;
         private int _sfSelectedCount = 0;
 
+        public MapLayer CurrentLayer
+        {
+            get { return _currentMapLayer; }
+            set
+            {
+                _currentMapLayer = value;
+            }
+        }
+
         public static EditShapeAttributeForm GetInstance(MapperForm parent, MapInterActionHandler mapInterActionHandler)
         {
             if (_instance == null) _instance = new EditShapeAttributeForm(parent, mapInterActionHandler);
@@ -157,7 +166,7 @@ namespace FAD3.Mapping.Forms
                                 {
                                     headerText = sf.Field[n].Name;
                                 }
-                                string valueText = sf.CellValue[n, index].ToString();
+                                string valueText = sf.CellValue[n, index]?.ToString();
                                 row.CreateCells(gridAttributes);
                                 row.Cells[0].Value = valueText;
                                 row.HeaderCell.Value = headerText;

@@ -503,8 +503,10 @@ namespace FAD3
                 sf.DefaultDrawingOptions.PointShape = tkPointShapeType.ptShapeCircle;
                 sf.DefaultDrawingOptions.FillColor = new Utils().ColorByName(tkMapColor.Red);
                 sf.DefaultDrawingOptions.LineColor = new Utils().ColorByName(tkMapColor.White);
+                ClassificationType classificationType = ClassificationType.None;
                 if (Aggregated)
                 {
+                    classificationType = ClassificationType.NaturalBreaks;
                     ShapefileLayerHelper.CategorizeNumericPointLayer(sf, ifldCount);
                 }
                 else
@@ -520,7 +522,8 @@ namespace FAD3
                     newExtent.MoveTo(sf.Extents.Center.x, sf.Extents.Center.y);
                     MapControl.Extents = newExtent;
                 }
-                MapLayersHandler.AddLayer(sf, "Fishing grounds", true, true);
+                var h = MapLayersHandler.AddLayer(sf, "Fishing grounds", true, true);
+                MapLayersHandler[h].ClassificationType = classificationType;
             }
         }
     }

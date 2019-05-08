@@ -53,6 +53,11 @@ namespace FAD3.Database.Forms
             lvDetails.Columns.Add("Sitio");
             lvDetails.Columns.Add("Gear variation");
             lvDetails.Columns.Add("Local names");
+            lvDetails.Columns.Add("Total");
+            lvDetails.Columns.Add("Count commercial");
+            lvDetails.Columns.Add("Count municipal motorized");
+            lvDetails.Columns.Add("Count municipal non-motorized");
+            lvDetails.Columns.Add("Count no boat");
 
             SizeColumns(lvDetails);
             FillList();
@@ -66,7 +71,15 @@ namespace FAD3.Database.Forms
             string sql = $@"SELECT tblGearInventoryBarangayData.DataGuid, tblGearInventories.InventoryName,
                                 tblGearInventories.DateConducted, Provinces.ProvinceName, Municipalities.Municipality,
                                 tblGearInventoryBarangay.Barangay, tblGearInventoryBarangay.Sitio, tblGearVariations.Variation,
-                                tblGearLocalNames.LocalName
+                                tblGearLocalNames.LocalName,
+                                [tblGearInventoryBarangayData].[CountCommercial]
+                                    +[tblGearInventoryBarangayData].[CountMunicipalMotorized]
+                                    +[tblGearInventoryBarangayData].[CountMunicipalNonMotorized]
+                                    +[tblGearInventoryBarangayData].[CountNoBoat] AS Total,
+                                tblGearInventoryBarangayData.CountCommercial,
+                                tblGearInventoryBarangayData.CountMunicipalMotorized,
+                                tblGearInventoryBarangayData.CountMunicipalNonMotorized,
+                                tblGearInventoryBarangayData.CountNoBoat
                             FROM tblGearVariations
                                 INNER JOIN (tblGearLocalNames
                                 RIGHT JOIN ((tblGearInventories
@@ -107,6 +120,11 @@ namespace FAD3.Database.Forms
                             lvi.SubItems.Add(dr["Sitio"].ToString());
                             lvi.SubItems.Add(dr["Variation"].ToString());
                             lvi.SubItems.Add(dr["LocalName"].ToString());
+                            lvi.SubItems.Add(dr["Total"].ToString());
+                            lvi.SubItems.Add(dr["CountCommercial"].ToString());
+                            lvi.SubItems.Add(dr["CountMunicipalMotorized"].ToString());
+                            lvi.SubItems.Add(dr["CountMunicipalNonMotorized"].ToString());
+                            lvi.SubItems.Add(dr["CountNoBoat"].ToString());
                         }
                         else
                         {

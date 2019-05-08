@@ -255,19 +255,22 @@ namespace FAD3.Mapping.Classes
                         }
                     }
                     sf.DefaultDrawingOptions.PointShape = tkPointShapeType.ptShapeCircle;
+                    ClassificationType classificationType = ClassificationType.None;
                     if (Aggregate)
                     {
                         ShapefileLayerHelper.CategorizeNumericPointLayer(sf, ifldCount);
                         sf.DefaultDrawingOptions.LineVisible = true;
                         sf.DefaultDrawingOptions.LineColor = new Utils().ColorByName(tkMapColor.White);
                         sf.CollisionMode = tkCollisionMode.AllowCollisions;
+                        classificationType = ClassificationType.JenksFisher;
                     }
                     else
                     {
                         sf.DefaultDrawingOptions.PointSize = 8;
                     }
 
-                    MapLayersHandler.AddLayer(sf, $"Species mapping: {ItemName} ({YearsToCSV()})", mappingMode: fad3MappingMode.occurenceMappingSpeciesAggregated);
+                    var h = MapLayersHandler.AddLayer(sf, $"Species mapping: {ItemName} ({YearsToCSV()})", mappingMode: fad3MappingMode.occurenceMappingSpeciesAggregated);
+                    MapLayersHandler[h].ClassificationType = classificationType;
                     MapControl.Redraw();
                 }
             }
@@ -480,19 +483,22 @@ namespace FAD3.Mapping.Classes
                         }
                     }
                     sf.DefaultDrawingOptions.PointShape = tkPointShapeType.ptShapeCircle;
+                    ClassificationType classificationType = ClassificationType.None;
                     if (Aggregate)
                     {
                         ShapefileLayerHelper.CategorizeNumericPointLayer(sf, ifldCount);
                         sf.DefaultDrawingOptions.LineVisible = true;
                         sf.DefaultDrawingOptions.LineColor = new Utils().ColorByName(tkMapColor.White);
                         sf.CollisionMode = tkCollisionMode.AllowCollisions;
+                        classificationType = ClassificationType.NaturalBreaks;
                     }
                     else
                     {
                         sf.DefaultDrawingOptions.PointSize = 8;
                     }
 
-                    MapLayersHandler.AddLayer(sf, $"Gear mapping: {ItemName} ({YearsToCSV()})", mappingMode: fad3MappingMode.occurenceMappingGearAggregated);
+                    var h = MapLayersHandler.AddLayer(sf, $"Gear mapping: {ItemName} ({YearsToCSV()})", mappingMode: fad3MappingMode.occurenceMappingGearAggregated);
+                    MapLayersHandler[h].ClassificationType = classificationType;
                     MapControl.Redraw();
                 }
             }

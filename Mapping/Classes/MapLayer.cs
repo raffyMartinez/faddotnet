@@ -1,7 +1,9 @@
 ﻿using FAD3.Database.Classes;
+using FAD3.Mapping.Classes;
 using MapWinGIS;
 using System;
 using System.Drawing;
+using System.Collections.Generic;
 using System.IO;
 
 namespace FAD3
@@ -44,6 +46,99 @@ namespace FAD3
         public bool PrintLabelsReverse { get; set; }
         public bool IsGrid25Layer { get; set; }
         private bool _isPointDatabaseLayer;
+        public Type ClassifiedValueDataType { get; set; }
+        private ClassificationType _classificationType;
+
+        public Dictionary<string, ClassifiedItem> ClassificationItems = new Dictionary<string, ClassifiedItem>();
+
+        public ClassificationType ClassificationType
+        {
+            get { return _classificationType; }
+            set
+            {
+                var sf = LayerObject as Shapefile;
+                ClassificationItems.Clear();
+                _classificationType = value;
+                if (_classificationType != ClassificationType.None)
+                {
+                    switch (sf.Field[sf.Categories.ClassificationField].Type)
+                    {
+                        case FieldType.BOOLEAN_FIELD:
+                            ClassifiedValueDataType = typeof(bool);
+                            break;
+
+                        case FieldType.DATE_FIELD:
+                            ClassifiedValueDataType = typeof(DateTime);
+                            break;
+
+                        case FieldType.DOUBLE_FIELD:
+                            ClassifiedValueDataType = typeof(double);
+                            break;
+
+                        case FieldType.INTEGER_FIELD:
+                            ClassifiedValueDataType = typeof(int);
+                            break;
+
+                        case FieldType.STRING_FIELD:
+                            ClassifiedValueDataType = typeof(string);
+                            break;
+                    }
+                }
+
+                switch (_classificationType)
+                {
+                    case ClassificationType.EqualCount:
+                        break;
+
+                    case ClassificationType.EqualIntervals:
+                        break;
+
+                    case ClassificationType.EqualSumOfValues:
+                        break;
+
+                    case ClassificationType.JenksFisher:
+
+                        for (int n = 0; n < sf.Categories.Count; n++)
+                        {
+                            string range = $"{sf.Categories.Item[n].MinValue}-{sf.Categories.Item[n].MaxValue}";
+                            ClassifiedItem cl = new ClassifiedItem(range);
+                            ClassificationItems.Add(n + 1.ToString(), cl);
+                        }
+                        break;
+
+                    case ClassificationType.NaturalBreaks:
+
+                        for (int n = 0; n < sf.Categories.Count; n++)
+                        {
+                            string range = "";
+                            if (sf.Categories.Item[n].MinValue != null)
+                            {
+                                range = $"{sf.Categories.Item[n].MinValue}-{(double)sf.Categories.Item[n].MaxValue - 1}";
+                            }
+                            else
+                            {
+                                range = $"{sf.Categories.Item[n - 1].MinValue}-{(double)sf.Categories.Item[n - 1].MaxValue}";
+                                ClassificationItems[(n).ToString()].Caption = range;
+                                range = "";
+                            }
+
+                            if (range.Length > 0)
+                            {
+                                ClassifiedItem cl = new ClassifiedItem(range);
+                                cl.DrawingOptions = sf.Categories.Item[n].DrawingOptions;
+                                ClassificationItems.Add((n + 1).ToString(), cl);
+                            }
+                        }
+                        break;
+
+                    case ClassificationType.StandardDeviation:
+                        break;
+
+                    case ClassificationType.UniqueValues:
+                        break;
+                }
+            }
+        }
 
         public bool IsPointDatabaseLayer
         {
@@ -101,6 +196,7 @@ namespace FAD3
             Visible = visible;
             VisibleInLayersUI = visibleInLayersUI;
             IsFishingGrid = false;
+            ClassificationType = ClassificationType.None;
         }
 
         public bool Save(string fileName)

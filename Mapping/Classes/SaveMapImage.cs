@@ -318,7 +318,10 @@ namespace FAD3
                             for (int y = 0; y < categoryCount; y++)
                             {
                                 ptSize = _axMap.get_Shapefile(h).Categories.Item[y].DrawingOptions.PointSize;
-                                maxPtSize = ptSize;
+                                if (ptSize > maxPtSize)
+                                {
+                                    maxPtSize = ptSize;
+                                }
                                 ptSize *= (float)(_dpi / 96);
                                 if (ptSize > 100)
                                 {

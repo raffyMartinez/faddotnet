@@ -994,22 +994,39 @@ namespace FAD3.Mapping.Forms
                 }
 
                 //update mesh with values from the selected month then categorize the column
-                MakeGridFromPoints.MapColumn(_columnValues, lblMappedSheet.Text, _classificationScheme);
-
-                graphSheet.Series.Clear();
-                graphSheet.ChartAreas[0].AxisY.Minimum = 0;
-                graphSheet.ChartAreas[0].AxisY.Maximum = 100;
-                graphSheet.ChartAreas[0].AxisY.MajorGrid.Enabled = false;
-                graphSheet.ChartAreas[0].AxisX.MajorGrid.Enabled = false;
-                graphSheet.ChartAreas[0].AxisX.LabelStyle.Enabled = false;
-                var series = new Series
+                if (MakeGridFromPoints.MapColumn(_columnValues, lblMappedSheet.Text, _classificationScheme))
                 {
-                    ChartType = SeriesChartType.Column,
-                    Name = "summary",
-                };
-                graphSheet.Series.Add(series);
+                    ClassificationType classificationType = ClassificationType.None;
+                    switch (_classificationScheme)
+                    {
+                        case "Unique values":
+                            classificationType = ClassificationType.UniqueValues;
+                            break;
 
-                UpdateSheetSummary(MakeGridFromPoints.SheetMapSummary);
+                        case "Jenk's-Fisher's":
+                            classificationType = ClassificationType.JenksFisher;
+                            break;
+
+                        case "Equal interval":
+                            classificationType = ClassificationType.EqualIntervals;
+                            break;
+                    }
+                    MakeGridFromPoints.MapLayersHandler[MakeGridFromPoints.MeshShapefileHandle].ClassificationType = classificationType;
+                    graphSheet.Series.Clear();
+                    graphSheet.ChartAreas[0].AxisY.Minimum = 0;
+                    graphSheet.ChartAreas[0].AxisY.Maximum = 100;
+                    graphSheet.ChartAreas[0].AxisY.MajorGrid.Enabled = false;
+                    graphSheet.ChartAreas[0].AxisX.MajorGrid.Enabled = false;
+                    graphSheet.ChartAreas[0].AxisX.LabelStyle.Enabled = false;
+                    var series = new Series
+                    {
+                        ChartType = SeriesChartType.Column,
+                        Name = "summary",
+                    };
+                    graphSheet.Series.Add(series);
+
+                    UpdateSheetSummary(MakeGridFromPoints.SheetMapSummary);
+                }
             }
             else
             {
