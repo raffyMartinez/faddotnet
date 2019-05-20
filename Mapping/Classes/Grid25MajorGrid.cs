@@ -93,14 +93,25 @@ namespace FAD3
 
         public string SourceFolder { get; set; }
 
+        public bool HasGrid
+        {
+            get
+            {
+                return _grid25MinorGrid.MinorGridLinesShapeFile?.NumShapes > 0
+                    && _grid25LabelManager.Grid25Labels?.NumShapes > 0
+                    && _shapefileBoundingRectangle?.NumShapes > 0
+                    && _shapefileMajorGridIntersect?.NumShapes > 0;
+            }
+        }
+
         public void LockMap()
         {
-            MapLayers.MapControl.LockWindow(tkLockMode.lmLock);
+            MaplayersHandler.MapControl.LockWindow(tkLockMode.lmLock);
         }
 
         public void UnlockMap()
         {
-            MapLayers.MapControl.LockWindow(tkLockMode.lmUnlock);
+            MaplayersHandler.MapControl.LockWindow(tkLockMode.lmUnlock);
         }
 
         public string FolderToSave
@@ -627,7 +638,7 @@ namespace FAD3
         /// <summary>
         /// References the collection of map layers
         /// </summary>
-        public MapLayersHandler MapLayers
+        public MapLayersHandler MaplayersHandler
         {
             get { return _mapLayers; }
             set
@@ -639,7 +650,7 @@ namespace FAD3
 
         public int AddGrid25GridToMap()
         {
-            Grid25ShapefileHandle = MapLayers.AddLayer(_shapefileMajorGrid, "Grid25", true, true);
+            Grid25ShapefileHandle = MaplayersHandler.AddLayer(_shapefileMajorGrid, "Grid25", true, true);
             return Grid25ShapefileHandle;
         }
 
@@ -1005,13 +1016,16 @@ namespace FAD3
                 sf.GeoProjection.SetWgs84Projection(_Grid25Geoprojection);
 
                 //set the origin, rows and columns
+                //yOrigin = FishingGrid.Grid25.MajorGridYOrigin;
+                //xOrigin = FishingGrid.Grid25.MajorGridXOrigin;
                 switch (_Grid25Geoprojection)
                 {
                     case tkWgs84Projection.Wgs84_UTM_zone_50N:
                         xOrigin = 300000;
-                        yOrigin = 800000;
+                        //yOrigin = 800000;
+                        yOrigin = 400000;
                         cols = 15;
-                        rows = 18;
+                        rows = 21;
                         offsetColumns = 0;
                         gridNumber = 1;
                         break;
@@ -1462,7 +1476,7 @@ namespace FAD3
 
         private void SetUpNonGridLayers()
         {
-            foreach (MapLayer ml in MapLayers)
+            foreach (MapLayer ml in MaplayersHandler)
             {
                 if (!ml.IsGrid25Layer)
                 {
@@ -1473,7 +1487,7 @@ namespace FAD3
 
         public void ResetLayerAndLabelVisibility()
         {
-            foreach (MapLayer ml in MapLayers)
+            foreach (MapLayer ml in MaplayersHandler)
             {
                 SetupShapefileLayerForPrinting(ml, true);
             }
@@ -1496,11 +1510,11 @@ namespace FAD3
                             case GridMapSideToPrint.SideToPrintFront:
                                 if (reset)
                                 {
-                                    MapLayers.MapControl.set_LayerVisible(ml.Handle, reset);
+                                    MaplayersHandler.MapControl.set_LayerVisible(ml.Handle, reset);
                                 }
                                 else
                                 {
-                                    MapLayers.MapControl.set_LayerVisible(ml.Handle, item.ShowInFront);
+                                    MaplayersHandler.MapControl.set_LayerVisible(ml.Handle, item.ShowInFront);
                                 }
 
                                 if (!item.ShowLabelsFront)
@@ -1512,11 +1526,11 @@ namespace FAD3
                             case GridMapSideToPrint.SideToPrintReverse:
                                 if (reset)
                                 {
-                                    MapLayers.MapControl.set_LayerVisible(ml.Handle, reset);
+                                    MaplayersHandler.MapControl.set_LayerVisible(ml.Handle, reset);
                                 }
                                 else
                                 {
-                                    MapLayers.MapControl.set_LayerVisible(ml.Handle, item.ShowInReverse);
+                                    MaplayersHandler.MapControl.set_LayerVisible(ml.Handle, item.ShowInReverse);
                                 }
 
                                 if (!item.ShowLabelsReverse)
@@ -1535,13 +1549,13 @@ namespace FAD3
                         {
                             case GridMapSideToPrint.SideToPrintFront:
 
-                                MapLayers.MapControl.set_LayerVisible(ml.Handle, item.ShowInFront);
+                                MaplayersHandler.MapControl.set_LayerVisible(ml.Handle, item.ShowInFront);
                                 sf.Labels.Visible = item.ShowLabelsFront;
                                 break;
 
                             case GridMapSideToPrint.SideToPrintReverse:
 
-                                MapLayers.MapControl.set_LayerVisible(ml.Handle, item.ShowInReverse);
+                                MaplayersHandler.MapControl.set_LayerVisible(ml.Handle, item.ShowInReverse);
                                 sf.Labels.Visible = item.ShowLabelsReverse;
 
                                 break;

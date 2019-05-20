@@ -233,6 +233,26 @@ namespace FAD3.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap checkLegend2 {
+            get {
+                object obj = ResourceManager.GetObject("checkLegend2", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap choosePosition {
+            get {
+                object obj = ResourceManager.GetObject("choosePosition", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap clear_all_selection {
             get {
                 object obj = ResourceManager.GetObject("clear_all_selection", resourceCulture);
@@ -301,6 +321,16 @@ namespace FAD3.Properties {
         internal static System.Drawing.Bitmap ColumnChart_16x {
             get {
                 object obj = ResourceManager.GetObject("ColumnChart_16x", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap CopyLongTextToClipboard_16x {
+            get {
+                object obj = ResourceManager.GetObject("CopyLongTextToClipboard_16x", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

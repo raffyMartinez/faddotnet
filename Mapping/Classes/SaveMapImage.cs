@@ -15,12 +15,32 @@ namespace FAD3
     /// </summary>
     public class SaveMapImage : IDisposable
     {
+        private static SaveMapImage _instance;
         private bool _disposed;
         private AxMap _axMap;
         private Shapefile _shapeFileMask;
         private bool _saveToTempFile;
 
         private string _fileName;
+
+        public string FileName
+        {
+            get { return _fileName; }
+            set { _fileName = value; }
+        }
+
+        public double DPI
+        {
+            get { return _dpi; }
+            set { _dpi = value; }
+        }
+
+        public AxMap MapControl
+        {
+            get { return _axMap; }
+            set { _axMap = value; }
+        }
+
         private double _dpi;
         public MapLayersHandler MapLayersHandler { get; set; }
         public bool Reset { get; set; }
@@ -35,6 +55,33 @@ namespace FAD3
         public float SuggestedDPI;
 
         public event EventHandler PointSizeExceed100Error;
+
+        public static SaveMapImage GetInstance()
+        {
+            if (_instance == null) _instance = new SaveMapImage();
+            return _instance;
+        }
+
+        public static SaveMapImage GetInstance(AxMap mapControl, double dpi)
+        {
+            if (_instance == null) _instance = new SaveMapImage(mapControl, dpi);
+            return _instance;
+        }
+
+        public static SaveMapImage GetInstance(AxMap mapControl)
+        {
+            if (_instance == null) _instance = new SaveMapImage(mapControl);
+            return _instance;
+        }
+
+        public static SaveMapImage GetInstance(string filename, double dpi, AxMap mapControl)
+        {
+            if (_instance == null)
+            {
+                _instance = new SaveMapImage(filename, dpi, mapControl);
+            }
+            return _instance;
+        }
 
         public void Dispose()
         {
@@ -57,6 +104,7 @@ namespace FAD3
                     _shapeFileMask.Close();
                     _shapeFileMask = null;
                 }
+                MapLayersHandler = null;
                 _axMap = null;
                 _disposed = true;
             }
@@ -78,6 +126,17 @@ namespace FAD3
         public SaveMapImage(AxMap mapControl)
         {
             _axMap = mapControl;
+        }
+
+        public SaveMapImage(AxMap mapControl, double dpi)
+        {
+            _axMap = mapControl;
+            _dpi = dpi;
+        }
+
+        public SaveMapImage()
+        {
+            _dpi = 300;
         }
 
         /// <summary>
@@ -453,6 +512,11 @@ namespace FAD3
                 Logger.Log(comex.Message, "SaveMapImage.cs", "SaveMapHelper");
                 proceed = false;
             }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message, "SaveMapImage.cs", "SaveMapHelper");
+                proceed = false;
+            }
 
             if (proceed)
             {
@@ -467,12 +531,21 @@ namespace FAD3
                     global.ListTemporaryFile(_fileName);
                     if (img.Save(_fileName))
                     {
+                        img.Close();
                         return true;
                     }
                     else
                     {
                         _fileName = $@"{global.AppPath}\tempMap1.jpg";
-                        return img.Save(_fileName);
+                        if (img.Save(_fileName))
+                        {
+                            img.Close();
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
                     }
                 }
                 else
@@ -486,7 +559,7 @@ namespace FAD3
                     {
                         //show the image file using the default image viewer
                         if (PreviewImage) Process.Start(_fileName);
-                        img = null;
+                        img.Close();
                         return true;
                     }
                     else
@@ -577,7 +650,16 @@ namespace FAD3
 
             _axMap.get_Shapefile(_handleLabels).Labels.AvoidCollisions = false;
 
-            return SaveMapHelper(handleMask);
+            bool success = false;
+            try
+            {
+                success = SaveMapHelper(handleMask);
+            }
+            catch
+            {
+                success = false;
+            }
+            return success;
         }
     }
 }

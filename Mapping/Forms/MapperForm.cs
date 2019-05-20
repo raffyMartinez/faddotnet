@@ -22,8 +22,10 @@ namespace FAD3
         private MapLayer _currentMapLayer;
         public event EventHandler MapperClosed;
         public event EventHandler MapperOpen;
+
         public float SuggestedDPI = 0;
         public fadUTMZone UTMZone { get; private set; }
+        public MapLegend MapLegend { get; internal set; }
 
         public Graticule Graticule
         {
@@ -74,6 +76,9 @@ namespace FAD3
 
                 _mapLayersHandler.Dispose();
                 _mapInterActionHandler.Dispose();
+                MapLegend.Dispose();
+                MapLegend = null;
+                GC.Collect();
             }
         }
 
@@ -129,7 +134,7 @@ namespace FAD3
             _grid25MajorGrid = new Grid25MajorGrid(axMap);
             _grid25MajorGrid.UTMZone = utmZone;
             _grid25MajorGrid.GenerateMajorGrids();
-            _grid25MajorGrid.MapLayers = _mapLayersHandler;
+            _grid25MajorGrid.MaplayersHandler = _mapLayersHandler;
             _grid25MajorGrid.MapInterActionHandler = _mapInterActionHandler;
             axMap.GeoProjection.SetWgs84Projection(_grid25MajorGrid.Grid25Geoprojection);
             axMap.MapUnits = tkUnitsOfMeasure.umMeters;
@@ -182,6 +187,7 @@ namespace FAD3
                 handler(this, EventArgs.Empty);
             }
             global.MappingForm = this;
+            MapLegend = new MapLegend(MapControl, _mapLayersHandler);
         }
 
         public void SetGraticuleTitle(string title)
@@ -322,14 +328,14 @@ namespace FAD3
 
         public void SaveMapImageBatch(double dpi, MapTextGraticuleHelper helper, string fileName)
         {
-            var tempFile = SaveTempMapImage(dpi);
+            var tempFile = SaveTempMapToImage(dpi);
             Bitmap b = new Bitmap(tempFile);
             var h = b.Height * 1.2;
             Rectangle r = new Rectangle(0, 0, b.Width, (int)h);
             Graphics g = Graphics.FromImage(b);
         }
 
-        public string SaveTempMapImage(double dpi = 96)
+        public string SaveTempMapToImage(double dpi = 96)
         {
             string fileName = string.Empty;
             _saveMapImage = new SaveMapImage(axMap);
@@ -343,10 +349,14 @@ namespace FAD3
             return fileName;
         }
 
-        public bool SaveMapImage(double DPI, string fileName, bool Preview = true, bool maintainOnePointLineWidth = false)
+        public bool SaveMapToImage(double dpi, string fileName, bool Preview = true, bool maintainOnePointLineWidth = false)
         {
             var success = false;
-            _saveMapImage = new SaveMapImage(fileName, DPI, axMap);
+            _saveMapImage = new SaveMapImage(fileName, dpi, axMap);
+            //_saveMapImage = SaveMapImage.GetInstance(axMap, dpi);
+            //_saveMapImage = SaveMapImage.GetInstance();
+            //_saveMapImage.MapControl = axMap;
+            //_saveMapImage.FileName = fileName;
             _saveMapImage.PreviewImage = Preview;
             _saveMapImage.MapLayersHandler = _mapLayersHandler;
             _saveMapImage.MaintainOnePointLineWidth = maintainOnePointLineWidth;
@@ -467,17 +477,7 @@ namespace FAD3
                     break;
 
                 case "tsButtonGraticule":
-                    _graticule = new Graticule(axMap, _mapLayersHandler);
-                    var gf = GraticuleForm.GetInstance(this);
-                    if (!gf.Visible)
-                    {
-                        gf.Show(this);
-                    }
-                    else
-                    {
-                        gf.BringToFront();
-                    }
-                    gf.GraticuleRemoved += OnGraticuleRemoved;
+                    ShowGraticuleForm();
                     break;
 
                 case "tsButtonSaveImage":
@@ -507,12 +507,32 @@ namespace FAD3
             }
         }
 
+        public void ShowGraticuleForm()
+        {
+            _graticule = new Graticule(axMap, _mapLayersHandler);
+            var gf = GraticuleForm.GetInstance(this);
+            if (!gf.Visible)
+            {
+                gf.Show(this);
+            }
+            else
+            {
+                gf.BringToFront();
+            }
+            if (MapLegend != null)
+            {
+                MapLegend.Graticule = _graticule;
+            }
+            gf.GraticuleRemoved += OnGraticuleRemoved;
+        }
+
         private void OnGraticuleRemoved(object sender, EventArgs e)
         {
             if (_graticule != null)
             {
                 _graticule.Dispose();
                 _graticule = null;
+                MapLegend.Graticule = null;
             }
         }
     }

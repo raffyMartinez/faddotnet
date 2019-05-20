@@ -604,6 +604,7 @@
             this.tsButtonXY.Name = "tsButtonXY";
             this.tsButtonXY.Size = new System.Drawing.Size(23, 22);
             this.tsButtonXY.Text = "toolStripButton1";
+            this.tsButtonXY.ToolTipText = "Capture pointer x,y";
             // 
             // tsButtonExit
             // 

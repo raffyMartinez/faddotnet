@@ -32,7 +32,67 @@ namespace FAD3
             sf.Categories.ApplyExpression(sf.Categories.CategoryIndex[cat0]);
         }
 
-        public static void CategorizeNumericPointLayer(Shapefile sf, List<double> breaks, int classificationField = 1)
+        public static void CategorizeNumericPointLayer(Shapefile sf, List<double> breaks, int classificationField = 1, double maxValue = 0, double minValue = 0, bool ignoreZero = false)
+        {
+            sf.Categories.ClassificationField = classificationField;
+            for (int b = 0; b < breaks.Count; b++)
+            {
+                var cat = sf.Categories.Add(b.ToString());
+                if (b == 0 && ignoreZero)
+                {
+                    cat.MinValue = minValue;
+                }
+                else
+                {
+                    cat.MinValue = breaks[b];
+                }
+                if ((b + 1) == breaks.Count)
+                {
+                    cat.MaxValue = maxValue;
+                }
+                else
+                {
+                    cat.MaxValue = breaks[b + 1];
+                }
+
+                cat.DrawingOptions.LineColor = new Utils().ColorByName(tkMapColor.White);
+                cat.DrawingOptions.PointSize = PointSizeOfMaxCategory * ((float)(b + 1) / breaks.Count);
+            }
+            var cat0 = sf.Categories.Add("zero");
+            cat0.DrawingOptions.LineColor = new Utils().ColorByName(tkMapColor.White);
+            cat0.DrawingOptions.PointSize = 0;
+            cat0.DrawingOptions.FillVisible = false;
+            cat0.DrawingOptions.LineVisible = false;
+            sf.Categories.ApplyExpressions();
+            for (int n = 0; n < sf.NumShapes; n++)
+            {
+                double v = (int)sf.CellValue[classificationField, n];
+                if (v > 0)
+                {
+                    for (int c = 0; c < breaks.Count; c++)
+                    {
+                        if (c + 1 < breaks.Count)
+                        {
+                            if (v >= breaks[c] && v < breaks[c + 1])
+                            {
+                                sf.ShapeCategory[n] = c;
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            sf.ShapeCategory[n] = breaks.Count - 1;
+                        }
+                    }
+                }
+                else
+                {
+                    sf.ShapeCategory3[n] = cat0;
+                }
+            }
+        }
+
+        public static void CategorizeNumericPointLayer1(Shapefile sf, List<double> breaks, int classificationField = 1)
         {
             for (int b = 0; b < breaks.Count; b++)
             {

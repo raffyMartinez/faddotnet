@@ -20,7 +20,7 @@ namespace FAD3.Database.Forms
             yearsMapped = yearsMapped.Trim(',');
 
             var file = $@"{FishingGearMapping.SaveMapFolder}\{_currentGearItem.Text}-{_currentGearItem.SubItems[1].Text}-{yearsMapped}.tif";
-            global.MappingForm.SaveMapImage(int.Parse(txtDPI.Text), file, false);
+            global.MappingForm.SaveMapToImage(int.Parse(txtDPI.Text), file, false);
         }
 
         public MappingBatchForm(TargetAreaGearsForm parent)

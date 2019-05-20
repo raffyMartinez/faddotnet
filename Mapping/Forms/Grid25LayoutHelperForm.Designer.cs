@@ -60,7 +60,6 @@
             this.btnLocateSourceFolder = new System.Windows.Forms.Button();
             this.lblProvideTitles = new System.Windows.Forms.Label();
             this.buttonSubGrid = new System.Windows.Forms.Button();
-            this.menuDropDown = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.tabSave = new System.Windows.Forms.TabPage();
             this.groupSaveTemplate = new System.Windows.Forms.GroupBox();
             this.btnSaveTemplate = new System.Windows.Forms.Button();
@@ -80,6 +79,7 @@
             this.txtDPI = new System.Windows.Forms.TextBox();
             this.txtFolderExportPath = new System.Windows.Forms.TextBox();
             this.btnFolderExportImage = new System.Windows.Forms.Button();
+            this.menuDropDown = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.chkAutoExpand = new System.Windows.Forms.CheckBox();
             this.tabsLayout.SuspendLayout();
             this.tabLayout.SuspendLayout();
@@ -425,12 +425,6 @@
             this.buttonSubGrid.UseVisualStyleBackColor = true;
             this.buttonSubGrid.Click += new System.EventHandler(this.OnButtonClick);
             // 
-            // menuDropDown
-            // 
-            this.menuDropDown.Name = "menuDropDown";
-            this.menuDropDown.Size = new System.Drawing.Size(61, 4);
-            this.menuDropDown.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnDropDownItemClicked);
-            // 
             // tabSave
             // 
             this.tabSave.Controls.Add(this.groupSaveTemplate);
@@ -635,6 +629,12 @@
             this.btnFolderExportImage.TabIndex = 11;
             this.btnFolderExportImage.UseVisualStyleBackColor = true;
             this.btnFolderExportImage.Click += new System.EventHandler(this.OnButtonClick);
+            // 
+            // menuDropDown
+            // 
+            this.menuDropDown.Name = "menuDropDown";
+            this.menuDropDown.Size = new System.Drawing.Size(61, 4);
+            this.menuDropDown.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnDropDownItemClicked);
             // 
             // chkAutoExpand
             // 

@@ -113,7 +113,7 @@ namespace FAD3.Mapping.Classes
 
                 if (_hsfLayout > 0)
                 {
-                    _majorGrid.MapLayers.RemoveLayer(_hsfLayout);
+                    _majorGrid.MaplayersHandler.RemoveLayer(_hsfLayout);
                 }
                 _hsfLayout = -1;
             }
@@ -326,7 +326,7 @@ namespace FAD3.Mapping.Classes
             _sfLayout = new Shapefile();
             if (_sfLayout.Open(fileName.Replace("lay", "shp")))
             {
-                _hsfLayout = _majorGrid.MapLayers.AddLayer(_sfLayout, "Layout frame", true, true);
+                _hsfLayout = _majorGrid.MaplayersHandler.AddLayer(_sfLayout, "Layout frame", true, true);
                 if (_hsfLayout > 0)
                 {
                     MaxPanelHeight = 0;
@@ -349,7 +349,7 @@ namespace FAD3.Mapping.Classes
                     _sfLayout.DefaultDrawingOptions.FillVisible = false;
                     _sfLayout.DefaultDrawingOptions.LineWidth = 2;
                     _sfLayout.DefaultDrawingOptions.LineColor = new Utils().ColorByName(tkMapColor.DarkBlue);
-                    _majorGrid.MapLayers[_hsfLayout].IsFishingGridLayoutTemplate = true;
+                    _majorGrid.MaplayersHandler[_hsfLayout].IsFishingGridLayoutTemplate = true;
                     _axMap.Redraw();
                     success = true;
                     LayoutTemplateFromFile = true;
@@ -458,7 +458,7 @@ namespace FAD3.Mapping.Classes
                 //if shapefile already exists (handle >0) then we close the file
                 if (_hsfLayout > 0)
                 {
-                    _majorGrid.MapLayers.RemoveLayer(_hsfLayout);
+                    _majorGrid.MaplayersHandler.RemoveLayer(_hsfLayout);
                     _sfLayout.Close();
                 }
 
@@ -552,11 +552,11 @@ namespace FAD3.Mapping.Classes
                         }
                     }
                 }
-                _hsfLayout = _majorGrid.MapLayers.AddLayer(_sfLayout, "Layout frame", true, true);
+                _hsfLayout = _majorGrid.MaplayersHandler.AddLayer(_sfLayout, "Layout frame", true, true);
                 if (_hsfLayout > 0 && _sfLayout.NumShapes > 0)
                 {
-                    _majorGrid.MapLayers[_hsfLayout].IsFishingGridLayoutTemplate = true;
-                    _majorGrid.MapLayers.ClearAllSelections();
+                    _majorGrid.MaplayersHandler[_hsfLayout].IsFishingGridLayoutTemplate = true;
+                    _majorGrid.MaplayersHandler.ClearAllSelections();
                     _axMap.Redraw();
                     return true;
                 }

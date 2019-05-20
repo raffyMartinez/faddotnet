@@ -46,8 +46,13 @@ namespace FAD3
         public bool PrintLabelsReverse { get; set; }
         public bool IsGrid25Layer { get; set; }
         private bool _isPointDatabaseLayer;
+        public bool IgnoreZeroWhenClassifying { get; set; }
         public Type ClassifiedValueDataType { get; set; }
+        public List<string> ClassificationItemCaptions { get; set; }
         private ClassificationType _classificationType;
+        public bool IncludeInLegend { get; set; }
+        private MapLayersHandler _parent;
+        public Size SymbolSize { get; set; }
 
         public Dictionary<string, ClassifiedItem> ClassificationItems = new Dictionary<string, ClassifiedItem>();
 
@@ -96,30 +101,43 @@ namespace FAD3
                     case ClassificationType.EqualSumOfValues:
                         break;
 
+                    case ClassificationType.NaturalBreaks:
                     case ClassificationType.JenksFisher:
 
                         for (int n = 0; n < sf.Categories.Count; n++)
                         {
-                            string range = $"{sf.Categories.Item[n].MinValue}-{sf.Categories.Item[n].MaxValue}";
-                            ClassifiedItem cl = new ClassifiedItem(range);
-                            ClassificationItems.Add(n + 1.ToString(), cl);
-                        }
-                        break;
-
-                    case ClassificationType.NaturalBreaks:
-
-                        for (int n = 0; n < sf.Categories.Count; n++)
-                        {
+                            double? min = null;
+                            double? max = null;
                             string range = "";
                             if (sf.Categories.Item[n].MinValue != null)
                             {
-                                range = $"{sf.Categories.Item[n].MinValue}-{(double)sf.Categories.Item[n].MaxValue - 1}";
+                                min = (double)sf.Categories.Item[n]?.MinValue;
+                                if (n == 0 && min == 0 && IgnoreZeroWhenClassifying)
+                                {
+                                    min = 1;
+                                }
+                                max = (double)sf.Categories.Item[n]?.MaxValue;
+                            }
+
+                            if (min != null)
+                            {
+                                range = $"{min}-{max - 1}";
                             }
                             else
                             {
-                                range = $"{sf.Categories.Item[n - 1].MinValue}-{(double)sf.Categories.Item[n - 1].MaxValue}";
+                                min = (double)sf.Categories.Item[n - 1]?.MinValue;
+                                max = (double)sf.Categories.Item[n - 1]?.MaxValue;
+                                if (min == max)
+                                {
+                                    range = min.ToString();
+                                }
+                                else
+                                {
+                                    range = $"{min}-{max}";
+                                }
                                 ClassificationItems[(n).ToString()].Caption = range;
                                 range = "";
+                                break;
                             }
 
                             if (range.Length > 0)
@@ -137,6 +155,7 @@ namespace FAD3
                     case ClassificationType.UniqueValues:
                         break;
                 }
+                _parent.LayerFinishedClassification();
             }
         }
 
@@ -189,13 +208,14 @@ namespace FAD3
             }
         }
 
-        public MapLayer(int handle, string name, bool visible, bool visibleInLayersUI)
+        public MapLayer(int handle, string name, bool visible, bool visibleInLayersUI, MapLayersHandler parent)
         {
             Handle = handle;
             Name = name;
             Visible = visible;
             VisibleInLayersUI = visibleInLayersUI;
             IsFishingGrid = false;
+            _parent = parent;
             ClassificationType = ClassificationType.None;
         }
 

@@ -60,6 +60,7 @@ namespace FAD3
             this.generateGridMapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemZone50 = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemZone51 = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemLayoutTemplateOpen = new System.Windows.Forms.ToolStripMenuItem();
             this.spatioTemporalMapMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.downloadSpatiotemporalDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemBrowseLGUs = new System.Windows.Forms.ToolStripMenuItem();
@@ -83,7 +84,6 @@ namespace FAD3
             this.buttonCatch = new System.Windows.Forms.Button();
             this.buttonOK = new System.Windows.Forms.Button();
             this.lvMain = new System.Windows.Forms.ListView();
-            this.menuItemLayoutTemplateOpen = new System.Windows.Forms.ToolStripMenuItem();
             this.toolbar = new ToolStripExtensions.ToolStripEx();
             this.tsButtonAbout = new System.Windows.Forms.ToolStripButton();
             this.tsButtonGear = new System.Windows.Forms.ToolStripButton();
@@ -161,6 +161,7 @@ namespace FAD3
             this.menuMenuBar.TabIndex = 1;
             this.menuMenuBar.Text = "menuStrip1";
             this.menuMenuBar.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnmenuMenuBar_ItemClicked);
+            this.menuMenuBar.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnToolbarMouseDown);
             // 
             // menuFile
             // 
@@ -311,6 +312,13 @@ namespace FAD3
             this.menuItemZone51.Size = new System.Drawing.Size(189, 22);
             this.menuItemZone51.Tag = "zone51";
             this.menuItemZone51.Text = "UTM zone 51";
+            // 
+            // menuItemLayoutTemplateOpen
+            // 
+            this.menuItemLayoutTemplateOpen.Name = "menuItemLayoutTemplateOpen";
+            this.menuItemLayoutTemplateOpen.Size = new System.Drawing.Size(189, 22);
+            this.menuItemLayoutTemplateOpen.Tag = "layoutTemplate";
+            this.menuItemLayoutTemplateOpen.Text = "Open layout template";
             // 
             // spatioTemporalMapMenuItem
             // 
@@ -572,13 +580,6 @@ namespace FAD3
             this.lvMain.Leave += new System.EventHandler(this.OnListViewLeave);
             this.lvMain.MouseClick += new System.Windows.Forms.MouseEventHandler(this.OnListView_MouseClick);
             this.lvMain.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnListView_MouseDown);
-            // 
-            // menuItemLayoutTemplateOpen
-            // 
-            this.menuItemLayoutTemplateOpen.Name = "menuItemLayoutTemplateOpen";
-            this.menuItemLayoutTemplateOpen.Size = new System.Drawing.Size(189, 22);
-            this.menuItemLayoutTemplateOpen.Tag = "layoutTemplate";
-            this.menuItemLayoutTemplateOpen.Text = "Open layout template";
             // 
             // toolbar
             // 

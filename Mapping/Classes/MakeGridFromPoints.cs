@@ -1083,6 +1083,7 @@ namespace FAD3.Mapping.Classes
                                         }
                                     }
                                 }
+                                _meshShapeFile.Categories.ClassificationField = _ifldDateColumn;
                             }
                             else
                             {

@@ -390,9 +390,11 @@ namespace FAD3.Mapping.Forms
             {
                 smi.Dispose();
                 smi = null;
+                GC.Collect();
             }
 
             return rv;
+            //return global.MappingForm.SaveMapToImage(_exportDPI, fileName, Preview: false, maintainOnePointLineWidth: true);
         }
 
         private bool BatchExportMain(GridMapSideToPrint sideToPrint)
@@ -437,7 +439,7 @@ namespace FAD3.Mapping.Forms
                     fileName = $@"{_exportImageFolderSavePath}\{_layoutPanelTitle}_reverse_grid.tif";
                     break;
             }
-
+            // return global.MappingForm.SaveMapToImage(_exportDPI, fileName, Preview: false, maintainOnePointLineWidth: true);
             smi.MaintainOnePointLineWidth = true;
             smi.MapLayersHandler = global.MappingForm.MapLayersHandler;
             smi.PreviewImage = false;
@@ -447,6 +449,7 @@ namespace FAD3.Mapping.Forms
             {
                 smi.Dispose();
                 smi = null;
+                GC.Collect();
             }
             return rv;
         }
@@ -587,7 +590,7 @@ namespace FAD3.Mapping.Forms
                     break;
 
                 case "btnInputTitles":
-                    _majorGrid.MapLayers.set_MapLayer(LayoutHelper.LayerHandle);
+                    _majorGrid.MaplayersHandler.set_MapLayer(LayoutHelper.LayerHandle);
                     EditShapeAttributeForm esaf = EditShapeAttributeForm.GetInstance(global.MappingForm, _majorGrid.MapInterActionHandler);
                     if (esaf.Visible)
                     {

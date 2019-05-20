@@ -38,6 +38,8 @@ namespace FAD3
 
         public event EventHandler LayerRefreshNeeded;
 
+        public event EventHandler LayerClassificationFinished;
+
         public delegate void LayerReadHandler(MapLayersHandler s, LayerEventArg e);                 //an event that is raised when a layer from the mapcontrol is retrieved
         public event LayerReadHandler LayerRead;                                                    //in order for the listener is able to add the layer to the layers list
 
@@ -69,14 +71,14 @@ namespace FAD3
             }
         }
 
-        public void Refresh()
-        {
-            _mapLayerDictionary.Clear();
-            for (int n = 0; n < _axmap.NumLayers; n++)
-            {
-                //MapLayer ml = new MapLayer()
-            }
-        }
+        //public void Refresh()
+        //{
+        //    _mapLayerDictionary.Clear();
+        //    for (int n = 0; n < _axmap.NumLayers; n++)
+        //    {
+        //        MapLayer ml = new MapLayer()
+        //    }
+        //}
 
         public void MoveToTop()
         {
@@ -331,6 +333,11 @@ namespace FAD3
         public void RefreshLayers()
         {
             LayerRefreshNeeded?.Invoke(this, EventArgs.Empty);
+        }
+
+        public void LayerFinishedClassification()
+        {
+            LayerClassificationFinished?.Invoke(this, EventArgs.Empty);
         }
 
         public void RefreshMap()
@@ -679,7 +686,7 @@ namespace FAD3
                                 bool ShowInLayerUI, GeoProjection gp,
                                 string layerType = "ShapefileClass", string fileName = "")
         {
-            var mapLayer = new MapLayer(layerHandle, layerName, Visible, ShowInLayerUI);
+            var mapLayer = new MapLayer(layerHandle, layerName, Visible, ShowInLayerUI, this);
             mapLayer.LayerType = layerType;
             mapLayer.FileName = _axmap.get_LayerFilename(layerHandle);
             if (mapLayer.FileName.Length == 0)

@@ -178,7 +178,7 @@ namespace FAD3
                 picPreview.Image.Dispose();
             }
 
-            var tempFileName = global.MappingForm.SaveTempMapImage();
+            var tempFileName = global.MappingForm.SaveTempMapToImage();
             if (tempFileName?.Length > 0)
             {
                 picPreview.ImageLocation = tempFileName;

@@ -137,7 +137,7 @@ namespace FAD3
                                 && txtSave.Text.Length > 0
                                 && int.Parse(txtSave.Text) <= (int)global.MappingForm.SuggestedDPI)
                             {
-                                if (global.MappingForm.SaveMapImage(int.Parse(txtSave.Text), _fileName, maintainOnePointLineWidth: true))
+                                if (global.MappingForm.SaveMapToImage(int.Parse(txtSave.Text), _fileName, maintainOnePointLineWidth: true))
                                 {
                                     Close();
                                 }
@@ -154,7 +154,7 @@ namespace FAD3
                                 if (result == DialogResult.OK && sfd.FileName.Length > 0)
                                 {
                                     _fileName = sfd.FileName;
-                                    if (global.MappingForm.SaveMapImage(int.Parse(txtSave.Text), _fileName, maintainOnePointLineWidth: true))
+                                    if (global.MappingForm.SaveMapToImage(int.Parse(txtSave.Text), _fileName, maintainOnePointLineWidth: true))
                                     {
                                         Close();
                                     }

@@ -66,6 +66,7 @@ namespace FAD3.Database.Classes
                             tblGearVariations.Variation,
                             tblSampling.RefNo AS [Reference number],
                             tblSampling.SamplingDate AS [Date sampled],
+                            temp_AllNames.Identification,
                             temp_AllNames.Name1, temp_AllNames.Name2,
                             tblSampling.WtCatch AS [Weight of catch],
                             tblSampling.WtSample AS [Weight of sample],
@@ -99,7 +100,8 @@ namespace FAD3.Database.Classes
                             tblLandingSites.LSName,
                             tblGearClass.GearClassName,
                             tblGearVariations.Variation,
-                            tblSampling.RefNo";
+                            tblSampling.RefNo,
+                            temp_AllNames.Identification";
         }
 
         private static string SetEffortSQL()

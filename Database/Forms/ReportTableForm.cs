@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Windows.Forms;
+using System.Text;
 
 namespace FAD3.Database.Forms
 {
@@ -210,6 +211,58 @@ namespace FAD3.Database.Forms
         {
             _instance = null;
             global.SaveFormSettings(this);
+        }
+
+        private void CopyText()
+        {
+            StringBuilder copyText = new StringBuilder();
+            string col = "";
+            foreach (ColumnHeader c in lvTable.Columns)
+            {
+                col += $"{c.Text}\t";
+            }
+            copyText.Append($"{col.TrimEnd()}\r\n");
+            foreach (ListViewItem item in lvTable.Items)
+            {
+                copyText.Append(item.Text);
+                for (int n = 1; n < item.SubItems.Count; n++)
+                {
+                    copyText.Append($"\t{item.SubItems[n]?.Text}");
+                }
+                copyText.Append("\r\n");
+            }
+            Clipboard.SetText(copyText.ToString());
+        }
+
+        private void OnMenuItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+            switch (e.ClickedItem.Name)
+            {
+                case "menuitemCopyText":
+                    CopyText();
+                    break;
+
+                case "menuItemClose":
+                    Close();
+                    break;
+            }
+        }
+
+        private void OnToolbarItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+            switch (e.ClickedItem.Name)
+            {
+                case "btnExportToExcel":
+                    break;
+
+                case "btnCopyText":
+                    CopyText();
+                    break;
+
+                case "btnClose":
+                    Close();
+                    break;
+            }
         }
     }
 }

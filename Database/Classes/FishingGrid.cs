@@ -598,9 +598,10 @@ namespace FAD3
             {
                 case fadUTMZone.utmZone50N:
                     _grid25.MajorGridXOrigin = 300000;
-                    _grid25.MajorGridYOrigin = 800000;
+                    //_grid25.MajorGridYOrigin = 800000;
+                    _grid25.MajorGridYOrigin = 400000;
                     _grid25.MajorGridColumns = 15;
-                    _grid25.MaxGridNumber = 270;
+                    _grid25.MaxGridNumber = 315;
                     break;
 
                 case fadUTMZone.utmZone51N:

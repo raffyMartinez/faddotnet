@@ -544,7 +544,7 @@ namespace FAD3
 
                     tsi = menuDropDown.Items.Add("Map fishing effort");
                     tsi.Name = "menuMapEffort";
-                    tsi.Enabled = global.MapIsOpen;
+                    tsi.Enabled = _treeLevel != "root" && global.MapIsOpen;
 
                     sep = menuDropDown.Items.Add("-");
                     sep.Name = "menuSeparator3";
@@ -1782,11 +1782,12 @@ namespace FAD3
 
         public void SetMapDependendMenus()
         {
+            bool mapIsOpen = global.MapIsOpen;
             spatioTemporalMapMenuItem.Enabled = global.MapIsOpen;
-            downloadSpatiotemporalDataToolStripMenuItem.Enabled = global.MapIsOpen;
-            menuItemZone50.Enabled = !global.MapIsOpen;
-            menuItemZone51.Enabled = !global.MapIsOpen;
-            menuItemLayoutTemplateOpen.Enabled = global.MapIsOpen;
+            downloadSpatiotemporalDataToolStripMenuItem.Enabled = mapIsOpen;
+            menuItemZone50.Enabled = !mapIsOpen;
+            menuItemZone51.Enabled = !mapIsOpen;
+            menuItemLayoutTemplateOpen.Enabled = mapIsOpen;
 
             if (!global.MapIsOpen)
             {
@@ -3478,6 +3479,10 @@ namespace FAD3
                     menuItemLayoutTemplateOpen.Enabled = global.MapIsOpen;
                     break;
             }
+        }
+
+        private void OnToolbarMouseDown(object sender, MouseEventArgs e)
+        {
         }
     }
 }

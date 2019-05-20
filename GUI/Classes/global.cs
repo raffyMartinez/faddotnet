@@ -91,7 +91,7 @@ namespace FAD3
         {
             maxLength -= 3; //account for delimiter spacing
 
-            if (rawString.Length <= maxLength)
+            if (rawString.Length <= maxLength || !rawString.Contains(delimiter))
             {
                 return rawString;
             }

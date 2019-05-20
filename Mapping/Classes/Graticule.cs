@@ -50,9 +50,16 @@ namespace FAD3
         public int GridlinesWidth { get; set; }
         public bool BoldLabels { get; set; }
         public bool GridVisible { get; set; }
+        public double TopLeft { get; internal set; }
+        public double TopRight { get; internal set; }
+        public double BottomLeft { get; internal set; }
+        public double BottomRight { get; internal set; }
+        public uint BorderColor { get; set; }
 
         public event EventHandler GraticuleExtentChanged;
         public event EventHandler MapRedrawNeeded;
+        public static EventHandler GraticuleLoaded;
+        public static EventHandler GraticuleUnloaded;
 
         public Extents GraticuleExtents
         {
@@ -106,6 +113,7 @@ namespace FAD3
 
         public void Dispose()
         {
+            GraticuleUnloaded?.Invoke(this, EventArgs.Empty);
             Dispose(true);
             GC.SuppressFinalize(this);
         }
@@ -152,6 +160,7 @@ namespace FAD3
                 _ifldLabel = _sfGraticule.EditAddField("Label", FieldType.STRING_FIELD, 1, 25);
                 _ifldSide = _sfGraticule.EditAddField("Side", FieldType.STRING_FIELD, 1, 1);
                 _sfGraticule.GeoProjection = _geoProjection;
+                GraticuleLoaded?.Invoke(this, EventArgs.Empty);
             }
         }
 
@@ -202,6 +211,7 @@ namespace FAD3
             _mapLayersHandler.OnLayerVisibilityChanged += OnLayerVisibleChange;
             _mapLayersHandler.MapRedrawNeeded += OnRedrawNeeded;
             GraticuleTextHelper = new MapTextGraticuleHelper(_geoProjection, this);
+            BorderColor = new Utils().ColorByName(tkMapColor.Black);
             switch (global.CoordinateDisplay)
             {
                 case CoordinateDisplayFormat.DegreeDecimal:
@@ -285,8 +295,10 @@ namespace FAD3
             ComputeGraticule(_axMap.Extents.xMax, _axMap.Extents.yMax, _axMap.Extents.xMin, _axMap.Extents.yMin);
             _sfGraticule.Labels.VerticalPosition = tkVerticalPosition.vpAboveAllLayers;
             var maskHandle = _mapLayersHandler.AddLayer(Mask(), "Mask", true, false);
-            _mapLayersHandler.get_MapLayer(maskHandle).IsMaskLayer = true;
-            _mapLayersHandler.AddLayer(_sfGraticule, Name, true, true);
+            _mapLayersHandler[maskHandle].IsMaskLayer = true;
+            var graticuleHandle = _mapLayersHandler.AddLayer(_sfGraticule, Name, true, true);
+            _mapLayersHandler[graticuleHandle].IsGraticule = true;
+            _mapLayersHandler.RefreshLayers();
         }
 
         /// <summary>
@@ -567,7 +579,7 @@ namespace FAD3
                             case @"[Part] = ""Border""":
                             case @"[Part] = ""tic""":
                                 category.DrawingOptions.LineWidth = BorderWidth;
-                                category.DrawingOptions.VerticesColor = new Utils().ColorByName(tkMapColor.Black);
+                                category.DrawingOptions.LineColor = BorderColor;
                                 break;
 
                             default:

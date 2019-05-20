@@ -175,14 +175,21 @@ namespace FAD3
             //we only respond to double-click on the name column
             if (e.ColumnIndex == 1)
             {
-                var lpf = LayerPropertyForm.GetInstance(this, (int)layerGrid[0, _rowIndexFromMouseDown].Tag);
-                if (!lpf.Visible)
+                int layerHandle = (int)layerGrid[0, _rowIndexFromMouseDown].Tag;
+                if (MapLayers[layerHandle].IsGraticule)
                 {
-                    lpf.Show(this);
                 }
                 else
                 {
-                    lpf.BringToFront();
+                    var lpf = LayerPropertyForm.GetInstance(this, layerHandle);
+                    if (!lpf.Visible)
+                    {
+                        lpf.Show(this);
+                    }
+                    else
+                    {
+                        lpf.BringToFront();
+                    }
                 }
             }
         }
@@ -201,9 +208,9 @@ namespace FAD3
         /// <summary>
         /// handles the event when a new visible layer is added into the map
         /// </summary>
-        /// <param name="layer"></param>
+        /// <param name="mapLayersHandler"></param>
         /// <param name="e"></param>
-        private void OnLayerRead(MapLayersHandler layer, LayerEventArg e)
+        private void OnLayerRead(MapLayersHandler mapLayersHandler, LayerEventArg e)
         {
             if (e.ShowInLayerUI)
             {
@@ -216,14 +223,17 @@ namespace FAD3
                 };
                 _mapLayersHandler.LayerSymbol(e.LayerHandle, pic, e.LayerType);
 
-                //we always insert a new layer in the first row of the dataGrid
-                layerGrid.Rows.Insert(0, new object[] { e.LayerVisible, e.LayerName, pic.Image });
+                if (!_mapLayersHandler[e.LayerHandle].IsMaskLayer)
+                {
+                    //we always insert a new layer in the first row of the dataGrid
+                    layerGrid.Rows.Insert(0, new object[] { e.LayerVisible, e.LayerName, pic.Image });
 
-                //we assign the layerhandle to the tag of cell 0,0
-                layerGrid[0, 0].Tag = e.LayerHandle;
+                    //we assign the layerhandle to the tag of cell 0,0
+                    layerGrid[0, 0].Tag = e.LayerHandle;
 
-                //symbolize the current layer by making it bold font
-                MarkCurrentLayerName(CurrentLayerRow());
+                    //symbolize the current layer by making it bold font
+                    MarkCurrentLayerName(CurrentLayerRow());
+                }
             }
         }
 
@@ -456,7 +466,7 @@ namespace FAD3
             switch (e.ClickedItem.Name)
             {
                 case "buttonLegend":
-                    MapLegendForm mlf = MapLegendForm.GetInstance();
+                    MapLegendForm mlf = MapLegendForm.GetInstance(MapLayers);
                     if (mlf.Visible)
                     {
                         mlf.BringToFront();
@@ -466,8 +476,7 @@ namespace FAD3
                         mlf.Show(global.MappingForm);
                     }
 
-                    mlf.MapLayersHandler = global.MappingForm.MapLayersHandler;
-                    mlf.DrawLayers();
+                    mlf.DrawLegendLayers();
                     break;
 
                 case "buttonAddLayer":

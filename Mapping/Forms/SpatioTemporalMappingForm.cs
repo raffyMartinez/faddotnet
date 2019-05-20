@@ -1012,6 +1012,7 @@ namespace FAD3.Mapping.Forms
                             break;
                     }
                     MakeGridFromPoints.MapLayersHandler[MakeGridFromPoints.MeshShapefileHandle].ClassificationType = classificationType;
+
                     graphSheet.Series.Clear();
                     graphSheet.ChartAreas[0].AxisY.Minimum = 0;
                     graphSheet.ChartAreas[0].AxisY.Maximum = 100;

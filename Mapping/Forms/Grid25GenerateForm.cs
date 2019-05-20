@@ -233,7 +233,7 @@ namespace FAD3
 
                     _grid25MajorGrid.ClearSelectedGrids();
                     _parentForm.SetCursor(MapWinGIS.tkCursorMode.cmSelection);
-                    _grid25MajorGrid.MapLayers.set_MapLayer(_grid25MajorGrid.Grid25ShapefileHandle, refreshLayerList: true);
+                    _grid25MajorGrid.MaplayersHandler.set_MapLayer(_grid25MajorGrid.Grid25ShapefileHandle, refreshLayerList: true);
 
                     _hasSubGrid = false;
                     break;
@@ -361,7 +361,7 @@ namespace FAD3
                         }
                     }
 
-                    _grid25MajorGrid.MapLayers.RefreshLayers();
+                    _grid25MajorGrid.MaplayersHandler.RefreshLayers();
                 }
             }
             else
@@ -495,7 +495,7 @@ namespace FAD3
                 //Saves fishing grids either as shapefile or image file
                 case "tsButtonSaveImage":
                 case "tsButtonSaveShapefile":
-                    if (txtMapTitle.Text.Length > 0)
+                    if (txtMapTitle.Text.Length > 0 && _grid25MajorGrid.HasGrid)
                     {
                         RedoGridLabel();
                         using (var saveForm = new SaveMapForm(this))
@@ -510,7 +510,7 @@ namespace FAD3
                     }
                     else
                     {
-                        MessageBox.Show("Please provide map title", "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBox.Show("Please provide map title and fishing grid", "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     break;
 

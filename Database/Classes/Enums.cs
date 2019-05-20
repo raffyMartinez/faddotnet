@@ -12,6 +12,12 @@
         EqualSumOfValues
     }
 
+    public enum MapLegendPosition
+    {
+        PositionFromCorner,
+        PositionFromDefinedExtent
+    }
+
     public enum ExportImportAction
     {
         ActionExport,

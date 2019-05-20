@@ -359,6 +359,8 @@
     <Compile Include="Mapping\Classes\Grid25MinorGrid.cs" />
     <Compile Include="Mapping\Classes\InventoryMapping.cs" />
     <Compile Include="Mapping\Classes\GearInventoryMappingItem.cs" />
+    <Compile Include="Mapping\Classes\LegendFrame.cs" />
+    <Compile Include="Mapping\Classes\LegendLabel.cs" />
     <Compile Include="Mapping\Classes\LocationCoordinate.cs" />
     <Compile Include="Mapping\Classes\MapEditor.cs" />
     <Compile Include="Mapping\Classes\MapLegend.cs" />
@@ -1255,6 +1257,8 @@
     <None Include="Resources\add_l.bmp" />
     <Content Include="Resources\BigProp.bmp" />
     <None Include="Resources\Cancel_16x.bmp" />
+    <None Include="Resources\checkLegend2.bmp" />
+    <None Include="Resources\choosePosition.bmp" />
     <Content Include="Resources\clear_selection.bmp" />
     <None Include="Resources\document-save.bmp" />
     <None Include="Resources\fit.bmp" />
@@ -1285,6 +1289,7 @@
     <None Include="Resources\ImportFile_16x.png" />
     <None Include="Resources\fish list.bmp" />
     <None Include="Resources\ExportToExcel_16x.png" />
+    <None Include="Resources\CopyLongTextToClipboard_16x.png" />
     <Content Include="Resources\internet-web-browser.png" />
     <None Include="Resources\system-file-manager.png" />
     <None Include="Resources\layerAdd.bmp" />

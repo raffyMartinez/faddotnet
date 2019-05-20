@@ -517,4 +517,13 @@
   <data name="legend" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\legend.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="checkLegend2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\checkLegend2.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="choosePosition" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\choosePosition.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="CopyLongTextToClipboard_16x" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CopyLongTextToClipboard_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

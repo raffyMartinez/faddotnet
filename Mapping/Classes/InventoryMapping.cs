@@ -19,7 +19,8 @@ namespace FAD3.Mapping.Classes
         public bool ComparisonAmongLGUs { get; set; }
         public static List<double> GearDataFisherJenksBreaks;
         public static List<double> FisherVesselDataFisherJenksBreaks;
-        public double BreakSourceMaximum { get; set; }
+        public static double BreakSourceMaximum { get; set; }
+        public static double BreakSourceMinimum { get; set; }
         private List<FisherVesselInventoryItem> _fisherVesselDistributionList;
         private static string _labelXML;
         private static Labels _labels;
@@ -110,6 +111,7 @@ namespace FAD3.Mapping.Classes
                 }
             }
             BreakSourceMaximum = source.Max();
+            BreakSourceMinimum = source.Min();
             return JenksFisher.CreateJenksFisherBreaksArray(source, numBreaks);
         }
 
@@ -146,6 +148,7 @@ namespace FAD3.Mapping.Classes
                         DataRow dr = dt.Rows[i];
                         source.Add((double)dr["TotalCount"]);
                     }
+                    BreakSourceMinimum = (double)dt.Rows[dt.Rows.Count - 1]["TotalCount"];
                 }
                 catch (Exception ex)
                 {
@@ -209,7 +212,7 @@ namespace FAD3.Mapping.Classes
 
                     case "commercial":
                         fld = ifldCommercial;
-                        itemName = "Total number of municipal motorized vessels";
+                        itemName = "Total number of commercial fishing vessels";
                         break;
 
                     case "municipalMotorized":
@@ -222,24 +225,20 @@ namespace FAD3.Mapping.Classes
                         itemName = "Total number of municipal non-motorized vessels";
                         break;
                 }
-                //ShapefileLayerHelper.CategorizeNumericPointLayer(sf, fld);
 
                 Database.Classes.ClassificationType classificationType = Database.Classes.ClassificationType.NaturalBreaks;
-                if (itemToMap == "fishers")
-                {
-                    ShapefileLayerHelper.CategorizeNumericPointLayer(sf, fld);
-                }
-                else if (ComparisonAmongLGUs)
+                if (itemToMap == "fishers" || ComparisonAmongLGUs)
                 {
                     ShapefileLayerHelper.CategorizeNumericPointLayer(sf, fld);
                 }
                 else
                 {
-                    ShapefileLayerHelper.CategorizeNumericPointLayer(sf, FisherVesselDataFisherJenksBreaks, fld);
+                    ShapefileLayerHelper.CategorizeNumericPointLayer(sf, FisherVesselDataFisherJenksBreaks, fld, BreakSourceMaximum);
                     classificationType = Database.Classes.ClassificationType.JenksFisher;
                 }
 
                 InventoryLayerHandle = _layersHandler.AddLayer(sf, itemName);
+                _layersHandler[InventoryLayerHandle].IgnoreZeroWhenClassifying = true;
                 _layersHandler[InventoryLayerHandle].ClassificationType = classificationType;
 
                 if (Labels != null)
@@ -306,7 +305,7 @@ namespace FAD3.Mapping.Classes
                 }
                 else
                 {
-                    ShapefileLayerHelper.CategorizeNumericPointLayer(sf, GearDataFisherJenksBreaks, ifldCount);
+                    ShapefileLayerHelper.CategorizeNumericPointLayer(sf, GearDataFisherJenksBreaks, ifldCount, BreakSourceMaximum);
                     classificationType = Database.Classes.ClassificationType.JenksFisher;
                 }
                 InventoryLayerHandle = _layersHandler.AddLayer(sf, gearName);
