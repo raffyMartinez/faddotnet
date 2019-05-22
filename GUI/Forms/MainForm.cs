@@ -61,14 +61,14 @@ namespace FAD3
         private string _vesLength = "";
         private string _vesWidth = "";
         private Taxa _taxa = Taxa.To_be_determined;
-        private string _referenceNumber = "";
+
         private bool _appIsLocked;
 
         private ListView lvCatch;
         private ListView lvLF_GMS;
 
         //for column sort
-        private int _sortColumn = -1;
+        //private int _sortColumn = -1;
         private TreeNode _nodeParent;
         public event EventHandler SamplingDetailClosed;
         private CatchLocalNamesForm _catchLocalNamesForm;
@@ -77,6 +77,7 @@ namespace FAD3
         private bool _readEfforMonth;
         private bool _enableUIEvent;
         private Grid25GenerateForm _grid25GenerateForm;
+        private string _referenceNumber = "";
 
         public MainForm()
         {

@@ -60,6 +60,7 @@ namespace FAD3
         public event EventHandler MapRedrawNeeded;
         public static EventHandler GraticuleLoaded;
         public static EventHandler GraticuleUnloaded;
+        //public EventHandler GraticuleBeforeLoading;
 
         public Extents GraticuleExtents
         {
@@ -289,6 +290,7 @@ namespace FAD3
         /// </summary>
         public void ShowGraticule()
         {
+            //GraticuleBeforeLoading?.Invoke(this, EventArgs.Empty);
             _mapLayersHandler.RemoveLayer(Name);
             _mapLayersHandler.RemoveLayer("Mask");
             SetupShapefile();
@@ -296,6 +298,7 @@ namespace FAD3
             _sfGraticule.Labels.VerticalPosition = tkVerticalPosition.vpAboveAllLayers;
             var maskHandle = _mapLayersHandler.AddLayer(Mask(), "Mask", true, false);
             _mapLayersHandler[maskHandle].IsMaskLayer = true;
+            _mapLayersHandler[maskHandle].IsGraticule = true;
             var graticuleHandle = _mapLayersHandler.AddLayer(_sfGraticule, Name, true, true);
             _mapLayersHandler[graticuleHandle].IsGraticule = true;
             _mapLayersHandler.RefreshLayers();

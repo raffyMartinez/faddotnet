@@ -1784,17 +1784,7 @@ namespace FAD3.Database.Forms
                     break;
 
                 case "itemCopyText":
-                    StringBuilder copyText = new StringBuilder();
-                    foreach (ListViewItem item in lvInventory.Items)
-                    {
-                        copyText.Append(item.Text);
-                        for (int n = 1; n < item.SubItems.Count; n++)
-                        {
-                            copyText.Append($"\t{item.SubItems[n]?.Text}");
-                        }
-                        copyText.Append("\r\n");
-                    }
-                    Clipboard.SetText(copyText.ToString());
+                    CopyText();
                     proceed = false;
                     break;
 
@@ -1856,6 +1846,21 @@ namespace FAD3.Database.Forms
             {
                 inventoryEditForm.ShowDialog(this);
             }
+        }
+
+        private void CopyText()
+        {
+            StringBuilder copyText = new StringBuilder();
+            foreach (ListViewItem item in lvInventory.Items)
+            {
+                copyText.Append(item.Text);
+                for (int n = 1; n < item.SubItems.Count; n++)
+                {
+                    copyText.Append($"\t{item.SubItems[n]?.Text}");
+                }
+                copyText.Append("\r\n");
+            }
+            Clipboard.SetText(copyText.ToString());
         }
 
         private void OnCoordinateFormClosed(object sender, EventArgs e)

@@ -20,6 +20,7 @@ namespace FAD3.Mapping.Forms
         private MapLayer _currentMapLayer;
         private static EditShapeAttributeForm _instance;
         private int _sfSelectedCount = 0;
+        private bool _graticuleLoading;
 
         public MapLayer CurrentLayer
         {
@@ -54,7 +55,11 @@ namespace FAD3.Mapping.Forms
         private void OnCurrentLayer(MapLayersHandler s, LayerEventArg e)
         {
             _currentMapLayer = MapInterActionHandler.MapLayersHandler.CurrentMapLayer;
-            DisplayAttributes();
+            if (!_graticuleLoading)
+            {
+                DisplayAttributes();
+            }
+            _graticuleLoading = false;
         }
 
         private void DisplayAttributes()
@@ -76,169 +81,172 @@ namespace FAD3.Mapping.Forms
                 //set up the column headers
                 _sfSelectedCount = 0;
                 Shapefile sf = _currentMapLayer.LayerObject as Shapefile;
-                object queryResult = new object();
-                int[] rowIndices = new int[0];
-                string errMsg = "";
-                if (sf.VisibilityExpression.Length > 0)
+                if (sf.NumFields > 0)
                 {
-                    sf.Table.Query(sf.VisibilityExpression, ref queryResult, ref errMsg);
-                    rowIndices = (int[])queryResult;
-                }
-                _sfSelectedCount = sf.NumSelected;
-                if (!chkRemember.Checked)
-                {
-                    if (_sfSelectedCount == 1)
+                    object queryResult = new object();
+                    int[] rowIndices = new int[0];
+                    string errMsg = "";
+                    if (sf.VisibilityExpression.Length > 0)
                     {
-                        DataGridViewTextBoxColumn valueColumn = new DataGridViewTextBoxColumn();
-                        gridAttributes.Columns.Add(valueColumn);
-                        valueColumn.ReadOnly = false;
-                        valueColumn.HeaderText = "Value";
+                        sf.Table.Query(sf.VisibilityExpression, ref queryResult, ref errMsg);
+                        rowIndices = (int[])queryResult;
                     }
-                    else
+                    _sfSelectedCount = sf.NumSelected;
+                    if (!chkRemember.Checked)
                     {
-                        gridAttributes.ColumnCount = sf.NumFields;
-                        for (int n = 0; n < sf.NumFields; n++)
+                        if (_sfSelectedCount == 1)
                         {
-                            string headerText = sf.Field[n].Alias;
-                            if (headerText.Length == 0)
-                            {
-                                headerText = sf.Field[n].Name;
-                            }
-                            gridAttributes.Columns[n].Name = headerText;
-                            gridAttributes.Columns[n].Tag = sf.Field[n].Name;
-                        }
-                    }
-
-                    if (_sfSelectedCount == 0)
-                    {
-                        if (sf.VisibilityExpression.Length == 0)
-                        {
-                            labelShapeFileName.Text = $"Attribute data of the shapefile (n={sf.NumShapes.ToString()})";
-                            rows = sf.NumShapes;
-                            for (int ishp = 0; ishp < rows; ishp++)
-                            {
-                                row = new DataGridViewRow();
-                                row.CreateCells(gridAttributes);
-                                object[] arr = new object[sf.NumFields];
-                                for (int ifld = 0; ifld < sf.NumFields; ifld++)
-                                {
-                                    arr[ifld] = sf.CellValue[ifld, ishp];
-                                }
-                                row.SetValues(arr);
-                                row.Tag = ishp;
-                                gridAttributes.Rows.Add(row);
-                            }
+                            DataGridViewTextBoxColumn valueColumn = new DataGridViewTextBoxColumn();
+                            gridAttributes.Columns.Add(valueColumn);
+                            valueColumn.ReadOnly = false;
+                            valueColumn.HeaderText = "Value";
                         }
                         else
                         {
-                            rows = rowIndices.Length;
-                            labelShapeFileName.Text = $"Attribute data of the shapefile (n={rowIndices.Length.ToString()})";
-                            for (int vShp = 0; vShp < rows; vShp++)
-                            {
-                                row = new DataGridViewRow();
-                                row.CreateCells(gridAttributes);
-                                object[] arr = new object[sf.NumFields];
-                                for (int ifld = 0; ifld < sf.NumFields; ifld++)
-                                {
-                                    arr[ifld] = sf.CellValue[ifld, rowIndices[vShp]];
-                                }
-                                row.SetValues(arr);
-                                row.Tag = rowIndices[vShp];
-                                gridAttributes.Rows.Add(row);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (sf.NumSelected == 1 && _currentMapLayer.SelectedIndexes != null)
-                        {
-                            labelShapeFileName.Text = "Attribute data of the selected shape (n=1)";
-                            int index = _currentMapLayer.SelectedIndexes[0];
-
-                            //show attribute of selected shape and display in 2 column property-value format
+                            gridAttributes.ColumnCount = sf.NumFields;
                             for (int n = 0; n < sf.NumFields; n++)
                             {
-                                row = new DataGridViewRow();
-
                                 string headerText = sf.Field[n].Alias;
-
                                 if (headerText.Length == 0)
                                 {
                                     headerText = sf.Field[n].Name;
                                 }
-                                string valueText = sf.CellValue[n, index]?.ToString();
-                                row.CreateCells(gridAttributes);
-                                row.Cells[0].Value = valueText;
-                                row.HeaderCell.Value = headerText;
-                                gridAttributes.Rows.Add(row);
+                                gridAttributes.Columns[n].Name = headerText;
+                                gridAttributes.Columns[n].Tag = sf.Field[n].Name;
+                            }
+                        }
+
+                        if (_sfSelectedCount == 0)
+                        {
+                            if (sf.VisibilityExpression.Length == 0)
+                            {
+                                labelShapeFileName.Text = $"Attribute data of the shapefile (n={sf.NumShapes.ToString()})";
+                                rows = sf.NumShapes;
+                                for (int ishp = 0; ishp < rows; ishp++)
+                                {
+                                    row = new DataGridViewRow();
+                                    row.CreateCells(gridAttributes);
+                                    object[] arr = new object[sf.NumFields];
+                                    for (int ifld = 0; ifld < sf.NumFields; ifld++)
+                                    {
+                                        arr[ifld] = sf.CellValue[ifld, ishp];
+                                    }
+                                    row.SetValues(arr);
+                                    row.Tag = ishp;
+                                    gridAttributes.Rows.Add(row);
+                                }
+                            }
+                            else
+                            {
+                                rows = rowIndices.Length;
+                                labelShapeFileName.Text = $"Attribute data of the shapefile (n={rowIndices.Length.ToString()})";
+                                for (int vShp = 0; vShp < rows; vShp++)
+                                {
+                                    row = new DataGridViewRow();
+                                    row.CreateCells(gridAttributes);
+                                    object[] arr = new object[sf.NumFields];
+                                    for (int ifld = 0; ifld < sf.NumFields; ifld++)
+                                    {
+                                        arr[ifld] = sf.CellValue[ifld, rowIndices[vShp]];
+                                    }
+                                    row.SetValues(arr);
+                                    row.Tag = rowIndices[vShp];
+                                    gridAttributes.Rows.Add(row);
+                                }
                             }
                         }
                         else
                         {
-                            if (_currentMapLayer.SelectedIndexes != null)
+                            if (sf.NumSelected == 1 && _currentMapLayer.SelectedIndexes != null)
                             {
-                                if (sf.VisibilityExpression.Length > 0)
-                                {
-                                    int c = 0;
-                                    var intersect = rowIndices.Intersect(_currentMapLayer.SelectedIndexes);
-                                    foreach (int v in rowIndices.Intersect(_currentMapLayer.SelectedIndexes))
-                                    {
-                                        c++;
-                                        row = new DataGridViewRow();
-                                        row.CreateCells(gridAttributes);
-                                        object[] arr = new object[sf.NumFields];
+                                labelShapeFileName.Text = "Attribute data of the selected shape (n=1)";
+                                int index = _currentMapLayer.SelectedIndexes[0];
 
-                                        for (int col = 0; col < sf.NumFields; col++)
-                                        {
-                                            try
-                                            {
-                                                arr[col] = sf.CellValue[col, v].ToString();
-                                            }
-                                            catch
-                                            {
-                                                arr[col] = "";
-                                            }
-                                        }
-                                        row.SetValues(arr);
-                                        row.Tag = v;
-                                        gridAttributes.Rows.Add(row);
+                                //show attribute of selected shape and display in 2 column property-value format
+                                for (int n = 0; n < sf.NumFields; n++)
+                                {
+                                    row = new DataGridViewRow();
+
+                                    string headerText = sf.Field[n].Alias;
+
+                                    if (headerText.Length == 0)
+                                    {
+                                        headerText = sf.Field[n].Name;
                                     }
-                                    labelShapeFileName.Text = $"Attribute data of the selected shapes (n={c.ToString()})";
+                                    string valueText = sf.CellValue[n, index]?.ToString();
+                                    row.CreateCells(gridAttributes);
+                                    row.Cells[0].Value = valueText;
+                                    row.HeaderCell.Value = headerText;
+                                    gridAttributes.Rows.Add(row);
                                 }
-                                else
+                            }
+                            else
+                            {
+                                if (_currentMapLayer.SelectedIndexes != null)
                                 {
-                                    labelShapeFileName.Text = $"Attribute data of the selected shapes (n={_currentMapLayer.SelectedIndexes.Length.ToString()})";
-                                    //show attributes of selected shapes
-                                    for (int r = 0; r < _currentMapLayer.SelectedIndexes.Length; r++)
+                                    if (sf.VisibilityExpression.Length > 0)
                                     {
-                                        row = new DataGridViewRow();
-                                        row.CreateCells(gridAttributes);
-                                        object[] arr = new object[sf.NumFields];
-
-                                        for (int col = 0; col < sf.NumFields; col++)
+                                        int c = 0;
+                                        var intersect = rowIndices.Intersect(_currentMapLayer.SelectedIndexes);
+                                        foreach (int v in rowIndices.Intersect(_currentMapLayer.SelectedIndexes))
                                         {
-                                            try
+                                            c++;
+                                            row = new DataGridViewRow();
+                                            row.CreateCells(gridAttributes);
+                                            object[] arr = new object[sf.NumFields];
+
+                                            for (int col = 0; col < sf.NumFields; col++)
                                             {
-                                                arr[col] = sf.CellValue[col, _currentMapLayer.SelectedIndexes[r]].ToString();
+                                                try
+                                                {
+                                                    arr[col] = sf.CellValue[col, v].ToString();
+                                                }
+                                                catch
+                                                {
+                                                    arr[col] = "";
+                                                }
                                             }
-                                            catch
-                                            {
-                                                arr[col] = "";
-                                            }
+                                            row.SetValues(arr);
+                                            row.Tag = v;
+                                            gridAttributes.Rows.Add(row);
                                         }
-                                        row.SetValues(arr);
-                                        row.Tag = _currentMapLayer.SelectedIndexes[r];
-                                        gridAttributes.Rows.Add(row);
+                                        labelShapeFileName.Text = $"Attribute data of the selected shapes (n={c.ToString()})";
+                                    }
+                                    else
+                                    {
+                                        labelShapeFileName.Text = $"Attribute data of the selected shapes (n={_currentMapLayer.SelectedIndexes.Length.ToString()})";
+                                        //show attributes of selected shapes
+                                        for (int r = 0; r < _currentMapLayer.SelectedIndexes.Length; r++)
+                                        {
+                                            row = new DataGridViewRow();
+                                            row.CreateCells(gridAttributes);
+                                            object[] arr = new object[sf.NumFields];
+
+                                            for (int col = 0; col < sf.NumFields; col++)
+                                            {
+                                                try
+                                                {
+                                                    arr[col] = sf.CellValue[col, _currentMapLayer.SelectedIndexes[r]].ToString();
+                                                }
+                                                catch
+                                                {
+                                                    arr[col] = "";
+                                                }
+                                            }
+                                            row.SetValues(arr);
+                                            row.Tag = _currentMapLayer.SelectedIndexes[r];
+                                            gridAttributes.Rows.Add(row);
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
-                    if (sf.NumSelected != 1)
-                    {
-                        foreach (DataGridViewRow r in gridAttributes.Rows)
+                        if (sf.NumSelected != 1)
                         {
-                            r.HeaderCell.Value = String.Format("{0}", r.Index + 1);
+                            foreach (DataGridViewRow r in gridAttributes.Rows)
+                            {
+                                r.HeaderCell.Value = String.Format("{0}", r.Index + 1);
+                            }
                         }
                     }
                 }
@@ -327,6 +335,35 @@ namespace FAD3.Mapping.Forms
             {
                 string fieldName = gridAttributes.Columns[e.ColumnIndex].Tag.ToString();
                 _currentMapLayer.EditShapeFileField(fieldName, e.RowIndex, gridAttributes.Rows[e.RowIndex].Cells[e.ColumnIndex].Value);
+            }
+        }
+
+        private void CopyText()
+        {
+            StringBuilder copyText = new StringBuilder();
+            foreach (DataGridViewColumn ch in gridAttributes.Columns)
+            {
+                copyText.Append($"{ch.HeaderText}\t");
+            }
+            copyText.Append("\r\n");
+            foreach (DataGridViewRow r in gridAttributes.Rows)
+            {
+                for (int n = 0; n < r.Cells.Count; n++)
+                {
+                    copyText.Append($"{r.Cells[n].Value.ToString()}\t");
+                }
+                copyText.Append("\r\n");
+            }
+            Clipboard.SetText(copyText.ToString());
+        }
+
+        private void OnDropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+            switch (e.ClickedItem.Name)
+            {
+                case "menuCopyText":
+                    CopyText();
+                    break;
             }
         }
     }

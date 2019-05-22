@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.gridAttributes = new System.Windows.Forms.DataGridView();
             this.colField = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colValue = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -35,7 +36,10 @@
             this.btnCancel = new System.Windows.Forms.Button();
             this.chkRemember = new System.Windows.Forms.CheckBox();
             this.labelShapeFileName = new System.Windows.Forms.Label();
+            this.dropDownMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.menuCopyText = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.gridAttributes)).BeginInit();
+            this.dropDownMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // gridAttributes
@@ -47,6 +51,7 @@
             this.gridAttributes.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.colField,
             this.colValue});
+            this.gridAttributes.ContextMenuStrip = this.dropDownMenu;
             this.gridAttributes.Location = new System.Drawing.Point(0, 30);
             this.gridAttributes.Name = "gridAttributes";
             this.gridAttributes.RowHeadersVisible = false;
@@ -110,6 +115,20 @@
             this.labelShapeFileName.TabIndex = 4;
             this.labelShapeFileName.Text = "label1";
             // 
+            // dropDownMenu
+            // 
+            this.dropDownMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuCopyText});
+            this.dropDownMenu.Name = "dropDownMenu";
+            this.dropDownMenu.Size = new System.Drawing.Size(181, 48);
+            this.dropDownMenu.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnDropDownItemClicked);
+            // 
+            // menuCopyText
+            // 
+            this.menuCopyText.Name = "menuCopyText";
+            this.menuCopyText.Size = new System.Drawing.Size(180, 22);
+            this.menuCopyText.Text = "Copy text";
+            // 
             // EditShapeAttributeForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -126,6 +145,7 @@
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OnFormClosed);
             this.Load += new System.EventHandler(this.OnFormLoad);
             ((System.ComponentModel.ISupportInitialize)(this.gridAttributes)).EndInit();
+            this.dropDownMenu.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -140,5 +160,7 @@
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.CheckBox chkRemember;
         private System.Windows.Forms.Label labelShapeFileName;
+        private System.Windows.Forms.ContextMenuStrip dropDownMenu;
+        private System.Windows.Forms.ToolStripMenuItem menuCopyText;
     }
 }
