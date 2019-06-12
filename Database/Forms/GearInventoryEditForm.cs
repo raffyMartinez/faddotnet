@@ -203,16 +203,30 @@ namespace FAD3.Database.Forms
 
         private void SetupGearInventoryUI()
         {
+            Gears.RefreshGearClasses();
+            foreach (var item in Gears.GearClasses)
+            {
+                KeyValuePair<string, string> gear = new KeyValuePair<string, string>(item.Key, item.Value.GearClassName);
+                cboGearClass.Items.Add(gear);
+            }
+            cboGearClass.With(o =>
+            {
+                o.DisplayMember = "Value";
+                o.ValueMember = "Key";
+                o.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+                o.AutoCompleteSource = AutoCompleteSource.ListItems;
+            });
+
             //setup the gearclass combo box
-            cboGearClass.DataSource = new BindingSource(Gear.GearClass, null);
-            cboGearClass.DisplayMember = "Value";
-            cboGearClass.ValueMember = "Key";
-            cboGearClass.AutoCompleteMode = AutoCompleteMode.Suggest;
-            cboGearClass.AutoCompleteSource = AutoCompleteSource.ListItems;
+            //cboGearClass.DataSource = new BindingSource(Gears.GearClassEx, null);
+            //cboGearClass.DisplayMember = "Value";
+            //cboGearClass.ValueMember = "Key";
+            //cboGearClass.AutoCompleteMode = AutoCompleteMode.Suggest;
+            //cboGearClass.AutoCompleteSource = AutoCompleteSource.ListItems;
 
             //setup the combobox of gear local names
             cboSelectGearLocalName.Items.Clear();
-            foreach (var item in Gear.GearLocalNames)
+            foreach (var item in Gears.GearLocalNames)
             {
                 cboSelectGearLocalName.Items.Add(item);
             }
@@ -260,7 +274,7 @@ namespace FAD3.Database.Forms
             cboCatchUnit.SelectedIndex = 0;
 
             cboSelectAccessory.Items.Clear();
-            foreach (var item in Gear.Accessories)
+            foreach (var item in Gears.Accessories)
             {
                 cboSelectAccessory.Items.Add(item);
             }
@@ -539,9 +553,9 @@ namespace FAD3.Database.Forms
 
             foreach (var item in gearData.gearLocalNames)
             {
-                if (Gear.GearLocalNames.Values.Contains(item))
+                if (Gears.GearLocalNames.Values.Contains(item))
                 {
-                    foreach (var localName in Gear.GearLocalNames)
+                    foreach (var localName in Gears.GearLocalNames)
                     {
                         if (localName.Value == item)
                         {
@@ -1300,7 +1314,7 @@ namespace FAD3.Database.Forms
         private void SetGearVariationsCombo(string gearKey)
         {
             cboGearVariation.Items.Clear();
-            foreach (var item in Gear.GearVariationsUsage(gearKey))
+            foreach (var item in Gears.GearVariationsUsage(gearKey))
             {
                 cboGearVariation.Items.Add(item);
             }

@@ -16,27 +16,6 @@ namespace FAD3
             get { return _GMSMeasurementRows; }
         }
 
-        //public enum FishCrabGMS
-        //{
-        //    AllTaxaNotDetermined,
-        //    FishJuvenile = 1,
-        //    FishStg1Immature,
-        //    FishStg2Maturing,
-        //    FishStg3Mature,
-        //    FishStg4Gravid,
-        //    FishStg5Spent,
-        //    FemaleCrabImmature = 2,
-        //    FemaleCrabMature = 4,
-        //    FemaleCrabBerried,
-        //}
-
-        //public enum sex
-        //{
-        //    Juvenile,
-        //    Male,
-        //    Female
-        //}
-
         public static Dictionary<FishCrabGMS, string> GMSStages(Taxa taxa, ref bool Success)
         {
             Success = false;

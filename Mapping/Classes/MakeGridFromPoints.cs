@@ -982,7 +982,10 @@ namespace FAD3.Mapping.Classes
                 case "Equal interval":
                     for (int c = 0; c < _categories.Count; c++)
                     {
-                        if (value >= (double)_categories.Item[c].MinValue && value <= (double)_categories.Item[c].MaxValue)
+                        if (_categories.Item[c].MinValue != null
+                            && _categories.Item[c].MaxValue != null
+                            && value >= (double)_categories.Item[c].MinValue
+                            && value <= (double)_categories.Item[c].MaxValue)
                         {
                             catIndex = c + 1;
                             break;

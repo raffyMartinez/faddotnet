@@ -14,6 +14,8 @@ using System.Data;
 using System.Data.OleDb;
 using System.Reflection;
 using System.Windows.Forms;
+using System.Drawing;
+using Oware;
 
 namespace FAD3
 {
@@ -22,6 +24,7 @@ namespace FAD3
     /// </summary>
     public class TargetArea
     {
+        public fadSubgridStyle SubgridStyle { get; set; } = fadSubgridStyle.SubgridStyleNone;
         private string _targetAreaGuid = "";
         private string _targetAreaName = "";
         private string _targetAreaLetter = "";
@@ -29,6 +32,17 @@ namespace FAD3
         private Dictionary<string, string> _targetAreas = new Dictionary<string, string>();
         private Dictionary<string, string> _landingSites = new Dictionary<string, string>();
         private static string _lastError;
+        public fadUTMZone UTMZone { get; set; }
+        private string _utmZone;
+        public static PointF UpperLeftPoint { get; internal set; }
+        public static PointF LowerRightPoint { get; internal set; }
+
+        public double Width { get; internal set; }
+        public double Height { get; internal set; }
+        public double Area { get; internal set; }
+        public PointF UpperLeftPointLL { get; internal set; }
+        public PointF LowerRightPointLL { get; internal set; }
+        public List<(string UpperLeft, string LowerRight, string GridDescription, PointF UpperLeftCorner, PointF LowerRightCorner)> ListGridExtents { get; private set; }
 
         public static string LastError
         {
@@ -45,6 +59,11 @@ namespace FAD3
             }
 
             return exists;
+        }
+
+        public static bool TargetAreaExists(string targetAreaName, string targetAreaGuid)
+        {
+            return false;
         }
 
         public string MajorGrids
@@ -96,6 +115,33 @@ namespace FAD3
             //default constructor
         }
 
+        public static int CountSamplings(string targetAreaGuid)
+        {
+            string sql = $@"SELECT Count(SamplingGUID) AS n
+                                FROM tblSampling
+                                WHERE AOI={{{targetAreaGuid}}}
+                                GROUP BY AOI
+                                ";
+            int count = 0;
+            using (var con = new OleDbConnection(global.ConnectionString))
+            {
+                con.Open();
+
+                using (OleDbCommand getCount = new OleDbCommand(sql, con))
+                {
+                    try
+                    {
+                        count = (int)getCount.ExecuteScalar();
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log(ex.Message, "TargetArea", "CountSamplings");
+                    }
+                }
+            }
+            return count;
+        }
+
         public static bool Delete(string aoiGuid)
         {
             bool Success = false;
@@ -104,6 +150,12 @@ namespace FAD3
             {
                 try
                 {
+                    if (CountSamplings(aoiGuid) > 0)
+                    {
+                    }
+                    Landingsite.DeleteEx(aoiGuid);
+                    FishingGrid.DeleteAdditionalFishingGroundMaps(aoiGuid);
+                    Enumerators.DeleteEnumerators(aoiGuid);
                     updateQuery = $"Delete * from tblAOI where AOIGuid = {{{aoiGuid}}}";
                     conn.Open();
                     using (OleDbCommand update = new OleDbCommand(updateQuery, conn))
@@ -185,7 +237,7 @@ namespace FAD3
                 try
                 {
                     conection.Open();
-                    string query = $"SELECT AOIName, Letter, MajorGridList from tblAOI WHERE AOIGuid= '{{{_targetAreaGuid}}}'";
+                    string query = $"SELECT AOIName, UTMZone, Letter, MajorGridList, SubgridStyle from tblAOI WHERE AOIGuid= '{{{_targetAreaGuid}}}'";
                     var command = new OleDbCommand(query, conection);
                     var reader = command.ExecuteReader();
                     if (reader.Read())
@@ -193,6 +245,22 @@ namespace FAD3
                         myName = reader["AOIName"].ToString();
                         _targetAreaLetter = reader["Letter"].ToString();
                         _majorGrids = reader["MajorGridList"].ToString();
+                        _utmZone = reader["UTMZone"].ToString();
+                        SubgridStyle = (fadSubgridStyle)(int)reader["SubgridStyle"];
+                        UTMZone = fadUTMZone.utmZone_Undefined;
+                        if (_utmZone.Length > 0)
+                        {
+                            switch (_utmZone)
+                            {
+                                case "51N":
+                                    UTMZone = fadUTMZone.utmZone51N;
+                                    break;
+
+                                case "50N":
+                                    UTMZone = fadUTMZone.utmZone50N;
+                                    break;
+                            }
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -469,11 +537,54 @@ namespace FAD3
             return myList;
         }
 
+        public static bool AddNewTargetArea(string targetAreaName, string targetAreaGuid,
+            string targetAreaCode, fadSubgridStyle subGridStyle, fadUTMZone zone)
+        {
+            bool success = false;
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    string utmzone = "";
+                    switch (zone)
+                    {
+                        case fadUTMZone.utmZone50N:
+                            utmzone = "50N";
+                            break;
+
+                        case fadUTMZone.utmZone51N:
+                            utmzone = "51N";
+                            break;
+
+                        case fadUTMZone.utmZone_Undefined:
+                            break;
+                    }
+                    string sql = $@"Insert into tblAOI (AOIGUID, AOIName, Letter, SubgridStyle, UTMZone)
+                            Values (
+                                  {{{targetAreaGuid}}},
+                                  '{targetAreaName}',
+                                  '{targetAreaCode}',
+                                   {(int)subGridStyle},
+                                   '{utmzone}'
+                                    )";
+                    OleDbCommand update = new OleDbCommand(sql, conn);
+                    conn.Open();
+                    success = (update.ExecuteNonQuery() > 0);
+                    conn.Close();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
+                }
+            }
+            return success;
+        }
+
         public static bool UpdateData(Dictionary<string, string> AOIData)
         {
             string updateQuery = "";
             bool Success = false;
-            fadSubgridSyle subGridStyle = fadSubgridSyle.SubgridStyleNone;
+            fadSubgridStyle subGridStyle = fadSubgridStyle.SubgridStyleNone;
             switch (AOIData["SubGridStyle"])
             {
                 case "0":
@@ -481,11 +592,11 @@ namespace FAD3
                     break;
 
                 case "1":
-                    subGridStyle = fadSubgridSyle.SubgridStyle4;
+                    subGridStyle = fadSubgridStyle.SubgridStyle4;
                     break;
 
                 case "2":
-                    subGridStyle = fadSubgridSyle.SubgridStyle9;
+                    subGridStyle = fadSubgridStyle.SubgridStyle9;
                     break;
             }
             using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
@@ -559,7 +670,11 @@ namespace FAD3
 
         public string TargetAreaData()
         {
+            ListGridExtents?.Clear();
             string rv = "";
+            string utmZone = "";
+            string ulg = "";
+            string lrg = "";
             var dt = new DataTable();
             using (var conection = new OleDbConnection(global.ConnectionString))
             {
@@ -567,7 +682,7 @@ namespace FAD3
                 {
                     conection.Open();
 
-                    string query = $"Select AOIName, Letter, MajorGridList, SubgridStyle from tblAOI where AOIGuid = {{{_targetAreaGuid}}}";
+                    string query = $"Select AOIName, Letter, MajorGridList, SubgridStyle, UTMZone, UpperLeftGrid, LowerRightGrid, GridDescription from tblAOI where AOIGuid = {{{_targetAreaGuid}}}";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
                     if (dt.Rows.Count > 0)
@@ -584,6 +699,20 @@ namespace FAD3
                                 rv += "|" + dr[i].ToString();
                             }
                         }
+                        utmZone = dr["UTMZone"].ToString();
+                        if (utmZone.Length > 0)
+                        {
+                            ListGridExtents = new List<(string UpperLeft, string LowerRight, string GridDescription, PointF UpperLeftCorner, PointF LowerRightCorner)>();
+                            ulg = dr["UpperLeftGrid"].ToString();
+                            lrg = dr["LowerRightGrid"].ToString();
+                            PointF ulp = FishingGrid.Grid25ToUTMPoint(ulg);
+                            ulp = new PointF(ulp.X - 1000, ulp.Y + 1000);
+                            PointF lrp = FishingGrid.Grid25ToUTMPoint(lrg);
+                            lrp = new PointF(lrp.X + 1000, lrp.Y - 1000);
+                            ListGridExtents.Add((ulg, lrg, dr["GridDescription"].ToString(), ulp, lrp));
+                            GetAdditionalMapExtents();
+                            ComputeTargetAreaExtent();
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -592,6 +721,97 @@ namespace FAD3
                 }
             }
             return rv;
+        }
+
+        private void ComputeTargetAreaExtent()
+        {
+            UpperLeftPoint = new PointF(ListGridExtents[0].UpperLeftCorner.X, ListGridExtents[0].UpperLeftCorner.Y);
+            LowerRightPoint = new PointF(ListGridExtents[0].LowerRightCorner.X, ListGridExtents[0].LowerRightCorner.Y);
+            if (ListGridExtents.Count > 0)
+            {
+                for (int n = 1; n < ListGridExtents.Count; n++)
+                {
+                    var ulX = ListGridExtents[n].UpperLeftCorner.X;
+                    var ulY = ListGridExtents[n].UpperLeftCorner.Y;
+                    if (UpperLeftPoint.Y > ulY)
+                    {
+                        ulY = UpperLeftPoint.Y;
+                    }
+                    if (UpperLeftPoint.X < ulX)
+                    {
+                        ulX = UpperLeftPoint.X;
+                    }
+                    UpperLeftPoint = new PointF(ulX, ulY);
+
+                    var lrX = ListGridExtents[n].LowerRightCorner.X;
+                    var lrY = ListGridExtents[n].LowerRightCorner.Y;
+                    if (LowerRightPoint.Y < lrY)
+                    {
+                        lrY = LowerRightPoint.Y;
+                    }
+                    if (LowerRightPoint.X > lrX)
+                    {
+                        lrX = LowerRightPoint.X;
+                    }
+                    LowerRightPoint = new PointF(lrX, lrY);
+                }
+            }
+
+            Width = LowerRightPoint.X - UpperLeftPoint.X;
+            Height = UpperLeftPoint.Y - LowerRightPoint.Y;
+            Area = Width * Height;
+
+            int ZoneNumber = 0;
+            switch (FishingGrid.UTMZone)
+            {
+                case fadUTMZone.utmZone51N:
+                    ZoneNumber = 51;
+                    break;
+
+                case fadUTMZone.utmZone50N:
+                    ZoneNumber = 50;
+                    break;
+            }
+
+            LatLngUTMConverter LL2UTM = new LatLngUTMConverter("");
+            var xy = LL2UTM.convertUtmToLatLng(UpperLeftPoint.X, UpperLeftPoint.Y, ZoneNumber, "N");
+            UpperLeftPointLL = new PointF((float)xy.Lng, (float)xy.Lat);
+            xy = LL2UTM.convertUtmToLatLng(LowerRightPoint.X, LowerRightPoint.Y, ZoneNumber, "N");
+            LowerRightPointLL = new PointF((float)xy.Lng, (float)xy.Lat);
+        }
+
+        private void GetAdditionalMapExtents()
+        {
+            var dt = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+
+                    string query = $"Select UpperLeft, LowerRight, GridDescription from tblAdditionalAOIExtent where AOIGuid = {{{_targetAreaGuid}}}";
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(dt);
+                    if (dt.Rows.Count > 0)
+                    {
+                        for (int n = 0; n < dt.Rows.Count; n++)
+                        {
+                            DataRow dr = dt.Rows[n];
+                            string ulg = dr["UpperLeft"].ToString();
+                            string lrg = dr["LowerRight"].ToString();
+                            PointF ulp = FishingGrid.Grid25ToUTMPoint(ulg);
+                            ulp = new PointF(ulp.X - 1000, ulp.Y + 1000);
+                            PointF lrp = FishingGrid.Grid25ToUTMPoint(lrg);
+                            lrp = new PointF(lrp.X + 1000, lrp.Y - 1000);
+                            ListGridExtents.Add((ulg, lrg, dr["GridDescription"].ToString(), ulp, lrp));
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
+                }
+            }
         }
 
         public Dictionary<string, string> ListYearsWithSamplingCount()

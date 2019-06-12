@@ -7,5 +7,6 @@ namespace FAD3
         public string Status { get; set; }
         public string StatusDescription { get; set; }
         public int GridCount { get; set; }
+        public int ShapesCount { get; set; }
     }
 }

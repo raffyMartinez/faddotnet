@@ -1297,23 +1297,20 @@ namespace FAD3.Database.Classes
             List<(int? decade, int? specificYear, int cpue, string unit, string notes)> cpueHistories = new List<(int? decade, int? specificYear, int cpue, string unit, string notes)>();
             List<(string expenseItem, double cost, string source, string notes)> expenseItems = new List<(string expenseItem, double cost, string source, string notes)>();
             while ((elementCounter == 0 || (elementCounter > 0 && proceed)) && xmlReader.Read())
+            //while (xmlReader.Read())
             {
                 if (xmlReader.NodeType == XmlNodeType.Element)
                 {
                     switch (xmlReader.Name)
                     {
                         case "FisherVesselGearInventoryProject":
+                            if (elementCounter == 0)
+                            {
+                                proceed = true;
+                                elementCounter++;
+                            }
                             projectGuid = xmlReader.GetAttribute("ProjectGuid");
                             projectName = xmlReader.GetAttribute("ProjectName");
-                            //FisheriesInventoryImportEventArg e = new FisheriesInventoryImportEventArg(projectName, projectGuid, FisheriesInventoryLevel.Project);
-                            //e.ImportInventoryAction = importAction;
-                            //InventoryLevel?.Invoke(this, e);
-                            //if (e.Cancel)
-                            //{
-                            //   return -1;
-                            //}
-                            //else
-                            //{
                             projectDate = DateTime.Parse(xmlReader.GetAttribute("DateStart"));
                             projectTargetArea = xmlReader.GetAttribute("TargetArea");
                             projectTargetAreaGuid = xmlReader.GetAttribute("TargetAreaGuid");
@@ -1355,7 +1352,6 @@ namespace FAD3.Database.Classes
                                         break;
                                 }
                             }
-                            //}
                             break;
 
                         case "Enumerators":
@@ -1630,14 +1626,14 @@ namespace FAD3.Database.Classes
         private (bool success, string variationGuid) SaveGearVariation(string gearClassName, string gearVariationName, string gearVariationGuid)
         {
             bool saveSuccess = false;
-            string variationGuid = Gear.GetVariationGuidFromVariationName(gearVariationName);
+            string variationGuid = Gears.GetVariationGuidFromVariationName(gearVariationName);
             if (variationGuid.Length == 0)
             {
-                if (!Gear.GearVariationGUIDExists(gearVariationGuid))
+                if (!Gears.GearVariationGUIDExists(gearVariationGuid))
                 {
-                    string classGuid = Gear.GearClassGuidFromClassName(gearClassName);
+                    string classGuid = Gears.GearClassGuidFromClassName(gearClassName);
                     NewFisheryObjectName newGear = new NewFisheryObjectName(gearVariationName, FisheryObjectNameType.GearVariationName);
-                    var result = Gear.SaveNewVariationName(newGear, classGuid, gearVariationGuid);
+                    var result = Gears.SaveNewVariationName(newGear, classGuid, gearVariationGuid);
                     saveSuccess = result.success;
                     variationGuid = result.newGuid;
                 }
@@ -3750,7 +3746,7 @@ namespace FAD3.Database.Classes
                     if (localName.Length > 0)
                     {
                         NewFisheryObjectName gearLocalName = new NewFisheryObjectName(localName, FisheryObjectNameType.GearLocalName);
-                        var result = Gear.SaveNewLocalName(gearLocalName);
+                        var result = Gears.SaveNewLocalName(gearLocalName);
                         if (result.success)
                         {
                             foreach (var item in listGuids)
@@ -3763,7 +3759,7 @@ namespace FAD3.Database.Classes
                         }
                     }
 
-                    var deleteResult = Gear.DeleteGearVariation(Gear.GetVariationGuidFromVariationName(oldName));
+                    var deleteResult = Gears.DeleteGearVariation(Gears.GetVariationGuidFromVariationName(oldName));
                     succeeded = deleteResult.success;
                 }
             }
@@ -3817,7 +3813,7 @@ namespace FAD3.Database.Classes
                         foreach (var item in localNamesDict)
                         {
                             NewFisheryObjectName nfo = new NewFisheryObjectName(item.Value, FisheryObjectNameType.GearLocalName);
-                            var result = Gear.SaveNewLocalName(nfo, item.Key);
+                            var result = Gears.SaveNewLocalName(nfo, item.Key);
 
                             sql = $"Insert into tblGearInventoryGearLocalNames (InventoryDataGuid, LocalNameGuid, RowGuid) values ({{{sitioGearInventoryGuid}}}, {{{result.newGuid}}},{{{Guid.NewGuid().ToString()}}})";
                             using (OleDbCommand update = new OleDbCommand(sql, conn))

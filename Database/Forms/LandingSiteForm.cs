@@ -33,6 +33,9 @@ namespace FAD3
         private bool _definedFromKML;
         private string _coordinateformat;
         private bool _hasCoordinate;
+        public string LandingSiteMunicipalityName { get; internal set; }
+        public int LandingSiteMunicipalityNumber { get; internal set; }
+        private static string _province = "";
 
         public LandingSiteForm(TargetArea targetArea, LandingSiteFromKMLForm kmlParentForm, string name, double xCoord, double yCoord, bool isNew = false, bool definedFromKML = true)
         {
@@ -104,6 +107,12 @@ namespace FAD3
             textLandingSiteName.Focus();
             if (_definedFromKML)
             {
+                if (_province.Length > 0)
+                {
+                    comboProvince.Text = _province;
+                    System.ComponentModel.CancelEventArgs ee = new System.ComponentModel.CancelEventArgs(false);
+                    OnComboBoxValidating(comboProvince, ee);
+                }
                 _coordinateformat = global.CoordinateFormatCode;
                 textLandingSiteName.Text = _landingSiteName;
                 var coordinate = new Coordinate((float)_yCoordinate, (float)_xCoordinate);
@@ -190,10 +199,14 @@ namespace FAD3
                         }
                         else
                         {
-                            _parentKMLForm.LandingSiteName = textLandingSiteName.Text;
-                            _parentKMLForm.LandingSiteMunicipalityNumber = (int)_municipalityNumber;
-                            _parentKMLForm.LandingSiteMunicipalityName = $"{comboMunicipality.Text}, {comboProvince.Text}";
+                            //_parentKMLForm.LandingSiteName = textLandingSiteName.Text;
+                            //_parentKMLForm.LandingSiteMunicipalityNumber = (int)_municipalityNumber;
+                            //_parentKMLForm.LandingSiteMunicipalityName = $"{comboMunicipality.Text}, {comboProvince.Text}";
+                            LandingSiteMunicipalityName = $"{comboMunicipality.Text}, {comboProvince.Text}";
+                            LandingSiteMunicipalityNumber = (int)_municipalityNumber;
                         }
+                        _province = comboProvince.Text;
+                        DialogResult = DialogResult.OK;
                         Close();
                     }
                     else
@@ -202,6 +215,7 @@ namespace FAD3
                     break;
 
                 case "buttonCancel":
+                    DialogResult = DialogResult.Cancel;
                     Close();
                     break;
             }

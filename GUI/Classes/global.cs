@@ -769,7 +769,7 @@ namespace FAD3
                     Names.MakeAllNames();
                     FishingVessel.MakeVesselTypeTable();
                     GetProvinces();
-                    Gear.GetLists();
+                    Gears.GetLists();
                     GetVesselTypes();
                 }
             }

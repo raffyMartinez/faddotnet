@@ -34,7 +34,7 @@ namespace FAD3
         private TextBox _currentTextBox;
         private bool _isNew = false;
         private int _row = 1;
-        private Sampling _sampling;
+        private Samplings _sampling;
         private int _spacer = 3;
         private Taxa _taxa = Taxa.To_be_determined;
         private bool _updateSequence = false;
@@ -45,7 +45,7 @@ namespace FAD3
         private string _currentTextContents = "";
         private bool _errorValidating = false;
 
-        public GMSDataEntryForm(bool isNew, Sampling sampling, string catchRowGuid, string catchName, Taxa taxa, MainForm parent)
+        public GMSDataEntryForm(bool isNew, Samplings sampling, string catchRowGuid, string catchName, Taxa taxa, MainForm parent)
         {
             InitializeComponent();
             _catchRowGuid = catchRowGuid;

@@ -231,6 +231,17 @@ namespace FAD3.Database.Forms
             }
         }
 
+        private void OnListSelectionChanged(object sender, EventArgs e)
+        {
+            _clickFromTree = false;
+            //_listTargetHit = lvInventory.HitTest(e.X, e.Y).Item;
+            if (lvInventory.SelectedItems.Count > 0)
+            {
+                _listTargetHit = lvInventory.SelectedItems[0];
+                ConfigureContextMenu();
+            }
+        }
+
         private void OnFormLoad(object sender, EventArgs e)
         {
             _allowNodeDrag = false;
@@ -1103,7 +1114,7 @@ namespace FAD3.Database.Forms
                             }
                             lvi = lvInventory.Items.Add($"{item.Value.gearClass} - {item.Value.gearVariation} ({item.Value.localNames})");
                             lvi.SubItems.Add(item.Value.total.ToString());
-                            lvi.ImageKey = Gear.GearClassImageKeyFromGearClasName(item.Value.gearClass);
+                            lvi.ImageKey = Gears.GearClassImageKeyFromGearClasName(item.Value.gearClass);
                             row++;
                         }
 
@@ -1239,7 +1250,7 @@ namespace FAD3.Database.Forms
                         }
                         lvi = lvInventory.Items.Add($"{item.Value.gearClass} - {item.Value.gearVariation} ({item.Value.localNames})");
                         lvi.SubItems.Add(item.Value.total.ToString());
-                        lvi.ImageKey = Gear.GearClassImageKeyFromGearClasName(item.Value.gearClass);
+                        lvi.ImageKey = Gears.GearClassImageKeyFromGearClasName(item.Value.gearClass);
                         row++;
                     }
 
@@ -1375,7 +1386,7 @@ namespace FAD3.Database.Forms
                         }
                         var nd = node.Nodes.Add(item.variationInventoryGuid, $"{item.gearVariation} ({item.localNames})");
                         nd.Tag = "gearVariation";
-                        nd.ImageKey = Gear.GearClassImageKeyFromGearClasName(item.gearClass);
+                        nd.ImageKey = Gears.GearClassImageKeyFromGearClasName(item.gearClass);
                     }
                 }
             }
@@ -1526,7 +1537,7 @@ namespace FAD3.Database.Forms
                             lvi = lvInventory.Items.Add("       " + item.gearClass + "-" + item.gearVariation + " (" + item.localNames + ")");
                             lvi.Name = (item.dataGuid);
                             lvi.SubItems.Add(item.total.ToString());
-                            lvi.ImageKey = Gear.GearClassImageKeyFromGearClasName(item.gearClass);
+                            lvi.ImageKey = Gears.GearClassImageKeyFromGearClasName(item.gearClass);
                             lvi.Tag = "gearVariation";
                         }
                         else
@@ -1568,7 +1579,7 @@ namespace FAD3.Database.Forms
                         lvi = lvInventory.Items.Add(item.Value.gearVarGuid, itemName, null);
                         lvi.SubItems.Add(item.Value.total.ToString());
                         lvi.Tag = "gearVariationSummary";
-                        lvi.ImageKey = Gear.GearClassImageKeyFromGearClasName(item.Value.gearClass);
+                        lvi.ImageKey = Gears.GearClassImageKeyFromGearClasName(item.Value.gearClass);
                     }
                 }
             }
@@ -1651,6 +1662,15 @@ namespace FAD3.Database.Forms
             im.GetGearVariationDistribution(lvInventory.SelectedItems[0].Text, lvInventory.SelectedItems[0].Name);
             global.MappingForm.SetGraticuleTitle(lvInventory.SelectedItems[0].Text);
             _inventoryLayerHandle = im.InventoryLayerHandle;
+            //CenterExtentToInventoryMap();
+        }
+
+        private void CenterExtentToInventoryMap()
+        {
+            MapWinGIS.Extents ext = global.MappingForm.MapControl.Extents;
+            var sf = global.MappingForm.MapLayersHandler[_inventoryLayerHandle].LayerObject as MapWinGIS.Shapefile;
+            ext.MoveTo(sf.Extents.Center.x, sf.Extents.Center.y);
+            global.MappingForm.MapControl.Extents = ext;
         }
 
         /// <summary>
@@ -1870,20 +1890,6 @@ namespace FAD3.Database.Forms
 
         private void OnCoordinatesAvailable(object sender, EventArgs e)
         {
-            var coord = _coordinateEntryForm.Coordinate;
-            BarangayMunicipalityCoordinateHelper bmsc = new BarangayMunicipalityCoordinateHelper(_treeLevel, treeInventory.SelectedNode.Text);
-            bmsc.Coordinate = coord;
-            switch (_treeLevel)
-            {
-                case "barangay":
-                    bmsc.LGUNumber = int.Parse(treeInventory.SelectedNode.Parent.Name);
-                    break;
-
-                case "municipality":
-                    bmsc.LGUNumber = int.Parse(treeInventory.SelectedNode.Name);
-                    break;
-            }
-            bmsc.SetCoordinate();
         }
 
         private void OnListViewDoubleClick(object sender, EventArgs e)
@@ -2544,17 +2550,6 @@ namespace FAD3.Database.Forms
             if (nd.Tag?.ToString() == "targetAreaInventory" && draggedNode.Parent.Name != nd.Name)
             {
                 treeInventory.SelectedNode = nd;
-            }
-        }
-
-        private void OnListSelectionChanged(object sender, EventArgs e)
-        {
-            _clickFromTree = false;
-            //_listTargetHit = lvInventory.HitTest(e.X, e.Y).Item;
-            if (lvInventory.SelectedItems.Count > 0)
-            {
-                _listTargetHit = lvInventory.SelectedItems[0];
-                ConfigureContextMenu();
             }
         }
     }

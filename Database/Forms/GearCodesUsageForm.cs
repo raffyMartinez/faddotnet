@@ -81,7 +81,7 @@ namespace FAD3
             foreach (ListViewItem lvi in lv.Items)
             {
                 lvi.SubItems.Add("");
-                if (Gear.GearVarHasSpecsTemplate(lvi.Name))
+                if (Gears.GearVarHasSpecsTemplate(lvi.Name))
                     lvi.SubItems[1].Text = "x";
             }
         }
@@ -219,7 +219,7 @@ namespace FAD3
         private void FillLocalNames()
         {
             listViewLocalNames.Items.Clear();
-            var list = Gear.GearLocalName_TargetArea(_gearRefCode, _targetAreaGuid);
+            var list = Gears.GearLocalName_TargetArea(_gearRefCode, _targetAreaGuid);
             foreach (var i in list)
             {
                 var lvi = new ListViewItem
@@ -235,7 +235,7 @@ namespace FAD3
         private void FillRefCodeUsage()
         {
             listViewWhereUsed.Items.Clear();
-            var list = Gear.TargetAreaUsed_RefCode(_gearRefCode);
+            var list = Gears.TargetAreaUsed_RefCode(_gearRefCode);
             foreach (var i in list)
             {
                 var lvi = new ListViewItem
@@ -251,7 +251,7 @@ namespace FAD3
         private void FillRefCodeList()
         {
             listViewCodes.Items.Clear();
-            var list = Gear.GearSubVariations(_gearVarGuid);
+            var list = Gears.GearSubVariations(_gearVarGuid);
             foreach (KeyValuePair<string, bool> kv in list)
             {
                 var lvi = new ListViewItem
@@ -270,7 +270,7 @@ namespace FAD3
             if (comboClass.Items.Count > 0)
             {
                 var key = ((KeyValuePair<string, string>)comboClass.SelectedItem).Key;
-                var list = Gear.GearVariationsWithSpecs(key);
+                var list = Gears.GearVariationsWithSpecs(key);
                 foreach (var item in list)
                 {
                     var lvi = new ListViewItem
@@ -287,10 +287,11 @@ namespace FAD3
         private void ReadGearClass()
         {
             comboClass.Items.Clear();
-            Gear.RefreshGearClasses();
-            foreach (var item in Gear.GearClass)
+            Gears.RefreshGearClasses();
+            foreach (var item in Gears.GearClasses)
             {
-                comboClass.Items.Add(item);
+                KeyValuePair<string, string> gear = new KeyValuePair<string, string>(item.Key, item.Value.GearClassName);
+                comboClass.Items.Add(gear);
             }
             comboClass.With(o =>
             {
@@ -546,7 +547,7 @@ namespace FAD3
                                         "Confirmation needed", MessageBoxButtons.OKCancel,
                                         MessageBoxIcon.Exclamation) == DialogResult.OK)
                     {
-                        var result = Gear.DeleteTargetAreaUsage(RowNumberForDeletion);
+                        var result = Gears.DeleteTargetAreaUsage(RowNumberForDeletion);
                         if (result.success)
                         {
                             listViewWhereUsed.Items.Remove(listViewWhereUsed.SelectedItems[0]);
@@ -564,7 +565,7 @@ namespace FAD3
                                         "Confirmation needed", MessageBoxButtons.OKCancel,
                                         MessageBoxIcon.Exclamation) == DialogResult.OK)
                     {
-                        if (Gear.DeleteLocalNameUsage(RowNumberForDeletion))
+                        if (Gears.DeleteLocalNameUsage(RowNumberForDeletion))
                         {
                             listViewLocalNames.Items.Remove(listViewLocalNames.SelectedItems[0]);
                         }
@@ -616,7 +617,7 @@ namespace FAD3
                                             "Confirmation needed", MessageBoxButtons.OKCancel,
                                             MessageBoxIcon.Exclamation) == DialogResult.OK)
                         {
-                            var result = Gear.DeleteGearVariation(_gearVarGuid);
+                            var result = Gears.DeleteGearVariation(_gearVarGuid);
                             if (!result.success)
                             {
                                 var reason = result.reason;
@@ -733,7 +734,7 @@ namespace FAD3
 
             if (_gearRefCode.Length > 0 && _targetAreaGuid.Length > 0)
             {
-                var result = Gear.AddGearCodeUsageTargetArea(_gearRefCode, _targetAreaGuid);
+                var result = Gears.AddGearCodeUsageTargetArea(_gearRefCode, _targetAreaGuid);
                 if (result.Success)
                 {
                     var newLVI = listViewWhereUsed.Items.Add(_targetAreaGuid, _targetAreaName, null);
@@ -753,7 +754,7 @@ namespace FAD3
 
             if (_gearRefCode.Length > 0 && _targetAreaGuid.Length > 0 && _localNameGuid.Length > 0 && _targetAreaUsageRow.Length > 0)
             {
-                var result = Gear.AddUsageLocalName(_targetAreaUsageRow, _localNameGuid);
+                var result = Gears.AddUsageLocalName(_targetAreaUsageRow, _localNameGuid);
                 if (result.Success)
                 {
                     var newLVI = listViewLocalNames.Items.Add(_localNameGuid, _localName, null);
@@ -767,7 +768,7 @@ namespace FAD3
             _gearRefCode = gearCode;
             if (_gearVarGuid.Length > 0)
             {
-                if (Gear.AddGearVariationReferenceCode(_gearRefCode, _gearVarGuid, isVariation))
+                if (Gears.AddGearVariationReferenceCode(_gearRefCode, _gearVarGuid, isVariation))
                 {
                     var lvi = listViewCodes.Items.Add(_gearRefCode, _gearRefCode, null);
                     lvi.SubItems.Add(isVariation.ToString());
@@ -782,7 +783,7 @@ namespace FAD3
             {
                 var dms = new DoubleMetaphoneShort();
                 dms.ComputeMetaphoneKeys(gearVariationName, out short key1, out short key2);
-                var similarNames = Gear.GearSoundsLike(key1, key2);
+                var similarNames = Gears.GearSoundsLike(key1, key2);
                 var proceed = true;
 
                 var sb = new StringBuilder();
@@ -804,7 +805,7 @@ namespace FAD3
 
                 if (proceed)
                 {
-                    var result = Gear.AddGearVariation(_gearClassGuid, gearVariationName);
+                    var result = Gears.AddGearVariation(_gearClassGuid, gearVariationName);
                     if (result.success)
                     {
                         _gearVarGuid = result.newGuid;
@@ -836,7 +837,7 @@ namespace FAD3
                         switch (whatToExport)
                         {
                             case ExportImportDataType.GearsRefCode:
-                                var codes = Gear.GetGearRefCodes();
+                                var codes = Gears.GetGearRefCodes();
                                 var count = codes.Count;
 
                                 if (count > 0)
@@ -878,7 +879,7 @@ namespace FAD3
                                 break;
 
                             case ExportImportDataType.GearsVariation:
-                                var gearsDict = Gear.GetAllVariations();
+                                var gearsDict = Gears.GetAllVariations();
                                 count = gearsDict.Count;
 
                                 if (count > 0)
@@ -891,11 +892,11 @@ namespace FAD3
                                     {
                                         writer.WriteStartElement("GearVariation");
                                         writer.WriteAttributeString("guid", gear.Key);
-                                        writer.WriteAttributeString("name", gear.Value.gearVarName);
-                                        writer.WriteAttributeString("gear_class", gear.Value.gearCLassGuid);
-                                        writer.WriteAttributeString("mph1", gear.Value.metaPhoneKey1.ToString());
-                                        writer.WriteAttributeString("mph2", gear.Value.metaPhoneKey2.ToString());
-                                        writer.WriteAttributeString("name2", gear.Value.Name2);
+                                        writer.WriteAttributeString("name", gear.Value.VariationName);
+                                        writer.WriteAttributeString("gear_class", gear.Value.GearClassGuid);
+                                        writer.WriteAttributeString("mph1", gear.Value.MetaphoneKey1.ToString());
+                                        writer.WriteAttributeString("mph2", gear.Value.MetaphoneKey2.ToString());
+                                        writer.WriteAttributeString("name2", gear.Value.VariationName2);
                                         if (count == 1)
                                         {
                                             writer.WriteEndDocument();
@@ -922,8 +923,9 @@ namespace FAD3
                                 break;
 
                             case ExportImportDataType.GearsClass:
-                                var gearClassDict = Gear.GetGearClassEx();
-                                count = gearClassDict.Count;
+                                //var gearClassDict = Gears.GetGearClassEx();
+                                Gears.RefreshGearClasses();
+                                count = Gears.GearClasses.Count();
 
                                 if (count > 0)
                                 {
@@ -931,12 +933,12 @@ namespace FAD3
                                     XmlWriter writer = XmlWriter.Create(fileName);
                                     writer.WriteStartDocument();
                                     writer.WriteStartElement("GearClasses");
-                                    foreach (var gearClass in gearClassDict)
+                                    foreach (var gearClass in Gears.GearClasses)
                                     {
                                         writer.WriteStartElement("GearClass");
                                         writer.WriteAttributeString("guid", gearClass.Key);
-                                        writer.WriteAttributeString("name", gearClass.Value.gearClassName);
-                                        writer.WriteAttributeString("code", gearClass.Value.gearCode);
+                                        writer.WriteAttributeString("name", gearClass.Value.GearClassName);
+                                        writer.WriteAttributeString("code", gearClass.Value.GearClassLetter);
                                         if (count == 1)
                                         {
                                             writer.WriteEndDocument();
@@ -1022,7 +1024,7 @@ namespace FAD3
 
                                     if (gearClassGuid?.Length > 0 && gearClass?.Length > 0 && gearClassCode.Length > 0)
                                     {
-                                        var success = Gear.SaveNewGearClass(gearClassGuid, gearClass, gearClassCode);
+                                        var success = Gears.SaveNewGearClass(gearClassGuid, gearClass, gearClassCode);
                                         if (success)
                                         {
                                             saveCounter++;
@@ -1078,7 +1080,7 @@ namespace FAD3
                                     if (gearVariation?.Length > 0 && gearVariationGuid?.Length > 0 && gearClassGuid.Length > 0)
                                     {
                                         NewFisheryObjectName nfon = new NewFisheryObjectName(gearVariation, FisheryObjectNameType.GearVariationName);
-                                        var result = Gear.SaveNewVariationName(nfon, gearClassGuid, gearVariationGuid);
+                                        var result = Gears.SaveNewVariationName(nfon, gearClassGuid, gearVariationGuid);
                                         if (result.success)
                                         {
                                             saveCounter++;
@@ -1133,7 +1135,7 @@ namespace FAD3
 
                                     if (gearVariation?.Length > 0 && gearVariationGuid?.Length > 0 && gearCode.Length > 0)
                                     {
-                                        var success = Gear.SaveNewGearReferenceCode(gearCode, gearVariationGuid, isSubVariation);
+                                        var success = Gears.SaveNewGearReferenceCode(gearCode, gearVariationGuid, isSubVariation);
                                         if (success)
                                         {
                                             saveCounter++;

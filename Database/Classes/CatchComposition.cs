@@ -94,6 +94,48 @@ namespace FAD3
                 return resultCount == (InsertCount + UpdateCount);
         }
 
+        public static List<CatchLine> RetriveAllCatchFromTargetArea(string targetAreaGuid)
+        {
+            List<CatchLine> allCatch = new List<CatchLine>();
+            string sql = $@"SELECT DISTINCT tblCatchComp.NameType, temp_AllNames.Name1, temp_AllNames.Name2, tblCatchComp.NameGUID,
+                            tblAllSpecies.TaxaNo, tblAllSpecies.ListedFB, tblAllSpecies.FBSpNo FROM tblAllSpecies
+                            RIGHT JOIN (temp_AllNames
+                                INNER JOIN (tblSampling
+                                INNER JOIN tblCatchComp
+                                    ON tblSampling.SamplingGUID = tblCatchComp.SamplingGUID)
+                                    ON temp_AllNames.NameNo = tblCatchComp.NameGUID)
+                                    ON tblAllSpecies.SpeciesGUID = tblCatchComp.NameGUID
+                            WHERE tblSampling.AOI = {{{targetAreaGuid}}}
+                            ORDER BY tblCatchComp.NameType, temp_AllNames.Name1, temp_AllNames.Name2";
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                DataTable dt = new DataTable();
+                var adapter = new OleDbDataAdapter(sql, conection);
+                adapter.Fill(dt);
+                Identification IdType = Identification.Scientific;
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    DataRow dr = dt.Rows[i];
+                    int? taxaNo = dr["TaxaNo"].ToString().Length == 0 ?
+                        taxaNo = null : (int?)dr["TaxaNo"];
+                    int? fbNo = dr["FBSpNo"].ToString().Length == 0 ?
+                        fbNo = null : (int?)dr["FBSpNo"];
+                    IdType = (Identification)(int)dr["NameType"];
+                    CatchLine cl = new CatchLine(dr["NameGUID"].ToString(),
+                                                 dr["Name1"].ToString(),
+                                                 dr["Name2"].ToString(),
+                                                 IdType,
+                                                 taxaNo,
+                                                 fbNo,
+                                                 (bool)dr["ListedFB"]
+                                                 );
+                    allCatch.Add(cl);
+                }
+
+            }
+            return allCatch;
+        }
+
         public static Dictionary<string, CatchLine> RetrieveCatchComposition(string SamplingGUID)
         {
             _CatchCompositionRows = 0;
@@ -152,6 +194,10 @@ namespace FAD3
                             {
                                 TaxaNumber = null;
                             }
+                        }
+                        else
+                        {
+                            TaxaNumber = null;
                         }
 
                         //defines a catch line

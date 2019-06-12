@@ -80,6 +80,8 @@ namespace FAD3
                 MapLegend = null;
                 GC.Collect();
             }
+            axMap.Dispose();
+            Dispose();
         }
 
         public void MapDecorationsVisibility(bool visible)
@@ -95,6 +97,10 @@ namespace FAD3
             {
                 axMap.ShowCoordinates = tkCoordinatesDisplay.cdmNone;
             }
+        }
+
+        public void ShowMBR()
+        {
         }
 
         public MapLayer CurrentMapLayer

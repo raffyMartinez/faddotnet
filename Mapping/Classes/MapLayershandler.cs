@@ -71,14 +71,73 @@ namespace FAD3
             }
         }
 
-        //public void Refresh()
-        //{
-        //    _mapLayerDictionary.Clear();
-        //    for (int n = 0; n < _axmap.NumLayers; n++)
-        //    {
-        //        MapLayer ml = new MapLayer()
-        //    }
-        //}
+        /// <summary>
+        /// add the MBR of a target area as a new map layer
+        /// </summary>
+        /// <param name="moveMapToMBRCenter"></param>
+        public void AddMBRLayer(TargetArea targetArea, bool moveMapToMBRCenter = false)
+        {
+            var sf = new Shapefile();
+            if (sf.CreateNew("", ShpfileType.SHP_POLYGON))
+            {
+                GeoProjection gp = new GeoProjection();
+                gp.SetWgs84();
+                sf.GeoProjection = gp;
+
+                int ifldTargetArea = sf.EditAddField("Target area", FieldType.STRING_FIELD, 1, 30);
+                int ifldyMax = sf.EditAddField("yMax", FieldType.DOUBLE_FIELD, 10, 12);
+                int ifldxMin = sf.EditAddField("xMin", FieldType.DOUBLE_FIELD, 10, 12);
+                int ifldyMin = sf.EditAddField("yMin", FieldType.DOUBLE_FIELD, 10, 12);
+                int ifldxMax = sf.EditAddField("xMax", FieldType.DOUBLE_FIELD, 10, 12);
+                int ifldWidth = sf.EditAddField("Width", FieldType.DOUBLE_FIELD, 10, 12);
+                int ifldHeight = sf.EditAddField("Height", FieldType.DOUBLE_FIELD, 10, 12);
+                int ifldArea = sf.EditAddField("Area", FieldType.DOUBLE_FIELD, 15, 17);
+                var ext = new Extents();
+                //ext.SetBounds(FishingGrid.LowerRighttExtent.X,
+                //    FishingGrid.LowerRighttExtent.Y,
+                //    0,
+                //    FishingGrid.UpperLeftExtent.X,
+                //    FishingGrid.UpperLeftExtent.Y,
+                //    0);
+                ext.SetBounds(targetArea.UpperLeftPointLL.X, targetArea.LowerRightPointLL.Y, 0,
+                              targetArea.LowerRightPointLL.X, targetArea.UpperLeftPointLL.Y, 0);
+                var shp = ext.ToShape();
+                int iShp = sf.EditAddShape(shp);
+                if (iShp >= 0)
+                {
+                    sf.EditCellValue(ifldTargetArea, iShp, targetArea.TargetAreaName);
+                    if (sf.Labels.Generate("[Target area]", tkLabelPositioning.lpCenter, true) > 0)
+                    {
+                        sf.Labels.FontSize = 13;
+                        sf.Labels.FrameVisible = false;
+                        sf.Labels.Visible = true;
+                        sf.Labels.FontBold = true;
+                    }
+
+                    sf.EditCellValue(ifldyMax, iShp, ext.yMax);
+                    sf.EditCellValue(ifldxMin, iShp, ext.xMin);
+                    sf.EditCellValue(ifldyMin, iShp, ext.yMin);
+                    sf.EditCellValue(ifldxMax, iShp, ext.xMax);
+
+                    sf.EditCellValue(ifldWidth, iShp, targetArea.Width);
+
+                    sf.EditCellValue(ifldHeight, iShp, targetArea.Height);
+
+                    sf.EditCellValue(ifldArea, iShp, targetArea.Area);
+
+                    sf.DefaultDrawingOptions.FillVisible = false;
+                    sf.DefaultDrawingOptions.LineColor = new Utils().ColorByName(tkMapColor.Blue);
+                    sf.DefaultDrawingOptions.LineWidth = 2;
+                    AddLayer(sf, "MBR", true, true);
+                    if (moveMapToMBRCenter)
+                    {
+                        ext = MapControl.Extents;
+                        ext.MoveTo(sf.Extents.Center.x, sf.Extents.Center.y);
+                        MapControl.Extents = ext;
+                    }
+                }
+            }
+        }
 
         public void MoveToTop()
         {

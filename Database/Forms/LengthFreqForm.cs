@@ -17,7 +17,7 @@ namespace FAD3
         private TextBox _lastFreq;
         private TextBox _lastLen;
         private int _row;
-        private Sampling _sampling;
+        private Samplings _sampling;
         private int _spacer = 3;
         private int _y = 5;
         private List<double> _lengthClasses = new List<double>();
@@ -27,7 +27,7 @@ namespace FAD3
         private string _currentRow;
         private int _catchCount;
 
-        public LengthFreqForm(bool isNew, Sampling sampling, string catchRowGuid, string catchName, int catchCount, MainForm parent)
+        public LengthFreqForm(bool isNew, Samplings sampling, string catchRowGuid, string catchName, int catchCount, MainForm parent)
         {
             InitializeComponent();
             _catchRowGuid = catchRowGuid;

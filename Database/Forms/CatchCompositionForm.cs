@@ -54,6 +54,7 @@ namespace FAD3
         private double? _weightOfSample;
 
         private string _emptySumOfWeightsLabel;
+        private Dictionary<string, int> _textRowDict = new Dictionary<string, int>();
 
         /// <summary>
         /// Form constructor
@@ -412,6 +413,7 @@ namespace FAD3
             }
 
             _y += labelRow.Height + _spacer;
+            _textRowDict.Add(key, _row);
             _row++;
         }
 
@@ -1013,6 +1015,7 @@ namespace FAD3
                     break;
 
                 case "buttonRemove":
+                    Text = $"current row is {_currentRow.ToString()}";
                     break;
             }
         }
@@ -1425,7 +1428,11 @@ namespace FAD3
             var Cancel = false;
             var msg = "";
             SetIDType(_lastIdentification);
-            if (CurrentIDType == Identification.Scientific)
+            if (_lastIdentification == null)
+            {
+                return (Cancel, msg);
+            }
+            else if (CurrentIDType == Identification.Scientific)
             {
                 Cancel = _lastIdentification.Text.Length == 0 || _lastName1.Text.Length == 0
                     || _lastName2.Text.Length == 0 || _lastWeight.Text.Length == 0;
@@ -1496,7 +1503,14 @@ namespace FAD3
 
         private void SetIDType(TextBox source)
         {
-            CurrentIDType = _CatchCompositionData[source.Tag.ToString()].NameType;
+            if (source == null)
+            {
+                CurrentIDType = Identification.Scientific;
+            }
+            else
+            {
+                CurrentIDType = _CatchCompositionData[source.Tag.ToString()].NameType;
+            }
         }
 
         private void SetRowStatusToEdited(Control source)

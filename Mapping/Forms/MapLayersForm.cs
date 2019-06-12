@@ -225,14 +225,17 @@ namespace FAD3
 
                 if (!_mapLayersHandler[e.LayerHandle].IsMaskLayer)
                 {
-                    //we always insert a new layer in the first row of the dataGrid
-                    layerGrid.Rows.Insert(0, new object[] { e.LayerVisible, e.LayerName, pic.Image });
+                    layerGrid.Invoke((MethodInvoker)delegate
+                    {
+                        //we always insert a new layer in the first row of the dataGrid
+                        layerGrid.Rows.Insert(0, new object[] { e.LayerVisible, e.LayerName, pic.Image });
 
-                    //we assign the layerhandle to the tag of cell 0,0
-                    layerGrid[0, 0].Tag = e.LayerHandle;
+                        //we assign the layerhandle to the tag of cell 0,0
+                        layerGrid[0, 0].Tag = e.LayerHandle;
 
-                    //symbolize the current layer by making it bold font
-                    MarkCurrentLayerName(CurrentLayerRow());
+                        //symbolize the current layer by making it bold font
+                        MarkCurrentLayerName(CurrentLayerRow());
+                    });
                 }
             }
         }

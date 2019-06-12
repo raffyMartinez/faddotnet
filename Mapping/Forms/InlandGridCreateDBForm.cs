@@ -3,6 +3,7 @@ using MapWinGIS;
 using System;
 using System.IO;
 using System.Windows.Forms;
+using System.Threading.Tasks;
 
 namespace FAD3
 {
@@ -29,6 +30,7 @@ namespace FAD3
             switch (((Button)sender).Name)
             {
                 case "btnOk":
+                    txtStatus.Clear();
                     CreateInlandPointDatabase.UTMZone = UTMZone;
                     CreateInlandPointDatabase.StatusUpdate += OnStatusUpdate;
                     CreateInlandPointDatabase.Grid25Shapefile = (Shapefile)global.MappingForm.MapLayersHandler.get_MapLayer(cboGrid25.Text).LayerObject;
@@ -59,7 +61,8 @@ namespace FAD3
                         {
                             CreateInlandPointDatabase.MapInterActionHandler = global.MappingForm.MapInterActionHandler;
                             CreateInlandPointDatabase.FileName = fileOpen.FileName;
-                            CreateInlandPointDatabase.Start();
+                            //CreateInlandPointDatabase.Start();
+                            AsyncCreateInlandPoints();
                         }
                     }
                     break;
@@ -70,13 +73,26 @@ namespace FAD3
             }
         }
 
+        private async void AsyncCreateInlandPoints()
+        {
+            bool result = await TaskCreateInlandPoints();
+        }
+
+        private Task<bool> TaskCreateInlandPoints()
+        {
+            return Task.Run(() => CreateInlandPointDatabase.Start());
+        }
+
         private void OnStatusUpdate(CreateInlandGridEventArgs e)
         {
-            txtStatus.Text += $"{e.Status}: {e.GridCount}\r\n";
-            if (e.StatusDescription != null && e.StatusDescription.Length > 0)
+            Invoke((MethodInvoker)(() =>
             {
-                txtStatus.Text += $"{e.StatusDescription}\r\n";
-            }
+                txtStatus.Text = $"{e.Status}: {e.GridCount}\r\n{txtStatus.Text}";
+                if (e.StatusDescription != null && e.StatusDescription.Length > 0)
+                {
+                    txtStatus.Text = $"{e.StatusDescription}\r\n{txtStatus.Text}";
+                }
+            }));
         }
 
         private void OnInlandGridCreateDBForm_FormClosed(object sender, FormClosedEventArgs e)

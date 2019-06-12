@@ -115,13 +115,13 @@ namespace FAD3.Mapping.Forms
                 {
                     case "rdbAll":
                         MapInSelectedTargetArea = false;
-                        _sampledYears = Sampling.GetSamplingYears();
+                        _sampledYears = Samplings.GetSamplingYears();
                         SelectedTargetAreaGuid = "";
                         break;
 
                     case "rdbSelected":
                         MapInSelectedTargetArea = true;
-                        _sampledYears = Sampling.GetSamplingYears(SelectedTargetAreaGuid);
+                        _sampledYears = Samplings.GetSamplingYears(SelectedTargetAreaGuid);
                         break;
                 }
                 FillSampledYearList();

@@ -45,6 +45,7 @@ namespace FAD3.Mapping.Forms
         private string _startTimePeriod = "";
         private string _endTimePeriod = "";
         private bool _classificationCancelled = false;
+        private List<CategoryItem> _categoryItems = new List<CategoryItem>();
 
         public static SpatioTemporalMappingForm GetInstance()
         {
@@ -131,12 +132,14 @@ namespace FAD3.Mapping.Forms
         /// <summary>
         /// calls method that reads csv data as a separate process. When reading of CSV is done, it will update the fields
         /// </summary>
-        private async void ReadCSVFile()
+        //private async void ReadCSVFile()
+        private async Task ReadCSVFile()
         {
-            bool result = await ReadCVSFileTask();
+            //bool result = await ReadCVSFileTask();
+            bool result = await Task.Run(() => MakeGridFromPoints.ParseSingleDimensionCSV());
 
-            //this will wait until ReadCVSFileTask() is finished then
-            //the fields and comboBoxes is filled up
+            //this will wait until MakeGridFromPoints.ParseSingleDimensionCSV() is finished then
+            //the fields and comboBoxes are filled up
             _dataPoints = MakeGridFromPoints.PointCountPerTimeEra;
             txtRows.Text = _dataPoints.ToString();
 
@@ -168,15 +171,6 @@ namespace FAD3.Mapping.Forms
                 cboLastData.Text = _endTimePeriod;
             }
             _datafileRead = true;
-        }
-
-        /// <summary>
-        /// reads CSV data as a separate process
-        /// </summary>
-        /// <returns></returns>
-        private Task<bool> ReadCVSFileTask()
-        {
-            return Task.Run(() => MakeGridFromPoints.ParseSingleDimensionCSV());
         }
 
         private void RemoveMappingResults()
@@ -222,7 +216,7 @@ namespace FAD3.Mapping.Forms
             }
         }
 
-        private void OnButtonClick(object sender, EventArgs e)
+        private async void OnButtonClick(object sender, EventArgs e)
         {
             switch (((Button)sender).Name)
             {
@@ -306,13 +300,14 @@ namespace FAD3.Mapping.Forms
                         ResetCategoryAndMappingResults();
 
                         //reads csv data in a separate thread
-                        ReadCSVFile();
+                        await ReadCSVFile();
 
                         lblParameter.Text = cboValue.Text;
                     }
                     break;
 
                 case "btnCategorize":
+                    dgCategories.Rows.Clear();
                     btnCategorize.Enabled = false;
                     bool categorizationSuccess = false;
                     _classificationCancelled = false;
@@ -329,7 +324,13 @@ namespace FAD3.Mapping.Forms
                         switch (_classificationScheme)
                         {
                             case "Jenk's-Fisher's":
-                                categorizationSuccess = DoJenksFisherCategorization();
+                                int colorIndex = icbColorScheme.SelectedIndex;
+                                categorizationSuccess = await Task.Run(() => DoJenksFisherCategorization(colorIndex));
+                                foreach (CategoryItem ci in _categoryItems)
+                                {
+                                    var row = dgCategories.Rows.Add(new object[] { $"{ci.Lower.ToString("N5")} - {ci.Upper.ToString("N5")}", ci.ClassSize, "" });
+                                    dgCategories[2, row].Style.BackColor = ci.Color;
+                                }
                                 break;
 
                             case "Unique values":
@@ -400,13 +401,18 @@ namespace FAD3.Mapping.Forms
 
                     if (MakeGridFromPoints.RegularShapeGrid)
                     {
-                        btnCategorize.Enabled = MapGridPoints();
+                        btnCategorize.Enabled = await Task.Run(() => MapGridPoints());
                         listSelectedTimePeriods.Enabled = _hasMesh;
                     }
                     else
                     {
-                        btnShowGridPolygons.Enabled = MapGridPoints();
+                        btnShowGridPolygons.Enabled = await Task.Run(() => MapGridPoints());
                     }
+                    var mapControl = global.MappingForm.MapControl;
+                    var ext = mapControl.Extents;
+                    ext.MoveTo(MakeGridFromPoints.GridShapefile.Extents.Center.x, MakeGridFromPoints.GridShapefile.Extents.Center.y);
+                    mapControl.Extents = ext;
+                    //mapControl.Redraw();
                     txtInlandPoints.Text = MakeGridFromPoints.InlandPointCount.ToString();
                     break;
 
@@ -554,7 +560,13 @@ namespace FAD3.Mapping.Forms
                                         }
                                         else
                                         {
-                                            dictCategory[MakeGridFromPoints.WhatCategory(item, _classificationScheme).ToString()]++;
+                                            try
+                                            {
+                                                dictCategory[MakeGridFromPoints.WhatCategory(item, _classificationScheme).ToString()]++;
+                                            }
+                                            catch
+                                            {
+                                            }
                                         }
                                     }
                                     break;
@@ -737,7 +749,7 @@ namespace FAD3.Mapping.Forms
             }
             if (_hashSelectedValues.Count > 0)
             {
-                dgCategories.Rows.Clear();
+                //dgCategories.Rows.Clear();
                 int row;
                 Color color;
 
@@ -764,11 +776,11 @@ namespace FAD3.Mapping.Forms
         /// do a Jenk's-Fisher categorization of the values. The category breaks are found in List<Double> listBreaks
         /// </summary>
         /// <returns></returns>
-        private bool DoJenksFisherCategorization()
+        private bool DoJenksFisherCategorization(int colorIndex)
         {
             if (txtCategoryCount.Text.Length > 0)
             {
-                dgCategories.Rows.Clear();
+                _categoryItems.Clear();
                 _dataValues.Sort();
                 var listBreaks = JenksFisher.CreateJenksFisherBreaksArray(_dataValues, int.Parse(txtCategoryCount.Text));
                 var n = 0;
@@ -779,28 +791,42 @@ namespace FAD3.Mapping.Forms
                 Color color;
 
                 MakeGridFromPoints.Categories.Clear();
-                ColorBlend blend = (ColorBlend)icbColorScheme.ColorSchemes.List[icbColorScheme.SelectedIndex];
+                //ColorBlend blend = (ColorBlend)icbColorScheme.ColorSchemes.List[icbColorScheme.SelectedIndex];
+                ColorBlend blend = (ColorBlend)icbColorScheme.ColorSchemes.List[colorIndex];
                 MakeGridFromPoints.NumberOfCategories = int.Parse(txtCategoryCount.Text);
                 MakeGridFromPoints.ColorBlend = blend;
 
                 //make categories from the breaks defined in Jenk's-Fisher's
                 //add the category range and color to a datagridview
+                CategoryItem ci;
                 foreach (var item in listBreaks)
                 {
                     if (n > 0)
                     {
                         upper = item;
                         color = MakeGridFromPoints.AddCategory(lower, upper);
-                        row = dgCategories.Rows.Add(new object[] { $"{lower.ToString("N5")} - {upper.ToString("N5")}", GetClassSize(lower, upper).ToString(), "" });
-                        dgCategories[2, row].Style.BackColor = color;
+                        ci = new CategoryItem();
+                        ci.Upper = item;
+                        ci.Color = color;
+                        ci.Lower = lower;
+                        ci.ClassSize = GetClassSize(lower, upper).ToString();
+                        //row = dgCategories.Rows.Add(new object[] { $"{lower.ToString("N5")} - {upper.ToString("N5")}", GetClassSize(lower, upper).ToString(), "" });
+                        //dgCategories[2, row].Style.BackColor = color;
                         lower = item;
+                        _categoryItems.Add(ci);
                     }
                     n++;
                 }
                 //add the last category to the datagridview
                 color = MakeGridFromPoints.AddCategory(upper, _dataValues.Max() + 1);
-                row = dgCategories.Rows.Add(new object[] { $"{listBreaks.Max().ToString("N5")} - {_dataValues.Max().ToString("N5")}", GetClassSize(listBreaks.Max(), 0, true).ToString(), "" });
-                dgCategories[2, row].Style.BackColor = color;
+                //row = dgCategories.Rows.Add(new object[] { $"{listBreaks.Max().ToString("N5")} - {_dataValues.Max().ToString("N5")}", GetClassSize(listBreaks.Max(), 0, true).ToString(), "" });
+                //dgCategories[2, row].Style.BackColor = color;
+                ci = new CategoryItem();
+                ci.Color = color;
+                ci.Lower = listBreaks.Max();
+                ci.Upper = _dataValues.Max();
+                ci.ClassSize = GetClassSize(listBreaks.Max(), 0, true).ToString();
+                _categoryItems.Add(ci);
 
                 //add an empty null category
                 MakeGridFromPoints.AddNullCategory();

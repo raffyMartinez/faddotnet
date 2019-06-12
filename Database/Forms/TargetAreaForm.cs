@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using FAD3.GUI.Classes;
+using ISO_Classes;
 
 namespace FAD3
 {
@@ -75,6 +76,18 @@ namespace FAD3
             InitializeComponent();
             _isNew = IsNew;
             _parent_form = Parent;
+            global.MapperOpen += OnMapperOpen;
+            global.MapperClosed += OnMapperClosed;
+        }
+
+        private void OnMapperClosed(object sender, EventArgs e)
+        {
+            btnShow.Enabled = false;
+        }
+
+        private void OnMapperOpen(object sender, EventArgs e)
+        {
+            btnShow.Enabled = true;
         }
 
         public void ShowTargetAreaProperties()
@@ -110,15 +123,15 @@ namespace FAD3
                         }
                         switch (FishingGrid.SubGridStyle)
                         {
-                            case fadSubgridSyle.SubgridStyleNone:
+                            case fadSubgridStyle.SubgridStyleNone:
                                 comboSubGrid.SelectedIndex = 0;
                                 break;
 
-                            case fadSubgridSyle.SubgridStyle4:
+                            case fadSubgridStyle.SubgridStyle4:
                                 comboSubGrid.SelectedIndex = 1;
                                 break;
 
-                            case fadSubgridSyle.SubgridStyle9:
+                            case fadSubgridStyle.SubgridStyle9:
                                 comboSubGrid.SelectedIndex = 2;
                                 break;
                         }
@@ -183,6 +196,7 @@ namespace FAD3
             }
             SetupTooltips();
             txtName.Focus();
+            btnShow.Enabled = global.MapIsOpen;
         }
 
         private void SetupTooltips()
@@ -347,6 +361,10 @@ namespace FAD3
         {
             switch (((Button)sender).Name)
             {
+                case "btnShow":
+                    global.MappingForm.MapLayersHandler.AddMBRLayer(_targetArea, true);
+                    break;
+
                 case "buttonOK":
                     if (ValidateForm())
                     {
@@ -376,10 +394,12 @@ namespace FAD3
         private void OnFormClosed(object sender, FormClosedEventArgs e)
         {
             if (FishingGrid.GridType == fadGridType.gridTypeGrid25)
-                FishingGrid.SubGridStyle = (fadSubgridSyle)comboSubGrid.SelectedIndex;
+                FishingGrid.SubGridStyle = (fadSubgridStyle)comboSubGrid.SelectedIndex;
 
             _instance = null;
             global.SaveFormSettings(this);
+            global.MapperOpen -= OnMapperOpen;
+            global.MapperClosed -= OnMapperClosed;
         }
 
         private void lvMaps_MouseDown(object sender, MouseEventArgs e)
@@ -494,6 +514,37 @@ namespace FAD3
             if (e.Cancel)
             {
                 MessageBox.Show(msg, "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
+        private void OnSelectedTabChanged(object sender, EventArgs e)
+        {
+            switch (((TabControl)(sender)).SelectedTab.Name)
+            {
+                case "tabMBR":
+                    Coordinate ul = new Coordinate(FishingGrid.UpperLeftExtent.Y, FishingGrid.UpperLeftExtent.X);
+                    Coordinate lr = new Coordinate(FishingGrid.LowerRighttExtent.Y, FishingGrid.LowerRighttExtent.X);
+                    switch (global.CoordinateDisplay)
+                    {
+                        case CoordinateDisplayFormat.DegreeDecimal:
+                            txtUL.Text = ul.ToString("D");
+                            txtLR.Text = lr.ToString("D");
+                            break;
+
+                        case CoordinateDisplayFormat.DegreeMinute:
+                            txtUL.Text = ul.ToString("DM");
+                            txtLR.Text = lr.ToString("DM");
+                            break;
+
+                        case CoordinateDisplayFormat.DegreeMinuteSecond:
+                            txtUL.Text = ul.ToString("DMS");
+                            txtLR.Text = lr.ToString("DMS");
+                            break;
+                    }
+                    break;
+
+                case "tabOtherGrid":
+                    break;
             }
         }
     }

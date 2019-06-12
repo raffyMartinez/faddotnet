@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
 using System.Reflection;
+using MetaphoneCOM;
 
 namespace FAD3
 {
@@ -66,6 +67,97 @@ namespace FAD3
                 }
                 return taxa;
             }
+        }
+
+        public static bool AddCatchName(string nameGuid, string identification, string name1, string name2,
+           int? taxaNumber = null, bool inFishbase = false, int? fbSpeciesNumber = null)
+        {
+            bool success = false;
+            string sql = "";
+            var dms = new DoubleMetaphoneShort();
+            if (identification == "Scientific")
+            {
+                dms.ComputeMetaphoneKeys(name1, out short g1, out short g2);
+                dms.ComputeMetaphoneKeys(name2, out short s1, out short s2);
+                sql = $@"Insert into tblAllSpecies(Genus,species,ListedFB,TaxaNo,FBSpNo,SpeciesGUID,MPHG1,MPHG2,MPHS1,MPHS2)
+                        values (
+                          '{name1}',
+                          '{name2}',
+                          {inFishbase},
+                          {taxaNumber},
+                          {(fbSpeciesNumber == null ? "null" : fbSpeciesNumber.ToString())},
+                          {{{nameGuid}}},
+                          {g1},
+                          {g2},
+                          {s1},
+                          {s2}
+                        )";
+            }
+            else if (identification == "LocalName")
+            {
+                dms.ComputeMetaphoneKeys(name1, out short ln1, out short ln2);
+                sql = $@"Insert into tblBaseLocalNames(Name, NameNo, MPH1,MPH2)
+                         values (
+                        '{name1}',
+                        {{{nameGuid}}},
+                        {ln1},
+                        {ln2}
+                        )";
+            }
+            using (var conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+
+                using (OleDbCommand update = new OleDbCommand(sql, conn))
+                {
+                    try
+                    {
+                        success = update.ExecuteNonQuery() > 0;
+                        if (success)
+                        {
+                            string idType = "";
+                            switch (identification)
+                            {
+                                case "Scientific":
+                                    idType = "Species names";
+                                    break;
+
+                                case "LocalName":
+                                    idType = "Local names";
+                                    break;
+                            }
+                            sql = $@"Insert into temp_AllNames (Name1,Name2,NameNo,Identification)
+                                    values (
+                                    '{name1}','{name2}',{{{nameGuid}}},{idType}
+                                    )";
+                            using (OleDbCommand updateAll = new OleDbCommand(sql, conn))
+                            {
+                                try
+                                {
+                                    updateAll.ExecuteNonQuery();
+                                }
+                                catch (OleDbException dbex)
+                                {
+                                    Logger.Log(dbex.Message, "CatchName", "AddCatchName");
+                                }
+                                catch (Exception ex1)
+                                {
+                                    Logger.Log(ex1.Message, "CatchName", "AddCatchName");
+                                }
+                            }
+                        }
+                    }
+                    catch (OleDbException)
+                    {
+                        success = false;
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log(ex.Message, "CatchName", "AddCatchName");
+                    }
+                }
+            }
+            return success;
         }
 
         public static Taxa TaxaFromCatchName(string genus, string species)

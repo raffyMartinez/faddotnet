@@ -10,8 +10,9 @@ namespace FAD3
 {
     public static class LandingSiteMappingHandler
     {
-        public static bool ShowLandingSitesOnMap(MapLayersHandler layersHandler, string aoiGUID, GeoProjection gp, bool uniqueLayerName = false)
+        public static bool ShowLandingSitesOnMap(MapLayersHandler layersHandler, string aoiGUID, GeoProjection gp, ref string layerName, bool uniqueLayerName = false)
         {
+            layerName = "Landing sites";
             var myDT = new DataTable();
             var iShp = -1;
             using (var conection = new OleDbConnection(global.ConnectionString))
@@ -70,7 +71,20 @@ namespace FAD3
                                     }
                                 }
                             }
-                            if (iShp >= 0) layersHandler.AddLayer(sf, "Landing sites", true, uniqueLayerName);
+                            sf.DefaultDrawingOptions.PointShape = tkPointShapeType.ptShapeCircle;
+                            sf.DefaultDrawingOptions.FillColor = new Utils().ColorByName(tkMapColor.Red);
+                            sf.DefaultDrawingOptions.PointSize = 7;
+                            sf.DefaultDrawingOptions.LineVisible = false;
+                            if (sf.Labels.Generate("[Name]", tkLabelPositioning.lpCenter, false) > 0)
+                            {
+                                sf.Labels.FontSize = 7;
+                                sf.Labels.FontBold = true;
+                                sf.Labels.FrameVisible = false;
+                            }
+                            if (iShp >= 0)
+                            {
+                                layersHandler.AddLayer(sf, layerName, true, uniqueLayerName);
+                            }
                         }
                     }
                 }

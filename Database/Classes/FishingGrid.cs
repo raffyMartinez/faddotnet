@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
 using System.Reflection;
+using System.Drawing;
 
 namespace FAD3
 {
@@ -21,8 +22,10 @@ namespace FAD3
         private static fadGridType _gt = fadGridType.gridTypeNone;
         private static List<string> _UTMZones = new List<string>();
         private static string _appPath;
-        private static fadSubgridSyle _subGridStyle = fadSubgridSyle.SubgridStyleNone;
+        private static fadSubgridStyle _subGridStyle = fadSubgridStyle.SubgridStyleNone;
         private static List<string> _subGri2dStyleList = new List<string>();
+        public static PointF UpperLeftExtent { get; internal set; }
+        public static PointF LowerRighttExtent { get; internal set; }
 
         /// <summary>
         /// Constructor
@@ -34,8 +37,8 @@ namespace FAD3
             _appPath = global.ApplicationPath;
 
             _subGri2dStyleList.Add("None");
-            _subGri2dStyleList.Add("4");
-            _subGri2dStyleList.Add("9");
+            _subGri2dStyleList.Add("2 x 2");
+            _subGri2dStyleList.Add("3 x 3");
         }
 
         /// <summary>
@@ -119,7 +122,7 @@ namespace FAD3
         /// Sets subgridding of minor grid for finer grid resolution.
         /// Choices are none, 4 subgrids, or 9 subgrids.
         /// </summary>
-        public static fadSubgridSyle SubGridStyle
+        public static fadSubgridStyle SubGridStyle
         {
             get { return _subGridStyle; }
             set
@@ -793,7 +796,7 @@ namespace FAD3
         private static void CalculateGridSet()
         {
             _grid25.GridSet.Clear();
-            //foreach (var item in _grid25.Bounds)
+            int c = 0;
             foreach (var item in _grid25.BoundsEx)
             {
                 var arr = item.Value.ulGridName.Split('-');
@@ -817,6 +820,42 @@ namespace FAD3
                         _grid25.GridSet.Add((ul - (_grid25.MajorGridColumns * n) + nn).ToString());
                     }
                 }
+                var ptUL = Grid25ToLatLong(item.Value.ulGridName, _utmZone);
+                var ptLR = Grid25ToLatLong(item.Value.lrGridName, _utmZone);
+
+                if (c == 0)
+                {
+                    UpperLeftExtent = new PointF((float)ptUL.longitude, (float)ptUL.latitude);
+                    LowerRighttExtent = new PointF((float)ptLR.longitude, (float)ptLR.latitude);
+                }
+                else
+                {
+                    var ulX = UpperLeftExtent.X;
+                    var ulY = UpperLeftExtent.Y;
+                    if (ptUL.latitude > ulY)
+                    {
+                        ulY = (float)ptUL.latitude;
+                    }
+                    if (ptUL.longitude < ulX)
+                    {
+                        ulX = (float)ptUL.longitude;
+                    }
+                    UpperLeftExtent = new PointF(ulX, ulY);
+
+                    var lrX = LowerRighttExtent.X;
+                    var lrY = LowerRighttExtent.Y;
+                    if (ptLR.latitude < lrY)
+                    {
+                        lrY = (float)ptLR.latitude;
+                    }
+                    if (ptLR.longitude > lrX)
+                    {
+                        lrX = (float)ptLR.longitude;
+                    }
+                    LowerRighttExtent = new PointF(lrX, lrY);
+                }
+
+                c++;
             }
         }
 
@@ -918,15 +957,15 @@ namespace FAD3
                                 {
                                     case "-1":
                                     case "0":
-                                        _subGridStyle = fadSubgridSyle.SubgridStyleNone;
+                                        _subGridStyle = fadSubgridStyle.SubgridStyleNone;
                                         break;
 
                                     case "1":
-                                        _subGridStyle = fadSubgridSyle.SubgridStyle4;
+                                        _subGridStyle = fadSubgridStyle.SubgridStyle4;
                                         break;
 
                                     case "2":
-                                        _subGridStyle = fadSubgridSyle.SubgridStyle9;
+                                        _subGridStyle = fadSubgridStyle.SubgridStyle9;
                                         break;
                                 }
                             }
@@ -1065,15 +1104,22 @@ namespace FAD3
         /// <summary>
         /// returns using out parameters the UTM easting and northing coordinates of a grid
         /// </summary>
-        /// <param name="GridName"></param>
-        /// <param name="Easting"></param>
-        /// <param name="Northing"></param>
+        /// <param name="gridName"></param>
+        /// <param name="easting"></param>
+        /// <param name="northing"></param>
         /// <returns></returns>
-        public static string Grid25_to_UTM(string GridName, out int Easting, out int Northing)
+        public static string Grid25_to_UTM(string gridName, out int easting, out int northing)
         {
-            Easting = Northing = 0;
-            MinorGridCentroid(GridName, out Easting, out Northing);
-            return UTMZoneName + " " + Easting + " " + Northing;
+            easting = northing = 0;
+            MinorGridCentroid(gridName, out easting, out northing);
+            return UTMZoneName + " " + easting + " " + northing;
+        }
+
+        public static Point Grid25ToUTMPoint(string gridName)
+        {
+            int easting = 0; int northing = 0;
+            MinorGridCentroid(gridName, out easting, out northing);
+            return new Point(easting, northing);
         }
 
         private static void CleanGridName()
@@ -1088,7 +1134,7 @@ namespace FAD3
         /// deletes additional fishing ground maps of a target area
         /// </summary>
         /// <param name="TargetAreaGuid"></param>
-        private static void DeleteAdditionalFishingGroundMaps(string TargetAreaGuid)
+        public static void DeleteAdditionalFishingGroundMaps(string TargetAreaGuid)
         {
             using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
             {
@@ -1134,6 +1180,51 @@ namespace FAD3
                 }
             }
             return proceed;
+        }
+
+        public static bool AddGrid25Map(string targetAreaGuid, fadSubgridStyle subgridStyle, fadUTMZone zone, string ulg, string lrg, string mapName, bool firstMap = false)
+        {
+            string utmzone = "";
+            bool success = false;
+            switch (zone)
+            {
+                case fadUTMZone.utmZone50N:
+                    utmzone = "50N";
+                    break;
+
+                case fadUTMZone.utmZone51N:
+                    utmzone = "51N";
+                    break;
+
+                case fadUTMZone.utmZone_Undefined:
+                    break;
+            }
+            string sql = "";
+            if (firstMap)
+            {
+                sql = $@"Update tblAOI set
+                         UseGrid25 = {true},
+                         UTMZone = '{utmzone}',
+                         SubgridStyle = {(int)subgridStyle},
+                         GridDescription = '{mapName}',
+                         UpperLeftGrid = '{ulg}',
+                         LowerRightGrid = '{lrg}'
+                         where AOIGuid = {{{targetAreaGuid}}}";
+            }
+            else
+            {
+                sql = $@"Insert into tblAdditionalAOIExtent
+                            (AOIGuid, GridDescription, UpperLeft, LowerRight, RowNumber)
+                            values
+                            ({{{targetAreaGuid}}},'{mapName}','{ulg}','{lrg}', {{{Guid.NewGuid().ToString()}}})";
+            }
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                OleDbCommand update = new OleDbCommand(sql, conn);
+                conn.Open();
+                success = (update.ExecuteNonQuery() > 0);
+            }
+            return success;
         }
 
         /// <summary>

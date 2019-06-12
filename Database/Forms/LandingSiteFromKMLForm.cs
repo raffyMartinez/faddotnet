@@ -63,6 +63,7 @@ namespace FAD3
             switch (((Button)sender).Name)
             {
                 case "btnOk":
+                    List<string> itemsNotAdded = new List<string>();
                     bool isNew = false;
                     var landingSite = new Landingsite();
                     Dictionary<string, string> LSData = new Dictionary<string, string>();
@@ -70,40 +71,64 @@ namespace FAD3
                     {
                         if (item.Checked && item.SubItems[4].Text == "yes")
                         {
-                            var landingSiteName = item.Text;
-                            LSData.Clear();
-                            LSData.Add("LSName", landingSiteName);
-                            LSData.Add("MunNo", item.SubItems[1].Tag.ToString());
-                            LSData.Add("AOIGuid", _targetArea.TargetAreaGuid);
-                            if (_targetArea.LandingSiteExists(landingSiteName))
+                            if (item.SubItems[1].Text.Length > 0)
                             {
-                                isNew = false;
-                                landingSite = TargetArea.LandingSiteFromName(LandingSiteName, _targetArea.TargetAreaGuid);
-                                LSData.Add("LSGUID", landingSite.LandingSiteGUID);
-                                //landingSite
-                            }
-                            else
-                            {
-                                var coordinate = new Coordinate(float.Parse(item.SubItems[3].Tag.ToString()), float.Parse(item.SubItems[2].Tag.ToString()));
-                                LSData.Add("HasCoordinate", true.ToString());
-                                landingSite.Coordinate = coordinate;
-                                isNew = true;
-                                LSData.Add("LSGUID", Guid.NewGuid().ToString());
-                            }
-                            if (landingSite.UpdateData(isNew, LSData))
-                            {
-                                if (isNew)
+                                var landingSiteName = item.Text;
+                                LSData.Clear();
+                                LSData.Add("LSName", landingSiteName);
+                                LSData.Add("MunNo", item.SubItems[1].Tag.ToString());
+                                LSData.Add("AOIGuid", _targetArea.TargetAreaGuid);
+                                if (_targetArea.LandingSiteExists(landingSiteName))
                                 {
-                                    global.mainForm.NewLandingSite(LSData["LSName"], LSData["LSGUID"], _targetArea.TargetAreaGuid);
+                                    isNew = false;
+                                    landingSite = TargetArea.LandingSiteFromName(landingSiteName, _targetArea.TargetAreaGuid);
+                                    LSData.Add("LSGUID", landingSite.LandingSiteGUID);
+                                    //landingSite
                                 }
                                 else
                                 {
-                                    global.mainForm.RefreshLV("landing_site");
+                                    var coordinate = new Coordinate(float.Parse(item.SubItems[3].Tag.ToString()), float.Parse(item.SubItems[2].Tag.ToString()));
+                                    LSData.Add("HasCoordinate", true.ToString());
+                                    landingSite.Coordinate = coordinate;
+                                    isNew = true;
+                                    LSData.Add("LSGUID", Guid.NewGuid().ToString());
                                 }
+                                if (landingSite.UpdateData(isNew, LSData))
+                                {
+                                    if (isNew)
+                                    {
+                                        global.mainForm.NewLandingSite(LSData["LSName"], LSData["LSGUID"], _targetArea.TargetAreaGuid);
+                                    }
+                                    else
+                                    {
+                                        global.mainForm.RefreshLV("landing_site");
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                itemsNotAdded.Add(item.Text);
                             }
                         }
                     }
-                    Close();
+                    if (itemsNotAdded.Count > 0)
+                    {
+                        string notAdded = "";
+                        for (int x = 0; x < itemsNotAdded.Count; x++)
+                        {
+                            notAdded += $"{itemsNotAdded[x]}, ";
+                        }
+                        notAdded = notAdded.Trim(new char[] { ' ', ',' });
+                        DialogResult dr = MessageBox.Show($"The municipality of the landing sites is missing:\r\n{notAdded}", "Municipality is not provided", MessageBoxButtons.RetryCancel, MessageBoxIcon.Information);
+                        if (dr == DialogResult.Cancel)
+                        {
+                            Close();
+                        }
+                    }
+                    else
+                    {
+                        Close();
+                    }
                     break;
 
                 case "btnCancel":
@@ -182,10 +207,16 @@ namespace FAD3
 
         private void OnContextMenuClick(object sender, ToolStripItemClickedEventArgs e)
         {
-            var lsForm = new LandingSiteForm(_targetArea, this, lvLS.SelectedItems[0].Text, double.Parse(lvLS.SelectedItems[0].SubItems[2].Tag.ToString()), double.Parse(lvLS.SelectedItems[0].SubItems[3].Tag.ToString()), false, true);
-            lsForm.ShowDialog(this);
-            lvLS.SelectedItems[0].SubItems[1].Text = LandingSiteMunicipalityName;
-            lvLS.SelectedItems[0].SubItems[1].Tag = LandingSiteMunicipalityNumber;
+            using (var lsForm = new LandingSiteForm(_targetArea, this, lvLS.SelectedItems[0].Text, double.Parse(lvLS.SelectedItems[0].SubItems[2].Tag.ToString()), double.Parse(lvLS.SelectedItems[0].SubItems[3].Tag.ToString()), false, true))
+            {
+                if (lsForm.ShowDialog(this) == DialogResult.OK)
+                {
+                    //lvLS.SelectedItems[0].SubItems[1].Text = LandingSiteMunicipalityName;
+                    //lvLS.SelectedItems[0].SubItems[1].Tag = LandingSiteMunicipalityNumber;
+                    lvLS.SelectedItems[0].SubItems[1].Text = lsForm.LandingSiteMunicipalityName;
+                    lvLS.SelectedItems[0].SubItems[1].Tag = lsForm.LandingSiteMunicipalityNumber;
+                }
+            }
         }
     }
 }

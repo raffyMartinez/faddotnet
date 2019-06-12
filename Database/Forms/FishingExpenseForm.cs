@@ -54,14 +54,14 @@ namespace FAD3.Database.Forms
 
         private void OnFormLoad(object sender, EventArgs e)
         {
-            foreach (var item in Gear.ExpenseItems)
+            foreach (var item in Gears.ExpenseItems)
             {
                 cboExpenseItem.Items.Add(item);
             }
             cboExpenseItem.AutoCompleteSource = AutoCompleteSource.ListItems;
             cboExpenseItem.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
 
-            foreach (var item in Gear.PaymentSources)
+            foreach (var item in Gears.PaymentSources)
             {
                 cboSource.Items.Add(item);
             }
@@ -138,11 +138,11 @@ namespace FAD3.Database.Forms
                                 switch (name)
                                 {
                                     case "cboExpenseItem":
-                                        Gear.AddExpense(s);
+                                        Gears.AddExpense(s);
                                         break;
 
                                     case "cboSource":
-                                        Gear.AddPaymentSource(s);
+                                        Gears.AddPaymentSource(s);
                                         break;
                                 }
                             }

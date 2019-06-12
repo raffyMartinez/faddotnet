@@ -28,7 +28,7 @@ namespace FAD3
             }
         }
 
-        public static string AOIGuid
+        public static string TargetAreaGUID
         {
             get { return _targetAreaGuid; }
             set
@@ -182,6 +182,28 @@ namespace FAD3
                 }
             }
             return (success, newEnumeratorGuid);
+        }
+
+        /// <summary>
+        /// deletes enumerators belonging to a target area
+        /// </summary>
+        /// <param name="targetAreaGuid"></param>
+        public static void DeleteEnumerators(string targetAreaGuid)
+        {
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                var sql = $"Delete * from tblEnumerators where TargetArea = {{{targetAreaGuid}}}";
+                OleDbCommand update = new OleDbCommand(sql, conn);
+                conn.Open();
+                try
+                {
+                    update.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex.Message, "Enumerators", "DeleteEnumerators");
+                }
+            }
         }
 
         public static bool SaveNewTargetAreaEnumerator(string targetAreaGuid, string name, DateTime hireDate, bool isActive, string enumeratorGuid)

@@ -22,6 +22,7 @@ using System.Windows.Forms;
 using FAD3.Mapping.Forms;
 using System.Text;
 using FAD3.Mapping.Classes;
+using System.Threading.Tasks;
 
 namespace FAD3
 {
@@ -48,7 +49,7 @@ namespace FAD3
         private mru _mrulist = new mru();
         private bool _newSamplingEntered;
         private string _oldMDB = "";
-        private Sampling _sampling;// =  new sampling();
+        private Samplings _sampling;// =  new sampling();
         private string _samplingGUID = "";
         private string _samplingMonth = "";
         private double _weightOfCatch;
@@ -143,7 +144,7 @@ namespace FAD3
                     {
                         _targetArea.TargetAreaGuid = _targetAreaGuid;
                         FishingGrid.TargetAreaGuid = _targetAreaGuid;
-                        Enumerators.AOIGuid = _targetAreaGuid;
+                        Enumerators.TargetAreaGUID = _targetAreaGuid;
                     }
                 }
             }
@@ -167,7 +168,7 @@ namespace FAD3
             get { return _mrulist; }
         }
 
-        public Sampling Sampling
+        public Samplings Sampling
         {
             get { return _sampling; }
         }
@@ -517,6 +518,10 @@ namespace FAD3
                     tsi.Name = "menuTargetAreaProp";
                     tsi.Enabled = _treeLevel == "target_area";
 
+                    tsi = menuDropDown.Items.Add("Target area MBR");
+                    tsi.Name = "menuMBR";
+                    tsi.Enabled = global.MapIsOpen && FishingGrid.IsCompleteGrid25;
+
                     var sep = menuDropDown.Items.Add("-");
                     sep.Name = "menuSeparator1";
 
@@ -553,6 +558,14 @@ namespace FAD3
                     tsi = menuDropDown.Items.Add("Delete");
                     tsi.Name = "menuDeleteTreeItem";
                     tsi.Enabled = _treeLevel != "root";
+
+                    tsi = menuDropDown.Items.Add("Export fish catch monitoring data");
+                    tsi.Name = "menuExportFishCatchMonitoring";
+                    tsi.Enabled = _treeLevel == "target_area";
+
+                    tsi = menuDropDown.Items.Add("Import fish catch monitoring data");
+                    tsi.Name = "menuImportFishCatchMonitoring";
+                    tsi.Enabled = _treeLevel == "root";
 
                     break;
 
@@ -670,7 +683,7 @@ namespace FAD3
             {
                 if (lvMain.Tag.ToString() == "sampling")
                 {
-                    if (Sampling.DeleteSampling(SamplingGUID))
+                    if (Samplings.DeleteSampling(SamplingGUID))
                     {
                         lvMain.Items.Remove(lvMain.Items[SamplingGUID]);
                         if (lvMain.Items.Count >= 1)
@@ -712,7 +725,7 @@ namespace FAD3
             var CompleteGrid25 = FishingGrid.IsCompleteGrid25;
             if (_readEfforMonth || (_updatedEffortMonth.LandingSiteGuid.Length > 0 && _updatedEffortMonth.GearVariationGuid.Length > 0))
             {
-                Sampling.SamplingSummaryForMonth(LSGUID, GearGUID, SamplingMonth);
+                Samplings.SamplingSummaryForMonth(LSGUID, GearGUID, SamplingMonth);
                 if (_updatedEffortMonth.LandingSiteGuid.Length > 0)
                 {
                     _updatedEffortMonth.LandingSiteGuid = "";
@@ -720,7 +733,7 @@ namespace FAD3
                 }
                 _readEfforMonth = false;
             }
-            foreach (var item in Sampling.EffortMonth)
+            foreach (var item in Samplings.EffortMonth)
             {
                 var row = lvMain.Items.Add(item.Key, item.Value.RefNo, null);                           //reference number
                 DateTime dt = (DateTime)item.Value.SamplingDate;
@@ -796,17 +809,17 @@ namespace FAD3
                         global.MDBPath = SavedMDBPath;
                         Names.GetGenus_LocalNames();
                         Names.GetLocalNames();
-                        Gear.GetGearLocalNames();
+                        Gears.GetGearLocalNames();
                         UpdateLocationTables();
                         statusPanelDBPath.Text = SavedMDBPath;
                         lblErrorFormOpen.Visible = false;
                         PopulateTree();
 
-                        _sampling = new Sampling();
+                        _sampling = new Samplings();
                         _sampling.OnEffortUpdated += EffortUpdated;
 
-                        Sampling.SetUpUIElement();
-                        _sampling.OnUIRowRead += new Sampling.ReadUIElement(OnUIRowRead);
+                        Samplings.SetUpUIElement();
+                        _sampling.OnUIRowRead += new Samplings.ReadUIElement(OnUIRowRead);
                     }
                     else
                     {
@@ -862,7 +875,7 @@ namespace FAD3
             global.mainForm = this;
         }
 
-        private void EffortUpdated(Sampling s, EffortEventArg e)
+        private void EffortUpdated(Samplings s, EffortEventArg e)
         {
             _updatedEffortMonth.SamplingDate = e.SamplingDate;
             _updatedEffortMonth.GearVariationGuid = e.GearVarGuid;
@@ -1037,12 +1050,92 @@ namespace FAD3
             }
         }
 
-        private void OnMenuDropDown_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        private async Task SamplingImportFromXML(string fileName, string targetAreaName, string targetAreaGuid, bool newTargetArea)
+        {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            SamplingToFromXML esxml = new SamplingToFromXML(fileName);
+            esxml.NewTargetArea = newTargetArea;
+            esxml.TargetAreaName = targetAreaName;
+            esxml.TargetAreaGuid = targetAreaGuid;
+            FileDownloadForm fdf = new FileDownloadForm(esxml, _targetArea);
+            fdf.Show(this);
+            bool result = await Task.Run(() => esxml.Import());
+            sw.Stop();
+            if (result)
+            {
+                Console.WriteLine($"time elapsed: { sw.ElapsedMilliseconds.ToString()} ms");
+                //MessageBox.Show("Successfully exported sampling to XML", "Export successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+            }
+        }
+
+        private async Task SamplingExportToXML(string fileName)
+        {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            SamplingToFromXML esxml = new SamplingToFromXML(_targetArea, fileName);
+            FileDownloadForm fdf = new FileDownloadForm(esxml, _targetArea);
+            fdf.Show(this);
+            bool result = await Task.Run(() => esxml.Export());
+            sw.Stop();
+            if (result)
+            {
+                Console.WriteLine($"time elapsed: { sw.ElapsedMilliseconds.ToString()} ms");
+                //MessageBox.Show("Successfully exported sampling to XML", "Export successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
+        private async void OnMenuDropDown_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
             var ItemName = e.ClickedItem.Name;
             e.ClickedItem.Owner.Hide();
             switch (ItemName)
             {
+                case "menuImportFishCatchMonitoring":
+                    using (OpenFileDialog ofd = new OpenFileDialog())
+                    {
+                        ofd.Title = "Import fish catch monitoring data";
+                        ofd.Filter = "XML|*.xml|CSV|*.csv|All file type|*.*";
+                        ofd.FilterIndex = 1;
+                        DialogResult dr = ofd.ShowDialog(this);
+                        if (dr == DialogResult.OK && ofd.FileName.Length > 0 && File.Exists(ofd.FileName))
+                        {
+                            using (ImportFishCatchMonitoringDestinationForm importForm = new ImportFishCatchMonitoringDestinationForm(_targetAreaName, _targetAreaGuid, this))
+                            {
+                                importForm.ImportXMLFileName = ofd.FileName;
+                                DialogResult drr = importForm.ShowDialog(this);
+                                if (drr == DialogResult.OK)
+                                {
+                                    await SamplingImportFromXML(ofd.FileName, importForm.TargetAreaName, importForm.TargetAreaGUID, importForm.NewTargetArea);
+                                    PopulateTree();
+                                    treeMain.Nodes["root"].Expand();
+                                }
+                            }
+                        }
+                    }
+                    break;
+
+                case "menuExportFishCatchMonitoring":
+                    using (SaveFileDialog sfd = new SaveFileDialog())
+                    {
+                        sfd.Title = "Export fish catch monitoring data";
+                        sfd.Filter = "XML|*.xml|CSV|*.csv|All file type|*.*";
+                        sfd.FilterIndex = 1;
+                        DialogResult dr = sfd.ShowDialog(this);
+                        if (dr == DialogResult.OK && sfd.FileName.Length > 0)
+                        {
+                            await SamplingExportToXML(sfd.FileName);
+                        }
+                    }
+                    break;
+
+                case "menuMBR":
+                    global.MappingForm.MapLayersHandler.AddMBRLayer(_targetArea, true);
+                    break;
+
                 case "menuFishingBoats":
                     FishingBoatForm fbf = FishingBoatForm.GetInstance();
                     if (fbf.Visible)
@@ -1180,9 +1273,17 @@ namespace FAD3
                     break;
 
                 case "menuShowOnMapLandingSites":
-                    if (!LandingSiteMappingHandler.ShowLandingSitesOnMap(global.MappingForm.MapLayersHandler, _targetAreaGuid, global.MappingForm.GeoProjection, true))
+                    string layerName = "";
+                    if (!LandingSiteMappingHandler.ShowLandingSitesOnMap(global.MappingForm.MapLayersHandler, _targetAreaGuid, global.MappingForm.GeoProjection, ref layerName, true))
                     {
                         MessageBox.Show("Landing sites could not be shown on the map.\r\nPlease check landing site coordinates", "Mapping error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        var ext = global.MappingForm.MapControl.Extents;
+                        var layerExt = ((MapWinGIS.Shapefile)global.MappingForm.MapLayersHandler.get_MapLayer(layerName).LayerObject).Extents;
+                        ext.MoveTo(layerExt.Center.x, layerExt.Center.y);
+                        global.MappingForm.MapControl.Extents = ext;
                     }
                     break;
 
@@ -1400,7 +1501,7 @@ namespace FAD3
                     if (SetupLF_GMSListView(Show: true, Content: fad3CatchSubRow.GMS))
                     {
                         _catchSubRow = fad3CatchSubRow.GMS;
-                        if (Enum.TryParse(lvCatch.SelectedItems[0].SubItems[7].Text, out Taxa myTaxa))
+                        if (Enum.TryParse(lvCatch.SelectedItems[0].SubItems[1].Tag.ToString(), out Taxa myTaxa))
                         {
                             _taxa = myTaxa;
                         }
@@ -1442,6 +1543,16 @@ namespace FAD3
                                             TargetAreaForm f = new TargetAreaForm(this, IsNew: false);
                                             f.TargetArea = _targetArea;
                                             f.ShowDialog(this);
+                                            //TargetAreaForm f = TargetAreaForm.GetInstance(this, IsNew: false);
+                                            //f.TargetArea = _targetArea;
+                                            //if (f.Visible)
+                                            //{
+                                            //    f.BringToFront();
+                                            //}
+                                            //else
+                                            //{
+                                            //    f.Show(this);
+                                            //}
                                         }
                                         else if (item.Name == "Enumerators")
                                         {
@@ -1601,9 +1712,9 @@ namespace FAD3
                         {
                             ShowCatchCompositionForm(true);
                         }
-                        else if (lvh.Item != null)
+                        else if (lvh.Item != null && lvh.Item.Text.Length > 0)
                         {
-                            if (Enum.TryParse(lvh.Item.SubItems[7].Text, out Taxa myTaxa))
+                            if (Enum.TryParse(lvh.Item.SubItems[1].Tag.ToString(), out Taxa myTaxa))
                             {
                                 _taxa = myTaxa;
                             }
@@ -1934,7 +2045,7 @@ namespace FAD3
 
                         nd1.Tag = Tuple.Create(item.LandingSiteGuid, item.GearVariationGuid, "gear");
                         nd1.Name = $"{item.LandingSiteGuid}|{item.GearVariationGuid}";
-                        nd1.ImageKey = Gear.GearClassImageKeyFromGearClasName(item.GearClassName);
+                        nd1.ImageKey = Gears.GearClassImageKeyFromGearClasName(item.GearClassName);
                     }
                     else if (myTag.Item3 == "gear")
                     {
@@ -1998,7 +2109,7 @@ namespace FAD3
                         _landingSiteGuid = treeMain.SelectedNode.Parent.Name;
                         _gearVarName = treeMain.SelectedNode.Text;
                         _gearVarGUID = myTag.Item2;
-                        var rv = Gear.GearClassGuidNameFromGearVarGuid(_gearVarGUID);
+                        var rv = Gears.GearClassGuidNameFromGearVarGuid(_gearVarGUID);
                         _gearClassName = rv.Value;
                         _gearClassGUID = rv.Key;
                         _LSNode = e.Node.Parent;
@@ -2012,7 +2123,7 @@ namespace FAD3
                         _landingSiteGuid = myTag.Item1;
                         _gearVarName = treeMain.SelectedNode.Parent.Text;
                         _gearVarGUID = myTag.Item2;
-                        rv = Gear.GearClassGuidNameFromGearVarGuid(_gearVarGUID);
+                        rv = Gears.GearClassGuidNameFromGearVarGuid(_gearVarGUID);
                         _gearClassName = rv.Value;
                         _gearClassGUID = rv.Key;
                         _LSNode = e.Node.Parent.Parent;
@@ -2164,9 +2275,9 @@ namespace FAD3
 
                 var gearNode = new TreeNode();
                 gearNode.Name = $"{LandingSiteGuid}|{GearVarGuid}";
-                gearNode.Text = Gear.GearVarNameFromGearGuid(GearVarGuid);
+                gearNode.Text = Gears.GearVarNameFromGearGuid(GearVarGuid);
                 gearNode.Tag = Tuple.Create(LandingSiteGuid, GearVarGuid, "gear");
-                gearNode.ImageKey = Gear.GearVarNodeImageKeyFromGearVar(GearVarGuid);
+                gearNode.ImageKey = Gears.GearVarNodeImageKeyFromGearVar(GearVarGuid);
 
                 var samplingMonthNode = new TreeNode(MonthYear);
                 samplingMonthNode.Name = $"{LandingSiteGuid}|{GearVarGuid}|{MonthYear}";
@@ -2511,10 +2622,10 @@ namespace FAD3
 
                 case "gear":
                     var myTag = (Tuple<string, string, string>)treeMain.SelectedNode.Tag;
-                    Gear.GearVarGUID = myTag.Item2;
+                    Gears.GearVarGUID = myTag.Item2;
                     var n = 0;
                     lvi = lvMain.Items.Add("Months sampled");
-                    foreach (var item in Gear.MonthsSampledByGear(myTag.Item1))
+                    foreach (var item in Gears.MonthsSampledByGear(myTag.Item1))
                     {
                         if (n > 0)
                         {
@@ -2581,7 +2692,14 @@ namespace FAD3
                     lvi.SubItems.Add(arr[1]);
                     lvi.Tag = "target_area_data";
                     lvi = lvMain.Items.Add("MBR");
-                    lvi.SubItems.Add("");
+                    if (FishingGrid.IsCompleteGrid25)
+                    {
+                        lvi.SubItems.Add($"{(_targetArea.Height / 1000).ToString("N1")} x {(_targetArea.Width / 1000).ToString("N1")} km");
+                    }
+                    else
+                    {
+                        lvi.SubItems.Add("");
+                    }
                     lvi.Tag = "target_area_data";
                     lvi = lvMain.Items.Add("Grid system");
                     lvi.Tag = "target_area_data";
@@ -2589,21 +2707,20 @@ namespace FAD3
 
                     if (FishingGrid.GridTypeName == "Grid25")
                     {
-                        lvi = lvMain.Items.Add("Sub grid style");
+                        lvi = lvMain.Items.Add("Sub-grid style");
                         lvi.Tag = "target_area_data";
-                        switch (arr[3])
+                        switch ((fadSubgridStyle)int.Parse(arr[3]))
                         {
-                            case "-1":
-                            case "0":
+                            case fadSubgridStyle.SubgridStyleNone:
                                 lvi.SubItems.Add("None");
                                 break;
 
-                            case "1":
-                                lvi.SubItems.Add("1");
+                            case fadSubgridStyle.SubgridStyle4:
+                                lvi.SubItems.Add("2 x 2");
                                 break;
 
-                            case "2":
-                                lvi.SubItems.Add("9");
+                            case fadSubgridStyle.SubgridStyle9:
+                                lvi.SubItems.Add("3 x 3");
                                 break;
                         }
                     }
@@ -2708,7 +2825,6 @@ namespace FAD3
                     break;
 
                 case "landing_site":
-
                     //add landing site form data
                     _ls.LandingSiteGUID = _landingSiteGuid;
                     _ls.LandingSiteName = _landingSiteName;
@@ -2860,7 +2976,7 @@ namespace FAD3
                 lblErrorFormOpen.Visible = false;
                 Names.GetGenus_LocalNames();
                 Names.GetLocalNames();
-                Gear.GetGearLocalNames();
+                Gears.GetGearLocalNames();
                 PopulateTree();
                 treeMain.SelectedNode = treeMain.Nodes["root"];
                 statusPanelDBPath.Text = MDBFile;
@@ -3024,6 +3140,7 @@ namespace FAD3
                     });
                     lvi.Name = kv.Key;
                     lvi.SubItems[1].Name = kv.Value.CatchNameGUID;
+                    lvi.SubItems[1].Tag = kv.Value.TaxaNumber.ToString();
                     lvi.Tag = kv.Value.NameType.ToString();
                     lvCatch.Items.Add(lvi);
                     totalCatchWt += kv.Value.CatchWeight;
@@ -3364,7 +3481,7 @@ namespace FAD3
                     var node = landingSiteNode.Nodes.Add(item.gearVariationGuid, item.gearVariationName);
                     node.Tag = Tuple.Create(tag.Item1, item.gearVariationGuid, "gear");
                     node.Name = $"{tag.Item1}|{item.gearVariationGuid}";
-                    node.ImageKey = Gear.GearClassImageKeyFromGearClasName(item.gearClassName);
+                    node.ImageKey = Gears.GearClassImageKeyFromGearClasName(item.gearClassName);
                     node.Nodes.Add("*dummy*");
                 }
             }
@@ -3447,25 +3564,28 @@ namespace FAD3
             switch (((ListView)sender).Name)
             {
                 case "lvCatch":
-                    switch (lvCatch.SelectedItems[0].Tag.ToString())
+                    if (lvCatch.SelectedItems[0].Text.Length > 0)
                     {
-                        case "Scientific":
-                            var speciesName = lvCatch.SelectedItems[0].SubItems[1].Text;
-                            if (_catchLocalNamesForm != null)
-                            {
-                                _catchLocalNamesForm.SpeciesName = speciesName;
-                                _catchLocalNamesForm.SpeciesGuid = lvCatch.SelectedItems[0].SubItems[1].Name;
-                            }
-                            break;
+                        switch (lvCatch.SelectedItems[0].Tag.ToString())
+                        {
+                            case "Scientific":
+                                var speciesName = lvCatch.SelectedItems[0].SubItems[1].Text;
+                                if (_catchLocalNamesForm != null)
+                                {
+                                    _catchLocalNamesForm.SpeciesName = speciesName;
+                                    _catchLocalNamesForm.SpeciesGuid = lvCatch.SelectedItems[0].SubItems[1].Name;
+                                }
+                                break;
 
-                        case "LocalName":
-                            var localName = lvCatch.SelectedItems[0].SubItems[1].Text;
-                            if (_catchLocalNamesForm != null)
-                            {
-                                _catchLocalNamesForm.LocalName = localName;
-                                _catchLocalNamesForm.LocalNameGuid = lvCatch.SelectedItems[0].SubItems[1].Name;
-                            }
-                            break;
+                            case "LocalName":
+                                var localName = lvCatch.SelectedItems[0].SubItems[1].Text;
+                                if (_catchLocalNamesForm != null)
+                                {
+                                    _catchLocalNamesForm.LocalName = localName;
+                                    _catchLocalNamesForm.LocalNameGuid = lvCatch.SelectedItems[0].SubItems[1].Name;
+                                }
+                                break;
+                        }
                     }
 
                     break;

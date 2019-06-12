@@ -56,7 +56,7 @@ namespace FAD3
                             break;
 
                         case "textBoxDescription":
-                            if (o.Text.Length < 6)
+                            if (o.Text.Length < 3)
                             {
                                 e.Cancel = true;
                                 msg = "Description is too short";

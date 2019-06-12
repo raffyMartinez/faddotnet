@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+using FAD3.Database.Classes;
 
 namespace FAD3
 {
     public partial class SamplingForm : Form
     {
-        private Dictionary<string, Sampling.UserInterfaceStructure> _uis = new Dictionary<string, Sampling.UserInterfaceStructure>();
-        private Sampling _sampling;
+        private Dictionary<string, Samplings.UserInterfaceStructure> _uis = new Dictionary<string, Samplings.UserInterfaceStructure>();
+        private Samplings _sampling;
         private string _samplingGUID = "";
         private ListView _lv;
         private Control _topControl;
@@ -71,7 +72,7 @@ namespace FAD3
             string myAOIGUID = ((KeyValuePair<string, string>)((ComboBox)panelUI.Controls["comboTargetArea"]).SelectedItem).Key;
             key = ((KeyValuePair<string, string>)((ComboBox)panelUI.Controls["comboGearClass"]).SelectedItem).Key;
             targetCombo = (ComboBox)panelUI.Controls["comboFishingGear"];
-            comboItems = Gear.GearVariationsUsage(key, myAOIGUID);
+            comboItems = Gears.GearVariationsUsage(key, myAOIGUID);
             ChangeComboDataSource(targetCombo, comboItems);
         }
 
@@ -101,6 +102,11 @@ namespace FAD3
 
                             o.Text = o.Text.Substring(0, o.Text.Length - 2);
                         });
+                }
+                else
+                {
+                    ((TextBox)panelUI.Controls["textFishingGround"]).Text = "";
+                    ((TextBox)panelUI.Controls["textAdditionalFishingGround"]).Text = "";
                 }
             }
         }
@@ -216,7 +222,7 @@ namespace FAD3
         {
             global.SaveFormSettings(this);
             ManageGearSpecsClass.SampledGearSpecs.Clear();
-            _sampling.OnUIRowRead -= new Sampling.ReadUIElement(OnUIRowRead);
+            _sampling.OnUIRowRead -= new Samplings.ReadUIElement(OnUIRowRead);
             _sampling = null;
         }
 
@@ -306,11 +312,18 @@ namespace FAD3
                             break;
 
                         case "GearClass":
-                            Gear.GetGearClassEx((ComboBox)ctl);
+                            ComboBox cbo = (ComboBox)ctl;
+                            foreach (var item in Gears.GearClasses)
+                            {
+                                KeyValuePair<string, string> gear = new KeyValuePair<string, string>(item.Key, item.Value.GearClassName);
+                                cbo.Items.Add(gear);
+                            }
+
+                            //Gears.GetGearClassEx((ComboBox)ctl);
                             break;
 
                         case "Engine":
-                            foreach (var item in Sampling.Engines)
+                            foreach (var item in Samplings.Engines)
                             {
                                 ((ComboBox)ctl).Items.Add(item);
                             }
@@ -319,7 +332,7 @@ namespace FAD3
                         case "FishingGear":
                             if (!_isNew)
                             {
-                                Gear.GearClassUsed = _lv.Items["GearClass"].Tag.ToString();
+                                Gears.GearClassUsed = _lv.Items["GearClass"].Tag.ToString();
                             }
 
                             if (_gearClassGuid.Length == 0)
@@ -330,11 +343,11 @@ namespace FAD3
                                 }
                                 else
                                 {
-                                    _gearClassGuid = Gear.GearClassUsed;
+                                    _gearClassGuid = Gears.GearClassUsed;
                                 }
                             }
 
-                            Gear.GearVariationsUsage(_gearClassGuid, _targetAreaGuid, (ComboBox)ctl);
+                            Gears.GearVariationsUsage(_gearClassGuid, _targetAreaGuid, (ComboBox)ctl);
                             break;
 
                         case "TypeOfVesselUsed":
@@ -615,7 +628,7 @@ namespace FAD3
             this.Size = new Size(Width, _lv.Height);
             global.LoadFormSettings(this, true);
             _sampling = _parentForm.Sampling;
-            _sampling.OnUIRowRead += new Sampling.ReadUIElement(OnUIRowRead);
+            _sampling.OnUIRowRead += new Samplings.ReadUIElement(OnUIRowRead);
             panelUI.SuspendLayout();
             _sampling.ReadUIFromXML();
             AdustControlsPosition();
@@ -937,7 +950,7 @@ namespace FAD3
                     {
                         if (SaveEdits())
                         {
-                            _sampling.OnUIRowRead -= new Sampling.ReadUIElement(OnUIRowRead);
+                            _sampling.OnUIRowRead -= new Samplings.ReadUIElement(OnUIRowRead);
                             if (IsNew) ReferenceNumberManager.UpdateRefCodeCounter();
                             _parentForm.RefreshCatchDetail(_samplingGUID, _isNew, _samplingDate, _gearVarGuid, _landingSiteGuid);
                             Close();
@@ -957,7 +970,7 @@ namespace FAD3
             {
                 if (c.Name.Substring(0, 8) == "errLabel")
                 {
-                    Sampling.UserInterfaceStructure ui = Sampling.uis[c.Tag.ToString()];
+                    Samplings.UserInterfaceStructure ui = Samplings.uis[c.Tag.ToString()];
                     c.Visible = ui.Required && Visible;
                 }
             }
@@ -1013,7 +1026,7 @@ namespace FAD3
                 {
                     //we want to get the UserInterfaceStructure element specified
                     //in the tag of the control
-                    Sampling.UserInterfaceStructure ui = Sampling.uis[c.Tag.ToString()];
+                    Samplings.UserInterfaceStructure ui = Samplings.uis[c.Tag.ToString()];
 
                     if (ui.Required && c.Text.Length == 0)
                     {
@@ -1182,7 +1195,7 @@ namespace FAD3
 
                                     targetCombo = (ComboBox)panelUI.Controls["comboFishingGear"];
                                     string myGearClassGUID = ((KeyValuePair<string, string>)((ComboBox)panelUI.Controls["comboGearClass"]).SelectedItem).Key;
-                                    comboItems = Gear.GearVariationsUsage(myGearClassGUID, key);
+                                    comboItems = Gears.GearVariationsUsage(myGearClassGUID, key);
                                     ChangeComboDataSource(targetCombo, comboItems);
 
                                     break;
@@ -1256,7 +1269,7 @@ namespace FAD3
         private void OnFieldValidate(object sender, CancelEventArgs e)
         {
             //we want to get the UserInterfaceStructure element specified in the tag of the control to validate
-            Sampling.UserInterfaceStructure ui = Sampling.uis[((Control)sender).Tag.ToString()];
+            Samplings.UserInterfaceStructure ui = Samplings.uis[((Control)sender).Tag.ToString()];
 
             string controlText = ((Control)sender).Text;
             string msg = "";

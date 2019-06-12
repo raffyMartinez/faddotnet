@@ -46,7 +46,7 @@ namespace FAD3.Database.Forms
 
                 case FisheryObjectNameType.GearLocalName:
                     Text = "New gear local name";
-                    _similarNames = Gear.GetSimilarSoundingLocalNames(_newObjectName);
+                    _similarNames = Gears.GetSimilarSoundingLocalNames(_newObjectName);
                     lblNewType.Text = "New gear local name";
                     lblTitle.Text = "Add new fishing gear local name";
                     break;
@@ -95,7 +95,7 @@ namespace FAD3.Database.Forms
 
                 case FisheryObjectNameType.GearLocalName:
                     Text = "New gear local name";
-                    _similarNames = Gear.GetSimilarSoundingLocalNames(_newObjectName);
+                    _similarNames = Gears.GetSimilarSoundingLocalNames(_newObjectName);
                     break;
             }
             txtLocalName.Text = newName;
@@ -120,19 +120,19 @@ namespace FAD3.Database.Forms
                             break;
 
                         case FisheryObjectNameType.GearLocalName:
-                            result = Gear.SaveNewLocalName(_newObjectName);
+                            result = Gears.SaveNewLocalName(_newObjectName);
                             break;
 
                         case FisheryObjectNameType.GearVariationName:
-                            result = Gear.SaveNewVariationName(_newObjectName, _gearClassGuid);
+                            result = Gears.SaveNewVariationName(_newObjectName, _gearClassGuid);
                             break;
 
                         case FisheryObjectNameType.FishingAccessory:
-                            result.success = Gear.AddAccessory(_newObjectName.NewName);
+                            result.success = Gears.AddAccessory(_newObjectName.NewName);
                             break;
 
                         case FisheryObjectNameType.FishingExpense:
-                            result.success = Gear.AddExpense(_newObjectName.NewName);
+                            result.success = Gears.AddExpense(_newObjectName.NewName);
                             break;
                     }
 

@@ -58,11 +58,19 @@ namespace FAD3
             this.tabOtherGrid = new System.Windows.Forms.TabPage();
             this.buttonDefine = new System.Windows.Forms.Button();
             this.textBoxOtherGrid = new System.Windows.Forms.TextBox();
-            this.tabMBR = new System.Windows.Forms.TabPage();
             this.lblTitle = new System.Windows.Forms.Label();
+            this.txtUL = new System.Windows.Forms.TextBox();
+            this.txtLR = new System.Windows.Forms.TextBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
+            this.tabMBR = new System.Windows.Forms.TabPage();
+            this.shapeContainer1 = new Microsoft.VisualBasic.PowerPacks.ShapeContainer();
+            this.rectangleShape1 = new Microsoft.VisualBasic.PowerPacks.RectangleShape();
+            this.btnShow = new System.Windows.Forms.Button();
             this.tabAOI.SuspendLayout();
             this.tabGrid25.SuspendLayout();
             this.tabOtherGrid.SuspendLayout();
+            this.tabMBR.SuspendLayout();
             this.SuspendLayout();
             // 
             // txtName
@@ -136,6 +144,7 @@ namespace FAD3
             this.tabAOI.SelectedIndex = 0;
             this.tabAOI.Size = new System.Drawing.Size(370, 357);
             this.tabAOI.TabIndex = 8;
+            this.tabAOI.SelectedIndexChanged += new System.EventHandler(this.OnSelectedTabChanged);
             // 
             // tabGrid25
             // 
@@ -273,16 +282,6 @@ namespace FAD3
             this.textBoxOtherGrid.Size = new System.Drawing.Size(353, 212);
             this.textBoxOtherGrid.TabIndex = 7;
             // 
-            // tabMBR
-            // 
-            this.tabMBR.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.tabMBR.Location = new System.Drawing.Point(4, 25);
-            this.tabMBR.Name = "tabMBR";
-            this.tabMBR.Size = new System.Drawing.Size(362, 328);
-            this.tabMBR.TabIndex = 2;
-            this.tabMBR.Text = "MBR";
-            this.tabMBR.UseVisualStyleBackColor = true;
-            // 
             // lblTitle
             // 
             this.lblTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -292,6 +291,82 @@ namespace FAD3
             this.lblTitle.TabIndex = 9;
             this.lblTitle.Text = "Title";
             this.lblTitle.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // txtUL
+            // 
+            this.txtUL.Location = new System.Drawing.Point(22, 49);
+            this.txtUL.Name = "txtUL";
+            this.txtUL.Size = new System.Drawing.Size(182, 21);
+            this.txtUL.TabIndex = 4;
+            // 
+            // txtLR
+            // 
+            this.txtLR.Location = new System.Drawing.Point(155, 250);
+            this.txtLR.Name = "txtLR";
+            this.txtLR.Size = new System.Drawing.Size(182, 21);
+            this.txtLR.TabIndex = 5;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(21, 31);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(60, 15);
+            this.label6.TabIndex = 6;
+            this.label6.Text = "Upper left";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(152, 274);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(68, 15);
+            this.label7.TabIndex = 7;
+            this.label7.Text = "Lower right";
+            // 
+            // tabMBR
+            // 
+            this.tabMBR.Controls.Add(this.btnShow);
+            this.tabMBR.Controls.Add(this.label7);
+            this.tabMBR.Controls.Add(this.label6);
+            this.tabMBR.Controls.Add(this.txtLR);
+            this.tabMBR.Controls.Add(this.txtUL);
+            this.tabMBR.Controls.Add(this.shapeContainer1);
+            this.tabMBR.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tabMBR.Location = new System.Drawing.Point(4, 25);
+            this.tabMBR.Name = "tabMBR";
+            this.tabMBR.Size = new System.Drawing.Size(362, 328);
+            this.tabMBR.TabIndex = 2;
+            this.tabMBR.Text = "MBR";
+            this.tabMBR.UseVisualStyleBackColor = true;
+            // 
+            // shapeContainer1
+            // 
+            this.shapeContainer1.Location = new System.Drawing.Point(0, 0);
+            this.shapeContainer1.Margin = new System.Windows.Forms.Padding(0);
+            this.shapeContainer1.Name = "shapeContainer1";
+            this.shapeContainer1.Shapes.AddRange(new Microsoft.VisualBasic.PowerPacks.Shape[] {
+            this.rectangleShape1});
+            this.shapeContainer1.Size = new System.Drawing.Size(362, 328);
+            this.shapeContainer1.TabIndex = 8;
+            this.shapeContainer1.TabStop = false;
+            // 
+            // rectangleShape1
+            // 
+            this.rectangleShape1.Location = new System.Drawing.Point(23, 81);
+            this.rectangleShape1.Name = "rectangleShape1";
+            this.rectangleShape1.Size = new System.Drawing.Size(313, 161);
+            // 
+            // btnShow
+            // 
+            this.btnShow.Enabled = false;
+            this.btnShow.Location = new System.Drawing.Point(282, 291);
+            this.btnShow.Name = "btnShow";
+            this.btnShow.Size = new System.Drawing.Size(55, 26);
+            this.btnShow.TabIndex = 9;
+            this.btnShow.Text = "Show";
+            this.btnShow.UseVisualStyleBackColor = true;
+            this.btnShow.Click += new System.EventHandler(this.OnMainButtonClick);
             // 
             // TargetAreaForm
             // 
@@ -319,6 +394,8 @@ namespace FAD3
             this.tabGrid25.PerformLayout();
             this.tabOtherGrid.ResumeLayout(false);
             this.tabOtherGrid.PerformLayout();
+            this.tabMBR.ResumeLayout(false);
+            this.tabMBR.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -332,7 +409,6 @@ namespace FAD3
         private System.Windows.Forms.TabControl tabAOI;
         private System.Windows.Forms.TabPage tabGrid25;
         private System.Windows.Forms.TabPage tabOtherGrid;
-        private System.Windows.Forms.TabPage tabMBR;
         private System.Windows.Forms.Button buttonDefine;
         private System.Windows.Forms.TextBox textBoxOtherGrid;
         private System.Windows.Forms.Button buttonRemoveMap;
@@ -345,5 +421,13 @@ namespace FAD3
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label lblTitle;
         private System.Windows.Forms.ImageList imageList1;
+        private System.Windows.Forms.TabPage tabMBR;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.TextBox txtLR;
+        private System.Windows.Forms.TextBox txtUL;
+        private Microsoft.VisualBasic.PowerPacks.ShapeContainer shapeContainer1;
+        private Microsoft.VisualBasic.PowerPacks.RectangleShape rectangleShape1;
+        private System.Windows.Forms.Button btnShow;
     }
 }

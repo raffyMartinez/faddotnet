@@ -35,8 +35,9 @@ namespace FAD3
         /// <summary>
         /// Start the process of creating a database of inland minor grids
         /// </summary>
-        public static void Start()
+        public static bool Start()
         {
+            bool success = false;
             if (LandShapefile?.ShapefileType == ShpfileType.SHP_POLYGON
                 && Grid25Shapefile?.ShapefileType == ShpfileType.SHP_POLYGON
                 && FileName.Length > 0)
@@ -72,8 +73,10 @@ namespace FAD3
                     e.Status = "Point creation finished";
                     e.StatusDescription = DateTime.Now.ToShortTimeString();
                     StatusUpdate(e);
+                    success = true;
                 }
             }
+            return success;
         }
 
         /// <summary>
@@ -81,17 +84,28 @@ namespace FAD3
         /// </summary>
         private static void ProcessInlandGrids()
         {
+            bool proceed = true;
             if (_inlandMinorGrids.NumShapes == 0)
             {
-                _inlandMinorGrids = MinorGridsShapefile.ExportSelection();
+                try
+                {
+                    _inlandMinorGrids = MinorGridsShapefile.ExportSelection();
+                }
+                catch
+                {
+                    proceed = false;
+                }
             }
             else
             {
                 _inlandMinorGrids = _inlandMinorGrids.Merge(false, MinorGridsShapefile, true);
             }
-            _inlandMinorGrids.DefaultDrawingOptions.FillVisible = false;
-            _inlandMinorGrids.DefaultDrawingOptions.LineWidth = 1.1f;
-            _inlandMinorGrids.DefaultDrawingOptions.LineColor = new Utils().ColorByName(tkMapColor.Red);
+            if (proceed)
+            {
+                _inlandMinorGrids.DefaultDrawingOptions.FillVisible = false;
+                _inlandMinorGrids.DefaultDrawingOptions.LineWidth = 1.1f;
+                _inlandMinorGrids.DefaultDrawingOptions.LineColor = new Utils().ColorByName(tkMapColor.Red);
+            }
         }
 
         /// <summary>
@@ -286,11 +300,14 @@ namespace FAD3
                 _iFldInland = MinorGridsShapefile.EditAddField("inland", FieldType.BOOLEAN_FIELD, 1, 1);
                 MinorGridsShapefile.GeoProjection = global.MappingForm.MapControl.GeoProjection;
 
-                _inlandMinorGrids = new Shapefile();
-                if (_inlandMinorGrids.CreateNewWithShapeID("", ShpfileType.SHP_POLYGON))
+                if (_inlandMinorGrids == null)
                 {
-                    _inlandMinorGrids.EditAddField("name", FieldType.STRING_FIELD, 1, 8);
-                    _inlandMinorGrids.EditAddField("inland", FieldType.BOOLEAN_FIELD, 1, 1);
+                    _inlandMinorGrids = new Shapefile();
+                    if (_inlandMinorGrids.CreateNewWithShapeID("", ShpfileType.SHP_POLYGON))
+                    {
+                        _inlandMinorGrids.EditAddField("name", FieldType.STRING_FIELD, 1, 8);
+                        _inlandMinorGrids.EditAddField("inland", FieldType.BOOLEAN_FIELD, 1, 1);
+                    }
                 }
 
                 return true;

@@ -57,7 +57,7 @@ namespace FAD3.Database.Forms
             lblTitle.Text = $"Editing the gear:\r\n{_variationName}";
             cboGearClasses.DisplayMember = "Value";
             cboGearClasses.ValueMember = "Key";
-            foreach (var item in Gear.GetGearClassDictionary())
+            foreach (var item in Gears.GetGearClassDictionary())
             {
                 KeyValuePair<string, string> gearClass = new KeyValuePair<string, string>(item.Key, item.Value.gearClassName);
                 cboGearClasses.Items.Add(gearClass);
@@ -72,7 +72,7 @@ namespace FAD3.Database.Forms
             int n = 0;
             string selectVariation = "";
             cboGearVariation.Items.Clear();
-            foreach (var item in Gear.GearVariationsUsage(((KeyValuePair<string, string>)cboGearClasses.SelectedItem).Key))
+            foreach (var item in Gears.GearVariationsUsage(((KeyValuePair<string, string>)cboGearClasses.SelectedItem).Key))
             {
                 cboGearVariation.Items.Add(item);
                 if (_parsedVariationName != item.Value.ToLower() && _parsedVariationName.Contains(item.Value.ToLower()))

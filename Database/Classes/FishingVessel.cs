@@ -1,9 +1,40 @@
 ﻿using dao;
+using FAD3.Database.Classes;
 
 namespace FAD3
 {
-    public static class FishingVessel
+    public class FishingVessel
     {
+        public double? Breadth { get; set; }
+        public double? Depth { get; set; }
+        public double? Length { get; set; }
+        public string Engine { get; set; }
+        public double? EngineHorsepower { get; set; }
+        public VesselType VesselType { get; set; }
+
+        public FishingVessel(VesselType vesselType, double? breadth, double? depth, double? length)
+        {
+            Breadth = breadth;
+            Depth = depth;
+            Length = length;
+            VesselType = vesselType;
+        }
+
+        public double? GrossTonnage
+        {
+            get
+            {
+                if (Breadth == null || Depth == null || Length == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    return (Breadth * Depth * Length * 0.7) / 2.83;
+                }
+            }
+        }
+
         public static void MakeVesselTypeTable()
         {
             var dbe = new DBEngine();

@@ -12,6 +12,38 @@
         EqualSumOfValues
     }
 
+    public enum ExportSamplingStatus
+    {
+        StartExport,
+        StartImport,
+        WhereToSaveImport,
+        Header,
+        Extents,
+        Enumerator,
+        LandingSites,
+        FishingGears,
+        Taxa,
+        BeginCatchNames,
+        CatchNames,
+        BeginSamplings,
+        Samplings,
+        CatchComposition,
+        LenFreq,
+        FishingVessel,
+        FishingGround,
+        EndExport,
+        EndImport,
+        Error
+    }
+
+    public enum VesselType
+    {
+        NotDetermined,
+        Motorized,
+        NonMotorized,
+        NoVesselUsed
+    }
+
     public enum MapLegendPosition
     {
         PositionFromCorner,
@@ -172,7 +204,7 @@
     /// <summary>
     /// categories of subgridding minor grids for finer resolution of fishing grounds
     /// </summary>
-    public enum fadSubgridSyle
+    public enum fadSubgridStyle
     {
         SubgridStyleNone,
         SubgridStyle4,

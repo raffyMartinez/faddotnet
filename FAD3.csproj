@@ -143,19 +143,25 @@
   <ItemGroup>
     <Compile Include="Database\Classes\CatchNameURLGenerator.cs" />
     <Compile Include="Database\Classes\EffortEventArg.cs" />
+    <Compile Include="Database\Classes\SamplingEventArgs.cs" />
+    <Compile Include="Database\Classes\SamplingToFromXML.cs" />
     <Compile Include="Database\Classes\FADDiagnostics.cs" />
     <Compile Include="Database\Classes\FileDialogHelper.cs" />
     <Compile Include="Database\Classes\FishingBoat.cs" />
     <Compile Include="Database\Classes\FishingBoats.cs" />
     <Compile Include="Database\Classes\FishingGearInventory.cs" />
     <Compile Include="Database\Classes\FisheriesInventoryImportEventArg.cs" />
+    <Compile Include="Database\Classes\GearClass.cs" />
+    <Compile Include="Database\Classes\GearVariation.cs" />
     <Compile Include="Database\Classes\ImportRowsFromFileEventArgs.cs" />
     <Compile Include="Database\Classes\InventoryItem.cs" />
     <Compile Include="Database\Classes\LengthFreq.cs" />
+    <Compile Include="Database\Classes\LengthFreqItem.cs" />
     <Compile Include="Database\Classes\LGU.cs" />
     <Compile Include="Database\Classes\LGUs.cs" />
     <Compile Include="Database\Classes\Province.cs" />
     <Compile Include="Database\Classes\ReportGeneratorClass.cs" />
+    <Compile Include="Database\Classes\Sampling.cs" />
     <Compile Include="Database\Classes\SimMetrics\AbstractStringMetric.cs" />
     <Compile Include="Database\Classes\SimMetrics\AbstractSubstitutionCost.cs" />
     <Compile Include="Database\Classes\SimMetrics\IStringMetric.cs" />
@@ -164,6 +170,8 @@
     <Compile Include="Database\Classes\NewFisheryObjectName.cs" />
     <Compile Include="Database\Classes\SimMetrics\MathFunctions.cs" />
     <Compile Include="Database\Classes\SimMetrics\SubCostRange0To1.cs" />
+    <Compile Include="Database\Classes\CatchTaxa.cs" />
+    <Compile Include="Database\Classes\TaxaCategory.cs" />
     <Compile Include="Database\Forms\AllSpeciesForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -222,6 +230,12 @@
     <Compile Include="Database\Forms\EditSelectedLocalNameForm.Designer.cs">
       <DependentUpon>EditSelectedLocalNameForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Database\Forms\ExportCatchMonitoringDataForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Database\Forms\ExportCatchMonitoringDataForm.Designer.cs">
+      <DependentUpon>ExportCatchMonitoringDataForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Database\Forms\ExportImportDialogForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -275,6 +289,12 @@
     </Compile>
     <Compile Include="Database\Forms\HTMLTableSelectColumnsForm.Designer.cs">
       <DependentUpon>HTMLTableSelectColumnsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Database\Forms\ImportFishCatchMonitoringDestinationForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Database\Forms\ImportFishCatchMonitoringDestinationForm.Designer.cs">
+      <DependentUpon>ImportFishCatchMonitoringDestinationForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Database\Forms\ImportInventoryForm.cs">
       <SubType>Form</SubType>
@@ -345,6 +365,7 @@
       <DependentUpon>GraphForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Mapping\Classes\BarangayMunicipalityCoordinateHelper.cs" />
+    <Compile Include="Mapping\Classes\CategoryItem.cs" />
     <Compile Include="Mapping\Classes\ClassifiedItem.cs" />
     <Compile Include="Mapping\Classes\Colors.cs" />
     <Compile Include="Mapping\Classes\ColorSchemes.cs" />
@@ -731,7 +752,7 @@
     <Compile Include="Database\Forms\VesselDimensionForm.Designer.cs">
       <DependentUpon>VesselDimensionForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Database\Classes\Gear.cs" />
+    <Compile Include="Database\Classes\Gears.cs" />
     <Compile Include="Database\Forms\ReferenceNumberForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -819,7 +840,7 @@
     <Compile Include="Database\Forms\SampledGear_SpecsForm.Designer.cs">
       <DependentUpon>SampledGear_SpecsForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Database\Classes\Sampling.cs" />
+    <Compile Include="Database\Classes\Samplings.cs" />
     <Compile Include="Database\Classes\UIRow.cs" />
     <Compile Include="Mapping\Forms\VisibilityQueryForm.cs">
       <SubType>Form</SubType>
@@ -856,6 +877,9 @@
     <EmbeddedResource Include="Database\Forms\EditSelectedLocalNameForm.resx">
       <DependentUpon>EditSelectedLocalNameForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Database\Forms\ExportCatchMonitoringDataForm.resx">
+      <DependentUpon>ExportCatchMonitoringDataForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Database\Forms\ExportImportDialogForm.resx">
       <DependentUpon>ExportImportDialogForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -882,6 +906,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Database\Forms\HTMLTableSelectColumnsForm.resx">
       <DependentUpon>HTMLTableSelectColumnsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Database\Forms\ImportFishCatchMonitoringDestinationForm.resx">
+      <DependentUpon>ImportFishCatchMonitoringDestinationForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Database\Forms\ImportInventoryForm.resx">
       <DependentUpon>ImportInventoryForm.cs</DependentUpon>

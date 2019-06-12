@@ -222,6 +222,32 @@ namespace FAD3
             }
         }
 
+        public static bool DeleteEx (string aoiGuid)
+        {
+            bool success = false;
+            string updateQuery = "";
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    updateQuery = $"Delete * from tblLandingSites where AOIGuid = {{{aoiGuid}}}";
+                    conn.Open();
+                    using (OleDbCommand update = new OleDbCommand(updateQuery, conn))
+                    {
+                        update.ExecuteNonQuery();
+                        success = true;
+                    }
+                    conn.Close();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log($"{ex.Message}\r\n{ex.Source}");
+                }
+            }
+
+            return success;
+        }
+
         public static bool Delete(string name, string aoiGuid)
         {
             bool Success = false;
@@ -304,6 +330,36 @@ namespace FAD3
                 }
                 return myList;
             }
+        }
+
+        public static bool AddNewLandingSite(string targetAreaGuid, string landingSiteGuid, string landingSiteName, int municipalityNumber, double? x, double? y)
+        {
+            bool success = false;
+
+            string sql = $@"Insert into tblLandingSites
+                            (AOIGUID, LSGUID, LSName, MunNo, cx, cy) values (
+                            {{{targetAreaGuid}}},
+                            {{{landingSiteGuid}}},
+                            '{landingSiteName}',
+                            {municipalityNumber},
+                            {(x == null ? "null" : x.ToString())},
+                            {(y == null ? "null" : y.ToString())})";
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    using (OleDbCommand update = new OleDbCommand(sql, conn))
+                    {
+                        success = (update.ExecuteNonQuery() > 0);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex.Message, "LandingSite", "AddNewLandingSite");
+                }
+            }
+            return success;
         }
 
         /// <summary>
@@ -459,6 +515,43 @@ namespace FAD3
                 catch (Exception ex) { Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name); }
             }
             return myGears;
+        }
+
+        public static Dictionary<string, (string name, int municipalityNumber, bool hasCoordinate, Coordinate coord)> GetLandingSitesInTargetArea(string targetAreaGuid)
+        {
+            Dictionary<string, (string name, int municipalityNumber, bool hasCoordinate, Coordinate coord)> landingSites = new Dictionary<string, (string name, int municipalityNumber, bool hasCoordinate, Coordinate coord)>();
+            var myDT = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    string query = $@"SELECT LSGUID, LSName, MunNo, cx, cy FROM tblLandingSites
+                        WHERE AOIGuid={{{targetAreaGuid}}}";
+
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(myDT);
+                    for (int i = 0; i < myDT.Rows.Count; i++)
+                    {
+                        DataRow dr = myDT.Rows[i];
+                        Coordinate c = new Coordinate();
+                        bool hasCoordinate = false;
+                        if (dr["cx"].ToString().Length > 0 && dr["cy"].ToString().Length > 0)
+                        {
+                            c.Latitude = (float)(double)dr["cy"];
+                            c.Longitude = (float)(double)dr["cx"];
+                            hasCoordinate = true;
+                        }
+                        landingSites.Add(dr["LSGUID"].ToString(), (dr["LSName"].ToString(), (int)dr["MunNo"], hasCoordinate, c));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
+                }
+            }
+
+            return landingSites;
         }
 
         /// <summary>

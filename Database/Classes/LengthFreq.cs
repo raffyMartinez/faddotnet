@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace FAD3.Database.Classes
 {
-    public static class LengthFreq
+    public class LengthFreq
     {
         private static int _LFRowsCount;
 
@@ -33,7 +33,33 @@ namespace FAD3.Database.Classes
             return saveCount + fromDbCount == LFData.Count;
         }
 
-        public static Dictionary<string, (double len, int freq, fad3DataStatus dataStatus)> LFData(string CatchCompRowNo)
+        public static List<LengthFreqItem> LenFreqList(string catchCompRowNo)
+        {
+            List<LengthFreqItem> lfList = new List<LengthFreqItem>();
+            using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.MDBPath))
+            {
+                try
+                {
+                    var dt = new DataTable();
+                    conection.Open();
+                    string query = $"SELECT RowGUID, Sequence, LenClass, Freq FROM tblLF WHERE tblLF.CatchCompRow={{{catchCompRowNo}}} ORDER BY Sequence, LenClass";
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(dt);
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        DataRow dr = dt.Rows[i];
+                        lfList.Add(new LengthFreqItem((int)dr["Freq"], (float)(double)dr["LenClass"], catchCompRowNo));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
+                }
+            }
+            return lfList;
+        }
+
+        public static Dictionary<string, (double len, int freq, fad3DataStatus dataStatus)> LFData(string catchCompRowNo)
         {
             _LFRowsCount = 0;
             Dictionary<string, (double len, int freq, fad3DataStatus dataStatus)> mydata = new Dictionary<string, (double len, int freq, fad3DataStatus dataStatus)>();
@@ -43,7 +69,7 @@ namespace FAD3.Database.Classes
                 try
                 {
                     conection.Open();
-                    string query = $"SELECT RowGUID, Sequence, LenClass, Freq FROM tblLF WHERE tblLF.CatchCompRow={{{CatchCompRowNo}}} ORDER BY Sequence, LenClass";
+                    string query = $"SELECT RowGUID, Sequence, LenClass, Freq FROM tblLF WHERE tblLF.CatchCompRow={{{catchCompRowNo}}} ORDER BY Sequence, LenClass";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
                     for (int i = 0; i < dt.Rows.Count; i++)
