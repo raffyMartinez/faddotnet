@@ -9,7 +9,7 @@ namespace FAD3
 {
     public partial class CatchCompositionForm : Form
     {
-        private Dictionary<string, CatchLine> _CatchCompositionData = new Dictionary<string, CatchLine>();
+        private Dictionary<string, CatchLine> _catchCompositionData = new Dictionary<string, CatchLine>();
 
         //becomes true when _combo comboxes are added to the panel
         private bool _comboBoxesSet = false;
@@ -89,7 +89,10 @@ namespace FAD3
         private void AddNewRow()
         {
             AddRow(isNew: true);
-            _lastIdentification.Focus();
+            if (_lastIdentification != null)
+            {
+                _lastIdentification.Focus();
+            }
         }
 
         /// <summary>
@@ -194,10 +197,15 @@ namespace FAD3
                 });
 
                 //adds the comboboxes to the panel
-                panelUI.Controls.Add(_comboIdentificationType);
-                panelUI.Controls.Add(_comboGenus);
-                panelUI.Controls.Add(_comboSpecies);
-                panelUI.Controls.Add(_comboLocalName);
+                //panelUI.Controls.Add(_comboIdentificationType);
+                //panelUI.Controls.Add(_comboGenus);
+                //panelUI.Controls.Add(_comboSpecies);
+                //panelUI.Controls.Add(_comboLocalName);
+
+                Controls.Add(_comboIdentificationType);
+                Controls.Add(_comboGenus);
+                Controls.Add(_comboSpecies);
+                Controls.Add(_comboLocalName);
             }
 
             //adds the catch composition data from the database to the form level catch composition dictionary
@@ -207,11 +215,11 @@ namespace FAD3
                 key = Guid.NewGuid().ToString();
                 CurrentIDType = Identification.Scientific;
                 _currentRow = key;
-                _CatchCompositionData.Add(key, new CatchLine(_samplingGuid));
-                _CatchCompositionData[key].Sequence = _row;
-                _CatchCompositionData[key].dataStatus = fad3DataStatus.statusNew;
-                _CatchCompositionData[key].NameType = CurrentIDType;
-                _CatchCompositionData[key].CatchCompGUID = key;
+                _catchCompositionData.Add(key, new CatchLine(_samplingGuid));
+                _catchCompositionData[key].Sequence = _row;
+                _catchCompositionData[key].dataStatus = fad3DataStatus.statusNew;
+                _catchCompositionData[key].NameType = CurrentIDType;
+                _catchCompositionData[key].CatchCompGUID = key;
             }
 
             //configure column 1 - the row label
@@ -450,7 +458,7 @@ namespace FAD3
 
             ((ComboBox)sender).With(o =>
             {
-                _CatchCompositionData[_currentRow].With(ccd =>
+                _catchCompositionData[_currentRow].With(ccd =>
                 {
                     var s = o.Text;
                     if (s.Length > 0)
@@ -517,8 +525,16 @@ namespace FAD3
 
                                         //we have to test if the found test matches any of the keys
                                         ccd.CatchNameGUID = ((KeyValuePair<string, string>)o.SelectedItem).Key;
-                                        ccd.Name1 = GetTextBoxAtRow(o.Tag.ToString(), "txtName1").Text;
-                                        ccd.Name2 = GetTextBoxAtRow(o.Tag.ToString(), "txtName2").Text;
+                                        if (o.Name == "cboLocalName")
+                                        {
+                                            ccd.Name1 = _cboEditor.Text;
+                                        }
+                                        else if (o.Name == "cboSpecies")
+                                        {
+                                            ccd.Name1 = GetTextBoxAtRow(o.Tag.ToString(), "txtName1").Text;
+                                            //ccd.Name2 = GetTextBoxAtRow(o.Tag.ToString(), "txtName2").Text;
+                                            ccd.Name2 = _cboEditor.Text;
+                                        }
                                     }
                                     catch
                                     {
@@ -696,7 +712,11 @@ namespace FAD3
 
             if (Proceed)
             {
-                _cboEditor.Bounds = txt.Bounds;
+                //_cboEditor.Parent = panelUI;
+                //_cboEditor.Bounds = txt.Bounds;
+                _cboEditor.Left = panelUI.Left + txt.Left;
+                _cboEditor.Top = panelUI.Top + txt.Top;
+                _cboEditor.Size = txt.Size;
                 _cboEditor.Tag = txt.Tag;
                 _cboEditor.BringToFront();
                 _cboEditor.Show();
@@ -987,9 +1007,11 @@ namespace FAD3
                 case "buttonOK":
                     if (ValidateForm())
                     {
-                        if (CatchComposition.UpdateCatchComposition(_CatchCompositionData))
+                        if (CatchComposition.UpdateCatchComposition(_catchCompositionData))
                         {
                             Close();
+                            //KeyValuePair<string, int> updatedCatchRow = new KeyValuePair<string, int>(_samplingGuid, _row-1);
+                            _parentForm.UpdatedSamplingCatchRowCount = new UpdatedSamplingCatchCompositionCount(_samplingGuid, _row - 1);
                             _parentForm.RefreshCatchComposition();
                         }
                     }
@@ -1016,6 +1038,15 @@ namespace FAD3
 
                 case "buttonRemove":
                     Text = $"current row is {_currentRow.ToString()}";
+                    if (_catchCompositionData[_currentRow].dataStatus != fad3DataStatus.statusNew)
+                    {
+                        _catchCompositionData[_currentRow].dataStatus = fad3DataStatus.statusForDeletion;
+                    }
+                    else
+                    {
+                        _catchCompositionData.Remove(_currentRow);
+                    }
+                    BuildUI();
                     break;
             }
         }
@@ -1027,9 +1058,9 @@ namespace FAD3
                 SetRowStatusToEdited(o);
 
                 if (o.Name == "chkFromTotal")
-                    _CatchCompositionData[o.Tag.ToString()].FromTotalCatch = o.Checked;
+                    _catchCompositionData[o.Tag.ToString()].FromTotalCatch = o.Checked;
                 else
-                    _CatchCompositionData[o.Tag.ToString()].LiveFish = o.Checked;
+                    _catchCompositionData[o.Tag.ToString()].LiveFish = o.Checked;
             });
         }
 
@@ -1076,6 +1107,36 @@ namespace FAD3
             }
         }
 
+        private void BuildUI()
+        {
+            labelSumOfWeight.Text = "Sum of weight:";
+            _y = 0;
+            _row = 1;
+            _textRowDict.Clear();
+            panelUI.Controls.Clear();
+            //foreach (Control c in panelUI.Controls)
+            //{
+            //    if (c.GetType().Name == "ComboBox")
+            //    {
+            //        panelUI.Controls.Remove(c);
+            //        Console.WriteLine($"removed {c.GetType().Name}");
+            //    }
+            //}
+            _sumOfWeight = 0;
+            foreach (var item in _catchCompositionData)
+            {
+                if (item.Value.dataStatus != fad3DataStatus.statusForDeletion)
+                {
+                    AddRow(isNew: false, item.Key, item.Value);
+                }
+            }
+            labelSumOfWeight.Text += $" {_sumOfWeight.ToString("0.000")}";
+            if (_sumOfWeight > _weightOfCatch)
+            {
+                labelSumOfWeight.ForeColor = Color.Red;
+            }
+        }
+
         private void OnForm_Load(object sender, EventArgs e)
         {
             global.LoadFormSettings(this, true);
@@ -1088,16 +1149,8 @@ namespace FAD3
             }
             else
             {
-                _CatchCompositionData = CatchComposition.RetrieveCatchComposition(_samplingGuid);
-                foreach (var item in _CatchCompositionData)
-                {
-                    AddRow(isNew: false, item.Key, item.Value);
-                }
-                labelSumOfWeight.Text += $" {_sumOfWeight.ToString("0.000")}";
-                if (_sumOfWeight > _weightOfCatch)
-                {
-                    labelSumOfWeight.ForeColor = Color.Red;
-                }
+                _catchCompositionData = CatchComposition.RetrieveCatchComposition(_samplingGuid);
+                BuildUI();
             }
 
             labelWtCatch.Text += $" {_weightOfCatch.ToString("0.000")}";
@@ -1132,7 +1185,7 @@ namespace FAD3
                 {
                     if (_newGenus.Length == 0)
                     {
-                        Names.Genus = _CatchCompositionData[_currentRow].Name1;
+                        Names.Genus = _catchCompositionData[_currentRow].Name1;
                         FillSpeciesComboBox();
                     }
                     else
@@ -1157,7 +1210,7 @@ namespace FAD3
         private void ComputeSumOfWeights()
         {
             var weight = 0D;
-            foreach (var item in _CatchCompositionData)
+            foreach (var item in _catchCompositionData)
             {
                 if (item.Value.dataStatus != fad3DataStatus.statusForDeletion) weight += item.Value.CatchWeight;
             }
@@ -1175,12 +1228,13 @@ namespace FAD3
 
         private void OnTextBoxValidating(object sender, CancelEventArgs e)
         {
+            //_cboEditor.Parent = this;
             var msg = "";
             _errorValidating = false;
 
             ((TextBox)sender).With(o =>
             {
-                _CatchCompositionData[_currentRow].With(ccd =>
+                _catchCompositionData[_currentRow].With(ccd =>
                   {
                       var s = o.Text;
 
@@ -1364,9 +1418,9 @@ namespace FAD3
         {
             var MissingFields = new List<string>();
             var HasRequirements = true;
-            if (_currentRow.Length > 0)
+            if (_currentRow.Length > 0 && _catchCompositionData.ContainsKey(_currentRow))
             {
-                _CatchCompositionData[_currentRow].With(ccd =>
+                _catchCompositionData[_currentRow].With(ccd =>
                 {
                     if (ccd.NameType == Identification.Scientific)
                     {
@@ -1461,7 +1515,7 @@ namespace FAD3
             _lastSubCount.BackColor = SystemColors.Window;
             _lastSubWeight.BackColor = SystemColors.Window;
 
-            _CatchCompositionData[_lastIdentification.Tag.ToString()].With(ccd =>
+            _catchCompositionData[_lastIdentification.Tag.ToString()].With(ccd =>
             {
                 Cancel = ccd.CatchCount == null && ccd.CatchSubsampleWt == null && ccd.CatchSubsampleCount == null;
                 if (Cancel)
@@ -1509,15 +1563,15 @@ namespace FAD3
             }
             else
             {
-                CurrentIDType = _CatchCompositionData[source.Tag.ToString()].NameType;
+                CurrentIDType = _catchCompositionData[source.Tag.ToString()].NameType;
             }
         }
 
         private void SetRowStatusToEdited(Control source)
         {
-            if (_CatchCompositionData[source.Tag.ToString()].dataStatus != fad3DataStatus.statusNew)
+            if (_catchCompositionData[source.Tag.ToString()].dataStatus != fad3DataStatus.statusNew)
             {
-                _CatchCompositionData[source.Tag.ToString()].dataStatus = fad3DataStatus.statusEdited;
+                _catchCompositionData[source.Tag.ToString()].dataStatus = fad3DataStatus.statusEdited;
             }
         }
 
@@ -1525,7 +1579,7 @@ namespace FAD3
         {
             var IsValidated = true;
 
-            foreach (var item in _CatchCompositionData)
+            foreach (var item in _catchCompositionData)
             {
                 if (!RowHasRequired(item.Key))
                 {

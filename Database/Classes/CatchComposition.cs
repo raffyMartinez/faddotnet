@@ -10,7 +10,6 @@ namespace FAD3
     public static class CatchComposition
     {
         private static int _CatchCompositionRows;
-
         private static double _TotalWtOfFromTotal = 0;
 
         public static int CatchCompositionRows
@@ -84,14 +83,27 @@ namespace FAD3
                     {
                         DeleteCount++;
                         sql = $"Delete * from tblCatchDetail WHERE CatchCompRow = {{{item.Value.CatchCompGUID}}}";
-                        sql = $"Delete * from tbkCatchComp WHERE RowGUID = {{{item.Value.SamplingGUID}}}";
+                        OleDbCommand update = new OleDbCommand(sql, conn);
+                        update.ExecuteNonQuery(); ;
+
+                        sql = $"Delete * from tblGMS WHERE CatchCompRow = {{{item.Value.CatchCompGUID}}}";
+                        update = new OleDbCommand(sql, conn);
+                        update.ExecuteNonQuery();
+
+                        sql = $"Delete * from tblLF WHERE CatchCompRow = {{{item.Value.CatchCompGUID}}}";
+                        update = new OleDbCommand(sql, conn);
+                        update.ExecuteNonQuery();
+
+                        sql = $"Delete * from tblCatchComp WHERE RowGUID = {{{item.Value.CatchCompGUID}}}";
+                        update = new OleDbCommand(sql, conn);
+                        if (update.ExecuteNonQuery() > 0) resultCount++;
                     }
                 }
             }
-            if ((InsertCount + UpdateCount) > 0)
+            if ((InsertCount + UpdateCount + DeleteCount) > 0)
                 return resultCount > 0;
             else
-                return resultCount == (InsertCount + UpdateCount);
+                return resultCount == (InsertCount + UpdateCount + DeleteCount);
         }
 
         public static List<CatchLine> RetriveAllCatchFromTargetArea(string targetAreaGuid)
@@ -131,7 +143,6 @@ namespace FAD3
                                                  );
                     allCatch.Add(cl);
                 }
-
             }
             return allCatch;
         }

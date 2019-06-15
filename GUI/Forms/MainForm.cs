@@ -31,6 +31,8 @@ namespace FAD3
     /// </summary>
     public partial class MainForm : Form
     {
+        public bool _efforRefreshNeeded = false;
+        public UpdatedSamplingCatchCompositionCount UpdatedSamplingCatchRowCount { get; set; }
         private MapEffortHelperForm _formEffortMapper;
         private TargetArea _targetArea = new TargetArea();
         private string _targetAreaGuid = "";
@@ -593,7 +595,8 @@ namespace FAD3
                     tsi.Visible = ((ListView)Source).Items.Count > 0;
 
                     //only show browse submenu if catch name is scientific name
-                    if (((ListView)Source).SelectedItems[0].Tag.ToString() == "Scientific")
+                    ListViewItem lvi = ((ListView)Source).SelectedItems[0];
+                    if (lvi.Text.Length > 0 && lvi.Tag.ToString() == "Scientific")
                     {
                         tsi = menuDropDown.Items.Add("Species details");
                         tsi.Name = "menuSpeciesDetail";
@@ -732,13 +735,27 @@ namespace FAD3
                     _updatedEffortMonth.GearVariationGuid = "";
                 }
                 _readEfforMonth = false;
+                _efforRefreshNeeded = false;
             }
             foreach (var item in Samplings.EffortMonth)
             {
                 var row = lvMain.Items.Add(item.Key, item.Value.RefNo, null);                           //reference number
                 DateTime dt = (DateTime)item.Value.SamplingDate;
                 row.SubItems.Add(string.Format("{0:MMM-dd-yyyy}", dt));                                 //sampling date
-                row.SubItems.Add(item.Value.CatchRows.ToString());                                      //number of catch rows
+
+                if (UpdatedSamplingCatchRowCount != null                                                 //number of catch rows
+                    && UpdatedSamplingCatchRowCount.SamplingGuid == item.Key)
+                {
+                    row.SubItems.Add(UpdatedSamplingCatchRowCount.CatchRowsCount.ToString());
+                    UpdatedSamplingCatchRowCount = null;
+                    _readEfforMonth = true;
+                    _efforRefreshNeeded = true;
+                }
+                else
+                {
+                    row.SubItems.Add(item.Value.CatchRows.ToString());
+                }
+
                 row.SubItems.Add(item.Value.WtCatch != null ? item.Value.WtCatch.ToString() : "");      //wt of catch
                 var fishingGround = item.Value.FishingGround;                                           //fishing ground
                 if (item.Value.SubGrid.Length > 0)
@@ -1398,7 +1415,10 @@ namespace FAD3
                     break;
 
                 case "menuCatchSpeciesNames":
-                    ShowLocalSpeciesNames(lvCatch.SelectedItems[0].SubItems[1].Name, lvCatch.SelectedItems[0].SubItems[1].Text, Identification.LocalName);
+                    if (lvCatch.SelectedItems[0].Text.Length > 0)
+                    {
+                        ShowLocalSpeciesNames(lvCatch.SelectedItems[0].SubItems[1].Name, lvCatch.SelectedItems[0].SubItems[1].Text, Identification.LocalName);
+                    }
                     break;
 
                 case "menuDeleteSampling":
@@ -1435,6 +1455,8 @@ namespace FAD3
         {
             CatchCompositionForm ccf = new CatchCompositionForm(IsNew, this, _samplingGUID, _referenceNumber, _weightOfCatch, _weightOfSample);
             ccf.ShowDialog(this);
+            //CatchCompositionForm2 ccf = new CatchCompositionForm2(IsNew, this, _samplingGUID, _referenceNumber, _weightOfCatch, _weightOfSample);
+            //ccf.Show(this);
         }
 
         private void NewSamplingForm()
@@ -1708,16 +1730,15 @@ namespace FAD3
                     }
                     else
                     {
-                        if (e.Clicks == 2 && lvCatch.Items.Count == 0)
+                        if (e.Clicks == 2 && lvCatch.Items.Count == 2 && lvCatch.Items[0].Text == "")
                         {
                             ShowCatchCompositionForm(true);
                         }
-                        else if (lvh.Item != null && lvh.Item.Text.Length > 0)
+                        else if (lvh.Item != null
+                            && lvh.Item.Text.Length > 0
+                            && Enum.TryParse(lvh.Item.SubItems[1].Tag.ToString(), out Taxa myTaxa))
                         {
-                            if (Enum.TryParse(lvh.Item.SubItems[1].Tag.ToString(), out Taxa myTaxa))
-                            {
-                                _taxa = myTaxa;
-                            }
+                            _taxa = myTaxa;
                             Show_LF_GMS_List(lvh.Item.Name, _taxa);
                         }
                     }
@@ -2128,7 +2149,7 @@ namespace FAD3
                         _gearClassGUID = rv.Key;
                         _LSNode = e.Node.Parent.Parent;
                         _samplingMonth = e.Node.Text;
-                        _readEfforMonth = _effortMonth.SampledMonth != _samplingMonth || _effortMonth.GearVariationGuid != _gearVarGUID || _effortMonth.LandingSiteGuid != _landingSiteGuid;
+                        _readEfforMonth = _efforRefreshNeeded || _effortMonth.SampledMonth != _samplingMonth || _effortMonth.GearVariationGuid != _gearVarGUID || _effortMonth.LandingSiteGuid != _landingSiteGuid;
                         _effortMonth.SampledMonth = _samplingMonth;
                         _effortMonth.GearVariationGuid = _gearVarGUID;
                         _effortMonth.LandingSiteGuid = _landingSiteGuid;
@@ -3081,7 +3102,7 @@ namespace FAD3
             _catchLocalNamesForm = null;
         }
 
-        private void ShowCatchComposition(string SamplingGuid)
+        private void ShowCatchComposition(string samplingGuid)
         {
             if (_subListExisting)
             {

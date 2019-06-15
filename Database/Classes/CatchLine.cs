@@ -9,7 +9,6 @@ namespace FAD3
         public string Name1 { get; set; }
         public string Name2 { get; set; }
         public string CatchNameGUID { get; set; }
-
         public fad3DataStatus dataStatus { get; set; }
 
         public double CatchWeight { get; set; }
@@ -38,9 +37,9 @@ namespace FAD3
             IsListedFB = isListedFB;
         }
 
-        public CatchLine(string inSamplingGUID)
+        public CatchLine(string samplingGUID)
         {
-            SamplingGUID = inSamplingGUID;
+            SamplingGUID = samplingGUID;
         }
 
         public CatchLine(int sequence, string name1, string name2, string catchName, string samplingGUID,
