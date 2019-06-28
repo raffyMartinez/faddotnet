@@ -40,6 +40,14 @@ namespace FAD3.Database.Classes
             XmlTextReader xmlReader = new XmlTextReader(XMLFilename);
             string gearClassGuid = "";
             int mapCount = 0;
+
+            VesselType vesselType = VesselType.NotDetermined;
+            List<FishingGround> listFishingGrounds = new List<FishingGround>();
+            Sampling sampling = new Sampling();
+            FishingVessel fishingVessel = new FishingVessel(VesselType.NotDetermined);
+            string gearVariationGuid = "";
+            string refCode = "";
+            string usageCodeID = "";
             while (xmlReader.Read())
             {
                 if (xmlReader.NodeType == XmlNodeType.Element)
@@ -47,7 +55,7 @@ namespace FAD3.Database.Classes
                     switch (xmlReader.Name)
                     {
                         case "FishCatchMonitoring":
-                            SamplingEventArgs sev = new SamplingEventArgs(ExportSamplingStatus.StartImport);
+                            SamplingEventArgs sev = new SamplingEventArgs(SamplingRecordStatus.StartImport);
                             sev.SamplingToFromXML = this;
                             sev.TargetAreaName = TargetAreaName;
                             OnExportSamplingStatus?.Invoke(null, sev);
@@ -57,6 +65,12 @@ namespace FAD3.Database.Classes
                             if (NewTargetArea
                                 && !TargetArea.AddNewTargetArea(TargetAreaName, TargetAreaGuid, targetAreaCode, subgridStyle, zone))
                             {
+                            }
+                            else
+                            {
+                                TargetArea = new TargetArea(TargetAreaGuid);
+                                TargetArea.TargetAreaName = TargetAreaName;
+                                TargetArea.TargetAreaLetter = targetAreaCode;
                             }
                             break;
 
@@ -97,9 +111,32 @@ namespace FAD3.Database.Classes
                             break;
 
                         case "FishingGears":
+                            SamplingEventArgs sve = new SamplingEventArgs(SamplingRecordStatus.BeginFishingGears);
+                            sve.RecordCount = int.Parse(xmlReader.GetAttribute("GearVariationsCount"));
+                            OnExportSamplingStatus?.Invoke(null, sve);
+                            break;
+
+                        case "GearLocalNames":
+                            sve = new SamplingEventArgs(SamplingRecordStatus.BeginGearLocalNames);
+                            sve.RecordCount = int.Parse(xmlReader.GetAttribute("LocalNameCount"));
+                            OnExportSamplingStatus?.Invoke(null, sve);
+                            break;
+
+                        case "GearLocalName":
+
+                            string gearLocalName = xmlReader.GetAttribute("LocalName");
+
+                            NewFisheryObjectName nfo = new NewFisheryObjectName(gearLocalName, FisheryObjectNameType.GearLocalName);
+                            Gears.SaveNewLocalName(nfo, xmlReader.GetAttribute("LocalNameGuid"));
+
+                            sve = new SamplingEventArgs(SamplingRecordStatus.GearLocalName);
+                            sve.GearLocalName = gearLocalName;
+                            OnExportSamplingStatus?.Invoke(null, sve);
+
                             break;
 
                         case "GearClasses":
+
                             break;
 
                         case "GearClass":
@@ -111,8 +148,51 @@ namespace FAD3.Database.Classes
 
                         case "GearVariation":
                             string gearVariationName = xmlReader.GetAttribute("name");
-                            string gearVariationGuid = xmlReader.GetAttribute("guid");
+                            gearVariationGuid = xmlReader.GetAttribute("guid");
                             Gears.AddGearVariation(gearClassGuid, gearVariationName, gearVariationGuid);
+
+                            sve = new SamplingEventArgs(SamplingRecordStatus.FishingGears);
+                            sve.GearVariationName = gearVariationName;
+                            OnExportSamplingStatus?.Invoke(null, sve);
+                            break;
+
+                        case "Specifications":
+                            break;
+
+                        case "Specification":
+                            GearSpecification gs = new GearSpecification(xmlReader.GetAttribute("ElementName"),
+                                                                xmlReader.GetAttribute("ElementType"),
+                                                                xmlReader.GetAttribute("SpecRowGUID"),
+                                                                int.Parse(xmlReader.GetAttribute("Sequence")));
+                            gs.Notes = xmlReader.GetAttribute("Description");
+                            ManageGearSpecsClass.SaveGearSpec(gearVariationGuid, gs);
+                            break;
+
+                        case "GearRefCodes":
+                            break;
+
+                        case "GearRefCode":
+                            refCode = xmlReader.GetAttribute("RefCode");
+                            Gears.SaveNewGearReferenceCode(refCode, gearVariationGuid, bool.Parse(xmlReader.GetAttribute("IsSubVariation").ToString()));
+                            break;
+
+                        case "RefCodeUsage":
+                            usageCodeID = xmlReader.GetAttribute("UsageRowID");
+                            if (usageCodeID.Length > 0)
+                            {
+                                var addUsageResult = Gears.AddGearCodeUsageTargetArea(refCode, TargetArea.TargetAreaGuid, usageCodeID);
+                                usageCodeID = addUsageResult.NewRow;
+                            }
+                            break;
+
+                        case "LocalNamesInUse":
+                            break;
+
+                        case "LocalNameUsed":
+                            if (usageCodeID.Length > 0)
+                            {
+                                Gears.AddUsageLocalName(usageCodeID, xmlReader.GetAttribute("LocalNameGuid"), xmlReader.GetAttribute("UsageGuid"));
+                            }
                             break;
 
                         case "Taxa":
@@ -125,13 +205,22 @@ namespace FAD3.Database.Classes
                             break;
 
                         case "AllCatchNames":
+                            sve = new SamplingEventArgs(SamplingRecordStatus.BeginCatchNames);
+                            sve.RecordCount = int.Parse(xmlReader.GetAttribute("NamesOfCatchCount"));
+                            OnExportSamplingStatus?.Invoke(null, sve);
                             break;
 
                         case "CatchName":
                             string nameGuid = xmlReader.GetAttribute("NameGuid");
                             string name1 = xmlReader.GetAttribute("Name1");
                             string name2 = xmlReader.GetAttribute("Name2");
-                            taxaNumber = int.Parse(xmlReader.GetAttribute("TaxaNumber"));
+
+                            int? taxaNo = null;
+                            if (int.TryParse(xmlReader.GetAttribute("TaxaNumber"), out int tn))
+                            {
+                                taxaNo = tn;
+                            }
+
                             string identification = xmlReader.GetAttribute("Identification");
                             bool inFishbase = bool.Parse(xmlReader.GetAttribute("IsListedInFishbase"));
 
@@ -140,29 +229,122 @@ namespace FAD3.Database.Classes
                             {
                                 fbNumber = v;
                             }
-                            CatchName.AddCatchName(nameGuid, identification, name1, name2, taxaNumber, inFishbase, fbNumber);
+                            bool success = CatchName.AddCatchName(nameGuid, identification, name1, name2, taxaNo, inFishbase, fbNumber);
+                            sve = new SamplingEventArgs(SamplingRecordStatus.CatchNames);
+                            sve.CatchName = $"{name1} {name2}";
+                            OnExportSamplingStatus?.Invoke(null, sve);
                             break;
 
                         case "Samplings":
                             samplingRecords = int.Parse(xmlReader.GetAttribute("SamplingRecordsCount"));
-                            OnExportSamplingStatus?.Invoke(null, new SamplingEventArgs(ExportSamplingStatus.BeginSamplings, samplingRecords));
+                            OnExportSamplingStatus?.Invoke(null, new SamplingEventArgs(SamplingRecordStatus.BeginSamplings, samplingRecords));
                             break;
 
                         case "Sampling":
-                            string refNumber = xmlReader.GetAttribute("ReferenceNumber");
-                            OnExportSamplingStatus?.Invoke(null, new SamplingEventArgs(ExportSamplingStatus.Samplings, refNumber));
+                            sampling = new Sampling(xmlReader.GetAttribute("SamplingGUID"),
+                                DateTime.Parse(xmlReader.GetAttribute("SamplingDateTime")),
+                                xmlReader.GetAttribute("LandingSiteGuid"),
+                                xmlReader.GetAttribute("ReferenceNumber"));
+                            sampling.TargetAreaGuid = TargetAreaGuid;
+                            sampling.EnumeratorGuid = xmlReader.GetAttribute("EnumeratorGuid");
+                            sampling.SamplingType = CatchMonitoringSamplingType.FisheryDependent;
+                            if (xmlReader.GetAttribute("SamplingType") != null)
+                            {
+                                sampling.SamplingType = (CatchMonitoringSamplingType)Enum.Parse(typeof(CatchMonitoringSamplingType), xmlReader.GetAttribute("SamplingType"));
+                            }
+
+                            if (DateTime.TryParse(xmlReader.GetAttribute("DateEncoded"), out DateTime result))
+                            {
+                                sampling.DateEncoded = result;
+                            }
+
+                            if (DateTime.TryParse(xmlReader.GetAttribute("GearSetDateTime"), out result))
+                            {
+                                sampling.GearSettingDateTime = result;
+                            }
+
+                            if (DateTime.TryParse(xmlReader.GetAttribute("GearHaulDateTime"), out result))
+                            {
+                                sampling.GearHaulingDateTime = result;
+                            }
+
+                            sampling.GearVariationGuid = xmlReader.GetAttribute("GearVariationGuid");
+
+                            if (bool.TryParse(xmlReader.GetAttribute("HasLiveFish"), out bool hlf))
+                            {
+                                sampling.HasLiveFish = hlf;
+                            }
+
+                            sampling.Notes = xmlReader.GetAttribute("Notes");
+
+                            if (int.TryParse(xmlReader.GetAttribute("NumberOfFishers"), out int nf))
+                            {
+                                sampling.NumberOfFishers = nf;
+                            }
+
+                            if (int.TryParse(xmlReader.GetAttribute("NumberOfHauls"), out int nh))
+                            {
+                                sampling.NumberOfHauls = nh;
+                            }
+
+                            if (int.TryParse(xmlReader.GetAttribute("WeightCatch"), out int wc))
+                            {
+                                sampling.CatchWeight = wc;
+                            }
+
+                            if (int.TryParse(xmlReader.GetAttribute("WeightSample"), out int ws))
+                            {
+                                sampling.SampleWeight = ws;
+                            }
+
                             break;
 
                         case "FishingVessel":
+                            if (Enum.TryParse(xmlReader.GetAttribute("VesselType"), out VesselType t))
+                            {
+                                vesselType = t;
+                            }
+                            fishingVessel = new FishingVessel(vesselType);
+                            fishingVessel.Engine = xmlReader.GetAttribute("Engine");
+                            if (int.TryParse(xmlReader.GetAttribute("EngineHp"), out int hp))
+                            {
+                                fishingVessel.EngineHorsepower = hp;
+                            }
+
+                            var dimension = xmlReader.GetAttribute("Dimension_BDL").Split(new char[] { 'x', ' ' });
+                            if (dimension[0].Length > 0)
+                            {
+                                fishingVessel.Breadth = double.Parse(dimension[0]);
+                                fishingVessel.Depth = double.Parse(dimension[3]);
+                                fishingVessel.Length = double.Parse(dimension[6]);
+                            }
+                            sampling.FishingVessel = fishingVessel;
                             break;
 
                         case "FishingGrounds":
+                            listFishingGrounds.Clear();
                             break;
 
                         case "FishingGround":
+                            int? sg = null;
+                            string fg = xmlReader.GetAttribute("Name");
+                            if (fg.Length > 0)
+                            {
+                                if (int.TryParse(xmlReader.GetAttribute("SubGrid"), out int s))
+                                {
+                                    sg = s;
+                                }
+                                listFishingGrounds.Add(new FishingGround(fg, sg));
+                            }
                             break;
 
                         case "CatchComposition":
+                            sampling.FishingGroundList = listFishingGrounds;
+                            Samplings sp = new Samplings();
+                            if (sp.UpdateEffort(true, sampling))
+                            {
+                                OnExportSamplingStatus?.Invoke(null, new SamplingEventArgs(SamplingRecordStatus.Samplings, sampling.ReferenceNumber));
+                            }
                             break;
 
                         case "Catch":
@@ -188,14 +370,14 @@ namespace FAD3.Database.Classes
                 //    proceed = false;
                 //}
             }
-            OnExportSamplingStatus?.Invoke(null, new SamplingEventArgs(ExportSamplingStatus.EndImport));
+            OnExportSamplingStatus?.Invoke(null, new SamplingEventArgs(SamplingRecordStatus.EndImport));
             xmlReader.Close();
             return proceed;
         }
 
         public bool Export()
         {
-            OnExportSamplingStatus?.Invoke(null, new SamplingEventArgs(ExportSamplingStatus.StartExport));
+            OnExportSamplingStatus?.Invoke(null, new SamplingEventArgs(SamplingRecordStatus.StartExport));
             bool success = false;
             //StringBuilder sb = new StringBuilder();
             XmlWriter writer = XmlWriter.Create(XMLFilename);
@@ -209,7 +391,7 @@ namespace FAD3.Database.Classes
                 writer.WriteAttributeString("TargetAreaCode", TargetArea.TargetAreaLetter);
                 writer.WriteAttributeString("UTMZone", TargetArea.UTMZone.ToString());
                 writer.WriteAttributeString("SubGridStyle", TargetArea.SubgridStyle.ToString());
-                OnExportSamplingStatus?.Invoke(null, new SamplingEventArgs(ExportSamplingStatus.Header));
+                OnExportSamplingStatus?.Invoke(null, new SamplingEventArgs(SamplingRecordStatus.Header));
 
                 //target area extents
                 {
@@ -225,7 +407,7 @@ namespace FAD3.Database.Classes
                             writer.WriteEndElement();
                         }
                         writer.WriteEndElement();
-                        OnExportSamplingStatus?.Invoke(null, new SamplingEventArgs(ExportSamplingStatus.Extents));
+                        OnExportSamplingStatus?.Invoke(null, new SamplingEventArgs(SamplingRecordStatus.Extents));
                     }
                 }
 
@@ -242,7 +424,7 @@ namespace FAD3.Database.Classes
                         writer.WriteEndElement();
                     }
                     writer.WriteEndElement();
-                    OnExportSamplingStatus?.Invoke(null, new SamplingEventArgs(ExportSamplingStatus.Enumerator));
+                    OnExportSamplingStatus?.Invoke(null, new SamplingEventArgs(SamplingRecordStatus.Enumerator));
                 }
 
                 //Landing sites
@@ -269,13 +451,37 @@ namespace FAD3.Database.Classes
                         writer.WriteEndElement();
                     }
                     writer.WriteEndElement();
-                    OnExportSamplingStatus?.Invoke(null, new SamplingEventArgs(ExportSamplingStatus.LandingSites));
+                    OnExportSamplingStatus?.Invoke(null, new SamplingEventArgs(SamplingRecordStatus.LandingSites));
                 }
 
                 //fishing gears
                 {
                     writer.WriteStartElement("FishingGears");
                     {
+                        writer.WriteAttributeString("GearVariationsCount", Gears.GearVariationCount().ToString());
+
+                        //gear local names
+                        {
+                            writer.WriteStartElement("GearLocalNames");
+                            {
+                                if (Gears.GearLocalNames.Count == 0)
+                                {
+                                    Gears.GetGearLocalNames();
+                                }
+                                var localNames = Gears.GearLocalNames;
+                                writer.WriteAttributeString("LocalNameCount", localNames.Count.ToString());
+                                foreach (KeyValuePair<string, string> kv in localNames)
+                                {
+                                    writer.WriteStartElement("GearLocalName");
+                                    writer.WriteAttributeString("LocalName", kv.Value);
+                                    writer.WriteAttributeString("LocalNameGuid", kv.Key);
+                                    writer.WriteEndElement();
+                                }
+                            }
+                            writer.WriteEndElement();
+                        }
+
+                        //gear classes
                         writer.WriteStartElement("GearClasses");
                         {
                             foreach (var gearClass in Gears.GearClasses.Values)
@@ -296,6 +502,59 @@ namespace FAD3.Database.Classes
                                             writer.WriteAttributeString("mph1", gear.Value.MetaphoneKey1.ToString());
                                             writer.WriteAttributeString("mph2", gear.Value.MetaphoneKey2.ToString());
                                             writer.WriteAttributeString("name2", gear.Value.VariationName2);
+
+                                            //gear specs
+                                            {
+                                                writer.WriteStartElement("Specifications");
+                                                {
+                                                    foreach (GearSpecification gs in ManageGearSpecsClass.GearVariationSpecs(gear.Key))
+                                                    {
+                                                        writer.WriteStartElement("Specification");
+                                                        writer.WriteAttributeString("SpecRowGUID", gs.RowGuid);
+                                                        writer.WriteAttributeString("ElementType", gs.Type);
+                                                        writer.WriteAttributeString("ElementName", gs.Property);
+                                                        writer.WriteAttributeString("Description", gs.Notes);
+                                                        writer.WriteAttributeString("Sequence", gs.Sequence.ToString());
+                                                        writer.WriteEndElement();
+                                                    }
+                                                }
+                                                writer.WriteEndElement();
+                                            }
+
+                                            //ref codes
+                                            {
+                                                writer.WriteStartElement("GearRefCodes");
+                                                {
+                                                    foreach (KeyValuePair<string, bool> refCode in Gears.GearSubVariations(gear.Key))
+                                                    {
+                                                        writer.WriteStartElement("GearRefCode");
+                                                        writer.WriteAttributeString("RefCode", refCode.Key);
+                                                        writer.WriteAttributeString("IsSubVariation", refCode.Value.ToString());
+
+                                                        //ref code usage
+                                                        {
+                                                            writer.WriteStartElement("RefCodeUsage");
+                                                            writer.WriteAttributeString("UsageRowID", Gears.RefCodeTargetAreaRowGuid(refCode.Key, TargetArea.TargetAreaGuid));
+
+                                                            //local name of gear in target area
+                                                            {
+                                                                writer.WriteStartElement("LocalNamesInUse");
+                                                                foreach (var item in Gears.GearLocalName_TargetArea(refCode.Key, TargetArea.TargetAreaGuid))
+                                                                {
+                                                                    writer.WriteStartElement("LocalNameUsed");
+                                                                    writer.WriteAttributeString("LocalNameGuid", item.Key);
+                                                                    writer.WriteAttributeString("UsageGuid", item.Value.RowNumber);
+                                                                    writer.WriteEndElement();
+                                                                }
+                                                                writer.WriteEndElement();
+                                                            }
+                                                            writer.WriteEndElement();
+                                                        }
+                                                        writer.WriteEndElement();
+                                                    }
+                                                }
+                                                writer.WriteEndElement();
+                                            }
                                             writer.WriteEndElement();
                                         }
                                     }
@@ -308,7 +567,7 @@ namespace FAD3.Database.Classes
                         writer.WriteEndElement();
                     }
                     writer.WriteEndElement();
-                    OnExportSamplingStatus?.Invoke(null, new SamplingEventArgs(ExportSamplingStatus.FishingGears));
+                    OnExportSamplingStatus?.Invoke(null, new SamplingEventArgs(SamplingRecordStatus.FishingGears));
                 }
 
                 //Taxa
@@ -322,14 +581,15 @@ namespace FAD3.Database.Classes
                         writer.WriteEndElement();
                     }
                     writer.WriteEndElement();
-                    OnExportSamplingStatus?.Invoke(null, new SamplingEventArgs(ExportSamplingStatus.Taxa));
+                    OnExportSamplingStatus?.Invoke(null, new SamplingEventArgs(SamplingRecordStatus.Taxa));
                 }
 
                 //All catch names
                 {
                     writer.WriteStartElement("AllCatchNames");
                     var listNames = CatchComposition.RetriveAllCatchFromTargetArea(TargetArea.TargetAreaGuid);
-                    OnExportSamplingStatus?.Invoke(null, new SamplingEventArgs(ExportSamplingStatus.BeginCatchNames, listNames.Count));
+                    writer.WriteAttributeString("NamesOfCatchCount", listNames.Count.ToString());
+                    OnExportSamplingStatus?.Invoke(null, new SamplingEventArgs(SamplingRecordStatus.BeginCatchNames, listNames.Count));
                     foreach (var catchItem in listNames)
                     {
                         writer.WriteStartElement("CatchName");
@@ -341,7 +601,7 @@ namespace FAD3.Database.Classes
                         writer.WriteAttributeString("IsListedInFishbase", catchItem.IsListedFB.ToString());
                         writer.WriteAttributeString("FBSpeciesNumber", catchItem.FishBaseSpeciesNumber.ToString());
                         writer.WriteEndElement();
-                        OnExportSamplingStatus?.Invoke(null, new SamplingEventArgs(ExportSamplingStatus.CatchNames, catchItem.Name1, catchItem.Name2));
+                        OnExportSamplingStatus?.Invoke(null, new SamplingEventArgs(SamplingRecordStatus.CatchNames, catchItem.Name1, catchItem.Name2));
                     }
                     writer.WriteEndElement();
                 }
@@ -353,7 +613,7 @@ namespace FAD3.Database.Classes
                         Samplings samplings = new Samplings(TargetArea.TargetAreaGuid, null);
                         samplings.GetSamplingGuids(TargetArea.TargetAreaGuid);
                         int recordCount = samplings.SamplingGuids.Count;
-                        OnExportSamplingStatus?.Invoke(null, new SamplingEventArgs(ExportSamplingStatus.BeginSamplings, recordCount));
+                        OnExportSamplingStatus?.Invoke(null, new SamplingEventArgs(SamplingRecordStatus.BeginSamplings, recordCount));
                         writer.WriteAttributeString("SamplingRecordsCount", recordCount.ToString());
                         foreach (string guid in samplings.SamplingGuids)
                         {
@@ -417,11 +677,11 @@ namespace FAD3.Database.Classes
                             {
                                 writer.WriteStartElement("FishingGrounds");
                                 {
-                                    foreach (var fg in sample.FishingGrounds)
+                                    foreach (var fg in sample.FishingGroundList)
                                     {
                                         writer.WriteStartElement("FishingGround");
-                                        writer.WriteAttributeString("Name", fg.FishingGround);
-                                        writer.WriteAttributeString("SubGrid", fg.SubGrid);
+                                        writer.WriteAttributeString("Name", fg.GridName);
+                                        writer.WriteAttributeString("SubGrid", fg.SubGrid.ToString());
                                         writer.WriteEndElement();
                                     }
                                 }
@@ -478,7 +738,7 @@ namespace FAD3.Database.Classes
                             }
 
                             writer.WriteEndElement();
-                            OnExportSamplingStatus?.Invoke(null, new SamplingEventArgs(ExportSamplingStatus.Samplings, sample.ReferenceNumber));
+                            OnExportSamplingStatus?.Invoke(null, new SamplingEventArgs(SamplingRecordStatus.Samplings, sample.ReferenceNumber));
                         }
                     }
                     writer.WriteEndElement();
@@ -491,7 +751,7 @@ namespace FAD3.Database.Classes
             writer.Close();
             success = true;
 
-            OnExportSamplingStatus?.Invoke(null, new SamplingEventArgs(ExportSamplingStatus.EndExport));
+            OnExportSamplingStatus?.Invoke(null, new SamplingEventArgs(SamplingRecordStatus.EndExport));
 
             return success;
         }

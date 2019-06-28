@@ -11,9 +11,11 @@ namespace FAD3.Database.Classes
         public string ReferenceNumber { get; set; }
         public string Status { get; set; }
         public string StatusMessage { get; set; }
-        public ExportSamplingStatus ExportStatus { get; set; }
+        public SamplingRecordStatus RecordStatus { get; set; }
         public int RecordCount { get; set; }
         public string CatchName { get; set; }
+        public string GearVariationName { get; set; }
+        public string GearLocalName { get; set; }
         public string TargetAreaName { get; set; }
         public string TargetAreaGuid { get; set; }
         public SamplingToFromXML SamplingToFromXML { get; set; }
@@ -26,14 +28,14 @@ namespace FAD3.Database.Classes
             Status = status;
         }
 
-        public SamplingEventArgs(ExportSamplingStatus status)
+        public SamplingEventArgs(SamplingRecordStatus status)
         {
-            ExportStatus = status;
+            RecordStatus = status;
         }
 
-        public SamplingEventArgs(ExportSamplingStatus status, string statusMessage, int importCount)
+        public SamplingEventArgs(SamplingRecordStatus status, string statusMessage, int importCount)
         {
-            ExportStatus = status;
+            RecordStatus = status;
             StatusMessage = statusMessage;
             RecordCount = importCount;
         }
@@ -44,21 +46,21 @@ namespace FAD3.Database.Classes
             ReferenceNumber = refNumber;
         }
 
-        public SamplingEventArgs(ExportSamplingStatus status, int count)
+        public SamplingEventArgs(SamplingRecordStatus status, int count)
         {
-            ExportStatus = status;
+            RecordStatus = status;
             RecordCount = count;
         }
 
-        public SamplingEventArgs(ExportSamplingStatus status, string refNumber)
+        public SamplingEventArgs(SamplingRecordStatus status, string refNumber)
         {
-            ExportStatus = status;
+            RecordStatus = status;
             ReferenceNumber = refNumber;
         }
 
-        public SamplingEventArgs(ExportSamplingStatus status, string name1, string name2)
+        public SamplingEventArgs(SamplingRecordStatus status, string name1, string name2)
         {
-            ExportStatus = status;
+            RecordStatus = status;
             CatchName = $"{name1} {name2}";
         }
     }

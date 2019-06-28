@@ -114,7 +114,7 @@ namespace FAD3.Database.Forms
             InitializeComponent();
             _idType = identification;
             _name = name;
-            Names.RowsImported += OnNamesImportRows;
+            Names.OnRowsImported += OnNamesImportRows;
         }
 
         private void OnNamesImportRows(object sender, ImportRowsFromFileEventArgs e)
@@ -193,14 +193,14 @@ namespace FAD3.Database.Forms
                     SpeciesGuid = nameGuid;
                     break;
             }
-            Names.RowsImported += OnNamesImportRows;
+            Names.OnRowsImported += OnNamesImportRows;
         }
 
         public CatchLocalNamesForm(Identification identification)
         {
             InitializeComponent();
             _idType = identification;
-            Names.RowsImported += OnNamesImportRows;
+            Names.OnRowsImported += OnNamesImportRows;
         }
 
         private void OnButtonClick(object sender, EventArgs e)
@@ -763,10 +763,10 @@ namespace FAD3.Database.Forms
 
                 case "tbExport":
                 case "tbImport":
-                    var actionType = ExportImportAction.ActionExport;
+                    var actionType = ExportImportDeleteAction.ActionExport;
                     if (e.ClickedItem.Name == "tbImport")
                     {
-                        actionType = ExportImportAction.ActionImport;
+                        actionType = ExportImportDeleteAction.ActionImport;
                     }
                     using (ExportImportDialogForm eidf = new ExportImportDialogForm(ExportImportDataType.CatchNametDataSelect, actionType))
                     {
@@ -777,11 +777,11 @@ namespace FAD3.Database.Forms
                             {
                                 switch (actionType)
                                 {
-                                    case ExportImportAction.ActionExport:
+                                    case ExportImportDeleteAction.ActionExport:
                                         ExportData(ExportImportDataType.CatchLocalNames, "Export local names of catch");
                                         break;
 
-                                    case ExportImportAction.ActionImport:
+                                    case ExportImportDeleteAction.ActionImport:
                                         ImportData(ExportImportDataType.CatchLocalNames, "Import local names of catch");
                                         break;
                                 }
@@ -790,11 +790,11 @@ namespace FAD3.Database.Forms
                             {
                                 switch (actionType)
                                 {
-                                    case ExportImportAction.ActionExport:
+                                    case ExportImportDeleteAction.ActionExport:
                                         ExportData(ExportImportDataType.LocalNameLanguages, "Export local name languages");
                                         break;
 
-                                    case ExportImportAction.ActionImport:
+                                    case ExportImportDeleteAction.ActionImport:
                                         ImportData(ExportImportDataType.LocalNameLanguages, "Import local name languages");
                                         break;
                                 }
@@ -803,11 +803,11 @@ namespace FAD3.Database.Forms
                             {
                                 switch (actionType)
                                 {
-                                    case ExportImportAction.ActionExport:
+                                    case ExportImportDeleteAction.ActionExport:
                                         ExportData(ExportImportDataType.CatchLocalNameSpeciesNamePair, "Export local names and species names");
                                         break;
 
-                                    case ExportImportAction.ActionImport:
+                                    case ExportImportDeleteAction.ActionImport:
                                         ImportData(ExportImportDataType.CatchLocalNameSpeciesNamePair, "Import local names and species names");
                                         break;
                                 }
@@ -817,11 +817,11 @@ namespace FAD3.Database.Forms
                             {
                                 switch (actionType)
                                 {
-                                    case ExportImportAction.ActionExport:
+                                    case ExportImportDeleteAction.ActionExport:
                                         ExportData(ExportImportDataType.CatchNameAll, "Export entire language, local name and scientific name database");
                                         break;
 
-                                    case ExportImportAction.ActionImport:
+                                    case ExportImportDeleteAction.ActionImport:
                                         ImportData(ExportImportDataType.CatchNameAll, "Import entire language, local name and scientific name database");
                                         break;
                                 }

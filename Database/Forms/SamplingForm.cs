@@ -457,7 +457,11 @@ namespace FAD3
 
                             case "FishingGear":
                                 _gearVarName = ctl.Text;
-                                _gearVarGuid = ((KeyValuePair<string, string>)((ComboBox)ctl).SelectedItem).Key;
+                                ComboBox c = (ComboBox)ctl;
+                                if (c.Items.Count > 0)
+                                {
+                                    _gearVarGuid = ((KeyValuePair<string, string>)(c.SelectedItem)).Key;
+                                }
                                 break;
 
                             case "ReferenceNumber":
@@ -1270,7 +1274,7 @@ namespace FAD3
         {
             //we want to get the UserInterfaceStructure element specified in the tag of the control to validate
             Samplings.UserInterfaceStructure ui = Samplings.uis[((Control)sender).Tag.ToString()];
-
+            bool emptyComboList = false;
             string controlText = ((Control)sender).Text;
             string msg = "";
             if (!ui.ReadOnly && controlText.Length > 0)
@@ -1360,6 +1364,7 @@ namespace FAD3
                                 break;
                             }
                         }
+                        emptyComboList = cbo.Items.Count == 0;
                         if (isInList)
                         {
                             switch (ui.Key)
@@ -1445,8 +1450,12 @@ namespace FAD3
 
                 if (msg.Length > 0)
                 {
-                    MessageBox.Show(msg, "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                    e.Cancel = true;
+                    
+                    if (!emptyComboList)
+                    {
+                        MessageBox.Show(msg, "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                        e.Cancel = true;
+                    }
                 }
                 else
                 {

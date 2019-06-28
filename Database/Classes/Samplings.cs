@@ -31,7 +31,7 @@ namespace FAD3
         private string _targetAreaGuid = "";
         private List<int> _sampledYears = new List<int>();
         public List<string> SamplingGuids { get; internal set; } = new List<string>();
-
+        public static EventHandler<SamplingEventArgs> OnDeleteSamplingStatus;
         public Dictionary<string, Sampling> FishCatchMonitoringSamplings = new Dictionary<string, Sampling>();
 
         private static Dictionary<string, (string RefNo, DateTime SamplingDate, string FishingGround, string SubGrid,
@@ -452,12 +452,55 @@ namespace FAD3
             return Success;
         }
 
+        public static bool DeleteSamplingsInTargetArea(string targetAreaGuid)
+        {
+            int rowCount = 0;
+            int deletedCount = 0;
+            string query = $"SELECT tblSampling.SamplingGUID, RefNo FROM tblSampling WHERE tblSampling.AOI={{{targetAreaGuid}}}";
+            var dt = new DataTable();
+            SamplingEventArgs sve = new SamplingEventArgs(SamplingRecordStatus.BeginDeleteSampling);
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(dt);
+                    rowCount = dt.Rows.Count;
+
+                    sve.RecordCount = rowCount;
+                    OnDeleteSamplingStatus?.Invoke(null, sve);
+
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        DataRow dr = dt.Rows[i];
+                        if (DeleteSampling(dr["SamplingGUID"].ToString()))
+                        {
+                            deletedCount++;
+                            sve = new SamplingEventArgs(SamplingRecordStatus.DeleteSampling);
+                            sve.ReferenceNumber = dr["RefNo"].ToString();
+                            OnDeleteSamplingStatus?.Invoke(null, sve);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
+                }
+            }
+
+            sve = new SamplingEventArgs(SamplingRecordStatus.EndDeleteSampling);
+            OnDeleteSamplingStatus?.Invoke(null, sve);
+            return deletedCount == rowCount;
+        }
+
         public static bool DeleteSampling(string samplingGUID)
         {
             bool Success = false;
             List<string> myList = new List<string>();
             string query = "";
-            var dt = new DataTable();
+            //var dt = new DataTable();
             using (var conection = new OleDbConnection(global.ConnectionString))
             {
                 conection.Open();
@@ -499,6 +542,13 @@ namespace FAD3
                 using (OleDbCommand update = new OleDbCommand(query, conection))
                 {
                     update.ExecuteNonQuery();
+                }
+
+                //delete additional fishing ground
+                query = $"Delete * from tblGrid where SamplingGUID = {{{samplingGUID}}}";
+                using (OleDbCommand update = new OleDbCommand(query, conection))
+                {
+                    Success = (update.ExecuteNonQuery() > 0);
                 }
 
                 //now we delete the parent catch and effort data
@@ -908,7 +958,8 @@ namespace FAD3
                         s.FishingVessel = fv;
 
                         s.CatchComposition = CatchComposition.RetrieveCatchComposition(samplingGUID);
-                        s.FishingGrounds = GetFishingGrounds(samplingGUID);
+                        //s.FishingGrounds = GetFishingGrounds(samplingGUID);
+                        s.FishingGroundList = GetFishingGroundsEx(samplingGUID);
 
                         if (samplingGuid.Length > 0)
                         {
@@ -926,6 +977,45 @@ namespace FAD3
                 }
             }
             return null;
+        }
+
+        private List<FishingGround> GetFishingGroundsEx(string samplingGuid)
+        {
+            List<FishingGround> fgs = new List<FishingGround>();
+            string sql = $@"SELECT FishingGround,Subgrid
+                            FROM tblSampling
+                            WHERE SamplingGUID={{{samplingGuid}}} AND FishingGround <> """"
+                            union all
+
+                            SELECT GridName,Subgrid
+                            FROM tblGrid
+                            WHERE SamplingGUID={{{samplingGuid}}}";
+            var dt = new DataTable();
+            using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.MDBPath))
+            {
+                try
+                {
+                    conection.Open();
+                    var adapter = new OleDbDataAdapter(sql, conection);
+                    adapter.Fill(dt);
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        DataRow dr = dt.Rows[i];
+                        string fg = dr["FishingGround"].ToString();
+                        int? sg = null;
+                        if (int.TryParse(dr["SubGrid"].ToString(), out int subg))
+                        {
+                            sg = subg;
+                        }
+                        fgs.Add(new FishingGround(fg, sg));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
+                }
+            }
+            return fgs;
         }
 
         private List<(string FishingGround, string SubGrid)> GetFishingGrounds(string samplingGuid)
@@ -1081,6 +1171,201 @@ namespace FAD3
             }
         }
 
+        public bool UpdateEffort(bool isNew, Sampling sampling)
+        {
+            bool success = false;
+            string updateQuery = "";
+            string dateSet = "null";
+            string timeSet = "null";
+            string dateHauled = "null";
+            string timeHauled = "null";
+            string subGrid = "null";
+            string fishingGrid = "null";
+            string wtCatch = sampling.CatchWeight.ToString();
+            string wtSample = sampling.SampleWeight.ToString();
+            string noHauls = sampling.NumberOfHauls.ToString();
+            string noFishers = sampling.NumberOfFishers.ToString();
+            string engineHp = sampling.FishingVessel.EngineHorsepower.ToString();
+            string breadth = sampling.FishingVessel.Breadth.ToString();
+            string depth = sampling.FishingVessel.Depth.ToString();
+            string length = sampling.FishingVessel.Length.ToString();
+            string enumeratorGuid = sampling.EnumeratorGuid;
+            string dateEncoded = sampling.DateEncoded.ToString();
+            string timeSampled = string.Format("{0:HH:mm}", sampling.SamplingDateTime);
+            string dateSampled = sampling.SamplingDateTime.Date.ToString("MMM-yyy-dd");
+
+            //msaccess sql requires date time values to be formatted as strings so we just
+            //enclose the values with single quotes
+            if (sampling.GearSettingDateTime != null)
+            {
+                timeSet = $"'{string.Format("{0:HH:mm}", sampling.GearSettingDateTime)}'";
+                dateSet = $"'{sampling.GearSettingDateTime.Value.Date.ToString("MMM-yyy-dd")}'";
+            }
+            if (sampling.GearHaulingDateTime != null)
+            {
+                timeHauled = $"'{string.Format("{0:HH:mm}", sampling.GearHaulingDateTime)}'";
+                dateHauled = $"'{sampling.GearHaulingDateTime.Value.Date.ToString("MMM-yyy-dd")}'";
+            }
+            if (sampling.FishingGroundList.Count > 0)
+            {
+                fishingGrid = sampling.FishingGroundList[0].GridName;
+                if (sampling.FishingGroundList[0].SubGrid != null)
+                {
+                    subGrid = sampling.FishingGroundList[0].SubGrid.ToString();
+                }
+            }
+            if (wtCatch.Length == 0)
+            {
+                wtCatch = "null";
+            }
+            if (wtSample.Length == 0)
+            {
+                wtSample = "null";
+            }
+            if (noFishers.Length == 0)
+            {
+                noFishers = "null";
+            }
+            if (noHauls.Length == 0)
+            {
+                noHauls = "null";
+            }
+            if (engineHp.Length == 0)
+            {
+                engineHp = "null";
+            }
+            if (breadth.Length == 0)
+            {
+                breadth = "null";
+            }
+            if (depth.Length == 0)
+            {
+                depth = "null";
+            }
+            if (length.Length == 0)
+            {
+                length = "null";
+            }
+            if (enumeratorGuid.Length == 0 || enumeratorGuid == "{}")
+            {
+                enumeratorGuid = "null";
+            }
+            else
+            {
+                enumeratorGuid = $"{{{enumeratorGuid}}}";
+            }
+            if (dateEncoded.Length == 0)
+            {
+                dateEncoded = "null";
+            }
+            else
+            {
+                dateEncoded = $"'{dateEncoded}'";
+            }
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                if (isNew)
+                {
+                    updateQuery = $@"Insert into tblSampling (SamplingGUID, GearVarGUID, AOI, RefNo, SamplingDate, SamplingTime,
+                            FishingGround, SubGrid, TimeSet, DateSet, TimeHauled, DateHauled, NoHauls, NoFishers, Engine, hp,
+                            WtCatch, WtSample, len, wdt, hgt, LSGUID,  Notes, VesType, SamplingType, HasLiveFish, Enumerator,
+                            DateEncoded) values (
+                            {{{sampling.SamplingGUID}}},
+                            {{{sampling.GearVariationGuid}}},
+                            {{{sampling.TargetAreaGuid}}},
+                            '{sampling.ReferenceNumber}',
+                            '{dateSampled}',
+                            '{timeSampled}',
+                            '{fishingGrid}',
+                            {subGrid},
+                            {timeSet},
+                            {dateSet},
+                            {timeHauled},
+                            {dateHauled},
+                            {noHauls},
+                            {noFishers},
+                            '{sampling.FishingVessel.Engine}',
+                            {engineHp},
+                            {wtCatch},
+                            {wtSample},
+                            {length},
+                            {breadth},
+                            {depth},
+                            {{{sampling.LandingSiteGuid}}},
+                            '{sampling.Notes}',
+                            {(int)sampling.FishingVessel.VesselType},
+                            {(int)sampling.SamplingType},
+                            {sampling.HasLiveFish.ToString()},
+                            {enumeratorGuid},
+                            {dateEncoded})";
+                }
+                else
+                {
+                    updateQuery = $@"Update tblSampling set
+                            GearVarGUID ={{{sampling.GearVariationGuid}}},
+                            AOI ={{{sampling.TargetAreaGuid}}},
+                            RefNo ='{sampling.ReferenceNumber}',
+                            SamplingDate ='{sampling.SamplingDateTime.Date}',
+                            SamplingTime ='{sampling.SamplingDateTime.TimeOfDay}',
+                            FishingGround = '{sampling.FishingGroundList[0].GridName}',
+                            SubGrid = {sampling.FishingGroundList[0].SubGrid.ToString()},
+                            TimeSet ={timeSet},
+                            DateSet = {dateSet},
+                            TimeHauled = {timeHauled},
+                            DateHauled = {dateHauled},
+                            NoHauls = {sampling.NumberOfHauls},
+                            NoFishers = {sampling.NumberOfFishers},
+                            Engine ='{sampling.FishingVessel.Engine}',
+                            hp = {sampling.FishingVessel.EngineHorsepower.ToString()},
+                            WtCatch ={sampling.CatchWeight.ToString()},
+                            WtSample ={sampling.SampleWeight.ToString()},
+                            len ={sampling.FishingVessel.Length.ToString()},
+                            wdt ={sampling.FishingVessel.Breadth.ToString()},
+                            hgt ={sampling.FishingVessel.Depth.ToString()},
+                            LSGUID ={{{sampling.LandingSiteGuid}}},
+                            Notes = '{sampling.Notes}',
+                            VesType ={(int)sampling.FishingVessel.VesselType},
+                            SamplingType ={(int)sampling.SamplingType},
+                            HasLiveFish = {sampling.HasLiveFish},
+                            Enumerator = {{{sampling.EnumeratorGuid}}}
+                            Where SamplingGUID = {{{sampling.SamplingGUID}}}";
+                }
+                using (OleDbCommand update = new OleDbCommand(updateQuery, conn))
+                {
+                    conn.Open();
+                    try
+                    {
+                        success = (update.ExecuteNonQuery() > 0);
+                    }
+                    //catch (OleDbException)
+                    //{
+                    //    success = false;
+                    //}
+                    catch (Exception ex)
+                    {
+                        Logger.LogError(ex.Message, ex.StackTrace);
+                        //Logger.Log(updateQuery);
+                        success = false;
+                    }
+                    conn.Close();
+                }
+                if (success)
+                {
+                    if (sampling.FishingGroundList.Count > 1)
+                    {
+                        SaveAdditionalFishingGroundsEx(sampling.FishingGroundList, sampling.SamplingGUID);
+                    }
+                    if (OnEffortUpdated != null)
+                    {
+                        EffortEventArg e = new EffortEventArg(sampling.SamplingDateTime.Date, sampling.GearVariationGuid, sampling.LandingSiteGuid);
+                        OnEffortUpdated(this, e);
+                    }
+                }
+            }
+
+            return success;
+        }
+
         public bool UpdateEffort(bool isNew, Dictionary<string, string> EffortData, List<string> FishingGrounds)
         {
             bool Success = false;
@@ -1219,6 +1504,40 @@ namespace FAD3
                 }
             }
             return Success;
+        }
+
+        private void SaveAdditionalFishingGroundsEx(List<FishingGround> fishingGrounds, string SamplingGUID)
+        {
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                var sql = $"Delete * from tblGrid where SamplingGuid = {{{SamplingGUID}}}";
+                using (OleDbCommand update = new OleDbCommand(sql, conn))
+                {
+                    update.ExecuteNonQuery();
+                }
+
+                for (int n = 1; n < fishingGrounds.Count; n++)
+                {
+                    var fg = fishingGrounds[n].GridName;
+                    var subGrid = fishingGrounds[n].SubGrid.ToString();
+                    if (subGrid.Length == 0)
+                    {
+                        subGrid = "null";
+                    }
+                    sql = $@"Insert into tblGrid (SamplingGuid, GridName,RowGUID,SubGrid) values
+                            (
+                              {{{SamplingGUID}}},
+                              '{fg}',
+                              {{{Guid.NewGuid()}}},
+                              {subGrid}
+                            )";
+                    using (OleDbCommand update = new OleDbCommand(sql, conn))
+                    {
+                        update.ExecuteNonQuery();
+                    }
+                }
+            }
         }
 
         private void SaveAdditionalFishingGrounds(List<string> FishingGrounds, string SamplingGUID)

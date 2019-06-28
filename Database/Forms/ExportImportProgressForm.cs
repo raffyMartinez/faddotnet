@@ -17,7 +17,7 @@ namespace FAD3.Database.Forms
         public string FileName { get; internal set; }
         public int ExportImportCount { get; set; }
         public int ExportImportTargetCount { get; internal set; }
-        public ExportImportAction ActionExportImport { get; set; }
+        public ExportImportDeleteAction ActionExportImport { get; set; }
         public FishingGearInventory FishingGearInventory { get; set; }
         public int BatchSize { get; set; }
         private GearInventoryForm _parentForm;
@@ -77,7 +77,7 @@ namespace FAD3.Database.Forms
                 else
                 {
                     progressBar.Value = (int)(((double)ExportImportCount / (double)ExportImportTargetCount) * 100);
-                    if (ActionExportImport == ExportImportAction.ActionExport)
+                    if (ActionExportImport == ExportImportDeleteAction.ActionExport)
                     {
                         lblStatus.Invoke(new MethodInvoker(delegate
                         {
@@ -87,7 +87,7 @@ namespace FAD3.Database.Forms
                 }
             }));
 
-            if (forcedComplete || (progressBar.Value == 100 && ActionExportImport == ExportImportAction.ActionExport))
+            if (forcedComplete || (progressBar.Value == 100 && ActionExportImport == ExportImportDeleteAction.ActionExport))
             {
                 lblTitle.Invoke((MethodInvoker)delegate
                 {
@@ -110,12 +110,12 @@ namespace FAD3.Database.Forms
         {
             switch (ActionExportImport)
             {
-                case ExportImportAction.ActionImport:
+                case ExportImportDeleteAction.ActionImport:
                     ExportImportTargetCount = BatchSize;
                     lblTitle.Text = "Importing inventory";
                     break;
 
-                case ExportImportAction.ActionExport:
+                case ExportImportDeleteAction.ActionExport:
                     lblTitle.Text = "Exporting inventory";
                     break;
             }
@@ -125,7 +125,7 @@ namespace FAD3.Database.Forms
 
         private void OnFormClosed(object sender, FormClosedEventArgs e)
         {
-            if (ActionExportImport == ExportImportAction.ActionImport)
+            if (ActionExportImport == ExportImportDeleteAction.ActionImport)
             {
                 FishingGearInventory.InventoryLevel -= OnInventoryLevel;
             }

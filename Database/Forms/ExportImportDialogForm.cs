@@ -7,12 +7,12 @@ namespace FAD3.Database.Forms
     public partial class ExportImportDialogForm : Form
     {
         private ExportImportDataType _dataType;
-        private ExportImportAction _action;
+        private ExportImportDeleteAction _action;
         public string TaxaCSV { get; set; }
         public ExportImportDataType Selection { get; internal set; }
         public bool ExportSelectedTaxa { get; internal set; }
 
-        public ExportImportDialogForm(ExportImportDataType exportDataType, ExportImportAction action)
+        public ExportImportDialogForm(ExportImportDataType exportDataType, ExportImportDeleteAction action)
         {
             InitializeComponent();
             _dataType = exportDataType;
@@ -32,7 +32,7 @@ namespace FAD3.Database.Forms
                 case ExportImportDataType.SpeciesNames:
                     rdButton.Visible = true;
                     rdButton.Text = "Export species names of catch";
-                    if (_action == ExportImportAction.ActionImport)
+                    if (_action == ExportImportDeleteAction.ActionImport)
                     {
                         rdButton.Text = "Import species names of catch";
                     }
@@ -66,7 +66,7 @@ namespace FAD3.Database.Forms
                 case ExportImportDataType.GearInventoryDataSelect:
                     var enumeratorCaption = "Export enumerators";
                     var inventoryCaption = "Export fishery inventory";
-                    if (_action == ExportImportAction.ActionImport)
+                    if (_action == ExportImportDeleteAction.ActionImport)
                     {
                         enumeratorCaption = "Import enumerators";
                         inventoryCaption = "Import fishery inventory";
@@ -89,7 +89,7 @@ namespace FAD3.Database.Forms
                     var gearLocalNameCaption = "Export gear local names";
                     var gearClassCaption = "Export gear classes";
                     var gearRefCodeCaption = "Export gear codes";
-                    if (_action == ExportImportAction.ActionImport)
+                    if (_action == ExportImportDeleteAction.ActionImport)
                     {
                         gearVarCaption = "Import gear variations";
                         gearLocalNameCaption = "Import gear local names";
@@ -128,7 +128,7 @@ namespace FAD3.Database.Forms
                     var localNamesCaption = "Export local names";
                     var namePairCaption = "Export local name - scientific name pairs";
                     var allDataCaption = "Export all";
-                    if (_action == ExportImportAction.ActionImport)
+                    if (_action == ExportImportDeleteAction.ActionImport)
                     {
                         languageCaption = "Import languages";
                         localNamesCaption = "Import local names";
@@ -164,7 +164,7 @@ namespace FAD3.Database.Forms
             }
             rdButton.CheckedChanged += OnCheckChanged;
             chkBox.CheckedChanged += OnCheckChanged;
-            if (_action == ExportImportAction.ActionImport)
+            if (_action == ExportImportDeleteAction.ActionImport)
             {
                 Text = "Import";
             }
@@ -228,7 +228,7 @@ namespace FAD3.Database.Forms
                             Selection |= (ExportImportDataType)c.Tag;
                         }
                     }
-                    if (_action == ExportImportAction.ActionExport && _dataType == ExportImportDataType.SpeciesNames)
+                    if (_action == ExportImportDeleteAction.ActionExport && _dataType == ExportImportDataType.SpeciesNames)
                     {
                         if (Controls.Contains((CheckBox)Controls["chkExportSelected"]))
                         {

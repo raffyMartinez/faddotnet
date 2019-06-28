@@ -1141,6 +1141,7 @@ namespace FAD3
         {
             global.LoadFormSettings(this, true);
             _emptySumOfWeightsLabel = labelSumOfWeight.Text;
+            Text = _referenceNumber;
             labelTitle.Text = $"Catch composition of {_referenceNumber}";
             if (_isNew)
             {

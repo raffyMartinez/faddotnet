@@ -2028,10 +2028,10 @@ namespace FAD3.Database.Forms
 
                 case "tsButtonExport":
                 case "tsButtonImport":
-                    var actionType = ExportImportAction.ActionExport;
+                    var actionType = ExportImportDeleteAction.ActionExport;
                     if (e.ClickedItem.Name == "tsButtonImport")
                     {
-                        actionType = ExportImportAction.ActionImport;
+                        actionType = ExportImportDeleteAction.ActionImport;
                     }
                     using (ExportImportDialogForm eidf = new ExportImportDialogForm(ExportImportDataType.GearInventoryDataSelect, actionType))
                     {
@@ -2042,7 +2042,7 @@ namespace FAD3.Database.Forms
                             {
                                 switch (actionType)
                                 {
-                                    case ExportImportAction.ActionExport:
+                                    case ExportImportDeleteAction.ActionExport:
                                         var exportCount = Enumerators.ExportEnumerators(_targetArea.TargetAreaGuid);
                                         if (exportCount > 0)
                                         {
@@ -2051,7 +2051,7 @@ namespace FAD3.Database.Forms
 
                                         break;
 
-                                    case ExportImportAction.ActionImport:
+                                    case ExportImportDeleteAction.ActionImport:
                                         FileDialogHelper.Title = "Import enumerators";
                                         FileDialogHelper.DialogType = FileDialogType.FileOpen;
                                         FileDialogHelper.DataFileType = DataFileType.Text | DataFileType.XML | DataFileType.HTML;
@@ -2071,11 +2071,11 @@ namespace FAD3.Database.Forms
                             {
                                 switch (actionType)
                                 {
-                                    case ExportImportAction.ActionExport:
+                                    case ExportImportDeleteAction.ActionExport:
                                         ExportInventory();
                                         break;
 
-                                    case ExportImportAction.ActionImport:
+                                    case ExportImportDeleteAction.ActionImport:
                                         ImportGearInventory();
                                         break;
                                 }
@@ -2426,7 +2426,7 @@ namespace FAD3.Database.Forms
                     }
 
                     _exportImportProgressForm = new ExportImportProgressForm(_inventory, iifx.ImportedInventoryFileName, this);
-                    _exportImportProgressForm.ActionExportImport = ExportImportAction.ActionImport;
+                    _exportImportProgressForm.ActionExportImport = ExportImportDeleteAction.ActionImport;
                     _exportImportProgressForm.Show(this);
                     int result = await _inventory.ImportInventoryAsync(iifx.ImportedInventoryFileName, iifx.ImportInventoryAction, _importInventoryProjectGuid);
                     _exportImportProgressForm.UpdateProgress(true);

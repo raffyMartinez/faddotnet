@@ -12,8 +12,17 @@
         EqualSumOfValues
     }
 
-    public enum ExportSamplingStatus
+    public enum CatchMonitoringSamplingType
     {
+        FisheryIndependent,
+        FisheryDependent
+    }
+
+    public enum SamplingRecordStatus
+    {
+        BeginDeleteSampling,
+        DeleteSampling,
+        EndDeleteSampling,
         StartExport,
         StartImport,
         WhereToSaveImport,
@@ -21,8 +30,11 @@
         Extents,
         Enumerator,
         LandingSites,
+        BeginFishingGears,
         FishingGears,
         Taxa,
+        BeginGearLocalNames,
+        GearLocalName,
         BeginCatchNames,
         CatchNames,
         BeginSamplings,
@@ -50,10 +62,12 @@
         PositionFromDefinedExtent
     }
 
-    public enum ExportImportAction
+    public enum ExportImportDeleteAction
     {
+        ActionNothing,
         ActionExport,
-        ActionImport
+        ActionImport,
+        ActionDelete
     }
 
     public enum PointFeatureType
@@ -135,7 +149,9 @@
         Enumerators = 1024,
         GearInventoryDataSelect = 2048,
         GearsRefCode = 4096,
-        CatchNameAll = 8192
+        CatchNameAll = 8192,
+        TargetAreaData = 16384,
+        ERDDAP = 32768
     }
 
     public enum EditActionType

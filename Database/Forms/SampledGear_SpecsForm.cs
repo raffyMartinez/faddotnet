@@ -29,7 +29,7 @@ namespace FAD3
         private static SampledGear_SpecsForm _instance;
         private string _gearVarGuid;
         private string _gearVarName;
-        private List<ManageGearSpecsClass.GearSpecification> _listGearSpecs = new List<ManageGearSpecsClass.GearSpecification>();
+        private List<GearSpecification> _listGearSpecs = new List<GearSpecification>();
         private bool _isNew = true;
         private bool _sampledGearSpecDataIsEdited = false;
         private SamplingForm _parent_form;
@@ -67,7 +67,7 @@ namespace FAD3
             var y = 0;
             var spacer = 15;
             var ControlHeight = 0;
-            foreach (ManageGearSpecsClass.GearSpecification spec in _listGearSpecs)
+            foreach (GearSpecification spec in _listGearSpecs)
             {
                 Label lbl = new Label
                 {

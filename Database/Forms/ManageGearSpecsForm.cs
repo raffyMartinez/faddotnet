@@ -8,34 +8,34 @@ namespace FAD3
 {
     public partial class ManageGearSpecsForm : Form
     {
-        private string _GearVarGuid;
-        private string _GearVarName;
-        private List<ManageGearSpecsClass.GearSpecification> _GearSpecs = new List<ManageGearSpecsClass.GearSpecification>();
-        private ListViewHitTestInfo _HitItem;
-        private int HiddenColIndex;
-        private List<string> _DeletedSpecsRow = new List<string>();
+        private string _gearVarGuid;
+        private string _gearVarName;
+        private List<GearSpecification> _gearSpecs = new List<GearSpecification>();
+        private ListViewHitTestInfo _hitItem;
+        private int _hiddenColIndex;
+        private List<string> _deletedSpecsRow = new List<string>();
         private SampledGear_SpecsForm _parentForm;
 
         public ManageGearSpecsForm(string GearVarGuid, string GearVarName = null, SampledGear_SpecsForm parent = null)
         {
             InitializeComponent();
-            _GearVarGuid = GearVarGuid;
+            _gearVarGuid = GearVarGuid;
             if (GearVarName == null)
                 ManageGearSpecsClass.GearVarGuid(GearVarGuid);
             else
             {
-                _GearVarName = GearVarName;
-                ManageGearSpecsClass.GearVariation(_GearVarGuid, _GearVarName);
+                _gearVarName = GearVarName;
+                ManageGearSpecsClass.GearVariation(_gearVarGuid, _gearVarName);
             }
 
-            _GearSpecs = ManageGearSpecsClass.GearSpecifications;
+            _gearSpecs = ManageGearSpecsClass.GearSpecifications;
 
             if (parent != null) _parentForm = parent;
         }
 
         private void ManageGearSpecs_Load(object sender, EventArgs e)
         {
-            labelTitle.Text += " " + _GearVarName;
+            labelTitle.Text += " " + _gearVarName;
             comboBoxType.Items.Add("Numeric");
             comboBoxType.Items.Add("Text");
             comboBoxType.Items.Add("Yes/No");
@@ -51,14 +51,14 @@ namespace FAD3
                 o.Columns.Add("Notes");
                 c = o.Columns.Add("DataStatus");
                 c.Width = 0;
-                HiddenColIndex = c.Index;
+                _hiddenColIndex = c.Index;
                 o.FullRowSelect = true;
 
                 lvSpecs.ColumnWidthChanging += OnlvSpecs_ColumnWidthChanging;
             });
 
-            if (_GearSpecs != null)
-                foreach (ManageGearSpecsClass.GearSpecification item in _GearSpecs)
+            if (_gearSpecs != null)
+                foreach (GearSpecification item in _gearSpecs)
                 {
                     var lvi = new ListViewItem(new string[] { item.Property, item.Type, item.Notes, item.DataStatus.ToString() });
                     lvi.Name = item.RowGuid;
@@ -102,7 +102,7 @@ namespace FAD3
                 case "buttonRemove":
                     if (lvSpecs.SelectedItems.Count > 0)
                     {
-                        _DeletedSpecsRow.Add(lvSpecs.SelectedItems[0].Name);
+                        _deletedSpecsRow.Add(lvSpecs.SelectedItems[0].Name);
                         lvSpecs.Items.Remove(lvSpecs.SelectedItems[0]);
                     }
                     ClearFields();
@@ -124,12 +124,12 @@ namespace FAD3
 
         private bool SaveProperties()
         {
-            _GearSpecs.Clear();
+            _gearSpecs.Clear();
             foreach (ListViewItem lvi in lvSpecs.Items)
             {
                 fad3DataStatus ds;
                 Enum.TryParse(lvi.SubItems[3].Text, out ds);
-                var spec = new ManageGearSpecsClass.GearSpecification
+                var spec = new GearSpecification
                 {
                     Property = lvi.Text,
                     Type = lvi.SubItems[1].Text,
@@ -144,20 +144,20 @@ namespace FAD3
                     spec.Sequence = lvi.Index + 1;
                 }
 
-                _GearSpecs.Add(spec);
+                _gearSpecs.Add(spec);
             }
 
-            foreach (var item in _DeletedSpecsRow)
+            foreach (var item in _deletedSpecsRow)
             {
-                var spec = new ManageGearSpecsClass.GearSpecification
+                var spec = new GearSpecification
                 {
                     RowGuid = item,
                     DataStatus = fad3DataStatus.statusForDeletion
                 };
-                _GearSpecs.Add(spec);
+                _gearSpecs.Add(spec);
             }
 
-            return ManageGearSpecsClass.SaveGearSpecs(_GearSpecs);
+            return ManageGearSpecsClass.SaveGearSpecs(_gearSpecs);
         }
 
         private void AddPropertyToList()
@@ -198,9 +198,9 @@ namespace FAD3
 
         private void OnlvSpecs_DoubleClick(object sender, EventArgs e)
         {
-            if (_HitItem.Item != null)
+            if (_hitItem.Item != null)
             {
-                _HitItem.Item.With(o =>
+                _hitItem.Item.With(o =>
                 {
                     textBoxPropertyName.Text = o.Text;
                     comboBoxType.Text = o.SubItems[1].Text;
@@ -211,12 +211,12 @@ namespace FAD3
 
         private void OnlvSpecs_MouseDown(object sender, MouseEventArgs e)
         {
-            _HitItem = lvSpecs.HitTest(e.X, e.Y);
+            _hitItem = lvSpecs.HitTest(e.X, e.Y);
         }
 
         private void OnlvSpecs_ColumnWidthChanging(object sender, ColumnWidthChangingEventArgs e)
         {
-            if (e.ColumnIndex == HiddenColIndex)
+            if (e.ColumnIndex == _hiddenColIndex)
             {
                 e.Cancel = true;
                 e.NewWidth = lvSpecs.Columns[e.ColumnIndex].Width;

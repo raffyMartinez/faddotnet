@@ -1185,7 +1185,7 @@ namespace FAD3
                     break;
 
                 case "tbExport":
-                    using (ExportImportDialogForm eidf = new ExportImportDialogForm(ExportImportDataType.GearNameDataSelect, ExportImportAction.ActionExport))
+                    using (ExportImportDialogForm eidf = new ExportImportDialogForm(ExportImportDataType.GearNameDataSelect, ExportImportDeleteAction.ActionExport))
                     {
                         eidf.ShowDialog(this);
                         if (eidf.DialogResult == DialogResult.OK)
@@ -1210,7 +1210,7 @@ namespace FAD3
                     break;
 
                 case "tbImport":
-                    using (ExportImportDialogForm eidf = new ExportImportDialogForm(ExportImportDataType.GearNameDataSelect, ExportImportAction.ActionImport))
+                    using (ExportImportDialogForm eidf = new ExportImportDialogForm(ExportImportDataType.GearNameDataSelect, ExportImportDeleteAction.ActionImport))
                     {
                         eidf.ShowDialog(this);
                         if (eidf.DialogResult == DialogResult.OK)

@@ -12,7 +12,7 @@ namespace FAD3
         public double? EngineHorsepower { get; set; }
         public VesselType VesselType { get; set; }
 
-        public FishingVessel(VesselType vesselType, double? breadth, double? depth, double? length)
+        public FishingVessel(VesselType vesselType, double? breadth = null, double? depth = null, double? length = null)
         {
             Breadth = breadth;
             Depth = depth;

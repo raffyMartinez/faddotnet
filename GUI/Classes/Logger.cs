@@ -64,12 +64,21 @@ namespace FAD3
             }
         }
 
+        public static void LogError(string exceptionMessage, string stackTrace)
+        {
+            string filepath = Application.StartupPath + "\\fad.log";
+            using (StreamWriter writer = new StreamWriter(filepath, true))
+            {
+                writer.WriteLine($"Error: {exceptionMessage}\r\n{stackTrace}\r\n Date :{DateTime.Now.ToString()}");
+            }
+        }
+
         public static void Log(string s)
         {
             string filepath = Application.StartupPath + "\\fad.log";
             using (StreamWriter writer = new StreamWriter(filepath, true))
             {
-                writer.WriteLine("Message: " + s + " " + "Date :" + DateTime.Now.ToString());
+                writer.WriteLine($"Message: {s} Date :{DateTime.Now.ToString()}");
             }
         }
 

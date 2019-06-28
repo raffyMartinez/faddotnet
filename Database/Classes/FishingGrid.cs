@@ -1222,7 +1222,18 @@ namespace FAD3
             {
                 OleDbCommand update = new OleDbCommand(sql, conn);
                 conn.Open();
-                success = (update.ExecuteNonQuery() > 0);
+                try
+                {
+                    success = (update.ExecuteNonQuery() > 0);
+                }
+                catch (OleDbException)
+                {
+                    success = false;
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError(ex.Message, ex.StackTrace);
+                }
             }
             return success;
         }

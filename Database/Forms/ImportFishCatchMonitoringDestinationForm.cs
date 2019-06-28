@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
+using System.IO;
 
 namespace FAD3.Database.Forms
 {
@@ -22,6 +23,8 @@ namespace FAD3.Database.Forms
         private string _targetAreaGuidFromXML;
         private string _targetAreaCodeFromXML { get; set; }
         public bool NewTargetArea { get; private set; }
+        public string ErrorMessage { get; private set; }
+        private string _baseFileName;
 
         public ImportFishCatchMonitoringDestinationForm(string targetAreaName, string targetAreaGuid, MainForm parentForm)
         {
@@ -62,41 +65,57 @@ namespace FAD3.Database.Forms
         {
             int elementCounter = 0;
             bool proceed = false;
+            _baseFileName = Path.GetFileName(ImportXMLFileName);
             XmlTextReader xmlReader = new XmlTextReader(ImportXMLFileName);
-            while (((!proceed && elementCounter == 0) || proceed) && xmlReader.Read())
-            {
-                if (xmlReader.NodeType == XmlNodeType.Element)
-                {
-                    switch (xmlReader.Name)
-                    {
-                        case "FishCatchMonitoring":
-                            if (elementCounter == 0)
-                            {
-                                _targetAreaNameFromXML = xmlReader.GetAttribute("TargetAreaname");
-                                _targetAreaGuidFromXML = xmlReader.GetAttribute("TargetAreaGUID");
-                                _targetAreaCodeFromXML = xmlReader.GetAttribute("TargetAreaCode");
-                                lblTitle.Text = $"Importing {_targetAreaNameFromXML}";
-                                proceed = true;
-                            }
-                            break;
-                    }
-                    elementCounter++;
-                }
 
-                if (elementCounter > 0 && !proceed)
+            try
+            {
+                while (((!proceed && elementCounter == 0) || proceed) && xmlReader.Read())
                 {
-                    proceed = false;
-                    lblTitle.Text = "Error";
-                    lblError.Visible = true;
-                    lblError.Text = "XML file does not contain fish catch monitoring data";
-                    panelImport.Hide();
-                    btnOk.Enabled = false;
-                    break;
+                    if (xmlReader.NodeType == XmlNodeType.Element)
+                    {
+                        switch (xmlReader.Name)
+                        {
+                            case "FishCatchMonitoring":
+                                if (elementCounter == 0)
+                                {
+                                    _targetAreaNameFromXML = xmlReader.GetAttribute("TargetAreaname");
+                                    _targetAreaGuidFromXML = xmlReader.GetAttribute("TargetAreaGUID");
+                                    _targetAreaCodeFromXML = xmlReader.GetAttribute("TargetAreaCode");
+                                    lblTitle.Text = $"Importing {_targetAreaNameFromXML}";
+                                    proceed = true;
+                                }
+                                break;
+                        }
+                        elementCounter++;
+                    }
+
+                    if (elementCounter > 0 && !proceed)
+                    {
+                        proceed = false;
+                        lblTitle.Text = "Error";
+                        lblError.Visible = true;
+                        lblError.Text = "XML file does not contain fish catch monitoring data";
+                        panelImport.Hide();
+                        btnOk.Enabled = false;
+                        break;
+                    }
+                    else if (proceed)
+                    {
+                        break;
+                    }
                 }
-                else if (proceed)
-                {
-                    break;
-                }
+            }
+            catch (XmlException)
+            {
+                DialogResult = DialogResult.Abort;
+                ErrorMessage = $"Cannot open '{_baseFileName}' as XML";
+            }
+            catch (Exception ex)
+            {
+                DialogResult = DialogResult.Abort;
+                ErrorMessage = ex.Message;
+                Logger.LogError(ErrorMessage, ex.StackTrace);
             }
 
             if (proceed)

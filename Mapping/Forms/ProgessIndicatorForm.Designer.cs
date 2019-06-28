@@ -1,6 +1,6 @@
 ﻿namespace FAD3.Mapping.Forms
 {
-    partial class FileDownloadForm
+    partial class ProgessIndicatorForm
     {
         /// <summary>
         /// Required designer variable.

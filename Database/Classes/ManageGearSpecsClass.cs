@@ -73,15 +73,15 @@ namespace FAD3
         /// <summary>
         /// struct that holds the template for the specs of a gear variation
         /// </summary>
-        public struct GearSpecification
-        {
-            public string Property { get; set; }
-            public string Type { get; set; }
-            public string Notes { get; set; }
-            public string RowGuid { get; set; }
-            public fad3DataStatus DataStatus { get; set; }
-            public int Sequence { get; set; }
-        }
+        //public struct GearSpecification1
+        //{
+        //    public string Property { get; set; }
+        //    public string Type { get; set; }
+        //    public string Notes { get; set; }
+        //    public string RowGuid { get; set; }
+        //    public fad3DataStatus DataStatus { get; set; }
+        //    public int Sequence { get; set; }
+        //}
 
         /// <summary>
         /// structure that holds the data of sampled gear's specs
@@ -267,6 +267,36 @@ namespace FAD3
         }
 
         /// <summary>
+        /// returns a List<> of gear specifications
+        /// </summary>
+        /// <param name="variationGuid">gear variation guid</param>
+        /// <returns></returns>
+        public static List<GearSpecification> GearVariationSpecs(string variationGuid)
+        {
+            List<GearSpecification> gearSpecs = new List<GearSpecification>();
+            var dt = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                conection.Open();
+                string query = $"Select RowID, ElementName,ElementType,Sequence,Description from tblGearSpecs where Version = '2' AND GearVarGuid={{{variationGuid}}}";
+                using (var adapter = new OleDbDataAdapter(query, conection))
+                {
+                    adapter.Fill(dt);
+
+                    for (int n = 0; n < dt.Rows.Count; n++)
+                    {
+                        DataRow dr = dt.Rows[n];
+                        GearSpecification gs = new GearSpecification(dr["ElementName"].ToString(), dr["ElementType"].ToString(), dr["RowID"].ToString(), (int)dr["Sequence"]);
+                        gs.Notes = dr["Description"].ToString();
+                        gs.DataStatus = fad3DataStatus.statusFromDB;
+                        gearSpecs.Add(gs);
+                    }
+                }
+            }
+            return gearSpecs;
+        }
+
+        /// <summary>
         /// Gets the template for the gear specifications of a given gear variation
         /// A List (_GearSpecifications) is filled
         /// </summary>
@@ -300,6 +330,42 @@ namespace FAD3
             }
         }
 
+        public static bool SaveGearSpec(string gearVariationGuid, GearSpecification spec)
+        {
+            bool success = false;
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                int version = 2;
+                string sql = $@"Insert into tblGearSpecs (ElementName, ElementType, Description, Sequence, Version, RowId, GearVarGuid)
+                              values (
+                              '{spec.Property}',
+                              '{spec.Type}',
+                              '{spec.Notes}',
+                              {spec.Sequence},
+                              '{version}',
+                              {{{spec.RowGuid}}},
+                              {{{gearVariationGuid}}})";
+                using (OleDbCommand update = new OleDbCommand(sql, conn))
+                {
+                    try
+                    {
+                        success = (update.ExecuteNonQuery() > 0);
+                    }
+                    catch (OleDbException)
+                    {
+                        success = false;
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogError(ex.Message, ex.StackTrace);
+                        success = false;
+                    }
+                }
+            }
+            return success;
+        }
+
         /// <summary>
         /// Save a gear spec template of a gear variation
         /// </summary>
@@ -313,7 +379,8 @@ namespace FAD3
             using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
             {
                 conn.Open();
-                foreach (ManageGearSpecsClass.GearSpecification spec in specifications)
+                //foreach (ManageGearSpecsClass.GearSpecification spec in specifications)
+                foreach (GearSpecification spec in specifications)
                 {
                     if (spec.DataStatus == fad3DataStatus.statusEdited)
                     {

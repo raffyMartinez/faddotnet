@@ -41,6 +41,17 @@ namespace FAD3
             GetAccessories();
         }
 
+        public static int GearVariationCount()
+        {
+            int count = 0;
+            const string sql = "SELECT Count(Variation) AS n FROM tblGearVariations";
+            using (var conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+            }
+            return count;
+        }
+
         public static string GearsXML()
         {
             StringBuilder sb = new StringBuilder();
@@ -766,6 +777,30 @@ namespace FAD3
             return myList;
         }
 
+        public static string RefCodeTargetAreaRowGuid(string refGearCode, string targetAreaGuid)
+        {
+            string rowGuid = "";
+
+            string sql = $"Select RowNo from tblRefGearCodes_Usage where RefGearCode='{refGearCode}' and TargetAreaGuid={{{targetAreaGuid}}}";
+            var myDT = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    using (OleDbCommand getRowID = new OleDbCommand(sql, conection))
+                    {
+                        rowGuid = getRowID.ExecuteScalar().ToString();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError(ex.Message, ex.StackTrace);
+                }
+            }
+            return rowGuid;
+        }
+
         public static Dictionary<string, (string variationGuid, string variationName, bool isSubVariation)> GetGearRefCodes()
         {
             Dictionary<string, (string variationGuid, string variationName, bool isSubVariation)> dict = new Dictionary<string, (string variationGuid, string variationName, bool isSubVariation)>();
@@ -870,7 +905,7 @@ namespace FAD3
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
+                    Logger.LogError(ex.Message, ex.StackTrace);
                 }
             }
 
@@ -1412,10 +1447,18 @@ namespace FAD3
         /// </summary>
         /// <param name="gearCode"></param>
         /// <param name="targetAreaGuid"></param>
-        public static (string NewRow, bool Success) AddUsageLocalName(string targetAreaUsageGuid, string localNameGuid)
+        public static (string NewRow, bool Success) AddUsageLocalName(string targetAreaUsageGuid, string localNameGuid, string rowGuid = "")
         {
             var success = false;
-            var newRow = Guid.NewGuid().ToString();
+            var newRow = "";
+            if (rowGuid.Length > 0)
+            {
+                newRow = rowGuid;
+            }
+            else
+            {
+                newRow = Guid.NewGuid().ToString();
+            }
             using (var conn = new OleDbConnection(global.ConnectionString))
             {
                 conn.Open();
@@ -1424,7 +1467,18 @@ namespace FAD3
                          values({{{targetAreaUsageGuid}}}, {{{localNameGuid}}}, {{{newRow}}})";
                 using (OleDbCommand update = new OleDbCommand(sql, conn))
                 {
-                    success = update.ExecuteNonQuery() > 0;
+                    try
+                    {
+                        success = update.ExecuteNonQuery() > 0;
+                    }
+                    catch (OleDbException)
+                    {
+                        success = false;
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogError(ex.Message, ex.StackTrace);
+                    }
                 }
             }
             return (newRow, success);
@@ -1488,10 +1542,18 @@ namespace FAD3
         /// </summary>
         /// <param name="gearCode"></param>
         /// <param name="targetAreaGuid"></param>
-        public static (string NewRow, bool Success) AddGearCodeUsageTargetArea(string gearCode, string targetAreaGuid)
+        public static (string NewRow, bool Success) AddGearCodeUsageTargetArea(string gearCode, string targetAreaGuid, string usageGuid = "")
         {
-            var newGuid = Guid.NewGuid().ToString();
-            var Success = false;
+            string newGuid = "";
+            if (usageGuid.Length > 0)
+            {
+                newGuid = usageGuid;
+            }
+            else
+            {
+                newGuid = Guid.NewGuid().ToString();
+            }
+            bool success = false;
             using (var conn = new OleDbConnection(global.ConnectionString))
             {
                 conn.Open();
@@ -1499,10 +1561,26 @@ namespace FAD3
                          values('{gearCode}', {{{targetAreaGuid}}}, {{{newGuid}}})";
                 using (OleDbCommand update = new OleDbCommand(sql, conn))
                 {
-                    Success = update.ExecuteNonQuery() > 0;
+                    try
+                    {
+                        success = update.ExecuteNonQuery() > 0;
+                    }
+                    catch (OleDbException)
+                    {
+                        sql = $"Select RowNo from tblRefGearCodes_Usage where RefGearCode = '{gearCode}' and TargetAreaGUID = {{{targetAreaGuid}}}";
+                        using (OleDbCommand getUsageID = new OleDbCommand(sql, conn))
+                        {
+                            newGuid = getUsageID.ExecuteScalar().ToString();
+                            success = newGuid.Length > 0;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogError(ex.Message, ex.StackTrace);
+                    }
                 }
             }
-            return (newGuid, Success);
+            return (newGuid, success);
         }
 
         public static Dictionary<string, (string AOIName, string RowNumber)> TargetAreaUsed_RefCode(string RefCode)

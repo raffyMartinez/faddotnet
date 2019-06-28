@@ -30,7 +30,7 @@ namespace FAD3
         private static Dictionary<string, string> _languageDictReverse = new Dictionary<string, string>();
 
         private static int _updateInterval = 50;
-        public static event EventHandler<ImportRowsFromFileEventArgs> RowsImported;
+        public static event EventHandler<ImportRowsFromFileEventArgs> OnRowsImported;
 
         public static Dictionary<string, string> LocalNamesReverseDictionary
         {
@@ -156,7 +156,7 @@ namespace FAD3
                                 saveCounter++;
                                 if (((double)saveCounter / _updateInterval) == (saveCounter / _updateInterval))
                                 {
-                                    RowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(saveCounter, ExportImportDataType.CatchLocalNames, false));
+                                    OnRowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(saveCounter, ExportImportDataType.CatchLocalNames, false));
                                 }
                             }
                             localName = "";
@@ -166,7 +166,7 @@ namespace FAD3
 
                     break;
             }
-            RowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(saveCounter, ExportImportDataType.CatchLocalNames, true));
+            OnRowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(saveCounter, ExportImportDataType.CatchLocalNames, true));
             return saveCounter;
         }
 
@@ -214,6 +214,7 @@ namespace FAD3
                                 if (elementCounter == 0 && xmlReader.Name == "SpeciesNames")
                                 {
                                     proceed = true;
+                                    OnRowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(rowsImported: 0));
                                 }
                                 if (xmlReader.Name == "SpeciesName")
                                 {
@@ -247,8 +248,9 @@ namespace FAD3
                                 saveCounter++;
                                 if (((double)saveCounter / _updateInterval) == (saveCounter / _updateInterval))
                                 {
-                                    RowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(saveCounter, ExportImportDataType.SpeciesNames, false));
+                                    OnRowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(saveCounter, ExportImportDataType.SpeciesNames, false));
                                 }
+                                OnRowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(genus, species));
                             }
                             genus = "";
                             species = "";
@@ -256,7 +258,10 @@ namespace FAD3
                         }
                     }
                     MakeAllNames();
-                    RowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(saveCounter, ExportImportDataType.SpeciesNames, true));
+                    Names.GetGenus_LocalNames();
+                    Names.GetLocalNames();
+                    //OnRowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(saveCounter, ExportImportDataType.SpeciesNames, true));
+                    OnRowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(isComplete: true));
                     break;
             }
             return saveCounter;
@@ -662,7 +667,7 @@ namespace FAD3
                                     savedCount++;
                                     if (((double)savedCount / _updateInterval) == (savedCount / _updateInterval))
                                     {
-                                        RowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(savedCount, ExportImportDataType.CatchLocalNameSpeciesNamePair, false));
+                                        OnRowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(savedCount, ExportImportDataType.CatchLocalNameSpeciesNamePair, false));
                                     }
                                 }
                                 break;
@@ -676,7 +681,7 @@ namespace FAD3
                 }
             }
 
-            RowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(savedCount, ExportImportDataType.CatchLocalNameSpeciesNamePair, true));
+            OnRowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(savedCount, ExportImportDataType.CatchLocalNameSpeciesNamePair, true));
             MakeAllNames();
 
             return savedCount;
@@ -792,7 +797,7 @@ namespace FAD3
                                 saveCounter++;
                                 if (((double)saveCounter / _updateInterval) == (saveCounter / _updateInterval))
                                 {
-                                    RowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(saveCounter, ExportImportDataType.CatchLocalNameSpeciesNamePair, false));
+                                    OnRowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(saveCounter, ExportImportDataType.CatchLocalNameSpeciesNamePair, false));
                                 }
                             }
                             speciesNameGuid = "";
@@ -800,7 +805,7 @@ namespace FAD3
                             localNameGuid = "";
                         }
                     }
-                    RowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(saveCounter, ExportImportDataType.CatchLocalNameSpeciesNamePair, true));
+                    OnRowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(saveCounter, ExportImportDataType.CatchLocalNameSpeciesNamePair, true));
                     return saveCounter;
 
                 case ".txt":
@@ -1063,7 +1068,7 @@ namespace FAD3
                                     k++;
                                     if (((double)k / _updateInterval) == (k / _updateInterval))
                                     {
-                                        RowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(k, ExportImportDataType.SpeciesNames, false));
+                                        OnRowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(k, ExportImportDataType.SpeciesNames, false));
                                     }
                                 }
 
@@ -1078,7 +1083,7 @@ namespace FAD3
             if (k > 0)
             {
                 MakeAllNames();
-                RowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(k, ExportImportDataType.SpeciesNames, true));
+                OnRowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(k, ExportImportDataType.SpeciesNames, true));
             }
 
             return k;
@@ -1151,14 +1156,14 @@ namespace FAD3
                                     n++;
                                     if (((double)n / _updateInterval) == (n / _updateInterval))
                                     {
-                                        RowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(n, ExportImportDataType.SpeciesNames, true));
+                                        OnRowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(n, ExportImportDataType.SpeciesNames, true));
                                     }
                                 }
                             }
                         }
                     }
                 }
-                RowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(n, ExportImportDataType.SpeciesNames, false));
+                OnRowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(n, ExportImportDataType.SpeciesNames, false));
             }
             catch (Exception ex)
             {

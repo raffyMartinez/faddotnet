@@ -24,6 +24,8 @@ using System.Text;
 using FAD3.Mapping.Classes;
 using System.Threading.Tasks;
 
+using FAD3.Mapping.Forms;
+
 namespace FAD3
 {
     /// <summary>
@@ -588,11 +590,11 @@ namespace FAD3
                 case "lvCatch":
                     tsi = menuDropDown.Items.Add("New catch composition");
                     tsi.Name = "menuNewCatchComposition";
-                    tsi.Visible = ((ListView)Source).Items.Count == 0;
+                    tsi.Visible = ((ListView)Source).Items.Count == 2;
 
                     tsi = menuDropDown.Items.Add("Edit catch composition");
                     tsi.Name = "menuEditCatchComposition";
-                    tsi.Visible = ((ListView)Source).Items.Count > 0;
+                    tsi.Visible = ((ListView)Source).Items.Count > 2;
 
                     //only show browse submenu if catch name is scientific name
                     ListViewItem lvi = ((ListView)Source).SelectedItems[0];
@@ -628,6 +630,8 @@ namespace FAD3
                         tsi = menuDropDown.Items.Add("Species names");
                         tsi.Name = "menuCatchSpeciesNames";
                         tsi.Tag = ((ListView)Source).SelectedItems[0].Name;
+                        tsi.Enabled = tsi.Visible = ((ListView)Source).Items.Count > 2
+                            && ((ListView)Source).SelectedItems[0].Text.Length > 0;
                     }
                     break;
 
@@ -1067,6 +1071,24 @@ namespace FAD3
             }
         }
 
+        private async Task DeleteSamplingsFromTargetAreaAsync(string targetAreaGuid)
+        {
+            ProgessIndicatorForm pif = new ProgessIndicatorForm(_targetAreaName);
+            pif.ExportImportDataType = ExportImportDataType.TargetAreaData;
+            pif.ExportImportDeleteAction = ExportImportDeleteAction.ActionDelete;
+            pif.Show(this);
+
+            bool result = await Task.Run(() => TargetArea.Delete(targetAreaGuid));
+            if (result)
+            {
+                treeMain.Nodes.Remove(treeMain.SelectedNode);
+            }
+            else if (TargetArea.LastError?.Length > 0)
+            {
+                MessageBox.Show(TargetArea.LastError, "Error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
         private async Task SamplingImportFromXML(string fileName, string targetAreaName, string targetAreaGuid, bool newTargetArea)
         {
             Stopwatch sw = new Stopwatch();
@@ -1075,7 +1097,9 @@ namespace FAD3
             esxml.NewTargetArea = newTargetArea;
             esxml.TargetAreaName = targetAreaName;
             esxml.TargetAreaGuid = targetAreaGuid;
-            FileDownloadForm fdf = new FileDownloadForm(esxml, _targetArea);
+            ProgessIndicatorForm fdf = new ProgessIndicatorForm(esxml, _targetArea);
+            fdf.ExportImportDataType = ExportImportDataType.TargetAreaData;
+            fdf.ExportImportDeleteAction = ExportImportDeleteAction.ActionImport;
             fdf.Show(this);
             bool result = await Task.Run(() => esxml.Import());
             sw.Stop();
@@ -1094,7 +1118,9 @@ namespace FAD3
             Stopwatch sw = new Stopwatch();
             sw.Start();
             SamplingToFromXML esxml = new SamplingToFromXML(_targetArea, fileName);
-            FileDownloadForm fdf = new FileDownloadForm(esxml, _targetArea);
+            ProgessIndicatorForm fdf = new ProgessIndicatorForm(esxml, _targetArea);
+            fdf.ExportImportDataType = ExportImportDataType.TargetAreaData;
+            fdf.ExportImportDeleteAction = ExportImportDeleteAction.ActionExport;
             fdf.Show(this);
             bool result = await Task.Run(() => esxml.Export());
             sw.Stop();
@@ -1129,6 +1155,11 @@ namespace FAD3
                                     await SamplingImportFromXML(ofd.FileName, importForm.TargetAreaName, importForm.TargetAreaGUID, importForm.NewTargetArea);
                                     PopulateTree();
                                     treeMain.Nodes["root"].Expand();
+                                }
+                                else if (drr == DialogResult.Abort)
+                                {
+                                    //MessageBox.Show("Selected XML file is not valid. Try again", "Invlaid XML file", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                    MessageBox.Show(importForm.ErrorMessage, "Error importing xml file", MessageBoxButtons.OK, MessageBoxIcon.Information);
                                 }
                             }
                         }
@@ -1206,17 +1237,18 @@ namespace FAD3
 
                             if (result == DialogResult.Yes)
                             {
-                                if (TargetArea.Delete(myTag.Item1))
-                                {
-                                    treeMain.Nodes.Remove(treeMain.SelectedNode);
-                                }
-                                else
-                                {
-                                    if (TargetArea.LastError.Length > 0)
-                                    {
-                                        MessageBox.Show(TargetArea.LastError, "Error", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                                    }
-                                }
+                                await DeleteSamplingsFromTargetAreaAsync(myTag.Item1);
+                                //if (TargetArea.Delete(myTag.Item1))
+                                //{
+                                //    treeMain.Nodes.Remove(treeMain.SelectedNode);
+                                //}
+                                //else
+                                //{
+                                //    if (TargetArea.LastError?.Length > 0)
+                                //    {
+                                //        MessageBox.Show(TargetArea.LastError, "Error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                //    }
+                                //}
                             }
                             break;
 

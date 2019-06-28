@@ -37,7 +37,7 @@ namespace FAD3
         {
             InitializeComponent();
             _parent = parent;
-            Names.RowsImported += OnNamesImportRows;
+            Names.OnRowsImported += OnNamesImportRows;
         }
 
         private void OnNamesImportRows(object sender, ImportRowsFromFileEventArgs e)
@@ -216,6 +216,8 @@ namespace FAD3
 
         private int FillListNames(Dictionary<string, string> filters = null, bool OnlyWithRecords = false)
         {
+            //lvNames.Visible = false;
+            //lvNames.Items.Clear();
             int n = 1;
             foreach (var item in Names.RetrieveScientificNames(filters, OnlyWithRecords))
             {
@@ -223,9 +225,16 @@ namespace FAD3
                 var recordCount = item.Value.catchCompositionRecordCount == 0 ? "" : item.Value.catchCompositionRecordCount.ToString();
                 var lvi = new ListViewItem(new string[] { n.ToString(), item.Value.genus, item.Value.species, item.Value.taxaName, inFishBase, recordCount, item.Value.Notes });
                 lvi.Name = item.Value.catchNameGuid;
-                AddItem(lvi);
+                //AddItem(lvi);
+                lvNames.Invoke((MethodInvoker)delegate
+                {
+                    //btnOk.Enabled = _enableOK;
+                    lvNames.Items.Add(lvi);
+                });
                 n++;
             }
+            //SizeColumns(lvNames, false);
+            //lvNames.Visible = true;
             return n;
         }
 
@@ -410,7 +419,7 @@ namespace FAD3
             _instance = null;
         }
 
-        private void OnToolBarItemClick(object sender, ToolStripItemClickedEventArgs e)
+        private async void OnToolBarItemClick(object sender, ToolStripItemClickedEventArgs e)
         {
             switch (e.ClickedItem.Name)
             {
@@ -441,7 +450,7 @@ namespace FAD3
                         }
                         taxaCSV.Trim(',');
                     }
-                    using (ExportImportDialogForm edf = new ExportImportDialogForm(ExportImportDataType.SpeciesNames, ExportImportAction.ActionExport))
+                    using (ExportImportDialogForm edf = new ExportImportDialogForm(ExportImportDataType.SpeciesNames, ExportImportDeleteAction.ActionExport))
                     {
                         edf.TaxaCSV = taxaCSV;
                         edf.ShowDialog(this);
@@ -516,7 +525,7 @@ namespace FAD3
                     break;
 
                 case "tbImport":
-                    using (ExportImportDialogForm edf = new ExportImportDialogForm(ExportImportDataType.SpeciesNames, ExportImportAction.ActionImport))
+                    using (ExportImportDialogForm edf = new ExportImportDialogForm(ExportImportDataType.SpeciesNames, ExportImportDeleteAction.ActionImport))
                     {
                         edf.ShowDialog(this);
                         if (edf.DialogResult == DialogResult.OK)
@@ -545,7 +554,19 @@ namespace FAD3
                                     }
                                     else
                                     {
-                                        GetImportedRows(fileName, null);
+                                        ProgessIndicatorForm pif = new ProgessIndicatorForm(url: "", fileName);
+                                        pif.ExportImportDataType = ExportImportDataType.SpeciesNames;
+                                        pif.ExportImportDeleteAction = ExportImportDeleteAction.ActionImport;
+                                        pif.Show(this);
+                                        int r = await Names.ImportSpeciesNamesAsync(fileName, null);
+                                        //GetSpeciesNames();
+                                        lvNames.Visible = false;
+                                        lvNames.Items.Clear();
+                                        FillListNames();
+                                        SizeColumns(lvNames, false);
+                                        lvNames.Visible = true;
+                                        lblListViewLabel.Text = "List of species names";
+                                        //MessageBox.Show($"{_rowsImported} species names were saved to the database", "Import successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
                                     }
                                 }
                             }

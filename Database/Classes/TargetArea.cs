@@ -92,6 +92,7 @@ namespace FAD3
         public string TargetAreaLetter
         {
             get { return _targetAreaLetter; }
+            set { _targetAreaLetter = value; }
         }
 
         public string TargetAreaName
@@ -120,8 +121,7 @@ namespace FAD3
             string sql = $@"SELECT Count(SamplingGUID) AS n
                                 FROM tblSampling
                                 WHERE AOI={{{targetAreaGuid}}}
-                                GROUP BY AOI
-                                ";
+                                GROUP BY AOI";
             int count = 0;
             using (var con = new OleDbConnection(global.ConnectionString))
             {
@@ -144,6 +144,7 @@ namespace FAD3
 
         public static bool Delete(string aoiGuid)
         {
+            bool proceed = false;
             bool Success = false;
             string updateQuery = "";
             using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
@@ -152,15 +153,24 @@ namespace FAD3
                 {
                     if (CountSamplings(aoiGuid) > 0)
                     {
+                        proceed = Samplings.DeleteSamplingsInTargetArea(aoiGuid);
                     }
-                    Landingsite.DeleteEx(aoiGuid);
-                    FishingGrid.DeleteAdditionalFishingGroundMaps(aoiGuid);
-                    Enumerators.DeleteEnumerators(aoiGuid);
-                    updateQuery = $"Delete * from tblAOI where AOIGuid = {{{aoiGuid}}}";
-                    conn.Open();
-                    using (OleDbCommand update = new OleDbCommand(updateQuery, conn))
+                    else
                     {
-                        Success = (update.ExecuteNonQuery() > 0);
+                        proceed = true;
+                    }
+
+                    if (proceed)
+                    {
+                        Landingsite.DeleteEx(aoiGuid);
+                        FishingGrid.DeleteAdditionalFishingGroundMaps(aoiGuid);
+                        Enumerators.DeleteEnumerators(aoiGuid);
+                        updateQuery = $"Delete * from tblAOI where AOIGuid = {{{aoiGuid}}}";
+                        conn.Open();
+                        using (OleDbCommand update = new OleDbCommand(updateQuery, conn))
+                        {
+                            Success = (update.ExecuteNonQuery() > 0);
+                        }
                     }
                     conn.Close();
                 }

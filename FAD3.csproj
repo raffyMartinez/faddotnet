@@ -143,6 +143,8 @@
   <ItemGroup>
     <Compile Include="Database\Classes\CatchNameURLGenerator.cs" />
     <Compile Include="Database\Classes\EffortEventArg.cs" />
+    <Compile Include="Database\Classes\FishingGround.cs" />
+    <Compile Include="Database\Classes\GearSpecification.cs" />
     <Compile Include="Database\Classes\SamplingEventArgs.cs" />
     <Compile Include="Database\Classes\SamplingToFromXML.cs" />
     <Compile Include="Database\Classes\FADDiagnostics.cs" />
@@ -426,11 +428,11 @@
     <Compile Include="Mapping\Forms\ERDDAPConfigureDownloadForm.Designer.cs">
       <DependentUpon>ERDDAPConfigureDownloadForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Mapping\Forms\FileDownloadForm.cs">
+    <Compile Include="Mapping\Forms\ProgessIndicatorForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Mapping\Forms\FileDownloadForm.Designer.cs">
-      <DependentUpon>FileDownloadForm.cs</DependentUpon>
+    <Compile Include="Mapping\Forms\ProgessIndicatorForm.Designer.cs">
+      <DependentUpon>ProgessIndicatorForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Mapping\Forms\Grid25GeographicDisplayOptionsForm.cs">
       <SubType>Form</SubType>
@@ -965,8 +967,8 @@
     <EmbeddedResource Include="Mapping\Forms\ERDDAPConfigureDownloadForm.resx">
       <DependentUpon>ERDDAPConfigureDownloadForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Mapping\Forms\FileDownloadForm.resx">
-      <DependentUpon>FileDownloadForm.cs</DependentUpon>
+    <EmbeddedResource Include="Mapping\Forms\ProgessIndicatorForm.resx">
+      <DependentUpon>ProgessIndicatorForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Mapping\Forms\Grid25GeographicDisplayOptionsForm.resx">
       <DependentUpon>Grid25GeographicDisplayOptionsForm.cs</DependentUpon>
