@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.btnOk = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
+            this.btnCancel = new System.Windows.Forms.Button();
             this.cboSpName = new System.Windows.Forms.ComboBox();
             this.lblSpName = new System.Windows.Forms.Label();
             this.lblLocalName = new System.Windows.Forms.Label();
@@ -48,15 +48,15 @@
             this.btnOk.UseVisualStyleBackColor = true;
             this.btnOk.Click += new System.EventHandler(this.OnButtonClick);
             // 
-            // button1
+            // btnCancel
             // 
-            this.button1.Location = new System.Drawing.Point(131, 200);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(52, 25);
-            this.button1.TabIndex = 2;
-            this.button1.Text = "Cancel";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.OnButtonClick);
+            this.btnCancel.Location = new System.Drawing.Point(131, 200);
+            this.btnCancel.Name = "btnCancel";
+            this.btnCancel.Size = new System.Drawing.Size(52, 25);
+            this.btnCancel.TabIndex = 2;
+            this.btnCancel.Text = "Cancel";
+            this.btnCancel.UseVisualStyleBackColor = true;
+            this.btnCancel.Click += new System.EventHandler(this.OnButtonClick);
             // 
             // cboSpName
             // 
@@ -126,7 +126,7 @@
             this.Controls.Add(this.cboLocalName);
             this.Controls.Add(this.lblSpName);
             this.Controls.Add(this.cboSpName);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnOk);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "HTMLTableSelectColumnsForm";
@@ -140,7 +140,7 @@
 
         #endregion
         private System.Windows.Forms.Button btnOk;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.ComboBox cboSpName;
         private System.Windows.Forms.Label lblSpName;
         private System.Windows.Forms.Label lblLocalName;

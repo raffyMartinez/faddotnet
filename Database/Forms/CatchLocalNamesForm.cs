@@ -5,6 +5,7 @@ using System.IO;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml;
+using FAD3.Mapping.Forms;
 
 namespace FAD3.Database.Forms
 {
@@ -114,7 +115,7 @@ namespace FAD3.Database.Forms
             InitializeComponent();
             _idType = identification;
             _name = name;
-            Names.OnRowsImported += OnNamesImportRows;
+            Names.OnRowsImportedExported += OnNamesImportRows;
         }
 
         private void OnNamesImportRows(object sender, ImportRowsFromFileEventArgs e)
@@ -193,14 +194,14 @@ namespace FAD3.Database.Forms
                     SpeciesGuid = nameGuid;
                     break;
             }
-            Names.OnRowsImported += OnNamesImportRows;
+            Names.OnRowsImportedExported += OnNamesImportRows;
         }
 
         public CatchLocalNamesForm(Identification identification)
         {
             InitializeComponent();
             _idType = identification;
-            Names.OnRowsImported += OnNamesImportRows;
+            Names.OnRowsImportedExported += OnNamesImportRows;
         }
 
         private void OnButtonClick(object sender, EventArgs e)
@@ -838,13 +839,19 @@ namespace FAD3.Database.Forms
             FileDialogHelper.Title = title;
             FileDialogHelper.DialogType = FileDialogType.FileOpen;
             FileDialogHelper.DataFileType = DataFileType.Text | DataFileType.XML | DataFileType.HTML;
-            FileDialogHelper.ShowDialog();
-            var fileName = FileDialogHelper.FileName;
-            if (fileName.Length > 0)
+            DialogResult dr = FileDialogHelper.ShowDialog();
+            if (dr == DialogResult.OK && FileDialogHelper.FileName.Length > 0)
             {
+                var fileName = FileDialogHelper.FileName;
                 switch (dataType)
                 {
                     case ExportImportDataType.CatchNameAll:
+                        switch (Path.GetExtension(fileName).ToLower())
+                        {
+                            case ".xml":
+                                GetCatchNamesAllXMLAsync(fileName);
+                                break;
+                        }
                         break;
 
                     case ExportImportDataType.CatchLocalNames:
@@ -859,10 +866,14 @@ namespace FAD3.Database.Forms
                             case ".html":
                                 using (HTMLTableSelectColumnsForm htmlColForm = new HTMLTableSelectColumnsForm(fileName, CatchNameDataType.CatchSpeciesLocalNamePair))
                                 {
-                                    DialogResult dr = htmlColForm.ShowDialog(this);
-                                    if (dr == DialogResult.OK)
+                                    DialogResult dr1 = htmlColForm.ShowDialog(this);
+                                    if (dr1 == DialogResult.OK)
                                     {
-                                        GetImportedRows(fileName, htmlColForm.SpeciesNameColumn, htmlColForm.LocalNameColumn, htmlColForm.LanguageColumn);
+                                        ProgessIndicatorForm pif = new ProgessIndicatorForm(url: "", fileName);
+                                        pif.ExportImportDataType = ExportImportDataType.CatchLocalNameSpeciesNamePair;
+                                        pif.ExportImportDeleteAction = ExportImportDeleteAction.ActionImport;
+                                        pif.Show(this);
+                                        GetImportedRowsAsync(fileName, htmlColForm.SpeciesNameColumn, htmlColForm.LocalNameColumn, htmlColForm.LanguageColumn);
                                     }
                                 }
                                 break;
@@ -880,11 +891,21 @@ namespace FAD3.Database.Forms
                 }
                 SetTreeItem("root");
                 SetUI();
+
+                return true;
             }
-            return true;
+            else
+            {
+                return false;
+            }
         }
 
-        private async void GetImportedRows(string fileName, int speciesColumn, int localNameColumn, int languageColumn)
+        private async void GetCatchNamesAllXMLAsync(string fileName)
+        {
+            int result = await Names.ImportFromXMLLocalNamestoScientificNamesAsync(fileName);
+        }
+
+        private async void GetImportedRowsAsync(string fileName, int speciesColumn, int localNameColumn, int languageColumn)
         {
             int result = await Names.ImportFromHTMLLocalNamestoScientificNamesAsync(fileName, speciesColumn, localNameColumn, languageColumn);
             lblList.Text = "List of species names";
@@ -1086,6 +1107,20 @@ namespace FAD3.Database.Forms
 
                 if (exportLNSNPair)
                 {
+                    writer.WriteStartElement("SpeciesNames");
+                    foreach (var spName in Names.GetSpeciesDict())
+                    {
+                        writer.WriteStartElement("SpeciesNames");
+                        writer.WriteAttributeString("guid", spName.Key);
+                        writer.WriteAttributeString("species", spName.Value.species);
+                        writer.WriteAttributeString("genus", spName.Value.genus);
+                        writer.WriteAttributeString("taxa", spName.Value.taxa.ToString());
+                        writer.WriteAttributeString("inFishbase", spName.Value.inFishbase.ToString());
+                        writer.WriteAttributeString("fbNumber", spName.Value.fishBaseSpeciesNo?.ToString());
+                        writer.WriteEndElement();
+                    }
+                    writer.WriteEndElement();
+
                     var list = Names.GetLocalNameSpeciesNameLanguage();
                     lnsnPairCount = list.Count;
                     if (lnsnPairCount > 0)

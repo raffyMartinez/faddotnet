@@ -143,9 +143,13 @@
   <ItemGroup>
     <Compile Include="Database\Classes\CatchNameURLGenerator.cs" />
     <Compile Include="Database\Classes\EffortEventArg.cs" />
+    <Compile Include="Database\Classes\ExpensePerOperation.cs" />
+    <Compile Include="Database\Classes\FishingExpenseItemsPerOperation.cs" />
     <Compile Include="Database\Classes\FishingGround.cs" />
     <Compile Include="Database\Classes\GearSpecification.cs" />
+    <Compile Include="Database\Classes\OperatingExpenses.cs" />
     <Compile Include="Database\Classes\SamplingEventArgs.cs" />
+    <Compile Include="Database\Classes\SamplingSummary.cs" />
     <Compile Include="Database\Classes\SamplingToFromXML.cs" />
     <Compile Include="Database\Classes\FADDiagnostics.cs" />
     <Compile Include="Database\Classes\FileDialogHelper.cs" />
@@ -174,6 +178,9 @@
     <Compile Include="Database\Classes\SimMetrics\SubCostRange0To1.cs" />
     <Compile Include="Database\Classes\CatchTaxa.cs" />
     <Compile Include="Database\Classes\TaxaCategory.cs" />
+    <Compile Include="Database\Classes\TreeLevel.cs" />
+    <Compile Include="Database\Classes\TreeLevels.cs" />
+    <Compile Include="Database\Classes\TreeLevelTag.cs" />
     <Compile Include="Database\Classes\UpdatedSamplingCatchCompositionCount.cs" />
     <Compile Include="Database\Forms\AllSpeciesForm.cs">
       <SubType>Form</SubType>
@@ -233,6 +240,12 @@
     <Compile Include="Database\Forms\EditGearVariationNameForm.Designer.cs">
       <DependentUpon>EditGearVariationNameForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Database\Forms\EditOperatingExpenseItemForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Database\Forms\EditOperatingExpenseItemForm.Designer.cs">
+      <DependentUpon>EditOperatingExpenseItemForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Database\Forms\EditSelectedLocalNameForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -268,6 +281,12 @@
     </Compile>
     <Compile Include="Database\Forms\FishingExpenseForm.Designer.cs">
       <DependentUpon>FishingExpenseForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Database\Forms\FishingOperationCostsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Database\Forms\FishingOperationCostsForm.Designer.cs">
+      <DependentUpon>FishingOperationCostsForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Database\Forms\GearInventoryEditForm.cs">
       <SubType>Form</SubType>
@@ -886,6 +905,9 @@
     <EmbeddedResource Include="Database\Forms\EditGearVariationNameForm.resx">
       <DependentUpon>EditGearVariationNameForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Database\Forms\EditOperatingExpenseItemForm.resx">
+      <DependentUpon>EditOperatingExpenseItemForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Database\Forms\EditSelectedLocalNameForm.resx">
       <DependentUpon>EditSelectedLocalNameForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -903,6 +925,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Database\Forms\FishingExpenseForm.resx">
       <DependentUpon>FishingExpenseForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Database\Forms\FishingOperationCostsForm.resx">
+      <DependentUpon>FishingOperationCostsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Database\Forms\GearInventoryEditForm.resx">
       <DependentUpon>GearInventoryEditForm.cs</DependentUpon>

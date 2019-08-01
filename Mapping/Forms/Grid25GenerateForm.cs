@@ -25,6 +25,7 @@ namespace FAD3
         private Grid25LayoutHelperForm _g25lhf;
         private bool _hasSubGrid;
         private int _subGridCount;
+        private bool _hasUnsavedMap;
 
         public string FishingGround { get; internal set; }
         public string LayoutGridSaveFolder { get; internal set; }
@@ -211,6 +212,7 @@ namespace FAD3
                         {
                             _grid25MajorGrid.LabelAndGridProperties = _labelAndGridProperties;
                             _grid25MajorGrid.MapTitle = txtMapTitle.Text;
+                            _hasUnsavedMap = true;
                         }
                         else
                         {
@@ -234,13 +236,7 @@ namespace FAD3
                     _grid25MajorGrid.ClearSelectedGrids();
                     _parentForm.SetCursor(MapWinGIS.tkCursorMode.cmSelection);
                     _grid25MajorGrid.MaplayersHandler.set_MapLayer(_grid25MajorGrid.Grid25ShapefileHandle, refreshLayerList: true);
-
                     _hasSubGrid = false;
-                    break;
-
-                case "buttonClose":
-                    Close();
-
                     break;
 
                 case "buttonLocateGrid":
@@ -430,6 +426,7 @@ namespace FAD3
 
         private void OnFormLoad(object sender, EventArgs e)
         {
+            _hasUnsavedMap = false;
             txtMinorGridLabelDistance.Text = "1000";
             txtMinorGridLabelSize.Text = "8";
             txtMajorGridLabelSize.Text = "12";
@@ -500,11 +497,12 @@ namespace FAD3
                         RedoGridLabel();
                         using (var saveForm = new SaveMapForm(this))
                         {
-                            saveForm.SaveType(e.ClickedItem.Name == "tsButtonSaveShapefile");
+                            saveForm.SaveType(SaveAsShapefile: e.ClickedItem.Name == "tsButtonSaveShapefile");
                             saveForm.MapTitle = txtMapTitle.Text;
                             saveForm.ShowDialog(this);
                             if (saveForm.DialogResult == DialogResult.OK)
                             {
+                                _hasUnsavedMap = false;
                             }
                         }
                     }
@@ -519,7 +517,18 @@ namespace FAD3
                     break;
 
                 case "tsButtonExit":
-                    Close();
+                    if (!_hasUnsavedMap)
+                    {
+                        Close();
+                    }
+                    else
+                    {
+                        if (MessageBox.Show("You have not saved the map. Are you sure you still want to close?",
+                            "Close this window", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
+                        {
+                            Close();
+                        }
+                    }
                     break;
             }
         }

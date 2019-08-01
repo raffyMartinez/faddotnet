@@ -1037,7 +1037,7 @@ namespace FAD3
                     break;
 
                 case "buttonRemove":
-                    Text = $"current row is {_currentRow.ToString()}";
+                    //Text = $"current row is {_currentRow.ToString()}";
                     if (_catchCompositionData[_currentRow].dataStatus != fad3DataStatus.statusNew)
                     {
                         _catchCompositionData[_currentRow].dataStatus = fad3DataStatus.statusForDeletion;

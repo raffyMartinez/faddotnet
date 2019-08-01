@@ -175,7 +175,11 @@ namespace FAD3
                         }
                         catch (Exception ex)
                         {
-                            Logger.Log($"{ex.Message}\r\n{ex.Source}");
+                            if (templateRel.ForeignTable == "tblSampling" && templateRel.Table == "tblFishingExpense")
+                            {
+                                FixSamplingExpenseRelation(mdbPath);
+                            }
+                            Logger.LogError(ex.Message, ex.StackTrace);
                         }
                     }
                     finally
@@ -191,6 +195,28 @@ namespace FAD3
             dbTemplate = null;
 
             return true;
+        }
+
+        private static void FixSamplingExpenseRelation(string mdbPath)
+        {
+            var dbe = new DBEngine();
+            var dbData = dbe.OpenDatabase(mdbPath);
+            const string sql = @"ALTER TABLE tblFishingExpense
+                                ADD CONSTRAINT FK_SamplingGUID
+                                FOREIGN KEY (SamplingGUID) REFERENCES
+                                tblSampling (SamplingGUID)";
+
+            try
+            {
+                dbData.Execute(sql);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex.Message, ex.StackTrace);
+            }
+
+            dbData.Close();
+            dbData = null;
         }
 
         private static void RemoveGearInventoryBarangayDataAltKey(string mdbPath)

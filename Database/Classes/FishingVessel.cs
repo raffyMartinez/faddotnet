@@ -11,6 +11,9 @@ namespace FAD3
         public string Engine { get; set; }
         public double? EngineHorsepower { get; set; }
         public VesselType VesselType { get; set; }
+        public string VesselID { get; set; }
+
+        public string VesselTypeString { get; internal set; }
 
         public FishingVessel(VesselType vesselType, double? breadth = null, double? depth = null, double? length = null)
         {
@@ -18,6 +21,7 @@ namespace FAD3
             Depth = depth;
             Length = length;
             VesselType = vesselType;
+            VesselTypeString = VesselTypeFromVesselTypeNumber((int)vesselType);
         }
 
         public double? GrossTonnage
@@ -31,6 +35,21 @@ namespace FAD3
                 else
                 {
                     return (Breadth * Depth * Length * 0.7) / 2.83;
+                }
+            }
+        }
+
+        public string VesselDimension
+        {
+            get
+            {
+                if (Breadth != null && Depth != null && Length != null)
+                {
+                    return $"(BxDxL) {Breadth} x {Depth} x {Length}";
+                }
+                else
+                {
+                    return "";
                 }
             }
         }

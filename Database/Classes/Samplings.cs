@@ -23,16 +23,16 @@ namespace FAD3
     public class Samplings
     {
         private static Dictionary<string, UserInterfaceStructure> _uis = new Dictionary<string, UserInterfaceStructure>();
-        private long _CatchAndEffortPropertyCount = 0;
-        private string _RererenceNo = "";
-        private string _SamplingGUID = "";
+        private long _catchAndEffortPropertyCount = 0;
+        private string _rererenceNo = "";
+        private string _samplingGUID = "";
         private static List<string> _engines = new List<string>();
         private static bool _engineReadDone = false;
         private string _targetAreaGuid = "";
         private List<int> _sampledYears = new List<int>();
         public List<string> SamplingGuids { get; internal set; } = new List<string>();
         public static EventHandler<SamplingEventArgs> OnDeleteSamplingStatus;
-        public Dictionary<string, Sampling> FishCatchMonitoringSamplings = new Dictionary<string, Sampling>();
+        public Dictionary<string, Sampling> FishCatchMonitoringSamplings { get; internal set; } = new Dictionary<string, Sampling>();
 
         private static Dictionary<string, (string RefNo, DateTime SamplingDate, string FishingGround, string SubGrid,
                                string EnumeratorName, string Notes, double? WtCatch, bool IsGrid25FG,
@@ -46,6 +46,8 @@ namespace FAD3
         {
             get { return _effortMonth; }
         }
+
+        public Dictionary<string, Sampling> SamplingsForMonth { get; internal set; } = new Dictionary<string, Sampling>();
 
         public static List<string> Engines
         {
@@ -84,7 +86,7 @@ namespace FAD3
 
         public Samplings(string SamplingGUID)
         {
-            _SamplingGUID = SamplingGUID;
+            _samplingGUID = SamplingGUID;
         }
 
         public Samplings()
@@ -109,18 +111,18 @@ namespace FAD3
 
         public long CatchAndEffortPropertyCount
         {
-            get { return _CatchAndEffortPropertyCount; }
+            get { return _catchAndEffortPropertyCount; }
         }
 
         public string ReferenceNo
         {
-            get { return _RererenceNo; }
+            get { return _rererenceNo; }
         }
 
         public string SamplingGUID
         {
-            get { return _SamplingGUID; }
-            set { _SamplingGUID = value; }
+            get { return _samplingGUID; }
+            set { _samplingGUID = value; }
         }
 
         private static bool HasEnumerators(string landingSiteGuid)
@@ -143,6 +145,251 @@ namespace FAD3
             return samplingCount > 0;
         }
 
+        public void SamplingSummaryForMonth(string LSGUID, string GearGUID, string SamplingMonth)
+        {
+            //List<Sampling> samplingsForTheMonth = new List<Sampling>();
+            SamplingsForMonth = new Dictionary<string, Sampling>();
+
+            _effortMonth.Clear();
+            var CompleteGrid25 = FishingGrid.IsCompleteGrid25;
+            bool landingSiteHasEnumerator = false;
+            string[] arr = SamplingMonth.Split('-');
+            string MonthNumber = "1";
+            switch (arr[0])
+            {
+                case "Jan":
+                    MonthNumber = "1";
+                    break;
+
+                case "Feb":
+                    MonthNumber = "2";
+                    break;
+
+                case "Mar":
+                    MonthNumber = "3";
+                    break;
+
+                case "Apr":
+                    MonthNumber = "4";
+                    break;
+
+                case "May":
+                    MonthNumber = "5";
+                    break;
+
+                case "Jun":
+                    MonthNumber = "6";
+                    break;
+
+                case "Jul":
+                    MonthNumber = "7";
+                    break;
+
+                case "Aug":
+                    MonthNumber = "8";
+                    break;
+
+                case "Sep":
+                    MonthNumber = "9";
+                    break;
+
+                case "Oct":
+                    MonthNumber = "10";
+                    break;
+
+                case "Nov":
+                    MonthNumber = "11";
+                    break;
+
+                case "Dec":
+                    MonthNumber = "12";
+                    break;
+            }
+
+            string StartDate = MonthNumber + "/1/" + arr[1];
+            string EndDate = (Convert.ToInt32(MonthNumber) + 1).ToString();
+            if (arr[0] == "Dec")
+            {
+                string newYear = (Convert.ToInt32(arr[1]) + 1).ToString();
+                EndDate = "1/1/" + newYear;
+            }
+            else
+            {
+                EndDate += "/1/" + arr[1];
+            }
+
+            using (var myDT = new DataTable())
+            {
+                try
+                {
+                    using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.MDBPath))
+                    {
+                        conection.Open();
+                        string query = "";
+                        landingSiteHasEnumerator = HasEnumerators(LSGUID);
+                        if (landingSiteHasEnumerator)
+                        {
+                            //query = $@"SELECT tblSampling.*, tblEnumerators.EnumeratorName,
+                            //            (SELECT TOP 1 'x' AS HasSpec
+                            //              FROM tblGearSpecs
+                            //              INNER JOIN tblSampledGearSpec ON
+                            //                tblGearSpecs.RowID = tblSampledGearSpec.SpecID
+                            //              WHERE tblGearSpecs.Version='2' AND
+                            //                tblSampledGearSpec.SamplingGUID=[tblSampling.SamplingGUID]) AS Specs,
+                            //            (SELECT Count(SamplingGUID) AS n
+                            //              FROM tblCatchComp
+                            //              GROUP BY tblCatchComp.SamplingGUID
+                            //              HAVING tblCatchComp.SamplingGUID=[tblSampling.SamplingGUID]) AS [rows]
+                            //            FROM tblEnumerators RIGHT JOIN
+                            //              tblSampling ON
+                            //              tblEnumerators.EnumeratorID = tblSampling.Enumerator
+                            //            WHERE tblSampling.SamplingDate >=#{StartDate}# AND
+                            //              tblSampling.SamplingDate <#{EndDate}# AND
+                            //              tblSampling.LSGUID={{{LSGUID}}} AND
+                            //              tblSampling.GearVarGUID={{{GearGUID}}}
+                            //            ORDER BY tblSampling.DateEncoded";
+
+                            query = $@"SELECT tblSampling.*, tblEnumerators.EnumeratorName,
+                                        (SELECT TOP 1 'x' AS HasSpec FROM tblGearSpecs INNER JOIN tblSampledGearSpec ON
+                                          tblGearSpecs.RowID = tblSampledGearSpec.SpecID
+                                          WHERE tblGearSpecs.Version='2' AND
+                                          tblSampledGearSpec.SamplingGUID=[tblSampling.SamplingGUID]) AS Specs,
+                                        (SELECT Count(SamplingGUID) AS n FROM tblCatchComp
+                                          GROUP BY tblCatchComp.SamplingGUID
+                                          HAVING tblCatchComp.SamplingGUID=[tblSampling.SamplingGUID]) AS [rows],
+                                        (Select distinct 'x' as HasExpense from tblFishingExpense where
+                                          tblFishingExpense.SamplingGuid = [tblSampling.SamplingGUID] ) AS HasExpense
+                                        FROM tblEnumerators RIGHT JOIN
+                                          tblSampling ON
+                                          tblEnumerators.EnumeratorID = tblSampling.Enumerator
+                                        WHERE tblSampling.SamplingDate >=#{StartDate}# AND
+                                          tblSampling.SamplingDate <#{EndDate}# AND
+                                          tblSampling.LSGUID={{{LSGUID}}} AND
+                                          tblSampling.GearVarGUID={{{GearGUID}}}
+                                        ORDER BY tblSampling.DateEncoded";
+                        }
+                        else
+                        {
+                            query = $@"SELECT tblSampling.*,
+                                        (SELECT TOP 1 'x' AS  HasSpec
+                                            FROM tblGearSpecs INNER JOIN
+                                              tblSampledGearSpec ON
+                                              tblGearSpecs.RowID = tblSampledGearSpec.SpecID
+                                            WHERE tblGearSpecs.Version='2' AND
+                                              tblSampledGearSpec.SamplingGUID=[tblSampling.SamplingGUID]) AS Specs,
+                                        (SELECT Count(SamplingGUID) AS n
+                                            FROM tblCatchComp
+                                            GROUP BY tblCatchComp.SamplingGUID
+                                            HAVING tblCatchComp.SamplingGUID=[tblSampling.SamplingGUID]) AS [rows],
+                                        (Select distinct 'x' as HasExpense from tblFishingExpense where
+                                          tblFishingExpense.SamplingGuid = [tblSampling.SamplingGUID] ) AS HasExpense
+                                        FROM tblSampling WHERE tblSampling.SamplingDate >= #{StartDate}# AND
+                                          tblSampling.SamplingDate < #{EndDate}# AND
+                                          tblSampling.LSGUID={{{LSGUID}}} AND
+                                          tblSampling.GearVarGUID={{{GearGUID}}}
+                                        ORDER BY tblSampling.DateEncoded";
+                        }
+
+                        using (var adapter = new OleDbDataAdapter(query, conection))
+                        {
+                            adapter.Fill(myDT);
+                            foreach (DataRow dr in myDT.Rows)
+                            {
+                                string samplingGuid = dr["SamplingGUID"].ToString();
+
+                                Sampling s = new Sampling(dr["AOI"].ToString(), samplingGuid, DateTime.Parse(dr["SamplingDate"].ToString()), dr["LSGUID"].ToString(), dr["RefNo"].ToString());
+                                s.DataStatus = fad3DataStatus.statusFromDB;
+                                int rows = 0;
+                                if (dr["rows"].ToString().Length > 0)
+                                {
+                                    rows = int.Parse(dr["rows"].ToString());
+                                }
+
+                                s.SamplingSummary = new SamplingSummary(s, rows, dr["FishingGround"].ToString());
+
+                                if (landingSiteHasEnumerator)
+                                {
+                                    s.SamplingSummary.EnumeratorName = dr["EnumeratorName"].ToString();
+                                    s.EnumeratorGuid = dr["Enumerator"].ToString();
+                                }
+
+                                s.SamplingSummary.GearSpecsIndicator = "x";
+                                if (dr["Specs"].ToString().Length == 0)
+                                {
+                                    s.SamplingSummary.GearSpecsIndicator = "";
+                                }
+
+                                s.SamplingSummary.OperatingExpenseIndicator = "x";
+                                if (dr["HasExpense"].ToString().Length == 0)
+                                {
+                                    s.SamplingSummary.OperatingExpenseIndicator = "";
+                                }
+
+                                if (int.TryParse(dr["SubGrid"].ToString(), out int sg))
+                                {
+                                    s.SamplingSummary.SubGrid = sg;
+                                }
+                                double? wt = null;
+                                if (double.TryParse(dr["wtCatch"].ToString(), out double w))
+                                {
+                                    wt = w;
+                                }
+                                s.CatchWeight = wt;
+
+                                DateTime? dateEncoded = null;
+                                if (DateTime.TryParse(dr["DateEncoded"].ToString(), out DateTime dt))
+                                {
+                                    dateEncoded = dt;
+                                }
+                                s.DateEncoded = dateEncoded;
+
+                                SamplingsForMonth.Add(samplingGuid, s);
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError(ex.Message, ex.StackTrace);
+                }
+            }
+        }
+
+        private static List<FishingGround> FishingGroundFromSampling(string samplingGUID)
+        {
+            List<FishingGround> fgs = new List<FishingGround>();
+            string sql = $@"SELECT tblSampling.FishingGround, tblSampling.SubGrid FROM tblSampling WHERE tblSampling.SamplingGUID={{{samplingGUID}}}
+                         union all
+                        SELECT tblGrid.GridName, tblGrid.SubGrid FROM tblGrid WHERE tblGrid.SamplingGUID ={{{samplingGUID}}}";
+            using (var dt = new DataTable())
+            {
+                try
+                {
+                    using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.MDBPath))
+                    {
+                        var adapter = new OleDbDataAdapter(sql, conection);
+                        adapter.Fill(dt);
+                        for (int i = 0; i < dt.Rows.Count; i++)
+                        {
+                            DataRow dr = dt.Rows[i];
+                            int? subGrid = null;
+                            if (int.TryParse(dr["SubGrid"].ToString(), out int sg))
+                            {
+                                subGrid = sg;
+                            }
+                            fgs.Add(new FishingGround(dr["FishingGround"].ToString(), subGrid));
+                        }
+                        //conection.Open();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError(ex.Message, ex.StackTrace);
+                }
+            }
+            return fgs;
+        }
+
         /// <summary>
         /// returns a dictionary of 9 element tuples that will fill a list view with a sampling summary
         /// </summary>
@@ -152,7 +399,7 @@ namespace FAD3
         /// <returns></returns>
         public static Dictionary<string, (string RefNo, DateTime SamplingDate, string FishingGround, string SubGrid,
                                 string EnumeratorName, string Notes, double? WtCatch, bool IsGrid25FG,
-                                string HasSpecs, int CatchRows)> SamplingSummaryForMonth(string LSGUID, string GearGUID, string SamplingMonth)
+                                string HasSpecs, int CatchRows)> SamplingSummaryForMonth1(string LSGUID, string GearGUID, string SamplingMonth)
         {
             _effortMonth.Clear();
             var CompleteGrid25 = FishingGrid.IsCompleteGrid25;
@@ -656,163 +903,114 @@ namespace FAD3
         /// Dictionary object of keys and values
         /// </summary>
         /// <returns></returns>
-        public Dictionary<string, string> CatchAndEffort()
+        ///
+
+        public void CatchAndEffortOfSampling(string samplingGuid)
         {
-            string myVal = "";
             var myDT = new DataTable();
-            Dictionary<string, string> PropertyValue = new Dictionary<string, string>();
-            string VesType = "";
+            var sampling = SamplingsForMonth[samplingGuid];
             try
             {
                 using (var conection = new OleDbConnection("Provider=Microsoft.JET.OLEDB.4.0;data source=" + global.MDBPath))
                 {
                     conection.Open();
-                    string query =
-                        $@"SELECT tblSampling.*, tblAOI.AOIName, tblLandingSites.LSName, tblGearVariations.Variation, tblGearClass.GearClassName, tblGearClass.GearClass,
-                        tblEnumerators.EnumeratorName FROM (tblAOI RIGHT JOIN tblLandingSites ON tblAOI.AOIGuid = tblLandingSites.AOIGuid) RIGHT JOIN
-                        ((tblGearClass RIGHT JOIN tblGearVariations ON tblGearClass.GearClass = tblGearVariations.GearClass) RIGHT JOIN (tblEnumerators
-                        RIGHT JOIN tblSampling ON tblEnumerators.EnumeratorID = tblSampling.Enumerator) ON tblGearVariations.GearVarGUID =
-                        tblSampling.GearVarGUID) ON tblLandingSites.LSGUID = tblSampling.LSGUID
-                        WHERE tblSampling.SamplingGUID= {{{_SamplingGUID}}}";
+
+                    string query = $@"SELECT tblSampling.*, tblAOI.AOIName, tblLandingSites.LSName, tblGearVariations.Variation, tblGearClass.GearClassName,
+                                tblGearClass.GearClass, tblEnumerators.EnumeratorName,
+                                (Select distinct 'x' as HasExpense from tblFishingExpense where tblFishingExpense.SamplingGuid=[tblSampling.SamplingGuid]) AS HasExpense
+                                FROM(tblAOI
+                                RIGHT JOIN tblLandingSites ON tblAOI.AOIGuid = tblLandingSites.AOIGuid)
+                                RIGHT JOIN((tblGearClass
+                                RIGHT JOIN tblGearVariations ON tblGearClass.GearClass = tblGearVariations.GearClass)
+                                RIGHT JOIN(tblEnumerators
+                                RIGHT JOIN tblSampling ON tblEnumerators.EnumeratorID = tblSampling.Enumerator) ON tblGearVariations.GearVarGUID = tblSampling.GearVarGUID)
+                                ON tblLandingSites.LSGUID = tblSampling.LSGUID
+                                WHERE tblSampling.SamplingGUID= {{{samplingGuid}}}";
 
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(myDT);
                     if (myDT.Rows.Count > 0)
                     {
                         DataRow dr = myDT.Rows[0];
+                        sampling.SamplingSummary.TargetAreaName = dr["AOIName"].ToString();
+                        sampling.SamplingSummary.LandingSiteName = dr["LSName"].ToString();
+                        sampling.SamplingSummary.GearClassGuid = dr["GearClass"].ToString();
+                        sampling.SamplingSummary.GearClassName = dr["GearClassName"].ToString();
+                        sampling.SamplingSummary.OperatingExpenseIndicator = dr["HasExpense"].ToString();
+                        sampling.GearVariationGuid = dr["GearVarGUID"].ToString();
+                        sampling.SamplingSummary.GearVariationName = dr["Variation"].ToString();
+                        sampling.FishingGroundList = FishingGroundFromSampling(samplingGuid);
 
-                        PropertyValue.Add("ReferenceNumber", dr["RefNo"].ToString());
-                        try { PropertyValue.Add("Enumerator", dr["EnumeratorName"].ToString() + "|" + dr["Enumerator"].ToString()); }
-                        catch { PropertyValue.Add("Enumerator", ""); }
-                        PropertyValue.Add("TargetArea", dr["AOIName"].ToString());
-                        PropertyValue.Add("LandingSite", dr["LSName"].ToString() + "|" + dr["LSGuid"].ToString());
-                        PropertyValue.Add("GearClass", dr["GearClassName"].ToString() + "|" + dr["GearClass"].ToString());
-                        PropertyValue.Add("FishingGear", dr["Variation"].ToString() + "|" + dr["GearVarGUID"].ToString());
-
-                        try { PropertyValue.Add("FishingGround", dr["FishingGround"].ToString()); }
-                        catch { PropertyValue.Add("FishingGround", ""); }
-
-                        try { PropertyValue.Add("SubGrid", dr["SubGrid"].ToString()); }
-                        catch { PropertyValue.Add("SubGrid", ""); }
-
-                        DateTime dt = new DateTime();
-
-                        myVal = dr["SamplingDate"].ToString();
-                        if (myVal != "")
+                        if (DateTime.TryParse(dr["DateSet"].ToString(), out DateTime ds)
+                            && DateTime.TryParse(dr["TimeSet"].ToString(), out DateTime ts))
                         {
-                            dt = Convert.ToDateTime(myVal);
-                            PropertyValue.Add("SamplingDate", string.Format("{0:MMM-dd-yyyy}", dt));
-                        }
-                        else
-                        {
-                            PropertyValue.Add("SamplingDate", "");
+                            sampling.GearSettingDateTime = ds.AddHours((double)ts.Hour + ((Double)ts.Minute) / 60);
                         }
 
-                        myVal = dr["SamplingTime"].ToString();
-                        if (myVal != "")
+                        if (DateTime.TryParse(dr["DateHauled"].ToString(), out DateTime dh)
+                            && DateTime.TryParse(dr["TimeHauled"].ToString(), out DateTime th))
                         {
-                            dt = Convert.ToDateTime(myVal);
-                            PropertyValue.Add("SamplingTime", string.Format("{0:HH:mm}", dt));
-                        }
-                        else
-                        {
-                            PropertyValue.Add("SamplingTime", "");
+                            sampling.GearHaulingDateTime = dh.AddHours((double)th.Hour + ((Double)th.Minute) / 60);
                         }
 
-                        myVal = dr["DateSet"].ToString();
-                        if (myVal != "")
+                        if (int.TryParse(dr["NoHauls"].ToString(), out int nh))
                         {
-                            dt = Convert.ToDateTime(myVal);
-                            PropertyValue.Add("DateSet", string.Format("{0:MMM-dd-yyyy}", dt));
-                        }
-                        else
-                        {
-                            PropertyValue.Add("DateSet", "");
+                            sampling.NumberOfHauls = nh;
                         }
 
-                        myVal = dr["TimeSet"].ToString();
-                        if (myVal != "")
+                        if (int.TryParse(dr["NoFishers"].ToString(), out int nf))
                         {
-                            dt = Convert.ToDateTime(myVal);
-                            PropertyValue.Add("TimeSet", string.Format("{0:HH:mm}", dt));
-                        }
-                        else
-                        {
-                            PropertyValue.Add("TimeSet", "");
+                            sampling.NumberOfFishers = nf;
                         }
 
-                        myVal = dr["DateHauled"].ToString();
-                        if (myVal != "")
+                        if (double.TryParse(dr["WtSample"].ToString(), out double ws))
                         {
-                            dt = Convert.ToDateTime(myVal);
-                            PropertyValue.Add("DateHauled", string.Format("{0:MMM-dd-yyyy}", dt));
-                        }
-                        else
-                        {
-                            PropertyValue.Add("DateHauled", "");
+                            sampling.SampleWeight = ws;
                         }
 
-                        myVal = dr["TimeHauled"].ToString();
-                        if (myVal != "")
+                        sampling.HasLiveFish = Convert.ToBoolean(dr["HasLiveFish"]);
+
+                        double? breadth = null;
+                        double? length = null;
+                        double? depth = null;
+
+                        if (double.TryParse(dr["len"].ToString(), out double len))
                         {
-                            dt = Convert.ToDateTime(myVal);
-                            PropertyValue.Add("TimeHauled", string.Format("{0:HH:mm}", dt));
+                            length = len;
                         }
-                        else
+
+                        if (double.TryParse(dr["wdt"].ToString(), out double wdt))
                         {
-                            PropertyValue.Add("TimeHauled", "");
+                            breadth = wdt;
                         }
 
-                        PropertyValue.Add("NumberOfHauls", dr["NoHauls"].ToString());
-                        PropertyValue.Add("NumberOfFishers", dr["NoFishers"].ToString());
-                        PropertyValue.Add("WeightOfCatch", dr["WtCatch"].ToString());
-                        PropertyValue.Add("WeightOfSample", dr["WtSample"].ToString());
-
-                        string HasLiveFish = "False";
-                        if (Convert.ToBoolean(dr["HasLiveFish"]))
+                        if (double.TryParse(dr["hgt"].ToString(), out double hgt))
                         {
-                            HasLiveFish = "True";
+                            depth = hgt;
                         }
-                        PropertyValue.Add("HasLiveFish", HasLiveFish);
 
-                        VesType = FishingVessel.VesselTypeFromVesselTypeNumber((int)dr["VesType"]);
-                        PropertyValue.Add("TypeOfVesselUsed", VesType);
-
-                        PropertyValue.Add("Engine", dr["Engine"].ToString());
-                        PropertyValue.Add("EngineHorsepower", dr["hp"].ToString());
-
-                        PropertyValue.Add("VesLength", dr["len"].ToString());
-                        PropertyValue.Add("VesWidth", dr["wdt"].ToString());
-                        PropertyValue.Add("VesHeight", dr["hgt"].ToString());
-
-                        string VesDimension = "(LxWxH): " + dr["len"].ToString() + " x " + dr["wdt"].ToString() + " x " + dr["hgt"].ToString();
-                        PropertyValue.Add("VesselDimension", VesDimension);
-
-                        PropertyValue.Add("Notes", dr["Notes"].ToString());
-
-                        //the following are class properties that can be accessed by property get
-                        _RererenceNo = dr["RefNo"].ToString();
-
-                        myVal = dr["DateEncoded"].ToString();
-                        if (myVal != "")
+                        FishingVessel fv = new FishingVessel((VesselType)(int)dr["VesType"], breadth, depth, length);
+                        fv.Engine = dr["Engine"].ToString();
+                        fv.VesselID = dr["VesselID"].ToString();
+                        if (double.TryParse(dr["hp"].ToString(), out double hp))
                         {
-                            dt = Convert.ToDateTime(myVal);
-                            PropertyValue.Add("DateEncoded", string.Format("{0:MMM-dd-yyyy HH:mm}", dt));
+                            fv.EngineHorsepower = hp;
                         }
-                        else
+                        sampling.FishingVessel = fv;
+
+                        sampling.Notes = dr["Notes"].ToString();
+
+                        if (DateTime.TryParse(dr["DateEncoded"].ToString(), out DateTime de))
                         {
-                            PropertyValue.Add("DateEncoded", "");
+                            sampling.DateEncoded = de;
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
+                Logger.LogError(ex.Message, ex.StackTrace);
             }
-
-            _CatchAndEffortPropertyCount = PropertyValue.Count;
-            return PropertyValue;
         }
 
         public Dictionary<string, string> GearsFromLandingSite(string lsguid)
@@ -899,7 +1097,8 @@ namespace FAD3
                         DataRow dr = dt.Rows[i];
                         DateTime samplingDateTime = ((DateTime)dr["SamplingDate"]).Date.Add(((DateTime)dr["SamplingTime"]).TimeOfDay);
                         string samplingGUID = dr["SamplingGUID"].ToString();
-                        Sampling s = new Sampling(samplingGUID,
+                        Sampling s = new Sampling(dr["AOI"].ToString(),
+                                                  samplingGUID,
                                                   samplingDateTime,
                                                   dr["LSGUID"].ToString(),
                                                   dr["RefNo"].ToString());
@@ -1067,7 +1266,7 @@ namespace FAD3
                 try
                 {
                     conection.Open();
-                    string query = $"Select GridName from tblGrid where SamplingGUID = {{{_SamplingGUID}}}";
+                    string query = $"Select GridName from tblGrid where SamplingGUID = {{{_samplingGUID}}}";
                     var adapter = new OleDbDataAdapter(query, conection);
                     adapter.Fill(dt);
                     for (int i = 0; i < dt.Rows.Count; i++)
@@ -1366,7 +1565,7 @@ namespace FAD3
             return success;
         }
 
-        public bool UpdateEffort(bool isNew, Dictionary<string, string> EffortData, List<string> FishingGrounds)
+        public bool UpdateEffort(bool isNew, Dictionary<string, string> EffortData, List<string> FishingGrounds, DateTime dateUpdated)
         {
             bool Success = false;
             string updateQuery = "";
@@ -1412,7 +1611,7 @@ namespace FAD3
                     {
                         updateQuery = $@"Insert into tblSampling (SamplingGUID, GearVarGUID, AOI, RefNo, SamplingDate, SamplingTime,
                             FishingGround, SubGrid, TimeSet, DateSet, TimeHauled, DateHauled, NoHauls, NoFishers, Engine, hp,
-                            WtCatch, WtSample, len, wdt, hgt, LSGUID,  Notes, VesType, SamplingType, HasLiveFish, Enumerator,
+                            WtCatch, WtSample, len, wdt, hgt, LSGUID,  Notes, VesType, SamplingType, HasLiveFish, Enumerator, VesselID
                             DateEncoded) values (
                             {{{SamplingGuid}}},
                             {{{EffortData["FishingGear"]}}},
@@ -1439,7 +1638,8 @@ namespace FAD3
                             {EffortData["SamplingType"]},
                             {EffortData["HasLiveFish"]},
                             {{{EffortData["Enumerator"]}}},
-                            '{DateTime.Now}')";
+                            '{EffortData["VesselID"]}',
+                            '{dateUpdated}')";
                     }
                     else
                     {
@@ -1467,7 +1667,8 @@ namespace FAD3
                             VesType ={VesselType},
                             SamplingType ={EffortData["SamplingType"]},
                             HasLiveFish = {EffortData["HasLiveFish"]},
-                            Enumerator = {{{EffortData["Enumerator"]}}}
+                            Enumerator = {{{EffortData["Enumerator"]}}},
+                            VesselID = '{EffortData["VesselID"]}'
                             Where SamplingGUID = {{{SamplingGuid}}}";
                     }
 

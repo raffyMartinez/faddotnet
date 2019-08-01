@@ -178,7 +178,19 @@ namespace FAD3
                     if (sql.Length > 0)
                         using (OleDbCommand update = new OleDbCommand(sql, con))
                         {
-                            success = (update.ExecuteNonQuery() > 0);
+                            try
+                            {
+                                success = (update.ExecuteNonQuery() > 0);
+                            }
+                            catch (OleDbException)
+                            {
+                                success = false;
+                            }
+                            catch (Exception ex)
+                            {
+                                Logger.LogError(ex.Message, ex.StackTrace);
+                                success = false;
+                            }
                             //TODO: what to do if Success=false?
 
                             saveSuccess[n] = success;

@@ -25,7 +25,7 @@ namespace FAD3.Mapping.Forms
         private string _action;
         private string _titleText;
         private string _targetAreaName;
-        private int _importedCount;
+        private int _exportImportCount;
         public ExportImportDataType ExportImportDataType { get; set; }
         public ExportImportDeleteAction ExportImportDeleteAction { get; set; }
 
@@ -196,6 +196,10 @@ namespace FAD3.Mapping.Forms
             });
         }
 
+        public ProgessIndicatorForm()
+        {
+        }
+
         public ProgessIndicatorForm(string targetAreaName)
         {
             InitializeComponent();
@@ -250,27 +254,34 @@ namespace FAD3.Mapping.Forms
             InitializeComponent();
             _url = url;
             _fileName = fileName;
-            if (url.Length == 0)
-            {
-                Names.OnRowsImported += OnRowsImported;
-            }
+            //if (url.Length == 0)
+            //{
+            //    Names.OnRowsImportedExported += OnRowsImportedExported;
+            //}
             btnCancel.Hide();
             ControlBox = false;
             btnOk.Enabled = false;
         }
 
-        private void OnRowsImported(object sender, ImportRowsFromFileEventArgs e)
+        private void OnRowsImportedExported(object sender, ImportRowsFromFileEventArgs e)
         {
-            if (e.ImportedName?.Length > 0)
+            if (e.ImportedExportedName?.Length > 0 || e.LocalNameSciNameLanguage?.Length > 0)
             {
                 progressBar.Invoke((MethodInvoker)delegate
                 {
                     progressBar.Increment(1);
-                    _importedCount++;
+                    _exportImportCount++;
                 });
                 lblDownloadFile.Invoke((MethodInvoker)delegate
                 {
-                    lblDownloadFile.Text = $"Imported {e.ImportedName}";
+                    if (ExportImportDataType == ExportImportDataType.SpeciesNames)
+                    {
+                        lblDownloadFile.Text = $"Processed {e.ImportedExportedName}";
+                    }
+                    else if (ExportImportDataType == ExportImportDataType.CatchLocalNameSpeciesNamePair)
+                    {
+                        lblDownloadFile.Text = $"Processed {e.LocalNameSciNameLanguage}";
+                    }
                 });
             }
             else if (e.IsComplete)
@@ -281,7 +292,7 @@ namespace FAD3.Mapping.Forms
                 });
                 lblDownloadFile.Invoke((MethodInvoker)delegate
                 {
-                    lblDownloadFile.Text = $"Finished importing {_importedCount} names";
+                    lblDownloadFile.Text = $"Finished proceesing {_exportImportCount} names";
                 });
                 progressBar.Invoke((MethodInvoker)delegate
                 {
@@ -291,15 +302,19 @@ namespace FAD3.Mapping.Forms
             }
             else if (e.RowsImported >= 0)
             {
-                SetupProgressBar(_importedCount + 50, _importedCount + 1);
+                SetupProgressBar(_exportImportCount + 50, _exportImportCount + 1);
 
                 if (e.RowsImported == 0)
                 {
                     lblTitle.Invoke((MethodInvoker)delegate
                     {
-                        lblTitle.Text = $"Importing data in {global.EllipsisString(_fileName)}";
+                        lblTitle.Text = $"Procesing data in {global.EllipsisString(_fileName)}";
                     });
                 }
+            }
+            else if (e.RowsImported == 0)
+            {
+                ExportImportDataType = e.DataType;
             }
         }
 
@@ -364,6 +379,10 @@ namespace FAD3.Mapping.Forms
             {
                 DownloadFile();
             }
+            else
+            {
+                Names.OnRowsImportedExported += OnRowsImportedExported;
+            }
             lblDownloadError.Visible = false;
             switch (ExportImportDataType)
             {
@@ -377,6 +396,10 @@ namespace FAD3.Mapping.Forms
 
                 case ExportImportDataType.ERDDAP:
                     dataDescription = "ERDDAP data";
+                    break;
+
+                case ExportImportDataType.CatchLocalNameSpeciesNamePair:
+                    dataDescription = "species names and local names";
                     break;
             }
             switch (ExportImportDeleteAction)
@@ -402,7 +425,7 @@ namespace FAD3.Mapping.Forms
             progressBar.Value = e.ProgressPercentage;
             if (progressBar.Value == 100)
             {
-                lblTitle.Text = "Finished download!";
+                lblTitle.Text = "Finished processing file!";
             }
         }
 

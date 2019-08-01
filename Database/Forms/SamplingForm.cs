@@ -4,13 +4,14 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using FAD3.Database.Classes;
+using FAD3.Database.Forms;
 
 namespace FAD3
 {
     public partial class SamplingForm : Form
     {
         private Dictionary<string, Samplings.UserInterfaceStructure> _uis = new Dictionary<string, Samplings.UserInterfaceStructure>();
-        private Samplings _sampling;
+        private Samplings _samplings;
         private string _samplingGUID = "";
         private ListView _lv;
         private Control _topControl;
@@ -30,19 +31,28 @@ namespace FAD3
         private bool _isNew;
         private TargetArea _targetArea;
         private TextBox _txtVesselDimension = new TextBox();
+        private TextBox _txtExpenses = new TextBox();
+        private ComboBox _cboEngine = new ComboBox();
+        private string _engine = "";
+        private string _engineHP = "";
+        private TextBox _txtEngineHP = new TextBox();
+        private bool _hasExpenseData = false;
+        private string _vesselType = "";
 
         private string _vesLength = "";
         private string _vesWidth = "";
         private string _vesHeight = "";
 
         private string _enumeratorGuid = "";
+        public ExpensePerOperation ExpensePerOperation { get; set; }
+        public Sampling Sampling { get; set; }
 
         private string _datePrompt = "";
         private string _timePrompt = "";
         private DateTime _samplingDate;
         private bool _samplingDateSet = false;
         private DateTime _dateSetAdjust;
-
+        private DateTime _dateUpdated;
         private string _newReferenceNumber = "";
 
         private bool _sampledGearSpecIsEdited;
@@ -222,30 +232,31 @@ namespace FAD3
         {
             global.SaveFormSettings(this);
             ManageGearSpecsClass.SampledGearSpecs.Clear();
-            _sampling.OnUIRowRead -= new Samplings.ReadUIElement(OnUIRowRead);
-            _sampling = null;
+            _samplings.OnUIRowRead -= new Samplings.ReadUIElement(OnUIRowRead);
+            _samplings = null;
         }
 
         private void OnUIRowRead(object sender, UIRowFromXML e)
         {
-            int ht = 16;
+            int controlHeight = 16;
             int x = 0;
 
-            int Spacing = 15;
-            string cType;
-            int SizeAdjust = 50;
-            string ButtonText;
-            int ControlHt = 0;
+            int spacing = 15;
+            string controlType;
+            int sizeAdjust = 50;
+            string buttonText;
+            string e_key = e.Key;
+            int controlSpacing = 0;
             Control ctl = new Control();
 
             //setup the labels
             Label lbl = new Label
             {
-                Name = "label" + e.Key,
+                Name = "label" + e_key,
                 Text = e.RowLabel,
                 AutoSize = true,
-                Size = new Size(60, ht),
-                Tag = e.Key
+                Size = new Size(60, controlHeight),
+                Tag = e_key
             };
             panelUI.Controls.Add(lbl);
             lbl.Location = new Point(x, _yPos);
@@ -254,25 +265,25 @@ namespace FAD3
 
             try
             {
-                cType = e.Control.ToString();
+                controlType = e.Control.ToString();
             }
             catch
             {
-                cType = "";
+                controlType = "";
             }
 
             //setup error labels
-            if (cType != "Spacer")
+            if (controlType != "Spacer")
             {
                 Font f = new Font(lbl.Font.FontFamily, 8, FontStyle.Bold);
                 Label lblError = new Label()
                 {
-                    Name = "errLabel" + e.Key,
+                    Name = "errLabel" + e_key,
                     Text = "!",
                     AutoSize = true,
                     Size = new Size(3, 40),
                     Font = f,
-                    Tag = e.Key,
+                    Tag = e_key,
                     Visible = false,
                     ForeColor = Color.Red
                 };
@@ -281,12 +292,12 @@ namespace FAD3
             }
 
             //setup the field controls
-            switch (cType)
+            switch (controlType)
             {
                 case "TextBox":
                     ctl = new TextBox
                     {
-                        Name = "text" + e.Key
+                        Name = "text" + e_key
                     };
                     ((TextBox)ctl).ReadOnly = e.ReadOnly;
                     break;
@@ -294,10 +305,10 @@ namespace FAD3
                 case "ComboBox":
                     ctl = new ComboBox
                     {
-                        Name = "combo" + e.Key,
+                        Name = "combo" + e_key,
                     };
 
-                    switch (e.Key)
+                    switch (e_key)
                     {
                         case "Enumerator":
                             Enumerators.AOIEnumeratorsList(_targetAreaGuid, (ComboBox)ctl);
@@ -319,7 +330,6 @@ namespace FAD3
                                 cbo.Items.Add(gear);
                             }
 
-                            //Gears.GetGearClassEx((ComboBox)ctl);
                             break;
 
                         case "Engine":
@@ -356,7 +366,7 @@ namespace FAD3
                     }
                     ((ComboBox)ctl).With(o =>
                     {
-                        if (e.Key != "Engine")
+                        if (e_key != "Engine")
                         {
                             o.DisplayMember = "Value";
                             o.ValueMember = "Key";
@@ -367,13 +377,13 @@ namespace FAD3
                     break;
 
                 case "Spacer":
-                    ControlHt = 35;
+                    controlSpacing = 35;
                     break;
 
                 case "DateMask":
                     ctl = new MaskedTextBox
                     {
-                        Name = "dtxt" + e.Key,
+                        Name = "dtxt" + e_key,
                     };
 
                     ((MaskedTextBox)ctl).With(o =>
@@ -389,7 +399,7 @@ namespace FAD3
                 case "TimeMask":
                     ctl = new MaskedTextBox
                     {
-                        Name = "ttxt" + e.Key,
+                        Name = "ttxt" + e_key,
                     };
 
                     ((MaskedTextBox)ctl).With(o =>
@@ -405,7 +415,7 @@ namespace FAD3
                 case "Check":
                     ctl = new CheckBox
                     {
-                        Name = "chk" + e.Key
+                        Name = "chk" + e_key
                     };
                     break;
 
@@ -413,65 +423,65 @@ namespace FAD3
                     break;
             }
 
-            System.Type type = ctl.GetType();
-            if (type.Name != "Control" && cType != "Spacer")
+            Type type = ctl.GetType();
+            if (type.Name != "Control" && controlType != "Spacer")
             {
+                //setup tooltip of the control
                 ToolTip tt = new ToolTip
                 {
                     ToolTipTitle = ctl.Text
                 };
                 tt.SetToolTip(ctl, e.ToolTip);
 
+                //add control to the form
                 panelUI.Controls.Add(ctl);
 
+                //setup control size and position
                 ctl.With(o =>
                  {
-                     o.Location = new System.Drawing.Point(x, _yPos);
-                     o.Tag = e.Key;
+                     o.Location = new Point(x, _yPos);
+                     o.Tag = e_key;
                      if (type.Name != "CheckBox")
                      {
-                         o.Size = new System.Drawing.Size(_controlWidth, ht + SizeAdjust);
+                         o.Size = new System.Drawing.Size(_controlWidth, controlHeight + sizeAdjust);
                          if (e.Height != 1)
                          {
-                             o.Size = new System.Drawing.Size(_controlWidth, ht * e.Height);
+                             o.Size = new System.Drawing.Size(_controlWidth, controlHeight * e.Height);
                              ((TextBox)o).Multiline = true;
                          }
                      }
-                     ControlHt = o.Height;
+                     controlSpacing = o.Height;
                  });
 
+                //set the text of the control for both new and saved samplings
                 if (!_isNew)
                 {
                     if (type.Name != "CheckBox")
                     {
-                        ctl.Text = _lv.Items[e.Key].SubItems[1].Text;
+                        //the text of control is derived from the text of the catch details listview items
+                        ctl.Text = _lv.Items[e_key].SubItems[1].Text;
 
-                        switch (e.Key)
+                        switch (e_key)
                         {
+                            case "TypeOfVesselUsed":
+                                _vesselType = ctl.Text;
+                                break;
+
                             case "Enumerator":
-                                if (((ComboBox)ctl).SelectedItem != null)
-                                {
-                                    _enumeratorGuid = ((KeyValuePair<string, string>)((ComboBox)ctl).SelectedItem).Key;
-                                }
+                                _enumeratorGuid = Sampling.EnumeratorGuid;
                                 break;
 
                             case "FishingGear":
-                                _gearVarName = ctl.Text;
-                                ComboBox c = (ComboBox)ctl;
-                                if (c.Items.Count > 0)
-                                {
-                                    _gearVarGuid = ((KeyValuePair<string, string>)(c.SelectedItem)).Key;
-                                }
+                                _gearVarName = Sampling.SamplingSummary.GearVariationName;
+                                _gearVarGuid = Sampling.GearVariationGuid;
                                 break;
 
                             case "ReferenceNumber":
-                                var arr = ctl.Text.Split('-');
-                                _gearRefCode = arr[1];
+                                _gearRefCode = Sampling.ReferenceNumber.Split('-')[1];
                                 break;
 
                             case "TargetArea":
-                                _targetAreaName = ctl.Text;
-                                _targetAreaGuid = ((KeyValuePair<string, string>)((ComboBox)ctl).SelectedItem).Key;
+                                _targetAreaName = Sampling.SamplingSummary.TargetAreaName;
                                 break;
 
                             case "AdditionalFishingGround":
@@ -484,12 +494,13 @@ namespace FAD3
                     }
                     else
                     {
-                        ((CheckBox)ctl).Checked = _lv.Items[e.Key].SubItems[1].Text == "True";
+                        ((CheckBox)ctl).Checked = _lv.Items[e_key].SubItems[1].Text == "Yes";
                     }
                 }
                 else
                 {
-                    switch (e.Key)
+                    //setup control contents for a new sampling
+                    switch (e_key)
                     {
                         case "SamplingDate":
                             if (_isNew)
@@ -548,6 +559,8 @@ namespace FAD3
                             break;
                     }
                 }
+
+                //turn of selected text in combobox textbox
                 if (type.Name == "ComboBox")
                 {
                     ((ComboBox)ctl).SelectionLength = 0;
@@ -562,11 +575,36 @@ namespace FAD3
 
                 if (type.Name == "ComboBox")
                     ((ComboBox)ctl).SelectedIndexChanged += OnComboSelectedIndexChanged;
-                else if (cType == "DateMask")
+                else if (controlType == "DateMask")
                     ((MaskedTextBox)ctl).KeyDown += OnmaskedText_KeyDown;
 
-                if (e.Key == "VesselDimension")
-                    _txtVesselDimension = (TextBox)ctl;
+                try
+                {
+                    switch (e_key)
+                    {
+                        case "VesselDimension":
+                            _txtVesselDimension = (TextBox)ctl;
+                            break;
+
+                        case "OperatingExpenses":
+                            _txtExpenses = (TextBox)ctl;
+                            break;
+
+                        case "Engine":
+                            _cboEngine = (ComboBox)ctl;
+                            _cboEngine.Enabled = _vesselType == "Motorized";
+                            break;
+
+                        case "EngineHorsepower":
+                            _txtEngineHP = (TextBox)ctl;
+                            _txtEngineHP.Enabled = _vesselType == "Motorized";
+                            break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError(ex.Message, ex.StackTrace);
+                }
             }
 
             //making the controls not visible speeds up form drawing
@@ -575,26 +613,26 @@ namespace FAD3
             //setup the buttons
             try
             {
-                ButtonText = e.ButtonText;
+                buttonText = e.ButtonText;
             }
             catch
             {
-                ButtonText = "";
+                buttonText = "";
             }
-            if (ButtonText.Length > 0)
+            if (buttonText.Length > 0)
             {
                 Button btn = new Button
                 {
-                    Name = "btn" + e.Key,
-                    Text = ButtonText,
-                    Size = new Size(_controlWidth / 2, (int)(ht * 1.7)),
-                    Tag = e.Key
+                    Name = "btn" + e_key,
+                    Text = buttonText,
+                    Size = new Size(_controlWidth / 2, (int)(controlHeight * 1.7)),
+                    Tag = e_key
                 };
                 panelUI.Controls.Add(btn);
                 btn.Location = new Point(x, _yPos - 3);
                 btn.Click += OnbuttonSamplingFields_Click;
 
-                switch (e.Key)
+                switch (e_key)
                 {
                     case "Enumerator":
                         if (!IsNew) _topControl = btn;
@@ -605,7 +643,9 @@ namespace FAD3
                         break;
                 }
             }
-            _yPos += ControlHt + Spacing;
+
+            //setup horizontal position for next control
+            _yPos += controlSpacing + spacing;
         }
 
         private void OnFieldGotFocus(object sender, EventArgs e)
@@ -631,10 +671,21 @@ namespace FAD3
         {
             this.Size = new Size(Width, _lv.Height);
             global.LoadFormSettings(this, true);
-            _sampling = _parentForm.Sampling;
-            _sampling.OnUIRowRead += new Samplings.ReadUIElement(OnUIRowRead);
+
+            if (!_isNew)
+            {
+                _targetAreaGuid = Sampling.TargetAreaGuid;
+                _samplingGUID = Sampling.SamplingGUID;
+            }
+            else
+            {
+                _samplingGUID = Guid.NewGuid().ToString();
+            }
+
+            _samplings = _parentForm.Samplings;
+            _samplings.OnUIRowRead += new Samplings.ReadUIElement(OnUIRowRead);
             panelUI.SuspendLayout();
-            _sampling.ReadUIFromXML();
+            _samplings.ReadUIFromXML();
             AdustControlsPosition();
             panelUI.ResumeLayout();
 
@@ -646,6 +697,9 @@ namespace FAD3
             {
                 Text = "Sampling detail";
                 _gearClassName = _lv.Items["GearClass"].SubItems[1].Text;
+                var result = OperatingExpenses.ReadData(SamplingGUID);
+                _hasExpenseData = result.success;
+                _txtExpenses.Text = OperatingExpenses.SamplingExpenses;
             }
 
             SetFieldsVisible();
@@ -654,6 +708,11 @@ namespace FAD3
 
             CancelButton = buttonCancel;
             _topControl.Select();
+        }
+
+        public void UpdateExpenses()
+        {
+            _txtExpenses.Text = ExpensePerOperation.Summary;
         }
 
         private void SetFieldsVisible()
@@ -754,15 +813,13 @@ namespace FAD3
             EffortData.Add("VesHeight", _vesHeight);
             EffortData.Add("VesWidth", _vesWidth);
 
-            if (_isNew)
-                _samplingGUID = Guid.NewGuid().ToString();
             EffortData.Add("SamplingGUID", _samplingGUID);
 
             EffortData.Add("SamplingType", "1");
 
             PopulateFGList();
-
-            if (_sampling.UpdateEffort(_isNew, EffortData, _fishingGrounds))
+            _dateUpdated = DateTime.Now;
+            if (_samplings.UpdateEffort(_isNew, EffortData, _fishingGrounds, _dateUpdated))
                 return ManageGearSpecsClass.SaveSampledGearSpecs(_samplingGUID);
             else
                 return false;
@@ -773,6 +830,18 @@ namespace FAD3
             Button btn = (Button)sender;
             switch (btn.Name)
             {
+                case "btnOperatingExpenses":
+                    FishingOperationCostsForm fcf = FishingOperationCostsForm.GetInstance(_samplingGUID, this, _hasExpenseData);
+                    if (fcf.Visible)
+                    {
+                        fcf.BringToFront();
+                    }
+                    else
+                    {
+                        fcf.Show(this);
+                    }
+                    break;
+
                 case "btnEnumerator":
                     var ef = EnumeratorForm.GetInstance(_enumeratorGuid);
                     if (!ef.Visible)
@@ -954,8 +1023,18 @@ namespace FAD3
                     {
                         if (SaveEdits())
                         {
-                            _sampling.OnUIRowRead -= new Samplings.ReadUIElement(OnUIRowRead);
-                            if (IsNew) ReferenceNumberManager.UpdateRefCodeCounter();
+                            if (ExpensePerOperation != null)
+                            {
+                                if (OperatingExpenses.Update(ExpensePerOperation))
+                                {
+                                    _txtExpenses.Text = OperatingExpenses.SamplingExpenses;
+                                }
+                            }
+                            _samplings.OnUIRowRead -= new Samplings.ReadUIElement(OnUIRowRead);
+                            if (IsNew)
+                            {
+                                ReferenceNumberManager.UpdateRefCodeCounter();
+                            }
                             _parentForm.RefreshCatchDetail(_samplingGUID, _isNew, _samplingDate, _gearVarGuid, _landingSiteGuid);
                             Close();
                         }
@@ -963,7 +1042,7 @@ namespace FAD3
                     break;
 
                 case "buttonCancel":
-                    this.Close();
+                    Close();
                     break;
             }
         }
@@ -1218,6 +1297,22 @@ namespace FAD3
                                     break;
 
                                 case "comboTypeOfVesselUsed":
+                                    if (combo.Text != "Motorized")
+                                    {
+                                        _engine = _cboEngine.Text;
+                                        _engineHP = _txtEngineHP.Text;
+                                        _cboEngine.Enabled = false;
+                                        _txtEngineHP.Enabled = false;
+                                        _cboEngine.Text = "";
+                                        _txtEngineHP.Text = "";
+                                    }
+                                    else
+                                    {
+                                        _cboEngine.Enabled = true;
+                                        _txtEngineHP.Enabled = true;
+                                        _cboEngine.Text = _engine;
+                                        _txtEngineHP.Text = _engineHP;
+                                    }
                                     break;
                             }
                         }
@@ -1450,7 +1545,6 @@ namespace FAD3
 
                 if (msg.Length > 0)
                 {
-                    
                     if (!emptyComboList)
                     {
                         MessageBox.Show(msg, "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);

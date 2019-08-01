@@ -13,7 +13,7 @@ namespace FAD3
         private Taxa _taxa;
         private string _taxaName;
         private int _catchCompositionRecordCount;
-
+        public Dictionary<string, List<string>> LanguageLocalNames { get; internal set; } = new Dictionary<string, List<string>>();
         public string genus { get; set; }
         public string species { get; set; }
 

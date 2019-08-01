@@ -241,7 +241,8 @@ namespace FAD3.Database.Classes
                             break;
 
                         case "Sampling":
-                            sampling = new Sampling(xmlReader.GetAttribute("SamplingGUID"),
+                            sampling = new Sampling(xmlReader.GetAttribute("TargetAreaGUID"),
+                                xmlReader.GetAttribute("SamplingGUID"),
                                 DateTime.Parse(xmlReader.GetAttribute("SamplingDateTime")),
                                 xmlReader.GetAttribute("LandingSiteGuid"),
                                 xmlReader.GetAttribute("ReferenceNumber"));

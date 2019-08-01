@@ -24,8 +24,6 @@ using System.Text;
 using FAD3.Mapping.Classes;
 using System.Threading.Tasks;
 
-using FAD3.Mapping.Forms;
-
 namespace FAD3
 {
     /// <summary>
@@ -53,7 +51,7 @@ namespace FAD3
         private mru _mrulist = new mru();
         private bool _newSamplingEntered;
         private string _oldMDB = "";
-        private Samplings _sampling;// =  new sampling();
+        private Samplings _samplings;// =  new sampling();
         private string _samplingGUID = "";
         private string _samplingMonth = "";
         private double _weightOfCatch;
@@ -69,8 +67,8 @@ namespace FAD3
 
         private bool _appIsLocked;
 
-        private ListView lvCatch;
-        private ListView lvLF_GMS;
+        private ListView _lvCatch;
+        private ListView _lvLF_GMS;
 
         //for column sort
         //private int _sortColumn = -1;
@@ -172,9 +170,9 @@ namespace FAD3
             get { return _mrulist; }
         }
 
-        public Samplings Sampling
+        public Samplings Samplings
         {
-            get { return _sampling; }
+            get { return _samplings; }
         }
 
         public string SamplingGUID
@@ -332,11 +330,12 @@ namespace FAD3
             NewLandingSite(NodeName, nodeGUID);
         }
 
-        public void NewLandingSite(string NodeName, string nodeGUID)
+        public void NewLandingSite(string nodeName, string nodeGUID)
         {
             TreeNode NewNode = new TreeNode();
-            NewNode.Text = NodeName;
-            NewNode.Tag = Tuple.Create(nodeGUID, "", "landing_site");
+            NewNode.Text = nodeName;
+            TreeLevel tl = new TreeLevel(_targetAreaGuid, _targetAreaName, nodeGUID, nodeName);
+            NewNode.Tag = new TreeLevelTag(false, tl, "landing_site");
             NewNode.Name = nodeGUID;
             NewNode.ImageKey = "LandingSite";
             treeMain.SelectedNode.Expand();
@@ -344,24 +343,34 @@ namespace FAD3
             treeMain.SelectedNode = NewNode;
         }
 
-        public void NewTargetArea(string TargetAreaName, string TargetAreaGuid)
+        public void NewTargetArea(string targetAreaName, string targetAreaGuid)
         {
             TreeNode nd = new TreeNode
             {
-                Text = TargetAreaName,
-                Name = TargetAreaGuid,
+                Text = targetAreaName,
+                Name = targetAreaGuid,
                 ImageKey = "target_area"
             };
-            nd.Tag = Tuple.Create(TargetAreaGuid, "", "target_area");
+            TreeLevel tl = new TreeLevel(targetAreaGuid, targetAreaName);
+            nd.Tag = new TreeLevelTag(false, tl, "target_area");
             treeMain.Nodes["root"].Nodes.Add(nd);
             treeMain.SelectedNode = nd;
         }
 
-        public void RefreshCatchDetail(string SamplingGUID, bool NewSampling,
-                                               DateTime SamplingDate, string GearVarGuid, string LandingSiteGuid)
+        /// <summary>
+        /// refreshes the display of complete sampling details in the main form
+        /// </summary>
+        /// <param name="samplingGUID"></param>
+        /// <param name="newSampling"></param>
+        /// <param name="SamplingDate"></param>
+        /// <param name="GearVarGuid"></param>
+        /// <param name="LandingSiteGuid"></param>
+        public void RefreshCatchDetail(string samplingGUID, bool newSampling,
+                                               DateTime SamplingDate, string GearVarGuid,
+                                               string LandingSiteGuid)
         {
-            _samplingGUID = SamplingGUID;
-            _newSamplingEntered = NewSampling;
+            _samplingGUID = samplingGUID;
+            _newSamplingEntered = newSampling;
             lvMain.Columns.With(o =>
             {
                 o.Clear();
@@ -371,9 +380,13 @@ namespace FAD3
             if (_newSamplingEntered)
             {
                 RefreshTreeForNewSampling(LandingSiteGuid, GearVarGuid, SamplingDate.ToString("MMM-yyyy"));
+                Samplings.CatchAndEffortOfSampling(samplingGUID);
             }
             SetUPLV("samplingDetail");
-            ShowCatchDetailEx(_samplingGUID);
+            if (newSampling)
+            {
+            }
+            ShowCatchDetailEx(samplingGUID);
         }
 
         /// <summary>
@@ -420,10 +433,10 @@ namespace FAD3
             Close();
         }
 
-        private bool ApplyListViewColumnWidth(string TreeLevel)
+        private bool ApplyListViewColumnWidth(string treeLevel)
         {
             //apply column widths saved in registry
-            lvMain.Tag = TreeLevel;
+            lvMain.Tag = treeLevel;
             try
             {
                 RegistryKey rk = Registry.CurrentUser.OpenSubKey("SOFTWARE\\FAD3\\ColWidth");
@@ -453,12 +466,19 @@ namespace FAD3
             SetupSamplingButtonFrame(false);
             SetUPLV(_treeLevel);
             lvMain.Focus();
-            var lvi = lvMain.Items[_samplingGUID];
-            if (lvMain.Items.Contains(lvi))
+            try
             {
-                lvi.Selected = true;
-                lvi.EnsureVisible();
-                lvMain.TopItem = lvMain.Items[_topLVItemIndex];
+                var lvi = lvMain.Items[_samplingGUID];
+                if (lvMain.Items.Contains(lvi))
+                {
+                    lvi.Selected = true;
+                    lvi.EnsureVisible();
+                    lvMain.TopItem = lvMain.Items[_topLVItemIndex];
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex.Message, ex.StackTrace);
             }
         }
 
@@ -732,7 +752,7 @@ namespace FAD3
             var CompleteGrid25 = FishingGrid.IsCompleteGrid25;
             if (_readEfforMonth || (_updatedEffortMonth.LandingSiteGuid.Length > 0 && _updatedEffortMonth.GearVariationGuid.Length > 0))
             {
-                Samplings.SamplingSummaryForMonth(LSGUID, GearGUID, SamplingMonth);
+                _samplings.SamplingSummaryForMonth(LSGUID, GearGUID, SamplingMonth);
                 if (_updatedEffortMonth.LandingSiteGuid.Length > 0)
                 {
                     _updatedEffortMonth.LandingSiteGuid = "";
@@ -741,14 +761,13 @@ namespace FAD3
                 _readEfforMonth = false;
                 _efforRefreshNeeded = false;
             }
-            foreach (var item in Samplings.EffortMonth)
+            foreach (var sampling in _samplings.SamplingsForMonth.Values)
             {
-                var row = lvMain.Items.Add(item.Key, item.Value.RefNo, null);                           //reference number
-                DateTime dt = (DateTime)item.Value.SamplingDate;
-                row.SubItems.Add(string.Format("{0:MMM-dd-yyyy}", dt));                                 //sampling date
+                var row = lvMain.Items.Add(sampling.SamplingGUID, sampling.ReferenceNumber, null);                             //reference number
+                row.SubItems.Add(string.Format("{0:MMM-dd-yyyy}", sampling.SamplingDateTime));                                 //sampling date
 
-                if (UpdatedSamplingCatchRowCount != null                                                 //number of catch rows
-                    && UpdatedSamplingCatchRowCount.SamplingGuid == item.Key)
+                if (UpdatedSamplingCatchRowCount != null                                                                       //number of catch rows
+                    && UpdatedSamplingCatchRowCount.SamplingGuid == sampling.SamplingGUID)
                 {
                     row.SubItems.Add(UpdatedSamplingCatchRowCount.CatchRowsCount.ToString());
                     UpdatedSamplingCatchRowCount = null;
@@ -757,14 +776,14 @@ namespace FAD3
                 }
                 else
                 {
-                    row.SubItems.Add(item.Value.CatchRows.ToString());
+                    row.SubItems.Add(sampling.SamplingSummary.CatchCompositionRows.ToString());
                 }
 
-                row.SubItems.Add(item.Value.WtCatch != null ? item.Value.WtCatch.ToString() : "");      //wt of catch
-                var fishingGround = item.Value.FishingGround;                                           //fishing ground
-                if (item.Value.SubGrid.Length > 0)
+                row.SubItems.Add(sampling.CatchWeight != null ? sampling.CatchWeight.ToString() : "");      //wt of catch
+                var fishingGround = sampling.SamplingSummary.FirstFishingGround; //fishing ground
+                if (sampling.SamplingSummary.SubGrid != null)
                 {
-                    fishingGround += $"-{item.Value.SubGrid}";
+                    fishingGround += $"-{sampling.SamplingSummary.SubGrid.ToString()}";
                 }
                 row.SubItems.Add(fishingGround);
 
@@ -772,7 +791,7 @@ namespace FAD3
                 {
                     if (fishingGround.Length > 0)
                     {
-                        row.SubItems.Add(FishingGrid.Grid25_to_UTM(fishingGround));
+                        row.SubItems.Add(FishingGrid.Grid25_to_UTM(sampling.SamplingSummary.FirstFishingGround));
                     }
                     else
                     {
@@ -784,15 +803,16 @@ namespace FAD3
                     row.SubItems.Add("");
                 }
 
-                row.SubItems.Add(item.Value.EnumeratorName);                                          //enumerator
-                row.SubItems.Add(item.Value.HasSpecs);                                                //gear specs
-                row.SubItems.Add(item.Value.Notes);                                                   //notes
-                row.Tag = item.Key;                                                                   //sampling guid
-                row.Name = item.Key;
+                row.SubItems.Add(sampling.SamplingSummary.EnumeratorName);                                      //enumerator
+                row.SubItems.Add(sampling.SamplingSummary.GearSpecsIndicator);                                           //gear specs
+                row.SubItems.Add(sampling.SamplingSummary.OperatingExpenseIndicator);
+                row.SubItems.Add(sampling.Notes);                                                               //notes
+                row.Tag = sampling.SamplingGUID;                                                                        //sampling guid
+                row.Name = sampling.SamplingGUID;
                 n++;
             }
             SizeColumns(lvMain, false);
-            Logger.Log($"filled sampling summary list:{n} rows");
+            //Logger.Log($"filled sampling summary list:{n} rows");
         }
 
         private void frmMain_Activated(object sender, EventArgs e)
@@ -830,17 +850,18 @@ namespace FAD3
                         global.MDBPath = SavedMDBPath;
                         Names.GetGenus_LocalNames();
                         Names.GetLocalNames();
+                        OperatingExpenses.GetExpenseItemsSelection();
                         Gears.GetGearLocalNames();
                         UpdateLocationTables();
                         statusPanelDBPath.Text = SavedMDBPath;
                         lblErrorFormOpen.Visible = false;
                         PopulateTree();
 
-                        _sampling = new Samplings();
-                        _sampling.OnEffortUpdated += EffortUpdated;
+                        _samplings = new Samplings();
+                        _samplings.OnEffortUpdated += EffortUpdated;
 
                         Samplings.SetUpUIElement();
-                        _sampling.OnUIRowRead += new Samplings.ReadUIElement(OnUIRowRead);
+                        _samplings.OnUIRowRead += new Samplings.ReadUIElement(OnUIRowRead);
                     }
                     else
                     {
@@ -1229,7 +1250,7 @@ namespace FAD3
                     break;
 
                 case "menuDeleteTreeItem":
-                    var myTag = (Tuple<string, string, string>)treeMain.SelectedNode.Tag;
+                    var myTag = (TreeLevelTag)treeMain.SelectedNode.Tag;
                     switch (_treeLevel)
                     {
                         case "target_area":
@@ -1237,18 +1258,7 @@ namespace FAD3
 
                             if (result == DialogResult.Yes)
                             {
-                                await DeleteSamplingsFromTargetAreaAsync(myTag.Item1);
-                                //if (TargetArea.Delete(myTag.Item1))
-                                //{
-                                //    treeMain.Nodes.Remove(treeMain.SelectedNode);
-                                //}
-                                //else
-                                //{
-                                //    if (TargetArea.LastError?.Length > 0)
-                                //    {
-                                //        MessageBox.Show(TargetArea.LastError, "Error", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                                //    }
-                                //}
+                                await DeleteSamplingsFromTargetAreaAsync(myTag.TreeLevel.TargetAreaGuid);
                             }
                             break;
 
@@ -1257,7 +1267,7 @@ namespace FAD3
 
                             if (result == DialogResult.Yes)
                             {
-                                if (Landingsite.Delete(myTag.Item1))
+                                if (Landingsite.Delete(myTag.TreeLevel.LandingSiteGuid))
                                 {
                                     treeMain.Nodes.Remove(treeMain.SelectedNode);
                                 }
@@ -1412,7 +1422,7 @@ namespace FAD3
                 case "menuNewGMSTable":
                 case "menuEditGMSTable":
                     var Proceed = true;
-                    var lvi = lvCatch.SelectedItems[0];
+                    var lvi = _lvCatch.SelectedItems[0];
                     if (Enum.TryParse(lvi.SubItems[7].Text, out _taxa))
                     {
                         Proceed = _taxa != Taxa.To_be_determined;
@@ -1433,23 +1443,23 @@ namespace FAD3
                     break;
 
                 case "menuSpeciesDetail":
-                    lvi = lvCatch.SelectedItems[0];
+                    lvi = _lvCatch.SelectedItems[0];
 
                     SpeciesNameForm snf = new SpeciesNameForm(this);
-                    snf.SpeciesGuid = lvCatch.SelectedItems[0].SubItems[1].Name;
+                    snf.SpeciesGuid = _lvCatch.SelectedItems[0].SubItems[1].Name;
                     snf.ReadOnly = true;
                     snf.ShowDialog(this);
 
                     break;
 
                 case "menuCatchLocalNames":
-                    ShowLocalSpeciesNames(lvCatch.SelectedItems[0].SubItems[1].Name, lvCatch.SelectedItems[0].SubItems[1].Text, Identification.Scientific);
+                    ShowLocalSpeciesNames(_lvCatch.SelectedItems[0].SubItems[1].Name, _lvCatch.SelectedItems[0].SubItems[1].Text, Identification.Scientific);
                     break;
 
                 case "menuCatchSpeciesNames":
-                    if (lvCatch.SelectedItems[0].Text.Length > 0)
+                    if (_lvCatch.SelectedItems[0].Text.Length > 0)
                     {
-                        ShowLocalSpeciesNames(lvCatch.SelectedItems[0].SubItems[1].Name, lvCatch.SelectedItems[0].SubItems[1].Text, Identification.LocalName);
+                        ShowLocalSpeciesNames(_lvCatch.SelectedItems[0].SubItems[1].Name, _lvCatch.SelectedItems[0].SubItems[1].Text, Identification.LocalName);
                     }
                     break;
 
@@ -1494,7 +1504,7 @@ namespace FAD3
         private void NewSamplingForm()
         {
             ListViewNewSampling();
-            var f3 = new SamplingForm
+            var newSamlingForm = new SamplingForm
             {
                 IsNew = true,
                 GearClassName = _gearClassName,
@@ -1507,9 +1517,9 @@ namespace FAD3
                 LandingSiteGuid = _landingSiteGuid,
                 TargetArea = _targetArea
             };
-            f3.ListViewSamplingDetail(lvMain);
-            f3.Parent_Form = this;
-            f3.ShowDialog(this);
+            newSamlingForm.ListViewSamplingDetail(lvMain);
+            newSamlingForm.Parent_Form = this;
+            newSamlingForm.ShowDialog(this);
         }
 
         private void OnbuttonSamplingClick(object sender, EventArgs e)
@@ -1525,7 +1535,7 @@ namespace FAD3
 
                 case "buttonCatch":
                     SetupCatchListView();
-                    SizeColumns(lvCatch);
+                    SizeColumns(_lvCatch);
                     ShowCatchComposition(_samplingGUID);
                     break;
 
@@ -1533,9 +1543,9 @@ namespace FAD3
                     break;
 
                 case "btnSubClose":
-                    if (lvLF_GMS.Visible)
+                    if (_lvLF_GMS.Visible)
                     {
-                        lvLF_GMS.Visible = false;
+                        _lvLF_GMS.Visible = false;
                     }
                     else
                     {
@@ -1547,7 +1557,7 @@ namespace FAD3
                     if (SetupLF_GMSListView(Show: true, Content: fad3CatchSubRow.LF))
                     {
                         _catchSubRow = fad3CatchSubRow.LF;
-                        Show_LF_GMS_List(lvCatch.SelectedItems[0].Name);
+                        Show_LF_GMS_List(_lvCatch.SelectedItems[0].Name);
                     }
                     break;
 
@@ -1555,11 +1565,11 @@ namespace FAD3
                     if (SetupLF_GMSListView(Show: true, Content: fad3CatchSubRow.GMS))
                     {
                         _catchSubRow = fad3CatchSubRow.GMS;
-                        if (Enum.TryParse(lvCatch.SelectedItems[0].SubItems[1].Tag.ToString(), out Taxa myTaxa))
+                        if (Enum.TryParse(_lvCatch.SelectedItems[0].SubItems[1].Tag.ToString(), out Taxa myTaxa))
                         {
                             _taxa = myTaxa;
                         }
-                        Show_LF_GMS_List(lvCatch.SelectedItems[0].Name, _taxa);
+                        Show_LF_GMS_List(_lvCatch.SelectedItems[0].Name, _taxa);
                     }
                     break;
             }
@@ -1593,20 +1603,9 @@ namespace FAD3
                                     {
                                         if (item.Tag.ToString() == "target_area_data")
                                         {
-                                            var myTag = (Tuple<string, string, string>)treeMain.SelectedNode.Tag;
                                             TargetAreaForm f = new TargetAreaForm(this, IsNew: false);
                                             f.TargetArea = _targetArea;
                                             f.ShowDialog(this);
-                                            //TargetAreaForm f = TargetAreaForm.GetInstance(this, IsNew: false);
-                                            //f.TargetArea = _targetArea;
-                                            //if (f.Visible)
-                                            //{
-                                            //    f.BringToFront();
-                                            //}
-                                            //else
-                                            //{
-                                            //    f.Show(this);
-                                            //}
                                         }
                                         else if (item.Name == "Enumerators")
                                         {
@@ -1695,6 +1694,21 @@ namespace FAD3
                                             MessageBox.Show(s, "Gear specifications", MessageBoxButtons.OK, MessageBoxIcon.Information);
                                         }
                                     }
+                                    else if (item.Name == "OperatingExpenses")
+                                    {
+                                        if (item.SubItems[1].Text.Length > 0)
+                                        {
+                                            var result = OperatingExpenses.ReadData(_samplingGUID, readComplete: true);
+                                            if (result.success)
+                                            {
+                                                //MessageBox.Show(result.)
+                                            }
+                                        }
+                                        else
+                                        {
+                                            MessageBox.Show("Operating expense not found for this sampling", "Data not found", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                        }
+                                    }
                                     else
                                     {
                                         _enableUIEvent = false;
@@ -1757,12 +1771,12 @@ namespace FAD3
                 case "lvCatch":
                     if (e.Button == MouseButtons.Right)
                     {
-                        ConfigDropDownMenu(lvCatch);
+                        ConfigDropDownMenu(_lvCatch);
                         menuDropDown.Show(lv, new Point(_mouseX, _mouseY));
                     }
                     else
                     {
-                        if (e.Clicks == 2 && lvCatch.Items.Count == 2 && lvCatch.Items[0].Text == "")
+                        if (e.Clicks == 2 && _lvCatch.Items.Count == 2 && _lvCatch.Items[0].Text == "")
                         {
                             ShowCatchCompositionForm(true);
                         }
@@ -1785,7 +1799,7 @@ namespace FAD3
                     }
                     else
                     {
-                        if (e.Clicks == 2 && lvLF_GMS.Items.Count == 0)
+                        if (e.Clicks == 2 && _lvLF_GMS.Items.Count == 0)
                         {
                             if (_catchSubRow == fad3CatchSubRow.LF)
                             {
@@ -1881,6 +1895,7 @@ namespace FAD3
             switch (tsi.Tag)
             {
                 case "resetRefNos":
+                    ReferenceNumberManager.ResetReferenceNumbers();
                     break;
 
                 case "refNoRange":
@@ -2077,14 +2092,14 @@ namespace FAD3
         {
             if (e.Node.FirstNode.Text == "*dummy*")
             {
-                var myTag = (Tuple<string, string, string>)e.Node.Tag;
+                TreeLevelTag tlt = (TreeLevelTag)e.Node.Tag;
                 int n = 0;
-                foreach (var item in global.TreeSubNodes(myTag.Item3, myTag.Item1, myTag.Item2))
+                foreach (var item in global.TreeSubNodes(tlt.TreeLevelName, tlt.TreeLevel.LandingSiteGuid, tlt.TreeLevel.GearVariationGuid))
                 {
                     TreeNode nd1 = new TreeNode();
-                    if (myTag.Item3 == "landing_site")
+                    if (tlt.TreeLevelName == "landing_site")
                     {
-                        _landingSiteGuid = myTag.Item1;
+                        _landingSiteGuid = tlt.TreeLevel.LandingSiteGuid;
                         if (n == 0)
                         {
                             nd1 = e.Node.FirstNode;
@@ -2096,14 +2111,20 @@ namespace FAD3
                         }
                         nd1.Nodes.Add("*dummy*");
 
-                        nd1.Tag = Tuple.Create(item.LandingSiteGuid, item.GearVariationGuid, "gear");
-                        nd1.Name = $"{item.LandingSiteGuid}|{item.GearVariationGuid}";
+                        TreeLevel tl = new TreeLevel(tlt.TreeLevel.TargetAreaGuid,
+                            tlt.TreeLevel.TargetAreaName,
+                            tlt.TreeLevel.LandingSiteGuid,
+                            tlt.TreeLevel.LandingSiteName,
+                            item.GearVariationGuid);
+
+                        nd1.Tag = new TreeLevelTag(false, tl, "gear");
+                        nd1.Name = tl.GetNodeName("gear");
                         nd1.ImageKey = Gears.GearClassImageKeyFromGearClasName(item.GearClassName);
                     }
-                    else if (myTag.Item3 == "gear")
+                    else if (tlt.TreeLevelName == "gear")
                     {
-                        _landingSiteGuid = myTag.Item1;
-                        _gearVarGUID = myTag.Item2;
+                        _landingSiteGuid = tlt.TreeLevel.LandingSiteGuid;
+                        _gearVarGUID = tlt.TreeLevel.GearVariationGuid;
                         if (n == 0)
                         {
                             e.Node.FirstNode.Text = item.SamplingMonthYear;
@@ -2115,12 +2136,18 @@ namespace FAD3
                         }
                         if (_landingSiteGuid.Length == 0 && _gearVarGUID.Length == 0)
                         {
-                            myTag = (Tuple<string, string, string>)e.Node.Tag;
-                            _landingSiteGuid = myTag.Item1;
-                            _gearVarGUID = myTag.Item2;
+                            _landingSiteGuid = tlt.TreeLevel.LandingSiteGuid;
+                            _gearVarGUID = tlt.TreeLevel.GearVariationGuid;
                         }
-                        nd1.Tag = Tuple.Create(_landingSiteGuid, _gearVarGUID, "sampling");
-                        nd1.Name = $"{_landingSiteGuid}|{_gearVarGUID}|{item.SamplingMonthYear}";
+                        TreeLevel tl = new TreeLevel(tlt.TreeLevel.TargetAreaGuid,
+                            tlt.TreeLevel.TargetAreaName,
+                            tlt.TreeLevel.LandingSiteGuid,
+                            tlt.TreeLevel.LandingSiteName,
+                            tlt.TreeLevel.GearVariationGuid,
+                            "",
+                            item.SamplingMonthYear);
+                        nd1.Tag = new TreeLevelTag(false, tl, "sampling");
+                        nd1.Name = tlt.TreeLevel.GetNodeName("sampling");
                         nd1.ImageKey = "MonthGear";
                     }
                     n++;
@@ -2149,8 +2176,8 @@ namespace FAD3
                 ResetTheBackColor(treeMain);
                 nd.BackColor = Color.Gainsboro;
 
-                var myTag = (Tuple<string, string, string>)nd.Tag;
-                _treeLevel = myTag.Item3;
+                TreeLevelTag tlt = (TreeLevelTag)e.Node.Tag;
+                _treeLevel = tlt.TreeLevelName;
 
                 statusPanelTargetArea.Width = _statusPanelWidth;
                 switch (_treeLevel)
@@ -2161,7 +2188,7 @@ namespace FAD3
                         _landingSiteName = treeMain.SelectedNode.Parent.Text;
                         _landingSiteGuid = treeMain.SelectedNode.Parent.Name;
                         _gearVarName = treeMain.SelectedNode.Text;
-                        _gearVarGUID = myTag.Item2;
+                        _gearVarGUID = tlt.TreeLevel.GearVariationGuid;
                         var rv = Gears.GearClassGuidNameFromGearVarGuid(_gearVarGUID);
                         _gearClassName = rv.Value;
                         _gearClassGUID = rv.Key;
@@ -2171,11 +2198,11 @@ namespace FAD3
 
                     case "sampling":
                         _targetAreaName = treeMain.SelectedNode.Parent.Parent.Parent.Text;
-                        this.TargetAreaGuid = ((Tuple<string, string, string>)treeMain.SelectedNode.Parent.Parent.Parent.Tag).Item1;
+                        TargetAreaGuid = ((TreeLevelTag)treeMain.SelectedNode.Parent.Parent.Parent.Tag).TreeLevel.TargetAreaGuid;
                         _landingSiteName = treeMain.SelectedNode.Parent.Parent.Text;
-                        _landingSiteGuid = myTag.Item1;
+                        _landingSiteGuid = tlt.TreeLevel.LandingSiteGuid;
                         _gearVarName = treeMain.SelectedNode.Parent.Text;
-                        _gearVarGUID = myTag.Item2;
+                        _gearVarGUID = tlt.TreeLevel.GearVariationGuid; ;
                         rv = Gears.GearClassGuidNameFromGearVarGuid(_gearVarGUID);
                         _gearClassName = rv.Value;
                         _gearClassGUID = rv.Key;
@@ -2227,7 +2254,7 @@ namespace FAD3
             }
             catch (Exception ex)
             {
-                Logger.Log(ex.Message);
+                Logger.LogError(ex.Message, ex.StackTrace);
             }
 
             e.Node.SelectedImageKey = e.Node.ImageKey;
@@ -2248,38 +2275,41 @@ namespace FAD3
         /// </summary>
         private void PopulateTree()
         {
-            this.treeMain.Nodes.Clear();
+            treeMain.Nodes.Clear();
             TreeNode root = this.treeMain.Nodes.Add("Fisheries data");
             root.Name = "root";
-            root.Tag = Tuple.Create("root", "", "root");
+            root.Tag = new TreeLevelTag(isRoot: true);
             root.ImageKey = "db";
-            foreach (var item in global.TreeNodes())
+            TreeLevels.GetLevelTargetAreaLandingSite();
+            foreach (TreeLevel tl in TreeLevels.TreeLevelsList)
+            //foreach (var item in global.TreeNodes())
             {
-                if (root.Nodes.ContainsKey(item.AOIGuid))
+                //if (root.Nodes.ContainsKey(item.AOIGuid))
+                if (root.Nodes.ContainsKey(tl.TargetAreaGuid))
                 {
-                    TreeNode myNode = root.Nodes[item.AOIGuid];
-                    TreeNode myChild = new TreeNode(item.LandingSiteName);
+                    TreeNode myNode = root.Nodes[tl.TargetAreaGuid];
+                    TreeNode myChild = new TreeNode(tl.LandingSiteName);
                     myNode.Nodes.Add(myChild);
-                    myChild.Name = item.LandingSiteGuid;
+                    myChild.Name = tl.LandingSiteGuid;
                     myChild.Nodes.Add("*dummy*");
-                    myChild.Tag = Tuple.Create(item.LandingSiteGuid, "", "landing_site");
+                    myChild.Tag = new TreeLevelTag(false, tl, "landing_site");
                     myChild.ImageKey = "LandingSite";
                 }
                 else
                 {
-                    TreeNode myNode = new TreeNode(item.AOIName);
-                    myNode.Name = item.AOIGuid;
+                    TreeNode myNode = new TreeNode(tl.TargetAreaName);
+                    myNode.Name = tl.TargetAreaGuid;
                     root.Nodes.Add(myNode);
-                    myNode.Tag = Tuple.Create(item.AOIGuid, "", "target_area");
+                    myNode.Tag = new TreeLevelTag(false, tl, "target_area");
                     myNode.ImageKey = "target_area";
 
-                    if (item.LandingSiteName.Length > 0)
+                    if (tl.LandingSiteName.Length > 0)
                     {
-                        TreeNode myChild = new TreeNode(item.LandingSiteName);
+                        TreeNode myChild = new TreeNode(tl.LandingSiteName);
                         myNode.Nodes.Add(myChild);
                         myChild.Nodes.Add("*dummy*");
-                        myChild.Tag = Tuple.Create(item.LandingSiteGuid, "", "landing_site");
-                        myChild.Name = item.LandingSiteGuid;
+                        myChild.Tag = new TreeLevelTag(false, tl, "landing_site");
+                        myChild.Name = tl.LandingSiteGuid;
                         myChild.ImageKey = "LandingSite";
                     }
                     else
@@ -2320,25 +2350,26 @@ namespace FAD3
         /// <summary>
         /// refreshes tree for any new sampling
         /// </summary>
-        private void RefreshTreeForNewSampling(string LandingSiteGuid, string GearVarGuid, string MonthYear)
+        private void RefreshTreeForNewSampling(string landingSiteGuid, string gearVarGuid, string monthYear)
         {
             if (_newSamplingEntered)
             {
                 var LandingSiteNode = new TreeNode();
 
                 var gearNode = new TreeNode();
-                gearNode.Name = $"{LandingSiteGuid}|{GearVarGuid}";
-                gearNode.Text = Gears.GearVarNameFromGearGuid(GearVarGuid);
-                gearNode.Tag = Tuple.Create(LandingSiteGuid, GearVarGuid, "gear");
-                gearNode.ImageKey = Gears.GearVarNodeImageKeyFromGearVar(GearVarGuid);
+                gearNode.Name = $"{landingSiteGuid}|{gearVarGuid}";
+                gearNode.Text = Gears.GearVarNameFromGearGuid(gearVarGuid);
+                TreeLevel tl = new TreeLevel(_targetAreaGuid, _targetAreaName, landingSiteGuid, _landingSiteName, gearVarGuid, gearNode.Text);
+                gearNode.Tag = new TreeLevelTag(false, tl, "gear");
+                gearNode.ImageKey = Gears.GearVarNodeImageKeyFromGearVar(gearVarGuid);
 
-                var samplingMonthNode = new TreeNode(MonthYear);
-                samplingMonthNode.Name = $"{LandingSiteGuid}|{GearVarGuid}|{MonthYear}";
-                samplingMonthNode.Tag = Tuple.Create(LandingSiteGuid, GearVarGuid, "sampling");
+                var samplingMonthNode = new TreeNode(monthYear);
+                samplingMonthNode.Name = $"{landingSiteGuid}|{gearVarGuid}|{monthYear}";
+                tl = new TreeLevel(_targetAreaGuid, _targetAreaName, landingSiteGuid, _landingSiteName, gearVarGuid, gearNode.Text, monthYear);
+                samplingMonthNode.Tag = new TreeLevelTag(false, tl, "sampling");
                 samplingMonthNode.ImageKey = "MonthGear";
 
-                var myTag = (Tuple<string, string, string>)treeMain.SelectedNode.Tag;
-                var treeLevel = myTag.Item3;
+                var treeLevel = ((TreeLevelTag)treeMain.SelectedNode.Tag).TreeLevelName;
 
                 if (!treeMain.SelectedNode.IsExpanded) treeMain.SelectedNode.Expand();
                 switch (treeLevel)
@@ -2416,9 +2447,9 @@ namespace FAD3
                 else
                 {
                     _subListExisting = true;
-                    lvCatch = new ListView();
-                    panel1.Controls.Add(lvCatch);
-                    lvCatch.With(o =>
+                    _lvCatch = new ListView();
+                    panel1.Controls.Add(_lvCatch);
+                    _lvCatch.With(o =>
                     {
                         o.Name = "lvCatch";
                         o.Font = lvMain.Font;
@@ -2445,15 +2476,15 @@ namespace FAD3
                         o.HideSelection = false;
                     });
 
-                    lvLF_GMS = new ListView();
-                    panel1.Controls.Add(lvLF_GMS);
-                    lvLF_GMS.With(o =>
+                    _lvLF_GMS = new ListView();
+                    panel1.Controls.Add(_lvLF_GMS);
+                    _lvLF_GMS.With(o =>
                     {
                         o.Name = "lvLF_GMS";
-                        o.Font = lvCatch.Font;
-                        o.Height = lvCatch.Height;
+                        o.Font = _lvCatch.Font;
+                        o.Height = _lvCatch.Height;
                         o.View = View.Details;
-                        o.Top = lvCatch.Top;
+                        o.Top = _lvCatch.Top;
                         o.BringToFront();
                         o.FullRowSelect = true;
                         o.Visible = false;
@@ -2475,7 +2506,7 @@ namespace FAD3
                     {
                         Name = "btnSubClose",
                         Text = "Close",
-                        Font = lvCatch.Font,
+                        Font = _lvCatch.Font,
                         Height = ((Button)panelSamplingButtons.Controls["buttonOK"]).Height,
                         Width = ((Button)panelSamplingButtons.Controls["buttonOK"]).Width,
                         Left = ((Button)panelSamplingButtons.Controls["buttonOK"]).Left,
@@ -2487,7 +2518,7 @@ namespace FAD3
                     {
                         Name = "btnSubLF",
                         Text = "LF",
-                        Font = lvCatch.Font,
+                        Font = _lvCatch.Font,
                         Height = btnSubClose.Height,
                         Width = btnSubClose.Width,
                         Left = btnSubClose.Left,
@@ -2499,7 +2530,7 @@ namespace FAD3
                     {
                         Name = "btnSubGMS",
                         Text = "GMS",
-                        Font = lvCatch.Font,
+                        Font = _lvCatch.Font,
                         Height = btnSubClose.Height,
                         Width = btnSubClose.Width,
                         Left = btnSubClose.Left,
@@ -2517,7 +2548,7 @@ namespace FAD3
 
                     panel1.Controls.Add(SubPanel);
                     SubPanel.Location = new Point(panelSamplingButtons.Location.X,
-                                                   lvCatch.Top - (lvMain.Top - panelSamplingButtons.Top));
+                                                   _lvCatch.Top - (lvMain.Top - panelSamplingButtons.Top));
                     btnSubLF.Top = btnSubClose.Top + btnSubClose.Height + 5;
                     btnSubGMS.Top = btnSubLF.Top + btnSubLF.Height + 5;
                     SubPanel.BringToFront();
@@ -2548,41 +2579,41 @@ namespace FAD3
             var Proceed = false;
             if (_subListExisting)
             {
-                lvLF_GMS.Items.Clear();
-                lvLF_GMS.Columns.Clear();
+                _lvLF_GMS.Items.Clear();
+                _lvLF_GMS.Columns.Clear();
                 {
-                    if (Show && lvCatch.Items.Count > 0)
+                    if (Show && _lvCatch.Items.Count > 0)
                     {
-                        lvLF_GMS.Visible = true;
-                        lvLF_GMS.Left = lvCatch.Columns["NameOfCatch"].Width + lvCatch.Columns["Row"].Width +
-                                  lvCatch.Columns["Weight"].Width + lvCatch.Columns["Count"].Width;
+                        _lvLF_GMS.Visible = true;
+                        _lvLF_GMS.Left = _lvCatch.Columns["NameOfCatch"].Width + _lvCatch.Columns["Row"].Width +
+                                  _lvCatch.Columns["Weight"].Width + _lvCatch.Columns["Count"].Width;
 
-                        lvLF_GMS.Width = lvCatch.Columns["SubWt"].Width + lvCatch.Columns["SubCt"].Width +
-                                   lvCatch.Columns["FromTotal"].Width + lvCatch.Columns["CompWt"].Width +
-                                   lvCatch.Columns["CompCt"].Width + lvCatch.Columns["spacer"].Width + 3;
+                        _lvLF_GMS.Width = _lvCatch.Columns["SubWt"].Width + _lvCatch.Columns["SubCt"].Width +
+                                   _lvCatch.Columns["FromTotal"].Width + _lvCatch.Columns["CompWt"].Width +
+                                   _lvCatch.Columns["CompCt"].Width + _lvCatch.Columns["spacer"].Width + 3;
 
                         if (Content == fad3CatchSubRow.LF)
                         {
-                            lvLF_GMS.Columns.Add("Row");
-                            lvLF_GMS.Columns.Add("Length");
-                            lvLF_GMS.Columns.Add("Frequency");
-                            lvLF_GMS.Columns.Add("");
+                            _lvLF_GMS.Columns.Add("Row");
+                            _lvLF_GMS.Columns.Add("Length");
+                            _lvLF_GMS.Columns.Add("Frequency");
+                            _lvLF_GMS.Columns.Add("");
                         }
                         else if (Content == fad3CatchSubRow.GMS)
                         {
-                            lvLF_GMS.Columns.Add("Row");
-                            lvLF_GMS.Columns.Add("Length");
-                            lvLF_GMS.Columns.Add("Weight");
-                            lvLF_GMS.Columns.Add("Sex");
-                            lvLF_GMS.Columns.Add("GMS");
-                            lvLF_GMS.Columns.Add("Gonad wt");
-                            lvLF_GMS.Columns.Add("");
+                            _lvLF_GMS.Columns.Add("Row");
+                            _lvLF_GMS.Columns.Add("Length");
+                            _lvLF_GMS.Columns.Add("Weight");
+                            _lvLF_GMS.Columns.Add("Sex");
+                            _lvLF_GMS.Columns.Add("GMS");
+                            _lvLF_GMS.Columns.Add("Gonad wt");
+                            _lvLF_GMS.Columns.Add("");
                         }
                         Proceed = true;
                     }
                     else
                     {
-                        lvLF_GMS.Visible = false;
+                        _lvLF_GMS.Visible = false;
                         MessageBox.Show("Catch composition is empty", "Validation error",
                                          MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
@@ -2650,6 +2681,7 @@ namespace FAD3
                     lvMain.Columns.Add("Position");
                     lvMain.Columns.Add("Enumerator");
                     lvMain.Columns.Add("Gear specs");
+                    lvMain.Columns.Add("Expenses");
                     lvMain.Columns.Add("Notes");
                     lblTitle.Text = "Sampling";
                     break;
@@ -2674,11 +2706,11 @@ namespace FAD3
                     break;
 
                 case "gear":
-                    var myTag = (Tuple<string, string, string>)treeMain.SelectedNode.Tag;
-                    Gears.GearVarGUID = myTag.Item2;
+                    TreeLevelTag tlt = (TreeLevelTag)treeMain.SelectedNode.Tag;
+                    Gears.GearVarGUID = tlt.TreeLevel.GearVariationGuid;
                     var n = 0;
                     lvi = lvMain.Items.Add("Months sampled");
-                    foreach (var item in Gears.MonthsSampledByGear(myTag.Item1))
+                    foreach (var item in Gears.MonthsSampledByGear(tlt.TreeLevel.LandingSiteGuid))
                     {
                         if (n > 0)
                         {
@@ -3052,12 +3084,12 @@ namespace FAD3
 
         public void RefreshLF_GMS()
         {
-            Show_LF_GMS_List(lvCatch.SelectedItems[0].Name, _taxa);
+            Show_LF_GMS_List(_lvCatch.SelectedItems[0].Name, _taxa);
         }
 
         private void Show_LF_GMS_List(string CatchRowGuid, Taxa taxa = Taxa.To_be_determined)
         {
-            lvLF_GMS.Items.Clear();
+            _lvLF_GMS.Items.Clear();
             int n = 1;
             if (_catchSubRow == fad3CatchSubRow.LF)
             {
@@ -3070,7 +3102,7 @@ namespace FAD3
                                         item.Value.freq.ToString()
                     });
                     lvi.Name = item.Key;
-                    lvLF_GMS.Items.Add(lvi);
+                    _lvLF_GMS.Items.Add(lvi);
                     n++;
                 }
             }
@@ -3088,12 +3120,12 @@ namespace FAD3
                                     kv.Value.GonadWeight.ToString()
                     });
                     lvi.Name = kv.Key;
-                    lvLF_GMS.Items.Add(lvi);
+                    _lvLF_GMS.Items.Add(lvi);
                     n++;
                 }
             }
 
-            foreach (ColumnHeader c in lvLF_GMS.Columns)
+            foreach (ColumnHeader c in _lvLF_GMS.Columns)
             {
                 c.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
             }
@@ -3138,7 +3170,7 @@ namespace FAD3
         {
             if (_subListExisting)
             {
-                lvCatch.Items.Clear();
+                _lvCatch.Items.Clear();
                 int n = 1;
                 double computedWeight = 0;
                 double totalCatchWt = 0;
@@ -3195,7 +3227,7 @@ namespace FAD3
                     lvi.SubItems[1].Name = kv.Value.CatchNameGUID;
                     lvi.SubItems[1].Tag = kv.Value.TaxaNumber.ToString();
                     lvi.Tag = kv.Value.NameType.ToString();
-                    lvCatch.Items.Add(lvi);
+                    _lvCatch.Items.Add(lvi);
                     totalCatchWt += kv.Value.CatchWeight;
                     totalCatchCount += kv.Value.CatchCount == null ? 0 : (int)kv.Value.CatchCount;
                     totalComputedWeight += computedWeight;
@@ -3203,8 +3235,8 @@ namespace FAD3
                     n++;
                 }
 
-                lvCatch.Items.Add("");
-                var lviTotal = lvCatch.Items.Add("");
+                _lvCatch.Items.Add("");
+                var lviTotal = _lvCatch.Items.Add("");
                 lviTotal.SubItems.Add("Totals");
                 lviTotal.SubItems.Add(totalCatchWt.ToString());
                 lviTotal.SubItems.Add(totalCatchCount.ToString());
@@ -3214,10 +3246,10 @@ namespace FAD3
                 lviTotal.SubItems.Add(totalComputedWeight.ToString("N2"));
                 lviTotal.SubItems.Add(totalComputedCount.ToString());
 
-                if (lvCatch.Items.Count > 0)
-                    lvCatch.Items[0].Selected = true;
+                if (_lvCatch.Items.Count > 0)
+                    _lvCatch.Items[0].Selected = true;
 
-                foreach (ColumnHeader c in lvCatch.Columns)
+                foreach (ColumnHeader c in _lvCatch.Columns)
                 {
                     switch (c.Text)
                     {
@@ -3233,7 +3265,7 @@ namespace FAD3
                             break;
 
                         case "Name of catch":
-                            if (lvCatch.Items.Count > 0)
+                            if (_lvCatch.Items.Count > 0)
                                 c.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
                             else
                                 c.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
@@ -3266,108 +3298,173 @@ namespace FAD3
         /// <summary>
         /// fills the listview with the complete effort data from a fish landing sampling
         /// </summary>
-        /// <param name="SamplingGUID"></param>
-        private void ShowCatchDetailEx(string SamplingGUID = "")
+        /// <param name="samplingGUID"></param>
+        private void ShowCatchDetailEx(string samplingGUID = "")
         {
             lvMain.Items.Clear();
             _enableUIEvent = true;
-            _sampling.ReadUIFromXML();
+            _samplings.ReadUIFromXML();
             var DateEncoded = "";
 
-            if (SamplingGUID.Length > 0)
+            if (samplingGUID.Length > 0)
             {
                 //we fill up the list view from the _Sampling class variable.
-                _sampling.SamplingGUID = SamplingGUID;
-                Dictionary<string, string> effortData = _sampling.CatchAndEffort();
+                //_samplings.SamplingGUID = SamplingGUID;
+                _samplings.CatchAndEffortOfSampling(samplingGUID);
+                var sampling = _samplings.SamplingsForMonth[samplingGUID];
 
                 //the array splits the dictionary item from the name [0] and its guid [1]
                 //we make the guid the tag of the listitem
-                string[] arr1 = effortData["LandingSite"].Split('|');
-                lvMain.Items["LandingSite"].SubItems[1].Text = arr1[0];
-                lvMain.Items["LandingSite"].Tag = arr1[1];
+                lvMain.Items["LandingSite"].SubItems[1].Text = sampling.SamplingSummary.LandingSiteName;
+                lvMain.Items["LandingSite"].Tag = sampling.LandingSiteGuid;
 
-                arr1 = effortData["Enumerator"].Split('|');
-                lvMain.Items["Enumerator"].SubItems[1].Text = arr1[0];
-                lvMain.Items["Enumerator"].Tag = arr1[1];
+                lvMain.Items["Enumerator"].SubItems[1].Text = sampling.SamplingSummary.EnumeratorName;
+                lvMain.Items["Enumerator"].Tag = sampling.EnumeratorGuid;
 
-                arr1 = effortData["GearClass"].Split('|');
-                lvMain.Items["GearClass"].SubItems[1].Text = arr1[0];
-                lvMain.Items["GearClass"].Tag = arr1[1];
+                lvMain.Items["GearClass"].SubItems[1].Text = sampling.SamplingSummary.GearClassName;
+                lvMain.Items["GearClass"].Tag = sampling.SamplingSummary.GearClassGuid;
 
-                arr1 = effortData["FishingGear"].Split('|');
-                lvMain.Items["FishingGear"].SubItems[1].Text = arr1[0];
-                lvMain.Items["FishingGear"].Tag = arr1[1];
+                lvMain.Items["FishingGear"].SubItems[1].Text = sampling.SamplingSummary.GearVariationName;
+                lvMain.Items["FishingGear"].Tag = sampling.GearVariationGuid;
 
                 foreach (ListViewItem lvi in lvMain.Items)
                 {
                     switch (lvi.Name)
                     {
+                        case "VesselID":
+                            lvi.SubItems[1].Text = sampling.FishingVessel.VesselID;
+                            break;
+
+                        case "OperatingExpenses":
+                            lvi.SubItems[1].Text = sampling.SamplingSummary.OperatingExpenseIndicator;
+                            break;
+
+                        case "Notes":
+                            lvi.SubItems[1].Text = sampling.Notes;
+                            break;
+
+                        case "VesselDimension":
+                            lvi.SubItems[1].Text = sampling.FishingVessel == null ? "" : sampling.FishingVessel.VesselDimension;
+                            break;
+
+                        case "EngineHorsepower":
+                            lvi.SubItems[1].Text = sampling.FishingVessel == null ? "" : sampling.FishingVessel.EngineHorsepower.ToString();
+                            break;
+
+                        case "Engine":
+                            lvi.SubItems[1].Text = sampling.FishingVessel == null ? "" : sampling.FishingVessel.Engine;
+                            break;
+
+                        case "TypeOfVesselUsed":
+                            lvi.SubItems[1].Text = sampling.FishingVessel == null ? "" : sampling.FishingVessel.VesselTypeString;
+                            break;
+
+                        case "NumberOfHauls":
+                            lvi.SubItems[1].Text = sampling.NumberOfHauls == null ? "" : sampling.NumberOfHauls.ToString();
+                            break;
+
+                        case "NumberOfFishers":
+                            lvi.SubItems[1].Text = sampling.NumberOfFishers == null ? "" : sampling.NumberOfFishers.ToString();
+                            break;
+
+                        case "DateSet":
+                            lvi.SubItems[1].Text = ((DateTime)sampling.GearSettingDateTime).ToString("MMM-dd-yyyy");
+                            break;
+
+                        case "TimeSet":
+                            lvi.SubItems[1].Text = ((DateTime)sampling.GearSettingDateTime).ToString("hh:mm");
+                            break;
+
+                        case "DateHauled":
+                            lvi.SubItems[1].Text = ((DateTime)sampling.GearHaulingDateTime).ToString("MMM-dd-yyyy");
+                            break;
+
+                        case "TimeHauled":
+                            lvi.SubItems[1].Text = ((DateTime)sampling.GearHaulingDateTime).ToString("hh:mm");
+                            break;
+
+                        case "ReferenceNumber":
+                            lvi.SubItems[1].Text = sampling.ReferenceNumber;
+                            break;
+
                         case "LandingSite":
+                            lvi.SubItems[1].Text = sampling.SamplingSummary.LandingSiteName;
+                            break;
+
+                        case "SamplingDate":
+                            lvi.SubItems[1].Text = sampling.SamplingDateTime.ToString("MMM-dd-yyyy");
+                            break;
+
+                        case "SamplingTime":
+                            lvi.SubItems[1].Text = sampling.SamplingDateTime.ToString("hh:mm");
+                            break;
+
                         case "Enumerator":
+                            lvi.SubItems[1].Text = sampling.SamplingSummary.EnumeratorName;
+                            break;
+
                         case "GearClass":
+                            lvi.SubItems[1].Text = sampling.SamplingSummary.GearClassName;
+                            break;
+
                         case "FishingGear":
+                            lvi.SubItems[1].Text = sampling.SamplingSummary.GearVariationName;
+                            break;
+
                         case "SubGrid":
                             break;
 
+                        case "TargetArea":
+                            lvi.SubItems[1].Text = sampling.SamplingSummary.TargetAreaName;
+                            break;
+
                         case "FishingGround":
-                            string fg = effortData[lvi.Name];
-                            if (effortData["SubGrid"].Length > 0)
-                            {
-                                fg += $"-{effortData["SubGrid"]}";
-                            }
-                            lvi.SubItems[1].Text = fg;
+                            lvi.SubItems[1].Text = sampling.FirstFishingGround;
                             break;
 
                         case "GearSpecs":
-                            lvi.SubItems[1].Text = ManageGearSpecsClass.GetSampledSpecsEx(_samplingGUID, Truncated: true);
+                            lvi.SubItems[1].Text = ManageGearSpecsClass.GetSampledSpecsEx(samplingGUID, Truncated: true);
                             break;
 
                         case "AdditionalFishingGround":
-                            foreach (var item in FishingGrid.AdditionalFishingGrounds(_samplingGUID))
-                            {
-                                lvi.SubItems[1].Text += item + ", ";
-                            }
-
-                            if (lvi.SubItems[1].Text.Length > 0)
-                                lvi.SubItems[1].Text = lvi.SubItems[1].Text.Substring(0, lvi.SubItems[1].Text.Length - 2);
+                            lvi.SubItems[1].Text = sampling.AdditionalFishingGrounds;
                             break;
 
                         case "spacer":
                             break;
 
                         case "WeightOfSample":
-                            _weightOfSample = null;
-                            if (double.TryParse(effortData[lvi.Name], out double sampleWt))
-                            {
-                                _weightOfSample = sampleWt;
-                            }
-                            lvi.SubItems[1].Text = _weightOfSample == null ? "" : _weightOfSample.ToString();
+                            lvi.SubItems[1].Text = sampling.SampleWeight == null ? "" : sampling.SampleWeight.ToString();
                             break;
 
                         case "WeightOfCatch":
-                            if (double.TryParse(effortData[lvi.Name], out double v))
+                            lvi.SubItems[1].Text = sampling.CatchWeight == null ? "" : sampling.CatchWeight.ToString();
+                            break;
+
+                        case "HasLiveFish":
+                            lvi.SubItems[1].Text = "No";
+                            if (sampling.HasLiveFish)
                             {
-                                _weightOfCatch = v;
+                                lvi.SubItems[1].Text = "Yes";
                             }
-                            lvi.SubItems[1].Text = _weightOfCatch.ToString();
                             break;
 
                         default:
-                            lvi.SubItems[1].Text = effortData[lvi.Name];
+                            //lvi.SubItems[1].Text = effortData[lvi.Name];
                             break;
                     }
                 }
 
-                _vesHeight = effortData["VesHeight"];
-                _vesLength = effortData["VesLength"];
-                _vesWidth = effortData["VesWidth"];
+                _vesHeight = sampling.FishingVessel.Depth == null ? "" : sampling.FishingVessel.Depth.ToString();
+                _vesLength = sampling.FishingVessel.Length == null ? "" : sampling.FishingVessel.Length.ToString();
+                _vesWidth = sampling.FishingVessel.Breadth == null ? "" : sampling.FishingVessel.Breadth.ToString();
 
-                DateEncoded = effortData["DateEncoded"];
+                DateEncoded = sampling.DateEncoded == null ? "" : ((DateTime)sampling.DateEncoded).ToString("MMM-dd-yyyy");
             }
 
             var lvi1 = lvMain.Items.Add("");
             lvi1 = lvMain.Items.Add("DateEncoded", "Date encoded", null);
-            if (SamplingGUID.Length > 0) lvi1.SubItems.Add(DateEncoded);
+            if (samplingGUID.Length > 0) lvi1.SubItems.Add(DateEncoded);
 
             //position sampling buttons and make it visible
             SetupSamplingButtonFrame(true);
@@ -3378,32 +3475,33 @@ namespace FAD3
         {
             if (taxa != Taxa.To_be_determined)
             {
-                GMSDataEntryForm fgms = new GMSDataEntryForm(isNew, _sampling,
-                                          lvCatch.SelectedItems[0].Name,
-                                          lvCatch.SelectedItems[0].SubItems[1].Text, _taxa, this);
+                GMSDataEntryForm fgms = new GMSDataEntryForm(isNew, _samplings,
+                                          _lvCatch.SelectedItems[0].Name,
+                                          _lvCatch.SelectedItems[0].SubItems[1].Text, _taxa, this);
                 fgms.ShowDialog(this);
             }
         }
 
         private void ShowLFForm(bool IsNew = false)
         {
-            LengthFreqForm lff = new LengthFreqForm(IsNew, _sampling,
-                                      lvCatch.SelectedItems[0].Name,
-                                      lvCatch.SelectedItems[0].SubItems[1].Text,
-                                      int.Parse(lvCatch.SelectedItems[0].SubItems[3].Text),
+            LengthFreqForm lff = new LengthFreqForm(IsNew, _samplings,
+                                      _lvCatch.SelectedItems[0].Name,
+                                      _lvCatch.SelectedItems[0].SubItems[1].Text,
+                                      int.Parse(_lvCatch.SelectedItems[0].SubItems[3].Text),
                                       this);
 
             lff.ShowDialog(this);
-            Show_LF_GMS_List(lvCatch.SelectedItems[0].Name);
+            Show_LF_GMS_List(_lvCatch.SelectedItems[0].Name);
         }
 
         private void ShowSamplingDetailForm()
         {
             SamplingForm fs = new SamplingForm();
-            fs.SamplingGUID = _samplingGUID;
+            fs.Sampling = _samplings.SamplingsForMonth[_samplingGUID];
+            //fs.SamplingGUID = _samplingGUID;
             fs.ListViewSamplingDetail(lvMain);
             fs.TargetArea = _targetArea;
-            fs.TargetAreaGuid = _targetAreaGuid;
+            //fs.TargetAreaGuid = _targetAreaGuid;
             fs.Parent_Form = this;
             fs.VesselDimension(_vesLength, _vesWidth, _vesHeight);
             fs.Show(this);
@@ -3499,11 +3597,11 @@ namespace FAD3
                         if (canDrop)
                         {
                             // Yes. Move the node, expand it, and select it.
-                            var sourceTag = (Tuple<string, string, string>)draggedNode.Tag;
-                            var destinationTag = (Tuple<string, string, string>)targetNode.Tag;
+                            var sourceTag = (TreeLevelTag)draggedNode.Tag;
+                            var destinationTag = (TreeLevelTag)targetNode.Tag;
                             var result = MessageBox.Show($"Are you sure you want to transfer sampling data from {draggedNode.Text} to {targetNode.Text}?",
                                                             "Confirmation needed", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                            if (result == DialogResult.Yes && Landingsite.MoveToLandingSite(sourceTag.Item1, destinationTag.Item1))
+                            if (result == DialogResult.Yes && Landingsite.MoveToLandingSite(sourceTag.TreeLevel.LandingSiteGuid, destinationTag.TreeLevel.LandingSiteGuid))
                             {
                                 draggedNode.Nodes.Clear();
                                 RefreshLandingSiteNodeNodes(targetNode);
@@ -3525,15 +3623,16 @@ namespace FAD3
         private void RefreshLandingSiteNodeNodes(TreeNode landingSiteNode)
         {
             landingSiteNode.Nodes.Clear();
-            var tag = (Tuple<string, string, string>)landingSiteNode.Tag;
-            var gearList = Landingsite.SampledGearsFromLandingSite(tag.Item1);
+            var tag = (TreeLevelTag)landingSiteNode.Tag;
+            var gearList = Landingsite.SampledGearsFromLandingSite(tag.TreeLevel.LandingSiteGuid);
             if (gearList.Count > 0)
             {
                 foreach (var item in gearList)
                 {
                     var node = landingSiteNode.Nodes.Add(item.gearVariationGuid, item.gearVariationName);
-                    node.Tag = Tuple.Create(tag.Item1, item.gearVariationGuid, "gear");
-                    node.Name = $"{tag.Item1}|{item.gearVariationGuid}";
+                    TreeLevel tl = new TreeLevel(_targetAreaGuid, _targetAreaName, landingSiteNode.Name, landingSiteNode.Text, item.gearVariationGuid, item.gearVariationGuid);
+                    node.Tag = new TreeLevelTag(false, tl, "gear");
+                    node.Name = tl.GetNodeName("gear");
                     node.ImageKey = Gears.GearClassImageKeyFromGearClasName(item.gearClassName);
                     node.Nodes.Add("*dummy*");
                 }
@@ -3544,28 +3643,10 @@ namespace FAD3
             }
         }
 
-        private void OnDragOver1(object sender, DragEventArgs e)
-        {
-            TreeNode node = treeMain.GetNodeAt(treeMain.PointToClient(new Point(e.X, e.Y)));
-            var tag = (Tuple<string, string, string>)node.Tag;
-            if (tag.Item3 == "landing_site")
-            {
-                if (node.Parent == _nodeParent)
-                {
-                    treeMain.SelectedNode = node;
-                }
-            }
-            else
-            {
-                treeMain.SelectedNode = null;
-            }
-        }
-
         private void OnDragOver(object sender, DragEventArgs e)
         {
             Point p = treeMain.PointToClient(new Point(e.X, e.Y));
             TreeNode node = treeMain.GetNodeAt(p.X, p.Y);
-            var tag = (Tuple<string, string, string>)node.Tag;
             if (node.PrevVisibleNode != null)
             {
                 node.PrevVisibleNode.BackColor = Color.White;
@@ -3574,7 +3655,7 @@ namespace FAD3
             {
                 node.NextVisibleNode.BackColor = Color.White;
             }
-            if (tag.Item3 == "landing_site" && node.Parent == _nodeParent)
+            if (((TreeLevelTag)node.Tag).TreeLevelName == "landing_site" && node.Parent == _nodeParent)
             {
                 node.BackColor = Color.Aquamarine;
             }
@@ -3617,25 +3698,25 @@ namespace FAD3
             switch (((ListView)sender).Name)
             {
                 case "lvCatch":
-                    if (lvCatch.SelectedItems[0].Text.Length > 0)
+                    if (_lvCatch.SelectedItems[0].Text.Length > 0)
                     {
-                        switch (lvCatch.SelectedItems[0].Tag.ToString())
+                        switch (_lvCatch.SelectedItems[0].Tag.ToString())
                         {
                             case "Scientific":
-                                var speciesName = lvCatch.SelectedItems[0].SubItems[1].Text;
+                                var speciesName = _lvCatch.SelectedItems[0].SubItems[1].Text;
                                 if (_catchLocalNamesForm != null)
                                 {
                                     _catchLocalNamesForm.SpeciesName = speciesName;
-                                    _catchLocalNamesForm.SpeciesGuid = lvCatch.SelectedItems[0].SubItems[1].Name;
+                                    _catchLocalNamesForm.SpeciesGuid = _lvCatch.SelectedItems[0].SubItems[1].Name;
                                 }
                                 break;
 
                             case "LocalName":
-                                var localName = lvCatch.SelectedItems[0].SubItems[1].Text;
+                                var localName = _lvCatch.SelectedItems[0].SubItems[1].Text;
                                 if (_catchLocalNamesForm != null)
                                 {
                                     _catchLocalNamesForm.LocalName = localName;
-                                    _catchLocalNamesForm.LocalNameGuid = lvCatch.SelectedItems[0].SubItems[1].Name;
+                                    _catchLocalNamesForm.LocalNameGuid = _lvCatch.SelectedItems[0].SubItems[1].Name;
                                 }
                                 break;
                         }

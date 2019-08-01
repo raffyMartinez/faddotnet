@@ -210,7 +210,7 @@ namespace FAD3.Mapping.Forms
             bool layerFormIsOpen = false;
             foreach (Form f in Application.OpenForms)
             {
-                if (f.Name == "MapLayersForm")
+                if (f.Name == "MapLayersForm" || f.Name == "EditShapeAttributeForm" || f.Name == "ShapefileAttributesForm")
                 {
                     layerFormIsOpen = true;
                     break;
@@ -319,7 +319,7 @@ namespace FAD3.Mapping.Forms
             }
             else
             {
-                MessageBox.Show("Please close layers form to proceed", "Cannot proceed", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Please close layers or attributes window to proceed", "Cannot proceed", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
@@ -636,7 +636,23 @@ namespace FAD3.Mapping.Forms
                     break;
 
                 case "btnCancel":
-                    Close();
+                    if (_mapsForExportCount > 0 && _exportedImageCount > 0)
+                    {
+                        Close();
+                    }
+                    else
+                    {
+                        if (_mapsForExportCount == 0)
+                        {
+                            Close();
+                        }
+                        else if (MessageBox.Show("You haven't save any maps. Do you still want to close the form?",
+                            "Close the form?", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
+                        {
+                            Close();
+                        }
+                    }
+
                     break;
 
                 case "btnApplyDimension":
@@ -762,6 +778,7 @@ namespace FAD3.Mapping.Forms
 
         private void OnFormLoad(object sender, EventArgs e)
         {
+            ControlBox = false;
             _checkedGridRow = -1;
             dgResults.CellValueChanged -= OndgResultsCellValueChanged;
 

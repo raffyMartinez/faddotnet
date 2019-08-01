@@ -30,7 +30,7 @@ namespace FAD3
         private static Dictionary<string, string> _languageDictReverse = new Dictionary<string, string>();
 
         private static int _updateInterval = 50;
-        public static event EventHandler<ImportRowsFromFileEventArgs> OnRowsImported;
+        public static event EventHandler<ImportRowsFromFileEventArgs> OnRowsImportedExported;
 
         public static Dictionary<string, string> LocalNamesReverseDictionary
         {
@@ -156,7 +156,7 @@ namespace FAD3
                                 saveCounter++;
                                 if (((double)saveCounter / _updateInterval) == (saveCounter / _updateInterval))
                                 {
-                                    OnRowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(saveCounter, ExportImportDataType.CatchLocalNames, false));
+                                    OnRowsImportedExported?.Invoke(null, new ImportRowsFromFileEventArgs(saveCounter, ExportImportDataType.CatchLocalNames, false));
                                 }
                             }
                             localName = "";
@@ -166,13 +166,18 @@ namespace FAD3
 
                     break;
             }
-            OnRowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(saveCounter, ExportImportDataType.CatchLocalNames, true));
+            OnRowsImportedExported?.Invoke(null, new ImportRowsFromFileEventArgs(saveCounter, ExportImportDataType.CatchLocalNames, true));
             return saveCounter;
         }
 
         public static Task<int> ImportSpeciesNamesAsync(string fileName, int? speciesColumn)
         {
             return Task.Run(() => ImportSpeciesNames(fileName, speciesColumn));
+        }
+
+        public static Task<int> ExportSpeciesNamesAsync(string fileName)
+        {
+            return Task.Run(() => ExportSpeciesToXML(fileName));
         }
 
         public static int ImportSpeciesNames(string fileName, int? speciesNameColumn, bool withTaxa = false)
@@ -191,17 +196,75 @@ namespace FAD3
 
                 case ".htm":
                 case ".html":
-                    if (speciesNameColumn != null)
+                    var k = 0;
+                    GetAllSpecies();
+                    var genus = "";
+                    var species = "";
+                    HtmlDocument doc = new HtmlDocument();
+                    int col = 0;
+                    doc.Load(fileName);
+                    OnRowsImportedExported?.Invoke(null, new ImportRowsFromFileEventArgs(rowsImported: 0, ExportImportDataType.SpeciesNames, isComplete: false));
+                    foreach (HtmlNode table in doc.DocumentNode.SelectNodes("//table"))
                     {
-                        saveCounter = ImportSpeciesNamesFromHTML(fileName, (int)speciesNameColumn);
+                        foreach (HtmlNode body in table.SelectNodes("tbody"))
+                        {
+                            foreach (HtmlNode row in body.SelectNodes("tr"))
+                            {
+                                col = 0;
+                                foreach (HtmlNode cell in row.SelectNodes("th|td"))
+                                {
+                                    if (col == speciesNameColumn)
+                                    {
+                                        var arr = cell.InnerText.Split(' ');
+                                        genus = "";
+                                        species = "";
+                                        for (int n = 0; n < arr.Length; n++)
+                                        {
+                                            if (n == 0)
+                                            {
+                                                genus = arr[n];
+                                            }
+                                            else
+                                            {
+                                                species += arr[n] + " ";
+                                            }
+                                        }
+                                        species = species.Trim(' ');
+
+                                        if (!_allSpeciesDictionaryReverse.ContainsKey($"{genus} {species}")
+                                            && SaveNewFishSpeciesName(genus, species))
+                                        {
+                                            k++;
+                                            if (((double)k / _updateInterval) == (k / _updateInterval))
+                                            {
+                                                OnRowsImportedExported?.Invoke(null, new ImportRowsFromFileEventArgs(k, ExportImportDataType.SpeciesNames, false));
+                                            }
+                                            OnRowsImportedExported?.Invoke(null, new ImportRowsFromFileEventArgs(genus, species));
+                                        }
+
+                                        break;
+                                    }
+                                    col++;
+                                }
+                            }
+                        }
                     }
-                    break;
+
+                    if (k > 0)
+                    {
+                        MakeAllNames();
+                        GetGenus_LocalNames();
+                        GetLocalNames();
+                        OnRowsImportedExported?.Invoke(null, new ImportRowsFromFileEventArgs(isComplete: true));
+                    }
+
+                    return k;
 
                 case ".xml":
                 case ".XML":
                     XmlTextReader xmlReader = new XmlTextReader(fileName);
-                    var genus = "";
-                    var species = "";
+                    genus = "";
+                    species = "";
                     var speciesGuid = "";
                     Taxa taxa = Taxa.Fish;
                     bool inFisbase = false;
@@ -214,7 +277,7 @@ namespace FAD3
                                 if (elementCounter == 0 && xmlReader.Name == "SpeciesNames")
                                 {
                                     proceed = true;
-                                    OnRowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(rowsImported: 0));
+                                    OnRowsImportedExported?.Invoke(null, new ImportRowsFromFileEventArgs(rowsImported: 0, ExportImportDataType.SpeciesNames, isComplete: false));
                                 }
                                 if (xmlReader.Name == "SpeciesName")
                                 {
@@ -248,9 +311,9 @@ namespace FAD3
                                 saveCounter++;
                                 if (((double)saveCounter / _updateInterval) == (saveCounter / _updateInterval))
                                 {
-                                    OnRowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(saveCounter, ExportImportDataType.SpeciesNames, false));
+                                    OnRowsImportedExported?.Invoke(null, new ImportRowsFromFileEventArgs(saveCounter, ExportImportDataType.SpeciesNames, false));
                                 }
-                                OnRowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(genus, species));
+                                OnRowsImportedExported?.Invoke(null, new ImportRowsFromFileEventArgs(genus, species));
                             }
                             genus = "";
                             species = "";
@@ -258,13 +321,62 @@ namespace FAD3
                         }
                     }
                     MakeAllNames();
-                    Names.GetGenus_LocalNames();
-                    Names.GetLocalNames();
-                    //OnRowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(saveCounter, ExportImportDataType.SpeciesNames, true));
-                    OnRowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(isComplete: true));
+                    GetGenus_LocalNames();
+                    GetLocalNames();
+                    OnRowsImportedExported?.Invoke(null, new ImportRowsFromFileEventArgs(isComplete: true));
                     break;
             }
             return saveCounter;
+        }
+
+        public static int ExportSpeciesToXML(string fileName)
+        {
+            var n = 0;
+            var dict = Names.GetSpeciesDict();
+            var count = dict.Count;
+            if (count > 0)
+            {
+                XmlWriter writer = XmlWriter.Create(fileName);
+                OnRowsImportedExported?.Invoke(null, new ImportRowsFromFileEventArgs(rowsImported: 0, ExportImportDataType.SpeciesNames, isComplete: false));
+                writer.WriteStartDocument();
+                writer.WriteStartElement("SpeciesNames");
+                foreach (var spName in dict)
+                {
+                    writer.WriteStartElement("SpeciesName");
+                    writer.WriteAttributeString("guid", spName.Key);
+                    string genus = spName.Value.genus;
+                    string species = spName.Value.species;
+                    writer.WriteAttributeString("genus", genus);
+                    writer.WriteAttributeString("species", species);
+                    writer.WriteAttributeString("taxa", spName.Value.taxa.ToString());
+                    writer.WriteAttributeString("inFishbase", spName.Value.inFishbase.ToString());
+                    writer.WriteAttributeString("fishBaseSpNo", spName.Value.fishBaseSpeciesNo != null ? spName.Value.fishBaseSpeciesNo.ToString() : "");
+                    if (count == 1)
+                    {
+                        writer.WriteEndDocument();
+                    }
+                    else
+                    {
+                        if (n < (count - 1))
+                        {
+                            writer.WriteEndElement();
+                            if (((double)n / _updateInterval) == (n / _updateInterval))
+                            {
+                                OnRowsImportedExported?.Invoke(null, new ImportRowsFromFileEventArgs(n, ExportImportDataType.SpeciesNames, false));
+                            }
+                            OnRowsImportedExported?.Invoke(null, new ImportRowsFromFileEventArgs(genus, species));
+                        }
+                        else
+                        {
+                            writer.WriteEndDocument();
+                        }
+                    }
+                    n++;
+                }
+                writer.Close();
+                OnRowsImportedExported?.Invoke(null, new ImportRowsFromFileEventArgs(isComplete: true));
+            }
+            return n;
         }
 
         public static int ImportLanguages(string fileName)
@@ -587,6 +699,82 @@ namespace FAD3
             return list;
         }
 
+        public static Task<int> ImportFromXMLLocalNamestoScientificNamesAsync(string fileName)
+        {
+            return Task.Run(() => ImportFromXMLLocalNamestoScientificNames(fileName));
+        }
+
+        private static int ImportFromXMLLocalNamestoScientificNames(string fileName)
+        {
+            int elementCounter = 0;
+            bool proceed = false;
+            GetLanguages();
+            XmlTextReader xmlReader = new XmlTextReader(fileName);
+            string genus = "";
+            string species = "";
+            var speciesGuid = "";
+            Taxa taxa = Taxa.Fish;
+            bool inFisbase = false;
+            int? fbSPNo = null;
+            string languageGuid;
+            string localNameGuid;
+            while ((elementCounter == 0 || (elementCounter > 0 && proceed)) && xmlReader.Read())
+            {
+                switch (xmlReader.Name)
+                {
+                    case "ExportNamesData":
+                        if (elementCounter == 0)
+                        {
+                            OnRowsImportedExported?.Invoke(null, new ImportRowsFromFileEventArgs(rowsImported: 0, ExportImportDataType.CatchNameAll, isComplete: false));
+                            proceed = true;
+                            elementCounter++;
+                        }
+                        break;
+
+                    case "Languages":
+                        break;
+
+                    case "Language":
+                        string language = xmlReader.GetAttribute("value");
+                        if (!Languages.ContainsValue(language))
+                        {
+                            SaveNewLanguage(language);
+                        }
+                        break;
+
+                    case "LocalNames":
+                        break;
+
+                    case "LocalName":
+                        string localName = xmlReader.GetAttribute("value");
+                        if (!_localNameListDict.ContainsValue(localName))
+                        {
+                            NewFisheryObjectName nfo = new NewFisheryObjectName(localName, FisheryObjectNameType.CatchLocalName);
+                            SaveNewLocalName(nfo);
+                        }
+                        break;
+
+                    case "SpeciesNames":
+                        break;
+
+                    case "SpeciesName":
+                        string spName = xmlReader.GetAttribute("Name");
+                        if (!_allSpeciesDictionary.ContainsValue(spName))
+                        {
+                            Names.SaveNewFishSpeciesName("", "");
+                        }
+                        break;
+
+                    case "LocalNamesSpeciesNamesLanguages":
+                        break;
+
+                    case "LocalNameSpeciesNameLanguage":
+                        break;
+                }
+            }
+            return 0;
+        }
+
         public static Task<int> ImportFromHTMLLocalNamestoScientificNamesAsync(string fileName, int speciesColumn, int localNameColumn, int languageColumn)
         {
             return Task.Run(() => ImportFromHTMLLocalNamestoScientificNames(fileName, speciesColumn, localNameColumn, languageColumn));
@@ -602,6 +790,7 @@ namespace FAD3
             int col = 0;
             int savedCount = 0;
             doc.Load(fileName);
+            OnRowsImportedExported?.Invoke(null, new ImportRowsFromFileEventArgs(rowsImported: 0, ExportImportDataType.CatchLocalNameSpeciesNamePair, isComplete: false));
             foreach (HtmlNode table in doc.DocumentNode.SelectNodes("//table"))
             {
                 foreach (HtmlNode body in table.SelectNodes("tbody"))
@@ -630,23 +819,24 @@ namespace FAD3
                                 && language.Length > 0
                                 && localName.Length > 0)
                             {
+                                var arr = speciesName.Split(' ');
+                                string genus = "";
+                                string species = "";
+                                for (int n = 0; n < arr.Length; n++)
+                                {
+                                    if (n == 0)
+                                    {
+                                        genus = arr[n];
+                                    }
+                                    else
+                                    {
+                                        species += arr[n] + " ";
+                                    }
+                                }
+                                species = species.Trim();
+
                                 if (!_allSpeciesDictionaryReverse.ContainsKey(speciesName))
                                 {
-                                    var arr = speciesName.Split(' ');
-                                    var genus = "";
-                                    var species = "";
-                                    for (int n = 0; n < arr.Length; n++)
-                                    {
-                                        if (n == 0)
-                                        {
-                                            genus = arr[n];
-                                        }
-                                        else
-                                        {
-                                            species += arr[n] + " ";
-                                        }
-                                    }
-                                    species = species.Trim();
                                     SaveNewFishSpeciesName(genus, species);
                                 }
 
@@ -667,8 +857,9 @@ namespace FAD3
                                     savedCount++;
                                     if (((double)savedCount / _updateInterval) == (savedCount / _updateInterval))
                                     {
-                                        OnRowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(savedCount, ExportImportDataType.CatchLocalNameSpeciesNamePair, false));
+                                        OnRowsImportedExported?.Invoke(null, new ImportRowsFromFileEventArgs(savedCount, ExportImportDataType.CatchLocalNameSpeciesNamePair, false));
                                     }
+                                    OnRowsImportedExported?.Invoke(null, new ImportRowsFromFileEventArgs($"{genus} {species}", localName, language));
                                 }
                                 break;
                             }
@@ -681,9 +872,11 @@ namespace FAD3
                 }
             }
 
-            OnRowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(savedCount, ExportImportDataType.CatchLocalNameSpeciesNamePair, true));
+            //OnRowsImportedExported?.Invoke(null, new ImportRowsFromFileEventArgs(savedCount, ExportImportDataType.CatchLocalNameSpeciesNamePair, true));
             MakeAllNames();
-
+            GetGenus_LocalNames();
+            GetLocalNames();
+            OnRowsImportedExported?.Invoke(null, new ImportRowsFromFileEventArgs(isComplete: true));
             return savedCount;
         }
 
@@ -710,9 +903,13 @@ namespace FAD3
                             _languageDictReverse.Add(language, languageGuid);
                         }
                     }
-                    catch
+                    catch (OleDbException)
                     {
-                        //ignore
+                        success = false;
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogError(ex.Message, ex.StackTrace);
                     }
                 }
             }
@@ -743,9 +940,13 @@ namespace FAD3
                             _languageDictReverse.Add(language, guid);
                         }
                     }
-                    catch
+                    catch (OleDbException)
                     {
-                        //ignore
+                        success = false;
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogError(ex.Message, ex.StackTrace);
                     }
                 }
             }
@@ -797,7 +998,7 @@ namespace FAD3
                                 saveCounter++;
                                 if (((double)saveCounter / _updateInterval) == (saveCounter / _updateInterval))
                                 {
-                                    OnRowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(saveCounter, ExportImportDataType.CatchLocalNameSpeciesNamePair, false));
+                                    OnRowsImportedExported?.Invoke(null, new ImportRowsFromFileEventArgs(saveCounter, ExportImportDataType.CatchLocalNameSpeciesNamePair, false));
                                 }
                             }
                             speciesNameGuid = "";
@@ -805,7 +1006,7 @@ namespace FAD3
                             localNameGuid = "";
                         }
                     }
-                    OnRowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(saveCounter, ExportImportDataType.CatchLocalNameSpeciesNamePair, true));
+                    OnRowsImportedExported?.Invoke(null, new ImportRowsFromFileEventArgs(saveCounter, ExportImportDataType.CatchLocalNameSpeciesNamePair, true));
                     return saveCounter;
 
                 case ".txt":
@@ -902,8 +1103,13 @@ namespace FAD3
                     {
                         success = update.ExecuteNonQuery() > 0;
                     }
-                    catch
+                    catch (OleDbException)
                     {
+                        success = false;
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogError(ex.Message, ex.StackTrace);
                     }
                 }
             }
@@ -1026,7 +1232,6 @@ namespace FAD3
         }
 
         private static int ImportSpeciesNamesFromHTML(string filename, int speciesColumn)
-
         {
             var k = 0;
             GetAllSpecies();
@@ -1068,7 +1273,7 @@ namespace FAD3
                                     k++;
                                     if (((double)k / _updateInterval) == (k / _updateInterval))
                                     {
-                                        OnRowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(k, ExportImportDataType.SpeciesNames, false));
+                                        OnRowsImportedExported?.Invoke(null, new ImportRowsFromFileEventArgs(k, ExportImportDataType.SpeciesNames, false));
                                     }
                                 }
 
@@ -1083,7 +1288,7 @@ namespace FAD3
             if (k > 0)
             {
                 MakeAllNames();
-                OnRowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(k, ExportImportDataType.SpeciesNames, true));
+                OnRowsImportedExported?.Invoke(null, new ImportRowsFromFileEventArgs(k, ExportImportDataType.SpeciesNames, true));
             }
 
             return k;
@@ -1156,14 +1361,14 @@ namespace FAD3
                                     n++;
                                     if (((double)n / _updateInterval) == (n / _updateInterval))
                                     {
-                                        OnRowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(n, ExportImportDataType.SpeciesNames, true));
+                                        OnRowsImportedExported?.Invoke(null, new ImportRowsFromFileEventArgs(n, ExportImportDataType.SpeciesNames, true));
                                     }
                                 }
                             }
                         }
                     }
                 }
-                OnRowsImported?.Invoke(null, new ImportRowsFromFileEventArgs(n, ExportImportDataType.SpeciesNames, false));
+                OnRowsImportedExported?.Invoke(null, new ImportRowsFromFileEventArgs(n, ExportImportDataType.SpeciesNames, false));
             }
             catch (Exception ex)
             {
@@ -1635,9 +1840,13 @@ namespace FAD3
                         {
                             success = update.ExecuteNonQuery() > 0;
                         }
-                        catch
+                        catch (OleDbException)
                         {
-                            //ignore
+                            success = false;
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.LogError(ex.Message, ex.StackTrace);
                         }
                         if (success)
                         {

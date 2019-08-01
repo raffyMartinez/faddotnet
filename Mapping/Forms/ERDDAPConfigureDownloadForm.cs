@@ -469,6 +469,7 @@ namespace FAD3.Mapping.Forms
                 string startUTC = "";
                 string endUTC = "";
                 string altitudeQuery = "";
+
                 //switch (_freq)
                 //{
                 //    case "daily":
@@ -477,10 +478,8 @@ namespace FAD3.Mapping.Forms
                 //        break;
 
                 //    case "monthly":
-                //        //startUTC = dtPickerStart.Value.ToString("yyyy-MM-1T12:00:00Z");
-                //        //endUTC = dtPickerEnd.Value.ToString("yyyy-MM-1T12:00:00Z");
-                //        startUTC = dtPickerStart.Value.ToString("yyyy-MM-ddT12:00:00Z");
-                //        endUTC = dtPickerEnd.Value.ToString("yyyy-MM-ddT12:00:00Z");
+                //        startUTC = dtPickerStart.Value.ToString("yyyy-MM-T12:00:00Z");
+                //        endUTC = dtPickerEnd.Value.ToString("yyyy-MM-T12:00:00Z");
                 //        break;
 
                 //    default:

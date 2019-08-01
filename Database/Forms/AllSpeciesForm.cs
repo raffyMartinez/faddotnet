@@ -37,7 +37,7 @@ namespace FAD3
         {
             InitializeComponent();
             _parent = parent;
-            Names.OnRowsImported += OnNamesImportRows;
+            Names.OnRowsImportedExported += OnNamesImportRows;
         }
 
         private void OnNamesImportRows(object sender, ImportRowsFromFileEventArgs e)
@@ -470,46 +470,11 @@ namespace FAD3
                                     {
                                         case ".xml":
                                         case ".XML":
-                                            var dict = Names.GetSpeciesDict();
-                                            count = dict.Count;
-                                            if (count > 0)
-                                            {
-                                                var n = 0;
-                                                XmlWriter writer = XmlWriter.Create(fileName);
-                                                writer.WriteStartDocument();
-                                                writer.WriteStartElement("SpeciesNames");
-                                                foreach (var spName in dict)
-                                                {
-                                                    writer.WriteStartElement("SpeciesName");
-                                                    writer.WriteAttributeString("guid", spName.Key);
-                                                    writer.WriteAttributeString("genus", spName.Value.genus);
-                                                    writer.WriteAttributeString("species", spName.Value.species);
-                                                    writer.WriteAttributeString("taxa", spName.Value.taxa.ToString());
-                                                    writer.WriteAttributeString("inFishbase", spName.Value.inFishbase.ToString());
-                                                    writer.WriteAttributeString("fishBaseSpNo", spName.Value.fishBaseSpeciesNo != null ? spName.Value.fishBaseSpeciesNo.ToString() : "");
-                                                    if (count == 1)
-                                                    {
-                                                        writer.WriteEndDocument();
-                                                    }
-                                                    else
-                                                    {
-                                                        if (n < (count - 1))
-                                                        {
-                                                            writer.WriteEndElement();
-                                                        }
-                                                        else
-                                                        {
-                                                            writer.WriteEndDocument();
-                                                        }
-                                                    }
-                                                    n++;
-                                                }
-                                                writer.Close();
-                                                if (n > 0 && count > 0)
-                                                {
-                                                    MessageBox.Show($"Succesfully exported {count} species names", "Import successful");
-                                                }
-                                            }
+                                            ProgessIndicatorForm pif = new ProgessIndicatorForm(url: "", fileName);
+                                            pif.ExportImportDataType = ExportImportDataType.SpeciesNames;
+                                            pif.ExportImportDeleteAction = ExportImportDeleteAction.ActionExport;
+                                            pif.Show(this);
+                                            int r = await Names.ExportSpeciesNamesAsync(fileName);
                                             break;
 
                                         case ".txt":
@@ -540,33 +505,46 @@ namespace FAD3
                                 var fileName = FileDialogHelper.FileName;
                                 if (fileName.Length > 0)
                                 {
-                                    if (Path.GetExtension(fileName) == ".htm" || Path.GetExtension(fileName) == ".html")
+                                    ProgessIndicatorForm pif;// = new ProgessIndicatorForm();
+                                    switch (Path.GetExtension(fileName))
                                     {
-                                        using (HTMLTableSelectColumnsForm htmlColForm = new HTMLTableSelectColumnsForm(fileName, CatchNameDataType.CatchSpeciesName))
-                                        {
-                                            DialogResult dr = htmlColForm.ShowDialog(this);
-
-                                            if (dr == DialogResult.OK)
+                                        case ".htm":
+                                        case ".html":
+                                            using (HTMLTableSelectColumnsForm htmlColForm = new HTMLTableSelectColumnsForm(fileName, CatchNameDataType.CatchSpeciesName))
                                             {
-                                                GetImportedRows(fileName, htmlColForm.SpeciesNameColumn);
+                                                DialogResult dr = htmlColForm.ShowDialog(this);
+
+                                                if (dr == DialogResult.OK)
+                                                {
+                                                    pif = new ProgessIndicatorForm(url: "", fileName);
+                                                    pif.ExportImportDataType = ExportImportDataType.SpeciesNames;
+                                                    pif.ExportImportDeleteAction = ExportImportDeleteAction.ActionImport;
+                                                    pif.Show(this);
+                                                    int r1 = await Names.ImportSpeciesNamesAsync(fileName, htmlColForm.SpeciesNameColumn);
+                                                    lvNames.Visible = false;
+                                                    lvNames.Items.Clear();
+                                                    FillListNames();
+                                                    SizeColumns(lvNames, false);
+                                                    lvNames.Visible = true;
+                                                    lblListViewLabel.Text = "List of species names";
+                                                    //GetImportedRows(fileName, htmlColForm.SpeciesNameColumn);
+                                                }
                                             }
-                                        }
-                                    }
-                                    else
-                                    {
-                                        ProgessIndicatorForm pif = new ProgessIndicatorForm(url: "", fileName);
-                                        pif.ExportImportDataType = ExportImportDataType.SpeciesNames;
-                                        pif.ExportImportDeleteAction = ExportImportDeleteAction.ActionImport;
-                                        pif.Show(this);
-                                        int r = await Names.ImportSpeciesNamesAsync(fileName, null);
-                                        //GetSpeciesNames();
-                                        lvNames.Visible = false;
-                                        lvNames.Items.Clear();
-                                        FillListNames();
-                                        SizeColumns(lvNames, false);
-                                        lvNames.Visible = true;
-                                        lblListViewLabel.Text = "List of species names";
-                                        //MessageBox.Show($"{_rowsImported} species names were saved to the database", "Import successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                            break;
+
+                                        case ".xml":
+                                            pif = new ProgessIndicatorForm(url: "", fileName);
+                                            pif.ExportImportDataType = ExportImportDataType.SpeciesNames;
+                                            pif.ExportImportDeleteAction = ExportImportDeleteAction.ActionImport;
+                                            pif.Show(this);
+                                            int r = await Names.ImportSpeciesNamesAsync(fileName, null);
+                                            lvNames.Visible = false;
+                                            lvNames.Items.Clear();
+                                            FillListNames();
+                                            SizeColumns(lvNames, false);
+                                            lvNames.Visible = true;
+                                            lblListViewLabel.Text = "List of species names";
+                                            break;
                                     }
                                 }
                             }

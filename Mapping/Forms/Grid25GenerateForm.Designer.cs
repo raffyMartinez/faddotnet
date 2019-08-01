@@ -621,6 +621,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(292, 564);
+            this.ControlBox = false;
             this.Controls.Add(this.buttonSubGrid);
             this.Controls.Add(this.buttonOpenLayoutGrid);
             this.Controls.Add(this.buttonLocateGrid);

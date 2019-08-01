@@ -43,7 +43,8 @@ namespace FAD3
                             {
                                 case "name":
                                     inLandingSiteFolder = false;
-                                    if (string.Equals(cnd.InnerXml, "Landing site", System.StringComparison.CurrentCultureIgnoreCase))
+                                    if (string.Equals(cnd.InnerXml, "Landing site", System.StringComparison.CurrentCultureIgnoreCase)
+                                        || string.Equals(cnd.InnerXml, "Landing sites", System.StringComparison.CurrentCultureIgnoreCase))
                                     {
                                         inLandingSiteFolder = true;
                                     }

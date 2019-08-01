@@ -7,13 +7,13 @@ namespace FAD3
 {
     public partial class ReferenceNumberForm : Form
     {
-        private SamplingForm _Parent_Form;
-        private string _NextRefCode = "";
+        private SamplingForm _parent_Form;
+        private string _nextRefCode = "";
 
         public SamplingForm Parent_Form
         {
-            get { return _Parent_Form; }
-            set { _Parent_Form = value; }
+            get { return _parent_Form; }
+            set { _parent_Form = value; }
         }
 
         public ReferenceNumberForm()
@@ -25,10 +25,18 @@ namespace FAD3
         {
             switch (((Button)sender).Name)
             {
+                case "buttonReset":
+                    buttonReset.Visible = false;
+                    ReferenceNumberManager.ResetReferenceNumbers();
+                    _nextRefCode = ReferenceNumberManager.GetNextReferenceNumber(ReferenceNumberManager.FirstCode);
+                    labelRefNo.Visible = true;
+                    labelRefNo.Text = _nextRefCode;
+                    break;
+
                 case "buttonOK":
-                    if (_NextRefCode.Length > 0)
+                    if (_nextRefCode.Length > 0)
                     {
-                        _Parent_Form.NewReferenceNumber(_NextRefCode);
+                        _parent_Form.NewReferenceNumber(_nextRefCode);
                         Close();
                     }
                     break;
@@ -50,8 +58,17 @@ namespace FAD3
                 labelRefNo.With(o =>
                 {
                     o.Visible = true;
-                    _NextRefCode = ReferenceNumberManager.GetNextReferenceNumber(ReferenceNumberManager.FirstCode);
-                    o.Text = _NextRefCode;
+                    _nextRefCode = ReferenceNumberManager.GetNextReferenceNumber(ReferenceNumberManager.FirstCode);
+
+                    if (ReferenceNumberManager.RefNumberIsFree(_nextRefCode))
+                    {
+                        o.Text = _nextRefCode;
+                    }
+                    else
+                    {
+                        buttonReset.Visible = true;
+                        o.Visible = false;
+                    }
                 });
             }
             else
@@ -96,8 +113,8 @@ namespace FAD3
             var item = lvCodes.HitTest(e.X, e.Y).Item;
             if (item != null)
             {
-                _NextRefCode = ReferenceNumberManager.GetNextReferenceNumber(item.Text);
-                labelRefNo.Text = _NextRefCode;
+                _nextRefCode = ReferenceNumberManager.GetNextReferenceNumber(item.Text);
+                labelRefNo.Text = _nextRefCode;
             }
             else
                 labelRefNo.Text = "";

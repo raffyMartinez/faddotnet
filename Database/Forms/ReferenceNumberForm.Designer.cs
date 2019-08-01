@@ -33,6 +33,7 @@
             this.lvCodes = new System.Windows.Forms.ListView();
             this.labelTitle = new System.Windows.Forms.Label();
             this.labelRefNo = new System.Windows.Forms.Label();
+            this.buttonReset = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // buttonOK
@@ -85,12 +86,24 @@
             this.labelRefNo.Text = "label1";
             this.labelRefNo.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
+            // buttonReset
+            // 
+            this.buttonReset.Location = new System.Drawing.Point(156, 89);
+            this.buttonReset.Name = "buttonReset";
+            this.buttonReset.Size = new System.Drawing.Size(107, 46);
+            this.buttonReset.TabIndex = 6;
+            this.buttonReset.Text = "Reset reference numbers";
+            this.buttonReset.UseVisualStyleBackColor = true;
+            this.buttonReset.Visible = false;
+            this.buttonReset.Click += new System.EventHandler(this.Onbutton_Click);
+            // 
             // ReferenceNumberForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCancel;
             this.ClientSize = new System.Drawing.Size(412, 220);
+            this.Controls.Add(this.buttonReset);
             this.Controls.Add(this.labelRefNo);
             this.Controls.Add(this.labelTitle);
             this.Controls.Add(this.lvCodes);
@@ -114,5 +127,6 @@
         private System.Windows.Forms.ListView lvCodes;
         private System.Windows.Forms.Label labelTitle;
         private System.Windows.Forms.Label labelRefNo;
+        private System.Windows.Forms.Button buttonReset;
     }
 }

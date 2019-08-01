@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
+using dao;
 
 namespace FAD3
 {
@@ -30,6 +31,51 @@ namespace FAD3
             get { return _HasVariationCode; }
         }
 
+        public static void ResetReferenceNumbers()
+        {
+            var dbe = new DBEngine();
+            dao.Database db = dbe.OpenDatabase(global.MDBPath);
+
+            try
+            {
+                db.QueryDefs.Delete("qry_tempResetRefNo1");
+            }
+            catch (Exception)
+            {
+                //ignore error
+            }
+            try
+            {
+                db.QueryDefs.Delete("qry_tempResetRefNo2");
+            }
+            catch (Exception)
+            {
+                //ignore
+            }
+
+            string sql = @"SELECT Left([RefNo],InStr(InStr(1,[RefNo],'-')+1,[RefNo],'-')-1) AS code,
+                         CLng(Right([RefNo],Len(Left([RefNo],InStr(InStr(1,[RefNo],'-')+1,[RefNo],'-')-1))-3)) AS [counter]
+                        FROM tblSampling";
+            db.CreateQueryDef("qry_tempResetRefNo1", sql);
+
+            sql = @"SELECT qry_tempResetRefNo1.code,
+                    Max(qry_tempResetRefNo1.counter) AS [max]
+                    From qry_tempResetRefNo1
+                    GROUP BY qry_tempResetRefNo1.code";
+            db.CreateQueryDef("qry_tempResetRefNo2", sql);
+
+            sql = "Delete * from tblRefCodeCounter";
+            db.Execute(sql);
+
+            sql = @"INSERT INTO tblRefCodeCounter ( GearRefCode, [Counter] )
+                    SELECT qry_tempResetRefNo2.code, [Max]+1 AS countermax
+                    FROM qry_tempResetRefNo2";
+            db.Execute(sql);
+
+            db.QueryDefs.Delete("qry_tempResetRefNo1");
+            db.QueryDefs.Delete("qry_tempResetRefNo2");
+        }
+
         public static Dictionary<string, VariationCode> VariationCodes
         {
             get { return _VariationCodes; }
@@ -53,6 +99,25 @@ namespace FAD3
             _GearVariationGuid = GearVariationGuid;
             _SamplingDate = SamplingDate;
             GetGearVariationCodes();
+        }
+
+        public static bool RefNumberIsFree(string referenceNumber)
+        {
+            bool isUsed = false;
+            string sql = $@"SELECT tblSampling.RefNo
+                            FROM tblSampling
+                        WHERE tblSampling.RefNo='{referenceNumber}'";
+            using (var con = new OleDbConnection(global.ConnectionString))
+            {
+                con.Open();
+                using (var dt = new DataTable())
+                {
+                    var adapter = new OleDbDataAdapter(sql, con);
+                    adapter.Fill(dt);
+                    isUsed = dt.Rows.Count == 0;
+                }
+            }
+            return isUsed;
         }
 
         private static void GetGearVariationCodes()
