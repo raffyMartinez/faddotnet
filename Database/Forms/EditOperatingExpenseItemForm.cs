@@ -15,6 +15,8 @@ namespace FAD3.Database.Forms
     {
         public string ExpenseItem { get; set; }
         public double ItemCost { get; set; }
+        public string Unit { get; set; }
+        public double UnitQuantity { get; set; }
         private FishingOperationCostsForm _parent;
 
         public EditOperatingExpenseItemForm(FishingOperationCostsForm parentForm)
@@ -25,6 +27,10 @@ namespace FAD3.Database.Forms
             {
                 cboSelection.Items.Add(item);
             }
+            foreach (var item in OperatingExpenses.ExpenseUnitsSelection)
+            {
+                cboUnit.Items.Add(item);
+            }
         }
 
         private void OnButtonClick(object sender, EventArgs e)
@@ -32,11 +38,16 @@ namespace FAD3.Database.Forms
             switch (((Button)sender).Name)
             {
                 case "btnOk":
-                    if (txtCost.Text.Length > 0 && cboSelection.Text.Length > 0)
+                    if (txtCost.Text.Length > 0
+                        && cboSelection.Text.Length > 0
+                        && cboUnit.Text.Length > 0
+                        && txtUnitQuantity.Text.Length > 0)
 
                     {
                         ExpenseItem = cboSelection.Text;
                         ItemCost = double.Parse(txtCost.Text);
+                        Unit = cboUnit.Text;
+                        UnitQuantity = double.Parse(txtUnitQuantity.Text);
                         DialogResult = DialogResult.OK;
                     }
                     else
@@ -54,13 +65,14 @@ namespace FAD3.Database.Forms
         private void OnFieldValidating(object sender, CancelEventArgs e)
         {
             string s = ((Control)sender).Text;
+            string controlName = ((Control)sender).Name;
             string msg = "";
             if (s.Length > 0)
             {
-                switch (((Control)sender).Name)
+                switch (controlName)
                 {
                     case "txtCost":
-                        ;
+                    case "txtUnitQuantity":
                         if (double.TryParse(s, out double v))
                         {
                             if (v < 0)
@@ -77,27 +89,45 @@ namespace FAD3.Database.Forms
                         break;
 
                     case "cboSelection":
+                    case "cboUnit":
+                        ComboBox cbo = (ComboBox)sender;
                         if (s.Length < 2)
                         {
                             e.Cancel = true;
-                            msg = "Item name is too short. Make it at least 3 letters long";
+                            msg = "Item is too short. Make it at least 3 letters long";
                         }
                         else
                         {
-                            if (!cboSelection.Items.Contains(s))
+                            if (!cbo.Items.Contains(s))
                             {
-                                DialogResult dr = MessageBox.Show($"{s} was not found in the selection\r\nDo you want to add to the list", "Confirmation needed",
+                                DialogResult dr = MessageBox.Show($"{s} was not found in the selection\r\nDo you want to add {s} to the list?", "Confirmation needed",
                                     MessageBoxButtons.YesNo, MessageBoxIcon.Information);
                                 if (dr == DialogResult.Yes)
                                 {
-                                    if (OperatingExpenses.AddExpenseItemToSelection(s))
+                                    switch (controlName)
                                     {
-                                        cboSelection.Items.Add(s);
-                                        cboSelection.Text = s;
+                                        case "cboSelection":
+
+                                            if (OperatingExpenses.AddExpenseItemToSelection(s))
+                                            {
+                                                cboSelection.Items.Add(s);
+                                                cboSelection.Text = s;
+                                            }
+                                            break;
+
+                                        case "cboUnit":
+
+                                            if (OperatingExpenses.AddExpenseUnitToSelection(s))
+                                            {
+                                                cboUnit.Items.Add(s);
+                                                cboUnit.Text = s;
+                                            }
+                                            break;
                                     }
                                 }
                                 else
                                 {
+                                    msg = "Select an item in the drop-down list";
                                     e.Cancel = true;
                                 }
                             }
@@ -114,10 +144,12 @@ namespace FAD3.Database.Forms
 
         private void OnFormLoad(object sender, EventArgs e)
         {
-            if (ExpenseItem.Length > 0)
+            if (ExpenseItem?.Length > 0)
             {
                 cboSelection.Text = ExpenseItem;
                 txtCost.Text = ItemCost.ToString();
+                cboUnit.Text = Unit;
+                txtUnitQuantity.Text = UnitQuantity.ToString();
             }
         }
     }

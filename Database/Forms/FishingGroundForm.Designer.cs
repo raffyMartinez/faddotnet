@@ -48,19 +48,32 @@
             this.buttonOK = new System.Windows.Forms.Button();
             this.buttonCancel = new System.Windows.Forms.Button();
             this.buttonGrids = new System.Windows.Forms.Button();
+            this.tabPoints = new System.Windows.Forms.TabPage();
+            this.label5 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.button1 = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
+            this.button3 = new System.Windows.Forms.Button();
+            this.listView1 = new System.Windows.Forms.ListView();
+            this.maskedTextBox1 = new System.Windows.Forms.MaskedTextBox();
+            this.maskedTextBox2 = new System.Windows.Forms.MaskedTextBox();
+            this.colLatitude = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colLontitude = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.tabFG.SuspendLayout();
             this.tabGrid25.SuspendLayout();
+            this.tabPoints.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabFG
             // 
             this.tabFG.Controls.Add(this.tabGrid25);
+            this.tabFG.Controls.Add(this.tabPoints);
             this.tabFG.Controls.Add(this.tabText);
-            this.tabFG.Location = new System.Drawing.Point(8, 38);
+            this.tabFG.Location = new System.Drawing.Point(2, 38);
             this.tabFG.Margin = new System.Windows.Forms.Padding(4);
             this.tabFG.Name = "tabFG";
             this.tabFG.SelectedIndex = 0;
-            this.tabFG.Size = new System.Drawing.Size(349, 198);
+            this.tabFG.Size = new System.Drawing.Size(414, 198);
             this.tabFG.TabIndex = 0;
             // 
             // tabGrid25
@@ -83,7 +96,7 @@
             this.tabGrid25.Margin = new System.Windows.Forms.Padding(4);
             this.tabGrid25.Name = "tabGrid25";
             this.tabGrid25.Padding = new System.Windows.Forms.Padding(4);
-            this.tabGrid25.Size = new System.Drawing.Size(341, 170);
+            this.tabGrid25.Size = new System.Drawing.Size(406, 170);
             this.tabGrid25.TabIndex = 0;
             this.tabGrid25.Text = "Grid 25";
             this.tabGrid25.UseVisualStyleBackColor = true;
@@ -91,7 +104,7 @@
             // lblSubGrid
             // 
             this.lblSubGrid.AutoSize = true;
-            this.lblSubGrid.Location = new System.Drawing.Point(13, 128);
+            this.lblSubGrid.Location = new System.Drawing.Point(7, 128);
             this.lblSubGrid.Name = "lblSubGrid";
             this.lblSubGrid.Size = new System.Drawing.Size(54, 15);
             this.lblSubGrid.TabIndex = 13;
@@ -99,7 +112,7 @@
             // 
             // textBoxSubGrid
             // 
-            this.textBoxSubGrid.Location = new System.Drawing.Point(70, 125);
+            this.textBoxSubGrid.Location = new System.Drawing.Point(64, 125);
             this.textBoxSubGrid.Name = "textBoxSubGrid";
             this.textBoxSubGrid.Size = new System.Drawing.Size(75, 21);
             this.textBoxSubGrid.TabIndex = 12;
@@ -119,7 +132,7 @@
             // 
             this.buttonRemoveAll.Location = new System.Drawing.Point(163, 87);
             this.buttonRemoveAll.Name = "buttonRemoveAll";
-            this.buttonRemoveAll.Size = new System.Drawing.Size(39, 23);
+            this.buttonRemoveAll.Size = new System.Drawing.Size(30, 23);
             this.buttonRemoveAll.TabIndex = 10;
             this.buttonRemoveAll.Text = "<<";
             this.buttonRemoveAll.UseVisualStyleBackColor = true;
@@ -129,7 +142,7 @@
             // 
             this.buttonRemove.Location = new System.Drawing.Point(163, 60);
             this.buttonRemove.Name = "buttonRemove";
-            this.buttonRemove.Size = new System.Drawing.Size(39, 23);
+            this.buttonRemove.Size = new System.Drawing.Size(30, 23);
             this.buttonRemove.TabIndex = 9;
             this.buttonRemove.Text = "<";
             this.buttonRemove.UseVisualStyleBackColor = true;
@@ -139,7 +152,7 @@
             // 
             this.buttonAdd.Location = new System.Drawing.Point(163, 31);
             this.buttonAdd.Name = "buttonAdd";
-            this.buttonAdd.Size = new System.Drawing.Size(39, 23);
+            this.buttonAdd.Size = new System.Drawing.Size(30, 23);
             this.buttonAdd.TabIndex = 8;
             this.buttonAdd.Text = ">";
             this.buttonAdd.UseVisualStyleBackColor = true;
@@ -148,7 +161,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(13, 101);
+            this.label4.Location = new System.Drawing.Point(7, 101);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(32, 15);
             this.label4.TabIndex = 7;
@@ -156,7 +169,7 @@
             // 
             // textBoxRow
             // 
-            this.textBoxRow.Location = new System.Drawing.Point(70, 98);
+            this.textBoxRow.Location = new System.Drawing.Point(64, 98);
             this.textBoxRow.Name = "textBoxRow";
             this.textBoxRow.Size = new System.Drawing.Size(75, 21);
             this.textBoxRow.TabIndex = 6;
@@ -166,7 +179,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(13, 75);
+            this.label3.Location = new System.Drawing.Point(7, 75);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(50, 15);
             this.label3.TabIndex = 5;
@@ -174,7 +187,7 @@
             // 
             // textBoxColumn
             // 
-            this.textBoxColumn.Location = new System.Drawing.Point(70, 72);
+            this.textBoxColumn.Location = new System.Drawing.Point(64, 72);
             this.textBoxColumn.Name = "textBoxColumn";
             this.textBoxColumn.Size = new System.Drawing.Size(75, 21);
             this.textBoxColumn.TabIndex = 4;
@@ -184,7 +197,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(13, 49);
+            this.label2.Location = new System.Drawing.Point(7, 49);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(40, 15);
             this.label2.TabIndex = 3;
@@ -192,7 +205,7 @@
             // 
             // textBoxGridNo
             // 
-            this.textBoxGridNo.Location = new System.Drawing.Point(70, 46);
+            this.textBoxGridNo.Location = new System.Drawing.Point(64, 46);
             this.textBoxGridNo.Name = "textBoxGridNo";
             this.textBoxGridNo.Size = new System.Drawing.Size(75, 21);
             this.textBoxGridNo.TabIndex = 2;
@@ -202,7 +215,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(13, 23);
+            this.label1.Location = new System.Drawing.Point(7, 24);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(35, 15);
             this.label1.TabIndex = 1;
@@ -210,7 +223,7 @@
             // 
             // textBoxZone
             // 
-            this.textBoxZone.Location = new System.Drawing.Point(70, 21);
+            this.textBoxZone.Location = new System.Drawing.Point(64, 21);
             this.textBoxZone.Name = "textBoxZone";
             this.textBoxZone.Size = new System.Drawing.Size(75, 21);
             this.textBoxZone.TabIndex = 0;
@@ -228,7 +241,7 @@
             // 
             // buttonOK
             // 
-            this.buttonOK.Location = new System.Drawing.Point(314, 243);
+            this.buttonOK.Location = new System.Drawing.Point(370, 243);
             this.buttonOK.Name = "buttonOK";
             this.buttonOK.Size = new System.Drawing.Size(39, 23);
             this.buttonOK.TabIndex = 9;
@@ -240,7 +253,7 @@
             // 
             this.buttonCancel.CausesValidation = false;
             this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.buttonCancel.Location = new System.Drawing.Point(253, 243);
+            this.buttonCancel.Location = new System.Drawing.Point(309, 243);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(55, 23);
             this.buttonCancel.TabIndex = 10;
@@ -251,7 +264,7 @@
             // buttonGrids
             // 
             this.buttonGrids.CausesValidation = false;
-            this.buttonGrids.Location = new System.Drawing.Point(195, 243);
+            this.buttonGrids.Location = new System.Drawing.Point(251, 243);
             this.buttonGrids.Name = "buttonGrids";
             this.buttonGrids.Size = new System.Drawing.Size(52, 23);
             this.buttonGrids.TabIndex = 11;
@@ -259,12 +272,111 @@
             this.buttonGrids.UseVisualStyleBackColor = true;
             this.buttonGrids.Click += new System.EventHandler(this.Onbutton_Click);
             // 
+            // tabPoints
+            // 
+            this.tabPoints.Controls.Add(this.maskedTextBox2);
+            this.tabPoints.Controls.Add(this.maskedTextBox1);
+            this.tabPoints.Controls.Add(this.listView1);
+            this.tabPoints.Controls.Add(this.button1);
+            this.tabPoints.Controls.Add(this.button2);
+            this.tabPoints.Controls.Add(this.button3);
+            this.tabPoints.Controls.Add(this.label5);
+            this.tabPoints.Controls.Add(this.label6);
+            this.tabPoints.Location = new System.Drawing.Point(4, 24);
+            this.tabPoints.Name = "tabPoints";
+            this.tabPoints.Size = new System.Drawing.Size(406, 170);
+            this.tabPoints.TabIndex = 2;
+            this.tabPoints.Text = "Point coordinates";
+            this.tabPoints.UseVisualStyleBackColor = true;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(7, 50);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(62, 15);
+            this.label5.TabIndex = 7;
+            this.label5.Text = "Longitude";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(7, 24);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(51, 15);
+            this.label6.TabIndex = 5;
+            this.label6.Text = "Latitude";
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(179, 76);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(30, 23);
+            this.button1.TabIndex = 13;
+            this.button1.Text = "<<";
+            this.button1.UseVisualStyleBackColor = true;
+            // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(179, 49);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(30, 23);
+            this.button2.TabIndex = 12;
+            this.button2.Text = "<";
+            this.button2.UseVisualStyleBackColor = true;
+            // 
+            // button3
+            // 
+            this.button3.Location = new System.Drawing.Point(179, 20);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(30, 23);
+            this.button3.TabIndex = 11;
+            this.button3.Text = ">";
+            this.button3.UseVisualStyleBackColor = true;
+            // 
+            // listView1
+            // 
+            this.listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.colLatitude,
+            this.colLontitude});
+            this.listView1.FullRowSelect = true;
+            this.listView1.Location = new System.Drawing.Point(220, 22);
+            this.listView1.Name = "listView1";
+            this.listView1.Size = new System.Drawing.Size(179, 131);
+            this.listView1.TabIndex = 14;
+            this.listView1.UseCompatibleStateImageBehavior = false;
+            this.listView1.View = System.Windows.Forms.View.Details;
+            // 
+            // maskedTextBox1
+            // 
+            this.maskedTextBox1.Location = new System.Drawing.Point(73, 21);
+            this.maskedTextBox1.Name = "maskedTextBox1";
+            this.maskedTextBox1.Size = new System.Drawing.Size(100, 21);
+            this.maskedTextBox1.TabIndex = 15;
+            // 
+            // maskedTextBox2
+            // 
+            this.maskedTextBox2.Location = new System.Drawing.Point(73, 47);
+            this.maskedTextBox2.Name = "maskedTextBox2";
+            this.maskedTextBox2.Size = new System.Drawing.Size(100, 21);
+            this.maskedTextBox2.TabIndex = 16;
+            // 
+            // colLatitude
+            // 
+            this.colLatitude.Text = "Latitude";
+            this.colLatitude.Width = 81;
+            // 
+            // colLontitude
+            // 
+            this.colLontitude.Text = "Longitude";
+            this.colLontitude.Width = 84;
+            // 
             // FishingGroundForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCancel;
-            this.ClientSize = new System.Drawing.Size(368, 279);
+            this.ClientSize = new System.Drawing.Size(417, 279);
             this.Controls.Add(this.buttonGrids);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.buttonOK);
@@ -280,6 +392,8 @@
             this.tabFG.ResumeLayout(false);
             this.tabGrid25.ResumeLayout(false);
             this.tabGrid25.PerformLayout();
+            this.tabPoints.ResumeLayout(false);
+            this.tabPoints.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -306,5 +420,16 @@
         private System.Windows.Forms.Button buttonGrids;
         private System.Windows.Forms.Label lblSubGrid;
         private System.Windows.Forms.TextBox textBoxSubGrid;
+        private System.Windows.Forms.TabPage tabPoints;
+        private System.Windows.Forms.MaskedTextBox maskedTextBox2;
+        private System.Windows.Forms.MaskedTextBox maskedTextBox1;
+        private System.Windows.Forms.ListView listView1;
+        private System.Windows.Forms.ColumnHeader colLatitude;
+        private System.Windows.Forms.ColumnHeader colLontitude;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label6;
     }
 }

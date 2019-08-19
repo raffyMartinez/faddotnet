@@ -20,6 +20,7 @@ namespace FAD3.Database.Forms
         //public bool IsNew { get; internal set; } = false;
         private SamplingForm _parentForm;
         private fad3DataStatus _dataStatus;
+        private bool _expensesDeleted = false;
 
         public static FishingOperationCostsForm GetInstance(string samplingGUID, SamplingForm parentForm, bool hasExpenseData)
         {
@@ -72,7 +73,7 @@ namespace FAD3.Database.Forms
             ExpensePerOperation exp = new ExpensePerOperation(_samplingGUID, operatingCost, roi, incomeSales, weightConsumed, dataStatus);
             foreach (ListViewItem lvi in lvExpenseItems.Items)
             {
-                FishingExpenseItemsPerOperation fpe = new FishingExpenseItemsPerOperation(lvi.Name, lvi.Text, double.Parse(lvi.SubItems[1].Text), _dataStatus);
+                FishingExpenseItemsPerOperation fpe = new FishingExpenseItemsPerOperation(lvi.Name, lvi.Text, double.Parse(lvi.SubItems[1].Text), lvi.SubItems[2].Text, double.Parse(lvi.SubItems[3].Text), _dataStatus);
                 exp.AddExpenseItem(lvi.Name, fpe);
             }
 
@@ -105,18 +106,22 @@ namespace FAD3.Database.Forms
                     {
                         eof.ExpenseItem = lvi.Text;
                         eof.ItemCost = double.Parse(lvi.SubItems[1].Text);
+                        eof.Unit = lvi.SubItems[2].Text;
+                        eof.UnitQuantity = double.Parse(lvi.SubItems[3].Text);
                     }
                     eof.ShowDialog(this);
                     if (eof.DialogResult == DialogResult.OK)
                     {
                         if (lvi == null)
                         {
-                            AddNewExpenseLine(eof.ExpenseItem, eof.ItemCost);
+                            AddNewExpenseLine(eof.ExpenseItem, eof.ItemCost, eof.Unit, eof.UnitQuantity);
                         }
                         else
                         {
                             lvi.Text = eof.ExpenseItem;
                             lvi.SubItems[1].Text = eof.ItemCost.ToString();
+                            lvi.SubItems[2].Text = eof.Unit;
+                            lvi.SubItems[3].Text = eof.UnitQuantity.ToString();
                         }
                     }
                 }
@@ -131,6 +136,24 @@ namespace FAD3.Database.Forms
         {
             switch (((Button)sender).Name)
             {
+                case "btnDelete":
+                    DialogResult deleteDr = MessageBox.Show("Delete fishing operating costs for this sampling?", "Please confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                    if (deleteDr == DialogResult.Yes && OperatingExpenses.Delete(_samplingGUID))
+                    {
+                        lvExpenseItems.Items.Clear();
+                        foreach (Control c in Controls)
+                        {
+                            if (c.GetType().Name == "TextBox")
+                            {
+                                c.Text = "";
+                            }
+                        }
+                        _expensesDeleted = true;
+                        _parentForm.SamplingFishingOperatingExpenseDeleted();
+                        Close();
+                    }
+                    break;
+
                 case "btnAdd":
                     ShowEditItemForm();
                     break;
@@ -160,10 +183,12 @@ namespace FAD3.Database.Forms
             }
         }
 
-        public void AddNewExpenseLine(string expenseItem, double cost)
+        public void AddNewExpenseLine(string expenseItem, double cost, string unit, double unitQuantity)
         {
             var lvi = lvExpenseItems.Items.Add(Guid.NewGuid().ToString(), expenseItem, null);
             lvi.SubItems.Add(cost.ToString());
+            lvi.SubItems.Add(unit);
+            lvi.SubItems.Add(unitQuantity.ToString());
         }
 
         private void OnFormClosed(object sender, FormClosedEventArgs e)
@@ -193,6 +218,8 @@ namespace FAD3.Database.Forms
             {
                 var lvi = lvExpenseItems.Items.Add(item.Key, item.Value.ExpenseItem, null);
                 lvi.SubItems.Add(item.Value.ItemCost.ToString());
+                lvi.SubItems.Add(item.Value.Unit);
+                lvi.SubItems.Add(item.Value.UnitQuantity.ToString());
             }
         }
 

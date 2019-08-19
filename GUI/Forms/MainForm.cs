@@ -31,7 +31,7 @@ namespace FAD3
     /// </summary>
     public partial class MainForm : Form
     {
-        public bool _efforRefreshNeeded = false;
+        private bool _effortRefreshNeeded = false;
         public UpdatedSamplingCatchCompositionCount UpdatedSamplingCatchRowCount { get; set; }
         private MapEffortHelperForm _formEffortMapper;
         private TargetArea _targetArea = new TargetArea();
@@ -697,10 +697,10 @@ namespace FAD3
             Process.Start(e.ClickedItem.Tag.ToString());
         }
 
-        private string DatabaseSummary(string SummaryTopic)
-        {
-            return "x";
-        }
+        //private string DatabaseSummary(string SummaryTopic)
+        //{
+        //    return "x";
+        //}
 
         private void DeleteSampling()
         {
@@ -759,7 +759,7 @@ namespace FAD3
                     _updatedEffortMonth.GearVariationGuid = "";
                 }
                 _readEfforMonth = false;
-                _efforRefreshNeeded = false;
+                _effortRefreshNeeded = false;
             }
             foreach (var sampling in _samplings.SamplingsForMonth.Values)
             {
@@ -772,7 +772,7 @@ namespace FAD3
                     row.SubItems.Add(UpdatedSamplingCatchRowCount.CatchRowsCount.ToString());
                     UpdatedSamplingCatchRowCount = null;
                     _readEfforMonth = true;
-                    _efforRefreshNeeded = true;
+                    _effortRefreshNeeded = true;
                 }
                 else
                 {
@@ -851,6 +851,7 @@ namespace FAD3
                         Names.GetGenus_LocalNames();
                         Names.GetLocalNames();
                         OperatingExpenses.GetExpenseItemsSelection();
+                        OperatingExpenses.GetExpenseUnitsSelection();
                         Gears.GetGearLocalNames();
                         UpdateLocationTables();
                         statusPanelDBPath.Text = SavedMDBPath;
@@ -1738,7 +1739,10 @@ namespace FAD3
             ListView lv = (ListView)sender;
             _mouseX = e.Location.X;
             _mouseY = e.Location.Y;
-
+            if (global.MapIsOpen)
+            {
+                global.MappingForm.MapLayersHandler.RemoveLayer("Fishing ground");
+            }
             ListViewHitTestInfo lvh = lv.HitTest(_mouseX, _mouseY);
             switch (lv.Name)
             {
@@ -1748,10 +1752,7 @@ namespace FAD3
                         SamplingGUID = lvh.Item.Tag.ToString();
                         if (FishingGrid.GridType == fadGridType.gridTypeGrid25 && global.MapIsOpen)
                         {
-                            if (lvMain.SelectedItems.Count > 0)
-                            {
-                                global.MappingForm.MapFishingGround(lvMain.SelectedItems[0].Name, FishingGrid.UTMZone);
-                            }
+                            global.MappingForm.MapFishingGround(SamplingGUID, FishingGrid.UTMZone);
                         }
                         _referenceNumber = lvh.Item.Text;
                     }
@@ -2160,7 +2161,10 @@ namespace FAD3
         {
             _LSNode = null;
             SetupSamplingButtonFrame(false);
-
+            if (global.MapIsOpen)
+            {
+                global.MappingForm.MapLayersHandler.RemoveLayer("Fishing ground");
+            }
             try
             {
                 _landingSiteName = "";
@@ -2208,7 +2212,7 @@ namespace FAD3
                         _gearClassGUID = rv.Key;
                         _LSNode = e.Node.Parent.Parent;
                         _samplingMonth = e.Node.Text;
-                        _readEfforMonth = _efforRefreshNeeded || _effortMonth.SampledMonth != _samplingMonth || _effortMonth.GearVariationGuid != _gearVarGUID || _effortMonth.LandingSiteGuid != _landingSiteGuid;
+                        _readEfforMonth = _effortRefreshNeeded || _effortMonth.SampledMonth != _samplingMonth || _effortMonth.GearVariationGuid != _gearVarGUID || _effortMonth.LandingSiteGuid != _landingSiteGuid;
                         _effortMonth.SampledMonth = _samplingMonth;
                         _effortMonth.GearVariationGuid = _gearVarGUID;
                         _effortMonth.LandingSiteGuid = _landingSiteGuid;
@@ -2700,6 +2704,16 @@ namespace FAD3
             {
                 case "sampling":
                     FillLVSamplingSummary(_landingSiteGuid, _gearVarGUID, _samplingMonth);
+                    //if (global.MapIsOpen)
+                    //{
+                    //    global.MappingForm.MapLayersHandler.RemoveLayer("Fishing ground");
+                    //    if (lvMain.Items.Count > 0)
+                    //    {
+                    //        lvMain.Items[0].Selected = true;
+                    //        SamplingGUID = lvMain.Items[0].Name;
+                    //        global.MappingForm.MapFishingGround(SamplingGUID, FishingGrid.UTMZone);
+                    //    }
+                    //}
                     break;
 
                 case "samplingDetail":
@@ -2975,6 +2989,18 @@ namespace FAD3
             SizeColumns(lvMain, false);
             lvMain.ResumeLayout();
             lvMain.Visible = true;
+
+            if (treeLevel == "sampling" && global.MapIsOpen)
+            {
+                global.MappingForm.MapLayersHandler.RemoveLayer("Fishing ground");
+                if (lvMain.Items.Count > 0)
+                {
+                    lvMain.HideSelection = false;
+                    lvMain.Items[0].Selected = true;
+                    SamplingGUID = lvMain.Items[0].Name;
+                    global.MappingForm.MapFishingGround(SamplingGUID, FishingGrid.UTMZone);
+                }
+            }
         }
 
         /// <summary>

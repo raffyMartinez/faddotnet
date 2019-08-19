@@ -31,6 +31,22 @@ namespace FAD3.Mapping.Forms
             }
         }
 
+        public void AutoFitColumns()
+        {
+            foreach (DataGridViewColumn ch in gridAttributes.Columns)
+            {
+                ch.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+                ch.Tag = ch.Width;
+                //ch.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            }
+            for (int i = 0; i <= gridAttributes.Columns.Count - 1; i++)
+            {
+                int colW = gridAttributes.Columns[i].Width;
+                gridAttributes.Columns[i].AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+                gridAttributes.Columns[i].Width = colW;
+            }
+        }
+
         public static EditShapeAttributeForm GetInstance(MapperForm parent, MapInterActionHandler mapInterActionHandler)
         {
             if (_instance == null) _instance = new EditShapeAttributeForm(parent, mapInterActionHandler);
@@ -250,7 +266,7 @@ namespace FAD3.Mapping.Forms
                         }
                     }
                 }
-
+                AutoFitColumns();
                 gridAttributes.Visible = true;
             }
             else

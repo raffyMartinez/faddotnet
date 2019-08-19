@@ -107,6 +107,7 @@ namespace FAD3
             {
                 sf.DefaultDrawingOptions.PointShape = tkPointShapeType.ptShapeCircle;
             }
+
             sf.DefaultDrawingOptions.LineVisible = false;
             sf.DefaultDrawingOptions.PointSize = 9;
             sf.DefaultDrawingOptions.FillColor = new Utils().ColorByName(tkMapColor.Red);
@@ -115,23 +116,32 @@ namespace FAD3
         public bool MapSamplingFishingGround(string samplingGuid, fadUTMZone utmZone, string layerName)
         {
             var success = false;
+            string refNo = "";
             List<string> fg = new List<string>();
-            var sql = $@"SELECT FishingGround FROM tblSampling WHERE SamplingGUID={{{samplingGuid}}}
-                        UNION ALL
-                        SELECT GridName from tblGrid WHERE SamplingGUID={{{samplingGuid}}}";
-
             DataTable dt = new DataTable();
             using (var conection = new OleDbConnection(global.ConnectionString))
             {
                 try
                 {
                     conection.Open();
+                    var sql = $"Select RefNo from tblSampling WHERE SamplingGUID = {{{samplingGuid}}}";
                     var adapter = new OleDbDataAdapter(sql, conection);
+                    adapter.Fill(dt);
+                    DataRow dr = dt.Rows[0];
+                    refNo = dr["RefNo"].ToString();
+
+                    sql = $@"SELECT FishingGround FROM tblSampling WHERE SamplingGUID={{{samplingGuid}}}
+                        UNION ALL
+                        SELECT GridName from tblGrid
+                        WHERE SamplingGUID={{{samplingGuid}}}";
+
+                    dt.Rows.Clear();
+                    adapter = new OleDbDataAdapter(sql, conection);
                     adapter.Fill(dt);
 
                     for (int i = 0; i < dt.Rows.Count; i++)
                     {
-                        DataRow dr = dt.Rows[i];
+                        dr = dt.Rows[i];
                         fg.Add(dr["FishingGround"].ToString());
                     }
                 }
@@ -146,22 +156,25 @@ namespace FAD3
                 var sf = new Shapefile();
                 if (sf.CreateNew("", ShpfileType.SHP_POINT))
                 {
+                    MapLayersHandler.RemoveLayer(layerName);
+                    sf.GeoProjection = _geoProjection;
+                    var ifldLabel = sf.EditAddField("Label", FieldType.STRING_FIELD, 1, 15);
+                    sf.FieldByName["Label"].Alias = "Fishing ground";
+                    var ifldRefNo = sf.EditAddField("RefNo", FieldType.STRING_FIELD, 1, 20);
+                    sf.FieldByName["RefNo"].Alias = "Reference number";
                     foreach (var item in fg)
                     {
                         var shp = new Shape();
                         if (shp.Create(ShpfileType.SHP_POINT))
                         {
                             var iShp = 0;
-
                             var result = FishingGrid.Grid25ToLatLong(item, utmZone);
                             iShp = shp.AddPoint(result.longitude, result.latitude);
 
                             if (iShp >= 0 && sf.EditInsertShape(shp, 0))
                             {
-                                MapLayersHandler.RemoveLayer(layerName);
-                                sf.GeoProjection = _geoProjection;
-                                var ifldLabel = sf.EditAddField("Label", FieldType.STRING_FIELD, 1, 15);
                                 sf.EditCellValue(ifldLabel, iShp, item);
+                                sf.EditCellValue(ifldRefNo, iShp, refNo);
                                 sf.CollisionMode = tkCollisionMode.AllowCollisions;
                             }
                         }
@@ -171,6 +184,17 @@ namespace FAD3
                     sf.DefaultDrawingOptions.PointSize = 7;
                     sf.DefaultDrawingOptions.LineVisible = false;
                     success = MapLayersHandler.AddLayer(sf, layerName, true, true) >= 0;
+                    if (MapControl == null)
+                    {
+                        MapControl = global.MappingForm.MapControl;
+                    }
+                    if (!MapControl.Extents.ToShape().Contains(sf.Extents.ToShape()))
+                    {
+                        Point pt = sf.Extents.ToShape().Center;
+                        Extents ext = MapControl.Extents;
+                        ext.MoveTo(pt.x, pt.y);
+                        MapControl.Extents = ext;
+                    }
                 }
             }
             return success;

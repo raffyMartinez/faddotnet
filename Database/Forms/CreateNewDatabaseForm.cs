@@ -12,6 +12,8 @@ namespace FAD3
         private string _newMDBFile = "";
         private MainForm _parentForm;
         private List<string> _requiredTables = new List<string>();
+        private DBEngine _dbe;
+        private dao.Database _dbData;
 
         public CreateNewDatabaseForm(MainForm parent)
         {
@@ -24,6 +26,8 @@ namespace FAD3
             global.LoadFormSettings(this, true);
             group2.Visible = false;
             Size = new Size(group1.Width + (group1.Left * 5), Height);
+            _dbe = new DBEngine();
+            _dbData = _dbe.OpenDatabase(global.MDBPath);
         }
 
         private void Onbutton_Click(object sender, EventArgs e)
@@ -50,6 +54,10 @@ namespace FAD3
                                 _parentForm.NewDBFile(_newMDBFile);
                                 MessageBox.Show("New database is ready");
                                 this.Close();
+                            }
+                            else
+                            {
+                                MessageBox.Show("Creating a new database was not completed successfully");
                             }
                         }
                     }
@@ -106,8 +114,7 @@ namespace FAD3
 
         private string TableFieldList(string tableName)
         {
-            var dbe = new DBEngine();
-            var dbTemplate = dbe.OpenDatabase(global.TemplateMDBFile);
+            var dbTemplate = _dbe.OpenDatabase(global.TemplateMDBFile);
             var fieldList = string.Empty;
             foreach (Field f in dbTemplate.TableDefs[tableName].Fields)
             {
@@ -119,7 +126,212 @@ namespace FAD3
             return fieldList;
         }
 
+        private bool ExecuteSql(string tableName)
+        {
+            //var dbData = _dbe.OpenDatabase(global.MDBPath);
+            //var dbTemplate = _dbe.OpenDatabase(global.TemplateMDBFile);
+            var qd = new QueryDef();
+            var success = false;
+            string sql = sql = $"Insert Into {tableName} In '{_newMDBFile}' Select {TableFieldList(tableName)} from {tableName}";
+            qd = _dbData.CreateQueryDef("", sql);
+            try
+            {
+                qd.Execute();
+                success = true;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError($"{tableName} was not saved into the new datbase", ex.StackTrace);
+            }
+            //dbData.Close();
+            return success;
+        }
+
         private bool UpdateNewMDB()
+        {
+            int successCount = 0;
+            int attemptCount = 0;
+            foreach (var item in _requiredTables)
+            {
+                if (ExecuteSql(item))
+                {
+                    successCount++;
+                }
+            }
+
+            if (successCount == _requiredTables.Count)
+            {
+                attemptCount = successCount;
+
+                if (checkAOI.Checked)
+                {
+                    attemptCount++;
+                    if (ExecuteSql("tblAOI"))
+                    {
+                        successCount++;
+                    }
+
+                    attemptCount++;
+                    if (ExecuteSql("tblAdditionalAOIExtent"))
+                    {
+                        successCount++;
+                    }
+                }
+
+                if (checkAOI.Checked && checkLandingSites.Checked)
+                {
+                    attemptCount++;
+                    if (ExecuteSql("tblLandingSites"))
+                    {
+                        successCount++;
+                    }
+                }
+
+                if (checkGearLocalNames.Checked)
+                {
+                    attemptCount++;
+                    if (ExecuteSql("tblGearLocalNames"))
+                    {
+                        successCount++;
+                    }
+                }
+
+                if (checkGearVar.Checked)
+                {
+                    attemptCount++;
+                    if (ExecuteSql("tblGearVariations"))
+                    {
+                        successCount++;
+                    }
+
+                    attemptCount++;
+                    if (ExecuteSql("tblRefGearCodes"))
+                    {
+                        successCount++;
+                    }
+
+                    attemptCount++;
+                    if (ExecuteSql("tblGearSpecs"))
+                    {
+                        successCount++;
+                    }
+
+                    if (checkAOI.Checked)
+                    {
+                        attemptCount++;
+                        if (ExecuteSql("tblRefGearCodes_Usage"))
+                        {
+                            successCount++;
+                        }
+
+                        if (checkGearLocalNames.Checked)
+                        {
+                            attemptCount++;
+                            if (ExecuteSql("tblRefGearUsage_LocalName"))
+                            {
+                                successCount++;
+                            }
+                        }
+                    }
+                }
+                if (checkSciNames.Checked)
+                {
+                    attemptCount++;
+                    if (ExecuteSql("tblAllSpecies"))
+                    {
+                        successCount++;
+                    }
+                }
+
+                if (checkFishLocalNames.Checked)
+                {
+                    attemptCount++;
+                    if (ExecuteSql("tblBaseLocalNames"))
+                    {
+                        successCount++;
+                    }
+                }
+                if (checkLocalNameToSpeciesName.Checked && checkFishLocalNames.Checked && checkSciNames.Checked)
+                {
+                    attemptCount++;
+                    if (ExecuteSql("tblLanguages"))
+                    {
+                        successCount++;
+                    }
+
+                    attemptCount++;
+                    if (ExecuteSql("tblLocalNamesScientific"))
+                    {
+                        successCount++;
+                    }
+                }
+                if (checkAOI.Checked && checkEnumerators.Checked)
+                {
+                    attemptCount++;
+                    if (ExecuteSql("tblEnumerators"))
+                    {
+                        successCount++;
+                    }
+                }
+                if (checkAOI.Checked && checkGearLocalNames.Checked && checkFishLocalNames.Checked && checkInventory.Checked)
+                {
+                    attemptCount++;
+                    if (ExecuteSql("tblGearInventories"))
+                    {
+                        successCount++;
+                    }
+
+                    attemptCount++;
+                    if (ExecuteSql("tblGearInventoryBarangay"))
+                    {
+                        successCount++;
+                    }
+
+                    attemptCount++;
+                    if (ExecuteSql("tblGearInventoryBarangayData"))
+                    {
+                        successCount++;
+                    }
+
+                    attemptCount++;
+                    if (ExecuteSql("tblGearInventoryCatchComposition"))
+                    {
+                        successCount++;
+                    }
+
+                    attemptCount++;
+                    if (ExecuteSql("tblGearInventoryCPUEHistorical"))
+                    {
+                        successCount++;
+                    }
+
+                    attemptCount++;
+                    if (ExecuteSql("tblGearInventoryGearLocalNames"))
+                    {
+                        successCount++;
+                    }
+
+                    attemptCount++;
+                    if (ExecuteSql("tblGearInventoryMonthsUsed"))
+                    {
+                        successCount++;
+                    }
+
+                    attemptCount++;
+                    if (ExecuteSql("tblGearInventoryPeakMonths"))
+                    {
+                        successCount++;
+                    }
+                }
+            }
+            else
+            {
+                successCount = 0;
+            }
+            return successCount == attemptCount;
+        }
+
+        private bool UpdateNewMDB1()
         {
             var dbe = new DBEngine();
             var dbData = dbe.OpenDatabase(global.MDBPath);
@@ -308,6 +520,9 @@ namespace FAD3
         private void OnFormClosed(object sender, FormClosedEventArgs e)
         {
             global.SaveFormSettings(this);
+            _dbData.Close();
+            _dbData = null;
+            _dbe = null;
         }
     }
 }

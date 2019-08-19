@@ -10,8 +10,27 @@ namespace FAD3.Database.Classes
 {
     public static class OperatingExpenses
     {
+        public static List<string> ExpenseUnitsSelection { get; internal set; } = new List<string>();
         public static List<string> ExpenseItemsSelection { get; internal set; } = new List<string>();
         public static string SamplingExpenses { get; internal set; }
+
+        public static void GetExpenseUnitsSelection()
+        {
+            string sql = "Select Distinct Unit from tblFishingExpenseItems";
+            using (var con = new OleDbConnection(global.ConnectionString))
+            {
+                using (var dt = new DataTable())
+                {
+                    con.Open();
+                    var adapter = new OleDbDataAdapter(sql, con);
+                    adapter.Fill(dt);
+                    foreach (DataRow dr in dt.Rows)
+                    {
+                        ExpenseUnitsSelection.Add(dr["Unit"].ToString());
+                    }
+                }
+            }
+        }
 
         public static void GetExpenseItemsSelection()
         {
@@ -42,6 +61,42 @@ namespace FAD3.Database.Classes
             {
                 return false;
             }
+        }
+
+        public static bool AddExpenseUnitToSelection(string item)
+        {
+            if (!ExpenseUnitsSelection.Contains(item))
+            {
+                ExpenseUnitsSelection.Add(item);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public static bool Delete(string samplingGuid)
+        {
+            string sql = "";
+            bool success = false;
+            using (var con = new OleDbConnection(global.ConnectionString))
+            {
+                con.Open();
+
+                sql = $"Delete * from tblFishingExpenseItems where SamplingGuid = {{{samplingGuid}}}";
+                using (OleDbCommand update = new OleDbCommand(sql, con))
+                {
+                    update.ExecuteNonQuery();
+                }
+
+                sql = $"Delete * from tblFishingExpense where SamplingGUID = {{{samplingGuid}}}";
+                using (OleDbCommand update = new OleDbCommand(sql, con))
+                {
+                    success = update.ExecuteNonQuery() > 0;
+                }
+            }
+            return success;
         }
 
         public static bool Update(ExpensePerOperation exp)
@@ -83,8 +138,13 @@ namespace FAD3.Database.Classes
 
                         foreach (var item in exp.ExpenseItemsList)
                         {
-                            sql = $@"Insert into tblFishingExpenseItems (SamplingGuid, ExpenseRow, ExpenseItem, Cost)
-                                    values({{{exp.SamplingGuid}}}, {{{item.Key}}},'{item.Value.ExpenseItem}', {item.Value.ItemCost.ToString()})";
+                            sql = $@"Insert into tblFishingExpenseItems (SamplingGuid, ExpenseRow, ExpenseItem, Cost, Unit, UnitQuantity)
+                                    values({{{exp.SamplingGuid}}},
+                                            {{{item.Key}}},
+                                            '{item.Value.ExpenseItem}',
+                                            {item.Value.ItemCost.ToString()},
+                                            '{item.Value.Unit}',
+                                            {item.Value.UnitQuantity.ToString()})";
                             using (OleDbCommand update1 = new OleDbCommand(sql, con))
                             {
                                 update1.ExecuteNonQuery();
@@ -186,8 +246,10 @@ namespace FAD3.Database.Classes
                                 {
                                     string key = dr["ExpenseRow"].ToString();
                                     string item = dr["ExpenseItem"].ToString();
-                                    double cost = ((double)dr["Cost"]);
-                                    FishingExpenseItemsPerOperation expenseItem = new FishingExpenseItemsPerOperation(key, item, cost, fad3DataStatus.statusFromDB);
+                                    double cost = (double)dr["Cost"];
+                                    string unit = dr["Unit"].ToString();
+                                    double unitQuantity = (double)dr["UnitQuantity"];
+                                    FishingExpenseItemsPerOperation expenseItem = new FishingExpenseItemsPerOperation(key, item, cost, unit, unitQuantity, fad3DataStatus.statusFromDB);
                                     SamplingExpenses += $"{item}: {cost.ToString()}\r\n";
                                     exp.AddExpenseItem(key, expenseItem);
                                 }

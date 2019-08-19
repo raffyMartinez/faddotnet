@@ -173,6 +173,7 @@ namespace FAD3
                     mtextLatitude.Mask = "";
                     break;
             }
+
             _xCoordinatePrompt = mtextLongitude.Text;
             _yCoordinatePrompt = mtextLatitude.Text;
 

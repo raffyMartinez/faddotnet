@@ -648,6 +648,13 @@ namespace FAD3
             _yPos += controlSpacing + spacing;
         }
 
+        public void SamplingFishingOperatingExpenseDeleted()
+        {
+            ExpensePerOperation = null;
+            OperatingExpenses.ReadData(_samplingGUID);
+            _txtExpenses.Text = OperatingExpenses.SamplingExpenses;
+        }
+
         private void OnFieldGotFocus(object sender, EventArgs e)
         {
             switch (((Control)sender).Tag.ToString())
@@ -831,14 +838,22 @@ namespace FAD3
             switch (btn.Name)
             {
                 case "btnOperatingExpenses":
-                    FishingOperationCostsForm fcf = FishingOperationCostsForm.GetInstance(_samplingGUID, this, _hasExpenseData);
-                    if (fcf.Visible)
+                    if (CheckRequiredForRefNumber())
                     {
-                        fcf.BringToFront();
+                        FishingOperationCostsForm fcf = FishingOperationCostsForm.GetInstance(_samplingGUID, this, _hasExpenseData);
+                        if (fcf.Visible)
+                        {
+                            fcf.BringToFront();
+                        }
+                        else
+                        {
+                            fcf.Show(this);
+                        }
                     }
                     else
                     {
-                        fcf.Show(this);
+                        ShowReferenceNumberRequiredErrorLabel(showRefNumberError: true);
+                        MessageBox.Show("Some required fields not filled up", "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     break;
 
@@ -936,7 +951,34 @@ namespace FAD3
             }
         }
 
-        private void ShowReferenceNumberRequiredErrorLabel()
+        private void ShowReferenceNumberRequiredErrorLabel1(bool showRefNumberError = false)
+        {
+            foreach (Control c in panelUI.Controls)
+            {
+                if (c.Name.Substring(0, 8) == "errLabel")
+                {
+                    switch (c.Tag.ToString())
+                    {
+                        case "ReferenceNumber":
+                            c.Visible = showRefNumberError;
+                            break;
+
+                        case "SamplingDate":
+                        case "SamplingTime":
+                        case "GearClass":
+                        case "TypeOfVesselUsed":
+                        case "FishingGear":
+                        case "Enumerator":
+                        case "TargetArea":
+                        case "LandingSite":
+                            c.Visible = true;
+                            break;
+                    }
+                }
+            }
+        }
+
+        private void ShowReferenceNumberRequiredErrorLabel(bool showRefNumberError = false)
         {
             foreach (Control c in panelUI.Controls)
             {
@@ -953,6 +995,10 @@ namespace FAD3
                         case "TargetArea":
                         case "LandingSite":
                             c.Visible = true;
+                            break;
+
+                        case "ReferenceNumber":
+                            c.Visible = showRefNumberError;
                             break;
                     }
                 }

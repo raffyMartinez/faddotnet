@@ -39,16 +39,19 @@
             this.txtIncomeSales = new System.Windows.Forms.TextBox();
             this.txtWeightConsumed = new System.Windows.Forms.TextBox();
             this.lvExpenseItems = new System.Windows.Forms.ListView();
-            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colCostItemName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colCostItemCost = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.label5 = new System.Windows.Forms.Label();
             this.btnRemove = new System.Windows.Forms.Button();
             this.btnAdd = new System.Windows.Forms.Button();
+            this.btnDelete = new System.Windows.Forms.Button();
+            this.colCostItemUnit = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colCostItemUnitQuantity = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SuspendLayout();
             // 
             // btnOK
             // 
-            this.btnOK.Location = new System.Drawing.Point(307, 374);
+            this.btnOK.Location = new System.Drawing.Point(394, 374);
             this.btnOK.Name = "btnOK";
             this.btnOK.Size = new System.Drawing.Size(45, 25);
             this.btnOK.TabIndex = 0;
@@ -58,7 +61,7 @@
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(248, 374);
+            this.btnCancel.Location = new System.Drawing.Point(335, 374);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(53, 25);
             this.btnCancel.TabIndex = 1;
@@ -137,26 +140,28 @@
             // lvExpenseItems
             // 
             this.lvExpenseItems.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader1,
-            this.columnHeader2});
+            this.colCostItemName,
+            this.colCostItemCost,
+            this.colCostItemUnit,
+            this.colCostItemUnitQuantity});
             this.lvExpenseItems.FullRowSelect = true;
             this.lvExpenseItems.Location = new System.Drawing.Point(27, 202);
             this.lvExpenseItems.Name = "lvExpenseItems";
-            this.lvExpenseItems.Size = new System.Drawing.Size(298, 153);
+            this.lvExpenseItems.Size = new System.Drawing.Size(412, 153);
             this.lvExpenseItems.TabIndex = 10;
             this.lvExpenseItems.UseCompatibleStateImageBehavior = false;
             this.lvExpenseItems.View = System.Windows.Forms.View.Details;
             this.lvExpenseItems.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnMouseDown);
             // 
-            // columnHeader1
+            // colCostItemName
             // 
-            this.columnHeader1.Text = "Cost item";
-            this.columnHeader1.Width = 195;
+            this.colCostItemName.Text = "Cost item";
+            this.colCostItemName.Width = 195;
             // 
-            // columnHeader2
+            // colCostItemCost
             // 
-            this.columnHeader2.Text = "Cost (Pesos)";
-            this.columnHeader2.Width = 81;
+            this.colCostItemCost.Text = "Cost (Pesos)";
+            this.colCostItemCost.Width = 81;
             // 
             // label5
             // 
@@ -170,7 +175,7 @@
             // btnRemove
             // 
             this.btnRemove.Image = global::FAD3.Properties.Resources.removel_l;
-            this.btnRemove.Location = new System.Drawing.Point(332, 233);
+            this.btnRemove.Location = new System.Drawing.Point(445, 233);
             this.btnRemove.Name = "btnRemove";
             this.btnRemove.Size = new System.Drawing.Size(25, 25);
             this.btnRemove.TabIndex = 12;
@@ -180,18 +185,37 @@
             // btnAdd
             // 
             this.btnAdd.Image = global::FAD3.Properties.Resources.add_l;
-            this.btnAdd.Location = new System.Drawing.Point(332, 202);
+            this.btnAdd.Location = new System.Drawing.Point(445, 202);
             this.btnAdd.Name = "btnAdd";
             this.btnAdd.Size = new System.Drawing.Size(25, 25);
             this.btnAdd.TabIndex = 13;
             this.btnAdd.UseVisualStyleBackColor = true;
             this.btnAdd.Click += new System.EventHandler(this.OnButtonClick);
             // 
+            // btnDelete
+            // 
+            this.btnDelete.Location = new System.Drawing.Point(26, 374);
+            this.btnDelete.Name = "btnDelete";
+            this.btnDelete.Size = new System.Drawing.Size(53, 25);
+            this.btnDelete.TabIndex = 14;
+            this.btnDelete.Text = "Delete";
+            this.btnDelete.UseVisualStyleBackColor = true;
+            this.btnDelete.Click += new System.EventHandler(this.OnButtonClick);
+            // 
+            // colCostItemUnit
+            // 
+            this.colCostItemUnit.Text = "Unit";
+            // 
+            // colCostItemUnitQuantity
+            // 
+            this.colCostItemUnitQuantity.Text = "# of units";
+            // 
             // FishingOperationCostsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(364, 411);
+            this.ClientSize = new System.Drawing.Size(475, 411);
+            this.Controls.Add(this.btnDelete);
             this.Controls.Add(this.btnAdd);
             this.Controls.Add(this.btnRemove);
             this.Controls.Add(this.label5);
@@ -229,10 +253,13 @@
         private System.Windows.Forms.TextBox txtIncomeSales;
         private System.Windows.Forms.TextBox txtWeightConsumed;
         private System.Windows.Forms.ListView lvExpenseItems;
-        private System.Windows.Forms.ColumnHeader columnHeader1;
-        private System.Windows.Forms.ColumnHeader columnHeader2;
+        private System.Windows.Forms.ColumnHeader colCostItemName;
+        private System.Windows.Forms.ColumnHeader colCostItemCost;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Button btnRemove;
         private System.Windows.Forms.Button btnAdd;
+        private System.Windows.Forms.Button btnDelete;
+        private System.Windows.Forms.ColumnHeader colCostItemUnit;
+        private System.Windows.Forms.ColumnHeader colCostItemUnitQuantity;
     }
 }

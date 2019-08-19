@@ -397,6 +397,7 @@
     <Compile Include="Mapping\Classes\ClassifiedItem.cs" />
     <Compile Include="Mapping\Classes\Colors.cs" />
     <Compile Include="Mapping\Classes\ColorSchemes.cs" />
+    <Compile Include="Mapping\Classes\CoordinateDisplayFormatHelper.cs" />
     <Compile Include="Mapping\Classes\ERDDAPMetadataFiles.cs" />
     <Compile Include="Mapping\Classes\ERDDAPMetadataFile.cs" />
     <Compile Include="Mapping\Classes\ExtentDraggedBoxEventArgs.cs" />

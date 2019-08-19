@@ -13,6 +13,8 @@ Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "FADUpdaterMay212019", "upda
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "FADUpdaterJune282019", "updaters\FADUpdaterJune282019\FADUpdaterJune282019.vdproj", "{767680F3-F55B-45A7-8AB2-DC062F02D3CC}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "FadUpdaterAug2019", "updaters\FADUpdaterAug182019\FadUpdaterAug2019\FadUpdaterAug2019.vdproj", "{327C7377-DD68-4426-A1B9-7E81BBB8A332}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,12 @@ Global
 		{767680F3-F55B-45A7-8AB2-DC062F02D3CC}.Release|Any CPU.ActiveCfg = Release
 		{767680F3-F55B-45A7-8AB2-DC062F02D3CC}.Release|x64.ActiveCfg = Release
 		{767680F3-F55B-45A7-8AB2-DC062F02D3CC}.Release|x86.ActiveCfg = Release
+		{327C7377-DD68-4426-A1B9-7E81BBB8A332}.Debug|Any CPU.ActiveCfg = Debug
+		{327C7377-DD68-4426-A1B9-7E81BBB8A332}.Debug|x64.ActiveCfg = Debug
+		{327C7377-DD68-4426-A1B9-7E81BBB8A332}.Debug|x86.ActiveCfg = Debug
+		{327C7377-DD68-4426-A1B9-7E81BBB8A332}.Release|Any CPU.ActiveCfg = Release
+		{327C7377-DD68-4426-A1B9-7E81BBB8A332}.Release|x64.ActiveCfg = Release
+		{327C7377-DD68-4426-A1B9-7E81BBB8A332}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

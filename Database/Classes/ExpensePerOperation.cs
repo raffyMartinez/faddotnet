@@ -29,9 +29,9 @@ namespace FAD3.Database.Classes
             _expenseItemsList.Add(key, item);
         }
 
-        public void AddExpenseItem(string key, string operationExpenseItem, double cost, fad3DataStatus dataStatus, string expenseItemGuid = "")
+        public void AddExpenseItem(string key, string operationExpenseItem, double cost, fad3DataStatus dataStatus, string unit, double unitQuantity, string expenseItemGuid = "")
         {
-            FishingExpenseItemsPerOperation expenseItem = new FishingExpenseItemsPerOperation(key, operationExpenseItem, cost, dataStatus);
+            FishingExpenseItemsPerOperation expenseItem = new FishingExpenseItemsPerOperation(key, operationExpenseItem, cost, unit, unitQuantity, dataStatus);
             if (dataStatus == fad3DataStatus.statusNew)
             {
                 expenseItemGuid = Guid.NewGuid().ToString();
