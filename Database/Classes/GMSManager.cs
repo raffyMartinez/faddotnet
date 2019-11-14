@@ -240,10 +240,13 @@ namespace FAD3
 
                         if (dr["Len"].ToString().Length > 0)
                             Length = double.Parse(dr["Len"].ToString());
+
                         if (dr["Wt"].ToString().Length > 0)
-                            Weight = double.Parse(dr["GonadWt"].ToString());
+                            Weight = double.Parse(dr["Wt"].ToString());
+
                         if (dr["GonadWt"].ToString().Length > 0)
                             GonadWeight = double.Parse(dr["GonadWt"].ToString());
+
                         if (dr["Sequence"].ToString().Length > 0)
                             Sequence = int.Parse(dr["Sequence"].ToString());
 
