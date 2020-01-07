@@ -153,7 +153,14 @@ namespace FAD3.Mapping.Forms
             cboFirstData.Enabled = cboFirstData.Items.Count > 0;
             cboLastData.Enabled = cboLastData.Items.Count > 0;
 
-            txtInlandPoints.Text = MakeGridFromPoints.InlandPointCount.ToString();
+            if (MakeGridFromPoints.IgnoreInlandPoints)
+            {
+                txtInlandPoints.Text = "Ignored";
+            }
+            else
+            {
+                txtInlandPoints.Text = MakeGridFromPoints.InlandPointCount.ToString();
+            }
             txtDatasetUniqueCount.Text = MakeGridFromPoints.HashedValues.Count.ToString();
             txtDatasetNumberValues.Text = MakeGridFromPoints.CountNonNullValues.ToString();
             txtDatasetMax.Text = MakeGridFromPoints.MaximumValue.ToString();
@@ -281,7 +288,8 @@ namespace FAD3.Mapping.Forms
                         if (szf.DialogResult == DialogResult.OK)
                         {
                             _utmZone = szf.UTMZone;
-                            MakeGridFromPoints.IgnoreInlandPoints = false;
+                            //MakeGridFromPoints.IgnoreInlandPoints = false;
+                            MakeGridFromPoints.IgnoreInlandPoints = szf.IgnoreInlandPoints;
                             MakeGridFromPoints.UTMZone = _utmZone;
                         }
                         else if (szf.DialogResult == DialogResult.Ignore)

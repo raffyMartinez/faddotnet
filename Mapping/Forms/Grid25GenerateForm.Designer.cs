@@ -518,6 +518,7 @@
             // 
             // buttonSubGrid
             // 
+            this.buttonSubGrid.Enabled = false;
             this.buttonSubGrid.ImageKey = "subgrid";
             this.buttonSubGrid.ImageList = this.imList;
             this.buttonSubGrid.Location = new System.Drawing.Point(257, 259);

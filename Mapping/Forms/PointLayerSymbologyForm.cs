@@ -55,6 +55,7 @@ namespace FAD3
             Bitmap bmp = new Bitmap(rect.Width, rect.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             Graphics g = Graphics.FromImage(bmp);
             IntPtr ptr = g.GetHdc();
+            //int ptr = g.GetHdc().ToInt32();
 
             // creating shape to draw
             _options.DrawPoint(ptr, 0.0f, 0.0f, rect.Width, rect.Height, FAD3.Mapping.Colors.ColorToUInteger(this.BackColor));

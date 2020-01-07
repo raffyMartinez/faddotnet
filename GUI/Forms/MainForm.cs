@@ -2343,8 +2343,8 @@ namespace FAD3
             if (dr == DialogResult.OK && ofd.FileName.Length > 0)
             {
                 filename = ofd.FileName;
-                UpdateLocationTables();
                 SetupTree(filename);
+                UpdateLocationTables();
 
                 //add the recently opened file to the MRU
                 _mrulist.AddFile(filename);

@@ -29,6 +29,8 @@
         private void InitializeComponent()
         {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.rb100 = new System.Windows.Forms.RadioButton();
+            this.rbNone = new System.Windows.Forms.RadioButton();
             this.rb25 = new System.Windows.Forms.RadioButton();
             this.rb16 = new System.Windows.Forms.RadioButton();
             this.rb9 = new System.Windows.Forms.RadioButton();
@@ -36,12 +38,14 @@
             this.lblDescription = new System.Windows.Forms.Label();
             this.btnOk = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
-            this.rbNone = new System.Windows.Forms.RadioButton();
+            this.rb64 = new System.Windows.Forms.RadioButton();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.rb64);
+            this.groupBox1.Controls.Add(this.rb100);
             this.groupBox1.Controls.Add(this.rbNone);
             this.groupBox1.Controls.Add(this.rb25);
             this.groupBox1.Controls.Add(this.rb16);
@@ -49,10 +53,32 @@
             this.groupBox1.Controls.Add(this.rb4);
             this.groupBox1.Location = new System.Drawing.Point(12, 21);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(127, 140);
+            this.groupBox1.Size = new System.Drawing.Size(127, 185);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Sub grid options";
+            // 
+            // rb100
+            // 
+            this.rb100.AutoSize = true;
+            this.rb100.Location = new System.Drawing.Point(15, 155);
+            this.rb100.Name = "rb100";
+            this.rb100.Size = new System.Drawing.Size(90, 17);
+            this.rb100.TabIndex = 5;
+            this.rb100.Text = "100  - (200 m)";
+            this.rb100.UseVisualStyleBackColor = true;
+            this.rb100.CheckedChanged += new System.EventHandler(this.OnCheckChanged);
+            // 
+            // rbNone
+            // 
+            this.rbNone.AutoSize = true;
+            this.rbNone.Location = new System.Drawing.Point(15, 21);
+            this.rbNone.Name = "rbNone";
+            this.rbNone.Size = new System.Drawing.Size(51, 17);
+            this.rbNone.TabIndex = 4;
+            this.rbNone.Text = "None";
+            this.rbNone.UseVisualStyleBackColor = true;
+            this.rbNone.CheckedChanged += new System.EventHandler(this.OnCheckChanged);
             // 
             // rb25
             // 
@@ -110,7 +136,7 @@
             // 
             // btnOk
             // 
-            this.btnOk.Location = new System.Drawing.Point(296, 131);
+            this.btnOk.Location = new System.Drawing.Point(296, 176);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(36, 30);
             this.btnOk.TabIndex = 2;
@@ -120,7 +146,7 @@
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(240, 131);
+            this.btnCancel.Location = new System.Drawing.Point(240, 176);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(50, 30);
             this.btnCancel.TabIndex = 3;
@@ -128,22 +154,22 @@
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.OnButtonClick);
             // 
-            // rbNone
+            // rb64
             // 
-            this.rbNone.AutoSize = true;
-            this.rbNone.Location = new System.Drawing.Point(15, 21);
-            this.rbNone.Name = "rbNone";
-            this.rbNone.Size = new System.Drawing.Size(51, 17);
-            this.rbNone.TabIndex = 4;
-            this.rbNone.Text = "None";
-            this.rbNone.UseVisualStyleBackColor = true;
-            this.rbNone.CheckedChanged += new System.EventHandler(this.OnCheckChanged);
+            this.rb64.AutoSize = true;
+            this.rb64.Location = new System.Drawing.Point(15, 132);
+            this.rb64.Name = "rb64";
+            this.rb64.Size = new System.Drawing.Size(84, 17);
+            this.rb64.TabIndex = 6;
+            this.rb64.Text = "64  - (250 m)";
+            this.rb64.UseVisualStyleBackColor = true;
+            this.rb64.CheckedChanged += new System.EventHandler(this.OnCheckChanged);
             // 
             // Grid25SubGridForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(344, 173);
+            this.ClientSize = new System.Drawing.Size(344, 223);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnOk);
             this.Controls.Add(this.lblDescription);
@@ -170,5 +196,7 @@
         private System.Windows.Forms.Button btnOk;
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.RadioButton rbNone;
+        private System.Windows.Forms.RadioButton rb100;
+        private System.Windows.Forms.RadioButton rb64;
     }
 }

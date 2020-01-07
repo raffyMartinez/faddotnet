@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using FAD3.Database.Classes;
 using FAD3.GUI.Classes;
+using FAD3.Mapping.Classes;
 
 namespace FAD3.Mapping.Forms
 {
@@ -16,10 +17,13 @@ namespace FAD3.Mapping.Forms
     {
         public fadUTMZone UTMZone { get; internal set; }
 
+        public bool IgnoreInlandPoints { get; internal set; }
+
         public SelectUTMZoneForm()
         {
             InitializeComponent();
         }
+
         private void SetUpTooltips()
         {
             // Create the ToolTip and associate with the Form container.
@@ -40,7 +44,6 @@ namespace FAD3.Mapping.Forms
             tt.SetToolTip(btnCancel, "Closes the form");
         }
 
-
         private void OnButtonClick(object sender, EventArgs e)
         {
             switch (((Button)sender).Name)
@@ -59,7 +62,7 @@ namespace FAD3.Mapping.Forms
                         UTMZone = fadUTMZone.utmZone51N;
                     }
 
-
+                    IgnoreInlandPoints = chkboxIgnoreInland.Checked;
                     DialogResult = DialogResult.OK;
 
                     break;
@@ -73,6 +76,7 @@ namespace FAD3.Mapping.Forms
         private void OnFormLoad(object sender, EventArgs e)
         {
             SetUpTooltips();
+            chkboxIgnoreInland.Checked = MakeGridFromPoints.IgnoreInlandPoints;
         }
     }
 }

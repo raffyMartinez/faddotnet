@@ -225,7 +225,9 @@ namespace FAD3
 
             Bitmap bmp = new Bitmap(rect.Width, rect.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             Graphics g = Graphics.FromImage(bmp);
+
             IntPtr ptr = g.GetHdc();
+            //int ptr = g.GetHdc().ToInt32();
 
             var ly = _axmap.get_GetObject(layerHandle);
             switch (layerType)

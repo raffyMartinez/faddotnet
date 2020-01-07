@@ -51,6 +51,16 @@ namespace FAD3.Mapping.Forms
                         SubGridCount = 25;
                         SubGridSize = 400;
                         break;
+
+                    case "rb64":
+                        SubGridCount = 64;
+                        SubGridSize = 250;
+                        break;
+
+                    case "rb100":
+                        SubGridCount = 100;
+                        SubGridSize = 200;
+                        break;
                 }
                 if (SubGridCount == 0)
                 {
@@ -100,6 +110,14 @@ namespace FAD3.Mapping.Forms
 
                 case 25:
                     rb25.Checked = true;
+                    break;
+
+                case 64:
+                    rb64.Checked = true;
+                    break;
+
+                case 100:
+                    rb100.Checked = true;
                     break;
             }
         }

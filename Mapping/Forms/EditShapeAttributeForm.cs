@@ -80,6 +80,7 @@ namespace FAD3.Mapping.Forms
 
         private void DisplayAttributes()
         {
+            var colNames = new List<string>();
             int rows = 0;
             DataGridViewRow row = new DataGridViewRow();
             gridAttributes.Visible = false;
@@ -128,7 +129,8 @@ namespace FAD3.Mapping.Forms
                                     headerText = sf.Field[n].Name;
                                 }
                                 gridAttributes.Columns[n].Name = headerText;
-                                gridAttributes.Columns[n].Tag = sf.Field[n].Name;
+                                //gridAttributes.Columns[n].Tag = sf.Field[n].Name;
+                                colNames.Add(sf.Field[n].Name);
                             }
                         }
 
@@ -266,7 +268,14 @@ namespace FAD3.Mapping.Forms
                         }
                     }
                 }
+
                 AutoFitColumns();
+                int nn = 0;
+                foreach (DataGridViewColumn ch in gridAttributes.Columns)
+                {
+                    ch.Tag = colNames[nn];
+                    nn++;
+                }
                 gridAttributes.Visible = true;
             }
             else
@@ -350,6 +359,7 @@ namespace FAD3.Mapping.Forms
             else
             {
                 string fieldName = gridAttributes.Columns[e.ColumnIndex].Tag.ToString();
+                //string fieldName = gridAttributes.Columns[e.ColumnIndex].HeaderText;
                 _currentMapLayer.EditShapeFileField(fieldName, e.RowIndex, gridAttributes.Rows[e.RowIndex].Cells[e.ColumnIndex].Value);
             }
         }
