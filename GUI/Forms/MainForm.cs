@@ -2145,10 +2145,10 @@ namespace FAD3
                             tlt.TreeLevel.LandingSiteGuid,
                             tlt.TreeLevel.LandingSiteName,
                             tlt.TreeLevel.GearVariationGuid,
-                            "",
+                            nd1.Parent.Text,
                             item.SamplingMonthYear);
                         nd1.Tag = new TreeLevelTag(false, tl, "sampling");
-                        nd1.Name = tlt.TreeLevel.GetNodeName("sampling");
+                        nd1.Name = tlt.TreeLevel.GetNodeName("sampling") + item.SamplingMonthYear;
                         nd1.ImageKey = "MonthGear";
                     }
                     n++;
@@ -2362,6 +2362,7 @@ namespace FAD3
 
                 var gearNode = new TreeNode();
                 gearNode.Name = $"{landingSiteGuid}|{gearVarGuid}";
+                //gearNode.Name = $"{landingSiteGuid}|{gearVarGuid}|";
                 gearNode.Text = Gears.GearVarNameFromGearGuid(gearVarGuid);
                 TreeLevel tl = new TreeLevel(_targetAreaGuid, _targetAreaName, landingSiteGuid, _landingSiteName, gearVarGuid, gearNode.Text);
                 gearNode.Tag = new TreeLevelTag(false, tl, "gear");
@@ -2375,7 +2376,9 @@ namespace FAD3
 
                 var treeLevel = ((TreeLevelTag)treeMain.SelectedNode.Tag).TreeLevelName;
 
-                if (!treeMain.SelectedNode.IsExpanded) treeMain.SelectedNode.Expand();
+                if (!treeMain.SelectedNode.IsExpanded)
+                    treeMain.SelectedNode.Expand();
+
                 switch (treeLevel)
                 {
                     case "sampling":
@@ -2393,7 +2396,9 @@ namespace FAD3
 
                 try
                 {
+                    var gearNodeName = gearNode.Name.EndsWith("|") ? gearNode.Name : gearNode.Name + "|";
                     if (!LandingSiteNode.Nodes.ContainsKey(gearNode.Name))
+                    //if (!LandingSiteNode.Nodes.ContainsKey(gearNodeName))
                     {
                         LandingSiteNode.Nodes.Add(gearNode);
                         gearNode.Nodes.Add(samplingMonthNode);
@@ -2401,7 +2406,9 @@ namespace FAD3
                     else
                     {
                         gearNode = LandingSiteNode.Nodes[gearNode.Name];
-                        if (!gearNode.IsExpanded) gearNode.Expand();
+                        //gearNode = LandingSiteNode.Nodes[gearNodeName];
+                        //if (!gearNode.IsExpanded) gearNode.Expand();
+                        gearNode.Expand();
                         if (!gearNode.Nodes.ContainsKey(samplingMonthNode.Name))
                         {
                             gearNode.Nodes.Add(samplingMonthNode);
@@ -3332,6 +3339,7 @@ namespace FAD3
             _samplings.ReadUIFromXML();
             var DateEncoded = "";
 
+            //if (samplingGUID.Length > 0 && _samplings.SamplingsForMonth.ContainsKey(samplingGUID))
             if (samplingGUID.Length > 0)
             {
                 //we fill up the list view from the _Sampling class variable.
@@ -3394,19 +3402,31 @@ namespace FAD3
                             break;
 
                         case "DateSet":
-                            lvi.SubItems[1].Text = ((DateTime)sampling.GearSettingDateTime).ToString("MMM-dd-yyyy");
+                            if (sampling.GearSettingDateTime != null)
+                            {
+                                lvi.SubItems[1].Text = ((DateTime)sampling.GearSettingDateTime).ToString("MMM-dd-yyyy");
+                            }
                             break;
 
                         case "TimeSet":
-                            lvi.SubItems[1].Text = ((DateTime)sampling.GearSettingDateTime).ToString("hh:mm");
+                            if (sampling.GearSettingDateTime != null)
+                            {
+                                lvi.SubItems[1].Text = ((DateTime)sampling.GearSettingDateTime).ToString("HH:mm");
+                            }
                             break;
 
                         case "DateHauled":
-                            lvi.SubItems[1].Text = ((DateTime)sampling.GearHaulingDateTime).ToString("MMM-dd-yyyy");
+                            if (sampling.GearHaulingDateTime != null)
+                            {
+                                lvi.SubItems[1].Text = ((DateTime)sampling.GearHaulingDateTime).ToString("MMM-dd-yyyy");
+                            }
                             break;
 
                         case "TimeHauled":
-                            lvi.SubItems[1].Text = ((DateTime)sampling.GearHaulingDateTime).ToString("hh:mm");
+                            if (sampling.GearHaulingDateTime != null)
+                            {
+                                lvi.SubItems[1].Text = ((DateTime)sampling.GearHaulingDateTime).ToString("HH:mm");
+                            }
                             break;
 
                         case "ReferenceNumber":
@@ -3422,7 +3442,7 @@ namespace FAD3
                             break;
 
                         case "SamplingTime":
-                            lvi.SubItems[1].Text = sampling.SamplingDateTime.ToString("hh:mm");
+                            lvi.SubItems[1].Text = sampling.SamplingDateTime.ToString("HH:mm");
                             break;
 
                         case "Enumerator":
@@ -3480,10 +3500,12 @@ namespace FAD3
                             break;
                     }
                 }
-
-                _vesHeight = sampling.FishingVessel.Depth == null ? "" : sampling.FishingVessel.Depth.ToString();
-                _vesLength = sampling.FishingVessel.Length == null ? "" : sampling.FishingVessel.Length.ToString();
-                _vesWidth = sampling.FishingVessel.Breadth == null ? "" : sampling.FishingVessel.Breadth.ToString();
+                if (sampling.FishingVessel != null)
+                {
+                    _vesHeight = sampling.FishingVessel.Depth == null ? "" : sampling.FishingVessel.Depth.ToString();
+                    _vesLength = sampling.FishingVessel.Length == null ? "" : sampling.FishingVessel.Length.ToString();
+                    _vesWidth = sampling.FishingVessel.Breadth == null ? "" : sampling.FishingVessel.Breadth.ToString();
+                }
 
                 DateEncoded = sampling.DateEncoded == null ? "" : ((DateTime)sampling.DateEncoded).ToString("MMM-dd-yyyy");
             }

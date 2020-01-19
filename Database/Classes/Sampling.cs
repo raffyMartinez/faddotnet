@@ -25,6 +25,7 @@ namespace FAD3.Database.Classes
         //public List<(string FishingGround, string SubGrid)> FishingGrounds { get; set; }
         public string LandingSiteGuid { get; set; }
 
+        public string GearClassName { get; set; }
         public string GearVariationGuid { get; set; }
         public double? CatchWeight { get; set; }
         public double? SampleWeight { get; set; }
@@ -38,12 +39,45 @@ namespace FAD3.Database.Classes
         public string Notes { get; set; }
 
         public bool HasLiveFish { get; set; }
-
+        public bool IsNew { get; set; }
         public FishingVessel FishingVessel { get; set; }
+
+        public void ClearFishingGroundList()
+        {
+            if (FishingGroundList.Count > 0)
+            {
+                FishingGroundList.Clear();
+            }
+        }
 
         public Sampling()
         {
             SamplingSummary = new SamplingSummary(this);
+        }
+
+        public void AddFishingGround(FishingGround fg)
+        {
+            if (FishingGroundList == null)
+            {
+                FishingGroundList = new List<FishingGround>();
+            }
+            if (!FishingGroundList.Contains(fg))
+            {
+                FishingGroundList.Add(fg);
+            }
+        }
+
+        public int? FirstSubGrid
+        {
+            get
+            {
+                int? subGrid = null; ;
+                if (FishingGroundList != null && FishingGroundList.Count > 0 && FishingGroundList[0].SubGrid != null)
+                {
+                    subGrid = FishingGroundList[0].SubGrid;
+                }
+                return subGrid;
+            }
         }
 
         public string FirstFishingGround
@@ -52,7 +86,7 @@ namespace FAD3.Database.Classes
             get
             {
                 string fg = "";
-                if (FishingGroundList.Count > 0)
+                if (FishingGroundList != null && FishingGroundList.Count > 0)
                 {
                     fg = FishingGroundList[0].GridName;
                     if (FishingGroundList[0].SubGrid != null)

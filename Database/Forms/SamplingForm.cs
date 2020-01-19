@@ -46,6 +46,7 @@ namespace FAD3
         private string _enumeratorGuid = "";
         public ExpensePerOperation ExpensePerOperation { get; set; }
         public Sampling Sampling { get; set; }
+        private Sampling _editedSampling = new Sampling();
 
         private string _datePrompt = "";
         private string _timePrompt = "";
@@ -112,6 +113,10 @@ namespace FAD3
 
                             o.Text = o.Text.Substring(0, o.Text.Length - 2);
                         });
+                    else
+                    {
+                        ((TextBox)panelUI.Controls["textAdditionalFishingGround"]).Clear();
+                    }
                 }
                 else
                 {
@@ -759,6 +764,210 @@ namespace FAD3
 
         private bool SaveEdits()
         {
+            _editedSampling.SamplingGUID = _samplingGUID;
+
+            VesselType vesType = VesselType.NotDetermined;
+            string engineUsed = "";
+            double? engineHp = null;
+
+            foreach (Control c in panelUI.Controls)
+            {
+                string val = "";
+                string tag = "";
+                var typeName = c.GetType().Name;
+                if (typeName != "Button" && typeName != "Label")
+                {
+                    tag = c.Tag.ToString();
+                    switch (typeName)
+                    {
+                        case "ComboBox":
+                            var key = "";
+                            if (c.Name != "comboTypeOfVesselUsed" && c.Name != "comboEngine")
+                            {
+                                if (c.Text.Length > 0)
+                                {
+                                    key = ((KeyValuePair<string, string>)((ComboBox)c).SelectedItem).Key;
+                                }
+                            }
+                            else
+                            {
+                                if (c.Text.Length > 0)
+                                {
+                                    switch (c.Name)
+                                    {
+                                        case "comboTypeOfVesselUsed":
+                                            var cbo = ((ComboBox)panelUI.Controls["comboTypeOfVesselUsed"]);
+                                            if (cbo.Items.Count > 0)
+                                            {
+                                                var v = int.Parse(cbo.SelectedValue.ToString());
+                                                key = v.ToString();
+                                            }
+                                            break;
+
+                                        case "comboEngine":
+                                            key = c.Text;
+                                            break;
+                                    }
+                                }
+                            }
+                            val = key;
+                            break;
+
+                        case "TextBox":
+                            val = c.Text;
+                            break;
+
+                        case "MaskedTextBox":
+                            val = ((MaskedTextBox)c).MaskCompleted ? c.Text : "";
+                            break;
+
+                        case "CheckBox":
+                            val = ((CheckBox)c).Checked.ToString();
+                            break;
+                    }
+
+                    if (val.Length > 0)
+                    {
+                        switch (tag)
+                        {
+                            case "TargetArea":
+                                _editedSampling.TargetAreaGuid = val;
+                                break;
+
+                            case "LandingSite":
+                                _editedSampling.LandingSiteGuid = val;
+                                break;
+
+                            case "SamplingDate":
+                                _editedSampling.SamplingDateTime = DateTime.Parse(val);
+                                break;
+
+                            case "SamplingTime":
+                                _editedSampling.SamplingDateTime = _editedSampling.SamplingDateTime.Add(new TimeSpan(DateTime.Parse(val).Hour, DateTime.Parse(val).Minute, 0));
+                                break;
+
+                            case "Enumerator":
+                                _editedSampling.EnumeratorGuid = val;
+                                break;
+
+                            case "GearClass":
+                                break;
+
+                            case "FishingGear":
+                                _editedSampling.GearVariationGuid = val;
+                                _editedSampling.GearClassName = "";
+                                break;
+
+                            case "GearSpecs":
+                                break;
+
+                            case "ReferenceNumber":
+                                _editedSampling.ReferenceNumber = val;
+                                break;
+
+                            case "WeightOfCatch":
+                                _editedSampling.CatchWeight = double.Parse(val);
+                                break;
+
+                            case "WeightOfSample":
+                                _editedSampling.SampleWeight = double.Parse(val);
+
+                                break;
+
+                            case "HasLiveFish":
+                                _editedSampling.HasLiveFish = bool.Parse(val);
+                                break;
+
+                            case "FishingGround":
+                                break;
+
+                            case "DateSet":
+                                _editedSampling.GearSettingDateTime = DateTime.Parse(val);
+
+                                break;
+
+                            case "TimeSet":
+                                TimeSpan ts = new TimeSpan(DateTime.Parse(val).Hour, DateTime.Parse(val).Minute, 0);
+                                _editedSampling.GearSettingDateTime = _editedSampling.GearSettingDateTime.Value.Add(ts);
+
+                                break;
+
+                            case "DateHauled":
+                                _editedSampling.GearHaulingDateTime = DateTime.Parse(val);
+
+                                break;
+
+                            case "TimeHauled":
+                                ts = new TimeSpan(DateTime.Parse(val).Hour, DateTime.Parse(val).Minute, 0);
+                                _editedSampling.GearHaulingDateTime = _editedSampling.GearHaulingDateTime.Value.Add(ts);
+
+                                break;
+
+                            case "NumberOfHauls":
+                                _editedSampling.NumberOfHauls = int.Parse(val);
+                                break;
+
+                            case "NumberOfFishers":
+                                _editedSampling.NumberOfFishers = int.Parse(val);
+                                break;
+
+                            case "TypeOfVesselUsed":
+                                vesType = (VesselType)int.Parse(val);
+                                break;
+
+                            case "Engine":
+                                engineUsed = val;
+                                break;
+
+                            case "EngineHorsepower":
+                                engineHp = double.Parse(val);
+                                break;
+
+                            case "Notes":
+                                _editedSampling.Notes = val;
+                                break;
+                        }
+                    }
+                }
+            }
+
+            if (vesType == VesselType.Motorized || vesType == VesselType.NonMotorized)
+            {
+                FishingVessel v = new FishingVessel(vesType);
+                if (_vesHeight.Length > 0)
+                {
+                    v.Length = double.Parse(_vesLength);
+                    v.Depth = double.Parse(_vesHeight);
+                    v.Breadth = double.Parse(_vesWidth);
+                }
+                v.EngineHorsepower = engineHp;
+                v.Engine = engineUsed;
+                _editedSampling.FishingVessel = v;
+            }
+
+            PopulateFGList(_editedSampling);
+
+            _dateUpdated = DateTime.Now;
+            _editedSampling.DateEncoded = DateTime.Now;
+            _editedSampling.IsNew = _isNew;
+            _editedSampling.SamplingType = CatchMonitoringSamplingType.FisheryDependent;
+
+            if (_samplings.UpdateEffort(_editedSampling))
+            {
+                return ManageGearSpecsClass.SaveSampledGearSpecs(_samplingGUID);
+            }
+            else
+            {
+                return false;
+            }
+            //if (_samplings.UpdateEffort(_isNew, EffortData, _fishingGrounds, _dateUpdated))
+            //    return ManageGearSpecsClass.SaveSampledGearSpecs(_samplingGUID);
+            //else
+            //    return false;
+        }
+
+        private bool SaveEdits1()
+        {
             var EffortData = new Dictionary<string, string>();
             foreach (Control c in panelUI.Controls)
             {
@@ -1040,6 +1249,38 @@ namespace FAD3
                 }
             }
             return valid;
+        }
+
+        private void PopulateFGList(Sampling s)
+        {
+            ((TextBox)panelUI.Controls["textFishingGround"]).With(o =>
+            {
+                if (o.Text.Length > 0)
+                {
+                    var fgParts = o.Text.Split('-');
+                    int? sg = null;
+                    if (fgParts.Length == 3)
+                    {
+                        sg = int.Parse(fgParts[2]);
+                    }
+                    FishingGround fg = new FishingGround($"{fgParts[0]}-{fgParts[1]}", sg);
+                    s.AddFishingGround(fg);
+                }
+            });
+
+            var t = (TextBox)panelUI.Controls["textAdditionalFishingGround"];
+            var arr = t.Text.Length > 0 ? t.Text.Split(',') : null;
+            for (int n = 0; arr != null && n < arr.Length; n++)
+            {
+                var fgParts = arr[n].Trim().Split('-');
+                int? sg = null;
+                if (fgParts.Length == 3)
+                {
+                    sg = int.Parse(fgParts[2]);
+                }
+                FishingGround fg = new FishingGround($"{fgParts[0]}-{fgParts[1]}", sg);
+                s.AddFishingGround(fg);
+            }
         }
 
         private void PopulateFGList()
