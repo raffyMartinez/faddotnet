@@ -572,6 +572,7 @@ namespace FAD3
             this.lvMain.Location = new System.Drawing.Point(0, 30);
             this.lvMain.MultiSelect = false;
             this.lvMain.Name = "lvMain";
+            this.lvMain.ShowItemToolTips = true;
             this.lvMain.Size = new System.Drawing.Size(711, 442);
             this.lvMain.TabIndex = 11;
             this.lvMain.UseCompatibleStateImageBehavior = false;

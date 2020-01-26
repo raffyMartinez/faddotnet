@@ -31,6 +31,7 @@ namespace FAD3
     /// </summary>
     public partial class MainForm : Form
     {
+        private ExpensePerOperation _expensePerOperation;
         private bool _effortRefreshNeeded = false;
         public UpdatedSamplingCatchCompositionCount UpdatedSamplingCatchRowCount { get; set; }
         private MapEffortHelperForm _formEffortMapper;
@@ -804,8 +805,10 @@ namespace FAD3
                 }
 
                 row.SubItems.Add(sampling.SamplingSummary.EnumeratorName);                                      //enumerator
-                row.SubItems.Add(sampling.SamplingSummary.GearSpecsIndicator);                                           //gear specs
-                row.SubItems.Add(sampling.SamplingSummary.OperatingExpenseIndicator);
+                var specSubItem = row.SubItems.Add(sampling.SamplingSummary.GearSpecsIndicator);                                           //gear specs
+                specSubItem.Tag = "SpecSubItem";
+                var expenseSubItem = row.SubItems.Add(sampling.SamplingSummary.OperatingExpenseIndicator);
+                expenseSubItem.Tag = "ExpenseItem";
                 row.SubItems.Add(sampling.Notes);                                                               //notes
                 row.Tag = sampling.SamplingGUID;                                                                        //sampling guid
                 row.Name = sampling.SamplingGUID;
@@ -1753,6 +1756,22 @@ namespace FAD3
                         if (FishingGrid.GridType == fadGridType.gridTypeGrid25 && global.MapIsOpen)
                         {
                             global.MappingForm.MapFishingGround(SamplingGUID, FishingGrid.UTMZone);
+                        }
+                        if (e.Button == MouseButtons.Left
+                            && (ModifierKeys & Keys.Control) == Keys.Control)
+                        {
+                            var subItem = lvh.Item.GetSubItemAt(_mouseX, _mouseY);
+                            if (subItem.Tag?.ToString() == "ExpenseItem" && subItem.Text == "x")
+                            {
+                                var samplingGuid = lvh.Item.Name;
+                                var result = OperatingExpenses.ReadData(samplingGuid, true);
+                                if (result.success)
+                                {
+                                    var expenseItem = result.exp;
+                                    var expenseString = OperatingExpenses.SamplingExpenses;
+                                    MessageBox.Show($"{lvh.Item.SubItems[0].Text}\r\n\r\n {expenseString}", "Operating expenses:");
+                                }
+                            }
                         }
                         _referenceNumber = lvh.Item.Text;
                     }

@@ -766,13 +766,11 @@ namespace FAD3
         public void UsageGearCode(string gearCode, bool isVariation)
         {
             _gearRefCode = gearCode;
-            if (_gearVarGuid.Length > 0)
+            if (_gearVarGuid.Length > 0 &&
+                Gears.AddGearVariationReferenceCode(_gearRefCode, _gearVarGuid, isVariation))
             {
-                if (Gears.AddGearVariationReferenceCode(_gearRefCode, _gearVarGuid, isVariation))
-                {
-                    var lvi = listViewCodes.Items.Add(_gearRefCode, _gearRefCode, null);
-                    lvi.SubItems.Add(isVariation.ToString());
-                }
+                var lvi = listViewCodes.Items.Add(_gearRefCode, _gearRefCode, null);
+                lvi.SubItems.Add(isVariation.ToString());
             }
         }
 
