@@ -131,22 +131,23 @@
             // buttonRemove
             // 
             this.buttonRemove.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonRemove.Location = new System.Drawing.Point(262, 168);
+            this.buttonRemove.Location = new System.Drawing.Point(250, 173);
             this.buttonRemove.Margin = new System.Windows.Forms.Padding(4);
             this.buttonRemove.Name = "buttonRemove";
-            this.buttonRemove.Size = new System.Drawing.Size(31, 28);
+            this.buttonRemove.Size = new System.Drawing.Size(35, 28);
             this.buttonRemove.TabIndex = 11;
             this.buttonRemove.Text = "-";
             this.buttonRemove.UseVisualStyleBackColor = true;
             this.buttonRemove.Click += new System.EventHandler(this.OnButtonClick);
+            this.buttonRemove.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnButtonMouseDown);
             // 
             // buttonAdd
             // 
             this.buttonAdd.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonAdd.Location = new System.Drawing.Point(262, 137);
+            this.buttonAdd.Location = new System.Drawing.Point(250, 137);
             this.buttonAdd.Margin = new System.Windows.Forms.Padding(4);
             this.buttonAdd.Name = "buttonAdd";
-            this.buttonAdd.Size = new System.Drawing.Size(31, 28);
+            this.buttonAdd.Size = new System.Drawing.Size(35, 28);
             this.buttonAdd.TabIndex = 10;
             this.buttonAdd.Text = "+";
             this.buttonAdd.UseVisualStyleBackColor = true;
@@ -213,6 +214,7 @@
             this.Name = "LengthFreqForm";
             this.ShowInTaskbar = false;
             this.Text = "Length frequency";
+            this.Load += new System.EventHandler(this.OnFormLoad);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.ResumeLayout(false);

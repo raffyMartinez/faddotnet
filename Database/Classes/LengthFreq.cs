@@ -10,27 +10,58 @@ namespace FAD3.Database.Classes
     {
         private static int _LFRowsCount;
 
-        public static bool SaveEditedLF(Dictionary<string, (double len, int freq, fad3DataStatus dataStatus)> LFData, string catchRowGuid)
+        public static bool SaveEditedLF(Dictionary<string, (double len, int freq, fad3DataStatus dataStatus)> LFData, string catchRowGuid, bool eraseAll = false)
         {
             var saveCount = 0;
             var n = 0;
             var fromDbCount = 0;
-            foreach (var item in LFData)
+            if (eraseAll)
             {
-                if (item.Value.dataStatus != fad3DataStatus.statusFromDB)
-                {
-                    if (UpdateLF(item.Value.len, item.Value.freq, n, catchRowGuid, item.Key, item.Value.dataStatus))
-                    {
-                        saveCount++;
-                    }
-                }
-                else
-                {
-                    fromDbCount++;
-                }
-                n++;
+                return EraseAllLF(catchRowGuid);
             }
-            return saveCount + fromDbCount == LFData.Count;
+            else
+            {
+                foreach (var item in LFData)
+                {
+                    if (item.Value.dataStatus != fad3DataStatus.statusFromDB)
+                    {
+                        if (UpdateLF(item.Value.len, item.Value.freq, n, catchRowGuid, item.Key, item.Value.dataStatus))
+                        {
+                            saveCount++;
+                        }
+                    }
+                    else
+                    {
+                        fromDbCount++;
+                    }
+                    n++;
+                }
+                return saveCount + fromDbCount == LFData.Count;
+            }
+        }
+
+        public static bool EraseAllLF(string catchCompRowGuid)
+        {
+            bool success = false;
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    var query = $"Delete * from tblLF where CatchCompRow = {{{catchCompRowGuid}}}";
+
+                    OleDbCommand update = new OleDbCommand(query, conn);
+                    conn.Open();
+                    update.ExecuteNonQuery();
+                    conn.Close();
+                    success = true;
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
+                    success = false;
+                }
+            }
+            return success;
         }
 
         public static List<LengthFreqItem> LenFreqList(string catchCompRowNo)

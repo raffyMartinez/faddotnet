@@ -194,6 +194,7 @@ namespace FAD3
                     o.AutoCompleteSource = AutoCompleteSource.ListItems;
                     o.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
                     o.Visible = false;
+                    o.Sorted = true;
                 });
 
                 //adds the comboboxes to the panel
@@ -454,7 +455,7 @@ namespace FAD3
             //if true we change the currenttextbox text to the editor combobox text
             //this is made false when we process a not-in-list combo text because combo contents
             //could be out of context already
-            var CompareNameChanges = true;
+            var compareNameChanges = true;
 
             ((ComboBox)sender).With(o =>
             {
@@ -495,7 +496,7 @@ namespace FAD3
                                         _currentTextBox.Text = _newGenus;
                                         _currentGenus = _newGenus;
 
-                                        CompareNameChanges = false;
+                                        compareNameChanges = false;
 
                                         //empty the current row's name2 field
                                         GetTextBox(null, _currentTextBox, true).Text = "";
@@ -542,7 +543,8 @@ namespace FAD3
                                     }
                                 }
 
-                                if (!isInList)
+                                //if (!isInList)
+                                else
                                 {
                                     //text not in list
                                     var msg = "";
@@ -560,16 +562,42 @@ namespace FAD3
                                         DialogResult dr = MessageBox.Show(msg, "Item not in list", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
                                         if (dr == DialogResult.Yes)
                                         {
-                                            CompareNameChanges = false;
+                                            compareNameChanges = false;
                                             if (o.Name == "cboSpecies")
                                             {
                                                 _currentTextBox.Text = _cboEditor.Text.Trim();
-                                                SpeciesNameForm snf = new SpeciesNameForm(_currentGenus, o.Text, this);
-                                                snf.ShowDialog(this);
+                                                using (SpeciesNameForm snf = new SpeciesNameForm(_currentGenus, o.Text, this))
+                                                {
+                                                    snf.ShowDialog(this);
+                                                    if (snf.DialogResult == DialogResult.OK)
+                                                    {
+                                                        ccd.CatchName = $"{snf.Genus} {snf.Species}";
+                                                        ccd.CatchNameGUID = snf.SpeciesGuid;
+                                                        ccd.Name1 = snf.Genus;
+                                                        ccd.Name2 = snf.Species;
+                                                    }
+                                                }
                                             }
                                             else
                                             {
                                                 //add new local name here
+                                                string localNameGuid = Guid.NewGuid().ToString();
+                                                if (CatchName.AddCatchName(localNameGuid, "LocalName", o.Text, "")) ;
+                                                {
+                                                    _currentTextBox.Text = o.Text;
+                                                    ccd.Name1 = o.Text;
+                                                    ccd.CatchNameGUID = localNameGuid;
+                                                    //var kv = new KeyValuePair<string, string>(localNameGuid, o.Text);
+                                                    //o.Items.Add(kv);
+                                                    o.Items.Add(new KeyValuePair<string, string>(localNameGuid, o.Text));
+                                                    o.AutoCompleteSource = AutoCompleteSource.ListItems;
+                                                    //_comboLocalName.Items.Clear();
+                                                    //Names.GetLocalNames();
+                                                    //foreach (var item in Names.LocalNameListDict)
+                                                    //{
+                                                    //    _comboLocalName.Items.Add(item);
+                                                    //}
+                                                }
                                             }
                                         }
                                         else
@@ -583,11 +611,26 @@ namespace FAD3
                                     {
                                         //add new genus and species here
 
-                                        CompareNameChanges = false;
+                                        compareNameChanges = false;
 
                                         _currentTextBox.Text = _cboEditor.Text.Trim();
-                                        SpeciesNameForm snf = new SpeciesNameForm(_newGenus, o.Text, this);
-                                        snf.ShowDialog(this);
+                                        using (SpeciesNameForm snf = new SpeciesNameForm(_newGenus, o.Text, this))
+                                        {
+                                            snf.ShowDialog(this);
+                                            if (snf.DialogResult == DialogResult.OK)
+                                            {
+                                                ccd.CatchName = $"{snf.Genus} {snf.Species}";
+                                                ccd.CatchNameGUID = snf.SpeciesGuid;
+                                                ccd.Name1 = snf.Genus;
+                                                ccd.Name2 = snf.Species;
+                                                _comboGenus.Items.Clear();
+                                                Names.GetGenus();
+                                                foreach (var item in Names.GenusList)
+                                                {
+                                                    _comboGenus.Items.Add(item);
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                                 break;
@@ -611,7 +654,7 @@ namespace FAD3
                 });
             });
 
-            if (!e.Cancel && _currentTextBox.Text != _cboEditor.Text && CompareNameChanges)
+            if (!e.Cancel && _currentTextBox.Text != _cboEditor.Text && compareNameChanges)
             {
                 _currentTextBox.Text = _cboEditor.Text.Trim();
                 SetRowStatusToEdited(_currentTextBox);

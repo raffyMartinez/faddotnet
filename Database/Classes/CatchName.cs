@@ -128,7 +128,7 @@ namespace FAD3
                             }
                             sql = $@"Insert into temp_AllNames (Name1,Name2,NameNo,Identification)
                                     values (
-                                    '{name1}','{name2}',{{{nameGuid}}},{idType}
+                                    '{name1}','{name2}',{{{nameGuid}}},'{idType}'
                                     )";
                             using (OleDbCommand updateAll = new OleDbCommand(sql, conn))
                             {

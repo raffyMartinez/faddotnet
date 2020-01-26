@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+using FAD3.GUI.Classes;
 
 namespace FAD3
 {
@@ -168,15 +169,30 @@ namespace FAD3
             switch (((Button)sender).Name)
             {
                 case "buttonOK":
+                    var blankCount = 0;
                     var ValidationPassed = true;
-                    foreach (Control c in panelUI.Controls)
+                    if (_row == 1)
                     {
-                        if (c.GetType().Name == "TextBox")
+                        foreach (Control c in panelUI.Controls)
                         {
-                            if (c.Text.Length == 0)
+                            if (c.GetType().Name == "TextBox" && c.Text.Length == 0)
                             {
-                                ValidationPassed = false;
-                                break;
+                                blankCount++;
+                            }
+                        }
+                        ValidationPassed = blankCount == 2 || blankCount == 0;
+                    }
+                    else
+                    {
+                        foreach (Control c in panelUI.Controls)
+                        {
+                            if (c.GetType().Name == "TextBox")
+                            {
+                                if (c.Text.Length == 0)
+                                {
+                                    ValidationPassed = false;
+                                    break;
+                                }
                             }
                         }
                     }
@@ -206,7 +222,7 @@ namespace FAD3
 
                     if (proceed)
                     {
-                        if (SaveLFData())
+                        if (SaveLFData(blankCount == 2))
                         {
                             Close();
                             _parent_form.RefreshLF_GMS();
@@ -234,19 +250,22 @@ namespace FAD3
                     break;
 
                 case "buttonRemove":
-                    panelUI.Controls.Clear();
-                    var lfData = _lf[_currentRow];
-                    lfData.dataStatus = fad3DataStatus.statusForDeletion;
-                    _lf[_currentRow] = lfData;
-                    _lengthClasses.Clear();
-                    if (_lf.Count == 1 || FieldRowCount() == 1)
-                    {
-                        PopulateFieldControls(true);
-                    }
-                    else
-                    {
-                        PopulateFieldControls(false, true);
-                    }
+                    //panelUI.Controls.Clear();
+                    //var lfData = _lf[_currentRow];
+                    //lfData.dataStatus = fad3DataStatus.statusForDeletion;
+                    //_lf[_currentRow] = lfData;
+                    //_lengthClasses.Clear();
+
+                    ////if (_lf.Count == 1 || FieldRowCount() == 1)
+                    //if (_lf.Count == 0 || FieldRowCount() == 0)
+                    //{
+                    //    PopulateFieldControls(true);
+                    //}
+                    //else
+                    //{
+                    //    PopulateFieldControls(false, true);
+                    //}
+
                     break;
             }
         }
@@ -469,9 +488,9 @@ namespace FAD3
         /// Dictionary is passed to the SaveEditedLF function.
         /// </summary>
         /// <returns></returns>
-        private bool SaveLFData()
+        private bool SaveLFData(bool eraseAll = false)
         {
-            return LengthFreq.SaveEditedLF(_lf, _catchRowGuid);
+            return LengthFreq.SaveEditedLF(_lf, _catchRowGuid, eraseAll);
         }
 
         /// <summary>
@@ -642,6 +661,67 @@ namespace FAD3
                 case "checkUseSize":
                     break;
             }
+        }
+
+        private void SetUpToolTips()
+        {
+            // Create the ToolTip and associate with the Form container.
+            ToolTip tt = new ToolTip();
+
+            // Set up the delays for the ToolTip.
+            tt.AutoPopDelay = TooltipGlobal.AutoPopDelay;
+            tt.InitialDelay = TooltipGlobal.InitialDelay;
+            tt.ReshowDelay = TooltipGlobal.ReshowDelay;
+
+            // Force the ToolTip text to be displayed whether or not the form is active.
+            tt.ShowAlways = TooltipGlobal.ShowAlways;
+
+            tt.SetToolTip(buttonAdd, "Add a new LF data");
+            tt.SetToolTip(buttonRemove, "Remove one LF data, Control-click to remove all data");
+            tt.SetToolTip(buttonOK, "Save LF data");
+            tt.SetToolTip(buttonCancel, "Cancel and closes this form");
+        }
+
+        private void OnButtonMouseDown(object sender, MouseEventArgs e)
+        {
+            switch (((Button)sender).Name)
+            {
+                case "buttonRemove":
+
+                    if (e.Button == MouseButtons.Left && (ModifierKeys & Keys.Control) == Keys.Control)
+                    {
+                        if (MessageBox.Show("Are you sure you want to remove all LF data", "Verify first", MessageBoxButtons.OKCancel) == DialogResult.OK)
+                        {
+                            panelUI.Controls.Clear();
+                            _lengthClasses.Clear();
+                            PopulateFieldControls(true);
+                        }
+                    }
+                    else if (e.Button == MouseButtons.Left)
+                    {
+                        panelUI.Controls.Clear();
+                        var lfData = _lf[_currentRow];
+                        lfData.dataStatus = fad3DataStatus.statusForDeletion;
+                        _lf[_currentRow] = lfData;
+                        _lengthClasses.Clear();
+
+                        //if (_lf.Count == 1 || FieldRowCount() == 1)
+                        if (_lf.Count == 0 || FieldRowCount() == 0)
+                        {
+                            PopulateFieldControls(true);
+                        }
+                        else
+                        {
+                            PopulateFieldControls(false, true);
+                        }
+                    }
+                    break;
+            }
+        }
+
+        private void OnFormLoad(object sender, EventArgs e)
+        {
+            SetUpToolTips();
         }
     }
 }

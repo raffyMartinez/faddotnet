@@ -1443,11 +1443,34 @@ namespace FAD3
             return success;
         }
 
+        private static bool AddNewSpeciesToAllNamesTable(string spName, string genName, string nameGUID)
+        {
+            var success = false;
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                var sql = $@"Insert into temp_AllNames (Name1,Name2,NameNo,Identification) values
+                            ('{spName}','{genName}',{{{nameGUID}}},'Species names')";
+                using (OleDbCommand update = new OleDbCommand(sql, conn))
+                {
+                    try
+                    {
+                        success = update.ExecuteNonQuery() > 0;
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log(ex.Message, "Names", "AddNewSpeciesToAllNamesTable");
+                    }
+                }
+            }
+            return success;
+        }
+
         public static bool UpdateSpeciesData(fad3DataStatus dataStatus, string nameGuid, string genus, string species, Taxa taxa,
                               short genusMPH1, short genusMPH2, short speciesMPH1, short speciesMPH2, bool inFishbase, int? fishBaseSpeciesNo, string notes)
         {
             var sql = "";
-            var Success = false;
+            var success = false;
             var fbNo = fishBaseSpeciesNo == null ? "null" : fishBaseSpeciesNo.ToString();
             using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
             {
@@ -1464,11 +1487,12 @@ namespace FAD3
                     {
                         try
                         {
-                            Success = update.ExecuteNonQuery() > 0;
-                            if (Success)
+                            success = update.ExecuteNonQuery() > 0;
+                            if (success)
                             {
                                 _allSpeciesDictionaryReverse.Add(genus + " " + species, nameGuid);
                                 _allSpeciesDictionary.Add(nameGuid, genus + " " + species);
+                                success = AddNewSpeciesToAllNamesTable(genus, species, nameGuid);
                             }
                         }
                         catch
@@ -1512,7 +1536,7 @@ namespace FAD3
 
                     using (OleDbCommand update = new OleDbCommand(sql, conn))
                     {
-                        Success = update.ExecuteNonQuery() > 0;
+                        success = update.ExecuteNonQuery() > 0;
                     }
                 }
                 else if (dataStatus == fad3DataStatus.statusForDeletion)
@@ -1520,11 +1544,11 @@ namespace FAD3
                     sql = $"Delete * from tblAllSpecies where SpeciesGUID = {{{nameGuid}}}";
                     using (OleDbCommand update = new OleDbCommand(sql, conn))
                     {
-                        Success = update.ExecuteNonQuery() > 0;
+                        success = update.ExecuteNonQuery() > 0;
                     }
                 }
             }
-            return Success;
+            return success;
         }
 
         public static Dictionary<string, CatchName> RetrieveScientificNames(Dictionary<string, string> filters = null, bool selectOnlyWithRecords = false)
@@ -1936,6 +1960,32 @@ namespace FAD3
 
             dbData.Close();
             dbData = null;
+        }
+
+        public static void GetGenus()
+        {
+            _genusList.Clear();
+            DataTable dt = new DataTable();
+            using (var conection = new OleDbConnection(global.ConnectionString))
+            {
+                try
+                {
+                    conection.Open();
+                    const string query = "SELECT DISTINCT Name1 FROM temp_AllNames WHERE Identification = 'Species names' ORDER BY Name1";
+                    var adapter = new OleDbDataAdapter(query, conection);
+                    adapter.Fill(dt);
+
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        DataRow dr = dt.Rows[i];
+                        _genusList.Add(dr["Name1"].ToString());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex.Message, MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name);
+                }
+            }
         }
 
         public static void GetGenus_LocalNames()

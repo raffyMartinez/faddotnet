@@ -218,7 +218,7 @@ namespace FAD3
                             break;
 
                         case fad3GearEditAction.addGearCode:
-                            _parentForm.UsageGearCode(textBox.Text, checkBox.Checked);
+                            _parentForm.UsageGearCode($"{labelCode.Text}{textBox.Text}", checkBox.Checked);
                             break;
 
                         case fad3GearEditAction.addAOI:

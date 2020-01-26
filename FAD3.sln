@@ -15,6 +15,8 @@ Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "FADUpdaterJune282019", "upd
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "FadUpdaterAug2019", "updaters\FADUpdaterAug182019\FadUpdaterAug2019\FadUpdaterAug2019.vdproj", "{327C7377-DD68-4426-A1B9-7E81BBB8A332}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "FADUpdaterJan212020", "updaters\FADUpdaterJan212020\FADUpdaterJan212020.vdproj", "{64388EA8-BCC1-4238-8762-F807938AF2BB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,6 +79,12 @@ Global
 		{327C7377-DD68-4426-A1B9-7E81BBB8A332}.Release|Any CPU.ActiveCfg = Release
 		{327C7377-DD68-4426-A1B9-7E81BBB8A332}.Release|x64.ActiveCfg = Release
 		{327C7377-DD68-4426-A1B9-7E81BBB8A332}.Release|x86.ActiveCfg = Release
+		{64388EA8-BCC1-4238-8762-F807938AF2BB}.Debug|Any CPU.ActiveCfg = Debug
+		{64388EA8-BCC1-4238-8762-F807938AF2BB}.Debug|x64.ActiveCfg = Debug
+		{64388EA8-BCC1-4238-8762-F807938AF2BB}.Debug|x86.ActiveCfg = Debug
+		{64388EA8-BCC1-4238-8762-F807938AF2BB}.Release|Any CPU.ActiveCfg = Release
+		{64388EA8-BCC1-4238-8762-F807938AF2BB}.Release|x64.ActiveCfg = Release
+		{64388EA8-BCC1-4238-8762-F807938AF2BB}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
