@@ -65,7 +65,7 @@ namespace FAD3
         private string _vesLength = "";
         private string _vesWidth = "";
         private Taxa _taxa = Taxa.To_be_determined;
-
+        private bool _specAndExpenseFormVisible = false;
         private bool _appIsLocked;
 
         private ListView _lvCatch;
@@ -506,6 +506,10 @@ namespace FAD3
 
                 tsi1 = menuDropDown.Items.Add("Delete sampling");
                 tsi1.Name = "menuDeleteSampling";
+                tsi1.Visible = lvMain.Tag.ToString() == "sampling";
+
+                tsi1 = menuDropDown.Items.Add("View gear specs and expense items");
+                tsi1.Name = "menuViewGearSpecs_Expenses";
                 tsi1.Visible = lvMain.Tag.ToString() == "sampling";
             }
 
@@ -1156,6 +1160,11 @@ namespace FAD3
             }
         }
 
+        public void SpecExpenseViewwerFormStatus(bool visible)
+        {
+            _specAndExpenseFormVisible = visible;
+        }
+
         private async void OnMenuDropDown_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
             var ItemName = e.ClickedItem.Name;
@@ -1417,6 +1426,10 @@ namespace FAD3
                     ShowLFForm(IsNew: true);
                     break;
 
+                case "menuViewGearSpecs_Expenses":
+                    SetUpGearSpecExpenseViewer();
+                    break;
+
                 case "menuEditCatchComposition":
                 case "menuNewCatchComposition":
 
@@ -1485,6 +1498,23 @@ namespace FAD3
                     global.MappingMode = fad3MappingMode.fishingGroundMappingMode;
                     break;
             }
+        }
+
+        private void SetUpGearSpecExpenseViewer()
+        {
+            ViewGearSpec_ExpensesForm vgsef = ViewGearSpec_ExpensesForm.GetInstance();
+            if (vgsef.Visible)
+            {
+                vgsef.BringToFront();
+            }
+            else
+            {
+                vgsef.ParentForm = this;
+                vgsef.Show(this);
+            }
+            vgsef.RefNumber = lvMain.SelectedItems[0].SubItems[0].Text;
+            vgsef.SamplingGuid = _samplingGUID;
+            vgsef.LoadSpecsAndExpenses();
         }
 
         private void SetMappingEffortSource()
@@ -1761,18 +1791,32 @@ namespace FAD3
                             && (ModifierKeys & Keys.Control) == Keys.Control)
                         {
                             var subItem = lvh.Item.GetSubItemAt(_mouseX, _mouseY);
+                            var samplingGuid = lvh.Item.Name;
                             if (subItem.Tag?.ToString() == "ExpenseItem" && subItem.Text == "x")
                             {
-                                var samplingGuid = lvh.Item.Name;
                                 var result = OperatingExpenses.ReadData(samplingGuid, true);
                                 if (result.success)
                                 {
                                     var expenseItem = result.exp;
                                     var expenseString = OperatingExpenses.SamplingExpenses;
-                                    MessageBox.Show($"{lvh.Item.SubItems[0].Text}\r\n\r\n {expenseString}", "Operating expenses:");
+                                    MessageBox.Show($"{lvh.Item.SubItems[0].Text}\r\n\r\n {expenseString}", "Operating expenses:", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                }
+                            }
+                            else if (subItem?.Tag.ToString() == "SpecSubItem" && subItem.Text == "x")
+                            {
+                                var s = ManageGearSpecsClass.GetSampledSpecsEx(samplingGuid);
+                                if (s.Length == 0)
+                                    MessageBox.Show("Gear specs not found",
+                                                    "Gear specifications",
+                                                    MessageBoxButtons.OK,
+                                                    MessageBoxIcon.Information);
+                                else
+                                {
+                                    MessageBox.Show($"{lvh.Item.SubItems[0].Text}\r\n\r\n{s}", "Gear specifications", MessageBoxButtons.OK, MessageBoxIcon.Information);
                                 }
                             }
                         }
+
                         _referenceNumber = lvh.Item.Text;
                     }
                     if (e.Button == MouseButtons.Right)
@@ -3764,6 +3808,15 @@ namespace FAD3
         {
             switch (((ListView)sender).Name)
             {
+                case "lvMain":
+
+                    if (lvMain.Tag.ToString() == "sampling" && _specAndExpenseFormVisible)
+                    {
+                        SetUpGearSpecExpenseViewer();
+                    }
+
+                    break;
+
                 case "lvCatch":
                     if (_lvCatch.SelectedItems[0].Text.Length > 0)
                     {

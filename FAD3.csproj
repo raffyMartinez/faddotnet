@@ -379,6 +379,12 @@
     <Compile Include="Database\Forms\ReportTableForm.Designer.cs">
       <DependentUpon>ReportTableForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Database\Forms\ViewGearSpec_ExpensesForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Database\Forms\ViewGearSpec_ExpensesForm.Designer.cs">
+      <DependentUpon>ViewGearSpec_ExpensesForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="GUI\Classes\TooltipGlobal.cs" />
     <Compile Include="GUI\Forms\AboutFADForm2.cs">
       <SubType>Form</SubType>
@@ -974,6 +980,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Database\Forms\ReportTableForm.resx">
       <DependentUpon>ReportTableForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Database\Forms\ViewGearSpec_ExpensesForm.resx">
+      <DependentUpon>ViewGearSpec_ExpensesForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Forms\AboutFADForm2.resx">
       <DependentUpon>AboutFADForm2.cs</DependentUpon>
