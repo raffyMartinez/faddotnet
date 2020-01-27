@@ -16,7 +16,7 @@ namespace FAD3.Database.Forms
         private static ViewGearSpec_ExpensesForm _instance;
         public string SamplingGuid { get; set; }
         public string RefNumber { get; set; }
-        public MainForm ParentForm { get; set; }
+        public MainForm MainForm { get; set; }
 
         public static ViewGearSpec_ExpensesForm GetInstance()
         {
@@ -62,13 +62,13 @@ namespace FAD3.Database.Forms
         {
             _instance = null;
             global.SaveFormSettings(this);
-            ParentForm.SpecExpenseViewwerFormStatus(visible: false);
+            MainForm.SpecExpenseViewwerFormStatus(visible: false);
         }
 
         private void OnFormLoad(object sender, EventArgs e)
         {
             global.LoadFormSettings(this, true);
-            ParentForm.SpecExpenseViewwerFormStatus(visible: true);
+            MainForm.SpecExpenseViewwerFormStatus(visible: true);
         }
 
         private void OnButtonClick(object sender, EventArgs e)

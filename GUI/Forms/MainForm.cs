@@ -83,6 +83,11 @@ namespace FAD3
         private Grid25GenerateForm _grid25GenerateForm;
         private string _referenceNumber = "";
 
+        public bool SpecAndExpenseFormVisible
+        {
+            get { return _specAndExpenseFormVisible; }
+        }
+
         public MainForm()
         {
             //
@@ -1509,11 +1514,11 @@ namespace FAD3
             }
             else
             {
-                vgsef.ParentForm = this;
+                vgsef.MainForm = this;
                 vgsef.Show(this);
             }
             vgsef.RefNumber = lvMain.SelectedItems[0].SubItems[0].Text;
-            vgsef.SamplingGuid = _samplingGUID;
+            vgsef.SamplingGuid = lvMain.SelectedItems[0].Name;
             vgsef.LoadSpecsAndExpenses();
         }
 
@@ -2224,10 +2229,12 @@ namespace FAD3
         {
             _LSNode = null;
             SetupSamplingButtonFrame(false);
+
             if (global.MapIsOpen)
             {
                 global.MappingForm.MapLayersHandler.RemoveLayer("Fishing ground");
             }
+
             try
             {
                 _landingSiteName = "";
@@ -2774,6 +2781,14 @@ namespace FAD3
             {
                 case "sampling":
                     FillLVSamplingSummary(_landingSiteGuid, _gearVarGUID, _samplingMonth);
+                    if (lvMain.Items.Count > 0)
+                    {
+                        lvMain.Items[0].Selected = true;
+                    }
+                    if (_specAndExpenseFormVisible)
+                    {
+                        SetUpGearSpecExpenseViewer();
+                    }
                     //if (global.MapIsOpen)
                     //{
                     //    global.MappingForm.MapLayersHandler.RemoveLayer("Fishing ground");
