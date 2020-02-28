@@ -794,6 +794,19 @@ namespace FAD3
                     update.ExecuteNonQuery();
                 }
 
+                //we delete operating expenses
+                query = $"Delete * from tblFishingExpenseItems where SamplingGuid =  {{{samplingGUID}}}";
+                using (OleDbCommand update = new OleDbCommand(query, conection))
+                {
+                    Success = (update.ExecuteNonQuery() > 0);
+                }
+
+                query = $"Delete * from tblFishingExpense where SamplingGUID =  {{{samplingGUID}}}";
+                using (OleDbCommand update = new OleDbCommand(query, conection))
+                {
+                    Success = (update.ExecuteNonQuery() > 0);
+                }
+
                 //delete additional fishing ground
                 query = $"Delete * from tblGrid where SamplingGUID = {{{samplingGUID}}}";
                 using (OleDbCommand update = new OleDbCommand(query, conection))
@@ -1612,7 +1625,9 @@ namespace FAD3
                 {
                     if (sampling.IsNew)
                     {
-                        updateQuery = $@"Insert into tblSampling (SamplingGUID, GearVarGUID, AOI, RefNo, SamplingDate, SamplingTime,
+                        if (sampling.FishingVessel != null)
+                        {
+                            updateQuery = $@"Insert into tblSampling (SamplingGUID, GearVarGUID, AOI, RefNo, SamplingDate, SamplingTime,
                             FishingGround, SubGrid, TimeSet, DateSet, TimeHauled, DateHauled, NoHauls, NoFishers, Engine, hp,
                             WtCatch, WtSample, len, wdt, hgt, LSGUID,  Notes, VesType, SamplingType, HasLiveFish, Enumerator, DateEncoded)
                             values (
@@ -1630,7 +1645,7 @@ namespace FAD3
                             {(sampling.GearHaulingDateTime == null ? "Null" : "'" + sampling.GearHaulingDateTime.Value.Date.ToString() + "'")},
                             {(sampling.NumberOfHauls == null ? "Null" : sampling.NumberOfHauls.ToString())},
                             {(sampling.NumberOfFishers == null ? "Null" : sampling.NumberOfFishers.ToString())},
-                            '{(sampling.FishingVessel.Engine == null ? "" : sampling.FishingVessel.Engine)}',
+                            {(sampling.FishingVessel.Engine == null ? "" : sampling.FishingVessel.Engine)}',
                             {(sampling.FishingVessel.EngineHorsepower == null ? "Null" : sampling.FishingVessel.EngineHorsepower.ToString())},
                             {sampling.CatchWeight},
                             {(sampling.SampleWeight == null ? "Null" : sampling.SampleWeight.ToString())},
@@ -1644,11 +1659,45 @@ namespace FAD3
                             {sampling.HasLiveFish.ToString()},
                             {{{sampling.EnumeratorGuid}}},
                             '{sampling.DateEncoded.ToString()}')";
-                        // removed '{EffortData["VesselID"]}',
+                            // removed '{EffortData["VesselID"]}',
+                        }
+                        else
+                        {
+                            //update query if there is no fishing vessel used
+                            updateQuery = $@"Insert into tblSampling (SamplingGUID, GearVarGUID, AOI, RefNo, SamplingDate, SamplingTime,
+                            FishingGround, SubGrid, TimeSet, DateSet, TimeHauled, DateHauled, NoHauls, NoFishers, WtCatch, WtSample,
+                            LSGUID,  Notes, VesType, SamplingType, HasLiveFish, Enumerator, DateEncoded)
+                            values (
+                            {{{sampling.SamplingGUID}}},
+                            {{{sampling.GearVariationGuid}}},
+                            {{{sampling.TargetAreaGuid}}},
+                            '{sampling.ReferenceNumber}',
+                            '{sampling.SamplingDateTime.Date}',
+                            '{sampling.SamplingDateTime.TimeOfDay}',
+                            '{sampling.FirstFishingGround}',
+                            {(sampling.FirstSubGrid == null ? "Null" : sampling.FirstSubGrid.Value.ToString())},
+                            {(sampling.GearSettingDateTime == null ? "Null" : "'" + sampling.GearSettingDateTime.Value.TimeOfDay.ToString() + "'")},
+                            {(sampling.GearSettingDateTime == null ? "Null" : "'" + sampling.GearSettingDateTime.Value.Date.ToString() + "'")},
+                            {(sampling.GearHaulingDateTime == null ? "Null" : "'" + sampling.GearHaulingDateTime.Value.TimeOfDay.ToString() + "'")},
+                            {(sampling.GearHaulingDateTime == null ? "Null" : "'" + sampling.GearHaulingDateTime.Value.Date.ToString() + "'")},
+                            {(sampling.NumberOfHauls == null ? "Null" : sampling.NumberOfHauls.ToString())},
+                            {(sampling.NumberOfFishers == null ? "Null" : sampling.NumberOfFishers.ToString())},
+                            {sampling.CatchWeight},
+                            {(sampling.SampleWeight == null ? "Null" : sampling.SampleWeight.ToString())},
+                            {{{sampling.LandingSiteGuid}}},
+                            '{sampling.Notes}',
+                            {(int)sampling.FishingVessel.VesselType},
+                            {(int)sampling.SamplingType},
+                            {sampling.HasLiveFish.ToString()},
+                            {{{sampling.EnumeratorGuid}}},
+                            '{sampling.DateEncoded.ToString()}')";
+                        }
                     }
                     else
                     {
-                        updateQuery = $@"Update tblSampling set
+                        if (sampling.FishingVessel != null)
+                        {
+                            updateQuery = $@"Update tblSampling set
                             GearVarGUID ={{{sampling.GearVariationGuid}}},
                             AOI ={{{sampling.TargetAreaGuid}}},
                             RefNo ='{sampling.ReferenceNumber}',
@@ -1676,7 +1725,40 @@ namespace FAD3
                             HasLiveFish = {sampling.HasLiveFish.ToString()},
                             Enumerator = {{{sampling.EnumeratorGuid}}}
                             Where SamplingGUID = {{{sampling.SamplingGUID}}}";
-                        //removed VesselID = '{EffortData["VesselID"]}
+                            //removed VesselID = '{EffortData["VesselID"]}
+                        }
+                        else
+                        {
+                            //update query if there is no fishing vessel used
+                            updateQuery = $@"Update tblSampling set
+                            GearVarGUID ={{{sampling.GearVariationGuid}}},
+                            AOI ={{{sampling.TargetAreaGuid}}},
+                            RefNo ='{sampling.ReferenceNumber}',
+                            SamplingDate ='{sampling.SamplingDateTime.Date}',
+                            SamplingTime ='{sampling.SamplingDateTime.TimeOfDay}',
+                            FishingGround = '{sampling.FirstFishingGround}',
+                            SubGrid = {(sampling.FirstSubGrid == null ? "Null" : sampling.FirstSubGrid.Value.ToString())},
+                            TimeSet ={(sampling.GearSettingDateTime == null ? "Null" : "'" + sampling.GearSettingDateTime.Value.TimeOfDay.ToString() + "'")},
+                            DateSet = {(sampling.GearSettingDateTime == null ? "Null" : "'" + sampling.GearSettingDateTime.Value.Date.ToString() + "'")},
+                            TimeHauled = {(sampling.GearHaulingDateTime == null ? "Null" : "'" + sampling.GearHaulingDateTime.Value.TimeOfDay.ToString() + "'")},
+                            DateHauled = {(sampling.GearHaulingDateTime == null ? "Null" : "'" + sampling.GearHaulingDateTime.Value.Date.ToString() + "'")},
+                            NoHauls = {(sampling.NumberOfHauls == null ? "Null" : sampling.NumberOfHauls.ToString())},
+                            NoFishers = {(sampling.NumberOfFishers == null ? "Null" : sampling.NumberOfFishers.ToString())},
+                            WtCatch ={sampling.CatchWeight.ToString()},
+                            WtSample ={(sampling.SampleWeight == null ? "Null" : sampling.SampleWeight.ToString())},
+                            len = Null,
+                            wdt = Null,
+                            hgt = Null,
+                            Engine='',
+                            hp = Null,
+                            LSGUID ={{{sampling.LandingSiteGuid}}},
+                            Notes = '{sampling.Notes}',
+                            VesType = {(int)VesselType.NoVesselUsed},
+                            SamplingType ={(int)sampling.SamplingType},
+                            HasLiveFish = {sampling.HasLiveFish.ToString()},
+                            Enumerator = {{{sampling.EnumeratorGuid}}}
+                            Where SamplingGUID = {{{sampling.SamplingGUID}}}";
+                        }
                     }
 
                     using (OleDbCommand update = new OleDbCommand(updateQuery, conn))
@@ -1713,7 +1795,7 @@ namespace FAD3
             }
             if (success)
             {
-                if (sampling.FishingVessel.Engine.Length > 0 && !_engines.Contains(sampling.FishingVessel.Engine))
+                if (sampling.FishingVessel?.Engine.Length > 0 && !_engines.Contains(sampling.FishingVessel?.Engine))
                 {
                     _engines.Add(engine);
                 }

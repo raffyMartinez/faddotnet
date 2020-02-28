@@ -54,6 +54,7 @@
             this.buttonAttributes = new System.Windows.Forms.ToolStripButton();
             this.buttonZoomToLayer = new System.Windows.Forms.ToolStripButton();
             this.buttonClose = new System.Windows.Forms.ToolStripButton();
+            this.buttonTileVisibility = new System.Windows.Forms.ToolStripButton();
             ((System.ComponentModel.ISupportInitialize)(this.layerGrid)).BeginInit();
             this.menuLayers.SuspendLayout();
             this.toolBar.SuspendLayout();
@@ -216,6 +217,7 @@
             this.toolBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.buttonAddLayer,
             this.buttonRemoveLayer,
+            this.buttonTileVisibility,
             this.buttonLegend,
             this.buttonAttributes,
             this.buttonZoomToLayer,
@@ -285,6 +287,18 @@
             this.buttonClose.Text = "toolStripButton1";
             this.buttonClose.ToolTipText = "Close layers";
             // 
+            // buttonTileVisibility
+            // 
+            this.buttonTileVisibility.CheckOnClick = true;
+            this.buttonTileVisibility.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.buttonTileVisibility.DoubleClickEnabled = true;
+            this.buttonTileVisibility.Image = global::FAD3.Properties.Resources._2Rows2Columns_16x;
+            this.buttonTileVisibility.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonTileVisibility.Name = "buttonTileVisibility";
+            this.buttonTileVisibility.Size = new System.Drawing.Size(23, 22);
+            this.buttonTileVisibility.Text = "toolStripButton1";
+            this.buttonTileVisibility.ToolTipText = "Set tiles visibility";
+            // 
             // MapLayersForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -335,5 +349,6 @@
         private System.Windows.Forms.ToolStripMenuItem itemAttributes;
         private System.Windows.Forms.ToolStripMenuItem itemAlwaysKeepOnTop;
         private System.Windows.Forms.ToolStripButton buttonLegend;
+        private System.Windows.Forms.ToolStripButton buttonTileVisibility;
     }
 }

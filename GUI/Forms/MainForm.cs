@@ -1,13 +1,4 @@
-﻿/*
- * Created by SharpDevelop.
- * User: Raffy
- * Date: 8/7/2016
- * Time: 1:53 PM
- *
- * To change this template use Tools | Options | Coding | Edit Standard Headers.
- */
-
-using FAD3.Database.Classes;
+﻿using FAD3.Database.Classes;
 using FAD3.Database.Forms;
 using FAD3.GUI.Forms;
 using Microsoft.Win32;
@@ -27,11 +18,10 @@ using System.Threading.Tasks;
 namespace FAD3
 {
     /// <summary>
-    /// Description of frmMain.
+    /// Main form is the main window of FAD.
     /// </summary>
     public partial class MainForm : Form
     {
-        private ExpensePerOperation _expensePerOperation;
         private bool _effortRefreshNeeded = false;
         public UpdatedSamplingCatchCompositionCount UpdatedSamplingCatchRowCount { get; set; }
         private MapEffortHelperForm _formEffortMapper;
@@ -1536,8 +1526,6 @@ namespace FAD3
         {
             CatchCompositionForm ccf = new CatchCompositionForm(IsNew, this, _samplingGUID, _referenceNumber, _weightOfCatch, _weightOfSample);
             ccf.ShowDialog(this);
-            //CatchCompositionForm2 ccf = new CatchCompositionForm2(IsNew, this, _samplingGUID, _referenceNumber, _weightOfCatch, _weightOfSample);
-            //ccf.Show(this);
         }
 
         private void NewSamplingForm()
@@ -1964,7 +1952,14 @@ namespace FAD3
             switch (tsi.Tag)
             {
                 case "resetRefNos":
-                    ReferenceNumberManager.ResetReferenceNumbers();
+                    if (ReferenceNumberManager.ResetReferenceNumbers())
+                    {
+                        MessageBox.Show("Reset referenece numbers done!", "FAD", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Reset reference numbers was not successfuk!", "FAD", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
                     break;
 
                 case "refNoRange":
@@ -3289,61 +3284,66 @@ namespace FAD3
                 double totalComputedWeight = 0;
                 int totalComputedCount = 0;
                 int computedCount = 0;
-                foreach (KeyValuePair<string, CatchLine> kv in CatchComposition.RetrieveCatchComposition(_samplingGUID))
+                var catchComposition = CatchComposition.RetrieveCatchComposition(_samplingGUID);
+                if (catchComposition.Count > 0)
                 {
-                    if (kv.Value.FromTotalCatch)
+                    foreach (KeyValuePair<string, CatchLine> kv in catchComposition)
                     {
-                        computedWeight = kv.Value.CatchWeight;
-                        if (kv.Value.CatchCount == null)
+                        if (kv.Value.FromTotalCatch)
                         {
-                            computedCount = (int)((kv.Value.CatchWeight / kv.Value.CatchSubsampleWt) * kv.Value.CatchSubsampleCount);
-                        }
-                        else
-                        {
-                            computedCount = (int)kv.Value.CatchCount;
-                        }
-                    }
-                    else
-                    {
-                        if (_weightOfSample != null)
-                        {
-                            computedWeight = (_weightOfCatch / (double)_weightOfSample) * kv.Value.CatchWeight;
+                            computedWeight = kv.Value.CatchWeight;
                             if (kv.Value.CatchCount == null)
                             {
                                 computedCount = (int)((kv.Value.CatchWeight / kv.Value.CatchSubsampleWt) * kv.Value.CatchSubsampleCount);
                             }
                             else
                             {
-                                computedCount = (int)((_weightOfCatch / (double)_weightOfSample) * kv.Value.CatchCount);
+                                computedCount = (int)kv.Value.CatchCount;
                             }
                         }
                         else
                         {
+                            if (_weightOfSample != null)
+                            {
+                                computedWeight = (_weightOfCatch / (double)_weightOfSample) * kv.Value.CatchWeight;
+                                if (kv.Value.CatchCount == null)
+                                {
+                                    computedCount = (int)((kv.Value.CatchWeight / kv.Value.CatchSubsampleWt) * kv.Value.CatchSubsampleCount);
+                                }
+                                else
+                                {
+                                    computedCount = (int)((_weightOfCatch / (double)_weightOfSample) * kv.Value.CatchCount);
+                                }
+                            }
                         }
+
+                        var lvi = new ListViewItem(new string[]
+                        {
+                            n.ToString(),
+                            kv.Value.CatchName,
+                            kv.Value.CatchWeight.ToString(),
+                            kv.Value.CatchCount.ToString(),
+                            kv.Value.CatchSubsampleWt.ToString(),
+                            kv.Value.CatchSubsampleCount.ToString(),
+                            kv.Value.FromTotalCatch.ToString(),
+                            //kv.Value.TaxaNumber.ToString()
+                            computedWeight.ToString("N2"),
+                            computedCount.ToString()
+                        });
+
+                        lvi.Name = kv.Key;
+                        lvi.SubItems[1].Name = kv.Value.CatchNameGUID;
+                        lvi.SubItems[1].Tag = kv.Value.TaxaNumber.ToString();
+                        lvi.Tag = kv.Value.NameType.ToString();
+                        _lvCatch.Items.Add(lvi);
+
+                        totalCatchWt += kv.Value.CatchWeight;
+                        totalCatchCount += kv.Value.CatchCount == null ? 0 : (int)kv.Value.CatchCount;
+                        totalComputedWeight += computedWeight;
+                        totalComputedCount += computedCount;
+
+                        n++;
                     }
-                    var lvi = new ListViewItem(new string[]
-                    {
-                        n.ToString(),
-                        kv.Value.CatchName,
-                        kv.Value.CatchWeight.ToString(),
-                        kv.Value.CatchCount.ToString(),
-                        kv.Value.CatchSubsampleWt.ToString(),
-                        kv.Value.CatchSubsampleCount.ToString(),
-                        kv.Value.FromTotalCatch.ToString(),
-                        //kv.Value.TaxaNumber.ToString()
-                        computedWeight.ToString("N2"),
-                        computedCount.ToString()
-                    });
-                    lvi.Name = kv.Key;
-                    lvi.SubItems[1].Name = kv.Value.CatchNameGUID;
-                    lvi.SubItems[1].Tag = kv.Value.TaxaNumber.ToString();
-                    lvi.Tag = kv.Value.NameType.ToString();
-                    _lvCatch.Items.Add(lvi);
-                    totalCatchWt += kv.Value.CatchWeight;
-                    totalCatchCount += kv.Value.CatchCount == null ? 0 : (int)kv.Value.CatchCount;
-                    totalComputedWeight += computedWeight;
-                    totalComputedCount += computedCount;
-                    n++;
                 }
 
                 _lvCatch.Items.Add("");

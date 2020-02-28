@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
 using dao;
+using FAD3.Database.Classes;
 
 namespace FAD3
 {
@@ -31,49 +32,53 @@ namespace FAD3
             get { return _HasVariationCode; }
         }
 
-        public static void ResetReferenceNumbers()
+        public static bool ResetReferenceNumbers()
         {
             var dbe = new DBEngine();
             dao.Database db = dbe.OpenDatabase(global.MDBPath);
 
             try
             {
-                db.QueryDefs.Delete("qry_tempResetRefNo1");
-            }
-            catch (Exception)
-            {
-                //ignore error
-            }
-            try
-            {
-                db.QueryDefs.Delete("qry_tempResetRefNo2");
-            }
-            catch (Exception)
-            {
-                //ignore
-            }
+                try
+                {
+                    db.QueryDefs.Delete("qry_tempResetRefNo1");
+                }
+                catch { }
 
-            string sql = @"SELECT Left([RefNo],InStr(InStr(1,[RefNo],'-')+1,[RefNo],'-')-1) AS code,
+                try
+                {
+                    db.QueryDefs.Delete("qry_tempResetRefNo2");
+                }
+                catch { }
+
+                string sql = @"SELECT Left([RefNo],InStr(InStr(1,[RefNo],'-')+1,[RefNo],'-')-1) AS code,
                          CLng(Right([RefNo],Len(Left([RefNo],InStr(InStr(1,[RefNo],'-')+1,[RefNo],'-')-1))-3)) AS [counter]
                         FROM tblSampling";
-            db.CreateQueryDef("qry_tempResetRefNo1", sql);
+                db.CreateQueryDef("qry_tempResetRefNo1", sql);
 
-            sql = @"SELECT qry_tempResetRefNo1.code,
+                sql = @"SELECT qry_tempResetRefNo1.code,
                     Max(qry_tempResetRefNo1.counter) AS [max]
                     From qry_tempResetRefNo1
                     GROUP BY qry_tempResetRefNo1.code";
-            db.CreateQueryDef("qry_tempResetRefNo2", sql);
+                db.CreateQueryDef("qry_tempResetRefNo2", sql);
 
-            sql = "Delete * from tblRefCodeCounter";
-            db.Execute(sql);
+                sql = "Delete * from tblRefCodeCounter";
+                db.Execute(sql);
 
-            sql = @"INSERT INTO tblRefCodeCounter ( GearRefCode, [Counter] )
+                sql = @"INSERT INTO tblRefCodeCounter ( GearRefCode, [Counter] )
                     SELECT qry_tempResetRefNo2.code, [Max]+1 AS countermax
                     FROM qry_tempResetRefNo2";
-            db.Execute(sql);
+                db.Execute(sql);
 
-            db.QueryDefs.Delete("qry_tempResetRefNo1");
-            db.QueryDefs.Delete("qry_tempResetRefNo2");
+                db.QueryDefs.Delete("qry_tempResetRefNo1");
+                db.QueryDefs.Delete("qry_tempResetRefNo2");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex);
+                return false;
+            }
         }
 
         public static Dictionary<string, VariationCode> VariationCodes

@@ -32,6 +32,18 @@ namespace FAD3
         private ShapefileLabelHandler _sfLabelHandler;
         private PointLayerSymbologyHandler _sfSymbologyHandler;
 
+        private bool _tilesVisible = false;
+
+        public bool TilesVisible
+        {
+            get { return _tilesVisible; }
+            set
+            {
+                _tilesVisible = value;
+                _axmap.Tiles.Visible = _tilesVisible;
+            }
+        }
+
         public ColorSchemes LayerColors;
 
         public event EventHandler MapRedrawNeeded;

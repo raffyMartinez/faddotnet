@@ -468,6 +468,12 @@ namespace FAD3
         {
             switch (e.ClickedItem.Name)
             {
+                case "buttonTileVisibility":
+
+                    _mapLayersHandler.TilesVisible = ((ToolStripButton)e.ClickedItem).Checked;
+                    _mapLayersHandler.MapControl.Redraw();
+                    break;
+
                 case "buttonLegend":
                     MapLegendForm mlf = MapLegendForm.GetInstance(MapLayers);
                     if (mlf.Visible)

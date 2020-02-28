@@ -41,6 +41,49 @@ namespace FAD3
             GetAccessories();
         }
 
+        public static bool DeleteGearCode(string gearCode)
+        {
+            bool success = true;
+            using (OleDbConnection conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                var sql = $"Delete * from tblRefGearCodes where RefGearCode='{gearCode}'";
+                using (OleDbCommand update = new OleDbCommand(sql, conn))
+                {
+                    try
+                    {
+                        success = update.ExecuteNonQuery() > 0;
+                    }
+                    catch (OleDbException oleEx)
+                    {
+                        success = false;
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogError(ex);
+                        success = false;
+                    }
+                }
+            }
+            return success;
+        }
+
+        public static int GearCodeUsageCount(string gearCode)
+        {
+            int samplingCount = 0;
+            using (var conn = new OleDbConnection(global.ConnectionString))
+            {
+                conn.Open();
+                var sql = $"SELECT Count(RefNo) AS n FROM tblSampling WHERE RefNo Like '*-{gearCode}-*'";
+
+                using (OleDbCommand getCount = new OleDbCommand(sql, conn))
+                {
+                    samplingCount = (int)getCount.ExecuteScalar();
+                }
+            }
+            return samplingCount;
+        }
+
         public static int GearVariationCount()
         {
             int count = 0;

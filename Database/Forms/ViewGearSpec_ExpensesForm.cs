@@ -9,6 +9,11 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using FAD3.Database.Classes;
 
+/// <summary>
+/// Provides a read-only view of the expenses and fishing gear specifications of a sampled fish landing
+/// </summary>
+///
+
 namespace FAD3.Database.Forms
 {
     public partial class ViewGearSpec_ExpensesForm : Form

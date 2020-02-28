@@ -183,15 +183,12 @@ namespace FAD3
                         IdType = Identification.Scientific;
                         if (dr["Identification"].ToString() == "Local names") IdType = Identification.LocalName;
 
+                        CatchCount = null;
                         if (dr["ct"].ToString().Length > 0)
                         {
                             if (int.TryParse(dr["ct"].ToString(), out int myCount))
                             {
                                 CatchCount = myCount;
-                            }
-                            else
-                            {
-                                CatchCount = null;
                             }
                         }
 

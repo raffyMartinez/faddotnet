@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.960
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "FADUpdaterJan29_2019", "FADUpdaterJan29_2019\FADUpdaterJan29_2019.vdproj", "{BE6977C8-8A17-459D-9182-F260A51FBA29}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Default = Debug|Default
+		Release|Default = Release|Default
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BE6977C8-8A17-459D-9182-F260A51FBA29}.Debug|Default.ActiveCfg = Debug
+		{BE6977C8-8A17-459D-9182-F260A51FBA29}.Debug|Default.Build.0 = Debug
+		{BE6977C8-8A17-459D-9182-F260A51FBA29}.Release|Default.ActiveCfg = Release
+		{BE6977C8-8A17-459D-9182-F260A51FBA29}.Release|Default.Build.0 = Release
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7A06312C-65D9-44E8-A67B-F4DA21FB3F6E}
+	EndGlobalSection
+EndGlobal

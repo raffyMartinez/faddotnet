@@ -697,7 +697,10 @@ namespace FAD3
             _samplings = _parentForm.Samplings;
             _samplings.OnUIRowRead += new Samplings.ReadUIElement(OnUIRowRead);
             panelUI.SuspendLayout();
+
             _samplings.ReadUIFromXML();
+            //the form's field contents are filled up after ReadUIFromXML()
+
             AdustControlsPosition();
             panelUI.ResumeLayout();
 
@@ -712,6 +715,7 @@ namespace FAD3
                 var result = OperatingExpenses.ReadData(SamplingGUID);
                 _hasExpenseData = result.success;
                 _txtExpenses.Text = OperatingExpenses.SamplingExpenses;
+                panelUI.Controls["btnVesselDimension"].Enabled = panelUI.Controls["comboTypeOfVesselUsed"].Text == "Motorized" || panelUI.Controls["comboTypeOfVesselUsed"].Text == "Non-Motorized";
             }
 
             SetFieldsVisible();
@@ -1646,6 +1650,14 @@ namespace FAD3
                         panelUI.Controls["comboFishingGear"].Text = "";
                         _gearVarGuid = "";
                         _gearVarName = "";
+                        break;
+
+                    case "comboTypeOfVesselUsed":
+                        panelUI.Controls["btnVesselDimension"].Enabled = panelUI.Controls["comboTypeOfVesselUsed"].Text == "Motorized" || panelUI.Controls["comboTypeOfVesselUsed"].Text == "Non-Motorized";
+                        if (!panelUI.Controls["btnVesselDimension"].Enabled)
+                        {
+                            panelUI.Controls["textVesselDimension"].Text = "";
+                        }
                         break;
                 }
             }
