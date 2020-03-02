@@ -41,6 +41,7 @@
             this.txtGearSpecs.Location = new System.Drawing.Point(-1, 59);
             this.txtGearSpecs.Multiline = true;
             this.txtGearSpecs.Name = "txtGearSpecs";
+            this.txtGearSpecs.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.txtGearSpecs.Size = new System.Drawing.Size(303, 154);
             this.txtGearSpecs.TabIndex = 0;
             // 
@@ -67,6 +68,7 @@
             this.txtExpenses.Location = new System.Drawing.Point(-1, 253);
             this.txtExpenses.Multiline = true;
             this.txtExpenses.Name = "txtExpenses";
+            this.txtExpenses.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.txtExpenses.Size = new System.Drawing.Size(303, 154);
             this.txtExpenses.TabIndex = 2;
             // 

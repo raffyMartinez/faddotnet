@@ -87,13 +87,11 @@
             this.statusBar.Padding = new System.Windows.Forms.Padding(1, 0, 12, 0);
             this.statusBar.Size = new System.Drawing.Size(347, 22);
             this.statusBar.TabIndex = 4;
-            this.statusBar.Text = "statusStrip1";
             // 
             // panelTip
             // 
             this.panelTip.Name = "panelTip";
-            this.panelTip.Size = new System.Drawing.Size(131, 17);
-            this.panelTip.Text = "toolStripStatusLabel1";
+            this.panelTip.Size = new System.Drawing.Size(0, 17);
             // 
             // SampledGear_SpecsForm
             // 

@@ -144,7 +144,7 @@ namespace FAD3.Database.Classes
                                             '{item.Value.ExpenseItem}',
                                             {item.Value.ItemCost.ToString()},
                                             '{item.Value.Unit}',
-                                            {item.Value.UnitQuantity.ToString()})";
+                                            {(item.Value.UnitQuantity == null ? "Null" : item.Value.UnitQuantity.ToString())})";
                             using (OleDbCommand update1 = new OleDbCommand(sql, con))
                             {
                                 update1.ExecuteNonQuery();
@@ -249,7 +249,11 @@ namespace FAD3.Database.Classes
                                 string item = dr["ExpenseItem"].ToString();
                                 double cost = (double)dr["Cost"];
                                 string unit = dr["Unit"].ToString();
-                                double unitQuantity = (double)dr["UnitQuantity"];
+                                double? unitQuantity = null;
+                                if (double.TryParse(dr["UnitQuantity"].ToString(), out double v))
+                                {
+                                    unitQuantity = v;
+                                }
                                 FishingExpenseItemsPerOperation expenseItem = new FishingExpenseItemsPerOperation(key, item, cost, unit, unitQuantity, fad3DataStatus.statusFromDB);
                                 SamplingExpenses += $"{item}: {cost.ToString()}\r\n";
                                 exp.AddExpenseItem(key, expenseItem);

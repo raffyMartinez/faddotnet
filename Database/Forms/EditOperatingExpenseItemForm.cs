@@ -16,7 +16,7 @@ namespace FAD3.Database.Forms
         public string ExpenseItem { get; set; }
         public double ItemCost { get; set; }
         public string Unit { get; set; }
-        public double UnitQuantity { get; set; }
+        public double? UnitQuantity { get; set; }
         private FishingOperationCostsForm _parent;
 
         public EditOperatingExpenseItemForm(FishingOperationCostsForm parentForm)
@@ -38,16 +38,21 @@ namespace FAD3.Database.Forms
             switch (((Button)sender).Name)
             {
                 case "btnOk":
-                    if (txtCost.Text.Length > 0
-                        && cboSelection.Text.Length > 0
-                        && cboUnit.Text.Length > 0
-                        && txtUnitQuantity.Text.Length > 0)
+                    //if (txtCost.Text.Length > 0
+                    //    && cboSelection.Text.Length > 0
+                    //    && cboUnit.Text.Length > 0
+                    //    && txtUnitQuantity.Text.Length > 0)
+                    if (txtCost.Text.Length > 0 && cboSelection.Text.Length > 0)
 
                     {
                         ExpenseItem = cboSelection.Text;
                         ItemCost = double.Parse(txtCost.Text);
                         Unit = cboUnit.Text;
-                        UnitQuantity = double.Parse(txtUnitQuantity.Text);
+                        //UnitQuantity = double.Parse(txtUnitQuantity.Text);
+                        if (double.TryParse(txtUnitQuantity.Text, out double v))
+                        {
+                            UnitQuantity = v;
+                        }
                         DialogResult = DialogResult.OK;
                     }
                     else

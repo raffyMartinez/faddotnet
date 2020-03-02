@@ -191,12 +191,13 @@ namespace FAD3
         /// </summary>
         private void FillFields()
         {
-            if (ManageGearSpecsClass.HasSampledGearSpecs || ManageGearSpecsClass.HasUnsavedSampledGearSpecEdits)
+            if (ManageGearSpecsClass.SampledGearSpecs.Keys.Count > 0
+                && (ManageGearSpecsClass.HasSampledGearSpecs || ManageGearSpecsClass.HasUnsavedSampledGearSpecEdits))
             {
                 foreach (Control c in panelUI.Controls)
                 {
-                    if ((c.GetType().Name == "TextBox" || c.GetType().Name == "ComboBox") &&
-                         ManageGearSpecsClass.SampledGearSpecs.Keys.Contains(c.Name))
+                    if ((c.GetType().Name == "TextBox" || c.GetType().Name == "ComboBox")
+                        && ManageGearSpecsClass.SampledGearSpecs.Keys.Contains(c.Name))
                     {
                         var spec = ManageGearSpecsClass.SampledGearSpecs[c.Name];
                         c.Text = spec.SpecificationValue;
@@ -339,6 +340,13 @@ namespace FAD3
             }
             else
             {
+                foreach (Control c in panelUI.Controls)
+                {
+                    if (c.GetType().Name == "TextBox" && c.Text.Length > 0)
+                    {
+                    }
+                }
+
                 foreach (KeyValuePair<string, ManageGearSpecsClass.SampledGearSpecData> kv in ManageGearSpecsClass.SampledGearSpecs)
                 {
                     _sampledGearSpecDataIsEdited = panelUI.Controls[kv.Value.SpecificationGuid].Text != kv.Value.SpecificationValue;
@@ -353,30 +361,30 @@ namespace FAD3
         private void PreSaveSampledGearSpecs()
         {
             //test if data is edited
-            TestForEdits();
+            //TestForEdits();
 
-            if (_sampledGearSpecDataIsEdited)
+            //if (_sampledGearSpecDataIsEdited)
+            //{
+            ManageGearSpecsClass.SetSampledGearSpecsForPreSave();
+            foreach (Control c in panelUI.Controls)
             {
-                ManageGearSpecsClass.SetSampledGearSpecsForPreSave();
-                foreach (Control c in panelUI.Controls)
+                var spec = new ManageGearSpecsClass.SampledGearSpecData();
+                if (c.GetType().Name == "TextBox" || c.GetType().Name == "ComboBox")
                 {
-                    var spec = new ManageGearSpecsClass.SampledGearSpecData();
-                    if (c.GetType().Name == "TextBox" || c.GetType().Name == "ComboBox")
-                    {
-                        var arr = c.Tag.ToString().Split('|');
-                        if (_isNew) spec.RowID = Guid.NewGuid().ToString();
-                        spec.SpecificationGuid = c.Name;
-                        spec.SpecificationValue = c.Text;
-                        spec.SpecificationName = ManageGearSpecsClass.SpecNameFromSpecGUID(spec.SpecificationGuid);
-                        var ds = fad3DataStatus.statusFromDB;
-                        if (Enum.TryParse(arr[1], out ds)) spec.DataStatus = ds;
-                        spec.SamplingGuid = _samplingGUID;
+                    var arr = c.Tag.ToString().Split('|');
+                    if (_isNew) spec.RowID = Guid.NewGuid().ToString();
+                    spec.SpecificationGuid = c.Name;
+                    spec.SpecificationValue = c.Text;
+                    spec.SpecificationName = ManageGearSpecsClass.SpecNameFromSpecGUID(spec.SpecificationGuid);
+                    var ds = fad3DataStatus.statusFromDB;
+                    if (Enum.TryParse(arr[1], out ds)) spec.DataStatus = ds;
+                    spec.SamplingGuid = _samplingGUID;
 
-                        ManageGearSpecsClass.SampledGearSpecs.Add(spec.SpecificationGuid, spec);
-                    }
+                    ManageGearSpecsClass.SampledGearSpecs.Add(spec.SpecificationGuid, spec);
                 }
-                _parent_form.SampledGearSpecIsEdited = true;
             }
+            _parent_form.SampledGearSpecIsEdited = true;
+            //}
         }
 
         private void Onbutton_Click(object sender, EventArgs e)

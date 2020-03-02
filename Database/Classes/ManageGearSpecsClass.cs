@@ -36,10 +36,10 @@ namespace FAD3
                 _samplingGuid = value;
 
                 //get the specs of the sampled gear from the database
-                if (!_HasUnsavedSampledGearSpecEdits && _GearSpecifications.Count > 0)
-                    //if a gear has a specs template then we get the sampled gear specs
-                    //GetSampledGearSpecs will fill the _SampledGearSpecs Dictionary
-                    GetSampledGearSpecs();
+                //if (!_HasUnsavedSampledGearSpecEdits && _GearSpecifications.Count > 0)
+                //if a gear has a specs template then we get the sampled gear specs
+                //GetSampledGearSpecs will fill the _SampledGearSpecs Dictionary
+                GetSampledGearSpecs();
             }
         }
 
@@ -135,27 +135,25 @@ namespace FAD3
             get { return _GearSpecifications; }
         }
 
-        /// <summary>
-        /// save the specs of the gear that was sampled
-        /// </summary>
-        public static bool SaveSampledGearSpecs(string samplingGuid)
+        public static bool SaveSampledGearSpecsEx(string samplingGuid)
         {
-            if (_samplingGuid.Length == 0)
-            {
-                _samplingGuid = samplingGuid;
-            }
-
+            var saveSuccessCount = 0;
+            var deleteCount = 0;
+            string sql = "";
             using (var con = new OleDbConnection(global.ConnectionString))
             {
                 con.Open();
-                var sql = "";
-                var success = false;
-                bool[] saveSuccess = new bool[_SampledGearSpecs.Count];
-                var n = 0;
+                sql = $"Delete * from tblSampledGearSpec where SamplingGUID = {{{samplingGuid}}}";
+
+                using (OleDbCommand update = new OleDbCommand(sql, con))
+                {
+                    deleteCount = update.ExecuteNonQuery();
+                }
+
                 foreach (KeyValuePair<string, SampledGearSpecData> kv in _SampledGearSpecs)
                 {
                     sql = "";
-                    if (kv.Value.DataStatus == fad3DataStatus.statusNew)
+                    if (kv.Value.SpecificationValue.Length > 0)
                     {
                         sql = $@"Insert into tblSampledGearSpec (RowID, SamplingGUID, SpecID, [Value]) values (
                                 '{kv.Value.RowID}',
@@ -163,56 +161,32 @@ namespace FAD3
                                 '{kv.Value.SpecificationGuid}',
                                 '{kv.Value.SpecificationValue}')";
                     }
-                    else if (kv.Value.DataStatus == fad3DataStatus.statusEdited)
-                    {
-                        sql = $@"Update tblSampledGearSpec set
-                            [Value] = '{kv.Value.SpecificationValue}' where
-                            SamplingGUID = {{{kv.Value.SamplingGuid}}} and
-                            SpecID = {{{kv.Value.SpecificationGuid}}}";
-                    }
-                    else if (kv.Value.DataStatus == fad3DataStatus.statusForDeletion)
-                    {
-                        sql = $"Delete * from tblSampleGearSpec where RowID = {{{kv.Value.RowID}}}";
-                    }
 
                     if (sql.Length > 0)
+                    {
                         using (OleDbCommand update = new OleDbCommand(sql, con))
                         {
                             try
                             {
-                                success = (update.ExecuteNonQuery() > 0);
+                                if (update.ExecuteNonQuery() > 0)
+                                {
+                                    saveSuccessCount++;
+                                }
                             }
-                            catch (OleDbException)
+                            catch (OleDbException oex)
                             {
-                                success = false;
+                                Logger.LogError(oex.Message, oex.StackTrace);
                             }
                             catch (Exception ex)
                             {
                                 Logger.LogError(ex.Message, ex.StackTrace);
-                                success = false;
                             }
-                            //TODO: what to do if Success=false?
-
-                            saveSuccess[n] = success;
-                            sql = "";
                         }
-                    n++;
-                }
-
-                //If all specs were successfully saved then set flag to false
-                _HasUnsavedSampledGearSpecEdits = false;
-                for (int i = 0; i < saveSuccess.Length - 1; i++)
-                {
-                    if (!saveSuccess[i])
-                    {
-                        _HasUnsavedSampledGearSpecEdits = true;
-                        break;
                     }
                 }
             }
 
-            //return true if there are no unsaved edits
-            return !_HasUnsavedSampledGearSpecEdits;
+            return deleteCount > 0 || saveSuccessCount > 0 || SampledGearSpecs.Count == 0;
         }
 
         /// <summary>

@@ -79,7 +79,8 @@ namespace FAD3.Database.Forms
 
         private bool ValidateForm()
         {
-            return cboExpenseItem.Text.Length > 0 && cboSource.Text.Length > 0 && txtCost.Text.Length > 0;
+            //return cboExpenseItem.Text.Length > 0 && cboSource.Text.Length > 0 && txtCost.Text.Length > 0;
+            return cboExpenseItem.Text.Length > 0 && txtCost.Text.Length > 0;
         }
 
         private void OnButtonClick(object sender, EventArgs e)
@@ -145,6 +146,7 @@ namespace FAD3.Database.Forms
                                         Gears.AddPaymentSource(s);
                                         break;
                                 }
+                                cbo.Items.Add(s);
                             }
                             else
                             {

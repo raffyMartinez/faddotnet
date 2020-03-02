@@ -593,6 +593,7 @@ namespace FAD3
 
                         case "OperatingExpenses":
                             _txtExpenses = (TextBox)ctl;
+                            _txtExpenses.ScrollBars = ScrollBars.Both;
                             break;
 
                         case "Engine":
@@ -958,7 +959,7 @@ namespace FAD3
 
             if (_samplings.UpdateEffort(_editedSampling))
             {
-                return ManageGearSpecsClass.SaveSampledGearSpecs(_samplingGUID);
+                return ManageGearSpecsClass.SaveSampledGearSpecsEx(_samplingGUID);
             }
             else
             {
@@ -1239,12 +1240,9 @@ namespace FAD3
                     {
                         if (SaveEdits())
                         {
-                            if (ExpensePerOperation != null)
+                            if (ExpensePerOperation != null && OperatingExpenses.Update(ExpensePerOperation))
                             {
-                                if (OperatingExpenses.Update(ExpensePerOperation))
-                                {
-                                    _txtExpenses.Text = OperatingExpenses.SamplingExpenses;
-                                }
+                                _txtExpenses.Text = OperatingExpenses.SamplingExpenses;
                             }
                             _samplings.OnUIRowRead -= new Samplings.ReadUIElement(OnUIRowRead);
                             if (IsNew)
@@ -1583,6 +1581,15 @@ namespace FAD3
                         {
                             panelUI.Controls["textVesselDimension"].Text = "";
                         }
+
+                        if (panelUI.Controls["comboTypeOfVesselUsed"].Text != "Motorized")
+                        {
+                            panelUI.Controls["textEngineHorsepower"].Text = "";
+                            panelUI.Controls["comboEngine"].Text = "";
+                        }
+                        panelUI.Controls["textEngineHorsepower"].Enabled = panelUI.Controls["comboTypeOfVesselUsed"].Text == "Motorized";
+                        panelUI.Controls["comboEngine"].Enabled = panelUI.Controls["comboTypeOfVesselUsed"].Text == "Motorized";
+
                         break;
                 }
             }

@@ -45,7 +45,7 @@ namespace FAD3
         private Samplings _samplings;// =  new sampling();
         private string _samplingGUID = "";
         private string _samplingMonth = "";
-        private double _weightOfCatch;
+        private double? _weightOfCatch;
         private double? _weightOfSample;
         private int _statusPanelWidth = 200;
         private bool _subListExisting = false;
@@ -925,6 +925,8 @@ namespace FAD3
             _updatedEffortMonth.SamplingDate = e.SamplingDate;
             _updatedEffortMonth.GearVariationGuid = e.GearVarGuid;
             _updatedEffortMonth.LandingSiteGuid = e.LandingSiteGuid;
+            _weightOfCatch = e.CatchWeight;
+            _weightOfSample = e.SampleWeight;
         }
 
         private void OnGenerateGridMapToolStripMenuItem_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
@@ -1524,7 +1526,7 @@ namespace FAD3
 
         private void ShowCatchCompositionForm(bool IsNew = false)
         {
-            CatchCompositionForm ccf = new CatchCompositionForm(IsNew, this, _samplingGUID, _referenceNumber, _weightOfCatch, _weightOfSample);
+            CatchCompositionForm ccf = new CatchCompositionForm(IsNew, this, _samplingGUID, _referenceNumber, (double)_weightOfCatch, _weightOfSample);
             ccf.ShowDialog(this);
         }
 
@@ -3291,21 +3293,29 @@ namespace FAD3
                     {
                         if (kv.Value.FromTotalCatch)
                         {
-                            computedWeight = kv.Value.CatchWeight;
-                            if (kv.Value.CatchCount == null)
+                            if (_weightOfSample == null)
                             {
-                                computedCount = (int)((kv.Value.CatchWeight / kv.Value.CatchSubsampleWt) * kv.Value.CatchSubsampleCount);
+                                //from total and not a sub samle
+                                computedWeight = kv.Value.CatchWeight;
+                                if (kv.Value.CatchCount == null)
+                                {
+                                    computedCount = (int)((kv.Value.CatchWeight / kv.Value.CatchSubsampleWt) * kv.Value.CatchSubsampleCount);
+                                }
+                                else
+                                {
+                                    computedCount = (int)kv.Value.CatchCount;
+                                }
                             }
                             else
                             {
-                                computedCount = (int)kv.Value.CatchCount;
+                                //from total and is a sub sample
                             }
                         }
                         else
                         {
                             if (_weightOfSample != null)
                             {
-                                computedWeight = (_weightOfCatch / (double)_weightOfSample) * kv.Value.CatchWeight;
+                                computedWeight = ((double)_weightOfCatch / (double)_weightOfSample) * kv.Value.CatchWeight;
                                 if (kv.Value.CatchCount == null)
                                 {
                                     computedCount = (int)((kv.Value.CatchWeight / kv.Value.CatchSubsampleWt) * kv.Value.CatchSubsampleCount);
@@ -3314,6 +3324,9 @@ namespace FAD3
                                 {
                                     computedCount = (int)((_weightOfCatch / (double)_weightOfSample) * kv.Value.CatchCount);
                                 }
+                            }
+                            else
+                            {
                             }
                         }
 
@@ -3424,6 +3437,9 @@ namespace FAD3
                 //_samplings.SamplingGUID = SamplingGUID;
                 _samplings.CatchAndEffortOfSampling(samplingGUID);
                 var sampling = _samplings.SamplingsForMonth[samplingGUID];
+
+                _weightOfCatch = sampling.CatchWeight;
+                _weightOfSample = sampling.SampleWeight;
 
                 //the array splits the dictionary item from the name [0] and its guid [1]
                 //we make the guid the tag of the listitem
@@ -3610,10 +3626,22 @@ namespace FAD3
 
         private void ShowLFForm(bool IsNew = false)
         {
+            int itemCount = 0;
+            if (_lvCatch.SelectedItems[0].SubItems[3].Text.Length == 0)
+            {
+                int itemsubCount = int.Parse(_lvCatch.SelectedItems[0].SubItems[5].Text);
+                double itemSubWeight = double.Parse(_lvCatch.SelectedItems[0].SubItems[4].Text);
+                double itemWt = double.Parse(_lvCatch.SelectedItems[0].SubItems[2].Text);
+                itemCount = (int)(itemWt / itemSubWeight) * itemsubCount;
+            }
+            else
+            {
+                itemCount = int.Parse(_lvCatch.SelectedItems[3].SubItems[1].Text);
+            }
             LengthFreqForm lff = new LengthFreqForm(IsNew, _samplings,
                                       _lvCatch.SelectedItems[0].Name,
                                       _lvCatch.SelectedItems[0].SubItems[1].Text,
-                                      int.Parse(_lvCatch.SelectedItems[0].SubItems[3].Text),
+                                      itemCount,
                                       this);
 
             lff.ShowDialog(this);

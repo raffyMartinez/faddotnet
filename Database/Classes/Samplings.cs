@@ -1605,6 +1605,8 @@ namespace FAD3
                     if (OnEffortUpdated != null)
                     {
                         EffortEventArg e = new EffortEventArg(sampling.SamplingDateTime.Date, sampling.GearVariationGuid, sampling.LandingSiteGuid);
+                        e.CatchWeight = sampling.CatchWeight;
+                        e.SampleWeight = sampling.SampleWeight;
                         OnEffortUpdated(this, e);
                     }
                 }
@@ -1713,7 +1715,7 @@ namespace FAD3
                             NoHauls = {(sampling.NumberOfHauls == null ? "Null" : sampling.NumberOfHauls.ToString())},
                             NoFishers = {(sampling.NumberOfFishers == null ? "Null" : sampling.NumberOfFishers.ToString())},
                             Engine ='{(sampling.FishingVessel == null ? "" : sampling.FishingVessel.Engine)}',
-                            hp = {(sampling.FishingVessel == null ? "Null" : sampling.FishingVessel.EngineHorsepower.ToString())},
+                            hp = {(sampling.FishingVessel == null ? "Null" : sampling.FishingVessel.EngineHorsepower == null ? "Null" : sampling.FishingVessel.EngineHorsepower.ToString())},
                             WtCatch ={sampling.CatchWeight.ToString()},
                             WtSample ={(sampling.SampleWeight == null ? "Null" : sampling.SampleWeight.ToString())},
                             len ={(sampling.FishingVessel.Length == null ? "Null" : sampling.FishingVessel.Length.ToString())},
@@ -1780,6 +1782,8 @@ namespace FAD3
                         if (OnEffortUpdated != null)
                         {
                             EffortEventArg e = new EffortEventArg(sampling.SamplingDateTime.Date, sampling.GearVariationGuid, sampling.LandingSiteGuid);
+                            e.CatchWeight = sampling.CatchWeight;
+                            e.SampleWeight = sampling.SampleWeight;
                             OnEffortUpdated(this, e);
                         }
 
@@ -1845,7 +1849,17 @@ namespace FAD3
                             )";
                     using (OleDbCommand update = new OleDbCommand(sql, conn))
                     {
-                        update.ExecuteNonQuery();
+                        try
+                        {
+                            update.ExecuteNonQuery();
+                        }
+                        catch (OleDbException)
+                        {
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.LogError(ex);
+                        }
                     }
                 }
             }

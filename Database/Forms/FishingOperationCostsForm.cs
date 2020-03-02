@@ -73,7 +73,12 @@ namespace FAD3.Database.Forms
             ExpensePerOperation exp = new ExpensePerOperation(_samplingGUID, operatingCost, roi, incomeSales, weightConsumed, dataStatus);
             foreach (ListViewItem lvi in lvExpenseItems.Items)
             {
-                FishingExpenseItemsPerOperation fpe = new FishingExpenseItemsPerOperation(lvi.Name, lvi.Text, double.Parse(lvi.SubItems[1].Text), lvi.SubItems[2].Text, double.Parse(lvi.SubItems[3].Text), _dataStatus);
+                double? noOfUnits = null;
+                if (double.TryParse(lvi.SubItems[3].Text, out double v))
+                {
+                    noOfUnits = v;
+                }
+                FishingExpenseItemsPerOperation fpe = new FishingExpenseItemsPerOperation(lvi.Name, lvi.Text, double.Parse(lvi.SubItems[1].Text), lvi.SubItems[2].Text, noOfUnits, _dataStatus);
                 exp.AddExpenseItem(lvi.Name, fpe);
             }
 
@@ -183,7 +188,7 @@ namespace FAD3.Database.Forms
             }
         }
 
-        public void AddNewExpenseLine(string expenseItem, double cost, string unit, double unitQuantity)
+        public void AddNewExpenseLine(string expenseItem, double cost, string unit, double? unitQuantity)
         {
             var lvi = lvExpenseItems.Items.Add(Guid.NewGuid().ToString(), expenseItem, null);
             lvi.SubItems.Add(cost.ToString());
