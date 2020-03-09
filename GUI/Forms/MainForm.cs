@@ -3308,7 +3308,9 @@ namespace FAD3
                             }
                             else
                             {
-                                //from total and is a sub sample
+                                //from total
+                                computedWeight = kv.Value.CatchWeight;
+                                computedCount = (int)kv.Value.CatchCount;
                             }
                         }
                         else
@@ -3318,7 +3320,7 @@ namespace FAD3
                                 computedWeight = ((double)_weightOfCatch / (double)_weightOfSample) * kv.Value.CatchWeight;
                                 if (kv.Value.CatchCount == null)
                                 {
-                                    computedCount = (int)((kv.Value.CatchWeight / kv.Value.CatchSubsampleWt) * kv.Value.CatchSubsampleCount);
+                                    computedCount = (int)((kv.Value.CatchWeight / kv.Value.CatchSubsampleWt) * kv.Value.CatchSubsampleCount) * (int)((double)_weightOfCatch / (double)_weightOfSample);
                                 }
                                 else
                                 {
@@ -3636,7 +3638,7 @@ namespace FAD3
             }
             else
             {
-                itemCount = int.Parse(_lvCatch.SelectedItems[3].SubItems[1].Text);
+                itemCount = int.Parse(_lvCatch.SelectedItems[0].SubItems[3].Text);
             }
             LengthFreqForm lff = new LengthFreqForm(IsNew, _samplings,
                                       _lvCatch.SelectedItems[0].Name,

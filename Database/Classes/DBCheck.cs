@@ -24,13 +24,13 @@ namespace FAD3
 
             foreach (TableDef td in dbData.TableDefs)
             {
-                if (td.Name.Substring(0, 4) != "MSys" && td.Name.Substring(0, 5) != "temp_")
+                if (td.Name.Length > 4 && td.Name.Substring(0, 4) != "MSys" && td.Name.Substring(0, 5) != "temp_")
                     TableList.Add(td.Name);
             }
 
             foreach (TableDef tdTemplate in dbTemplate.TableDefs)
             {
-                if (tdTemplate.Name.Substring(0, 4) != "MSys" && tdTemplate.Name.Substring(0, 5) != "temp_")
+                if (tdTemplate.Name.Length > 4 && tdTemplate.Name.Substring(0, 4) != "MSys" && tdTemplate.Name.Substring(0, 5) != "temp_")
                 {
                     tdName = tdTemplate.Name;
                     if (!TableList.Contains(tdTemplate.Name))

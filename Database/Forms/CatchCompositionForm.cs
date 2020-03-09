@@ -53,6 +53,8 @@ namespace FAD3
         private double _sumOfWeight;
         private double? _weightOfSample;
 
+        public Sampling Sampling { get; set; }
+
         private string _emptySumOfWeightsLabel;
         private Dictionary<string, int> _textRowDict = new Dictionary<string, int>();
 
@@ -363,6 +365,10 @@ namespace FAD3
                 if (!isNew)
                 {
                     o.Checked = catchLine.FromTotalCatch;
+                }
+                else
+                {
+                    o.Checked = _weightOfSample == null;
                 }
                 o.CheckStateChanged += OnCheckBoxCheckStateChanged;
             });
